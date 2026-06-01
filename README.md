@@ -25,6 +25,8 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - `bun run lint` - run ESLint
 - `bun run format` - format the project with Prettier
 - `bun run test:run` - run the Vitest suite once
+- `bun run changeset` - create a versioning note for the next release
+- `bun run version:packages` - apply pending changesets and update versions
 - `bun run generate:bindings` - refresh TypeScript bindings generated from Rust commands
 - `bun run check:rust` - run rustfmt, clippy, and cargo check
 
@@ -36,3 +38,4 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - Tauri Specta bindings generated into `src/bindings.ts`
 - Husky, lint-staged, and commitlint
 - GitHub Actions CI for frontend and Rust checks
+- Changesets, Dependabot, and release workflow scaffolding
