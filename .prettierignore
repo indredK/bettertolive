@@ -1,0 +1,7 @@
+dist
+coverage
+node_modules
+src-tauri/gen
+src-tauri/target
+src/bindings.ts
+src/routeTree.gen.ts

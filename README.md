@@ -1,7 +1,38 @@
-# Tauri + React + Typescript
+# bettertolive
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and Bun.
 
-## Recommended IDE Setup
+## Stack
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- Tauri 2
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS 4
+- Bun
+
+## Requirements
+
+- Bun 1.3+
+- Rust stable toolchain
+- Tauri system prerequisites for your OS
+
+## Scripts
+
+- `bun run dev` - start the Vite dev server
+- `bun run start` - start the Tauri desktop app in development
+- `bun run build` - run TypeScript checks and build the frontend
+- `bun run lint` - run ESLint
+- `bun run format` - format the project with Prettier
+- `bun run test:run` - run the Vitest suite once
+- `bun run generate:bindings` - refresh TypeScript bindings generated from Rust commands
+- `bun run check:rust` - run rustfmt, clippy, and cargo check
+
+## Quality Gates
+
+- ESLint with TypeScript, React Hooks, and TanStack rules
+- Prettier with Tailwind class sorting
+- Vitest with Testing Library and happy-dom
+- Tauri Specta bindings generated into `src/bindings.ts`
+- Husky, lint-staged, and commitlint
+- GitHub Actions CI for frontend and Rust checks
