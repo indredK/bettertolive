@@ -1,3 +1,4 @@
 #!/usr/bin/env sh
 
-bunx lint-staged --no-stash
+bun run fix:precommit
+bun run check:precommit

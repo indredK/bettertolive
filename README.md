@@ -24,6 +24,8 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - `bun run build` - run TypeScript checks and build the frontend
 - `bun run lint` - run ESLint
 - `bun run format` - format the project with Prettier
+- `bun run fix:precommit` - auto-fix staged files before the strict commit gate
+- `bun run check:precommit` - run the full strict pre-commit gate
 - `bun run test:run` - run the Vitest suite once
 - `bun run analyze:bundle` - build with a bundle report in analyze mode
 - `bun run changeset` - create a versioning note for the next release
