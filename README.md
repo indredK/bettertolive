@@ -39,6 +39,6 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - Prettier with Tailwind class sorting
 - Vitest with Testing Library and happy-dom
 - Tauri Specta bindings generated into `src/bindings.ts`
-- Husky, lint-staged, and commitlint
+- Husky, strict pre-commit scripts, and commitlint
 - GitHub Actions CI for frontend and Rust checks
 - Changesets, Dependabot, and release workflow scaffolding

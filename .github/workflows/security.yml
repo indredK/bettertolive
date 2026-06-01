@@ -32,4 +32,5 @@ jobs:
         run: cargo audit --manifest-path src-tauri/Cargo.toml
 
       - name: Check Rust advisories and licenses
+        working-directory: src-tauri
         run: cargo deny check advisories licenses bans sources

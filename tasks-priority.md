@@ -8,7 +8,7 @@
 - [x] TanStack Router ESLint 规则
 - [x] TanStack Query ESLint 规则
 - [x] Husky
-- [x] `lint-staged`
+- [ ] `lint-staged`
 - [x] `commitlint`
 - [x] 提交规范
 - [x] Vitest

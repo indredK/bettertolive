@@ -1,4 +1,6 @@
 #!/usr/bin/env sh
 
+set -e
+
 bun run fix:precommit
 bun run check:precommit
