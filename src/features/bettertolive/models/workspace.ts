@@ -43,18 +43,75 @@ export type TransactionEntry = {
   note: string
 }
 
-export type ShoppingItem = {
+export type ShoppingSpotlight = {
   id: string
   title: string
-  note: string
-  price: string
+  stage: string
+  summary: string
+  reason: string
+  attention: string[]
 }
 
-export type ShoppingColumn = {
+export type ShoppingOwnedItem = {
+  id: string
+  name: string
+  category: string
+  space: string
+  quantity: number
+  status: string
+  replacementCue: string
+  note: string
+}
+
+export type ShoppingNeedLevel = "最低配置" | "必要" | "改善体验" | "提升幸福感"
+
+export type ShoppingPlanItem = {
+  id: string
+  name: string
+  category: string
+  stage: string
+  space: string
+  necessity: ShoppingNeedLevel
+  reason: string
+  targetLifestyle: string
+  currentPrice: number
+  buyBelowPrice: number
+  overpayPrice: number
+  note: string
+  tags: string[]
+}
+
+export type ShoppingPurchaseLane = {
   id: string
   title: string
   subtitle: string
-  items: ShoppingItem[]
+  items: ShoppingPlanItem[]
+}
+
+export type ShoppingStageChecklist = {
+  id: string
+  title: string
+  description: string
+  focus: string
+  minimum: string[]
+  essentials: string[]
+  upgrades: string[]
+}
+
+export type ShoppingPriceReference = {
+  id: string
+  category: string
+  entryPrice: number
+  sweetSpotPrice: number
+  overpayPrice: number
+  note: string
+}
+
+export type ShoppingLifestyleCollection = {
+  id: string
+  title: string
+  description: string
+  items: string[]
 }
 
 export type RecentRecordKind = "反思" | "记事" | "支出" | "收入" | "蓝图"
@@ -161,7 +218,12 @@ export type FinanceModuleData = {
 }
 
 export type ShoppingModuleData = {
-  columns: ShoppingColumn[]
+  spotlights: ShoppingSpotlight[]
+  ownedItems: ShoppingOwnedItem[]
+  purchaseLanes: ShoppingPurchaseLane[]
+  stageChecklists: ShoppingStageChecklist[]
+  priceReferences: ShoppingPriceReference[]
+  lifestyleCollections: ShoppingLifestyleCollection[]
 }
 
 export type BeliefsModuleData = BeliefProfile

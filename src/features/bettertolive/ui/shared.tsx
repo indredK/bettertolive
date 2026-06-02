@@ -31,9 +31,6 @@ const KIND_BADGE_STYLES: Record<RecentRecord["kind"], string> = {
 }
 
 export function PageIntro({
-  eyebrow,
-  title,
-  description,
   searchQuery,
 }: {
   eyebrow: string
@@ -41,29 +38,17 @@ export function PageIntro({
   description: string
   searchQuery: string
 }) {
-  return (
-    <div className="flex flex-col gap-3 min-[1240px]:flex-row min-[1240px]:items-end min-[1240px]:justify-between">
-      <div className="max-w-3xl">
-        <div className="text-xs tracking-[0.22em] text-[color:var(--text-muted)] uppercase">
-          {eyebrow}
-        </div>
-        <h3 className="mt-2 text-[1.7rem] leading-tight font-semibold tracking-tight text-[color:var(--text-primary)]">
-          {title}
-        </h3>
-        <p className="mt-3 text-sm leading-7 text-[color:var(--text-muted)]">
-          {description}
-        </p>
-      </div>
+  if (searchQuery.trim().length === 0) {
+    return null
+  }
 
-      {searchQuery.trim().length > 0 ? (
-        <Badge
-          variant="outline"
-          className="w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-        >
-          当前筛选：{searchQuery.trim()}
-        </Badge>
-      ) : null}
-    </div>
+  return (
+    <Badge
+      variant="outline"
+      className="w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+    >
+      当前筛选：{searchQuery.trim()}
+    </Badge>
   )
 }
 

@@ -106,15 +106,15 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
     lines: [
       {
         label: "记录",
-        text: "把想买、待买、已买分开，保留决策来路。",
+        text: "把已有物品、采购决策、阶段清单和价格感放到一起看。",
       },
       {
         label: "适合",
-        text: "适合整理零散需求，或区分冲动与必要时。",
+        text: "适合整理生活缺口，判断什么该补、什么该等、什么先别买时。",
       },
       {
         label: "目的",
-        text: "让日常选择可回看，也更容易看出重点。",
+        text: "让物品真正服务生活，而不是只堆成更多待买项。",
       },
     ],
   },

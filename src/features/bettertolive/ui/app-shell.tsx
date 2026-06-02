@@ -301,7 +301,7 @@ export function BetterToLiveAppShell() {
       case "shopping":
         return (
           <ShoppingPage
-            columns={viewModel.shoppingColumns}
+            shopping={viewModel.shoppingModule}
             visibleCount={viewModel.visibleShoppingCount}
             searchQuery={searchQuery}
           />

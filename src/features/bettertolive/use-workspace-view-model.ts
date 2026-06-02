@@ -1,6 +1,68 @@
 import { useCallback, useMemo } from "react"
 
-import type { WorkspaceSnapshot } from "@/features/bettertolive/models/workspace"
+import type {
+  ShoppingLifestyleCollection,
+  ShoppingStageChecklist,
+  WorkspaceSnapshot,
+} from "@/features/bettertolive/models/workspace"
+
+function filterChecklistByQuery(
+  checklist: ShoppingStageChecklist,
+  hasQuery: boolean,
+  matchesQuery: (...values: Array<string | number | undefined>) => boolean,
+) {
+  if (!hasQuery) {
+    return checklist
+  }
+
+  if (matchesQuery(checklist.title, checklist.description, checklist.focus)) {
+    return checklist
+  }
+
+  const minimum = checklist.minimum.filter((entry) => matchesQuery(entry))
+  const essentials = checklist.essentials.filter((entry) => matchesQuery(entry))
+  const upgrades = checklist.upgrades.filter((entry) => matchesQuery(entry))
+
+  if (
+    minimum.length === 0 &&
+    essentials.length === 0 &&
+    upgrades.length === 0
+  ) {
+    return null
+  }
+
+  return {
+    ...checklist,
+    minimum,
+    essentials,
+    upgrades,
+  }
+}
+
+function filterCollectionByQuery(
+  collection: ShoppingLifestyleCollection,
+  hasQuery: boolean,
+  matchesQuery: (...values: Array<string | number | undefined>) => boolean,
+) {
+  if (!hasQuery) {
+    return collection
+  }
+
+  if (matchesQuery(collection.title, collection.description)) {
+    return collection
+  }
+
+  const items = collection.items.filter((entry) => matchesQuery(entry))
+
+  if (items.length === 0) {
+    return null
+  }
+
+  return {
+    ...collection,
+    items,
+  }
+}
 
 export function useWorkspaceViewModel({
   searchQuery,
@@ -52,15 +114,79 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.finance.entries],
   )
 
-  const shoppingColumns = useMemo(
-    () =>
-      workspace.shopping.columns.map((column) => ({
-        ...column,
-        items: column.items.filter((item) =>
-          matchesQuery(item.title, item.note, item.price, column.title),
+  const shoppingModule = useMemo(
+    () => ({
+      ...workspace.shopping,
+      spotlights: workspace.shopping.spotlights.filter((entry) =>
+        matchesQuery(
+          entry.title,
+          entry.stage,
+          entry.summary,
+          entry.reason,
+          ...entry.attention,
+        ),
+      ),
+      ownedItems: workspace.shopping.ownedItems.filter((entry) =>
+        matchesQuery(
+          entry.name,
+          entry.category,
+          entry.space,
+          entry.status,
+          entry.replacementCue,
+          entry.note,
+          entry.quantity,
+        ),
+      ),
+      purchaseLanes: workspace.shopping.purchaseLanes.map((lane) => ({
+        ...lane,
+        items: lane.items.filter((entry) =>
+          matchesQuery(
+            lane.title,
+            lane.subtitle,
+            entry.name,
+            entry.category,
+            entry.stage,
+            entry.space,
+            entry.necessity,
+            entry.reason,
+            entry.targetLifestyle,
+            entry.currentPrice,
+            entry.buyBelowPrice,
+            entry.overpayPrice,
+            entry.note,
+            ...entry.tags,
+          ),
         ),
       })),
-    [matchesQuery, workspace.shopping.columns],
+      stageChecklists: workspace.shopping.stageChecklists
+        .map((entry) =>
+          filterChecklistByQuery(
+            entry,
+            normalizedQuery.length > 0,
+            matchesQuery,
+          ),
+        )
+        .filter((entry) => entry !== null),
+      priceReferences: workspace.shopping.priceReferences.filter((entry) =>
+        matchesQuery(
+          entry.category,
+          entry.entryPrice,
+          entry.sweetSpotPrice,
+          entry.overpayPrice,
+          entry.note,
+        ),
+      ),
+      lifestyleCollections: workspace.shopping.lifestyleCollections
+        .map((entry) =>
+          filterCollectionByQuery(
+            entry,
+            normalizedQuery.length > 0,
+            matchesQuery,
+          ),
+        )
+        .filter((entry) => entry !== null),
+    }),
+    [matchesQuery, normalizedQuery.length, workspace.shopping],
   )
 
   const recentRecords = useMemo(
@@ -154,7 +280,7 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.future.milestones],
   )
 
-  const visibleShoppingCount = shoppingColumns.reduce(
+  const visibleShoppingCount = shoppingModule.purchaseLanes.reduce(
     (count, column) => count + column.items.length,
     0,
   )
@@ -194,7 +320,7 @@ export function useWorkspaceViewModel({
     reflections,
     relationshipCircles,
     relationshipPatterns,
-    shoppingColumns,
+    shoppingModule,
     transactions,
     visibleExpenseTotal,
     visibleGrowthTraceCount,

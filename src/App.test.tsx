@@ -29,7 +29,6 @@ describe("App", () => {
       screen.getByRole("heading", { name: "BetterToLive" }),
     ).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "总览" })).toBeInTheDocument()
-    expect(screen.getByText("先看全局，再决定从哪里开始")).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /快速记录/ })).toBeInTheDocument()
     expect(screen.getByTestId("sidebar-nav-scroll")).toBeInTheDocument()
     expect(screen.getByTestId("sidebar-preview-bottom")).toBeInTheDocument()
@@ -183,13 +182,30 @@ describe("App", () => {
     expect(
       screen.getByRole("heading", { name: "成长环境" }),
     ).toBeInTheDocument()
-    expect(
-      screen.getByRole("heading", { name: "看见自己是怎样形成的" }),
-    ).toBeInTheDocument()
     expect(screen.getByText("成长说明")).toBeInTheDocument()
     expect(
       screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。"),
     ).toBeInTheDocument()
+  })
+
+  it("switches to the shopping view with planning and stage data", () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByTestId("nav-shopping"))
+
+    expect(
+      screen.getByRole("heading", { name: "购物清单" }),
+    ).toBeInTheDocument()
+    expect(screen.getByText("购物说明")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("tab", { name: "采购决策" }))
+    expect(screen.getByText("立即补齐")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("tab", { name: "阶段清单" }))
+    expect(screen.getByText("搬家最低配置")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("tab", { name: "理想生活" }))
+    expect(screen.getByText("送礼可以考虑什么")).toBeInTheDocument()
   })
 
   it("collapses the sidebar into an icon rail", async () => {
@@ -283,7 +299,7 @@ describe("App", () => {
     fireEvent.click(screen.getByText("前往成长页"))
 
     expect(
-      screen.getByRole("heading", { name: "看见自己是怎样形成的" }),
+      screen.getByRole("heading", { name: "成长环境" }),
     ).toBeInTheDocument()
   })
 
