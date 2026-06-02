@@ -1,10 +1,14 @@
 import {
+  HeartPulse,
+  LibraryBig,
   BookOpenText,
   CalendarDays,
   Compass,
   Lightbulb,
   NotebookPen,
   Route,
+  ScrollText,
+  ShieldAlert,
   Sparkles,
   Target,
   Users2,
@@ -37,10 +41,16 @@ export function OverviewPage({
   events,
   transactions,
   recentRecords,
+  emotionCheckInCount,
+  emotionTrendCount,
+  crisisStepCount,
   beliefCount,
   principleCount,
   relationshipCount,
   growthCount,
+  memoryCount,
+  legacyDirectiveCount,
+  legacyLetterCount,
   shoppingCount,
   futureMilestoneCount,
   onNavigate,
@@ -52,10 +62,16 @@ export function OverviewPage({
   events: EventEntry[]
   transactions: TransactionEntry[]
   recentRecords: RecentRecord[]
+  emotionCheckInCount: number
+  emotionTrendCount: number
+  crisisStepCount: number
   beliefCount: number
   principleCount: number
   relationshipCount: number
   growthCount: number
+  memoryCount: number
+  legacyDirectiveCount: number
+  legacyLetterCount: number
   shoppingCount: number
   futureMilestoneCount: number
   onNavigate: (view: AppView) => void
@@ -76,24 +92,36 @@ export function OverviewPage({
 
       <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.92fr)]">
         <div className="space-y-4">
-          <div className="grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4">
+          <div className="grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-3">
             <SummarySurface
               tone="value"
               title="形成"
-              value={`${growthCount} 段线索`}
-              detail={`${relationshipCount} 个关键关系和 ${principleCount} 条原则正在解释你为什么会这样。`}
+              value={`${growthCount + memoryCount} 段线索`}
+              detail={`${relationshipCount} 个关键关系、${principleCount} 条原则和 ${memoryCount} 个记忆节点正在解释你为什么会这样。`}
             />
             <SummarySurface
               tone="past"
               title="过去"
-              value={`${reflections.length} 条反思`}
-              detail={`${events.length} 条记事留下了最近的生活轨迹。`}
+              value={`${reflections.length + events.length} 条记录`}
+              detail={`${events.length} 条记事和 ${memoryCount} 个记忆节点正在补全你的来路。`}
             />
             <SummarySurface
               tone="present"
               title="现在"
               value={MONEY_FORMATTER.format(expenseTotal)}
-              detail={`${shoppingCount} 个购物条目正在反映最近的现实选择。`}
+              detail={`${shoppingCount} 个购物条目和 ${emotionCheckInCount} 条情绪记录一起反映最近生活。`}
+            />
+            <SummarySurface
+              tone="present"
+              title="内在状态"
+              value={`${emotionTrendCount} 段波动`}
+              detail={`${crisisStepCount} 条危机支持步骤，让低谷时也能知道下一步。`}
+            />
+            <SummarySurface
+              tone="future"
+              title="生命整理"
+              value={`${legacyLetterCount} 条留言`}
+              detail={`${legacyDirectiveCount} 项重要交代正在把重要的话和托付安放下来。`}
             />
             <SummarySurface
               tone="future"
@@ -136,14 +164,19 @@ export function OverviewPage({
                     "反思、记事、记账、购物，负责承接你现在到底在怎么生活。",
                 },
                 {
-                  title: "自我图谱",
+                  title: "内在状态",
                   detail:
-                    "观念、原则、关系、成长，负责解释你为什么会变成现在这样的人。",
+                    "情绪情感和危机支持，负责承接最近的心理波动，以及状态很差时该怎么撑住自己。",
                 },
                 {
-                  title: "未来方向",
+                  title: "自我图谱",
                   detail:
-                    "未来蓝图负责把理想自我、理想生活和阶段路径放到前面。",
+                    "观念、原则、关系深化、成长、记忆节点，负责解释你为什么会变成现在这样的人。",
+                },
+                {
+                  title: "生命整理与未来",
+                  detail:
+                    "生命整理负责安放重要的话和托付，未来蓝图负责把理想自我和阶段路径放到前面。",
                 },
               ].map((entry) => (
                 <div
@@ -205,6 +238,18 @@ export function OverviewPage({
                 onClick={() => onNavigate("finance")}
               />
               <QuickActionButton
+                icon={HeartPulse}
+                label="看情绪波动"
+                description="把最近的心理天气和触发因素放到同一页里看。"
+                onClick={() => onNavigate("emotion")}
+              />
+              <QuickActionButton
+                icon={ShieldAlert}
+                label="打开危机支持"
+                description="状态很差的时候，先知道下一步该做什么。"
+                onClick={() => onNavigate("crisis")}
+              />
+              <QuickActionButton
                 icon={Compass}
                 label="补未来方向"
                 description="把理想自我和生活方式说得更清楚。"
@@ -218,9 +263,21 @@ export function OverviewPage({
               />
               <QuickActionButton
                 icon={Users2}
-                label="看关系与成长"
-                description="从关系和成长环境回头理解今天的自己。"
-                onClick={() => onNavigate("growth")}
+                label="看关系深化"
+                description="把重要人物、关系模式和没说出口的话放到一起。"
+                onClick={() => onNavigate("relationships")}
+              />
+              <QuickActionButton
+                icon={LibraryBig}
+                label="回看人生记忆"
+                description="把人生节点、地点和物件背后的记忆重新连起来。"
+                onClick={() => onNavigate("memory")}
+              />
+              <QuickActionButton
+                icon={ScrollText}
+                label="整理重要托付"
+                description="把留给未来的话、牵挂和交代先安放好。"
+                onClick={() => onNavigate("legacy")}
               />
             </div>
 
@@ -230,7 +287,7 @@ export function OverviewPage({
                 当前重点
               </div>
               <p className="mt-2">
-                先把页面逻辑和基础展示搭清楚，再决定录入细节和后续的数据结构。
+                先把新增模块都接进同一张桌子上，保证能看、能切换、能带着基础数据一起成立。
               </p>
             </div>
           </Surface>

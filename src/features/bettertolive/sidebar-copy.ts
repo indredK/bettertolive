@@ -118,6 +118,40 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       },
     ],
   },
+  emotion: {
+    heading: "情绪说明",
+    lines: [
+      {
+        label: "观察",
+        text: "把波动、触发因素和恢复方式放到一起看，不只记录心情。",
+      },
+      {
+        label: "适合",
+        text: "适合最近状态不稳、想知道自己为什么这样时。",
+      },
+      {
+        label: "目的",
+        text: "让模糊的内在感受慢慢出现结构和节律。",
+      },
+    ],
+  },
+  crisis: {
+    heading: "危机说明",
+    lines: [
+      {
+        label: "支撑",
+        text: "状态很差时，先不要分析太多，先知道下一步该做什么。",
+      },
+      {
+        label: "适合",
+        text: "适合明显失衡、想躲起来、或已经不知道怎么继续时。",
+      },
+      {
+        label: "目的",
+        text: "把预警信号、联系人和应急步骤提前准备好。",
+      },
+    ],
+  },
   beliefs: {
     heading: "观念说明",
     lines: [
@@ -153,11 +187,11 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
     ],
   },
   relationships: {
-    heading: "关系说明",
+    heading: "关系深化说明",
     lines: [
       {
         label: "看见",
-        text: "把重要的人、关系状态和你的感受放回一张图里。",
+        text: "把重要的人、关系事件、未说出口的话和你的感受放回一张图里。",
       },
       {
         label: "适合",
@@ -165,7 +199,7 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       },
       {
         label: "目的",
-        text: "不只记得情绪，也看见关系结构本身。",
+        text: "不只记得情绪，也看见关系模式和反复出现的反应。",
       },
     ],
   },
@@ -183,6 +217,40 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       {
         label: "目的",
         text: "理解形成过程，是为了慢慢松开旧惯性。",
+      },
+    ],
+  },
+  memory: {
+    heading: "记忆说明",
+    lines: [
+      {
+        label: "回看",
+        text: "把人生节点、地点、物件和照片背后的记忆重新整理出来。",
+      },
+      {
+        label: "适合",
+        text: "适合你知道某些过去还在影响现在，但还没真正看清它们时。",
+      },
+      {
+        label: "目的",
+        text: "让过去不只是散在脑子里，而能成为可理解的人生线索。",
+      },
+    ],
+  },
+  legacy: {
+    heading: "生命整理说明",
+    lines: [
+      {
+        label: "安放",
+        text: "把重要交代、留给某人的话和未完成的牵挂安放下来。",
+      },
+      {
+        label: "适合",
+        text: "适合想留下重要表达、整理托付或回看此生在意什么的时候。",
+      },
+      {
+        label: "目的",
+        text: "让重要的话不只留在脑子里，也不必被迫一次说完。",
       },
     ],
   },

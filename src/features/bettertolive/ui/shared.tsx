@@ -3,8 +3,11 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   BookOpenText,
+  BookHeart,
   Compass,
+  HeartPulse,
   NotebookPen,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react"
 
@@ -28,6 +31,9 @@ const KIND_BADGE_STYLES: Record<RecentRecord["kind"], string> = {
   支出: "bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]",
   收入: "bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
   蓝图: "bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]",
+  情绪: "bg-[color:var(--tone-present-border)] text-[color:var(--tone-present-ink)]",
+  记忆: "bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
+  托付: "bg-[color:var(--tone-future-border)] text-[color:var(--tone-future-ink)]",
 }
 
 export function PageIntro({
@@ -250,6 +256,13 @@ function RecordIcon({ kind }: { kind: RecentRecord["kind"] }) {
     case "支出":
       return <ArrowDownLeft className="size-4" />
     case "蓝图":
+      return <Compass className="size-4" />
+    case "情绪":
+      return <HeartPulse className="size-4" />
+    case "记忆":
+      return <BookHeart className="size-4" />
+    case "托付":
+      return <ScrollText className="size-4" />
     default:
       return <Compass className="size-4" />
   }

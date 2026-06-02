@@ -3,10 +3,14 @@ import { createLiveBetterToLiveApi } from "@/features/bettertolive/api/live/live
 import { createMockBetterToLiveApi } from "@/features/bettertolive/api/mock/mock-bettertolive-api"
 import type {
   BeliefsModuleData,
+  CrisisWorkspaceModuleData,
+  EmotionWorkspaceModuleData,
   EventsModuleData,
   FinanceModuleData,
   FutureModuleData,
   GrowthModuleData,
+  LegacyWorkspaceModuleData,
+  MemoryWorkspaceModuleData,
   OverviewModuleData,
   PrinciplesModuleData,
   ReflectionModuleData,
@@ -21,10 +25,14 @@ export type BetterToLiveApi = {
   getEvents: () => Promise<EventsModuleData>
   getFinance: () => Promise<FinanceModuleData>
   getShopping: () => Promise<ShoppingModuleData>
+  getEmotion: () => Promise<EmotionWorkspaceModuleData>
+  getCrisis: () => Promise<CrisisWorkspaceModuleData>
   getBeliefs: () => Promise<BeliefsModuleData>
   getPrinciples: () => Promise<PrinciplesModuleData>
   getRelationships: () => Promise<RelationshipsModuleData>
   getGrowth: () => Promise<GrowthModuleData>
+  getMemory: () => Promise<MemoryWorkspaceModuleData>
+  getLegacy: () => Promise<LegacyWorkspaceModuleData>
   getFuture: () => Promise<FutureModuleData>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>
 }

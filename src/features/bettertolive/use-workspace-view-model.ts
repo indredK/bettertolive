@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react"
 
 import type {
+  EmotionTriggerGroup,
   ShoppingLifestyleCollection,
   ShoppingStageChecklist,
   WorkspaceSnapshot,
@@ -61,6 +62,31 @@ function filterCollectionByQuery(
   return {
     ...collection,
     items,
+  }
+}
+
+function filterEmotionTriggerByQuery(
+  group: EmotionTriggerGroup,
+  hasQuery: boolean,
+  matchesQuery: (...values: Array<string | number | undefined>) => boolean,
+) {
+  if (!hasQuery) {
+    return group
+  }
+
+  if (matchesQuery(group.title, group.summary)) {
+    return group
+  }
+
+  const cues = group.cues.filter((entry) => matchesQuery(entry))
+
+  if (cues.length === 0) {
+    return null
+  }
+
+  return {
+    ...group,
+    cues,
   }
 }
 
@@ -189,6 +215,77 @@ export function useWorkspaceViewModel({
     [matchesQuery, normalizedQuery.length, workspace.shopping],
   )
 
+  const emotionCheckIns = useMemo(
+    () =>
+      workspace.emotion.checkIns.filter((entry) =>
+        matchesQuery(
+          entry.date,
+          entry.summary,
+          entry.state,
+          entry.intensity,
+          entry.bodySignal,
+          ...entry.tags,
+        ),
+      ),
+    [matchesQuery, workspace.emotion.checkIns],
+  )
+
+  const emotionTrend = useMemo(
+    () =>
+      workspace.emotion.trend.filter((entry) =>
+        matchesQuery(entry.label, entry.score, entry.note),
+      ),
+    [matchesQuery, workspace.emotion.trend],
+  )
+
+  const emotionTriggers = useMemo(
+    () =>
+      workspace.emotion.triggers
+        .map((entry) =>
+          filterEmotionTriggerByQuery(
+            entry,
+            normalizedQuery.length > 0,
+            matchesQuery,
+          ),
+        )
+        .filter((entry) => entry !== null),
+    [matchesQuery, normalizedQuery.length, workspace.emotion.triggers],
+  )
+
+  const emotionTools = useMemo(
+    () =>
+      workspace.emotion.tools.filter((entry) =>
+        matchesQuery(entry.title, entry.description, entry.when),
+      ),
+    [matchesQuery, workspace.emotion.tools],
+  )
+
+  const crisisWarningSigns = useMemo(
+    () => workspace.crisis.warningSigns.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.crisis.warningSigns],
+  )
+
+  const crisisContacts = useMemo(
+    () =>
+      workspace.crisis.contacts.filter((entry) =>
+        matchesQuery(entry.name, entry.role, entry.when, entry.script),
+      ),
+    [matchesQuery, workspace.crisis.contacts],
+  )
+
+  const crisisSteps = useMemo(
+    () =>
+      workspace.crisis.steps.filter((entry) =>
+        matchesQuery(entry.title, entry.description),
+      ),
+    [matchesQuery, workspace.crisis.steps],
+  )
+
+  const crisisReviewNotes = useMemo(
+    () => workspace.crisis.reviewNotes.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.crisis.reviewNotes],
+  )
+
   const recentRecords = useMemo(
     () =>
       workspace.overview.recentRecords.filter((entry) =>
@@ -241,6 +338,8 @@ export function useWorkspaceViewModel({
             entry.role,
             entry.influence,
             entry.currentState,
+            entry.emotionalTone,
+            entry.unspokenLine,
           ),
         ),
       })),
@@ -251,6 +350,22 @@ export function useWorkspaceViewModel({
     () =>
       workspace.relationships.patterns.filter((entry) => matchesQuery(entry)),
     [matchesQuery, workspace.relationships.patterns],
+  )
+
+  const relationshipMoments = useMemo(
+    () =>
+      workspace.relationships.moments.filter((entry) =>
+        matchesQuery(entry.person, entry.title, entry.impact),
+      ),
+    [matchesQuery, workspace.relationships.moments],
+  )
+
+  const relationshipUnsentNotes = useMemo(
+    () =>
+      workspace.relationships.unsentNotes.filter((entry) =>
+        matchesQuery(entry.to, entry.theme, entry.excerpt),
+      ),
+    [matchesQuery, workspace.relationships.unsentNotes],
   )
 
   const growthStages = useMemo(
@@ -270,6 +385,70 @@ export function useWorkspaceViewModel({
   const growthThreads = useMemo(
     () => workspace.growth.threads.filter((entry) => matchesQuery(entry)),
     [matchesQuery, workspace.growth.threads],
+  )
+
+  const memoryNodes = useMemo(
+    () =>
+      workspace.memory.nodes.filter((entry) =>
+        matchesQuery(
+          entry.period,
+          entry.title,
+          entry.summary,
+          entry.impact,
+          ...entry.tags,
+        ),
+      ),
+    [matchesQuery, workspace.memory.nodes],
+  )
+
+  const memoryAnchors = useMemo(
+    () =>
+      workspace.memory.anchors.filter((entry) =>
+        matchesQuery(entry.type, entry.label, entry.note),
+      ),
+    [matchesQuery, workspace.memory.anchors],
+  )
+
+  const memoryReviewPrompts = useMemo(
+    () => workspace.memory.reviewPrompts.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.memory.reviewPrompts],
+  )
+
+  const legacyDirectives = useMemo(
+    () =>
+      workspace.legacy.directives.filter((entry) =>
+        matchesQuery(entry.title, entry.detail),
+      ),
+    [matchesQuery, workspace.legacy.directives],
+  )
+
+  const legacyLetters = useMemo(
+    () =>
+      workspace.legacy.letters.filter((entry) =>
+        matchesQuery(entry.to, entry.theme, entry.excerpt),
+      ),
+    [matchesQuery, workspace.legacy.letters],
+  )
+
+  const legacyWishes = useMemo(
+    () =>
+      workspace.legacy.wishes.filter((entry) =>
+        matchesQuery(entry.title, entry.detail),
+      ),
+    [matchesQuery, workspace.legacy.wishes],
+  )
+
+  const legacyPreferences = useMemo(
+    () =>
+      workspace.legacy.preferences.filter((entry) =>
+        matchesQuery(entry.label, entry.note),
+      ),
+    [matchesQuery, workspace.legacy.preferences],
+  )
+
+  const legacyLifeReview = useMemo(
+    () => workspace.legacy.lifeReview.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.legacy.lifeReview],
   )
 
   const milestones = useMemo(
@@ -306,12 +485,29 @@ export function useWorkspaceViewModel({
   return {
     beliefCards,
     beliefQuestions,
+    crisisContacts,
+    crisisCurrentState: workspace.crisis.currentState,
+    crisisReviewNotes,
+    crisisSteps,
+    crisisWarningSigns,
     dailyPulse: workspace.overview.dailyPulse,
+    emotionCheckIns,
+    emotionTools,
+    emotionTrend,
+    emotionTriggers,
     events,
     futureBlueprint: workspace.future,
     greeting: workspace.overview.greeting,
     growthStages,
     growthThreads,
+    legacyDirectives,
+    legacyLetters,
+    legacyLifeReview,
+    legacyPreferences,
+    legacyWishes,
+    memoryAnchors,
+    memoryNodes,
+    memoryReviewPrompts,
     milestones,
     principleBoundaries,
     principles,
@@ -319,7 +515,9 @@ export function useWorkspaceViewModel({
     reflectionDraftExample: workspace.reflection.draftExample,
     reflections,
     relationshipCircles,
+    relationshipMoments,
     relationshipPatterns,
+    relationshipUnsentNotes,
     shoppingModule,
     transactions,
     visibleExpenseTotal,

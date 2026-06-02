@@ -37,6 +37,8 @@ describe("App", () => {
     expect(screen.getByText("总览说明")).toBeInTheDocument()
     expect(screen.getByTestId("nav-beliefs")).toBeInTheDocument()
     expect(screen.getByTestId("nav-growth")).toBeInTheDocument()
+    expect(screen.getByTestId("nav-emotion")).toBeInTheDocument()
+    expect(screen.getByTestId("nav-legacy")).toBeInTheDocument()
   })
 
   it("switches to the compact rail layout between 960px and 1240px", () => {
@@ -186,6 +188,32 @@ describe("App", () => {
     expect(
       screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。"),
     ).toBeInTheDocument()
+  })
+
+  it("switches to the emotion view with trend and support data", () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByTestId("nav-emotion"))
+
+    expect(
+      screen.getByRole("heading", { name: "情绪情感" }),
+    ).toBeInTheDocument()
+    expect(screen.getByText("情绪说明")).toBeInTheDocument()
+    expect(screen.getByText("最近波动")).toBeInTheDocument()
+    expect(screen.getByText("恢复工具箱")).toBeInTheDocument()
+  })
+
+  it("switches to the legacy view with letters and directives", () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByTestId("nav-legacy"))
+
+    expect(
+      screen.getByRole("heading", { name: "生命整理" }),
+    ).toBeInTheDocument()
+    expect(screen.getByText("生命整理说明")).toBeInTheDocument()
+    expect(screen.getByText("重要交代与留给某人的话")).toBeInTheDocument()
+    expect(screen.getByText("未来的自己")).toBeInTheDocument()
   })
 
   it("switches to the shopping view with planning and stage data", () => {

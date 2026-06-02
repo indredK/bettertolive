@@ -3,7 +3,9 @@ import {
   BookOpenText,
   CalendarDays,
   Compass,
+  HeartPulse,
   LayoutDashboard,
+  LibraryBig,
   Lightbulb,
   ListTodo,
   NotebookPen,
@@ -11,6 +13,8 @@ import {
   RefreshCcw,
   Scale,
   Search,
+  ScrollText,
+  ShieldAlert,
   Sparkles,
   Sprout,
   Users2,
@@ -40,7 +44,11 @@ import { EventsPage } from "@/features/bettertolive/ui/events-page"
 import { FinancePage } from "@/features/bettertolive/ui/finance-page"
 import { FuturePage } from "@/features/bettertolive/ui/future-page"
 import { BeliefsPage } from "@/features/bettertolive/ui/beliefs-page"
+import { CrisisPage } from "@/features/bettertolive/ui/crisis-page"
+import { EmotionPage } from "@/features/bettertolive/ui/emotion-page"
 import { GrowthPage } from "@/features/bettertolive/ui/growth-page"
+import { LegacyPage } from "@/features/bettertolive/ui/legacy-page"
+import { MemoryPage } from "@/features/bettertolive/ui/memory-page"
 import { NotificationLayer } from "@/features/bettertolive/ui/notification-layer"
 import { OverviewPage } from "@/features/bettertolive/ui/overview-page"
 import { PrinciplesPage } from "@/features/bettertolive/ui/principles-page"
@@ -124,6 +132,23 @@ const NAV_SECTIONS: Array<{
     ],
   },
   {
+    title: "内在状态",
+    items: [
+      {
+        view: "emotion",
+        label: "情绪情感",
+        hint: "波动、触发和恢复方式",
+        icon: HeartPulse,
+      },
+      {
+        view: "crisis",
+        label: "危机支持",
+        hint: "低谷时先做什么",
+        icon: ShieldAlert,
+      },
+    ],
+  },
+  {
     title: "自我图谱",
     items: [
       {
@@ -140,8 +165,8 @@ const NAV_SECTIONS: Array<{
       },
       {
         view: "relationships",
-        label: "关系",
-        hint: "朋友亲戚与同伴",
+        label: "关系深化",
+        hint: "重要人物、关系事件与模式",
         icon: Users2,
       },
       {
@@ -149,6 +174,23 @@ const NAV_SECTIONS: Array<{
         label: "成长",
         hint: "环境经历与形成原因",
         icon: Sprout,
+      },
+      {
+        view: "memory",
+        label: "记忆节点",
+        hint: "人生阶段与记忆锚点",
+        icon: LibraryBig,
+      },
+    ],
+  },
+  {
+    title: "生命整理",
+    items: [
+      {
+        view: "legacy",
+        label: "生命整理",
+        hint: "重要交代和留给未来的话",
+        icon: ScrollText,
       },
     ],
   },
@@ -308,6 +350,27 @@ export function BetterToLiveAppShell() {
             isWideLayout={isWideLayout}
           />
         )
+      case "emotion":
+        return (
+          <EmotionPage
+            checkIns={viewModel.emotionCheckIns}
+            trend={viewModel.emotionTrend}
+            triggers={viewModel.emotionTriggers}
+            tools={viewModel.emotionTools}
+            searchQuery={searchQuery}
+          />
+        )
+      case "crisis":
+        return (
+          <CrisisPage
+            currentState={viewModel.crisisCurrentState}
+            warningSigns={viewModel.crisisWarningSigns}
+            contacts={viewModel.crisisContacts}
+            steps={viewModel.crisisSteps}
+            reviewNotes={viewModel.crisisReviewNotes}
+            searchQuery={searchQuery}
+          />
+        )
       case "beliefs":
         return (
           <BeliefsPage
@@ -328,7 +391,9 @@ export function BetterToLiveAppShell() {
         return (
           <RelationshipsPage
             relationshipCircles={viewModel.relationshipCircles}
+            moments={viewModel.relationshipMoments}
             patterns={viewModel.relationshipPatterns}
+            unsentNotes={viewModel.relationshipUnsentNotes}
             visibleRelationshipCount={viewModel.visibleRelationshipCount}
             searchQuery={searchQuery}
           />
@@ -339,6 +404,26 @@ export function BetterToLiveAppShell() {
             stages={viewModel.growthStages}
             threads={viewModel.growthThreads}
             traceCount={viewModel.visibleGrowthTraceCount}
+            searchQuery={searchQuery}
+          />
+        )
+      case "memory":
+        return (
+          <MemoryPage
+            nodes={viewModel.memoryNodes}
+            anchors={viewModel.memoryAnchors}
+            reviewPrompts={viewModel.memoryReviewPrompts}
+            searchQuery={searchQuery}
+          />
+        )
+      case "legacy":
+        return (
+          <LegacyPage
+            directives={viewModel.legacyDirectives}
+            letters={viewModel.legacyLetters}
+            wishes={viewModel.legacyWishes}
+            preferences={viewModel.legacyPreferences}
+            lifeReview={viewModel.legacyLifeReview}
             searchQuery={searchQuery}
           />
         )
@@ -361,10 +446,16 @@ export function BetterToLiveAppShell() {
             greeting={viewModel.greeting}
             transactions={viewModel.transactions}
             recentRecords={viewModel.recentRecords}
+            emotionCheckInCount={viewModel.emotionCheckIns.length}
+            emotionTrendCount={viewModel.emotionTrend.length}
+            crisisStepCount={viewModel.crisisSteps.length}
             beliefCount={viewModel.beliefCards.length}
             principleCount={viewModel.principles.length}
             relationshipCount={viewModel.visibleRelationshipCount}
             growthCount={viewModel.growthStages.length}
+            memoryCount={viewModel.memoryNodes.length}
+            legacyDirectiveCount={viewModel.legacyDirectives.length}
+            legacyLetterCount={viewModel.legacyLetters.length}
             shoppingCount={viewModel.visibleShoppingCount}
             onNavigate={setActiveView}
             searchQuery={searchQuery}
