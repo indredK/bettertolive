@@ -12,6 +12,8 @@
     height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
   }
 
   body {
@@ -20,6 +22,7 @@
       "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    touch-action: pan-x pan-y;
     @apply bg-background text-foreground;
   }
   * {
@@ -140,4 +143,16 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
 }
