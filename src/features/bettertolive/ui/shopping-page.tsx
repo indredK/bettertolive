@@ -33,6 +33,7 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
   最低配置:
@@ -84,11 +85,36 @@ function formatPrice(amount: number) {
   return MONEY_FORMATTER.format(amount)
 }
 
-function ShoppingPriceRow({ label, value }: { label: string; value: string }) {
+function ShoppingPriceRow({
+  label,
+  value,
+  compact = false,
+}: {
+  label: string
+  value: string
+  compact?: boolean
+}) {
   return (
-    <div className="flex items-center justify-between gap-3 border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0">
-      <span className="text-xs text-[color:var(--text-muted)]">{label}</span>
-      <span className="text-sm font-medium text-[color:var(--text-primary)]">
+    <div
+      className={cn(
+        "flex items-center justify-between gap-3 border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0",
+        compact && "py-1.5",
+      )}
+    >
+      <span
+        className={cn(
+          "text-xs text-[color:var(--text-muted)]",
+          compact && "text-[11px]",
+        )}
+      >
+        {label}
+      </span>
+      <span
+        className={cn(
+          "text-sm font-medium text-[color:var(--text-primary)]",
+          compact && "text-[13px]",
+        )}
+      >
         {value}
       </span>
     </div>
@@ -115,14 +141,79 @@ function ChecklistBlock({ title, items }: { title: string; items: string[] }) {
   )
 }
 
+function SpotlightCompactCard({
+  spotlight,
+}: {
+  spotlight: ShoppingModuleData["spotlights"][number]
+}) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2.5">
+      <div className="flex flex-wrap items-start gap-1.5">
+        <h3 className="min-w-0 flex-1 text-[13px] font-medium text-[color:var(--text-primary)]">
+          {spotlight.title}
+        </h3>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        >
+          {spotlight.stage}
+        </Badge>
+      </div>
+      <p className="mt-1.5 text-[12px] leading-[1.1rem] text-[color:var(--text-secondary)]">
+        {spotlight.summary} {spotlight.reason}
+      </p>
+      <p className="mt-1 text-[11px] leading-[1.05rem] text-[color:var(--text-muted)]">
+        {spotlight.attention.join(" · ")}
+      </p>
+    </div>
+  )
+}
+
+function ImmediateNeedCompactCard({ item }: { item: ShoppingPlanItem }) {
+  const signal = getPriceSignal(item)
+
+  return (
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2.5">
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <h3 className="text-[13px] font-medium text-[color:var(--text-primary)]">
+            {item.name}
+          </h3>
+          <Badge
+            variant="outline"
+            className={cn("px-1.5", NEED_LEVEL_STYLES[item.necessity])}
+          >
+            {item.necessity}
+          </Badge>
+          <Badge variant="outline" className={cn("px-1.5", signal.className)}>
+            {signal.label}
+          </Badge>
+        </div>
+        <p className="mt-1 text-[12px] leading-[1.05rem] text-[color:var(--text-secondary)]">
+          {item.reason}
+        </p>
+      </div>
+      <div className="shrink-0 text-right text-[11px] leading-[1.05rem] text-[color:var(--text-muted)]">
+        <div className="text-[13px] font-semibold text-[color:var(--text-primary)]">
+          {formatPrice(item.currentPrice)}
+        </div>
+        <div className="mt-1">买 &lt;= {formatPrice(item.buyBelowPrice)}</div>
+        <div className="mt-0.5">贵 &gt;= {formatPrice(item.overpayPrice)}</div>
+      </div>
+    </div>
+  )
+}
+
 export function ShoppingPage({
   shopping,
   visibleCount,
   searchQuery,
+  isWideLayout = false,
 }: {
   shopping: ShoppingModuleData
   visibleCount: number
   searchQuery: string
+  isWideLayout?: boolean
 }) {
   const immediateItems =
     shopping.purchaseLanes.find((lane) => lane.id === "buy-now")?.items ?? []
@@ -137,7 +228,12 @@ export function ShoppingPage({
   )
 
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isWideLayout && "flex h-full flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="生活物品"
         title="让物品、阶段和理想生活放到同一张桌上"
@@ -145,209 +241,374 @@ export function ShoppingPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-2 min-[1440px]:grid-cols-4">
+      <div
+        className={cn(
+          "grid gap-4 min-[960px]:grid-cols-2 min-[1440px]:grid-cols-4",
+          isWideLayout && "shrink-0 gap-3",
+        )}
+      >
         <SummarySurface
           tone="value"
           title="当前关注"
           value={`${shopping.spotlights.length} 个主题`}
           detail="先看最近最容易被忽略但会持续影响生活质量的缺口。"
+          compact={isWideLayout}
         />
         <SummarySurface
           tone="present"
           title="已有物品"
           value={`${shopping.ownedItems.length} 项`}
           detail="不是只看买什么，也要看已有的东西是否真的撑得住生活。"
+          compact={isWideLayout}
         />
         <SummarySurface
           tone="future"
           title="采购决策"
           value={`${visibleCount} 条`}
           detail="把立即补齐、等好价和先不买明确分开，冲动会少很多。"
+          compact={isWideLayout}
         />
         <SummarySurface
           tone="past"
           title="阶段模板"
           value={`${shopping.stageChecklists.length} 份`}
           detail="搬家、租房、安家到自建房，关注点不该混在一起。"
+          compact={isWideLayout}
         />
       </div>
 
-      <Tabs defaultValue="overview" className="gap-4">
+      <Tabs
+        defaultValue="overview"
+        className={cn(
+          "gap-4",
+          isWideLayout && "min-h-0 flex-1 gap-3 overflow-hidden",
+        )}
+      >
         <TabsList
           variant="line"
-          className="flex w-full flex-wrap items-center gap-1 rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-1"
+          className={cn(
+            "flex w-full flex-wrap items-center gap-1 rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-1",
+            isWideLayout && "shrink-0 gap-0.5 p-0.5",
+          )}
         >
-          <TabsTrigger value="overview" className="px-3">
+          <TabsTrigger
+            value="overview"
+            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
+          >
             总览
           </TabsTrigger>
-          <TabsTrigger value="inventory" className="px-3">
+          <TabsTrigger
+            value="inventory"
+            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
+          >
             我的东西
           </TabsTrigger>
-          <TabsTrigger value="planning" className="px-3">
+          <TabsTrigger
+            value="planning"
+            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
+          >
             采购决策
           </TabsTrigger>
-          <TabsTrigger value="stages" className="px-3">
+          <TabsTrigger
+            value="stages"
+            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
+          >
             阶段清单
           </TabsTrigger>
-          <TabsTrigger value="lifestyle" className="px-3">
+          <TabsTrigger
+            value="lifestyle"
+            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
+          >
             理想生活
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
-            <Surface className="p-5">
-              <SectionHeading
-                icon={AlertTriangle}
-                title="现在最值得先看的缺口"
-                description="不是所有想买都该现在买，先看哪些事情已经开始影响现实生活。"
-              />
+        <TabsContent
+          value="overview"
+          className={cn(
+            "space-y-4",
+            isWideLayout && "min-h-0 flex-1 overflow-hidden",
+          )}
+        >
+          {isWideLayout ? (
+            <div className="grid h-full min-h-0 gap-3 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(320px,0.86fr)]">
+              <Surface className="flex h-full min-h-0 flex-col p-4">
+                <SectionHeading
+                  compact
+                  icon={AlertTriangle}
+                  title="现在最值得先看的缺口"
+                  description="先把已经在影响现实生活的缺口集中看清。"
+                />
 
-              <div className="mt-5 space-y-5">
-                {shopping.spotlights.length > 0 ? (
-                  shopping.spotlights.map((spotlight) => (
-                    <div
-                      key={spotlight.id}
-                      className="border-t border-[color:var(--muted-surface-border)] pt-5 first:border-t-0 first:pt-0"
-                    >
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-medium text-[color:var(--text-primary)]">
-                          {spotlight.title}
-                        </h3>
-                        <Badge
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                        >
-                          {spotlight.stage}
-                        </Badge>
+                <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+                  {shopping.spotlights.length > 0 ? (
+                    <div className="grid content-start gap-3 min-[1360px]:grid-cols-2">
+                      {shopping.spotlights.map((spotlight) => (
+                        <SpotlightCompactCard
+                          key={spotlight.id}
+                          spotlight={spotlight}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      message="当前筛选下没有需要关注的主题。"
+                      compact
+                    />
+                  )}
+                </div>
+              </Surface>
+
+              <div className="grid min-h-0 [grid-template-rows:minmax(0,1fr)_auto] gap-3">
+                <Surface className="flex min-h-0 flex-col p-4">
+                  <SectionHeading
+                    compact
+                    icon={ShoppingBasket}
+                    title="当前最需要补齐"
+                    description="已经足够接近真实缺口的东西。"
+                  />
+
+                  <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+                    {immediateItems.length > 0 ? (
+                      immediateItems.map((item) => (
+                        <ImmediateNeedCompactCard key={item.id} item={item} />
+                      ))
+                    ) : (
+                      <EmptyState
+                        message="当前筛选下没有立即补齐项。"
+                        compact
+                      />
+                    )}
+                  </div>
+                </Surface>
+
+                <Surface className="p-4">
+                  <SectionHeading
+                    compact
+                    icon={House}
+                    title="别漏掉的基础件"
+                    description="很多生活崩溃感来自基础件没建起来。"
+                  />
+
+                  <div className="mt-4">
+                    {overlookedCollection ? (
+                      <div className="grid gap-2 min-[1360px]:grid-cols-2">
+                        {overlookedCollection.items.map((item) => (
+                          <div
+                            key={item}
+                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]"
+                          >
+                            {item}
+                          </div>
+                        ))}
                       </div>
-                      <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {spotlight.summary}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                        {spotlight.reason}
-                      </p>
-                      <ul className="mt-3 space-y-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {spotlight.attention.map((entry) => (
-                          <li key={entry}>{entry}</li>
+                    ) : (
+                      <EmptyState message="当前筛选下没有基础提醒。" compact />
+                    )}
+                  </div>
+                </Surface>
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
+              <Surface className="p-5">
+                <SectionHeading
+                  icon={AlertTriangle}
+                  title="现在最值得先看的缺口"
+                  description="不是所有想买都该现在买，先看哪些事情已经开始影响现实生活。"
+                />
+
+                <div className="mt-5 space-y-5">
+                  {shopping.spotlights.length > 0 ? (
+                    shopping.spotlights.map((spotlight) => (
+                      <div
+                        key={spotlight.id}
+                        className="border-t border-[color:var(--muted-surface-border)] pt-5 first:border-t-0 first:pt-0"
+                      >
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h3 className="text-base font-medium text-[color:var(--text-primary)]">
+                            {spotlight.title}
+                          </h3>
+                          <Badge
+                            variant="outline"
+                            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+                          >
+                            {spotlight.stage}
+                          </Badge>
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+                          {spotlight.summary}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+                          {spotlight.reason}
+                        </p>
+                        <ul className="mt-3 space-y-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                          {spotlight.attention.map((entry) => (
+                            <li key={entry}>{entry}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))
+                  ) : (
+                    <EmptyState message="当前筛选下没有需要关注的主题。" />
+                  )}
+                </div>
+              </Surface>
+
+              <div className="space-y-4">
+                <Surface className="p-5">
+                  <SectionHeading
+                    icon={ShoppingBasket}
+                    title="当前最需要补齐"
+                    description="这里放的是已经足够接近真实缺口的东西。"
+                  />
+
+                  <div className="mt-5 space-y-4">
+                    {immediateItems.length > 0 ? (
+                      immediateItems.map((item) => {
+                        const signal = getPriceSignal(item)
+
+                        return (
+                          <div
+                            key={item.id}
+                            className="border-t border-[color:var(--muted-surface-border)] pt-4 first:border-t-0 first:pt-0"
+                          >
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h3 className="text-sm font-medium text-[color:var(--text-primary)]">
+                                {item.name}
+                              </h3>
+                              <Badge
+                                variant="outline"
+                                className={NEED_LEVEL_STYLES[item.necessity]}
+                              >
+                                {item.necessity}
+                              </Badge>
+                              <Badge
+                                variant="outline"
+                                className={signal.className}
+                              >
+                                {signal.label}
+                              </Badge>
+                            </div>
+                            <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                              {item.reason}
+                            </p>
+                            <div className="mt-3">
+                              <ShoppingPriceRow
+                                label="当前价格"
+                                value={formatPrice(item.currentPrice)}
+                              />
+                              <ShoppingPriceRow
+                                label="可买入"
+                                value={`<= ${formatPrice(item.buyBelowPrice)}`}
+                              />
+                              <ShoppingPriceRow
+                                label="偏贵"
+                                value={`>= ${formatPrice(item.overpayPrice)}`}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })
+                    ) : (
+                      <EmptyState
+                        message="当前筛选下没有立即补齐项。"
+                        compact
+                      />
+                    )}
+                  </div>
+                </Surface>
+
+                <Surface className="p-5">
+                  <SectionHeading
+                    icon={House}
+                    title="别漏掉的基础件"
+                    description="很多生活崩溃感不是大件不够，而是基础件一直没建起来。"
+                  />
+
+                  <div className="mt-5">
+                    {overlookedCollection ? (
+                      <ul className="space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+                        {overlookedCollection.items.map((item) => (
+                          <li
+                            key={item}
+                            className="border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0"
+                          >
+                            {item}
+                          </li>
                         ))}
                       </ul>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下没有需要关注的主题。" />
-                )}
+                    ) : (
+                      <EmptyState message="当前筛选下没有基础提醒。" compact />
+                    )}
+                  </div>
+                </Surface>
               </div>
-            </Surface>
-
-            <div className="space-y-4">
-              <Surface className="p-5">
-                <SectionHeading
-                  icon={ShoppingBasket}
-                  title="当前最需要补齐"
-                  description="这里放的是已经足够接近真实缺口的东西。"
-                />
-
-                <div className="mt-5 space-y-4">
-                  {immediateItems.length > 0 ? (
-                    immediateItems.map((item) => {
-                      const signal = getPriceSignal(item)
-
-                      return (
-                        <div
-                          key={item.id}
-                          className="border-t border-[color:var(--muted-surface-border)] pt-4 first:border-t-0 first:pt-0"
-                        >
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-sm font-medium text-[color:var(--text-primary)]">
-                              {item.name}
-                            </h3>
-                            <Badge
-                              variant="outline"
-                              className={NEED_LEVEL_STYLES[item.necessity]}
-                            >
-                              {item.necessity}
-                            </Badge>
-                            <Badge
-                              variant="outline"
-                              className={signal.className}
-                            >
-                              {signal.label}
-                            </Badge>
-                          </div>
-                          <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                            {item.reason}
-                          </p>
-                          <div className="mt-3">
-                            <ShoppingPriceRow
-                              label="当前价格"
-                              value={formatPrice(item.currentPrice)}
-                            />
-                            <ShoppingPriceRow
-                              label="可买入"
-                              value={`<= ${formatPrice(item.buyBelowPrice)}`}
-                            />
-                            <ShoppingPriceRow
-                              label="偏贵"
-                              value={`>= ${formatPrice(item.overpayPrice)}`}
-                            />
-                          </div>
-                        </div>
-                      )
-                    })
-                  ) : (
-                    <EmptyState message="当前筛选下没有立即补齐项。" compact />
-                  )}
-                </div>
-              </Surface>
-
-              <Surface className="p-5">
-                <SectionHeading
-                  icon={House}
-                  title="别漏掉的基础件"
-                  description="很多生活崩溃感不是大件不够，而是基础件一直没建起来。"
-                />
-
-                <div className="mt-5">
-                  {overlookedCollection ? (
-                    <ul className="space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      {overlookedCollection.items.map((item) => (
-                        <li
-                          key={item}
-                          className="border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <EmptyState message="当前筛选下没有基础提醒。" compact />
-                  )}
-                </div>
-              </Surface>
             </div>
-          </div>
+          )}
         </TabsContent>
 
-        <TabsContent value="inventory" className="space-y-4">
-          <div className="grid gap-4 min-[1360px]:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.84fr)]">
-            <Surface className="p-5">
+        <TabsContent
+          value="inventory"
+          className={cn(
+            "space-y-4",
+            isWideLayout && "min-h-0 flex-1 overflow-hidden",
+          )}
+        >
+          <div
+            className={cn(
+              "grid gap-4 min-[1360px]:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.84fr)]",
+              isWideLayout && "h-full min-h-0",
+            )}
+          >
+            <Surface
+              className={cn(
+                "p-5",
+                isWideLayout && "flex h-full min-h-0 flex-col p-4",
+              )}
+            >
               <SectionHeading
+                compact={isWideLayout}
                 icon={Package2}
                 title="我现在有什么"
                 description="已有物品不是背景噪音，它们构成了现在的生活底盘。"
               />
 
-              <div className="mt-5">
+              <div
+                className={cn(
+                  "mt-5",
+                  isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1",
+                )}
+              >
                 {shopping.ownedItems.length > 0 ? (
-                  <Table>
+                  <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
                       <TableRow className="border-[color:var(--muted-surface-border)]">
-                        <TableHead>物品</TableHead>
-                        <TableHead>分类</TableHead>
-                        <TableHead>空间</TableHead>
-                        <TableHead>数量</TableHead>
-                        <TableHead>状态</TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          物品
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          分类
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          空间
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          数量
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          状态
+                        </TableHead>
                         <TableHead className="whitespace-normal">
                           备注
                         </TableHead>
@@ -359,19 +620,39 @@ export function ShoppingPage({
                           key={item.id}
                           className="border-[color:var(--muted-surface-border)]"
                         >
-                          <TableCell className="font-medium text-[color:var(--text-primary)]">
+                          <TableCell
+                            className={cn(
+                              "font-medium text-[color:var(--text-primary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {item.name}
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {item.category}
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {item.space}
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {item.quantity} 件
                           </TableCell>
-                          <TableCell>
+                          <TableCell className={cn(isWideLayout && "py-1.5")}>
                             <Badge
                               variant="outline"
                               className={getOwnedStatusClass(item.status)}
@@ -379,7 +660,12 @@ export function ShoppingPage({
                               {item.status}
                             </Badge>
                           </TableCell>
-                          <TableCell className="max-w-[28rem] text-sm leading-6 whitespace-normal text-[color:var(--text-muted)]">
+                          <TableCell
+                            className={cn(
+                              "max-w-[28rem] text-sm leading-6 whitespace-normal text-[color:var(--text-muted)]",
+                              isWideLayout && "py-1.5 text-[13px] leading-5",
+                            )}
+                          >
                             {item.note}
                           </TableCell>
                         </TableRow>
@@ -392,19 +678,34 @@ export function ShoppingPage({
               </div>
             </Surface>
 
-            <Surface className="p-5">
+            <Surface
+              className={cn(
+                "p-5",
+                isWideLayout && "flex h-full min-h-0 flex-col p-4",
+              )}
+            >
               <SectionHeading
+                compact={isWideLayout}
                 icon={Sparkles}
                 title="已有但需要关注"
                 description="不一定是坏了，而是它们已经在提醒你该补件、升级或重新布置。"
               />
 
-              <div className="mt-5 space-y-4">
+              <div
+                className={cn(
+                  "mt-5 space-y-4",
+                  isWideLayout &&
+                    "mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
+                )}
+              >
                 {ownedAttentionItems.length > 0 ? (
                   ownedAttentionItems.map((item) => (
                     <div
                       key={item.id}
-                      className="border-t border-[color:var(--muted-surface-border)] pt-4 first:border-t-0 first:pt-0"
+                      className={cn(
+                        "border-t border-[color:var(--muted-surface-border)] pt-4 first:border-t-0 first:pt-0",
+                        isWideLayout && "pt-3",
+                      )}
                     >
                       <div className="flex flex-wrap items-center gap-2">
                         <h3 className="text-sm font-medium text-[color:var(--text-primary)]">
@@ -417,10 +718,20 @@ export function ShoppingPage({
                           {item.status}
                         </Badge>
                       </div>
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                      <p
+                        className={cn(
+                          "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
+                          isWideLayout && "text-[13px] leading-5",
+                        )}
+                      >
                         {item.replacementCue}
                       </p>
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+                      <p
+                        className={cn(
+                          "mt-2 text-sm leading-6 text-[color:var(--text-muted)]",
+                          isWideLayout && "text-[13px] leading-5",
+                        )}
+                      >
                         {item.note}
                       </p>
                     </div>
@@ -436,18 +747,43 @@ export function ShoppingPage({
           </div>
         </TabsContent>
 
-        <TabsContent value="planning" className="space-y-4">
-          <div className="grid gap-4 min-[1400px]:grid-cols-[minmax(0,1.5fr)_minmax(340px,0.82fr)]">
-            <div className="space-y-4">
+        <TabsContent
+          value="planning"
+          className={cn(
+            "space-y-4",
+            isWideLayout && "min-h-0 flex-1 overflow-hidden",
+          )}
+        >
+          <div
+            className={cn(
+              "grid gap-4 min-[1400px]:grid-cols-[minmax(0,1.5fr)_minmax(340px,0.82fr)]",
+              isWideLayout && "h-full min-h-0",
+            )}
+          >
+            <div
+              className={cn(
+                "space-y-4",
+                isWideLayout && "min-h-0 overflow-y-auto pr-1",
+              )}
+            >
               {shopping.purchaseLanes.map((lane) => (
-                <Surface key={lane.id} className="p-5">
+                <Surface
+                  key={lane.id}
+                  className={cn("p-5", isWideLayout && "p-4")}
+                >
                   <SectionHeading
+                    compact={isWideLayout}
                     icon={ShoppingBasket}
                     title={lane.title}
                     description={lane.subtitle}
                   />
 
-                  <div className="mt-5 space-y-5">
+                  <div
+                    className={cn(
+                      "mt-5 space-y-5",
+                      isWideLayout && "mt-4 space-y-4",
+                    )}
+                  >
                     {lane.items.length > 0 ? (
                       lane.items.map((item) => {
                         const signal = getPriceSignal(item)
@@ -455,10 +791,18 @@ export function ShoppingPage({
                         return (
                           <div
                             key={item.id}
-                            className="border-t border-[color:var(--muted-surface-border)] pt-5 first:border-t-0 first:pt-0"
+                            className={cn(
+                              "border-t border-[color:var(--muted-surface-border)] pt-5 first:border-t-0 first:pt-0",
+                              isWideLayout && "pt-4",
+                            )}
                           >
                             <div className="flex flex-wrap items-center gap-2">
-                              <h3 className="text-base font-medium text-[color:var(--text-primary)]">
+                              <h3
+                                className={cn(
+                                  "text-base font-medium text-[color:var(--text-primary)]",
+                                  isWideLayout && "text-sm",
+                                )}
+                              >
                                 {item.name}
                               </h3>
                               <Badge
@@ -489,24 +833,42 @@ export function ShoppingPage({
                               <span>{item.targetLifestyle}</span>
                             </div>
 
-                            <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+                            <p
+                              className={cn(
+                                "mt-3 text-sm leading-6 text-[color:var(--text-secondary)]",
+                                isWideLayout && "mt-2 text-[13px] leading-5",
+                              )}
+                            >
                               {item.reason}
                             </p>
-                            <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+                            <p
+                              className={cn(
+                                "mt-2 text-sm leading-6 text-[color:var(--text-muted)]",
+                                isWideLayout && "text-[13px] leading-5",
+                              )}
+                            >
                               {item.note}
                             </p>
 
-                            <div className="mt-4 grid gap-4 min-[960px]:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+                            <div
+                              className={cn(
+                                "mt-4 grid gap-4 min-[960px]:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]",
+                                isWideLayout && "mt-3 gap-3",
+                              )}
+                            >
                               <div className="space-y-2">
                                 <ShoppingPriceRow
+                                  compact={isWideLayout}
                                   label="当前价格"
                                   value={formatPrice(item.currentPrice)}
                                 />
                                 <ShoppingPriceRow
+                                  compact={isWideLayout}
                                   label="什么价格可以购入"
                                   value={`<= ${formatPrice(item.buyBelowPrice)}`}
                                 />
                                 <ShoppingPriceRow
+                                  compact={isWideLayout}
                                   label="什么价格性价比低"
                                   value={`>= ${formatPrice(item.overpayPrice)}`}
                                 />
@@ -516,7 +878,12 @@ export function ShoppingPage({
                                 <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
                                   相关提醒
                                 </div>
-                                <div className="mt-3 flex flex-wrap gap-2">
+                                <div
+                                  className={cn(
+                                    "mt-3 flex flex-wrap gap-2",
+                                    isWideLayout && "mt-2 gap-1.5",
+                                  )}
+                                >
                                   {item.tags.map((tag) => (
                                     <Badge
                                       key={tag}
@@ -543,22 +910,49 @@ export function ShoppingPage({
               ))}
             </div>
 
-            <Surface className="p-5">
+            <Surface
+              className={cn(
+                "p-5",
+                isWideLayout && "flex h-full min-h-0 flex-col p-4",
+              )}
+            >
               <SectionHeading
+                compact={isWideLayout}
                 icon={CircleDollarSign}
                 title="价格参考"
                 description="这里不是绝对标准，而是帮你先形成自己的价格感。"
               />
 
-              <div className="mt-5">
+              <div
+                className={cn(
+                  "mt-5",
+                  isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1",
+                )}
+              >
                 {shopping.priceReferences.length > 0 ? (
-                  <Table>
+                  <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
                       <TableRow className="border-[color:var(--muted-surface-border)]">
-                        <TableHead>类别</TableHead>
-                        <TableHead>入门价</TableHead>
-                        <TableHead>舒服区间</TableHead>
-                        <TableHead>偏贵</TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          类别
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          入门价
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          舒服区间
+                        </TableHead>
+                        <TableHead
+                          className={cn(isWideLayout && "h-8 text-xs")}
+                        >
+                          偏贵
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -567,19 +961,44 @@ export function ShoppingPage({
                           key={entry.id}
                           className="border-[color:var(--muted-surface-border)]"
                         >
-                          <TableCell className="font-medium whitespace-normal text-[color:var(--text-primary)]">
+                          <TableCell
+                            className={cn(
+                              "font-medium whitespace-normal text-[color:var(--text-primary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             <div>{entry.category}</div>
-                            <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                            <div
+                              className={cn(
+                                "mt-1 text-xs leading-5 text-[color:var(--text-muted)]",
+                                isWideLayout && "mt-0.5 text-[11px]",
+                              )}
+                            >
                               {entry.note}
                             </div>
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {formatPrice(entry.entryPrice)}
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {formatPrice(entry.sweetSpotPrice)}
                           </TableCell>
-                          <TableCell className="text-[color:var(--text-secondary)]">
+                          <TableCell
+                            className={cn(
+                              "text-[color:var(--text-secondary)]",
+                              isWideLayout && "py-1.5",
+                            )}
+                          >
                             {formatPrice(entry.overpayPrice)}
                           </TableCell>
                         </TableRow>
@@ -594,22 +1013,48 @@ export function ShoppingPage({
           </div>
         </TabsContent>
 
-        <TabsContent value="stages" className="space-y-4">
-          <div className="grid gap-4 min-[1320px]:grid-cols-2">
+        <TabsContent
+          value="stages"
+          className={cn(
+            "space-y-4",
+            isWideLayout && "min-h-0 flex-1 overflow-hidden",
+          )}
+        >
+          <div
+            className={cn(
+              "grid gap-4 min-[1320px]:grid-cols-2",
+              isWideLayout &&
+                "h-full min-h-0 content-start overflow-y-auto pr-1",
+            )}
+          >
             {shopping.stageChecklists.length > 0 ? (
               shopping.stageChecklists.map((checklist) => (
-                <Surface key={checklist.id} className="p-5">
+                <Surface
+                  key={checklist.id}
+                  className={cn("p-5", isWideLayout && "p-4")}
+                >
                   <SectionHeading
+                    compact={isWideLayout}
                     icon={House}
                     title={checklist.title}
                     description={checklist.description}
                   />
 
-                  <p className="mt-5 text-sm leading-6 text-[color:var(--text-muted)]">
+                  <p
+                    className={cn(
+                      "mt-5 text-sm leading-6 text-[color:var(--text-muted)]",
+                      isWideLayout && "mt-4 text-[13px] leading-5",
+                    )}
+                  >
                     {checklist.focus}
                   </p>
 
-                  <div className="mt-5 grid gap-5 min-[960px]:grid-cols-3">
+                  <div
+                    className={cn(
+                      "mt-5 grid gap-5 min-[960px]:grid-cols-3",
+                      isWideLayout && "mt-4 gap-4",
+                    )}
+                  >
                     <ChecklistBlock
                       title="最低配置"
                       items={checklist.minimum}
@@ -631,8 +1076,20 @@ export function ShoppingPage({
           </div>
         </TabsContent>
 
-        <TabsContent value="lifestyle" className="space-y-4">
-          <div className="grid gap-4 min-[1320px]:grid-cols-3">
+        <TabsContent
+          value="lifestyle"
+          className={cn(
+            "space-y-4",
+            isWideLayout && "min-h-0 flex-1 overflow-hidden",
+          )}
+        >
+          <div
+            className={cn(
+              "grid gap-4 min-[1320px]:grid-cols-3",
+              isWideLayout &&
+                "h-full min-h-0 content-start overflow-y-auto pr-1",
+            )}
+          >
             {coreLifestyleCollections.length > 0 ? (
               coreLifestyleCollections.map((collection) => {
                 const icon =
@@ -643,18 +1100,30 @@ export function ShoppingPage({
                       : Sparkles
 
                 return (
-                  <Surface key={collection.id} className="p-5">
+                  <Surface
+                    key={collection.id}
+                    className={cn("p-5", isWideLayout && "p-4")}
+                  >
                     <SectionHeading
+                      compact={isWideLayout}
                       icon={icon}
                       title={collection.title}
                       description={collection.description}
                     />
 
-                    <div className="mt-5 space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+                    <div
+                      className={cn(
+                        "mt-5 space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]",
+                        isWideLayout && "mt-4 space-y-2 text-[13px] leading-5",
+                      )}
+                    >
                       {collection.items.map((item) => (
                         <div
                           key={item}
-                          className="border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0"
+                          className={cn(
+                            "border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0",
+                            isWideLayout && "py-2.5",
+                          )}
                         >
                           {item}
                         </div>

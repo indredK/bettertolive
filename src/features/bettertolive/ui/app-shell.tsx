@@ -256,6 +256,7 @@ export function BetterToLiveAppShell() {
   const isWideLayout = layoutMode === "wide"
   const isCompactLayout = layoutMode === "compact"
   const isStackedLayout = layoutMode === "stacked"
+  const isFixedShoppingWorkspace = isWideLayout && activeView === "shopping"
   const isHorizontalHeader = !isStackedLayout
   const showSidebar = !isStackedLayout
   const isSidebarInteractive = showSidebar
@@ -304,6 +305,7 @@ export function BetterToLiveAppShell() {
             shopping={viewModel.shoppingModule}
             visibleCount={viewModel.visibleShoppingCount}
             searchQuery={searchQuery}
+            isWideLayout={isWideLayout}
           />
         )
       case "beliefs":
@@ -615,18 +617,22 @@ export function BetterToLiveAppShell() {
           <header
             className={cn(
               "relative shrink-0 border-b border-[color:var(--surface-border)] px-4 py-4 backdrop-blur-xl",
-              isWideLayout && "px-8",
+              isWideLayout && "px-6 py-2.5",
               UI_LAYERS.header,
             )}
           >
             <div
-              className="absolute inset-x-0 top-0 -z-10 h-[88px]"
+              className={cn(
+                "absolute inset-x-0 top-0 -z-10 h-[88px]",
+                isWideLayout && "h-[70px]",
+              )}
               style={{ backgroundColor: "var(--topbar-bg)" }}
             />
             <div
               className={cn(
                 "mx-auto flex w-full max-w-[1500px] flex-col gap-3",
                 isHorizontalHeader && "flex-row items-center justify-between",
+                isWideLayout && "gap-2.5",
               )}
               data-testid="workspace-header-shell"
               data-orientation={isHorizontalHeader ? "row" : "column"}
@@ -636,7 +642,12 @@ export function BetterToLiveAppShell() {
                   本地优先 / 自我认知系统
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <h2 className="text-[1.35rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
+                  <h2
+                    className={cn(
+                      "text-[1.35rem] font-semibold tracking-tight text-[color:var(--text-primary)]",
+                      isWideLayout && "text-[1.2rem]",
+                    )}
+                  >
                     {currentViewLabel}
                   </h2>
                   <Badge
@@ -674,7 +685,10 @@ export function BetterToLiveAppShell() {
                     onChange={(event) =>
                       setSearchQuery(event.currentTarget.value)
                     }
-                    className="h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]"
+                    className={cn(
+                      "h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]",
+                      isWideLayout && "h-8",
+                    )}
                     placeholder="搜索记录、观念、关系或成长线索"
                     aria-label="搜索记录和页面内容"
                   />
@@ -714,7 +728,10 @@ export function BetterToLiveAppShell() {
                   <Button
                     variant="outline"
                     size="lg"
-                    className="h-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 text-[color:var(--text-primary)] hover:bg-[color:var(--muted-surface-bg)]"
+                    className={cn(
+                      "h-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 text-[color:var(--text-primary)] hover:bg-[color:var(--muted-surface-bg)]",
+                      isWideLayout && "h-8 px-2.5",
+                    )}
                     onClick={() => setActiveView("reflection")}
                   >
                     <NotebookPen className="size-4" />
@@ -729,8 +746,10 @@ export function BetterToLiveAppShell() {
             className={cn(
               "mx-auto w-full max-w-[1500px] px-4 py-5",
               showSidebar &&
-                "min-h-0 flex-1 overflow-y-auto overscroll-contain",
-              isWideLayout && "px-8 py-6",
+                (isFixedShoppingWorkspace
+                  ? "min-h-0 flex-1 overflow-hidden"
+                  : "min-h-0 flex-1 overflow-y-auto overscroll-contain"),
+              isWideLayout && "px-6 py-3",
             )}
           >
             {workspaceQuery.isError ? (
@@ -756,7 +775,7 @@ export function BetterToLiveAppShell() {
               animate={CONTENT_ENTER_PRESENCE.animate}
               exit={CONTENT_ENTER_PRESENCE.exit}
               transition={APP_FADE_TRANSITION}
-              className="min-h-full"
+              className={cn(isFixedShoppingWorkspace ? "h-full" : "min-h-full")}
             >
               {pageContent}
             </m.div>

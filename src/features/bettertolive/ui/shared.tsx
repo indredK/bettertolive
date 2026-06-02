@@ -57,21 +57,40 @@ export function SummarySurface({
   title,
   value,
   detail,
+  compact = false,
 }: {
   tone: keyof typeof SUMMARY_SURFACE_STYLES
   title: string
   value: string
   detail: string
+  compact?: boolean
 }) {
   return (
-    <Surface className={cn("p-5", SUMMARY_SURFACE_STYLES[tone])}>
-      <div className="text-xs tracking-[0.2em] text-[color:var(--text-muted)] uppercase">
+    <Surface
+      className={cn("p-5", compact && "p-3", SUMMARY_SURFACE_STYLES[tone])}
+    >
+      <div
+        className={cn(
+          "text-xs tracking-[0.2em] text-[color:var(--text-muted)] uppercase",
+          compact && "text-[10px] tracking-[0.14em]",
+        )}
+      >
         {title}
       </div>
-      <div className="mt-4 text-[1.1rem] leading-snug font-semibold tracking-tight text-[color:var(--text-primary)]">
+      <div
+        className={cn(
+          "mt-4 text-[1.1rem] leading-snug font-semibold tracking-tight text-[color:var(--text-primary)]",
+          compact && "mt-1.5 text-[15px]",
+        )}
+      >
         {value}
       </div>
-      <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+      <p
+        className={cn(
+          "mt-3 text-sm leading-6 text-[color:var(--text-secondary)]",
+          compact && "mt-1 text-[12px] leading-[1.1rem]",
+        )}
+      >
         {detail}
       </p>
     </Surface>
@@ -82,19 +101,33 @@ export function SectionHeading({
   icon: Icon,
   title,
   description,
+  compact = false,
 }: {
   icon: LucideIcon
   title: string
   description: string
+  compact?: boolean
 }) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
           <Icon className="size-4" />
-          <h4 className="text-base font-semibold tracking-tight">{title}</h4>
+          <h4
+            className={cn(
+              "text-base font-semibold tracking-tight",
+              compact && "text-sm",
+            )}
+          >
+            {title}
+          </h4>
         </div>
-        <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+        <p
+          className={cn(
+            "mt-2 text-sm leading-6 text-[color:var(--text-muted)]",
+            compact && "mt-1 text-[12px] leading-[1.1rem]",
+          )}
+        >
           {description}
         </p>
       </div>
