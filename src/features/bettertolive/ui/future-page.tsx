@@ -1,10 +1,7 @@
 import { CheckCheck, Compass, Target } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import type {
-  FutureBlueprint,
-  FutureMilestone,
-} from "@/features/bettertolive/types"
+import type { FutureBlueprint, FutureMilestone } from "@/features/bettertolive/types"
 import {
   EmptyState,
   PageIntro,
@@ -81,10 +78,7 @@ export function FuturePage({
                     </p>
                     <ul className="space-y-2 text-sm text-[color:var(--text-muted)]">
                       {entry.steps.map((step) => (
-                        <li
-                          key={step}
-                          className="flex items-start gap-2 leading-6"
-                        >
+                        <li key={step} className="flex items-start gap-2 leading-6">
                           <CheckCheck className="mt-1 size-3.5 shrink-0 text-[color:var(--text-muted)]" />
                           <span>{step}</span>
                         </li>

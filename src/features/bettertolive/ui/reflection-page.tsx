@@ -1,16 +1,8 @@
 import { NotebookPen, Sparkles } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import type {
-  ReflectionDraftExample,
-  ReflectionEntry,
-} from "@/features/bettertolive/types"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared"
+import type { ReflectionDraftExample, ReflectionEntry } from "@/features/bettertolive/types"
+import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
 
 export function ReflectionPage({
   draftExample,
@@ -69,9 +61,7 @@ export function ReflectionPage({
                   key={entry.id}
                   className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
                 >
-                  <div className="text-xs text-[color:var(--text-muted)]">
-                    {entry.date}
-                  </div>
+                  <div className="text-xs text-[color:var(--text-muted)]">{entry.date}</div>
                   <h3 className="mt-2 text-base font-medium text-[color:var(--text-primary)]">
                     {entry.title}
                   </h3>

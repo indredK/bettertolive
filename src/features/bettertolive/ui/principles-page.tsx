@@ -79,9 +79,7 @@ export function PrinciplesPage({
                     {entry.description}
                   </p>
                   <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                    <span className="font-medium text-[color:var(--text-primary)]">
-                      底线：
-                    </span>
+                    <span className="font-medium text-[color:var(--text-primary)]">底线：</span>
                     {entry.boundary}
                   </div>
                 </div>
@@ -107,9 +105,7 @@ export function PrinciplesPage({
                   className="flex items-start gap-3 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
                 >
                   <CheckCheck className="mt-1 size-4 shrink-0 text-[color:var(--text-muted)]" />
-                  <p className="text-sm leading-6 text-[color:var(--text-secondary)]">
-                    {entry}
-                  </p>
+                  <p className="text-sm leading-6 text-[color:var(--text-secondary)]">{entry}</p>
                 </div>
               ))
             ) : (

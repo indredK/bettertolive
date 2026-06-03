@@ -29,10 +29,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { AppView } from "@/features/bettertolive/types"
-import {
-  workspaceRhythmSlides,
-  workspaceSidebarNotes,
-} from "@/features/bettertolive/sidebar-copy"
+import { workspaceRhythmSlides, workspaceSidebarNotes } from "@/features/bettertolive/sidebar-copy"
 import { useWorkspaceNotifications } from "@/features/bettertolive/use-workspace-notifications"
 import { useWorkspaceMusic } from "@/features/bettertolive/use-workspace-music"
 import { useWorkspaceTheme } from "@/features/bettertolive/use-workspace-theme"
@@ -59,10 +56,7 @@ import {
   SidebarNoteCarousel,
   SidebarRhythmCarousel,
 } from "@/features/bettertolive/ui/sidebar-carousel"
-import {
-  SidebarNavigation,
-  StackedNavigation,
-} from "@/features/bettertolive/ui/sidebar-navigation"
+import { SidebarNavigation, StackedNavigation } from "@/features/bettertolive/ui/sidebar-navigation"
 import { WorkspaceUtilities } from "@/features/bettertolive/ui/workspace-utilities"
 import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
@@ -221,9 +215,7 @@ function getWorkspaceLayoutMode(width: number): WorkspaceLayoutMode {
 
 function useWorkspaceLayoutMode() {
   const [layoutMode, setLayoutMode] = useState<WorkspaceLayoutMode>(() =>
-    typeof window === "undefined"
-      ? "wide"
-      : getWorkspaceLayoutMode(window.innerWidth),
+    typeof window === "undefined" ? "wide" : getWorkspaceLayoutMode(window.innerWidth),
   )
 
   useEffect(() => {
@@ -248,18 +240,12 @@ function useWorkspaceLayoutMode() {
 
 export function BetterToLiveAppShell() {
   const activeView = useWorkspaceUiStore((state) => state.activeView)
-  const isSidebarCollapsed = useWorkspaceUiStore(
-    (state) => state.isSidebarCollapsed,
-  )
-  const isCompactSidebarExpanded = useWorkspaceUiStore(
-    (state) => state.isCompactSidebarExpanded,
-  )
+  const isSidebarCollapsed = useWorkspaceUiStore((state) => state.isSidebarCollapsed)
+  const isCompactSidebarExpanded = useWorkspaceUiStore((state) => state.isCompactSidebarExpanded)
   const searchQuery = useWorkspaceUiStore((state) => state.searchQuery)
   const setActiveView = useWorkspaceUiStore((state) => state.setActiveView)
   const setSearchQuery = useWorkspaceUiStore((state) => state.setSearchQuery)
-  const toggleSidebarCollapsed = useWorkspaceUiStore(
-    (state) => state.toggleSidebarCollapsed,
-  )
+  const toggleSidebarCollapsed = useWorkspaceUiStore((state) => state.toggleSidebarCollapsed)
   const toggleCompactSidebarExpanded = useWorkspaceUiStore(
     (state) => state.toggleCompactSidebarExpanded,
   )
@@ -329,9 +315,7 @@ export function BetterToLiveAppShell() {
           />
         )
       case "events":
-        return (
-          <EventsPage events={viewModel.events} searchQuery={searchQuery} />
-        )
+        return <EventsPage events={viewModel.events} searchQuery={searchQuery} />
       case "finance":
         return (
           <FinancePage
@@ -498,18 +482,13 @@ export function BetterToLiveAppShell() {
                 : "flex h-full w-[292px] flex-col overflow-hidden px-5 py-5",
             )}
           >
-            <div
-              className="absolute inset-0 -z-10"
-              style={{ background: "var(--aside-bg)" }}
-            />
+            <div className="absolute inset-0 -z-10" style={{ background: "var(--aside-bg)" }} />
 
             <div className="shrink-0">
               <div
                 className={cn(
                   "flex items-start",
-                  effectiveSidebarCollapsed
-                    ? "justify-center"
-                    : "justify-between gap-3",
+                  effectiveSidebarCollapsed ? "justify-center" : "justify-between gap-3",
                 )}
               >
                 <div
@@ -532,14 +511,10 @@ export function BetterToLiveAppShell() {
                         : undefined
                     }
                     aria-label={
-                      effectiveSidebarCollapsed && isSidebarInteractive
-                        ? "展开菜单列"
-                        : undefined
+                      effectiveSidebarCollapsed && isSidebarInteractive ? "展开菜单列" : undefined
                     }
                     aria-hidden={effectiveSidebarCollapsed ? undefined : true}
-                    tabIndex={
-                      effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1
-                    }
+                    tabIndex={effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1}
                     className={cn(
                       "flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)] transition-opacity",
                       effectiveSidebarCollapsed
@@ -565,9 +540,7 @@ export function BetterToLiveAppShell() {
                         <h1 className="text-[1.15rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
                           BetterToLive
                         </h1>
-                        <p className="text-sm text-[color:var(--text-muted)]">
-                          个人的人生工作台
-                        </p>
+                        <p className="text-sm text-[color:var(--text-muted)]">个人的人生工作台</p>
                       </m.div>
                     )}
                   </AnimatePresence>
@@ -658,10 +631,7 @@ export function BetterToLiveAppShell() {
         <m.main
           layout
           transition={SIDEBAR_LAYOUT_TRANSITION}
-          className={cn(
-            "min-w-0",
-            showSidebar && "flex flex-1 flex-col overflow-hidden",
-          )}
+          className={cn("min-w-0", showSidebar && "flex flex-1 flex-col overflow-hidden")}
         >
           {isStackedLayout ? (
             <>
@@ -684,9 +654,7 @@ export function BetterToLiveAppShell() {
                       <h1 className="truncate text-[1.05rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
                         BetterToLive
                       </h1>
-                      <p className="text-sm text-[color:var(--text-muted)]">
-                        个人的人生工作台
-                      </p>
+                      <p className="text-sm text-[color:var(--text-muted)]">个人的人生工作台</p>
                     </div>
                   </div>
                   <Badge
@@ -713,10 +681,7 @@ export function BetterToLiveAppShell() {
             )}
           >
             <div
-              className={cn(
-                "absolute inset-x-0 top-0 -z-10 h-[88px]",
-                isWideLayout && "h-[70px]",
-              )}
+              className={cn("absolute inset-x-0 top-0 -z-10 h-[88px]", isWideLayout && "h-[70px]")}
               style={{ backgroundColor: "var(--topbar-bg)" }}
             />
             <div
@@ -765,17 +730,13 @@ export function BetterToLiveAppShell() {
                 <div
                   className={cn(
                     "relative min-w-0",
-                    isHorizontalHeader
-                      ? "w-full max-w-[400px] justify-self-end"
-                      : "w-full",
+                    isHorizontalHeader ? "w-full max-w-[400px] justify-self-end" : "w-full",
                   )}
                 >
                   <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[color:var(--text-muted)]" />
                   <Input
                     value={searchQuery}
-                    onChange={(event) =>
-                      setSearchQuery(event.currentTarget.value)
-                    }
+                    onChange={(event) => setSearchQuery(event.currentTarget.value)}
                     className={cn(
                       "h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]",
                       isWideLayout && "h-8",
@@ -787,9 +748,7 @@ export function BetterToLiveAppShell() {
                 <div
                   className={cn(
                     "flex items-center gap-3",
-                    isHorizontalHeader
-                      ? "shrink-0 justify-end"
-                      : "flex-wrap justify-start",
+                    isHorizontalHeader ? "shrink-0 justify-end" : "flex-wrap justify-start",
                   )}
                 >
                   <div className="shrink-0">

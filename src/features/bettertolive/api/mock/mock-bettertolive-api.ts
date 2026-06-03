@@ -9,10 +9,7 @@ function cloneMockData<T>(data: T): T {
 
 function withMockLatency<T>(data: T) {
   return new Promise<T>((resolve) => {
-    globalThis.setTimeout(
-      () => resolve(cloneMockData(data)),
-      MOCK_API_LATENCY_MS,
-    )
+    globalThis.setTimeout(() => resolve(cloneMockData(data)), MOCK_API_LATENCY_MS)
   })
 }
 
@@ -27,8 +24,7 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getCrisis: () => withMockLatency(workspaceSnapshotMockData.crisis),
     getBeliefs: () => withMockLatency(workspaceSnapshotMockData.beliefs),
     getPrinciples: () => withMockLatency(workspaceSnapshotMockData.principles),
-    getRelationships: () =>
-      withMockLatency(workspaceSnapshotMockData.relationships),
+    getRelationships: () => withMockLatency(workspaceSnapshotMockData.relationships),
     getGrowth: () => withMockLatency(workspaceSnapshotMockData.growth),
     getMemory: () => withMockLatency(workspaceSnapshotMockData.memory),
     getLegacy: () => withMockLatency(workspaceSnapshotMockData.legacy),

@@ -9,9 +9,7 @@ export function resolveBetterToLiveApiMode(): BetterToLiveApiMode {
 }
 
 export function resolveBetterToLiveApiBaseUrl() {
-  const baseUrl = String(
-    import.meta.env.VITE_BETTERTOLIVE_API_BASE_URL ?? "",
-  ).trim()
+  const baseUrl = String(import.meta.env.VITE_BETTERTOLIVE_API_BASE_URL ?? "").trim()
 
   return baseUrl ? baseUrl.replace(/\/$/, "") : "/api/bettertolive"
 }

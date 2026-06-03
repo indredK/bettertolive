@@ -16,12 +16,7 @@ type CarouselDotButtonProps = {
   onClick: (index: number) => void
 }
 
-function CarouselDotButton({
-  index,
-  isActive,
-  label,
-  onClick,
-}: CarouselDotButtonProps) {
+function CarouselDotButton({ index, isActive, label, onClick }: CarouselDotButtonProps) {
   return (
     <button
       type="button"
@@ -48,10 +43,7 @@ function useSidebarCarousel(slideCount: number, delay: number) {
     [delay, slideCount],
   )
   const [selectedIndex, setSelectedIndex] = useState(0)
-  const plugins = useMemo(
-    () => (slideCount > 1 ? [autoplay] : []),
-    [autoplay, slideCount],
-  )
+  const plugins = useMemo(() => (slideCount > 1 ? [autoplay] : []), [autoplay, slideCount])
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       align: "start",
@@ -109,10 +101,7 @@ export function SidebarRhythmCarousel({
   slides: WorkspaceRhythmSlide[]
   title: string
 }) {
-  const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(
-    slides.length,
-    4600,
-  )
+  const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(slides.length, 4600)
 
   return (
     <section
@@ -151,9 +140,7 @@ export function SidebarRhythmCarousel({
               className="min-w-0 flex-[0_0_100%] pr-2"
               data-testid={`rhythm-slide-${slide.id}`}
             >
-              <div className="text-[13px] font-medium tracking-[0.02em]">
-                {slide.title}
-              </div>
+              <div className="text-[13px] font-medium tracking-[0.02em]">{slide.title}</div>
               <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--hero-muted)]">
                 {slide.body}
               </p>
@@ -172,10 +159,7 @@ export function SidebarNoteCarousel({
   icon: LucideIcon
   note: WorkspaceSidebarNote
 }) {
-  const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(
-    note.lines.length,
-    4200,
-  )
+  const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(note.lines.length, 4200)
 
   return (
     <section
@@ -210,17 +194,10 @@ export function SidebarNoteCarousel({
         ) : null}
       </div>
 
-      <div
-        className="mt-2 overflow-hidden"
-        data-testid="sidebar-note-panel"
-        ref={emblaRef}
-      >
+      <div className="mt-2 overflow-hidden" data-testid="sidebar-note-panel" ref={emblaRef}>
         <div className="flex">
           {note.lines.map((line) => (
-            <article
-              key={`${note.heading}-${line.label}`}
-              className="min-w-0 flex-[0_0_100%]"
-            >
+            <article key={`${note.heading}-${line.label}`} className="min-w-0 flex-[0_0_100%]">
               <div className="flex items-start gap-1.5 text-[12px] leading-4.5">
                 <span className="shrink-0 rounded-full border border-[color:var(--surface-border)] bg-[color:var(--muted-surface-bg)] px-1.5 py-0.5 text-[10px] tracking-[0.12em] text-[color:var(--text-muted)] uppercase">
                   {line.label}

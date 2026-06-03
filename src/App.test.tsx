@@ -25,9 +25,7 @@ describe("App", () => {
   it("renders the overview workspace", () => {
     render(<App />)
 
-    expect(
-      screen.getByRole("heading", { name: "BetterToLive" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "BetterToLive" })).toBeInTheDocument()
     expect(screen.getByRole("heading", { name: "总览" })).toBeInTheDocument()
     expect(screen.getByRole("button", { name: /快速记录/ })).toBeInTheDocument()
     expect(screen.getByTestId("sidebar-nav-scroll")).toBeInTheDocument()
@@ -46,22 +44,13 @@ describe("App", () => {
 
     render(<App />)
 
-    expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-      "data-layout-mode",
-      "compact",
-    )
-    expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-      "data-collapsed",
-      "true",
-    )
+    expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-layout-mode", "compact")
+    expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "true")
     expect(screen.queryByTestId("stacked-navigation")).not.toBeInTheDocument()
     expect(screen.queryByTestId("sidebar-toggle")).not.toBeInTheDocument()
     expect(screen.queryByText("BetterToLive")).not.toBeInTheDocument()
     expect(screen.getByTestId("sidebar-brand-toggle")).toBeInTheDocument()
-    expect(screen.getByTestId("workspace-header-shell")).toHaveAttribute(
-      "data-orientation",
-      "row",
-    )
+    expect(screen.getByTestId("workspace-header-shell")).toHaveAttribute("data-orientation", "row")
   })
 
   it("allows expanding the compact rail layout on demand", async () => {
@@ -72,10 +61,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("sidebar-brand-toggle"))
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
       expect(screen.getByTestId("sidebar-toggle")).toBeInTheDocument()
       expect(screen.getByText("BetterToLive")).toBeInTheDocument()
     })
@@ -89,33 +75,21 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("sidebar-brand-toggle"))
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
     })
 
     setViewportWidth(820)
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-        "data-layout-mode",
-        "stacked",
-      )
+      expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-layout-mode", "stacked")
       expect(screen.queryByTestId("workspace-sidebar")).not.toBeInTheDocument()
     })
 
     setViewportWidth(1100)
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-        "data-layout-mode",
-        "compact",
-      )
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-layout-mode", "compact")
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
       expect(screen.getByTestId("sidebar-toggle")).toBeInTheDocument()
       expect(screen.getByText("BetterToLive")).toBeInTheDocument()
     })
@@ -129,10 +103,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("sidebar-brand-toggle"))
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
     })
 
     view.unmount()
@@ -144,14 +115,8 @@ describe("App", () => {
     render(<App />)
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-        "data-layout-mode",
-        "compact",
-      )
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-layout-mode", "compact")
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
       expect(screen.getByTestId("sidebar-toggle")).toBeInTheDocument()
       expect(screen.getByText("BetterToLive")).toBeInTheDocument()
     })
@@ -162,10 +127,7 @@ describe("App", () => {
 
     render(<App />)
 
-    expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-      "data-layout-mode",
-      "stacked",
-    )
+    expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-layout-mode", "stacked")
     expect(screen.queryByTestId("workspace-sidebar")).not.toBeInTheDocument()
     expect(screen.getByTestId("stacked-navigation")).toBeInTheDocument()
     expect(screen.getAllByText("BetterToLive").length).toBeGreaterThan(0)
@@ -181,13 +143,9 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("nav-growth"))
 
-    expect(
-      screen.getByRole("heading", { name: "成长环境" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "成长环境" })).toBeInTheDocument()
     expect(screen.getByText("成长说明")).toBeInTheDocument()
-    expect(
-      screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。"),
-    ).toBeInTheDocument()
+    expect(screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。")).toBeInTheDocument()
   })
 
   it("switches to the emotion view with trend and support data", () => {
@@ -195,9 +153,7 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("nav-emotion"))
 
-    expect(
-      screen.getByRole("heading", { name: "情绪情感" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "情绪情感" })).toBeInTheDocument()
     expect(screen.getByText("情绪说明")).toBeInTheDocument()
     expect(screen.getByText("最近波动")).toBeInTheDocument()
     expect(screen.getByText("恢复工具箱")).toBeInTheDocument()
@@ -208,9 +164,7 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("nav-legacy"))
 
-    expect(
-      screen.getByRole("heading", { name: "生命整理" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "生命整理" })).toBeInTheDocument()
     expect(screen.getByText("生命整理说明")).toBeInTheDocument()
     expect(screen.getByText("重要交代与留给某人的话")).toBeInTheDocument()
     expect(screen.getByText("未来的自己")).toBeInTheDocument()
@@ -221,9 +175,7 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("nav-shopping"))
 
-    expect(
-      screen.getByRole("heading", { name: "购物清单" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "购物清单" })).toBeInTheDocument()
     expect(screen.getByText("购物说明")).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("tab", { name: "采购决策" }))
@@ -241,17 +193,10 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("sidebar-toggle"))
 
-    expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-      "data-collapsed",
-      "true",
-    )
+    expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "true")
     await waitFor(() => {
-      expect(
-        screen.queryByTestId("sidebar-rhythm-carousel"),
-      ).not.toBeInTheDocument()
-      expect(
-        screen.queryByTestId("sidebar-note-carousel"),
-      ).not.toBeInTheDocument()
+      expect(screen.queryByTestId("sidebar-rhythm-carousel")).not.toBeInTheDocument()
+      expect(screen.queryByTestId("sidebar-note-carousel")).not.toBeInTheDocument()
       expect(screen.queryByTestId("sidebar-toggle")).not.toBeInTheDocument()
       expect(screen.queryByText("BetterToLive")).not.toBeInTheDocument()
     })
@@ -261,10 +206,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("sidebar-brand-toggle"))
 
     await waitFor(() => {
-      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute(
-        "data-collapsed",
-        "false",
-      )
+      expect(screen.getByTestId("workspace-sidebar")).toHaveAttribute("data-collapsed", "false")
       expect(screen.getByTestId("sidebar-toggle")).toBeInTheDocument()
     })
   })
@@ -275,10 +217,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("theme-center-trigger"))
     fireEvent.click(screen.getByTestId("theme-option-linen"))
 
-    expect(screen.getByTestId("workspace-root")).toHaveAttribute(
-      "data-theme",
-      "linen",
-    )
+    expect(screen.getByTestId("workspace-root")).toHaveAttribute("data-theme", "linen")
   })
 
   it("shows and auto-dismisses top messages", async () => {
@@ -298,9 +237,7 @@ describe("App", () => {
     vi.useRealTimers()
 
     await waitFor(() => {
-      expect(screen.queryAllByTestId("notification-card-message")).toHaveLength(
-        0,
-      )
+      expect(screen.queryAllByTestId("notification-card-message")).toHaveLength(0)
     })
   })
 
@@ -312,23 +249,17 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("notification-demo-persistent"))
 
     expect(screen.getAllByText("成长线索待补充").length).toBeGreaterThan(0)
-    expect(
-      screen.getAllByTestId("notification-card-notification"),
-    ).toHaveLength(1)
+    expect(screen.getAllByTestId("notification-card-notification")).toHaveLength(1)
 
     act(() => {
       vi.advanceTimersByTime(6000)
     })
 
-    expect(
-      screen.getAllByTestId("notification-card-notification"),
-    ).toHaveLength(1)
+    expect(screen.getAllByTestId("notification-card-notification")).toHaveLength(1)
 
     fireEvent.click(screen.getByText("前往成长页"))
 
-    expect(
-      screen.getByRole("heading", { name: "成长环境" }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "成长环境" })).toBeInTheDocument()
   })
 
   it("opens the music panel from the persistent utility area", () => {

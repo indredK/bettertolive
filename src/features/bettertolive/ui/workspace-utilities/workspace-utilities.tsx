@@ -12,10 +12,7 @@ import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
 } from "@/features/bettertolive/notifications"
-import type {
-  WorkspaceTheme,
-  WorkspaceThemeId,
-} from "@/features/bettertolive/theme-presets"
+import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/theme-presets"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/use-workspace-music"
 import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
 import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"
@@ -110,10 +107,7 @@ export function WorkspaceUtilities({
       return
     }
 
-    const availableWidth = Math.max(
-      0,
-      window.innerWidth - PANEL_VIEWPORT_PADDING * 2,
-    )
+    const availableWidth = Math.max(0, window.innerWidth - PANEL_VIEWPORT_PADDING * 2)
     const width = Math.min(PANEL_WIDTHS[openPanel], availableWidth)
     const rect = trigger.getBoundingClientRect()
     const maxLeft = Math.max(
@@ -172,10 +166,7 @@ export function WorkspaceUtilities({
     function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node
 
-      if (
-        containerRef.current?.contains(target) ||
-        panelRef.current?.contains(target)
-      ) {
+      if (containerRef.current?.contains(target) || panelRef.current?.contains(target)) {
         return
       }
 
@@ -209,9 +200,7 @@ export function WorkspaceUtilities({
           label="主题切换"
           popupType="dialog"
           testId="theme-center-trigger"
-          onClick={() =>
-            setOpenPanel((current) => (current === "themes" ? null : "themes"))
-          }
+          onClick={() => setOpenPanel((current) => (current === "themes" ? null : "themes"))}
         >
           <Palette className="size-4" />
           <span
@@ -228,9 +217,7 @@ export function WorkspaceUtilities({
           popupType="dialog"
           testId="notification-center-trigger"
           onClick={() =>
-            setOpenPanel((current) =>
-              current === "notifications" ? null : "notifications",
-            )
+            setOpenPanel((current) => (current === "notifications" ? null : "notifications"))
           }
         >
           <BellRing className="size-4" />
@@ -243,9 +230,7 @@ export function WorkspaceUtilities({
           dot={isPlaying}
           popupType="dialog"
           testId="music-center-trigger"
-          onClick={() =>
-            setOpenPanel((current) => (current === "music" ? null : "music"))
-          }
+          onClick={() => setOpenPanel((current) => (current === "music" ? null : "music"))}
         >
           <Music4 className="size-4" />
         </UtilityIconButton>

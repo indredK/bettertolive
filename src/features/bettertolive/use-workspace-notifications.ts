@@ -13,9 +13,7 @@ function createNotificationId() {
   return `notification-${Date.now()}-${notificationCounter}`
 }
 
-function normalizeNotification(
-  input: WorkspaceNotificationInput,
-): WorkspaceNotification {
+function normalizeNotification(input: WorkspaceNotificationInput): WorkspaceNotification {
   const defaultDuration = input.channel === "message" ? 3000 : 5000
 
   return {
@@ -23,27 +21,16 @@ function normalizeNotification(
     tone: input.tone ?? "info",
     actionLabel: input.actionLabel ?? "前往查看",
     createdAt: Date.now(),
-    durationMs:
-      input.persistent === true ? null : (input.durationMs ?? defaultDuration),
+    durationMs: input.persistent === true ? null : (input.durationMs ?? defaultDuration),
     id: createNotificationId(),
     readAt: null,
   }
 }
 
-export function useWorkspaceNotifications({
-  onNavigate,
-}: {
-  onNavigate: (view: AppView) => void
-}) {
-  const [notifications, setNotifications] = useState<WorkspaceNotification[]>(
-    [],
-  )
-  const [notificationFeed, setNotificationFeed] = useState<
-    WorkspaceNotification[]
-  >([])
-  const [selectedNotificationId, setSelectedNotificationId] = useState<
-    string | null
-  >(null)
+export function useWorkspaceNotifications({ onNavigate }: { onNavigate: (view: AppView) => void }) {
+  const [notifications, setNotifications] = useState<WorkspaceNotification[]>([])
+  const [notificationFeed, setNotificationFeed] = useState<WorkspaceNotification[]>([])
+  const [selectedNotificationId, setSelectedNotificationId] = useState<string | null>(null)
   const timersRef = useRef(new Map<string, ReturnType<typeof setTimeout>>())
 
   const dismissNotification = useCallback((id: string) => {
@@ -146,9 +133,7 @@ export function useWorkspaceNotifications({
   )
 
   const selectedNotification = useMemo(
-    () =>
-      notificationFeed.find((entry) => entry.id === selectedNotificationId) ??
-      null,
+    () => notificationFeed.find((entry) => entry.id === selectedNotificationId) ?? null,
     [notificationFeed, selectedNotificationId],
   )
 

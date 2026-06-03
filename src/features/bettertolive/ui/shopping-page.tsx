@@ -101,12 +101,7 @@ function ShoppingPriceRow({
         compact && "py-1.5",
       )}
     >
-      <span
-        className={cn(
-          "text-xs text-[color:var(--text-muted)]",
-          compact && "text-[11px]",
-        )}
-      >
+      <span className={cn("text-xs text-[color:var(--text-muted)]", compact && "text-[11px]")}>
         {label}
       </span>
       <span
@@ -176,13 +171,8 @@ function ImmediateNeedCompactCard({ item }: { item: ShoppingPlanItem }) {
     <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2.5">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-1.5">
-          <h3 className="text-[13px] font-medium text-[color:var(--text-primary)]">
-            {item.name}
-          </h3>
-          <Badge
-            variant="outline"
-            className={cn("px-1.5", NEED_LEVEL_STYLES[item.necessity])}
-          >
+          <h3 className="text-[13px] font-medium text-[color:var(--text-primary)]">{item.name}</h3>
+          <Badge variant="outline" className={cn("px-1.5", NEED_LEVEL_STYLES[item.necessity])}>
             {item.necessity}
           </Badge>
           <Badge variant="outline" className={cn("px-1.5", signal.className)}>
@@ -215,11 +205,8 @@ export function ShoppingPage({
   searchQuery: string
   isWideLayout?: boolean
 }) {
-  const immediateItems =
-    shopping.purchaseLanes.find((lane) => lane.id === "buy-now")?.items ?? []
-  const ownedAttentionItems = shopping.ownedItems.filter(
-    (item) => !item.status.includes("稳定"),
-  )
+  const immediateItems = shopping.purchaseLanes.find((lane) => lane.id === "buy-now")?.items ?? []
+  const ownedAttentionItems = shopping.ownedItems.filter((item) => !item.status.includes("稳定"))
   const overlookedCollection = shopping.lifestyleCollections.find(
     (collection) => collection.id === "collection-overlooked",
   )
@@ -279,10 +266,7 @@ export function ShoppingPage({
 
       <Tabs
         defaultValue="overview"
-        className={cn(
-          "gap-4",
-          isWideLayout && "min-h-0 flex-1 gap-3 overflow-hidden",
-        )}
+        className={cn("gap-4", isWideLayout && "min-h-0 flex-1 gap-3 overflow-hidden")}
       >
         <TabsList
           variant="line"
@@ -309,10 +293,7 @@ export function ShoppingPage({
           >
             采购决策
           </TabsTrigger>
-          <TabsTrigger
-            value="stages"
-            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
-          >
+          <TabsTrigger value="stages" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
             阶段清单
           </TabsTrigger>
           <TabsTrigger
@@ -325,10 +306,7 @@ export function ShoppingPage({
 
         <TabsContent
           value="overview"
-          className={cn(
-            "space-y-4",
-            isWideLayout && "min-h-0 flex-1 overflow-hidden",
-          )}
+          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           {isWideLayout ? (
             <div className="grid h-full min-h-0 gap-3 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(320px,0.86fr)]">
@@ -344,17 +322,11 @@ export function ShoppingPage({
                   {shopping.spotlights.length > 0 ? (
                     <div className="grid content-start gap-3 min-[1360px]:grid-cols-2">
                       {shopping.spotlights.map((spotlight) => (
-                        <SpotlightCompactCard
-                          key={spotlight.id}
-                          spotlight={spotlight}
-                        />
+                        <SpotlightCompactCard key={spotlight.id} spotlight={spotlight} />
                       ))}
                     </div>
                   ) : (
-                    <EmptyState
-                      message="当前筛选下没有需要关注的主题。"
-                      compact
-                    />
+                    <EmptyState message="当前筛选下没有需要关注的主题。" compact />
                   )}
                 </div>
               </Surface>
@@ -374,10 +346,7 @@ export function ShoppingPage({
                         <ImmediateNeedCompactCard key={item.id} item={item} />
                       ))
                     ) : (
-                      <EmptyState
-                        message="当前筛选下没有立即补齐项。"
-                        compact
-                      />
+                      <EmptyState message="当前筛选下没有立即补齐项。" compact />
                     )}
                   </div>
                 </Surface>
@@ -483,10 +452,7 @@ export function ShoppingPage({
                               >
                                 {item.necessity}
                               </Badge>
-                              <Badge
-                                variant="outline"
-                                className={signal.className}
-                              >
+                              <Badge variant="outline" className={signal.className}>
                                 {signal.label}
                               </Badge>
                             </div>
@@ -511,10 +477,7 @@ export function ShoppingPage({
                         )
                       })
                     ) : (
-                      <EmptyState
-                        message="当前筛选下没有立即补齐项。"
-                        compact
-                      />
+                      <EmptyState message="当前筛选下没有立即补齐项。" compact />
                     )}
                   </div>
                 </Surface>
@@ -550,10 +513,7 @@ export function ShoppingPage({
 
         <TabsContent
           value="inventory"
-          className={cn(
-            "space-y-4",
-            isWideLayout && "min-h-0 flex-1 overflow-hidden",
-          )}
+          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
@@ -561,12 +521,7 @@ export function ShoppingPage({
               isWideLayout && "h-full min-h-0",
             )}
           >
-            <Surface
-              className={cn(
-                "p-5",
-                isWideLayout && "flex h-full min-h-0 flex-col p-4",
-              )}
-            >
+            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
               <SectionHeading
                 compact={isWideLayout}
                 icon={Package2}
@@ -575,43 +530,18 @@ export function ShoppingPage({
               />
 
               <div
-                className={cn(
-                  "mt-5",
-                  isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1",
-                )}
+                className={cn("mt-5", isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1")}
               >
                 {shopping.ownedItems.length > 0 ? (
                   <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
                       <TableRow className="border-[color:var(--muted-surface-border)]">
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          物品
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          分类
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          空间
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          数量
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          状态
-                        </TableHead>
-                        <TableHead className="whitespace-normal">
-                          备注
-                        </TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>物品</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>分类</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>空间</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>数量</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>状态</TableHead>
+                        <TableHead className="whitespace-normal">备注</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -653,10 +583,7 @@ export function ShoppingPage({
                             {item.quantity} 件
                           </TableCell>
                           <TableCell className={cn(isWideLayout && "py-1.5")}>
-                            <Badge
-                              variant="outline"
-                              className={getOwnedStatusClass(item.status)}
-                            >
+                            <Badge variant="outline" className={getOwnedStatusClass(item.status)}>
                               {item.status}
                             </Badge>
                           </TableCell>
@@ -678,12 +605,7 @@ export function ShoppingPage({
               </div>
             </Surface>
 
-            <Surface
-              className={cn(
-                "p-5",
-                isWideLayout && "flex h-full min-h-0 flex-col p-4",
-              )}
-            >
+            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
               <SectionHeading
                 compact={isWideLayout}
                 icon={Sparkles}
@@ -694,8 +616,7 @@ export function ShoppingPage({
               <div
                 className={cn(
                   "mt-5 space-y-4",
-                  isWideLayout &&
-                    "mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
+                  isWideLayout && "mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
                 )}
               >
                 {ownedAttentionItems.length > 0 ? (
@@ -711,10 +632,7 @@ export function ShoppingPage({
                         <h3 className="text-sm font-medium text-[color:var(--text-primary)]">
                           {item.name}
                         </h3>
-                        <Badge
-                          variant="outline"
-                          className={getOwnedStatusClass(item.status)}
-                        >
+                        <Badge variant="outline" className={getOwnedStatusClass(item.status)}>
                           {item.status}
                         </Badge>
                       </div>
@@ -737,10 +655,7 @@ export function ShoppingPage({
                     </div>
                   ))
                 ) : (
-                  <EmptyState
-                    message="当前筛选下没有需要关注的已有物品。"
-                    compact
-                  />
+                  <EmptyState message="当前筛选下没有需要关注的已有物品。" compact />
                 )}
               </div>
             </Surface>
@@ -749,10 +664,7 @@ export function ShoppingPage({
 
         <TabsContent
           value="planning"
-          className={cn(
-            "space-y-4",
-            isWideLayout && "min-h-0 flex-1 overflow-hidden",
-          )}
+          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
@@ -760,17 +672,9 @@ export function ShoppingPage({
               isWideLayout && "h-full min-h-0",
             )}
           >
-            <div
-              className={cn(
-                "space-y-4",
-                isWideLayout && "min-h-0 overflow-y-auto pr-1",
-              )}
-            >
+            <div className={cn("space-y-4", isWideLayout && "min-h-0 overflow-y-auto pr-1")}>
               {shopping.purchaseLanes.map((lane) => (
-                <Surface
-                  key={lane.id}
-                  className={cn("p-5", isWideLayout && "p-4")}
-                >
+                <Surface key={lane.id} className={cn("p-5", isWideLayout && "p-4")}>
                   <SectionHeading
                     compact={isWideLayout}
                     icon={ShoppingBasket}
@@ -778,12 +682,7 @@ export function ShoppingPage({
                     description={lane.subtitle}
                   />
 
-                  <div
-                    className={cn(
-                      "mt-5 space-y-5",
-                      isWideLayout && "mt-4 space-y-4",
-                    )}
-                  >
+                  <div className={cn("mt-5 space-y-5", isWideLayout && "mt-4 space-y-4")}>
                     {lane.items.length > 0 ? (
                       lane.items.map((item) => {
                         const signal = getPriceSignal(item)
@@ -817,10 +716,7 @@ export function ShoppingPage({
                               >
                                 {item.category}
                               </Badge>
-                              <Badge
-                                variant="outline"
-                                className={signal.className}
-                              >
+                              <Badge variant="outline" className={signal.className}>
                                 {signal.label}
                               </Badge>
                             </div>
@@ -900,22 +796,14 @@ export function ShoppingPage({
                         )
                       })
                     ) : (
-                      <EmptyState
-                        message={`当前筛选下，${lane.title} 暂时没有条目。`}
-                        compact
-                      />
+                      <EmptyState message={`当前筛选下，${lane.title} 暂时没有条目。`} compact />
                     )}
                   </div>
                 </Surface>
               ))}
             </div>
 
-            <Surface
-              className={cn(
-                "p-5",
-                isWideLayout && "flex h-full min-h-0 flex-col p-4",
-              )}
-            >
+            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
               <SectionHeading
                 compact={isWideLayout}
                 icon={CircleDollarSign}
@@ -924,35 +812,18 @@ export function ShoppingPage({
               />
 
               <div
-                className={cn(
-                  "mt-5",
-                  isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1",
-                )}
+                className={cn("mt-5", isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1")}
               >
                 {shopping.priceReferences.length > 0 ? (
                   <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
                       <TableRow className="border-[color:var(--muted-surface-border)]">
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          类别
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          入门价
-                        </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>类别</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>入门价</TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>
                           舒服区间
                         </TableHead>
-                        <TableHead
-                          className={cn(isWideLayout && "h-8 text-xs")}
-                        >
-                          偏贵
-                        </TableHead>
+                        <TableHead className={cn(isWideLayout && "h-8 text-xs")}>偏贵</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -1015,24 +886,17 @@ export function ShoppingPage({
 
         <TabsContent
           value="stages"
-          className={cn(
-            "space-y-4",
-            isWideLayout && "min-h-0 flex-1 overflow-hidden",
-          )}
+          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1320px]:grid-cols-2",
-              isWideLayout &&
-                "h-full min-h-0 content-start overflow-y-auto pr-1",
+              isWideLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
             )}
           >
             {shopping.stageChecklists.length > 0 ? (
               shopping.stageChecklists.map((checklist) => (
-                <Surface
-                  key={checklist.id}
-                  className={cn("p-5", isWideLayout && "p-4")}
-                >
+                <Surface key={checklist.id} className={cn("p-5", isWideLayout && "p-4")}>
                   <SectionHeading
                     compact={isWideLayout}
                     icon={House}
@@ -1055,18 +919,9 @@ export function ShoppingPage({
                       isWideLayout && "mt-4 gap-4",
                     )}
                   >
-                    <ChecklistBlock
-                      title="最低配置"
-                      items={checklist.minimum}
-                    />
-                    <ChecklistBlock
-                      title="必要物品"
-                      items={checklist.essentials}
-                    />
-                    <ChecklistBlock
-                      title="之后再升级"
-                      items={checklist.upgrades}
-                    />
+                    <ChecklistBlock title="最低配置" items={checklist.minimum} />
+                    <ChecklistBlock title="必要物品" items={checklist.essentials} />
+                    <ChecklistBlock title="之后再升级" items={checklist.upgrades} />
                   </div>
                 </Surface>
               ))
@@ -1078,16 +933,12 @@ export function ShoppingPage({
 
         <TabsContent
           value="lifestyle"
-          className={cn(
-            "space-y-4",
-            isWideLayout && "min-h-0 flex-1 overflow-hidden",
-          )}
+          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1320px]:grid-cols-3",
-              isWideLayout &&
-                "h-full min-h-0 content-start overflow-y-auto pr-1",
+              isWideLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
             )}
           >
             {coreLifestyleCollections.length > 0 ? (
@@ -1100,10 +951,7 @@ export function ShoppingPage({
                       : Sparkles
 
                 return (
-                  <Surface
-                    key={collection.id}
-                    className={cn("p-5", isWideLayout && "p-4")}
-                  >
+                  <Surface key={collection.id} className={cn("p-5", isWideLayout && "p-4")}>
                     <SectionHeading
                       compact={isWideLayout}
                       icon={icon}

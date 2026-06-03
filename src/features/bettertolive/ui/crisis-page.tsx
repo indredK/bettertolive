@@ -1,11 +1,7 @@
 import { ShieldAlert, Siren, UserRoundCheck, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import type {
-  CrisisContact,
-  CrisisCurrentState,
-  CrisisStep,
-} from "@/features/bettertolive/types"
+import type { CrisisContact, CrisisCurrentState, CrisisStep } from "@/features/bettertolive/types"
 import {
   EmptyState,
   PageIntro,

@@ -17,12 +17,9 @@ import type { RecentRecord } from "@/features/bettertolive/types"
 
 const SUMMARY_SURFACE_STYLES = {
   past: "border-[color:var(--tone-past-border)] bg-[color:var(--tone-past-bg)]",
-  present:
-    "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]",
-  future:
-    "border-[color:var(--tone-future-border)] bg-[color:var(--tone-future-bg)]",
-  value:
-    "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)]",
+  present: "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]",
+  future: "border-[color:var(--tone-future-border)] bg-[color:var(--tone-future-bg)]",
+  value: "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)]",
 } as const
 
 const KIND_BADGE_STYLES: Record<RecentRecord["kind"], string> = {
@@ -72,9 +69,7 @@ export function SummarySurface({
   compact?: boolean
 }) {
   return (
-    <Surface
-      className={cn("p-5", compact && "p-3", SUMMARY_SURFACE_STYLES[tone])}
-    >
+    <Surface className={cn("p-5", compact && "p-3", SUMMARY_SURFACE_STYLES[tone])}>
       <div
         className={cn(
           "text-xs tracking-[0.2em] text-[color:var(--text-muted)] uppercase",
@@ -119,12 +114,7 @@ export function SectionHeading({
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
           <Icon className="size-4" />
-          <h4
-            className={cn(
-              "text-base font-semibold tracking-tight",
-              compact && "text-sm",
-            )}
-          >
+          <h4 className={cn("text-base font-semibold tracking-tight", compact && "text-sm")}>
             {title}
           </h4>
         </div>
@@ -162,25 +152,15 @@ export function QuickActionButton({
         <Icon className="size-4" />
       </div>
       <div className="min-w-0">
-        <div className="font-medium text-[color:var(--text-primary)]">
-          {label}
-        </div>
-        <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-          {description}
-        </div>
+        <div className="font-medium text-[color:var(--text-primary)]">{label}</div>
+        <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">{description}</div>
       </div>
       <span className="text-[color:var(--text-muted)]">&rsaquo;</span>
     </button>
   )
 }
 
-export function EmptyState({
-  message,
-  compact = false,
-}: {
-  message: string
-  compact?: boolean
-}) {
+export function EmptyState({ message, compact = false }: { message: string; compact?: boolean }) {
   return (
     <div
       className={cn(
@@ -193,11 +173,7 @@ export function EmptyState({
   )
 }
 
-export function Surface({
-  className,
-  style,
-  ...props
-}: ComponentProps<"section">) {
+export function Surface({ className, style, ...props }: ComponentProps<"section">) {
   return (
     <section
       className={cn(
@@ -231,9 +207,7 @@ export function RecordStream({ records }: { records: RecentRecord[] }) {
               <span className="text-sm font-medium text-[color:var(--text-primary)]">
                 {record.title}
               </span>
-              <span className="text-xs text-[color:var(--text-muted)]">
-                {record.date}
-              </span>
+              <span className="text-xs text-[color:var(--text-muted)]">{record.date}</span>
             </div>
             <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
               {record.description}

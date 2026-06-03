@@ -67,8 +67,7 @@ export function useWorkspaceMusic() {
   const stepRef = useRef(0)
 
   const currentPreset = useMemo(
-    () =>
-      MUSIC_PRESETS.find((entry) => entry.id === presetId) ?? MUSIC_PRESETS[0],
+    () => MUSIC_PRESETS.find((entry) => entry.id === presetId) ?? MUSIC_PRESETS[0],
     [presetId],
   )
 
@@ -170,8 +169,7 @@ export function useWorkspaceMusic() {
   const selectPreset = useCallback(
     (nextPresetId: WorkspaceMusicPresetId) => {
       const nextPreset =
-        MUSIC_PRESETS.find((entry) => entry.id === nextPresetId) ??
-        MUSIC_PRESETS[0]
+        MUSIC_PRESETS.find((entry) => entry.id === nextPresetId) ?? MUSIC_PRESETS[0]
       setPresetId(nextPresetId)
 
       if (isPlaying) {

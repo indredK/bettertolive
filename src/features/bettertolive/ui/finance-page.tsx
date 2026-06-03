@@ -25,14 +25,11 @@ export function FinancePage({
   const spendingByCategory = transactions
     .filter((entry) => entry.direction === "expense")
     .reduce<Record<string, number>>((accumulator, entry) => {
-      accumulator[entry.category] =
-        (accumulator[entry.category] ?? 0) + entry.amount
+      accumulator[entry.category] = (accumulator[entry.category] ?? 0) + entry.amount
       return accumulator
     }, {})
 
-  const categoryRows = Object.entries(spendingByCategory).sort(
-    (left, right) => right[1] - left[1],
-  )
+  const categoryRows = Object.entries(spendingByCategory).sort((left, right) => right[1] - left[1])
 
   return (
     <div className="space-y-5">
@@ -82,9 +79,7 @@ export function FinancePage({
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-[color:var(--text-muted)]">
-                          {entry.date}
-                        </span>
+                        <span className="text-xs text-[color:var(--text-muted)]">{entry.date}</span>
                         <Badge
                           variant="outline"
                           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"

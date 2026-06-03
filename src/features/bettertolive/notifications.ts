@@ -2,11 +2,7 @@ import type { AppView } from "@/features/bettertolive/types"
 
 export type WorkspaceNotificationChannel = "message" | "notification"
 
-export type WorkspaceNotificationTone =
-  | "info"
-  | "success"
-  | "warning"
-  | "neutral"
+export type WorkspaceNotificationTone = "info" | "success" | "warning" | "neutral"
 
 export type WorkspaceNotificationInput = {
   channel: WorkspaceNotificationChannel
@@ -22,10 +18,7 @@ export type WorkspaceNotificationInput = {
   source?: string
 }
 
-export type WorkspaceNotification = Omit<
-  WorkspaceNotificationInput,
-  "durationMs"
-> & {
+export type WorkspaceNotification = Omit<WorkspaceNotificationInput, "durationMs"> & {
   id: string
   createdAt: number
   durationMs: number | null

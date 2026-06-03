@@ -160,8 +160,7 @@ export function OverviewPage({
               {[
                 {
                   title: "记录工作台",
-                  detail:
-                    "反思、记事、记账、购物，负责承接你现在到底在怎么生活。",
+                  detail: "反思、记事、记账、购物，负责承接你现在到底在怎么生活。",
                 },
                 {
                   title: "内在状态",
@@ -183,9 +182,7 @@ export function OverviewPage({
                   key={entry.title}
                   className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
                 >
-                  <div className="font-medium text-[color:var(--text-primary)]">
-                    {entry.title}
-                  </div>
+                  <div className="font-medium text-[color:var(--text-primary)]">{entry.title}</div>
                   <div className="mt-1">{entry.detail}</div>
                 </div>
               ))}

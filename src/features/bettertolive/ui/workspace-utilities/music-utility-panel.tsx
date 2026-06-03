@@ -38,9 +38,7 @@ export function MusicUtilityPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            音乐控制
-          </div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">音乐控制</div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
             常驻工具区的一部分。更像轻量陪伴，不抢页面注意力。
           </p>
@@ -51,11 +49,7 @@ export function MusicUtilityPanel({
           className="bg-white/80"
           onClick={() => void onToggleMusic()}
         >
-          {isPlaying ? (
-            <Pause className="size-4" />
-          ) : (
-            <Play className="size-4" />
-          )}
+          {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
         </Button>
       </div>
 
@@ -110,9 +104,7 @@ export function MusicUtilityPanel({
 
       <div className="mt-4 flex items-center justify-between rounded-xl border border-[color:var(--chip-border)] bg-white/65 px-3 py-3">
         <div>
-          <div className="text-xs font-medium text-[color:var(--text-muted)]">
-            音量微调
-          </div>
+          <div className="text-xs font-medium text-[color:var(--text-muted)]">音量微调</div>
           <div className="mt-1 text-sm text-[color:var(--text-primary)]">
             让功能区保持轻量，不盖住主页面。
           </div>

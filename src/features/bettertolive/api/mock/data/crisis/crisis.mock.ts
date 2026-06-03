@@ -39,14 +39,12 @@ export const crisisMockData = {
     {
       id: "crisis-step-1",
       title: "停止继续刺激自己",
-      description:
-        "先关掉会让你更乱的对话、页面和任务，不要一边崩一边继续受刺激。",
+      description: "先关掉会让你更乱的对话、页面和任务，不要一边崩一边继续受刺激。",
     },
     {
       id: "crisis-step-2",
       title: "做一个身体动作",
-      description:
-        "喝水、洗脸、站起来、去窗边或出门走两分钟，先让身体离开僵住状态。",
+      description: "喝水、洗脸、站起来、去窗边或出门走两分钟，先让身体离开僵住状态。",
     },
     {
       id: "crisis-step-3",

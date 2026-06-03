@@ -119,10 +119,7 @@ export function RelationshipsPage({
                         </div>
                       ))
                     ) : (
-                      <EmptyState
-                        message="当前筛选下这个圈层没有可展示的人物。"
-                        compact
-                      />
+                      <EmptyState message="当前筛选下这个圈层没有可展示的人物。" compact />
                     )}
                   </div>
                 </div>
@@ -183,9 +180,7 @@ export function RelationshipsPage({
                       >
                         {entry.to}
                       </Badge>
-                      <span className="text-xs text-[color:var(--text-muted)]">
-                        {entry.theme}
-                      </span>
+                      <span className="text-xs text-[color:var(--text-muted)]">{entry.theme}</span>
                     </div>
                     <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                       {entry.excerpt}
@@ -216,10 +211,7 @@ export function RelationshipsPage({
                   </div>
                 ))
               ) : (
-                <EmptyState
-                  message="当前筛选下没有可展示的关系模式。"
-                  compact
-                />
+                <EmptyState message="当前筛选下没有可展示的关系模式。" compact />
               )}
             </div>
           </Surface>

@@ -24,11 +24,7 @@ function filterChecklistByQuery(
   const essentials = checklist.essentials.filter((entry) => matchesQuery(entry))
   const upgrades = checklist.upgrades.filter((entry) => matchesQuery(entry))
 
-  if (
-    minimum.length === 0 &&
-    essentials.length === 0 &&
-    upgrades.length === 0
-  ) {
+  if (minimum.length === 0 && essentials.length === 0 && upgrades.length === 0) {
     return null
   }
 
@@ -129,13 +125,7 @@ export function useWorkspaceViewModel({
   const transactions = useMemo(
     () =>
       workspace.finance.entries.filter((entry) =>
-        matchesQuery(
-          entry.date,
-          entry.label,
-          entry.category,
-          entry.note,
-          entry.amount,
-        ),
+        matchesQuery(entry.date, entry.label, entry.category, entry.note, entry.amount),
       ),
     [matchesQuery, workspace.finance.entries],
   )
@@ -144,13 +134,7 @@ export function useWorkspaceViewModel({
     () => ({
       ...workspace.shopping,
       spotlights: workspace.shopping.spotlights.filter((entry) =>
-        matchesQuery(
-          entry.title,
-          entry.stage,
-          entry.summary,
-          entry.reason,
-          ...entry.attention,
-        ),
+        matchesQuery(entry.title, entry.stage, entry.summary, entry.reason, ...entry.attention),
       ),
       ownedItems: workspace.shopping.ownedItems.filter((entry) =>
         matchesQuery(
@@ -185,13 +169,7 @@ export function useWorkspaceViewModel({
         ),
       })),
       stageChecklists: workspace.shopping.stageChecklists
-        .map((entry) =>
-          filterChecklistByQuery(
-            entry,
-            normalizedQuery.length > 0,
-            matchesQuery,
-          ),
-        )
+        .map((entry) => filterChecklistByQuery(entry, normalizedQuery.length > 0, matchesQuery))
         .filter((entry) => entry !== null),
       priceReferences: workspace.shopping.priceReferences.filter((entry) =>
         matchesQuery(
@@ -203,13 +181,7 @@ export function useWorkspaceViewModel({
         ),
       ),
       lifestyleCollections: workspace.shopping.lifestyleCollections
-        .map((entry) =>
-          filterCollectionByQuery(
-            entry,
-            normalizedQuery.length > 0,
-            matchesQuery,
-          ),
-        )
+        .map((entry) => filterCollectionByQuery(entry, normalizedQuery.length > 0, matchesQuery))
         .filter((entry) => entry !== null),
     }),
     [matchesQuery, normalizedQuery.length, workspace.shopping],
@@ -232,9 +204,7 @@ export function useWorkspaceViewModel({
 
   const emotionTrend = useMemo(
     () =>
-      workspace.emotion.trend.filter((entry) =>
-        matchesQuery(entry.label, entry.score, entry.note),
-      ),
+      workspace.emotion.trend.filter((entry) => matchesQuery(entry.label, entry.score, entry.note)),
     [matchesQuery, workspace.emotion.trend],
   )
 
@@ -242,11 +212,7 @@ export function useWorkspaceViewModel({
     () =>
       workspace.emotion.triggers
         .map((entry) =>
-          filterEmotionTriggerByQuery(
-            entry,
-            normalizedQuery.length > 0,
-            matchesQuery,
-          ),
+          filterEmotionTriggerByQuery(entry, normalizedQuery.length > 0, matchesQuery),
         )
         .filter((entry) => entry !== null),
     [matchesQuery, normalizedQuery.length, workspace.emotion.triggers],
@@ -274,10 +240,7 @@ export function useWorkspaceViewModel({
   )
 
   const crisisSteps = useMemo(
-    () =>
-      workspace.crisis.steps.filter((entry) =>
-        matchesQuery(entry.title, entry.description),
-      ),
+    () => workspace.crisis.steps.filter((entry) => matchesQuery(entry.title, entry.description)),
     [matchesQuery, workspace.crisis.steps],
   )
 
@@ -310,19 +273,13 @@ export function useWorkspaceViewModel({
   const principles = useMemo(
     () =>
       workspace.principles.entries.filter((entry) =>
-        matchesQuery(
-          entry.title,
-          entry.description,
-          entry.boundary,
-          entry.source,
-        ),
+        matchesQuery(entry.title, entry.description, entry.boundary, entry.source),
       ),
     [matchesQuery, workspace.principles.entries],
   )
 
   const principleBoundaries = useMemo(
-    () =>
-      workspace.principles.boundaries.filter((entry) => matchesQuery(entry)),
+    () => workspace.principles.boundaries.filter((entry) => matchesQuery(entry)),
     [matchesQuery, workspace.principles.boundaries],
   )
 
@@ -347,8 +304,7 @@ export function useWorkspaceViewModel({
   )
 
   const relationshipPatterns = useMemo(
-    () =>
-      workspace.relationships.patterns.filter((entry) => matchesQuery(entry)),
+    () => workspace.relationships.patterns.filter((entry) => matchesQuery(entry)),
     [matchesQuery, workspace.relationships.patterns],
   )
 
@@ -371,13 +327,7 @@ export function useWorkspaceViewModel({
   const growthStages = useMemo(
     () =>
       workspace.growth.stages.filter((entry) =>
-        matchesQuery(
-          entry.stage,
-          entry.title,
-          entry.environment,
-          entry.impact,
-          ...entry.traces,
-        ),
+        matchesQuery(entry.stage, entry.title, entry.environment, entry.impact, ...entry.traces),
       ),
     [matchesQuery, workspace.growth.stages],
   )
@@ -390,22 +340,14 @@ export function useWorkspaceViewModel({
   const memoryNodes = useMemo(
     () =>
       workspace.memory.nodes.filter((entry) =>
-        matchesQuery(
-          entry.period,
-          entry.title,
-          entry.summary,
-          entry.impact,
-          ...entry.tags,
-        ),
+        matchesQuery(entry.period, entry.title, entry.summary, entry.impact, ...entry.tags),
       ),
     [matchesQuery, workspace.memory.nodes],
   )
 
   const memoryAnchors = useMemo(
     () =>
-      workspace.memory.anchors.filter((entry) =>
-        matchesQuery(entry.type, entry.label, entry.note),
-      ),
+      workspace.memory.anchors.filter((entry) => matchesQuery(entry.type, entry.label, entry.note)),
     [matchesQuery, workspace.memory.anchors],
   )
 
@@ -415,10 +357,7 @@ export function useWorkspaceViewModel({
   )
 
   const legacyDirectives = useMemo(
-    () =>
-      workspace.legacy.directives.filter((entry) =>
-        matchesQuery(entry.title, entry.detail),
-      ),
+    () => workspace.legacy.directives.filter((entry) => matchesQuery(entry.title, entry.detail)),
     [matchesQuery, workspace.legacy.directives],
   )
 
@@ -431,18 +370,12 @@ export function useWorkspaceViewModel({
   )
 
   const legacyWishes = useMemo(
-    () =>
-      workspace.legacy.wishes.filter((entry) =>
-        matchesQuery(entry.title, entry.detail),
-      ),
+    () => workspace.legacy.wishes.filter((entry) => matchesQuery(entry.title, entry.detail)),
     [matchesQuery, workspace.legacy.wishes],
   )
 
   const legacyPreferences = useMemo(
-    () =>
-      workspace.legacy.preferences.filter((entry) =>
-        matchesQuery(entry.label, entry.note),
-      ),
+    () => workspace.legacy.preferences.filter((entry) => matchesQuery(entry.label, entry.note)),
     [matchesQuery, workspace.legacy.preferences],
   )
 

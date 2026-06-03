@@ -75,9 +75,7 @@ export function LegacyPage({
                   key={entry.id}
                   className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
                 >
-                  <div className="font-medium text-[color:var(--text-primary)]">
-                    {entry.title}
-                  </div>
+                  <div className="font-medium text-[color:var(--text-primary)]">{entry.title}</div>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                     {entry.detail}
                   </p>
@@ -102,9 +100,7 @@ export function LegacyPage({
                     >
                       {entry.to}
                     </Badge>
-                    <span className="text-xs text-[color:var(--text-muted)]">
-                      {entry.theme}
-                    </span>
+                    <span className="text-xs text-[color:var(--text-muted)]">{entry.theme}</span>
                   </div>
                   <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
                     {entry.excerpt}
@@ -182,10 +178,7 @@ export function LegacyPage({
                   </div>
                 ))
               ) : (
-                <EmptyState
-                  message="当前筛选下没有可展示的安排偏好。"
-                  compact
-                />
+                <EmptyState message="当前筛选下没有可展示的安排偏好。" compact />
               )}
             </div>
           </Surface>

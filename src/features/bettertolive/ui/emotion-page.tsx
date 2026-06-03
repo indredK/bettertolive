@@ -77,9 +77,7 @@ export function EmotionPage({
                 >
                   {latestCheckIn.state}
                 </Badge>
-                <span className="text-[color:var(--text-muted)]">
-                  {latestCheckIn.date}
-                </span>
+                <span className="text-[color:var(--text-muted)]">{latestCheckIn.date}</span>
                 <span className="text-[color:var(--text-muted)]">
                   强度 {latestCheckIn.intensity}
                 </span>

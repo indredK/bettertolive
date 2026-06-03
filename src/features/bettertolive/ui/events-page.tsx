@@ -2,20 +2,9 @@ import { BookOpenText, Target } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import type { EventEntry } from "@/features/bettertolive/types"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared"
+import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
 
-export function EventsPage({
-  events,
-  searchQuery,
-}: {
-  events: EventEntry[]
-  searchQuery: string
-}) {
+export function EventsPage({ events, searchQuery }: { events: EventEntry[]; searchQuery: string }) {
   const themes = Array.from(new Set(events.map((entry) => entry.theme)))
 
   return (

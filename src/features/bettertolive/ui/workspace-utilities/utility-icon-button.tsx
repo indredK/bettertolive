@@ -16,16 +16,7 @@ export const UtilityIconButton = forwardRef<
     onClick: () => void
   }
 >(function UtilityIconButton(
-  {
-    children,
-    label,
-    badge = null,
-    dot = false,
-    isActive,
-    popupType = "dialog",
-    testId,
-    onClick,
-  },
+  { children, label, badge = null, dot = false, isActive, popupType = "dialog", testId, onClick },
   ref,
 ) {
   return (

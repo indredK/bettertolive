@@ -32,9 +32,7 @@ export function NotificationCenterPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            通知中心
-          </div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">通知中心</div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
             顶部消息和右下通知都会汇总到这里，适合回看和继续处理。
           </p>
@@ -47,9 +45,7 @@ export function NotificationCenterPanel({
       <div className="mt-4 space-y-2">
         {hasNotifications ? (
           notificationFeed.map((notification) => {
-            const isActive = notifications.some(
-              (entry) => entry.id === notification.id,
-            )
+            const isActive = notifications.some((entry) => entry.id === notification.id)
 
             return (
               <div
@@ -83,9 +79,7 @@ export function NotificationCenterPanel({
                         {notification.message}
                       </p>
                       <div className="mt-2 text-[11px] text-[color:var(--text-muted)]">
-                        {notification.channel === "message"
-                          ? "顶部消息"
-                          : "右下通知"}
+                        {notification.channel === "message" ? "顶部消息" : "右下通知"}
                       </div>
                     </div>
                   </div>
@@ -124,9 +118,7 @@ export function NotificationCenterPanel({
       </div>
 
       <div className="mt-4 rounded-xl border border-[color:var(--chip-border)] bg-white/65 px-3 py-3">
-        <div className="text-xs font-medium text-[color:var(--text-muted)]">
-          反馈测试
-        </div>
+        <div className="text-xs font-medium text-[color:var(--text-muted)]">反馈测试</div>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -140,8 +132,7 @@ export function NotificationCenterPanel({
                 message: "默认 3 秒后自动消失，适合保存成功这类轻反馈。",
                 tone: "success",
                 source: "顶部消息组件",
-                detail:
-                  "顶部消息更适合短暂确认和轻量结果反馈，不应该承载太重的阅读压力。",
+                detail: "顶部消息更适合短暂确认和轻量结果反馈，不应该承载太重的阅读压力。",
                 detailLines: [
                   "默认时长：3000ms",
                   "适合保存成功、完成确认、轻提醒",
@@ -164,8 +155,7 @@ export function NotificationCenterPanel({
                 message: "默认 5 秒停留，适合更完整的信息提示。",
                 tone: "info",
                 source: "右下通知组件",
-                detail:
-                  "右下通知更适合带上下文的提醒、建议和可操作的信息，也更适合多条堆叠。",
+                detail: "右下通知更适合带上下文的提醒、建议和可操作的信息，也更适合多条堆叠。",
                 detailLines: [
                   "默认时长：5000ms",
                   "适合任务完成、提醒、建议等场景",
@@ -191,8 +181,7 @@ export function NotificationCenterPanel({
                 targetView: "growth",
                 actionLabel: "前往成长页",
                 source: "扩展通知示例",
-                detail:
-                  "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
+                detail: "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
                 detailLines: [
                   "不会自动消失",
                   "支持前往指定页面",

@@ -118,15 +118,7 @@ export type ShoppingLifestyleCollection = {
   items: string[]
 }
 
-export type RecentRecordKind =
-  | "反思"
-  | "记事"
-  | "支出"
-  | "收入"
-  | "蓝图"
-  | "情绪"
-  | "记忆"
-  | "托付"
+export type RecentRecordKind = "反思" | "记事" | "支出" | "收入" | "蓝图" | "情绪" | "记忆" | "托付"
 
 export type RecentRecord = {
   id: string

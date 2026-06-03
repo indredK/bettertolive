@@ -2,6 +2,7 @@
 const config = {
   semi: false,
   trailingComma: "all",
+  printWidth: 100,
   plugins: ["prettier-plugin-tailwindcss"],
 }
 

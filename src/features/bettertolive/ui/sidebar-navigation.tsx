@@ -57,8 +57,7 @@ function SidebarPreviewBand({
   const hiddenOverflowCount = Math.max(0, hiddenCount - items.length)
   const Icon = direction === "top" ? ArrowUp : ArrowDown
   const scale = 0.96 + strength * 0.04
-  const translateY =
-    direction === "top" ? (1 - strength) * -6 : (1 - strength) * 6
+  const translateY = direction === "top" ? (1 - strength) * -6 : (1 - strength) * 6
 
   return (
     <div
@@ -138,14 +137,9 @@ export function SidebarNavigation({
   sections: SidebarNavigationSection[]
 }) {
   const scrollViewportRef = useRef<HTMLDivElement | null>(null)
-  const itemRefs = useRef<Partial<Record<AppView, HTMLButtonElement | null>>>(
-    {},
-  )
+  const itemRefs = useRef<Partial<Record<AppView, HTMLButtonElement | null>>>({})
   const animationFrameRef = useRef<number | null>(null)
-  const flattenedItems = useMemo(
-    () => sections.flatMap((section) => section.items),
-    [sections],
-  )
+  const flattenedItems = useMemo(() => sections.flatMap((section) => section.items), [sections])
   const [previewState, setPreviewState] = useState<PreviewState>(() => ({
     firstVisibleIndex: 0,
     lastVisibleIndex: Math.max(0, flattenedItems.length - 1),
@@ -340,10 +334,7 @@ export function SidebarNavigation({
           >
             <div className="grid content-start gap-2 py-0.5">
               {sections.map((section) => (
-                <div
-                  key={section.title}
-                  className="grid justify-items-center gap-2.5 py-1.5"
-                >
+                <div key={section.title} className="grid justify-items-center gap-2.5 py-1.5">
                   {section.items.map((item) => {
                     const Icon = item.icon
                     const isActive = item.view === activeView
@@ -436,11 +427,7 @@ export function SidebarNavigation({
                               ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
                               : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
                           )}
-                          style={
-                            isActive
-                              ? { boxShadow: "var(--surface-shadow)" }
-                              : undefined
-                          }
+                          style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
                         >
                           <div
                             className={cn(
@@ -460,9 +447,7 @@ export function SidebarNavigation({
                               {item.hint}
                             </div>
                           </div>
-                          <span className="text-[color:var(--text-muted)]">
-                            &rsaquo;
-                          </span>
+                          <span className="text-[color:var(--text-muted)]">&rsaquo;</span>
                         </button>
                       )
                     })}
@@ -505,8 +490,7 @@ export function StackedNavigation({
       ),
     [sections],
   )
-  const activeEntry =
-    entries.find((entry) => entry.view === activeView) ?? entries[0]
+  const activeEntry = entries.find((entry) => entry.view === activeView) ?? entries[0]
 
   return (
     <section
@@ -515,10 +499,7 @@ export function StackedNavigation({
     >
       <div className="mx-auto w-full max-w-[1500px] px-4 py-4">
         <div className="hide-scrollbar -mx-1 overflow-x-auto pb-1">
-          <nav
-            aria-label="页面导航"
-            className="flex w-max min-w-full gap-2 px-1"
-          >
+          <nav aria-label="页面导航" className="flex w-max min-w-full gap-2 px-1">
             {entries.map((item) => {
               const Icon = item.icon
               const isActive = item.view === activeView
@@ -537,11 +518,7 @@ export function StackedNavigation({
                       ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
                       : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
                   )}
-                  style={
-                    isActive
-                      ? { boxShadow: "var(--surface-shadow)" }
-                      : undefined
-                  }
+                  style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
                 >
                   <div
                     className={cn(

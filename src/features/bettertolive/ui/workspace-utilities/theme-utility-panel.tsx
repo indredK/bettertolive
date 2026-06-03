@@ -1,9 +1,6 @@
 import { Check } from "lucide-react"
 
-import type {
-  WorkspaceTheme,
-  WorkspaceThemeId,
-} from "@/features/bettertolive/theme-presets"
+import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/theme-presets"
 import { cn } from "@/lib/utils"
 
 export function ThemeUtilityPanel({
@@ -24,9 +21,7 @@ export function ThemeUtilityPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">
-            主题切换
-          </div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">主题切换</div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
             主题是一种工作氛围，不是昼夜模式。当前是 {currentTheme.label}。
           </p>

@@ -33,8 +33,7 @@ function readPersistedWorkspaceUiState(): PersistedWorkspaceUiState {
   if (typeof window === "undefined") {
     return {
       isSidebarCollapsed: defaultWorkspaceUiState.isSidebarCollapsed,
-      isCompactSidebarExpanded:
-        defaultWorkspaceUiState.isCompactSidebarExpanded,
+      isCompactSidebarExpanded: defaultWorkspaceUiState.isCompactSidebarExpanded,
     }
   }
 
@@ -43,15 +42,12 @@ function readPersistedWorkspaceUiState(): PersistedWorkspaceUiState {
   if (!rawState) {
     return {
       isSidebarCollapsed: defaultWorkspaceUiState.isSidebarCollapsed,
-      isCompactSidebarExpanded:
-        defaultWorkspaceUiState.isCompactSidebarExpanded,
+      isCompactSidebarExpanded: defaultWorkspaceUiState.isCompactSidebarExpanded,
     }
   }
 
   try {
-    const parsedState = JSON.parse(
-      rawState,
-    ) as Partial<PersistedWorkspaceUiState>
+    const parsedState = JSON.parse(rawState) as Partial<PersistedWorkspaceUiState>
 
     return {
       isSidebarCollapsed:
@@ -66,8 +62,7 @@ function readPersistedWorkspaceUiState(): PersistedWorkspaceUiState {
   } catch {
     return {
       isSidebarCollapsed: defaultWorkspaceUiState.isSidebarCollapsed,
-      isCompactSidebarExpanded:
-        defaultWorkspaceUiState.isCompactSidebarExpanded,
+      isCompactSidebarExpanded: defaultWorkspaceUiState.isCompactSidebarExpanded,
     }
   }
 }
@@ -98,15 +93,13 @@ function createInitialWorkspaceUiState() {
 export const useWorkspaceUiStore = create<WorkspaceUiState>((set) => ({
   ...createInitialWorkspaceUiState(),
   setActiveView: (activeView) => set({ activeView }),
-  toggleSidebarCollapsed: () =>
-    set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
+  toggleSidebarCollapsed: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }),
   toggleCompactSidebarExpanded: () =>
     set((state) => ({
       isCompactSidebarExpanded: !state.isCompactSidebarExpanded,
     })),
-  setCompactSidebarExpanded: (isCompactSidebarExpanded) =>
-    set({ isCompactSidebarExpanded }),
+  setCompactSidebarExpanded: (isCompactSidebarExpanded) => set({ isCompactSidebarExpanded }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
 }))
 

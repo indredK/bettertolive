@@ -52,10 +52,7 @@ const NOTIFICATION_TONE_STYLES = {
   },
 } as const
 
-const NOTIFICATION_TONE_ICONS: Record<
-  NonNullable<WorkspaceNotification["tone"]>,
-  LucideIcon
-> = {
+const NOTIFICATION_TONE_ICONS: Record<NonNullable<WorkspaceNotification["tone"]>, LucideIcon> = {
   info: Info,
   success: CheckCircle2,
   warning: TriangleAlert,
@@ -77,12 +74,8 @@ export function NotificationLayer({
   onCloseDetail: () => void
   onActivateTarget: (notification: WorkspaceNotification) => void
 }) {
-  const messageNotifications = notifications.filter(
-    (entry) => entry.channel === "message",
-  )
-  const inboxNotifications = notifications.filter(
-    (entry) => entry.channel === "notification",
-  )
+  const messageNotifications = notifications.filter((entry) => entry.channel === "message")
+  const inboxNotifications = notifications.filter((entry) => entry.channel === "notification")
 
   return (
     <>
@@ -191,12 +184,8 @@ function MessageCard({
               </span>
             ) : null}
           </div>
-          <div className="mt-1 text-sm font-medium text-slate-900">
-            {notification.title}
-          </div>
-          <p className="mt-0.5 text-sm leading-6 text-slate-600">
-            {notification.message}
-          </p>
+          <div className="mt-1 text-sm font-medium text-slate-900">{notification.title}</div>
+          <p className="mt-0.5 text-sm leading-6 text-slate-600">{notification.message}</p>
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
@@ -272,9 +261,7 @@ function NotificationCard({
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <div className="text-sm font-medium text-slate-900">
-              {notification.title}
-            </div>
+            <div className="text-sm font-medium text-slate-900">{notification.title}</div>
             <span
               className={cn(
                 "rounded-full border px-2 py-0.5 text-[11px] leading-none",
@@ -289,9 +276,7 @@ function NotificationCard({
               </span>
             ) : null}
           </div>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
-            {notification.message}
-          </p>
+          <p className="mt-1 text-sm leading-6 text-slate-600">{notification.message}</p>
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <Button
@@ -338,10 +323,7 @@ function NotificationDetailDialog({
   onActivateTarget: (notification: WorkspaceNotification) => void
 }) {
   return (
-    <Dialog
-      open={notification !== null}
-      onOpenChange={(open) => !open && onClose()}
-    >
+    <Dialog open={notification !== null} onOpenChange={(open) => !open && onClose()}>
       {notification ? (
         <DialogContent className="max-w-[560px] p-0" showCloseButton={false}>
           <DialogHeader className="px-5 pt-5">
@@ -349,9 +331,7 @@ function NotificationDetailDialog({
               <BellRing className="size-3.5" />
               {notification.channel === "message" ? "消息详情" : "通知详情"}
             </div>
-            <DialogTitle className="text-lg text-slate-900">
-              {notification.title}
-            </DialogTitle>
+            <DialogTitle className="text-lg text-slate-900">{notification.title}</DialogTitle>
             <DialogDescription className="leading-6 text-slate-600">
               {notification.message}
             </DialogDescription>
@@ -387,9 +367,7 @@ function NotificationDetailDialog({
               </span>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
                 时效：
-                {notification.persistent
-                  ? "常驻"
-                  : `${notification.durationMs}ms`}
+                {notification.persistent ? "常驻" : `${notification.durationMs}ms`}
               </span>
             </div>
           </div>
