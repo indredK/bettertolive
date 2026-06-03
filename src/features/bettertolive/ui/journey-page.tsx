@@ -66,7 +66,7 @@ export function JourneyPage({
 
         <div className="mt-5 grid gap-4 min-[1240px]:grid-cols-2">
           <div className="space-y-4">
-            <div className="text-xs font-medium tracking-wider text-[color:var(--text-muted)] uppercase">
+            <div className="text-xs font-medium tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
               成长阶段
             </div>
             {stages.length > 0 ? (
@@ -111,7 +111,7 @@ export function JourneyPage({
           </div>
 
           <div className="space-y-4">
-            <div className="text-xs font-medium tracking-wider text-[color:var(--text-muted)] uppercase">
+            <div className="text-xs font-medium tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
               人生节点
             </div>
             {nodes.length > 0 ? (

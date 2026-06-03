@@ -73,7 +73,7 @@ export function EmotionPage({
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <Badge
                   variant="outline"
-                  className="border-[color:var(--chip-border)] bg-white/60 text-[color:var(--text-secondary)]"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
                 >
                   {latestCheckIn.state}
                 </Badge>

@@ -66,7 +66,7 @@ export function CrisisPage({
           <div className="mt-5 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 py-4">
             <Badge
               variant="outline"
-              className="border-[color:var(--chip-border)] bg-white/60 text-[color:var(--text-secondary)]"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
             >
               {currentState.level}
             </Badge>
