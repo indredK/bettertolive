@@ -348,7 +348,7 @@ export function ShoppingPage({
                       {overlookedCollection.items.map((item) => (
                         <div
                           key={item}
-                          className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]"
+                          className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]"
                         >
                           {item}
                         </div>
@@ -861,8 +861,8 @@ export function ShoppingPage({
 
                   <div
                     className={cn(
-                      "mt-5 grid gap-5 min-[960px]:grid-cols-3",
-                      isWideLayout && "mt-4 gap-4",
+                      "mt-5 grid gap-4 min-[960px]:grid-cols-3",
+                      isWideLayout && "mt-4",
                     )}
                   >
                     <ChecklistBlock title="最低配置" items={checklist.minimum} />

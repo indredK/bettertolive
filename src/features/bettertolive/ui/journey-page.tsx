@@ -169,7 +169,7 @@ export function JourneyPage({
               {anchors.map((entry) => (
                 <span
                   key={entry.id}
-                  className="inline-flex items-center gap-2 rounded-md border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-1.5 text-xs text-[color:var(--text-secondary)]"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-1.5 text-xs text-[color:var(--text-secondary)]"
                   title={entry.note}
                 >
                   <span className="font-medium text-[color:var(--text-primary)]">{entry.type}</span>

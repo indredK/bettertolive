@@ -165,7 +165,7 @@ export function EmptyState({ message, compact = false }: { message: string; comp
     <div
       className={cn(
         "rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] px-4 py-5 text-sm text-[color:var(--text-muted)]",
-        compact ? "py-4" : "py-8",
+        compact && "py-4",
       )}
     >
       {message}
