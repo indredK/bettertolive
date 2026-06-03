@@ -6,7 +6,8 @@
   "scripts": {
     "start": "bun tauri dev",
     "dev": "vite",
-    "build": "bun run typecheck && vite build",
+    "build": "bun run lint && bun run typecheck && vite build",
+    "build:bundle": "vite build",
     "preview": "vite preview",
     "tauri": "tauri",
     "typecheck": "tsc --noEmit",
@@ -18,7 +19,7 @@
     "check:precommit": "bash ./scripts/pre-commit-strict.sh",
     "test": "vitest",
     "test:run": "vitest run",
-    "analyze:bundle": "bun run typecheck && vite build --mode analyze",
+    "analyze:bundle": "bun run lint && bun run typecheck && vite build --mode analyze",
     "changeset": "changeset",
     "version:packages": "changeset version",
     "check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --all --check && cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings && cargo check --manifest-path src-tauri/Cargo.toml --all-targets --all-features",
