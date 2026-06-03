@@ -11,8 +11,8 @@ import { BellRing, Music4, Palette } from "lucide-react"
 import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
-} from "@/features/bettertolive/notifications"
-import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/theme-presets"
+} from "@/features/bettertolive/config/notifications"
+import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
 import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
 import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"

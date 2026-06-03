@@ -1,7 +1,7 @@
 import { create } from "zustand"
 
 import type { AppView } from "@/features/bettertolive/models/workspace"
-import { readWorkspaceViewFromLocation } from "@/features/bettertolive/workspace-view-route"
+import { readWorkspaceViewFromLocation } from "@/features/bettertolive/config/workspace-view-route"
 
 const WORKSPACE_UI_STORAGE_KEY = "bettertolive.workspace-ui"
 

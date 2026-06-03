@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
-} from "@/features/bettertolive/notifications"
+} from "@/features/bettertolive/config/notifications"
 import type { AppView } from "@/features/bettertolive/types"
 
 let notificationCounter = 0

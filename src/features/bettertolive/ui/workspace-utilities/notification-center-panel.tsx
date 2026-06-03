@@ -2,8 +2,8 @@ import { Button } from "@/components/ui/button"
 import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
-} from "@/features/bettertolive/notifications"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/view-labels"
+} from "@/features/bettertolive/config/notifications"
+import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
 
 export function NotificationCenterPanel({
   notifications,

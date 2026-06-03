@@ -30,7 +30,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { AppView } from "@/features/bettertolive/types"
-import { workspaceRhythmSlides, workspaceSidebarNotes } from "@/features/bettertolive/sidebar-copy"
+import {
+  workspaceRhythmSlides,
+  workspaceSidebarNotes,
+} from "@/features/bettertolive/config/sidebar"
 import { useWorkspaceNotifications } from "@/features/bettertolive/hooks/use-workspace-notifications"
 import { useWorkspaceMusic } from "@/features/bettertolive/hooks/use-workspace-music"
 import { useWorkspaceTheme } from "@/features/bettertolive/hooks/use-workspace-theme"
@@ -38,7 +41,7 @@ import { useWorkspaceViewRoute } from "@/features/bettertolive/hooks/use-workspa
 import { useWorkspaceViewModel } from "@/features/bettertolive/hooks/use-workspace-view-model"
 import { useWorkspaceSnapshotQuery } from "@/features/bettertolive/queries/use-workspace-snapshot-query"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/view-labels"
+import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
 import { EventsPage } from "@/features/bettertolive/ui/events/events-page"
 import { FinancePage } from "@/features/bettertolive/ui/finance/finance-page"
 import { FuturePage } from "@/features/bettertolive/ui/future/future-page"

@@ -6,7 +6,7 @@ import useEmblaCarousel from "embla-carousel-react"
 import type {
   WorkspaceRhythmSlide,
   WorkspaceSidebarNote,
-} from "@/features/bettertolive/sidebar-copy"
+} from "@/features/bettertolive/config/sidebar"
 import { cn } from "@/lib/utils"
 
 type CarouselDotButtonProps = {

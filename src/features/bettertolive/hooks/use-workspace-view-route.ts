@@ -4,7 +4,7 @@ import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui
 import {
   getWorkspaceViewFromHash,
   syncWorkspaceViewHash,
-} from "@/features/bettertolive/workspace-view-route"
+} from "@/features/bettertolive/config/workspace-view-route"
 
 export function useWorkspaceViewRoute() {
   const activeView = useWorkspaceUiStore((state) => state.activeView)

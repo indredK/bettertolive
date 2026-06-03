@@ -5,7 +5,7 @@ import {
   workspaceThemesById,
   type WorkspaceTheme,
   type WorkspaceThemeId,
-} from "@/features/bettertolive/theme-presets"
+} from "@/features/bettertolive/config/theme-presets"
 
 const STORAGE_KEY = "bettertolive.theme"
 const DEFAULT_THEME_ID: WorkspaceThemeId = "morning"

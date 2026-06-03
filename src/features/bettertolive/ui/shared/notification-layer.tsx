@@ -19,8 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { WorkspaceNotification } from "@/features/bettertolive/notifications"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/view-labels"
+import type { WorkspaceNotification } from "@/features/bettertolive/config/notifications"
+import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
 import {
   APP_FADE_TRANSITION,
   NOTIFICATION_MESSAGE_PRESENCE,

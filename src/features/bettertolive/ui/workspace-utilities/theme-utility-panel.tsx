@@ -1,6 +1,6 @@
 import { Check } from "lucide-react"
 
-import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/theme-presets"
+import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import { cn } from "@/lib/utils"
 
 export function ThemeUtilityPanel({
