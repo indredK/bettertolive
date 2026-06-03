@@ -217,6 +217,9 @@ export function useWorkspaceViewModel({
           entry.note,
         ),
       ),
+      boundaryEntries: workspace.shopping.boundaryEntries.filter((entry) =>
+        matchesQuery(entry.item, entry.system, entry.reason),
+      ),
       lifestyleCollections: workspace.shopping.lifestyleCollections
         .map((entry) => filterCollectionByQuery(entry, normalizedQuery.length > 0, matchesQuery))
         .filter((entry) => entry !== null),

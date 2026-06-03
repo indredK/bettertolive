@@ -209,6 +209,13 @@ describe("App", () => {
 
     expect(screen.getByRole("heading", { name: "生活物品" })).toBeInTheDocument()
     expect(screen.getByText("生活物品说明")).toBeInTheDocument()
+    expect(screen.getByText("边界约定")).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole("tab", { name: "系统地图" }))
+    fireEvent.click(screen.getByRole("button", { name: "睡眠 系统详情" }))
+    expect(screen.getByRole("dialog")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "睡眠" })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "Close" }))
 
     fireEvent.click(screen.getByRole("tab", { name: "采购决策" }))
     expect(screen.getByRole("heading", { name: "立即补齐" })).toBeInTheDocument()
@@ -216,9 +223,6 @@ describe("App", () => {
     const stagesTab = screen.getByRole("tab", { name: "阶段模板" })
     fireEvent.click(stagesTab)
     expect(stagesTab).toHaveAttribute("aria-selected", "true")
-
-    fireEvent.click(screen.getByRole("tab", { name: "空间巡检" }))
-    expect(screen.getByRole("heading", { name: "卧室" })).toBeInTheDocument()
   })
 
   it("collapses the sidebar into an icon rail", async () => {

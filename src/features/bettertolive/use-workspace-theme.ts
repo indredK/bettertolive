@@ -27,12 +27,28 @@ export function useWorkspaceTheme() {
   const [themeId, setThemeId] = useState<WorkspaceThemeId>(readStoredTheme)
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_KEY, themeId)
+    if (typeof window === "undefined") {
+      return
     }
+
+    window.localStorage.setItem(STORAGE_KEY, themeId)
   }, [themeId])
 
   const theme: WorkspaceTheme = workspaceThemesById[themeId]
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+
+    const root = document.documentElement
+
+    root.dataset.theme = theme.id
+
+    for (const [property, value] of Object.entries(theme.vars)) {
+      root.style.setProperty(property, value)
+    }
+  }, [theme])
 
   const themeStyle = useMemo(
     (): CSSProperties => ({

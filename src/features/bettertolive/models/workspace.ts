@@ -157,6 +157,13 @@ export type ShoppingPriceReference = {
   note: string
 }
 
+export type ShoppingBoundaryEntry = {
+  id: string
+  item: string
+  system: ShoppingSystem
+  reason: string
+}
+
 export type ShoppingLifestyleCollection = {
   id: string
   title: string
@@ -413,6 +420,7 @@ export type ShoppingModuleData = {
   purchaseLanes: ShoppingPurchaseLane[]
   stageChecklists: ShoppingStageChecklist[]
   priceReferences: ShoppingPriceReference[]
+  boundaryEntries: ShoppingBoundaryEntry[]
   lifestyleCollections: ShoppingLifestyleCollection[]
 }
 

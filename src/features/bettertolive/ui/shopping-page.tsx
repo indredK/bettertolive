@@ -8,6 +8,8 @@ import {
   ShoppingBasket,
   Sparkles,
 } from "lucide-react"
+import { gsap } from "gsap"
+import { useEffect, useRef, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -36,11 +38,21 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import {
+  ShoppingSystemDetailDialog,
+  type ShoppingPlanWithLane,
+  type ShoppingSystemOverview,
+} from "@/features/bettertolive/ui/shopping-system-detail-dialog"
 import { cn } from "@/lib/utils"
 
-type ShoppingPlanWithLane = ShoppingPlanItem & {
-  laneId: string
-  laneTitle: string
+function chunkList<T>(items: T[], size: number) {
+  const chunks: T[][] = []
+
+  for (let index = 0; index < items.length; index += size) {
+    chunks.push(items.slice(index, index + size))
+  }
+
+  return chunks
 }
 
 const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
@@ -78,6 +90,10 @@ const DEPRECIATION_STYLES: Record<ShoppingDepreciation, string> = {
 
 const FAST_DEPRECIATION = new Set<ShoppingDepreciation>(["极快折旧", "较快折旧"])
 const PRIORITY_LEVELS = new Set<ShoppingNeedLevel>(["最低配置", "必要"])
+const SYSTEM_ROW_ACTIVE_WEIGHT = 5 / 3
+const SYSTEM_ROW_NEIGHBOR_WEIGHT = 2 / 3
+const SYSTEM_ROW_EDGE_ACTIVE_WEIGHT = 1.4
+const SYSTEM_ROW_EDGE_NEIGHBOR_WEIGHT = 0.6
 
 const LIFECYCLE_COPY: Record<
   ShoppingLifecycle,
@@ -106,18 +122,6 @@ const LIFECYCLE_COPY: Record<
 
 function formatPrice(amount: number) {
   return MONEY_FORMATTER.format(amount)
-}
-
-function getOwnedStatusClass(status: ShoppingOwnedItem["status"]) {
-  if (status.includes("稳定")) {
-    return "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
-  }
-
-  if (status.includes("升级")) {
-    return "border-[color:var(--tone-future-border)] bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]"
-  }
-
-  return "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
 }
 
 function getPriceSignal(item: ShoppingPlanItem) {
@@ -216,6 +220,55 @@ function ClassificationBadge({ label, className }: { label: string; className: s
       {label}
     </Badge>
   )
+}
+
+function getSystemNeighborIndexes(length: number, activeIndex: number) {
+  const indexes: number[] = []
+
+  for (
+    let step = 1;
+    indexes.length < 2 && (activeIndex - step >= 0 || activeIndex + step < length);
+    step += 1
+  ) {
+    if (activeIndex - step >= 0) {
+      indexes.push(activeIndex - step)
+    }
+
+    if (indexes.length >= 2) {
+      break
+    }
+
+    if (activeIndex + step < length) {
+      indexes.push(activeIndex + step)
+    }
+  }
+
+  return indexes
+}
+
+function getSystemRowTemplate(length: number, activeIndex: number | null) {
+  if (length <= 0) {
+    return ""
+  }
+
+  const weights = Array.from({ length }, () => 1)
+
+  if (activeIndex !== null && activeIndex >= 0 && activeIndex < length) {
+    const neighborIndexes = getSystemNeighborIndexes(length, activeIndex)
+
+    if (neighborIndexes.length === 1) {
+      weights[activeIndex] = SYSTEM_ROW_EDGE_ACTIVE_WEIGHT
+      weights[neighborIndexes[0]] = SYSTEM_ROW_EDGE_NEIGHBOR_WEIGHT
+    } else if (neighborIndexes.length >= 2) {
+      weights[activeIndex] = SYSTEM_ROW_ACTIVE_WEIGHT
+
+      neighborIndexes.slice(0, 2).forEach((index) => {
+        weights[index] = SYSTEM_ROW_NEIGHBOR_WEIGHT
+      })
+    }
+  }
+
+  return weights.map((weight) => `minmax(0, ${weight}fr)`).join(" ")
 }
 
 function CompactItemRow({
@@ -326,6 +379,109 @@ function LifecycleLane({
         <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前筛选下还没有条目。</p>
       )}
     </div>
+  )
+}
+
+function SystemMapCard({
+  definition,
+  isHovered,
+  onHover,
+  onOpen,
+}: {
+  definition: ShoppingSystemOverview
+  isHovered: boolean
+  onHover: (systemId: string | null) => void
+  onOpen: (systemId: string) => void
+}) {
+  const intensityClass = definition.isActive
+    ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
+    : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]"
+
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-label={`${definition.id} 系统详情`}
+      onPointerEnter={() => onHover(definition.id)}
+      onClick={() => {
+        onHover(null)
+        onOpen(definition.id)
+      }}
+      className={cn(
+        "flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border p-3 text-left transition-[box-shadow,border-color,background-color,opacity] duration-500 ease-in-out outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
+        intensityClass,
+        isHovered &&
+          "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40",
+      )}
+      style={{
+        boxShadow: isHovered ? "0 18px 36px rgba(15, 23, 42, 0.08)" : "0 0 0 rgba(0,0,0,0)",
+      }}
+    >
+      <div className="flex items-start gap-2">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
+          {definition.id.slice(0, 1)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+            {definition.id}
+          </div>
+          <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+            {definition.cluster}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className="h-5 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        >
+          {definition.owned.length} / {definition.planned.length}
+        </Badge>
+        {definition.urgentCount > 0 ? (
+          <Badge
+            variant="outline"
+            className="h-5 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
+          >
+            待补 {definition.urgentCount}
+          </Badge>
+        ) : null}
+      </div>
+
+      <p
+        className={cn(
+          "mt-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
+          "line-clamp-2",
+        )}
+      >
+        {definition.summary}
+      </p>
+
+      <div
+        className={cn(
+          "mt-auto flex min-h-[42px] flex-wrap gap-1.5 pt-2 transition-opacity duration-500 ease-in-out",
+          isHovered ? "opacity-100" : "opacity-45",
+        )}
+      >
+        {definition.secondaryGroups.slice(0, 2).map((group) => (
+          <Badge
+            key={group}
+            variant="outline"
+            className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            {group}
+          </Badge>
+        ))}
+        {definition.secondaryGroups.length > 2 ? (
+          <Badge
+            variant="outline"
+            className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            +{definition.secondaryGroups.length - 2}
+          </Badge>
+        ) : null}
+      </div>
+    </button>
   )
 }
 
@@ -462,6 +618,9 @@ export function ShoppingPage({
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
+  const [hoveredSystemId, setHoveredSystemId] = useState<string | null>(null)
+  const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
+  const systemRowRefs = useRef<Array<HTMLDivElement | null>>([])
   const planItems = shopping.purchaseLanes.flatMap((lane) =>
     lane.items.map((item) => ({
       ...item,
@@ -469,7 +628,7 @@ export function ShoppingPage({
       laneTitle: lane.title,
     })),
   )
-  const activeSystems = shopping.systemDefinitions.map((definition) => {
+  const activeSystems: ShoppingSystemOverview[] = shopping.systemDefinitions.map((definition) => {
     const owned = shopping.ownedItems.filter((item) => item.system === definition.id)
     const planned = planItems.filter((item) => item.system === definition.id)
     const spaces = Array.from(
@@ -487,6 +646,8 @@ export function ShoppingPage({
     }
   })
   const activeSystemCount = activeSystems.filter((item) => item.isActive).length
+  const selectedSystem = activeSystems.find((item) => item.id === selectedSystemId) ?? null
+  const systemRows = chunkList(activeSystems, 7)
   const fastDepreciationWarnings = planItems.filter(
     (item) =>
       item.depreciation &&
@@ -562,6 +723,42 @@ export function ShoppingPage({
     (collection) => collection.id !== "collection-overlooked",
   )
   const priorityItems = planItems.filter((item) => PRIORITY_LEVELS.has(item.necessity))
+
+  useEffect(() => {
+    if (!isFixedLayout) {
+      return
+    }
+
+    const rowElements = [...systemRowRefs.current]
+
+    systemRows.forEach((row, rowIndex) => {
+      const rowElement = rowElements[rowIndex]
+
+      if (!rowElement) {
+        return
+      }
+
+      const activeIndex = row.findIndex((item) => item.id === hoveredSystemId)
+
+      gsap.to(rowElement, {
+        gridTemplateColumns: getSystemRowTemplate(
+          row.length,
+          activeIndex === -1 ? null : activeIndex,
+        ),
+        duration: activeIndex === -1 ? 0.4 : 0.52,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      })
+    })
+
+    return () => {
+      rowElements.forEach((rowElement) => {
+        if (rowElement) {
+          gsap.killTweensOf(rowElement)
+        }
+      })
+    }
+  }, [hoveredSystemId, isFixedLayout, systemRows])
 
   return (
     <div
@@ -784,6 +981,45 @@ export function ShoppingPage({
                   )
                 })}
               </div>
+
+              <Surface className="p-5">
+                <SectionHeading
+                  compact={isWideLayout}
+                  icon={AlertTriangle}
+                  title="边界约定"
+                  description="遇到混淆物品时，先问它存在的目的，再决定它最强归属哪个 system。"
+                />
+
+                <div className="mt-5 overflow-x-auto">
+                  <Table className="min-w-[720px]">
+                    <TableHeader>
+                      <TableRow className="border-[color:var(--muted-surface-border)]">
+                        <TableHead>物品</TableHead>
+                        <TableHead>归属</TableHead>
+                        <TableHead>理由</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {shopping.boundaryEntries.map((entry) => (
+                        <TableRow
+                          key={entry.id}
+                          className="border-[color:var(--muted-surface-border)]"
+                        >
+                          <TableCell className="font-medium text-[color:var(--text-primary)]">
+                            {entry.item}
+                          </TableCell>
+                          <TableCell className="text-[color:var(--text-secondary)]">
+                            <SystemChip system={entry.system} />
+                          </TableCell>
+                          <TableCell className="max-w-[420px] text-[color:var(--text-secondary)]">
+                            <span className="block text-sm leading-6">{entry.reason}</span>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </Surface>
             </div>
 
             <div
@@ -890,168 +1126,62 @@ export function ShoppingPage({
           className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col")}>
-            <SectionHeading
-              compact={isWideLayout}
-              icon={Package2}
-              title="14 个生活系统"
-              description="先按 system 看缺口，比按“它是什么东西”更能推动下一步。没有被生活激活的系统先留空，不必提前展开。"
-            />
-
             <div
               className={cn(
-                "mt-5 grid gap-4 min-[1260px]:grid-cols-2",
-                isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                "flex flex-col gap-3",
+                isFixedLayout && "min-h-0 flex-1 overflow-hidden",
               )}
             >
-              {activeSystems.length > 0 ? (
-                activeSystems.map((definition) => (
-                  <div
-                    key={definition.id}
-                    className={cn(
-                      "rounded-lg border px-4 py-4",
-                      definition.isActive
-                        ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
-                        : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
-                    )}
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <div className="flex size-8 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-sm font-medium text-[color:var(--text-primary)]">
-                        {definition.id.slice(0, 1)}
-                      </div>
-                      <h3 className="text-sm font-medium text-[color:var(--text-primary)]">
-                        {definition.id}
-                      </h3>
-                      <Badge
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                      >
-                        {definition.cluster}
-                      </Badge>
-                      {definition.urgentCount > 0 ? (
-                        <Badge
-                          variant="outline"
-                          className="border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-                        >
-                          待补 {definition.urgentCount} 条
-                        </Badge>
-                      ) : null}
-                    </div>
-
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      {definition.summary}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                      核心问题：{definition.keyQuestion}
-                    </p>
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {definition.secondaryGroups.map((group) => (
-                        <Badge
-                          key={group}
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-                        >
-                          {group}
-                        </Badge>
+              {systemRows.length > 0 ? (
+                systemRows.map((row, rowIndex) => {
+                  return (
+                    <div
+                      key={`system-row-${rowIndex}`}
+                      ref={(element) => {
+                        systemRowRefs.current[rowIndex] = element
+                      }}
+                      onPointerLeave={() => setHoveredSystemId(null)}
+                      className={cn(
+                        isFixedLayout
+                          ? "grid min-h-0 flex-1 items-stretch gap-3"
+                          : "grid gap-3 min-[680px]:grid-cols-2 min-[1040px]:grid-cols-3",
+                      )}
+                      style={
+                        isFixedLayout
+                          ? {
+                              gridTemplateColumns: getSystemRowTemplate(row.length, null),
+                            }
+                          : undefined
+                      }
+                    >
+                      {row.map((definition) => (
+                        <SystemMapCard
+                          key={definition.id}
+                          definition={definition}
+                          isHovered={hoveredSystemId === definition.id}
+                          onHover={setHoveredSystemId}
+                          onOpen={setSelectedSystemId}
+                        />
                       ))}
                     </div>
-
-                    {definition.isActive ? (
-                      <div className="mt-4 grid gap-4 min-[960px]:grid-cols-2">
-                        <div>
-                          <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                            已有 {definition.owned.length} 项
-                          </div>
-                          {definition.owned.length > 0 ? (
-                            <div className="mt-3 space-y-2">
-                              {definition.owned.slice(0, 3).map((item) => (
-                                <div
-                                  key={item.id}
-                                  className="border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0"
-                                >
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-sm font-medium text-[color:var(--text-primary)]">
-                                      {item.name}
-                                    </span>
-                                    <Badge
-                                      variant="outline"
-                                      className={getOwnedStatusClass(item.status)}
-                                    >
-                                      {item.status}
-                                    </Badge>
-                                  </div>
-                                  <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                                    {item.category} · {item.spaces.join(" / ")}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-                              当前还没有已拥有条目。
-                            </p>
-                          )}
-                        </div>
-
-                        <div>
-                          <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                            待补 {definition.planned.length} 项
-                          </div>
-                          {definition.planned.length > 0 ? (
-                            <div className="mt-3 space-y-2">
-                              {definition.planned.slice(0, 3).map((item) => (
-                                <div
-                                  key={item.id}
-                                  className="border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0"
-                                >
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-sm font-medium text-[color:var(--text-primary)]">
-                                      {item.name}
-                                    </span>
-                                    <ClassificationBadge
-                                      label={item.necessity}
-                                      className={NEED_LEVEL_STYLES[item.necessity]}
-                                    />
-                                  </div>
-                                  <div className="mt-1 text-xs text-[color:var(--text-muted)]">
-                                    {item.category} · {item.laneTitle}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          ) : (
-                            <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-                              当前没有待补条目。
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <p className="mt-4 text-sm leading-6 text-[color:var(--text-muted)]">
-                        这个系统暂时还没有被当前数据激活，先留空，等生活真的需要它时再展开。
-                      </p>
-                    )}
-
-                    {definition.spaces.length > 0 ? (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {definition.spaces.map((space) => (
-                          <Badge
-                            key={space}
-                            variant="outline"
-                            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-                          >
-                            {space}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
-                  </div>
-                ))
+                  )
+                })
               ) : (
                 <EmptyState message="当前筛选下没有系统地图数据。" />
               )}
             </div>
           </Surface>
+
+          <ShoppingSystemDetailDialog
+            system={selectedSystem}
+            open={selectedSystem !== null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setHoveredSystemId(null)
+                setSelectedSystemId(null)
+              }
+            }}
+          />
         </TabsContent>
 
         <TabsContent
