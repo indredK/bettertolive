@@ -6,6 +6,7 @@ export const workspaceViewLabels: Record<AppView, string> = {
   events: "记事",
   finance: "记账",
   shopping: "购物清单",
+  nutrition: "饮食",
   emotion: "情绪情感",
   crisis: "危机支持",
   beliefs: "观念",
@@ -13,6 +14,7 @@ export const workspaceViewLabels: Record<AppView, string> = {
   relationships: "关系深化",
   journey: "成长记忆",
   legacy: "生命整理",
+  socioeconomics: "社会经济",
   future: "未来蓝图",
 }
 

@@ -12,11 +12,13 @@ import type {
   JourneyModuleData,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
+  NutritionModuleData,
   OverviewModuleData,
   PrinciplesModuleData,
   ReflectionModuleData,
   RelationshipsModuleData,
   ShoppingModuleData,
+  SocioeconomicsModuleData,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
 
@@ -26,6 +28,7 @@ export type BetterToLiveApi = {
   getEvents: () => Promise<EventsModuleData>
   getFinance: () => Promise<FinanceModuleData>
   getShopping: () => Promise<ShoppingModuleData>
+  getNutrition: () => Promise<NutritionModuleData>
   getEmotion: () => Promise<EmotionWorkspaceModuleData>
   getCrisis: () => Promise<CrisisWorkspaceModuleData>
   getBeliefs: () => Promise<BeliefsModuleData>
@@ -35,6 +38,7 @@ export type BetterToLiveApi = {
   getMemory: () => Promise<MemoryWorkspaceModuleData>
   getJourney: () => Promise<JourneyModuleData>
   getLegacy: () => Promise<LegacyWorkspaceModuleData>
+  getSocioeconomics: () => Promise<SocioeconomicsModuleData>
   getFuture: () => Promise<FutureModuleData>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>
 }

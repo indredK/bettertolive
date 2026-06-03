@@ -118,6 +118,23 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       },
     ],
   },
+  nutrition: {
+    heading: "饮食说明",
+    lines: [
+      {
+        label: "记录",
+        text: "按场景、构成、触发记录每一顿，再补一段身体反馈。",
+      },
+      {
+        label: "适合",
+        text: "适合发现自己吃得乱、吃完不舒服或想看饮食结构时。",
+      },
+      {
+        label: "目的",
+        text: "不算卡路里，而是把吃和生活、关系、心情连起来。",
+      },
+    ],
+  },
   emotion: {
     heading: "情绪说明",
     lines: [
@@ -234,6 +251,23 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       {
         label: "目的",
         text: "让重要的话不只留在脑子里，也不必被迫一次说完。",
+      },
+    ],
+  },
+  socioeconomics: {
+    heading: "社会经济说明",
+    lines: [
+      {
+        label: "梳理",
+        text: "按领域和层次梳理对外部经济世界的认知。",
+      },
+      {
+        label: "适合",
+        text: "适合想看清楚自己对宏观、行业、个人财务到底懂多少时。",
+      },
+      {
+        label: "目的",
+        text: "认知地图覆盖到哪、缺口在哪，先让它显形。",
       },
     ],
   },

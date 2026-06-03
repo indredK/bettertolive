@@ -4,6 +4,7 @@ import {
   CalendarDays,
   Compass,
   HeartPulse,
+  Landmark,
   LayoutDashboard,
   Lightbulb,
   ListTodo,
@@ -11,6 +12,7 @@ import {
   PanelLeftClose,
   RefreshCcw,
   Route,
+  Salad,
   Scale,
   Search,
   ScrollText,
@@ -46,11 +48,13 @@ import { EmotionPage } from "@/features/bettertolive/ui/emotion-page"
 import { JourneyPage } from "@/features/bettertolive/ui/journey-page"
 import { LegacyPage } from "@/features/bettertolive/ui/legacy-page"
 import { NotificationLayer } from "@/features/bettertolive/ui/notification-layer"
+import { NutritionPage } from "@/features/bettertolive/ui/nutrition-page"
 import { OverviewPage } from "@/features/bettertolive/ui/overview-page"
 import { PrinciplesPage } from "@/features/bettertolive/ui/principles-page"
 import { ReflectionPage } from "@/features/bettertolive/ui/reflection-page"
 import { RelationshipsPage } from "@/features/bettertolive/ui/relationships-page"
 import { ShoppingPage } from "@/features/bettertolive/ui/shopping-page"
+import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics-page"
 import {
   SidebarNoteCarousel,
   SidebarRhythmCarousel,
@@ -122,6 +126,12 @@ const NAV_SECTIONS: Array<{
         hint: "欲望和日常选择",
         icon: ListTodo,
       },
+      {
+        view: "nutrition",
+        label: "饮食",
+        hint: "吃在生活里的位置",
+        icon: Salad,
+      },
     ],
   },
   {
@@ -178,6 +188,17 @@ const NAV_SECTIONS: Array<{
         label: "生命整理",
         hint: "重要交代和留给未来的话",
         icon: ScrollText,
+      },
+    ],
+  },
+  {
+    title: "外部世界",
+    items: [
+      {
+        view: "socioeconomics",
+        label: "社会经济",
+        hint: "外部经济世界的认知地图",
+        icon: Landmark,
       },
     ],
   },
@@ -328,6 +349,15 @@ export function BetterToLiveAppShell() {
             isWideLayout={isWideLayout}
           />
         )
+      case "nutrition":
+        return (
+          <NutritionPage
+            meals={viewModel.nutritionMeals}
+            weeklyHighlights={viewModel.nutritionHighlights}
+            foodMemories={viewModel.nutritionFoodMemories}
+            searchQuery={searchQuery}
+          />
+        )
       case "emotion":
         return (
           <EmotionPage
@@ -396,6 +426,14 @@ export function BetterToLiveAppShell() {
             wishes={viewModel.legacyWishes}
             preferences={viewModel.legacyPreferences}
             lifeReview={viewModel.legacyLifeReview}
+            searchQuery={searchQuery}
+          />
+        )
+      case "socioeconomics":
+        return (
+          <SocioeconomicsPage
+            entries={viewModel.socioeconomicsEntries}
+            gaps={viewModel.socioeconomicsGaps}
             searchQuery={searchQuery}
           />
         )

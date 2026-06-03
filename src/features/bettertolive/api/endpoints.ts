@@ -4,6 +4,7 @@ export const BETTERTOLIVE_API_ENDPOINTS = {
   events: "/events",
   finance: "/finance",
   shopping: "/shopping",
+  nutrition: "/nutrition",
   emotion: "/emotion",
   crisis: "/crisis",
   beliefs: "/beliefs",
@@ -12,6 +13,7 @@ export const BETTERTOLIVE_API_ENDPOINTS = {
   growth: "/growth",
   memory: "/memory",
   legacy: "/legacy",
+  socioeconomics: "/socioeconomics",
   future: "/future",
   snapshot: "/workspace",
 } as const

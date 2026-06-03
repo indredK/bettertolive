@@ -8,11 +8,13 @@ import { futureMockData } from "@/features/bettertolive/api/mock/data/future/fut
 import { growthMockData } from "@/features/bettertolive/api/mock/data/growth/growth.mock"
 import { legacyMockData } from "@/features/bettertolive/api/mock/data/legacy/legacy.mock"
 import { memoryMockData } from "@/features/bettertolive/api/mock/data/memory/memory.mock"
+import { nutritionMockData } from "@/features/bettertolive/api/mock/data/nutrition/nutrition.mock"
 import { overviewMockData } from "@/features/bettertolive/api/mock/data/overview/overview.mock"
 import { principlesMockData } from "@/features/bettertolive/api/mock/data/principles/principles.mock"
 import { reflectionMockData } from "@/features/bettertolive/api/mock/data/reflection/reflection.mock"
 import { relationshipsMockData } from "@/features/bettertolive/api/mock/data/relationships/relationships.mock"
 import { shoppingMockData } from "@/features/bettertolive/api/mock/data/shopping/shopping.mock"
+import { socioeconomicsMockData } from "@/features/bettertolive/api/mock/data/socioeconomics/socioeconomics.mock"
 
 export const workspaceSnapshotMockData = {
   overview: overviewMockData,
@@ -20,6 +22,7 @@ export const workspaceSnapshotMockData = {
   events: eventsMockData,
   finance: financeMockData,
   shopping: shoppingMockData,
+  nutrition: nutritionMockData,
   emotion: emotionMockData,
   crisis: crisisMockData,
   beliefs: beliefsMockData,
@@ -28,5 +31,6 @@ export const workspaceSnapshotMockData = {
   growth: growthMockData,
   memory: memoryMockData,
   legacy: legacyMockData,
+  socioeconomics: socioeconomicsMockData,
   future: futureMockData,
 } satisfies WorkspaceSnapshot

@@ -360,6 +360,56 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.future.milestones],
   )
 
+  const nutritionMeals = useMemo(
+    () =>
+      workspace.nutrition.meals.filter((entry) =>
+        matchesQuery(
+          entry.date,
+          entry.scene,
+          entry.structure,
+          entry.composition,
+          entry.trigger,
+          entry.valueDensity,
+          entry.bodyFeedback,
+          entry.note,
+        ),
+      ),
+    [matchesQuery, workspace.nutrition.meals],
+  )
+
+  const nutritionHighlights = useMemo(
+    () => workspace.nutrition.weeklyHighlights.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.nutrition.weeklyHighlights],
+  )
+
+  const nutritionFoodMemories = useMemo(
+    () =>
+      workspace.nutrition.foodMemories.filter((entry) =>
+        matchesQuery(entry.name, entry.type, entry.story),
+      ),
+    [matchesQuery, workspace.nutrition.foodMemories],
+  )
+
+  const socioeconomicsEntries = useMemo(
+    () =>
+      workspace.socioeconomics.entries.filter((entry) =>
+        matchesQuery(
+          entry.title,
+          entry.domain,
+          entry.layer,
+          entry.confidence,
+          entry.source,
+          entry.summary,
+        ),
+      ),
+    [matchesQuery, workspace.socioeconomics.entries],
+  )
+
+  const socioeconomicsGaps = useMemo(
+    () => workspace.socioeconomics.gaps.filter((entry) => matchesQuery(entry)),
+    [matchesQuery, workspace.socioeconomics.gaps],
+  )
+
   const visibleShoppingCount = shoppingModule.purchaseLanes.reduce(
     (count, column) => count + column.items.length,
     0,
@@ -417,6 +467,9 @@ export function useWorkspaceViewModel({
     legacyPreferences,
     legacyWishes,
     milestones,
+    nutritionMeals,
+    nutritionHighlights,
+    nutritionFoodMemories,
     principleBoundaries,
     principles,
     recentRecords,
@@ -427,6 +480,8 @@ export function useWorkspaceViewModel({
     relationshipPatterns,
     relationshipUnsentNotes,
     shoppingModule,
+    socioeconomicsEntries,
+    socioeconomicsGaps,
     transactions,
     visibleExpenseTotal,
     visibleIncomeTotal,

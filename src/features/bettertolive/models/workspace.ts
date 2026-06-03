@@ -4,6 +4,7 @@ export type AppView =
   | "events"
   | "finance"
   | "shopping"
+  | "nutrition"
   | "emotion"
   | "crisis"
   | "beliefs"
@@ -11,6 +12,7 @@ export type AppView =
   | "relationships"
   | "journey"
   | "legacy"
+  | "socioeconomics"
   | "future"
 
 export type ReflectionEntry = {
@@ -390,12 +392,53 @@ export type LegacyWorkspaceModuleData = LegacyModuleData
 
 export type FutureModuleData = FutureBlueprint
 
+export type NutritionMealEntry = {
+  id: string
+  date: string
+  scene: string
+  structure: string
+  composition: string
+  trigger: string
+  valueDensity: string
+  bodyFeedback: string
+  note: string
+}
+
+export type NutritionFoodMemory = {
+  id: string
+  name: string
+  type: string
+  story: string
+}
+
+export type NutritionModuleData = {
+  meals: NutritionMealEntry[]
+  weeklyHighlights: string[]
+  foodMemories: NutritionFoodMemory[]
+}
+
+export type SocioeconomicsEntry = {
+  id: string
+  title: string
+  domain: string
+  layer: string
+  confidence: string
+  source: string
+  summary: string
+}
+
+export type SocioeconomicsModuleData = {
+  entries: SocioeconomicsEntry[]
+  gaps: string[]
+}
+
 export type WorkspaceSnapshot = {
   overview: OverviewModuleData
   reflection: ReflectionModuleData
   events: EventsModuleData
   finance: FinanceModuleData
   shopping: ShoppingModuleData
+  nutrition: NutritionModuleData
   emotion: EmotionWorkspaceModuleData
   crisis: CrisisWorkspaceModuleData
   beliefs: BeliefsModuleData
@@ -404,6 +447,7 @@ export type WorkspaceSnapshot = {
   growth: GrowthModuleData
   memory: MemoryWorkspaceModuleData
   legacy: LegacyWorkspaceModuleData
+  socioeconomics: SocioeconomicsModuleData
   future: FutureModuleData
 }
 

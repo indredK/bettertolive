@@ -8,6 +8,7 @@ const WORKSPACE_VIEWS = [
   "events",
   "finance",
   "shopping",
+  "nutrition",
   "emotion",
   "crisis",
   "beliefs",
@@ -15,6 +16,7 @@ const WORKSPACE_VIEWS = [
   "relationships",
   "journey",
   "legacy",
+  "socioeconomics",
   "future",
 ] satisfies AppView[]
 

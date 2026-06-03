@@ -20,6 +20,7 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getEvents: () => withMockLatency(workspaceSnapshotMockData.events),
     getFinance: () => withMockLatency(workspaceSnapshotMockData.finance),
     getShopping: () => withMockLatency(workspaceSnapshotMockData.shopping),
+    getNutrition: () => withMockLatency(workspaceSnapshotMockData.nutrition),
     getEmotion: () => withMockLatency(workspaceSnapshotMockData.emotion),
     getCrisis: () => withMockLatency(workspaceSnapshotMockData.crisis),
     getBeliefs: () => withMockLatency(workspaceSnapshotMockData.beliefs),
@@ -33,6 +34,7 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
         ...workspaceSnapshotMockData.memory,
       }),
     getLegacy: () => withMockLatency(workspaceSnapshotMockData.legacy),
+    getSocioeconomics: () => withMockLatency(workspaceSnapshotMockData.socioeconomics),
     getFuture: () => withMockLatency(workspaceSnapshotMockData.future),
     getWorkspaceSnapshot: () => withMockLatency(workspaceSnapshotMockData),
   }

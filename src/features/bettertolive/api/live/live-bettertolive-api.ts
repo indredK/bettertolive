@@ -12,11 +12,13 @@ import type {
   JourneyModuleData,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
+  NutritionModuleData,
   OverviewModuleData,
   PrinciplesModuleData,
   ReflectionModuleData,
   RelationshipsModuleData,
   ShoppingModuleData,
+  SocioeconomicsModuleData,
 } from "@/features/bettertolive/models/workspace"
 
 export function createLiveBetterToLiveApi(): BetterToLiveApi {
@@ -26,6 +28,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     getEvents: () => requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
     getFinance: () => requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
     getShopping: () => requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
+    getNutrition: () => requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
     getEmotion: () => requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
     getCrisis: () => requestJson<CrisisWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.crisis),
     getBeliefs: () => requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
@@ -42,6 +45,8 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
       return { ...growth, ...memory }
     },
     getLegacy: () => requestJson<LegacyWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.legacy),
+    getSocioeconomics: () =>
+      requestJson<SocioeconomicsModuleData>(BETTERTOLIVE_API_ENDPOINTS.socioeconomics),
     getFuture: () => requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
     async getWorkspaceSnapshot() {
       const [
@@ -50,6 +55,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         events,
         finance,
         shopping,
+        nutrition,
         emotion,
         crisis,
         beliefs,
@@ -58,6 +64,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         growth,
         memory,
         legacy,
+        socioeconomics,
         future,
       ] = await Promise.all([
         requestJson<OverviewModuleData>(BETTERTOLIVE_API_ENDPOINTS.overview),
@@ -65,6 +72,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
         requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
         requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
+        requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
         requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
         requestJson<CrisisWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.crisis),
         requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
@@ -73,6 +81,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
         requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
         requestJson<LegacyWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.legacy),
+        requestJson<SocioeconomicsModuleData>(BETTERTOLIVE_API_ENDPOINTS.socioeconomics),
         requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
       ])
 
@@ -82,6 +91,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         events,
         finance,
         shopping,
+        nutrition,
         emotion,
         crisis,
         beliefs,
@@ -90,6 +100,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         growth,
         memory,
         legacy,
+        socioeconomics,
         future,
       }
     },
