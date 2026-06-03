@@ -43,6 +43,12 @@ import {
   type ShoppingPlanWithLane,
   type ShoppingSystemOverview,
 } from "@/features/bettertolive/ui/shopping-system-detail-dialog"
+import {
+  ShoppingSpaceDetailDialog,
+  type SpaceOverview,
+} from "@/features/bettertolive/ui/shopping-space-detail-dialog"
+import { ShoppingStageDetailDialog } from "@/features/bettertolive/ui/shopping-stage-detail-dialog"
+import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
 import { cn } from "@/lib/utils"
 
 function chunkList<T>(items: T[], size: number) {
@@ -190,7 +196,7 @@ function ShoppingPriceRow({
   )
 }
 
-function ChecklistBlock({ title, items }: { title: string; items: string[] }) {
+export function ChecklistBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
       <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
@@ -485,6 +491,226 @@ function SystemMapCard({
   )
 }
 
+function SpaceMapCard({
+  space,
+  isHovered,
+  onHover,
+  onOpen,
+}: {
+  space: SpaceOverview
+  isHovered: boolean
+  onHover: (spaceName: string | null) => void
+  onOpen: (spaceName: string) => void
+}) {
+  const totalItems = space.owned.length + space.planned.length
+  const isActive = totalItems > 0
+
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-label={`${space.name} 空间详情`}
+      onPointerEnter={() => onHover(space.name)}
+      onClick={() => {
+        onHover(null)
+        onOpen(space.name)
+      }}
+      className={cn(
+        "flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border p-3 text-left transition-[box-shadow,border-color,background-color,opacity] duration-500 ease-in-out outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
+        isActive
+          ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
+          : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
+        isHovered &&
+          "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40",
+      )}
+      style={{
+        boxShadow: isHovered ? "0 18px 36px rgba(15, 23, 42, 0.08)" : "0 0 0 rgba(0,0,0,0)",
+      }}
+    >
+      <div className="flex items-start gap-2">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
+          <House className="size-3.5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+            {space.name}
+          </div>
+          <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+            {space.systems.size} 个关联系统
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className="h-5 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        >
+          {space.owned.length} / {space.planned.length}
+        </Badge>
+        {space.planned.length > 0 ? (
+          <Badge
+            variant="outline"
+            className="h-5 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
+          >
+            待补 {space.planned.length}
+          </Badge>
+        ) : null}
+      </div>
+
+      <p
+        className={cn(
+          "mt-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
+          "line-clamp-2",
+        )}
+      >
+        {isActive
+          ? `已有 ${space.owned
+              .map((i) => i.name)
+              .slice(0, 3)
+              .join("、")}${space.owned.length > 3 ? " 等" : ""}，待补 ${space.planned
+              .map((i) => i.name)
+              .slice(0, 2)
+              .join("、")}${space.planned.length > 2 ? " 等" : ""}`
+          : "暂无物品数据"}
+      </p>
+
+      <div
+        className={cn(
+          "mt-auto flex min-h-[42px] flex-wrap gap-1.5 pt-2 transition-opacity duration-500 ease-in-out",
+          isHovered ? "opacity-100" : "opacity-45",
+        )}
+      >
+        {Array.from(space.systems)
+          .slice(0, 3)
+          .map((system) => (
+            <Badge
+              key={system}
+              variant="outline"
+              className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+            >
+              {system}
+            </Badge>
+          ))}
+        {space.systems.size > 3 ? (
+          <Badge
+            variant="outline"
+            className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            +{space.systems.size - 3}
+          </Badge>
+        ) : null}
+      </div>
+    </button>
+  )
+}
+
+function StageMapCard({
+  checklist,
+  isHovered,
+  onHover,
+  onOpen,
+}: {
+  checklist: ShoppingStageChecklist
+  isHovered: boolean
+  onHover: (stageId: string | null) => void
+  onOpen: (stageId: string) => void
+}) {
+  const sectionCount = checklist.sections.length
+  const totalItems = checklist.sections.reduce(
+    (sum, s) => sum + s.minimum.length + s.essentials.length + s.upgrades.length,
+    0,
+  )
+  const systemNames = checklist.sections.map((s) => s.system)
+
+  return (
+    <button
+      type="button"
+      aria-haspopup="dialog"
+      aria-label={`${checklist.title} 阶段详情`}
+      onPointerEnter={() => onHover(checklist.id)}
+      onClick={() => {
+        onHover(null)
+        onOpen(checklist.id)
+      }}
+      className={cn(
+        "flex h-full w-full min-w-0 flex-col overflow-hidden rounded-xl border p-3 text-left transition-[box-shadow,border-color,background-color,opacity] duration-500 ease-in-out outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
+        totalItems > 0
+          ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
+          : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
+        isHovered &&
+          "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40",
+      )}
+      style={{
+        boxShadow: isHovered ? "0 18px 36px rgba(15, 23, 42, 0.08)" : "0 0 0 rgba(0,0,0,0)",
+      }}
+    >
+      <div className="flex items-start gap-2">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
+          <Sparkles className="size-3.5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+            {checklist.title}
+          </div>
+          <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+            {checklist.stage}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-2 flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className="h-5 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        >
+          {sectionCount} 系统
+        </Badge>
+        <Badge
+          variant="outline"
+          className="h-5 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
+        >
+          {totalItems} 条物品
+        </Badge>
+      </div>
+
+      <p
+        className={cn(
+          "mt-2 text-[12px] leading-5 text-[color:var(--text-secondary)]",
+          "line-clamp-2",
+        )}
+      >
+        {checklist.focus}
+      </p>
+
+      <div
+        className={cn(
+          "mt-auto flex min-h-[42px] flex-wrap gap-1.5 pt-2 transition-opacity duration-500 ease-in-out",
+          isHovered ? "opacity-100" : "opacity-45",
+        )}
+      >
+        {systemNames.slice(0, 3).map((system) => (
+          <Badge
+            key={system}
+            variant="outline"
+            className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            {system}
+          </Badge>
+        ))}
+        {systemNames.length > 3 ? (
+          <Badge
+            variant="outline"
+            className="h-5 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            +{systemNames.length - 3}
+          </Badge>
+        ) : null}
+      </div>
+    </button>
+  )
+}
+
 function PurchaseDecisionCard({
   item,
   compact = false,
@@ -620,7 +846,13 @@ export function ShoppingPage({
   const isFixedLayout = !isStackedLayout
   const [hoveredSystemId, setHoveredSystemId] = useState<string | null>(null)
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
+  const [hoveredSpaceName, setHoveredSpaceName] = useState<string | null>(null)
+  const [selectedSpaceName, setSelectedSpaceName] = useState<string | null>(null)
+  const [hoveredStageId, setHoveredStageId] = useState<string | null>(null)
+  const [selectedStageId, setSelectedStageId] = useState<string | null>(null)
   const systemRowRefs = useRef<Array<HTMLDivElement | null>>([])
+  const spaceRowRefs = useRef<Array<HTMLDivElement | null>>([])
+  const stageRowRefs = useRef<Array<HTMLDivElement | null>>([])
   const planItems = shopping.purchaseLanes.flatMap((lane) =>
     lane.items.map((item) => ({
       ...item,
@@ -648,6 +880,7 @@ export function ShoppingPage({
   const activeSystemCount = activeSystems.filter((item) => item.isActive).length
   const selectedSystem = activeSystems.find((item) => item.id === selectedSystemId) ?? null
   const systemRows = chunkList(activeSystems, 7)
+
   const fastDepreciationWarnings = planItems.filter(
     (item) =>
       item.depreciation &&
@@ -716,6 +949,8 @@ export function ShoppingPage({
     (left, right) =>
       right.owned.length + right.planned.length - (left.owned.length + left.planned.length),
   )
+  const spaceRows = chunkList(spaces, 5)
+  const stageRows = chunkList(shopping.stageChecklists, 7)
   const overlookedCollection = shopping.lifestyleCollections.find(
     (collection) => collection.id === "collection-overlooked",
   )
@@ -759,6 +994,80 @@ export function ShoppingPage({
       })
     }
   }, [hoveredSystemId, isFixedLayout, systemRows])
+
+  // Space row hover animation
+  useEffect(() => {
+    if (!isFixedLayout) {
+      return
+    }
+
+    const rowElements = [...spaceRowRefs.current]
+
+    spaceRows.forEach((row, rowIndex) => {
+      const rowElement = rowElements[rowIndex]
+
+      if (!rowElement) {
+        return
+      }
+
+      const activeIndex = row.findIndex((item) => item.name === hoveredSpaceName)
+
+      gsap.to(rowElement, {
+        gridTemplateColumns: getSystemRowTemplate(
+          row.length,
+          activeIndex === -1 ? null : activeIndex,
+        ),
+        duration: activeIndex === -1 ? 0.4 : 0.52,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      })
+    })
+
+    return () => {
+      rowElements.forEach((rowElement) => {
+        if (rowElement) {
+          gsap.killTweensOf(rowElement)
+        }
+      })
+    }
+  }, [hoveredSpaceName, isFixedLayout, spaceRows])
+
+  // Stage row hover animation
+  useEffect(() => {
+    if (!isFixedLayout) {
+      return
+    }
+
+    const rowElements = [...stageRowRefs.current]
+
+    stageRows.forEach((row, rowIndex) => {
+      const rowElement = rowElements[rowIndex]
+
+      if (!rowElement) {
+        return
+      }
+
+      const activeIndex = row.findIndex((item) => item.id === hoveredStageId)
+
+      gsap.to(rowElement, {
+        gridTemplateColumns: getSystemRowTemplate(
+          row.length,
+          activeIndex === -1 ? null : activeIndex,
+        ),
+        duration: activeIndex === -1 ? 0.4 : 0.52,
+        ease: "power2.inOut",
+        overwrite: "auto",
+      })
+    })
+
+    return () => {
+      rowElements.forEach((rowElement) => {
+        if (rowElement) {
+          gsap.killTweensOf(rowElement)
+        }
+      })
+    }
+  }, [hoveredStageId, isFixedLayout, stageRows])
 
   return (
     <div
@@ -1188,136 +1497,140 @@ export function ShoppingPage({
           value="spaces"
           className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
-          <div
-            className={cn(
-              "grid gap-4 min-[1260px]:grid-cols-2",
-              isFixedLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
-            )}
-          >
-            {spaces.length > 0 ? (
-              spaces.map((space) => (
-                <Surface key={space.name} className="p-5">
-                  <SectionHeading
-                    compact={isWideLayout}
-                    icon={House}
-                    title={space.name}
-                    description="按 space 看，最容易发现“好像东西很多，但总觉得缺”的真实原因。"
-                  />
+          <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              compact={isWideLayout}
+              icon={House}
+              title="空间巡检"
+              description="点击任意空间卡片，查看该位置的已有物品和待补缺口。"
+            />
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {Array.from(space.systems).map((system) => (
-                      <SystemChip key={system} system={system} />
-                    ))}
-                  </div>
-
-                  <div className="mt-5 grid gap-4 min-[960px]:grid-cols-2">
-                    <div>
-                      <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                        已有 {space.owned.length} 项
-                      </div>
-                      {space.owned.length > 0 ? (
-                        <div className="mt-3 space-y-3">
-                          {space.owned.map((item) => (
-                            <CompactItemRow key={item.id} item={item} sourceLabel="已拥有" />
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-                          当前没有已拥有条目。
-                        </p>
+            <div
+              className={cn(
+                "flex flex-col gap-3",
+                isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+              )}
+            >
+              {spaceRows.length > 0 ? (
+                spaceRows.map((row, rowIndex) => {
+                  return (
+                    <div
+                      key={`space-row-${rowIndex}`}
+                      ref={(element) => {
+                        spaceRowRefs.current[rowIndex] = element
+                      }}
+                      onPointerLeave={() => setHoveredSpaceName(null)}
+                      className={cn(
+                        isFixedLayout
+                          ? "grid min-h-0 flex-1 items-stretch gap-3"
+                          : "grid gap-3 min-[680px]:grid-cols-2 min-[1040px]:grid-cols-3",
                       )}
+                      style={
+                        isFixedLayout
+                          ? {
+                              gridTemplateColumns: getSystemRowTemplate(row.length, null),
+                            }
+                          : undefined
+                      }
+                    >
+                      {row.map((space) => (
+                        <SpaceMapCard
+                          key={space.name}
+                          space={space}
+                          isHovered={hoveredSpaceName === space.name}
+                          onHover={setHoveredSpaceName}
+                          onOpen={setSelectedSpaceName}
+                        />
+                      ))}
                     </div>
+                  )
+                })
+              ) : (
+                <EmptyState message="当前筛选下没有空间视角数据。" />
+              )}
+            </div>
+          </Surface>
 
-                    <div>
-                      <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                        待补 {space.planned.length} 项
-                      </div>
-                      {space.planned.length > 0 ? (
-                        <div className="mt-3 space-y-3">
-                          {space.planned.map((item) => (
-                            <CompactItemRow
-                              key={item.id}
-                              item={item}
-                              sourceLabel={item.laneTitle}
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-                          当前没有待补条目。
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </Surface>
-              ))
-            ) : (
-              <EmptyState message="当前筛选下没有空间视角数据。" />
-            )}
-          </div>
+          <ShoppingSpaceDetailDialog
+            space={spaces.find((s) => s.name === selectedSpaceName) ?? null}
+            open={selectedSpaceName !== null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setHoveredSpaceName(null)
+                setSelectedSpaceName(null)
+              }
+            }}
+          />
         </TabsContent>
 
         <TabsContent
           value="stages"
           className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
-          <div
-            className={cn(
-              "grid gap-4 min-[1320px]:grid-cols-2",
-              isFixedLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
-            )}
-          >
-            {shopping.stageChecklists.length > 0 ? (
-              shopping.stageChecklists.map((checklist) => (
-                <Surface key={checklist.id} className={cn("p-5", isWideLayout && "p-4")}>
-                  <SectionHeading
-                    compact={isWideLayout}
-                    icon={Sparkles}
-                    title={checklist.title}
-                    description={checklist.description}
-                  />
+          <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              compact={isWideLayout}
+              icon={Sparkles}
+              title="阶段模板"
+              description="点击任意阶段卡片，查看该生活阶段的完整物品清单模板。"
+            />
 
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Badge
-                      variant="outline"
-                      className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+            <div
+              className={cn(
+                "flex flex-col gap-3",
+                isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+              )}
+            >
+              {stageRows.length > 0 ? (
+                stageRows.map((row, rowIndex) => {
+                  return (
+                    <div
+                      key={`stage-row-${rowIndex}`}
+                      ref={(element) => {
+                        stageRowRefs.current[rowIndex] = element
+                      }}
+                      onPointerLeave={() => setHoveredStageId(null)}
+                      className={cn(
+                        isFixedLayout
+                          ? "grid min-h-0 flex-1 items-stretch gap-3"
+                          : "grid gap-3 min-[680px]:grid-cols-2 min-[1040px]:grid-cols-3",
+                      )}
+                      style={
+                        isFixedLayout
+                          ? {
+                              gridTemplateColumns: getSystemRowTemplate(row.length, null),
+                            }
+                          : undefined
+                      }
                     >
-                      {checklist.stage}
-                    </Badge>
-                  </div>
+                      {row.map((checklist) => (
+                        <StageMapCard
+                          key={checklist.id}
+                          checklist={checklist}
+                          isHovered={hoveredStageId === checklist.id}
+                          onHover={setHoveredStageId}
+                          onOpen={setSelectedStageId}
+                        />
+                      ))}
+                    </div>
+                  )
+                })
+              ) : (
+                <EmptyState message="当前筛选下没有阶段模板。" />
+              )}
+            </div>
+          </Surface>
 
-                  <p
-                    className={cn(
-                      "mt-4 text-sm leading-6 text-[color:var(--text-muted)]",
-                      isWideLayout && "text-[13px] leading-5",
-                    )}
-                  >
-                    {checklist.focus}
-                  </p>
-
-                  <div className="mt-5 space-y-4">
-                    {checklist.sections.map((section) => (
-                      <div
-                        key={`${checklist.id}-${section.system}`}
-                        className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
-                      >
-                        <div className="flex items-center gap-2">
-                          <SystemChip system={section.system} />
-                        </div>
-                        <div className="mt-4 grid gap-4 min-[960px]:grid-cols-3">
-                          <ChecklistBlock title="最低配置" items={section.minimum} />
-                          <ChecklistBlock title="必要物品" items={section.essentials} />
-                          <ChecklistBlock title="之后再升级" items={section.upgrades} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Surface>
-              ))
-            ) : (
-              <EmptyState message="当前筛选下没有阶段模板。" />
-            )}
-          </div>
+          <ShoppingStageDetailDialog
+            checklist={shopping.stageChecklists.find((c) => c.id === selectedStageId) ?? null}
+            open={selectedStageId !== null}
+            onOpenChange={(open) => {
+              if (!open) {
+                setHoveredStageId(null)
+                setSelectedStageId(null)
+              }
+            }}
+          />
         </TabsContent>
 
         <TabsContent
