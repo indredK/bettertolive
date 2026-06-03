@@ -13,7 +13,7 @@ import {
   SectionHeading,
   SummarySurface,
   Surface,
-} from "@/features/bettertolive/ui/shared"
+} from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function EmotionPage({

@@ -2,7 +2,7 @@ import { useState } from "react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react"
 
-import { BetterToLiveAppShell } from "@/features/bettertolive/ui/app-shell"
+import { BetterToLiveAppShell } from "@/features/bettertolive/ui/shell/app-shell"
 import { APP_LAYOUT_TRANSITION } from "@/lib/app-motion"
 import { createAppQueryClient } from "@/lib/query-client"
 

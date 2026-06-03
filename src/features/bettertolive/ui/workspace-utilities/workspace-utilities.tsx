@@ -13,7 +13,7 @@ import type {
   WorkspaceNotificationInput,
 } from "@/features/bettertolive/notifications"
 import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/theme-presets"
-import type { WorkspaceMusicPresetId } from "@/features/bettertolive/use-workspace-music"
+import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
 import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
 import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"
 import { ThemeUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/theme-utility-panel"

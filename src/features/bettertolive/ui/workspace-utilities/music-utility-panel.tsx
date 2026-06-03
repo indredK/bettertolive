@@ -1,7 +1,7 @@
 import { ChevronRight, Minus, Pause, Play, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { WorkspaceMusicPresetId } from "@/features/bettertolive/use-workspace-music"
+import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
 import { cn } from "@/lib/utils"
 
 export function MusicUtilityPanel({

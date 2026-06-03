@@ -30,24 +30,24 @@ import type {
   ShoppingPlanItem,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/formatters"
+import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
 import {
   EmptyState,
   PageIntro,
   SectionHeading,
   SummarySurface,
   Surface,
-} from "@/features/bettertolive/ui/shared"
+} from "@/features/bettertolive/ui/shared/shared"
 import {
   ShoppingSystemDetailDialog,
   type ShoppingPlanWithLane,
   type ShoppingSystemOverview,
-} from "@/features/bettertolive/ui/shopping-system-detail-dialog"
+} from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import {
   ShoppingSpaceDetailDialog,
   type SpaceOverview,
-} from "@/features/bettertolive/ui/shopping-space-detail-dialog"
-import { ShoppingStageDetailDialog } from "@/features/bettertolive/ui/shopping-stage-detail-dialog"
+} from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
+import { ShoppingStageDetailDialog } from "@/features/bettertolive/ui/shopping/shopping-stage-detail-dialog"
 import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
 import { cn } from "@/lib/utils"
 

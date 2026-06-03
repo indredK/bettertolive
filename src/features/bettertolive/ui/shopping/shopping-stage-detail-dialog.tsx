@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
-import { ChecklistBlock } from "@/features/bettertolive/ui/shopping-page"
+import { ChecklistBlock } from "@/features/bettertolive/ui/shopping/shopping-page"
 import { cn } from "@/lib/utils"
 
 const STAGE_DETAIL_DIALOG_CLASS = "w-[min(1040px,calc(100vw-2rem))] max-w-none p-0 sm:max-w-none"

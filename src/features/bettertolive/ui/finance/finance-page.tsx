@@ -8,8 +8,8 @@ import {
   SectionHeading,
   SummarySurface,
   Surface,
-} from "@/features/bettertolive/ui/shared"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/formatters"
+} from "@/features/bettertolive/ui/shared/shared"
+import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
 import { cn } from "@/lib/utils"
 
 export function FinancePage({

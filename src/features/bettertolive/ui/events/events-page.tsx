@@ -2,7 +2,12 @@ import { BookOpenText, Target } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import type { EventEntry } from "@/features/bettertolive/types"
-import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
+import {
+  EmptyState,
+  PageIntro,
+  SectionHeading,
+  Surface,
+} from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function EventsPage({

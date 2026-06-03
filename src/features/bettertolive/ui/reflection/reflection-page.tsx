@@ -2,7 +2,12 @@ import { NotebookPen, Sparkles } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import type { ReflectionDraftExample, ReflectionEntry } from "@/features/bettertolive/types"
-import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
+import {
+  EmptyState,
+  PageIntro,
+  SectionHeading,
+  Surface,
+} from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function ReflectionPage({

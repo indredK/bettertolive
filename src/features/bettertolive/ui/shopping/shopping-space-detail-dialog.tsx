@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { ShoppingOwnedItem, ShoppingSystem } from "@/features/bettertolive/types"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import { cn } from "@/lib/utils"
 
 export type SpaceOverview = {
