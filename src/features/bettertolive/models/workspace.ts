@@ -9,8 +9,7 @@ export type AppView =
   | "beliefs"
   | "principles"
   | "relationships"
-  | "growth"
-  | "memory"
+  | "journey"
   | "legacy"
   | "future"
 
@@ -378,6 +377,10 @@ export type RelationshipsModuleData = RelationshipMap
 export type GrowthModuleData = GrowthProfile
 
 export type MemoryWorkspaceModuleData = MemoryModuleData
+
+export type JourneyModuleData = GrowthModuleData & MemoryModuleData
+
+export type JourneyWorkspaceModuleData = JourneyModuleData
 
 export type EmotionWorkspaceModuleData = EmotionModuleData
 

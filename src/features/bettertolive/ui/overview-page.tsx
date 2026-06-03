@@ -47,8 +47,8 @@ export function OverviewPage({
   beliefCount,
   principleCount,
   relationshipCount,
-  growthCount,
-  memoryCount,
+  journeyStageCount,
+  journeyNodeCount,
   legacyDirectiveCount,
   legacyLetterCount,
   shoppingCount,
@@ -68,8 +68,8 @@ export function OverviewPage({
   beliefCount: number
   principleCount: number
   relationshipCount: number
-  growthCount: number
-  memoryCount: number
+  journeyStageCount: number
+  journeyNodeCount: number
   legacyDirectiveCount: number
   legacyLetterCount: number
   shoppingCount: number
@@ -96,14 +96,14 @@ export function OverviewPage({
             <SummarySurface
               tone="value"
               title="形成"
-              value={`${growthCount + memoryCount} 段线索`}
-              detail={`${relationshipCount} 个关键关系、${principleCount} 条原则和 ${memoryCount} 个记忆节点正在解释你为什么会这样。`}
+              value={`${journeyStageCount + journeyNodeCount} 段线索`}
+              detail={`${relationshipCount} 个关键关系、${principleCount} 条原则和 ${journeyNodeCount} 段人生节点正在解释你为什么会这样。`}
             />
             <SummarySurface
               tone="past"
               title="过去"
               value={`${reflections.length + events.length} 条记录`}
-              detail={`${events.length} 条记事和 ${memoryCount} 个记忆节点正在补全你的来路。`}
+              detail={`${events.length} 条记事和 ${journeyNodeCount} 段人生节点正在补全你的来路。`}
             />
             <SummarySurface
               tone="present"
@@ -266,9 +266,9 @@ export function OverviewPage({
               />
               <QuickActionButton
                 icon={LibraryBig}
-                label="回看人生记忆"
-                description="把人生节点、地点和物件背后的记忆重新连起来。"
-                onClick={() => onNavigate("memory")}
+                label="回看成长记忆"
+                description="把人生阶段、节点和地点物件背后的记忆重新连起来。"
+                onClick={() => onNavigate("journey")}
               />
               <QuickActionButton
                 icon={ScrollText}

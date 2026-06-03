@@ -9,6 +9,7 @@ import type {
   FinanceModuleData,
   FutureModuleData,
   GrowthModuleData,
+  JourneyModuleData,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
   OverviewModuleData,
@@ -32,6 +33,7 @@ export type BetterToLiveApi = {
   getRelationships: () => Promise<RelationshipsModuleData>
   getGrowth: () => Promise<GrowthModuleData>
   getMemory: () => Promise<MemoryWorkspaceModuleData>
+  getJourney: () => Promise<JourneyModuleData>
   getLegacy: () => Promise<LegacyWorkspaceModuleData>
   getFuture: () => Promise<FutureModuleData>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>

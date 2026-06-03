@@ -13,8 +13,7 @@ const WORKSPACE_VIEWS = [
   "beliefs",
   "principles",
   "relationships",
-  "growth",
-  "memory",
+  "journey",
   "legacy",
   "future",
 ] satisfies AppView[]

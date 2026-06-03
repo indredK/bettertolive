@@ -174,12 +174,12 @@ export function NotificationCenterPanel({
             onClick={() =>
               onNotify({
                 channel: "notification",
-                title: "成长线索待补充",
+                title: "人生脉络待补充",
                 message: "这条通知会常驻，直到你处理或手动关闭。",
                 tone: "warning",
                 persistent: true,
-                targetView: "growth",
-                actionLabel: "前往成长页",
+                targetView: "journey",
+                actionLabel: "前往成长记忆",
                 source: "扩展通知示例",
                 detail: "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
                 detailLines: [

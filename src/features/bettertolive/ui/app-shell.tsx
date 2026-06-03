@@ -5,18 +5,17 @@ import {
   Compass,
   HeartPulse,
   LayoutDashboard,
-  LibraryBig,
   Lightbulb,
   ListTodo,
   NotebookPen,
   PanelLeftClose,
   RefreshCcw,
+  Route,
   Scale,
   Search,
   ScrollText,
   ShieldAlert,
   Sparkles,
-  Sprout,
   Users2,
   Wallet,
   Waypoints,
@@ -44,9 +43,8 @@ import { FuturePage } from "@/features/bettertolive/ui/future-page"
 import { BeliefsPage } from "@/features/bettertolive/ui/beliefs-page"
 import { CrisisPage } from "@/features/bettertolive/ui/crisis-page"
 import { EmotionPage } from "@/features/bettertolive/ui/emotion-page"
-import { GrowthPage } from "@/features/bettertolive/ui/growth-page"
+import { JourneyPage } from "@/features/bettertolive/ui/journey-page"
 import { LegacyPage } from "@/features/bettertolive/ui/legacy-page"
-import { MemoryPage } from "@/features/bettertolive/ui/memory-page"
 import { NotificationLayer } from "@/features/bettertolive/ui/notification-layer"
 import { OverviewPage } from "@/features/bettertolive/ui/overview-page"
 import { PrinciplesPage } from "@/features/bettertolive/ui/principles-page"
@@ -165,16 +163,10 @@ const NAV_SECTIONS: Array<{
         icon: Users2,
       },
       {
-        view: "growth",
-        label: "成长",
-        hint: "环境经历与形成原因",
-        icon: Sprout,
-      },
-      {
-        view: "memory",
-        label: "记忆节点",
-        hint: "人生阶段与记忆锚点",
-        icon: LibraryBig,
+        view: "journey",
+        label: "成长记忆",
+        hint: "人生阶段、节点与影响",
+        icon: Route,
       },
     ],
   },
@@ -384,21 +376,15 @@ export function BetterToLiveAppShell() {
             searchQuery={searchQuery}
           />
         )
-      case "growth":
+      case "journey":
         return (
-          <GrowthPage
-            stages={viewModel.growthStages}
-            threads={viewModel.growthThreads}
-            traceCount={viewModel.visibleGrowthTraceCount}
-            searchQuery={searchQuery}
-          />
-        )
-      case "memory":
-        return (
-          <MemoryPage
-            nodes={viewModel.memoryNodes}
-            anchors={viewModel.memoryAnchors}
-            reviewPrompts={viewModel.memoryReviewPrompts}
+          <JourneyPage
+            stages={viewModel.journeyData.stages}
+            threads={viewModel.journeyData.threads}
+            nodes={viewModel.journeyData.nodes}
+            anchors={viewModel.journeyData.anchors}
+            reviewPrompts={viewModel.journeyData.reviewPrompts}
+            traceCount={viewModel.journeyData.traceCount}
             searchQuery={searchQuery}
           />
         )
@@ -438,8 +424,8 @@ export function BetterToLiveAppShell() {
             beliefCount={viewModel.beliefCards.length}
             principleCount={viewModel.principles.length}
             relationshipCount={viewModel.visibleRelationshipCount}
-            growthCount={viewModel.growthStages.length}
-            memoryCount={viewModel.memoryNodes.length}
+            journeyStageCount={viewModel.journeyData.stages.length}
+            journeyNodeCount={viewModel.journeyData.nodes.length}
             legacyDirectiveCount={viewModel.legacyDirectives.length}
             legacyLetterCount={viewModel.legacyLetters.length}
             shoppingCount={viewModel.visibleShoppingCount}

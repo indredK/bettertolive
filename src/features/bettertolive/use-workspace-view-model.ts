@@ -324,38 +324,6 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.relationships.unsentNotes],
   )
 
-  const growthStages = useMemo(
-    () =>
-      workspace.growth.stages.filter((entry) =>
-        matchesQuery(entry.stage, entry.title, entry.environment, entry.impact, ...entry.traces),
-      ),
-    [matchesQuery, workspace.growth.stages],
-  )
-
-  const growthThreads = useMemo(
-    () => workspace.growth.threads.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.growth.threads],
-  )
-
-  const memoryNodes = useMemo(
-    () =>
-      workspace.memory.nodes.filter((entry) =>
-        matchesQuery(entry.period, entry.title, entry.summary, entry.impact, ...entry.tags),
-      ),
-    [matchesQuery, workspace.memory.nodes],
-  )
-
-  const memoryAnchors = useMemo(
-    () =>
-      workspace.memory.anchors.filter((entry) => matchesQuery(entry.type, entry.label, entry.note)),
-    [matchesQuery, workspace.memory.anchors],
-  )
-
-  const memoryReviewPrompts = useMemo(
-    () => workspace.memory.reviewPrompts.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.memory.reviewPrompts],
-  )
-
   const legacyDirectives = useMemo(
     () => workspace.legacy.directives.filter((entry) => matchesQuery(entry.title, entry.detail)),
     [matchesQuery, workspace.legacy.directives],
@@ -402,10 +370,21 @@ export function useWorkspaceViewModel({
     0,
   )
 
-  const visibleGrowthTraceCount = growthStages.reduce(
-    (count, entry) => count + entry.traces.length,
-    0,
-  )
+  const journeyData = useMemo(() => {
+    const stages = workspace.growth.stages.filter((entry) =>
+      matchesQuery(entry.stage, entry.title, entry.environment, entry.impact, ...entry.traces),
+    )
+    const threads = workspace.growth.threads.filter((entry) => matchesQuery(entry))
+    const nodes = workspace.memory.nodes.filter((entry) =>
+      matchesQuery(entry.period, entry.title, entry.summary, entry.impact, ...entry.tags),
+    )
+    const anchors = workspace.memory.anchors.filter((entry) =>
+      matchesQuery(entry.type, entry.label, entry.note),
+    )
+    const reviewPrompts = workspace.memory.reviewPrompts.filter((entry) => matchesQuery(entry))
+    const traceCount = stages.reduce((count, entry) => count + entry.traces.length, 0)
+    return { stages, threads, nodes, anchors, reviewPrompts, traceCount }
+  }, [matchesQuery, workspace.growth, workspace.memory])
 
   const visibleExpenseTotal = transactions
     .filter((entry) => entry.direction === "expense")
@@ -431,16 +410,12 @@ export function useWorkspaceViewModel({
     events,
     futureBlueprint: workspace.future,
     greeting: workspace.overview.greeting,
-    growthStages,
-    growthThreads,
+    journeyData,
     legacyDirectives,
     legacyLetters,
     legacyLifeReview,
     legacyPreferences,
     legacyWishes,
-    memoryAnchors,
-    memoryNodes,
-    memoryReviewPrompts,
     milestones,
     principleBoundaries,
     principles,
@@ -454,7 +429,6 @@ export function useWorkspaceViewModel({
     shoppingModule,
     transactions,
     visibleExpenseTotal,
-    visibleGrowthTraceCount,
     visibleIncomeTotal,
     visibleRelationshipCount,
     visibleShoppingCount,

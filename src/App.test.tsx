@@ -43,7 +43,7 @@ describe("App", () => {
     expect(screen.getByTestId("sidebar-note-carousel")).toBeInTheDocument()
     expect(screen.getByText("总览说明")).toBeInTheDocument()
     expect(screen.getByTestId("nav-beliefs")).toBeInTheDocument()
-    expect(screen.getByTestId("nav-growth")).toBeInTheDocument()
+    expect(screen.getByTestId("nav-journey")).toBeInTheDocument()
     expect(screen.getByTestId("nav-emotion")).toBeInTheDocument()
     expect(screen.getByTestId("nav-legacy")).toBeInTheDocument()
   })
@@ -147,23 +147,25 @@ describe("App", () => {
     )
   })
 
-  it("switches to the growth view", () => {
+  it("switches to the journey view", () => {
     render(<App />)
 
-    fireEvent.click(screen.getByTestId("nav-growth"))
+    fireEvent.click(screen.getByTestId("nav-journey"))
 
-    expect(screen.getByRole("heading", { name: "成长环境" })).toBeInTheDocument()
-    expect(screen.getByText("成长说明")).toBeInTheDocument()
-    expect(screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "成长记忆" })).toBeInTheDocument()
+    expect(screen.getByText("成长记忆说明")).toBeInTheDocument()
+    expect(
+      screen.getByText("把人生节点、经历背景和留下的影响放在同一条时间线上回看。"),
+    ).toBeInTheDocument()
   })
 
   it("keeps the current menu view in the URL hash", async () => {
     render(<App />)
 
-    fireEvent.click(screen.getByTestId("nav-growth"))
+    fireEvent.click(screen.getByTestId("nav-journey"))
 
     await waitFor(() => {
-      expect(window.location.hash).toBe("#/growth")
+      expect(window.location.hash).toBe("#/journey")
     })
   })
 
@@ -278,7 +280,7 @@ describe("App", () => {
     fireEvent.click(screen.getByTestId("notification-center-trigger"))
     fireEvent.click(screen.getByTestId("notification-demo-persistent"))
 
-    expect(screen.getAllByText("成长线索待补充").length).toBeGreaterThan(0)
+    expect(screen.getAllByText("人生脉络待补充").length).toBeGreaterThan(0)
     expect(screen.getAllByTestId("notification-card-notification")).toHaveLength(1)
 
     act(() => {
@@ -287,9 +289,9 @@ describe("App", () => {
 
     expect(screen.getAllByTestId("notification-card-notification")).toHaveLength(1)
 
-    fireEvent.click(screen.getByText("前往成长页"))
+    fireEvent.click(screen.getAllByText("前往成长记忆")[0])
 
-    expect(screen.getByRole("heading", { name: "成长环境" })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "成长记忆" })).toBeInTheDocument()
   })
 
   it("opens the music panel from the persistent utility area", () => {

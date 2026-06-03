@@ -9,6 +9,7 @@ import type {
   FinanceModuleData,
   FutureModuleData,
   GrowthModuleData,
+  JourneyModuleData,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
   OverviewModuleData,
@@ -33,6 +34,13 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
       requestJson<RelationshipsModuleData>(BETTERTOLIVE_API_ENDPOINTS.relationships),
     getGrowth: () => requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
     getMemory: () => requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
+    async getJourney(): Promise<JourneyModuleData> {
+      const [growth, memory] = await Promise.all([
+        requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
+        requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
+      ])
+      return { ...growth, ...memory }
+    },
     getLegacy: () => requestJson<LegacyWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.legacy),
     getFuture: () => requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
     async getWorkspaceSnapshot() {

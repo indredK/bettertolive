@@ -203,37 +203,20 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       },
     ],
   },
-  growth: {
-    heading: "成长说明",
+  journey: {
+    heading: "成长记忆说明",
     lines: [
       {
         label: "追溯",
-        text: "把环境、经历和形成原因放一起，看自己怎么形成。",
+        text: "把人生节点、经历背景和留下的影响放在同一条时间线上回看。",
       },
       {
         label: "适合",
-        text: "适合反复出现某种反应，想追溯它从哪来时。",
+        text: "你想理解自己怎么形成，或追溯某个反应、模式从哪里开始时。",
       },
       {
         label: "目的",
-        text: "理解形成过程，是为了慢慢松开旧惯性。",
-      },
-    ],
-  },
-  memory: {
-    heading: "记忆说明",
-    lines: [
-      {
-        label: "回看",
-        text: "把人生节点、地点、物件和照片背后的记忆重新整理出来。",
-      },
-      {
-        label: "适合",
-        text: "适合你知道某些过去还在影响现在，但还没真正看清它们时。",
-      },
-      {
-        label: "目的",
-        text: "让过去不只是散在脑子里，而能成为可理解的人生线索。",
+        text: "把散落的过去整理成可理解的人生脉络，慢慢松开旧惯性。",
       },
     ],
   },

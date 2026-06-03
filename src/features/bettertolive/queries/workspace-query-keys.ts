@@ -11,8 +11,7 @@ export const workspaceQueryKeys = {
   beliefs: () => [...workspaceQueryKeys.all, "beliefs"] as const,
   principles: () => [...workspaceQueryKeys.all, "principles"] as const,
   relationships: () => [...workspaceQueryKeys.all, "relationships"] as const,
-  growth: () => [...workspaceQueryKeys.all, "growth"] as const,
-  memory: () => [...workspaceQueryKeys.all, "memory"] as const,
+  journey: () => [...workspaceQueryKeys.all, "journey"] as const,
   legacy: () => [...workspaceQueryKeys.all, "legacy"] as const,
   future: () => [...workspaceQueryKeys.all, "future"] as const,
 } as const

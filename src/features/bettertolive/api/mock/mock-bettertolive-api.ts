@@ -27,6 +27,11 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getRelationships: () => withMockLatency(workspaceSnapshotMockData.relationships),
     getGrowth: () => withMockLatency(workspaceSnapshotMockData.growth),
     getMemory: () => withMockLatency(workspaceSnapshotMockData.memory),
+    getJourney: () =>
+      withMockLatency({
+        ...workspaceSnapshotMockData.growth,
+        ...workspaceSnapshotMockData.memory,
+      }),
     getLegacy: () => withMockLatency(workspaceSnapshotMockData.legacy),
     getFuture: () => withMockLatency(workspaceSnapshotMockData.future),
     getWorkspaceSnapshot: () => withMockLatency(workspaceSnapshotMockData),
