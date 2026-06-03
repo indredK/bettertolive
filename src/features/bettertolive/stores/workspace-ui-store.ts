@@ -1,6 +1,7 @@
 import { create } from "zustand"
 
 import type { AppView } from "@/features/bettertolive/models/workspace"
+import { readWorkspaceViewFromLocation } from "@/features/bettertolive/workspace-view-route"
 
 const WORKSPACE_UI_STORAGE_KEY = "bettertolive.workspace-ui"
 
@@ -86,13 +87,15 @@ function clearPersistedWorkspaceUiState() {
 function createInitialWorkspaceUiState() {
   return {
     ...defaultWorkspaceUiState,
+    activeView: readWorkspaceViewFromLocation(),
     ...readPersistedWorkspaceUiState(),
   }
 }
 
 export const useWorkspaceUiStore = create<WorkspaceUiState>((set) => ({
   ...createInitialWorkspaceUiState(),
-  setActiveView: (activeView) => set({ activeView }),
+  setActiveView: (activeView) =>
+    set((state) => (state.activeView === activeView ? state : { activeView })),
   toggleSidebarCollapsed: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }),
   toggleCompactSidebarExpanded: () =>
@@ -124,6 +127,7 @@ export function resetWorkspaceUiStore(
 
   useWorkspaceUiStore.setState({
     ...defaultWorkspaceUiState,
+    activeView: readWorkspaceViewFromLocation(),
     ...(restorePersistedState ? readPersistedWorkspaceUiState() : {}),
   })
 }

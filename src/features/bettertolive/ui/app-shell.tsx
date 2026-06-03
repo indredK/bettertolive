@@ -33,6 +33,7 @@ import { workspaceRhythmSlides, workspaceSidebarNotes } from "@/features/bettert
 import { useWorkspaceNotifications } from "@/features/bettertolive/use-workspace-notifications"
 import { useWorkspaceMusic } from "@/features/bettertolive/use-workspace-music"
 import { useWorkspaceTheme } from "@/features/bettertolive/use-workspace-theme"
+import { useWorkspaceViewRoute } from "@/features/bettertolive/use-workspace-view-route"
 import { useWorkspaceViewModel } from "@/features/bettertolive/use-workspace-view-model"
 import { useWorkspaceSnapshotQuery } from "@/features/bettertolive/queries/use-workspace-snapshot-query"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
@@ -249,6 +250,7 @@ export function BetterToLiveAppShell() {
   const toggleCompactSidebarExpanded = useWorkspaceUiStore(
     (state) => state.toggleCompactSidebarExpanded,
   )
+  useWorkspaceViewRoute()
   const { theme, themeId, themes, setThemeId, themeStyle } = useWorkspaceTheme()
   const layoutMode = useWorkspaceLayoutMode()
   const workspaceQuery = useWorkspaceSnapshotQuery()

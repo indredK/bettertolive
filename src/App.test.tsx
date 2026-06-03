@@ -11,8 +11,17 @@ function setViewportWidth(width: number) {
   window.dispatchEvent(new Event("resize"))
 }
 
+function clearLocationHash() {
+  window.history.replaceState(
+    window.history.state,
+    "",
+    `${window.location.pathname}${window.location.search}`,
+  )
+}
+
 describe("App", () => {
   beforeEach(() => {
+    clearLocationHash()
     window.localStorage.removeItem(THEME_STORAGE_KEY)
     resetWorkspaceUiStore()
     setViewportWidth(1440)
@@ -146,6 +155,27 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: "成长环境" })).toBeInTheDocument()
     expect(screen.getByText("成长说明")).toBeInTheDocument()
     expect(screen.getByText("把环境、经历和形成原因放一起，看自己怎么形成。")).toBeInTheDocument()
+  })
+
+  it("keeps the current menu view in the URL hash", async () => {
+    render(<App />)
+
+    fireEvent.click(screen.getByTestId("nav-growth"))
+
+    await waitFor(() => {
+      expect(window.location.hash).toBe("#/growth")
+    })
+  })
+
+  it("restores the active view from the URL hash after a reload", async () => {
+    window.location.hash = "#/legacy"
+    resetWorkspaceUiStore()
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(screen.getByRole("heading", { name: "生命整理" })).toBeInTheDocument()
+    })
   })
 
   it("switches to the emotion view with trend and support data", () => {
