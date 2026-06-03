@@ -16,23 +16,40 @@ function filterChecklistByQuery(
     return checklist
   }
 
-  if (matchesQuery(checklist.title, checklist.description, checklist.focus)) {
+  if (matchesQuery(checklist.stage, checklist.title, checklist.description, checklist.focus)) {
     return checklist
   }
 
-  const minimum = checklist.minimum.filter((entry) => matchesQuery(entry))
-  const essentials = checklist.essentials.filter((entry) => matchesQuery(entry))
-  const upgrades = checklist.upgrades.filter((entry) => matchesQuery(entry))
+  const sections = checklist.sections
+    .map((section) => {
+      if (matchesQuery(section.system)) {
+        return section
+      }
 
-  if (minimum.length === 0 && essentials.length === 0 && upgrades.length === 0) {
+      const minimum = section.minimum.filter((entry) => matchesQuery(entry))
+      const essentials = section.essentials.filter((entry) => matchesQuery(entry))
+      const upgrades = section.upgrades.filter((entry) => matchesQuery(entry))
+
+      if (minimum.length === 0 && essentials.length === 0 && upgrades.length === 0) {
+        return null
+      }
+
+      return {
+        ...section,
+        minimum,
+        essentials,
+        upgrades,
+      }
+    })
+    .filter((section) => section !== null)
+
+  if (sections.length === 0) {
     return null
   }
 
   return {
     ...checklist,
-    minimum,
-    essentials,
-    upgrades,
+    sections,
   }
 }
 
@@ -133,14 +150,28 @@ export function useWorkspaceViewModel({
   const shoppingModule = useMemo(
     () => ({
       ...workspace.shopping,
+      systemDefinitions: workspace.shopping.systemDefinitions.filter((entry) =>
+        matchesQuery(
+          entry.id,
+          entry.cluster,
+          entry.summary,
+          entry.keyQuestion,
+          ...entry.secondaryGroups,
+        ),
+      ),
       spotlights: workspace.shopping.spotlights.filter((entry) =>
         matchesQuery(entry.title, entry.stage, entry.summary, entry.reason, ...entry.attention),
       ),
       ownedItems: workspace.shopping.ownedItems.filter((entry) =>
         matchesQuery(
           entry.name,
+          entry.system,
           entry.category,
-          entry.space,
+          ...entry.spaces,
+          ...entry.stages,
+          entry.necessity,
+          entry.lifecycle,
+          entry.depreciation,
           entry.status,
           entry.replacementCue,
           entry.note,
@@ -154,10 +185,13 @@ export function useWorkspaceViewModel({
             lane.title,
             lane.subtitle,
             entry.name,
+            entry.system,
             entry.category,
-            entry.stage,
-            entry.space,
+            ...entry.stages,
+            ...entry.spaces,
             entry.necessity,
+            entry.lifecycle,
+            entry.depreciation,
             entry.reason,
             entry.targetLifestyle,
             entry.currentPrice,
@@ -173,7 +207,10 @@ export function useWorkspaceViewModel({
         .filter((entry) => entry !== null),
       priceReferences: workspace.shopping.priceReferences.filter((entry) =>
         matchesQuery(
+          entry.system,
           entry.category,
+          entry.lifecycle,
+          entry.depreciation,
           entry.entryPrice,
           entry.sweetSpotPrice,
           entry.overpayPrice,

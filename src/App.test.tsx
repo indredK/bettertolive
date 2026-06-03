@@ -207,17 +207,18 @@ describe("App", () => {
 
     fireEvent.click(screen.getByTestId("nav-shopping"))
 
-    expect(screen.getByRole("heading", { name: "购物清单" })).toBeInTheDocument()
-    expect(screen.getByText("购物说明")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "生活物品" })).toBeInTheDocument()
+    expect(screen.getByText("生活物品说明")).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("tab", { name: "采购决策" }))
-    expect(screen.getByText("立即补齐")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "立即补齐" })).toBeInTheDocument()
 
-    fireEvent.click(screen.getByRole("tab", { name: "阶段清单" }))
-    expect(screen.getByText("搬家最低配置")).toBeInTheDocument()
+    const stagesTab = screen.getByRole("tab", { name: "阶段模板" })
+    fireEvent.click(stagesTab)
+    expect(stagesTab).toHaveAttribute("aria-selected", "true")
 
-    fireEvent.click(screen.getByRole("tab", { name: "理想生活" }))
-    expect(screen.getByText("送礼可以考虑什么")).toBeInTheDocument()
+    fireEvent.click(screen.getByRole("tab", { name: "空间巡检" }))
+    expect(screen.getByRole("heading", { name: "卧室" })).toBeInTheDocument()
   })
 
   it("collapses the sidebar into an icon rail", async () => {

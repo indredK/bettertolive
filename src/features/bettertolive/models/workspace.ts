@@ -57,26 +57,62 @@ export type ShoppingSpotlight = {
   attention: string[]
 }
 
-export type ShoppingOwnedItem = {
+export type ShoppingNeedLevel = "最低配置" | "必要" | "改善体验" | "提升幸福感"
+
+export type ShoppingSystem =
+  | "睡眠"
+  | "饮食"
+  | "清洁"
+  | "收纳"
+  | "照明"
+  | "环境"
+  | "电力网络"
+  | "工作学习"
+  | "应急健康"
+  | "个人护理"
+  | "穿着"
+  | "家具陈设"
+  | "出行"
+  | "娱乐爱好"
+
+export type ShoppingStage = "搬家最低配" | "租房" | "长期居住" | "自有住房" | "自建房"
+
+export type ShoppingLifecycle = "消耗品" | "耐用品" | "工具" | "情感物"
+
+export type ShoppingDepreciation = "极快折旧" | "较快折旧" | "中等折旧" | "慢折旧" | "不折旧或升值"
+
+export type ShoppingSystemCluster = "基础系统" | "家居与生活方式"
+
+export type ShoppingSystemDefinition = {
+  id: ShoppingSystem
+  cluster: ShoppingSystemCluster
+  summary: string
+  keyQuestion: string
+  secondaryGroups: string[]
+}
+
+export type ShoppingItemBase = {
+  system: ShoppingSystem
+  category: string
+  spaces: string[]
+  stages: ShoppingStage[]
+  necessity: ShoppingNeedLevel
+  lifecycle: ShoppingLifecycle
+  depreciation?: ShoppingDepreciation
+}
+
+export type ShoppingOwnedItem = ShoppingItemBase & {
   id: string
   name: string
-  category: string
-  space: string
   quantity: number
   status: string
   replacementCue: string
   note: string
 }
 
-export type ShoppingNeedLevel = "最低配置" | "必要" | "改善体验" | "提升幸福感"
-
-export type ShoppingPlanItem = {
+export type ShoppingPlanItem = ShoppingItemBase & {
   id: string
   name: string
-  category: string
-  stage: string
-  space: string
-  necessity: ShoppingNeedLevel
   reason: string
   targetLifestyle: string
   currentPrice: number
@@ -93,19 +129,28 @@ export type ShoppingPurchaseLane = {
   items: ShoppingPlanItem[]
 }
 
-export type ShoppingStageChecklist = {
-  id: string
-  title: string
-  description: string
-  focus: string
+export type ShoppingStageChecklistSection = {
+  system: ShoppingSystem
   minimum: string[]
   essentials: string[]
   upgrades: string[]
 }
 
+export type ShoppingStageChecklist = {
+  id: string
+  stage: ShoppingStage
+  title: string
+  description: string
+  focus: string
+  sections: ShoppingStageChecklistSection[]
+}
+
 export type ShoppingPriceReference = {
   id: string
+  system: ShoppingSystem
   category: string
+  lifecycle: ShoppingLifecycle
+  depreciation?: ShoppingDepreciation
   entryPrice: number
   sweetSpotPrice: number
   overpayPrice: number
@@ -362,6 +407,7 @@ export type FinanceModuleData = {
 }
 
 export type ShoppingModuleData = {
+  systemDefinitions: ShoppingSystemDefinition[]
   spotlights: ShoppingSpotlight[]
   ownedItems: ShoppingOwnedItem[]
   purchaseLanes: ShoppingPurchaseLane[]

@@ -102,19 +102,19 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
     ],
   },
   shopping: {
-    heading: "购物说明",
+    heading: "生活物品说明",
     lines: [
       {
         label: "记录",
-        text: "把已有物品、采购决策、阶段清单和价格感放到一起看。",
+        text: "把 system、space、stage、necessity、lifecycle 放到同一张桌上看。",
       },
       {
         label: "适合",
-        text: "适合整理生活缺口，判断什么该补、什么该等、什么先别买时。",
+        text: "适合整理生活缺口，判断什么该补、什么该等、什么只是想象中的好物时。",
       },
       {
         label: "目的",
-        text: "让物品真正服务生活，而不是只堆成更多待买项。",
+        text: "让物品真正服务生活系统，而不是只堆成更多待买项。",
       },
     ],
   },

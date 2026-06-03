@@ -5,7 +5,7 @@ export const workspaceViewLabels: Record<AppView, string> = {
   reflection: "反思",
   events: "记事",
   finance: "记账",
-  shopping: "购物清单",
+  shopping: "生活物品",
   nutrition: "饮食",
   emotion: "情绪情感",
   crisis: "危机支持",
