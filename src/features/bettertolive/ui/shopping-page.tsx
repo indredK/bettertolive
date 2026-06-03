@@ -279,27 +279,32 @@ export function ShoppingPage({
             value="overview"
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
+            <AlertTriangle />
             总览
           </TabsTrigger>
           <TabsTrigger
             value="inventory"
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
+            <Package2 />
             我的东西
           </TabsTrigger>
           <TabsTrigger
             value="planning"
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
+            <ShoppingBasket />
             采购决策
           </TabsTrigger>
           <TabsTrigger value="stages" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
+            <House />
             阶段清单
           </TabsTrigger>
           <TabsTrigger
             value="lifestyle"
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
+            <Sparkles />
             理想生活
           </TabsTrigger>
         </TabsList>
@@ -311,14 +316,7 @@ export function ShoppingPage({
           {isWideLayout ? (
             <div className="grid h-full min-h-0 gap-3 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(320px,0.86fr)]">
               <Surface className="flex h-full min-h-0 flex-col p-4">
-                <SectionHeading
-                  compact
-                  icon={AlertTriangle}
-                  title="现在最值得先看的缺口"
-                  description="先把已经在影响现实生活的缺口集中看清。"
-                />
-
-                <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+                <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                   {shopping.spotlights.length > 0 ? (
                     <div className="grid content-start gap-3 min-[1360px]:grid-cols-2">
                       {shopping.spotlights.map((spotlight) => (
@@ -333,14 +331,7 @@ export function ShoppingPage({
 
               <div className="grid min-h-0 [grid-template-rows:minmax(0,1fr)_auto] gap-3">
                 <Surface className="flex min-h-0 flex-col p-4">
-                  <SectionHeading
-                    compact
-                    icon={ShoppingBasket}
-                    title="当前最需要补齐"
-                    description="已经足够接近真实缺口的东西。"
-                  />
-
-                  <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+                  <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                     {immediateItems.length > 0 ? (
                       immediateItems.map((item) => (
                         <ImmediateNeedCompactCard key={item.id} item={item} />
@@ -352,42 +343,27 @@ export function ShoppingPage({
                 </Surface>
 
                 <Surface className="p-4">
-                  <SectionHeading
-                    compact
-                    icon={House}
-                    title="别漏掉的基础件"
-                    description="很多生活崩溃感来自基础件没建起来。"
-                  />
-
-                  <div className="mt-4">
-                    {overlookedCollection ? (
-                      <div className="grid gap-2 min-[1360px]:grid-cols-2">
-                        {overlookedCollection.items.map((item) => (
-                          <div
-                            key={item}
-                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]"
-                          >
-                            {item}
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <EmptyState message="当前筛选下没有基础提醒。" compact />
-                    )}
-                  </div>
+                  {overlookedCollection ? (
+                    <div className="grid gap-2 min-[1360px]:grid-cols-2">
+                      {overlookedCollection.items.map((item) => (
+                        <div
+                          key={item}
+                          className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2 text-[13px] leading-5 text-[color:var(--text-secondary)]"
+                        >
+                          {item}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState message="当前筛选下没有基础提醒。" compact />
+                  )}
                 </Surface>
               </div>
             </div>
           ) : (
             <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
               <Surface className="p-5">
-                <SectionHeading
-                  icon={AlertTriangle}
-                  title="现在最值得先看的缺口"
-                  description="不是所有想买都该现在买，先看哪些事情已经开始影响现实生活。"
-                />
-
-                <div className="mt-5 space-y-5">
+                <div className="space-y-5">
                   {shopping.spotlights.length > 0 ? (
                     shopping.spotlights.map((spotlight) => (
                       <div
@@ -426,13 +402,7 @@ export function ShoppingPage({
 
               <div className="space-y-4">
                 <Surface className="p-5">
-                  <SectionHeading
-                    icon={ShoppingBasket}
-                    title="当前最需要补齐"
-                    description="这里放的是已经足够接近真实缺口的东西。"
-                  />
-
-                  <div className="mt-5 space-y-4">
+                  <div className="space-y-4">
                     {immediateItems.length > 0 ? (
                       immediateItems.map((item) => {
                         const signal = getPriceSignal(item)
@@ -483,28 +453,20 @@ export function ShoppingPage({
                 </Surface>
 
                 <Surface className="p-5">
-                  <SectionHeading
-                    icon={House}
-                    title="别漏掉的基础件"
-                    description="很多生活崩溃感不是大件不够，而是基础件一直没建起来。"
-                  />
-
-                  <div className="mt-5">
-                    {overlookedCollection ? (
-                      <ul className="space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {overlookedCollection.items.map((item) => (
-                          <li
-                            key={item}
-                            className="border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0"
-                          >
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <EmptyState message="当前筛选下没有基础提醒。" compact />
-                    )}
-                  </div>
+                  {overlookedCollection ? (
+                    <ul className="space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+                      {overlookedCollection.items.map((item) => (
+                        <li
+                          key={item}
+                          className="border-t border-[color:var(--muted-surface-border)] py-3 first:border-t-0 first:pt-0 last:pb-0"
+                        >
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <EmptyState message="当前筛选下没有基础提醒。" compact />
+                  )}
                 </Surface>
               </div>
             </div>
@@ -522,16 +484,7 @@ export function ShoppingPage({
             )}
           >
             <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
-              <SectionHeading
-                compact={isWideLayout}
-                icon={Package2}
-                title="我现在有什么"
-                description="已有物品不是背景噪音，它们构成了现在的生活底盘。"
-              />
-
-              <div
-                className={cn("mt-5", isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1")}
-              >
+              <div className={cn(isWideLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
                 {shopping.ownedItems.length > 0 ? (
                   <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
@@ -606,17 +559,10 @@ export function ShoppingPage({
             </Surface>
 
             <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
-              <SectionHeading
-                compact={isWideLayout}
-                icon={Sparkles}
-                title="已有但需要关注"
-                description="不一定是坏了，而是它们已经在提醒你该补件、升级或重新布置。"
-              />
-
               <div
                 className={cn(
-                  "mt-5 space-y-4",
-                  isWideLayout && "mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
+                  "space-y-4",
+                  isWideLayout && "min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
                 )}
               >
                 {ownedAttentionItems.length > 0 ? (
