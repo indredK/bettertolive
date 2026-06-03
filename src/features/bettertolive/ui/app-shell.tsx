@@ -299,7 +299,6 @@ export function BetterToLiveAppShell() {
   const isWideLayout = layoutMode === "wide"
   const isCompactLayout = layoutMode === "compact"
   const isStackedLayout = layoutMode === "stacked"
-  const isFixedShoppingWorkspace = isWideLayout && activeView === "shopping"
   const isHorizontalHeader = !isStackedLayout
   const showSidebar = !isStackedLayout
   const isSidebarInteractive = showSidebar
@@ -309,6 +308,44 @@ export function BetterToLiveAppShell() {
       ? !isCompactSidebarExpanded
       : isSidebarCollapsed
   const currentViewLabel = getWorkspaceViewLabel(activeView)
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return
+    }
+
+    const html = document.documentElement
+    const { body } = document
+    const root = document.getElementById("root")
+
+    html.style.overflowX = "hidden"
+    body.style.overflowX = "hidden"
+    html.style.overflowY = isStackedLayout ? "auto" : "hidden"
+    body.style.overflowY = isStackedLayout ? "auto" : "hidden"
+    html.style.overscrollBehavior = isStackedLayout ? "auto" : "none"
+    body.style.overscrollBehavior = isStackedLayout ? "auto" : "none"
+
+    if (root) {
+      root.style.overflow = isStackedLayout ? "visible" : "hidden"
+      root.style.height = isStackedLayout ? "auto" : "100%"
+      root.style.minHeight = "100%"
+    }
+
+    return () => {
+      html.style.removeProperty("overflow-x")
+      body.style.removeProperty("overflow-x")
+      html.style.removeProperty("overflow-y")
+      body.style.removeProperty("overflow-y")
+      html.style.removeProperty("overscroll-behavior")
+      body.style.removeProperty("overscroll-behavior")
+
+      if (root) {
+        root.style.removeProperty("overflow")
+        root.style.removeProperty("height")
+        root.style.removeProperty("min-height")
+      }
+    }
+  }, [isStackedLayout])
 
   const handleSidebarCollapseToggle = () => {
     if (isCompactLayout) {
@@ -327,10 +364,17 @@ export function BetterToLiveAppShell() {
             draftExample={viewModel.reflectionDraftExample}
             reflections={viewModel.reflections}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "events":
-        return <EventsPage events={viewModel.events} searchQuery={searchQuery} />
+        return (
+          <EventsPage
+            events={viewModel.events}
+            searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
+          />
+        )
       case "finance":
         return (
           <FinancePage
@@ -338,6 +382,7 @@ export function BetterToLiveAppShell() {
             expenseTotal={viewModel.visibleExpenseTotal}
             incomeTotal={viewModel.visibleIncomeTotal}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "shopping":
@@ -347,6 +392,7 @@ export function BetterToLiveAppShell() {
             visibleCount={viewModel.visibleShoppingCount}
             searchQuery={searchQuery}
             isWideLayout={isWideLayout}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "nutrition":
@@ -356,6 +402,7 @@ export function BetterToLiveAppShell() {
             weeklyHighlights={viewModel.nutritionHighlights}
             foodMemories={viewModel.nutritionFoodMemories}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "emotion":
@@ -366,6 +413,7 @@ export function BetterToLiveAppShell() {
             triggers={viewModel.emotionTriggers}
             tools={viewModel.emotionTools}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "crisis":
@@ -377,6 +425,7 @@ export function BetterToLiveAppShell() {
             steps={viewModel.crisisSteps}
             reviewNotes={viewModel.crisisReviewNotes}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "beliefs":
@@ -385,6 +434,7 @@ export function BetterToLiveAppShell() {
             beliefCards={viewModel.beliefCards}
             questions={viewModel.beliefQuestions}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "principles":
@@ -393,6 +443,7 @@ export function BetterToLiveAppShell() {
             principles={viewModel.principles}
             boundaries={viewModel.principleBoundaries}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "relationships":
@@ -404,6 +455,7 @@ export function BetterToLiveAppShell() {
             unsentNotes={viewModel.relationshipUnsentNotes}
             visibleRelationshipCount={viewModel.visibleRelationshipCount}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "journey":
@@ -416,6 +468,7 @@ export function BetterToLiveAppShell() {
             reviewPrompts={viewModel.journeyData.reviewPrompts}
             traceCount={viewModel.journeyData.traceCount}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "legacy":
@@ -427,6 +480,7 @@ export function BetterToLiveAppShell() {
             preferences={viewModel.legacyPreferences}
             lifeReview={viewModel.legacyLifeReview}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "socioeconomics":
@@ -435,6 +489,7 @@ export function BetterToLiveAppShell() {
             entries={viewModel.socioeconomicsEntries}
             gaps={viewModel.socioeconomicsGaps}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "future":
@@ -443,6 +498,7 @@ export function BetterToLiveAppShell() {
             futureBlueprint={viewModel.futureBlueprint}
             milestones={viewModel.milestones}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
       case "overview":
@@ -469,6 +525,7 @@ export function BetterToLiveAppShell() {
             shoppingCount={viewModel.visibleShoppingCount}
             onNavigate={setActiveView}
             searchQuery={searchQuery}
+            isStackedLayout={isStackedLayout}
           />
         )
     }
@@ -481,8 +538,10 @@ export function BetterToLiveAppShell() {
       data-layout-mode={layoutMode}
       style={themeStyle}
       className={cn(
-        "relative [height:100dvh] h-screen max-h-screen overflow-x-hidden overscroll-none",
-        isStackedLayout ? "overflow-y-auto" : "overflow-hidden",
+        "relative overflow-x-hidden",
+        isStackedLayout
+          ? "min-h-screen"
+          : "[height:100dvh] h-screen max-h-screen overflow-hidden overscroll-none",
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(var(--app-grid)_1px,transparent_1px),linear-gradient(90deg,var(--app-grid)_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
@@ -490,7 +549,8 @@ export function BetterToLiveAppShell() {
         layout
         transition={SIDEBAR_LAYOUT_TRANSITION}
         className={cn(
-          "relative flex min-h-full flex-col",
+          "relative flex flex-col",
+          isStackedLayout ? "min-h-full" : "h-full",
           showSidebar && "h-full flex-row overflow-hidden",
         )}
       >
@@ -657,7 +717,7 @@ export function BetterToLiveAppShell() {
         <m.main
           layout
           transition={SIDEBAR_LAYOUT_TRANSITION}
-          className={cn("min-w-0", showSidebar && "flex flex-1 flex-col overflow-hidden")}
+          className={cn("min-w-0", !isStackedLayout && "flex flex-1 flex-col overflow-hidden")}
         >
           {isStackedLayout ? (
             <>
@@ -821,15 +881,17 @@ export function BetterToLiveAppShell() {
           <div
             className={cn(
               "mx-auto w-full max-w-[1500px] px-4 py-5",
-              showSidebar &&
-                (isFixedShoppingWorkspace
-                  ? "min-h-0 flex-1 overflow-hidden"
-                  : "min-h-0 flex-1 overflow-y-auto overscroll-contain"),
+              !isStackedLayout && "flex min-h-0 flex-1 flex-col overflow-hidden",
               isWideLayout && "px-6 py-3",
             )}
           >
             {workspaceQuery.isError ? (
-              <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-900">
+              <div
+                className={cn(
+                  "mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/90 px-4 py-3 text-sm text-amber-900",
+                  !isStackedLayout && "shrink-0",
+                )}
+              >
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="size-4" />
                   当前接口请求失败，页面已回退到本地 mock 数据。
@@ -851,7 +913,7 @@ export function BetterToLiveAppShell() {
               animate={CONTENT_ENTER_PRESENCE.animate}
               exit={CONTENT_ENTER_PRESENCE.exit}
               transition={APP_FADE_TRANSITION}
-              className={cn(isFixedShoppingWorkspace ? "h-full" : "min-h-full")}
+              className={cn(!isStackedLayout && "h-full min-h-0 flex-1")}
             >
               {pageContent}
             </m.div>

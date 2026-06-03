@@ -9,18 +9,28 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function FuturePage({
   futureBlueprint,
   milestones,
   searchQuery,
+  isStackedLayout = false,
 }: {
   futureBlueprint: FutureBlueprint
   milestones: FutureMilestone[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="未来蓝图"
         title="把想成为的人说清楚"
@@ -28,7 +38,7 @@ export function FuturePage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="present"
           title="理想自我"
@@ -49,15 +59,22 @@ export function FuturePage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.9fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.9fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Target}
             title="阶段路径"
             description="先把未来拆成靠近方式，而不是终局答案。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {milestones.length > 0 ? (
               milestones.map((entry) => (
                 <div
@@ -93,14 +110,16 @@ export function FuturePage({
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Compass}
             title="当前实验"
             description="不用一步到位，先让生活里出现一点点更像自己的东西。"
           />
 
-          <div className="mt-5 space-y-3">
+          <div
+            className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {futureBlueprint.experiments.map((entry) => (
               <div
                 key={entry}

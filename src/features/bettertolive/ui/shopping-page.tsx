@@ -199,12 +199,15 @@ export function ShoppingPage({
   visibleCount,
   searchQuery,
   isWideLayout = false,
+  isStackedLayout = false,
 }: {
   shopping: ShoppingModuleData
   visibleCount: number
   searchQuery: string
   isWideLayout?: boolean
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
   const immediateItems = shopping.purchaseLanes.find((lane) => lane.id === "buy-now")?.items ?? []
   const ownedAttentionItems = shopping.ownedItems.filter((item) => !item.status.includes("稳定"))
   const overlookedCollection = shopping.lifestyleCollections.find(
@@ -218,7 +221,7 @@ export function ShoppingPage({
     <div
       className={cn(
         "space-y-5",
-        isWideLayout && "flex h-full flex-col gap-3 space-y-0 overflow-hidden",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
       <PageIntro
@@ -231,7 +234,8 @@ export function ShoppingPage({
       <div
         className={cn(
           "grid gap-4 min-[960px]:grid-cols-2 min-[1440px]:grid-cols-4",
-          isWideLayout && "shrink-0 gap-3",
+          isFixedLayout && "shrink-0",
+          isWideLayout && "gap-3",
         )}
       >
         <SummarySurface
@@ -266,13 +270,18 @@ export function ShoppingPage({
 
       <Tabs
         defaultValue="overview"
-        className={cn("gap-4", isWideLayout && "min-h-0 flex-1 gap-3 overflow-hidden")}
+        className={cn(
+          "gap-4",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+          isWideLayout && "gap-3",
+        )}
       >
         <TabsList
           variant="line"
           className={cn(
             "flex w-full flex-wrap items-center gap-1 rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-1",
-            isWideLayout && "shrink-0 gap-0.5 p-0.5",
+            isFixedLayout && "shrink-0",
+            isWideLayout && "gap-0.5 p-0.5",
           )}
         >
           <TabsTrigger
@@ -311,7 +320,7 @@ export function ShoppingPage({
 
         <TabsContent
           value="overview"
-          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
+          className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           {isWideLayout ? (
             <div className="grid h-full min-h-0 gap-3 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(320px,0.86fr)]">
@@ -361,9 +370,19 @@ export function ShoppingPage({
               </div>
             </div>
           ) : (
-            <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]">
-              <Surface className="p-5">
-                <div className="space-y-5">
+            <div
+              className={cn(
+                "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(360px,0.82fr)]",
+                isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+              )}
+            >
+              <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
+                <div
+                  className={cn(
+                    "space-y-5",
+                    isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                  )}
+                >
                   {shopping.spotlights.length > 0 ? (
                     shopping.spotlights.map((spotlight) => (
                       <div
@@ -400,7 +419,7 @@ export function ShoppingPage({
                 </div>
               </Surface>
 
-              <div className="space-y-4">
+              <div className={cn("space-y-4", isFixedLayout && "min-h-0 overflow-y-auto pr-1")}>
                 <Surface className="p-5">
                   <div className="space-y-4">
                     {immediateItems.length > 0 ? (
@@ -475,16 +494,22 @@ export function ShoppingPage({
 
         <TabsContent
           value="inventory"
-          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
+          className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1360px]:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.84fr)]",
-              isWideLayout && "h-full min-h-0",
+              isFixedLayout && "h-full min-h-0",
             )}
           >
-            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
-              <div className={cn(isWideLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+            <Surface
+              className={cn(
+                "p-5",
+                isFixedLayout && "flex h-full min-h-0 flex-col",
+                isWideLayout && "p-4",
+              )}
+            >
+              <div className={cn(isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
                 {shopping.ownedItems.length > 0 ? (
                   <Table className={cn(isWideLayout && "text-[13px]")}>
                     <TableHeader>
@@ -558,11 +583,18 @@ export function ShoppingPage({
               </div>
             </Surface>
 
-            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
+            <Surface
+              className={cn(
+                "p-5",
+                isFixedLayout && "flex h-full min-h-0 flex-col",
+                isWideLayout && "p-4",
+              )}
+            >
               <div
                 className={cn(
                   "space-y-4",
-                  isWideLayout && "min-h-0 flex-1 space-y-3 overflow-y-auto pr-1",
+                  isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                  isWideLayout && "space-y-3",
                 )}
               >
                 {ownedAttentionItems.length > 0 ? (
@@ -610,15 +642,15 @@ export function ShoppingPage({
 
         <TabsContent
           value="planning"
-          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
+          className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1400px]:grid-cols-[minmax(0,1.5fr)_minmax(340px,0.82fr)]",
-              isWideLayout && "h-full min-h-0",
+              isFixedLayout && "h-full min-h-0",
             )}
           >
-            <div className={cn("space-y-4", isWideLayout && "min-h-0 overflow-y-auto pr-1")}>
+            <div className={cn("space-y-4", isFixedLayout && "min-h-0 overflow-y-auto pr-1")}>
               {shopping.purchaseLanes.map((lane) => (
                 <Surface key={lane.id} className={cn("p-5", isWideLayout && "p-4")}>
                   <SectionHeading
@@ -749,7 +781,13 @@ export function ShoppingPage({
               ))}
             </div>
 
-            <Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col p-4")}>
+            <Surface
+              className={cn(
+                "p-5",
+                isFixedLayout && "flex h-full min-h-0 flex-col",
+                isWideLayout && "p-4",
+              )}
+            >
               <SectionHeading
                 compact={isWideLayout}
                 icon={CircleDollarSign}
@@ -758,7 +796,11 @@ export function ShoppingPage({
               />
 
               <div
-                className={cn("mt-5", isWideLayout && "mt-4 min-h-0 flex-1 overflow-y-auto pr-1")}
+                className={cn(
+                  "mt-5",
+                  isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                  isWideLayout && "mt-4",
+                )}
               >
                 {shopping.priceReferences.length > 0 ? (
                   <Table className={cn(isWideLayout && "text-[13px]")}>
@@ -832,12 +874,12 @@ export function ShoppingPage({
 
         <TabsContent
           value="stages"
-          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
+          className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1320px]:grid-cols-2",
-              isWideLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
+              isFixedLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
             )}
           >
             {shopping.stageChecklists.length > 0 ? (
@@ -879,12 +921,12 @@ export function ShoppingPage({
 
         <TabsContent
           value="lifestyle"
-          className={cn("space-y-4", isWideLayout && "min-h-0 flex-1 overflow-hidden")}
+          className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
         >
           <div
             className={cn(
               "grid gap-4 min-[1320px]:grid-cols-3",
-              isWideLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
+              isFixedLayout && "h-full min-h-0 content-start overflow-y-auto pr-1",
             )}
           >
             {coreLifestyleCollections.length > 0 ? (

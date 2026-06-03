@@ -13,6 +13,7 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function RelationshipsPage({
   relationshipCircles,
@@ -21,6 +22,7 @@ export function RelationshipsPage({
   unsentNotes,
   visibleRelationshipCount,
   searchQuery,
+  isStackedLayout = false,
 }: {
   relationshipCircles: RelationshipCircle[]
   moments: RelationshipMoment[]
@@ -28,9 +30,17 @@ export function RelationshipsPage({
   unsentNotes: RelationshipUnsentNote[]
   visibleRelationshipCount: number
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="关系深化"
         title="把重要关系放进更深的上下文里看"
@@ -38,7 +48,7 @@ export function RelationshipsPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="value"
           title="关系圈"
@@ -59,15 +69,22 @@ export function RelationshipsPage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.24fr)_minmax(320px,0.84fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.24fr)_minmax(320px,0.84fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Users2}
             title="重要人物与关系状态"
             description="先把圈层分清，再慢慢补每段关系里的感受、事件和位置变化。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {relationshipCircles.some((circle) => circle.entries.length > 0) ? (
               relationshipCircles.map((circle) => (
                 <div
@@ -130,7 +147,7 @@ export function RelationshipsPage({
           </div>
         </Surface>
 
-        <div className="space-y-4">
+        <div className={cn("space-y-4", isFixedLayout && "min-h-0 overflow-y-auto pr-1")}>
           <Surface className="p-5">
             <SectionHeading
               icon={MessageCircleMore}

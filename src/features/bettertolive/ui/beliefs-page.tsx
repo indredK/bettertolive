@@ -9,18 +9,28 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function BeliefsPage({
   beliefCards,
   questions,
   searchQuery,
+  isStackedLayout = false,
 }: {
   beliefCards: BeliefCard[]
   questions: string[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="观念"
         title="把你怎么看世界和人生说清楚"
@@ -28,7 +38,7 @@ export function BeliefsPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="past"
           title="观念层"
@@ -49,15 +59,22 @@ export function BeliefsPage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.85fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.85fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Lightbulb}
             title="观念骨架"
             description="这些内容以后会成为很多决定背后的解释层。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {beliefCards.length > 0 ? (
               beliefCards.map((entry) => (
                 <div
@@ -89,36 +106,40 @@ export function BeliefsPage({
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={MessagesSquare}
             title="反复出现的问题"
             description="先把会反复追问自己的问题收进来，后面再慢慢回答。"
           />
 
-          <div className="mt-5 space-y-3">
-            {questions.length > 0 ? (
-              questions.map((entry) => (
-                <div
-                  key={entry}
-                  className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
-                >
-                  {entry}
-                </div>
-              ))
-            ) : (
-              <EmptyState message="当前筛选下没有可展示的问题。" compact />
-            )}
-          </div>
-
-          <div className="mt-5 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-            <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-              <Waypoints className="size-4" />
-              这页以后会连接什么
+          <div
+            className={cn("mt-5 space-y-5", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
+            <div className="space-y-3">
+              {questions.length > 0 ? (
+                questions.map((entry) => (
+                  <div
+                    key={entry}
+                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+                  >
+                    {entry}
+                  </div>
+                ))
+              ) : (
+                <EmptyState message="当前筛选下没有可展示的问题。" compact />
+              )}
             </div>
-            <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-              未来会和反思、关系、成长环境互相链接，用来解释“我为什么会这样判断”。
-            </p>
+
+            <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+              <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
+                <Waypoints className="size-4" />
+                这页以后会连接什么
+              </div>
+              <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+                未来会和反思、关系、成长环境互相链接，用来解释“我为什么会这样判断”。
+              </p>
+            </div>
           </div>
         </Surface>
       </div>

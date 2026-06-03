@@ -10,18 +10,22 @@ import {
   Surface,
 } from "@/features/bettertolive/ui/shared"
 import { MONEY_FORMATTER } from "@/features/bettertolive/ui/formatters"
+import { cn } from "@/lib/utils"
 
 export function FinancePage({
   transactions,
   expenseTotal,
   incomeTotal,
   searchQuery,
+  isStackedLayout = false,
 }: {
   transactions: TransactionEntry[]
   expenseTotal: number
   incomeTotal: number
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
   const spendingByCategory = transactions
     .filter((entry) => entry.direction === "expense")
     .reduce<Record<string, number>>((accumulator, entry) => {
@@ -32,7 +36,12 @@ export function FinancePage({
   const categoryRows = Object.entries(spendingByCategory).sort((left, right) => right[1] - left[1])
 
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="记账"
         title="让现实资源流向成为证据"
@@ -40,7 +49,7 @@ export function FinancePage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="present"
           title="本周支出"
@@ -61,15 +70,22 @@ export function FinancePage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.82fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.3fr)_minmax(320px,0.82fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Wallet}
             title="最近账目"
             description="mock 数据先让页面节奏成立，后面再接真实录入。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {transactions.length > 0 ? (
               transactions.map((entry) => (
                 <div
@@ -114,14 +130,16 @@ export function FinancePage({
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={CheckCheck}
             title="类别分布"
             description="不用图表也能先看出最近的钱在流向哪里。"
           />
 
-          <div className="mt-5 space-y-3">
+          <div
+            className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {categoryRows.length > 0 ? (
               categoryRows.map(([category, amount]) => {
                 const progress = Math.max(

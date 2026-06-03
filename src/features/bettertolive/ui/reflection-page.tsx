@@ -3,18 +3,28 @@ import { NotebookPen, Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import type { ReflectionDraftExample, ReflectionEntry } from "@/features/bettertolive/types"
 import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function ReflectionPage({
   draftExample,
   reflections,
   searchQuery,
+  isStackedLayout = false,
 }: {
   draftExample: ReflectionDraftExample
   reflections: ReflectionEntry[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="反思"
         title="先把此刻写下来"
@@ -22,39 +32,50 @@ export function ReflectionPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.85fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.85fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={NotebookPen}
             title="今天想写些什么？"
             description="这块先用 mock 内容占位，后面再接真实输入和保存。"
           />
 
-          <div className="mt-5 min-h-[240px] rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] p-5 text-sm leading-7 whitespace-pre-wrap text-[color:var(--text-secondary)]">
-            {draftExample.content}
-          </div>
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
+            <div className="min-h-[240px] rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] p-5 text-sm leading-7 whitespace-pre-wrap text-[color:var(--text-secondary)]">
+              {draftExample.content}
+            </div>
 
-          <div className="mt-4 flex flex-wrap gap-2">
-            {draftExample.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-              >
-                {tag}
-              </Badge>
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {draftExample.tags.map((tag) => (
+                <Badge
+                  key={tag}
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+                >
+                  {tag}
+                </Badge>
+              ))}
+            </div>
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Sparkles}
             title="最近反思"
             description="先展示最近写过的内容，再决定之后如何组织回看。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {reflections.length > 0 ? (
               reflections.map((entry) => (
                 <div

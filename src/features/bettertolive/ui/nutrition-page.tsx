@@ -9,20 +9,30 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function NutritionPage({
   meals,
   weeklyHighlights,
   foodMemories,
   searchQuery,
+  isStackedLayout = false,
 }: {
   meals: NutritionMealEntry[]
   weeklyHighlights: string[]
   foodMemories: NutritionFoodMemory[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="饮食"
         title="看见吃这件事在生活里的位置"
@@ -30,7 +40,7 @@ export function NutritionPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="present"
           title="本周记录"
@@ -51,15 +61,22 @@ export function NutritionPage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Utensils}
             title="最近进食"
             description="按场景、构成、触发记录每一顿，再补一段身体反馈。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {meals.length > 0 ? (
               meals.map((entry) => (
                 <div
@@ -105,7 +122,7 @@ export function NutritionPage({
           </div>
         </Surface>
 
-        <div className="space-y-4">
+        <div className={cn("space-y-4", isFixedLayout && "min-h-0 overflow-y-auto pr-1")}>
           <Surface className="p-5">
             <SectionHeading
               icon={Salad}

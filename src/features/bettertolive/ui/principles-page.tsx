@@ -9,18 +9,28 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function PrinciplesPage({
   principles,
   boundaries,
   searchQuery,
+  isStackedLayout = false,
 }: {
   principles: PrincipleEntry[]
   boundaries: string[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="原则"
         title="把原则和底线从模糊感觉里拿出来"
@@ -28,7 +38,7 @@ export function PrinciplesPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="present"
           title="原则"
@@ -49,15 +59,22 @@ export function PrinciplesPage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Scale}
             title="原则清单"
             description="这页以后会变成做决策时最稳定的参照。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {principles.length > 0 ? (
               principles.map((entry) => (
                 <div
@@ -90,14 +107,16 @@ export function PrinciplesPage({
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Shield}
             title="不想再退让的地方"
             description="先把不想失去的部分写出来，很多边界才有支点。"
           />
 
-          <div className="mt-5 space-y-3">
+          <div
+            className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {boundaries.length > 0 ? (
               boundaries.map((entry) => (
                 <div

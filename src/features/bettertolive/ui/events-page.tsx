@@ -3,12 +3,27 @@ import { BookOpenText, Target } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import type { EventEntry } from "@/features/bettertolive/types"
 import { EmptyState, PageIntro, SectionHeading, Surface } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
-export function EventsPage({ events, searchQuery }: { events: EventEntry[]; searchQuery: string }) {
+export function EventsPage({
+  events,
+  searchQuery,
+  isStackedLayout = false,
+}: {
+  events: EventEntry[]
+  searchQuery: string
+  isStackedLayout?: boolean
+}) {
+  const isFixedLayout = !isStackedLayout
   const themes = Array.from(new Set(events.map((entry) => entry.theme)))
 
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="记事"
         title="把生活片段接回时间线"
@@ -16,15 +31,22 @@ export function EventsPage({ events, searchQuery }: { events: EventEntry[]; sear
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.8fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={BookOpenText}
             title="时间线"
             description="记录下来以后，生活会开始出现连续感。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {events.length > 0 ? (
               events.map((entry) => (
                 <div
@@ -52,14 +74,19 @@ export function EventsPage({ events, searchQuery }: { events: EventEntry[]; sear
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Target}
             title="最近重复出现的主题"
             description="模块不用很复杂，也能开始帮助你看到模式。"
           />
 
-          <div className="mt-5 flex flex-wrap gap-2">
+          <div
+            className={cn(
+              "mt-5 flex flex-wrap content-start gap-2",
+              isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+            )}
+          >
             {themes.length > 0 ? (
               themes.map((theme) => (
                 <Badge

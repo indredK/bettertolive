@@ -33,6 +33,7 @@ import {
   Surface,
 } from "@/features/bettertolive/ui/shared"
 import { MONEY_FORMATTER } from "@/features/bettertolive/ui/formatters"
+import { cn } from "@/lib/utils"
 
 export function OverviewPage({
   greeting,
@@ -55,6 +56,7 @@ export function OverviewPage({
   futureMilestoneCount,
   onNavigate,
   searchQuery,
+  isStackedLayout = false,
 }: {
   greeting: string
   dailyPulse: string[]
@@ -76,13 +78,20 @@ export function OverviewPage({
   futureMilestoneCount: number
   onNavigate: (view: AppView) => void
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
   const expenseTotal = transactions
     .filter((entry) => entry.direction === "expense")
     .reduce((sum, entry) => sum + entry.amount, 0)
 
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="总览"
         title="先看全局，再决定从哪里开始"
@@ -90,9 +99,19 @@ export function OverviewPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.92fr)]">
-        <div className="space-y-4">
-          <div className="grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-3">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.92fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <div className={cn("space-y-4", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
+          <div
+            className={cn(
+              "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-3",
+              isFixedLayout && "shrink-0",
+            )}
+          >
             <SummarySurface
               tone="value"
               title="形成"
@@ -131,14 +150,14 @@ export function OverviewPage({
             />
           </div>
 
-          <Surface className="p-5">
+          <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-1 flex-col")}>
             <SectionHeading
               icon={CalendarDays}
               title="最近记录"
               description="从最近发生的事和最近写下的话里，先看见当下的自己。"
             />
 
-            <div className="mt-5">
+            <div className={cn("mt-5", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
               {recentRecords.length > 0 ? (
                 <RecordStream records={recentRecords} />
               ) : (
@@ -148,7 +167,7 @@ export function OverviewPage({
           </Surface>
         </div>
 
-        <div className="space-y-4">
+        <div className={cn("space-y-4", isFixedLayout && "min-h-0 overflow-y-auto pr-1")}>
           <Surface className="p-5">
             <SectionHeading
               icon={Waypoints}

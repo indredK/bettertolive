@@ -9,18 +9,23 @@
 ### 规则
 
 - **整页(`html` / `body`)不出现滚动条**——视口被布局完整占满,不存在页面级滚动。
-- **内容区域的外层容器不出现滚动条**——主内容区作为一个整体,不滚动。
-- **内容内的子区块可以独立滚动**——列表、卡片栈、详情面板等子模块按需 `overflow: auto`。
-- **窄屏(移动端断点以下)允许整页滚动**——此时回退到正常文档流,放弃 app shell 模式。
+- **内容区域的外层容器不出现滚动条**——主内容区作为一个整体,不滚动。这包括 app-shell 的 `<main>` 内层容器(`mx-auto w-full max-w-[1500px] ...`)和每个模块页的根 `<div>`。
+- **每个模块页都按"固定壳"模式实现**——根容器在 `wide` / `compact` 模式下都是 `flex h-full flex-col min-h-0 overflow-hidden`,内部任何会溢出的子区块自带滚动容器。**不允许**模块页根容器只写 `space-y-*` 把内容堆下去等外层兜底滚动(这正是 §1 第二条要避免的)。
+- **内容内的子区块可以独立滚动**——列表、卡片栈、详情面板等子模块按需 `overflow-y-auto`,且每个滚动容器都要在其链路上的所有 flex/grid 祖先设置 `min-h-0`。
+- **窄屏(`stacked` 模式)允许整页滚动**——此时回退到正常文档流,模块页根容器写成 `space-y-*`、由 `html` / `body` `overflow: auto` 接管。模块组件通过 `isStackedLayout` 之类的 prop 区分两套根容器写法,而不是依赖隐式断点。
 
 ### 为什么
 
 - **桌面端定位是工作台**:多区域并排展示(导航 / 列表 / 详情),用户视线在各区域之间切换,而不是从上往下浏览长文。整页滚动会让顶部信息(导航、工具栏)失焦,破坏空间记忆。
+- **所有模块共享一种节奏**:如果一部分模块是"固定壳",一部分模块是"长页面",用户在模块之间切换时会有忽然变成滚动视图的错位感。统一为固定壳,模块切换才是无缝的横向移动。
 - **窄屏放弃 shell**:小屏幕里多区域并排无意义,堆叠为单列后,正常滚动反而比拆分多个滚动容器更符合直觉,也避免嵌套滚动的手势冲突。
 
 ### 例外 / 实现要点
 
+- **canonical 模式参考**:[shopping-page.tsx](src/features/bettertolive/ui/shopping-page.tsx) 已经实现了完整的固定壳:根容器 `flex h-full flex-col gap-3 space-y-0 overflow-hidden`,顶部摘要 `shrink-0`,中段网格 `min-h-0 flex-1 overflow-hidden`,内部列表用独立的 `overflow-y-auto` 容器。新模块页或重构旧模块页时,都以这个文件为模板。
+- **app-shell 配合**:[app-shell.tsx](src/features/bettertolive/ui/app-shell.tsx) 的内容容器在非 `stacked` 模式下必须是 `min-h-0 flex-1 overflow-hidden`,而不是 `overflow-y-auto`。`overflow-y-auto` 等价于把"内容会很长"当默认,与本规则相悖。
 - **必须配套设置 `min-height: 0`**:flex / grid 子项默认 `min-height: auto`,会被内容撑开导致滚动条出现在错误的层级。所有作为"滚动容器父级"的 flex 子项都要显式 `min-height: 0`(grid 同理 `min-block-size: 0`)。
+- **`<m.div>` / motion 包装**:页面切换动画的包装容器在固定壳下应写成 `h-full`,而不是 `min-h-full`。`min-h-full` 会让内容超出时把外层撑高,触发外层滚动。
 - **窄屏断点要同时解除两处**:不仅要切布局,还要把 `html, body { overflow: hidden }` 改回 `overflow: auto`,否则窄屏下内容被裁掉。
 - **模态层 / Toast 不受此规则约束**:它们脱离正常文档流,自身管理滚动(如 `Dialog` 内部的长表单)。
 - **滚动条样式统一**:子区块出现滚动条时使用统一的细滚动条样式(具体值后续在「滚动条样式」章节补充)。
@@ -166,6 +171,80 @@
 - 用 shadcn 组件时其内部已用 `bg-background` / `text-foreground` 等语义令牌,不要再额外覆盖颜色。
 - 业务页面用 workspace 主题变量(`--text-primary` 等),shadcn 内部用 shadcn 令牌(`--foreground` 等),两套不要混。
 - 字距类 `tracking-[0.22em]`(标签小字)、`tracking-tight`(标题)——除此之外不引入新字距。
+
+---
+
+## 8. 模块页结构骨架
+
+### 规则
+
+每个模块页(`overview` / `reflection` / `nutrition` / ... )都按下面这一套骨架实现,只有内部子区块的分栏可以差异化:
+
+```tsx
+// canonical 模块页骨架,对照 shopping-page.tsx
+export function ModulePage({ isWideLayout, /* data... */ }) {
+  return (
+    <div
+      className={cn(
+        "space-y-5",                                       // stacked 模式:正常文档流
+        isWideLayout && "flex h-full flex-col gap-3 space-y-0 overflow-hidden",
+        // compact 模式介于两者之间;如果模块在 compact 也想固定壳,沿用上面这一行
+      )}
+    >
+      <PageIntro ... />                                    // 永远在最上,占自然高度
+
+      <div
+        className={cn(
+          "grid gap-4 min-[960px]:grid-cols-3",             // 顶部摘要 SummarySurface 阵列
+          isWideLayout && "shrink-0 gap-3",                 // 固定壳里要 shrink-0
+        )}
+      >
+        <SummarySurface ... />
+      </div>
+
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]",
+          isWideLayout && "min-h-0 flex-1 gap-3 overflow-hidden",
+        )}
+      >
+        {/* 这里的每一列再各自 overflow-y-auto,详见下条 */}
+      </div>
+    </div>
+  )
+}
+```
+
+每一列(`Surface` 等卡片栈)在固定壳模式下要包一层独立的滚动容器:
+
+```tsx
+<Surface className={cn("p-5", isWideLayout && "flex h-full min-h-0 flex-col")}>
+  <SectionHeading ... />                                   // shrink-0
+  <div
+    className={cn(
+      "mt-5 space-y-4",
+      isWideLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+    )}
+  >
+    {entries.map(...)}
+  </div>
+</Surface>
+```
+
+### 为什么
+
+- **一套骨架,横向无缝**:模块切换时如果一个页面是固定壳、下一个是长滚动页,用户会瞬间失去空间方位感。统一骨架后,模块之间就是横向移动,而不是切换到新形态。
+- **"哪里出滚动条"是设计决策**:固定壳让"哪一列长、哪一列要滚"成为可控的设计判断,而不是"内容多就自动撑长页面"的隐式后果。
+- **`isWideLayout` 作为单一切换点**:只在根容器和容器边界使用 `isWideLayout` 切换形态,内部细节不重复判断,避免布局逻辑散落。
+
+### 例外 / 实现要点
+
+- **`PageIntro` 不占行高时**:`PageIntro` 在没有 `searchQuery` 时返回 `null`(参考 [shared.tsx:36](src/features/bettertolive/ui/shared.tsx:36)),不会破坏 `flex-1` 中段的高度计算,不需要额外处理。
+- **顶部摘要可缺省**:不是所有模块都有摘要阵列。没有摘要时,中段网格直接成为 `flex-1 min-h-0`,不要塞占位卡片。
+- **滚动容器只能出现在叶子层**:不要在中段网格上写 `overflow-y-auto`——那会让两列同时滚动,空间感塌掉。只让每一列内部的列表 `overflow-y-auto`。
+- **`pr-1` / `pr-0.5` 给滚动条留位**:子区块开启 `overflow-y-auto` 后,加一点右内边距让滚动条不贴边,这点参考 [sidebar-navigation.tsx](src/features/bettertolive/ui/sidebar-navigation.tsx) 的 `pr-0.5`。
+- **`stacked` 模式不走这套**:窄屏直接 `space-y-5`,所有 `flex h-full overflow-hidden` / `min-h-0 flex-1 overflow-y-auto` 都不加。判断逻辑挂在 `isWideLayout`(或 `!isStackedLayout`)props 上,不在组件内部再调 `useWorkspaceLayoutMode()`。
+- **数据非常少的模块**:即使现在内容很短也按固定壳实现——内容会随使用增长,等"开始溢出再改"成本远高于一开始就按规则写。
 
 ---
 

@@ -9,18 +9,28 @@ import {
   SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared"
+import { cn } from "@/lib/utils"
 
 export function SocioeconomicsPage({
   entries,
   gaps,
   searchQuery,
+  isStackedLayout = false,
 }: {
   entries: SocioeconomicsEntry[]
   gaps: string[]
   searchQuery: string
+  isStackedLayout?: boolean
 }) {
+  const isFixedLayout = !isStackedLayout
+
   return (
-    <div className="space-y-5">
+    <div
+      className={cn(
+        "space-y-5",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+      )}
+    >
       <PageIntro
         eyebrow="社会经济"
         title="看清外部经济世界怎么运转"
@@ -28,7 +38,7 @@ export function SocioeconomicsPage({
         searchQuery={searchQuery}
       />
 
-      <div className="grid gap-4 min-[960px]:grid-cols-3">
+      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
         <SummarySurface
           tone="value"
           title="已有认知"
@@ -49,15 +59,22 @@ export function SocioeconomicsPage({
         />
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]">
-        <Surface className="p-5">
+      <div
+        className={cn(
+          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.2fr)_minmax(320px,0.88fr)]",
+          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
+        )}
+      >
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Landmark}
             title="经济认知地图"
             description="按领域、层次、掌握程度归类，看看自己的认知地图覆盖到哪。"
           />
 
-          <div className="mt-5 space-y-4">
+          <div
+            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {entries.length > 0 ? (
               entries.map((entry) => (
                 <div
@@ -96,14 +113,16 @@ export function SocioeconomicsPage({
           </div>
         </Surface>
 
-        <Surface className="p-5">
+        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
           <SectionHeading
             icon={Telescope}
             title="认知缺口"
             description="先把哪里只是听过名词、哪里还没形成判断写出来。"
           />
 
-          <div className="mt-5 space-y-3">
+          <div
+            className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+          >
             {gaps.length > 0 ? (
               gaps.map((entry) => (
                 <div
