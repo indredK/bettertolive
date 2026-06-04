@@ -1,23 +1,19 @@
 import { Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
 import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
-import { ChecklistBlock } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
-function SystemChip({ label }: { label: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-    >
-      {label}
-    </Badge>
-  )
-}
-
-function StageDetailPanel({ checklist }: { checklist: ShoppingStageChecklist }) {
+function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageChecklist }) {
   const sectionCount = checklist.sections.length
   const totalItems = checklist.sections.reduce(
     (sum, s) => sum + s.minimum.length + s.essentials.length + s.upgrades.length,
@@ -25,66 +21,113 @@ function StageDetailPanel({ checklist }: { checklist: ShoppingStageChecklist }) 
   )
 
   return (
-    <div className="flex h-full flex-col rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div>
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-[color:var(--text-primary)]">
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
+      {/* Fixed header */}
+      <div className="shrink-0 p-5 pb-0">
+        {/* Line 1: Title left, badges + focus right */}
+        <div className="flex items-start justify-between gap-4">
+          <h3 className="flex shrink-0 items-center gap-2 text-lg font-semibold text-[color:var(--text-primary)]">
             <Sparkles className="size-5" />
             {checklist.title}
           </h3>
-          <p className="mt-1 leading-6 text-[color:var(--text-secondary)]">
-            {checklist.description}
-          </p>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge
-            variant="outline"
-            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-          >
-            {checklist.stage}
-          </Badge>
-          <Badge
-            variant="outline"
-            className="border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
-          >
-            {sectionCount} 个系统
-          </Badge>
-          <Badge
-            variant="outline"
-            className="border border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-          >
-            {totalItems} 条物品
-          </Badge>
-        </div>
-
-        <p className="mt-4 text-sm leading-6 text-[color:var(--text-secondary)]">
-          {checklist.focus}
-        </p>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {checklist.sections.map((section) => (
-            <SystemChip key={section.system} label={section.system} />
-          ))}
-        </div>
-
-        <div className="mt-6 space-y-4">
-          {checklist.sections.map((section) => (
-            <div
-              key={section.system}
-              className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
-            >
-              <div className="flex items-center gap-2">
-                <SystemChip label={section.system} />
-              </div>
-              <div className="mt-4 grid gap-4 min-[960px]:grid-cols-3">
-                <ChecklistBlock title="最低配置" items={section.minimum} />
-                <ChecklistBlock title="必要物品" items={section.essentials} />
-                <ChecklistBlock title="之后再升级" items={section.upgrades} />
-              </div>
+          <div className="flex min-w-0 flex-col items-end gap-1.5">
+            <div className="flex flex-wrap justify-end gap-1.5">
+              <Badge
+                variant="outline"
+                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+              >
+                {checklist.stage}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
+              >
+                {sectionCount} 个系统
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
+              >
+                {totalItems} 条物品
+              </Badge>
             </div>
-          ))}
+            <p className="truncate text-right text-[13px] leading-5 text-[color:var(--text-secondary)]">
+              {checklist.focus}
+            </p>
+          </div>
         </div>
+
+        {/* Line 2: Description */}
+        <p className="mt-2 leading-6 text-[color:var(--text-secondary)]">{checklist.description}</p>
+      </div>
+
+      {/* Scrollable table */}
+      <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto p-5 pt-3">
+        <Table className="whitespace-nowrap">
+          <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
+            <TableRow>
+              <TableHead className="w-[30%] text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                系统
+              </TableHead>
+              <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                最低配置
+              </TableHead>
+              <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                升级配置
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {checklist.sections.map((section) => {
+              const upgradeItems = [...section.essentials, ...section.upgrades]
+
+              return (
+                <TableRow key={section.system} className="hover:bg-transparent">
+                  <TableCell className="align-top">
+                    <Badge
+                      variant="outline"
+                      className="border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[12px] text-[color:var(--tone-present-ink)]"
+                    >
+                      {section.system}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="align-top">
+                    {section.minimum.length > 0 ? (
+                      <ul className="space-y-1">
+                        {section.minimum.map((name) => (
+                          <li
+                            key={name}
+                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-2.5 py-1.5 text-sm leading-5 text-[color:var(--text-secondary)]"
+                          >
+                            {name}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-sm text-[color:var(--text-muted)]">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="align-top">
+                    {upgradeItems.length > 0 ? (
+                      <ul className="space-y-1">
+                        {upgradeItems.map((name) => (
+                          <li
+                            key={name}
+                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-2.5 py-1.5 text-sm leading-5 text-[color:var(--text-secondary)]"
+                          >
+                            {name}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <span className="text-sm text-[color:var(--text-muted)]">—</span>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
       </div>
     </div>
   )
@@ -222,9 +265,9 @@ export function ShoppingStagesTab({
         </Surface>
 
         {/* Right: Detail Panel */}
-        <div className={cn("min-h-0", isFixedLayout && "overflow-y-auto")}>
+        <div className="min-h-0 overflow-hidden">
           {selectedChecklist ? (
-            <StageDetailPanel checklist={selectedChecklist} />
+            <StageDetailGroupedTable checklist={selectedChecklist} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
               <p className="text-sm text-[color:var(--text-muted)]">选择一个阶段查看详情</p>

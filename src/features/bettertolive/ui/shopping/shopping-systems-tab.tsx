@@ -271,7 +271,7 @@ export function ShoppingSystemsTab({
         </Surface>
 
         {/* Right: Detail Panel */}
-        <div className={cn("min-h-0", isFixedLayout && "overflow-y-auto")}>
+        <div className="min-h-0 overflow-hidden">
           {selectedSystem ? (
             <SystemDetailPanel system={selectedSystem} />
           ) : (

@@ -1,10 +1,18 @@
 import { House } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
-import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import type { SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 function SystemSummaryChip({ label }: { label: string }) {
@@ -18,119 +26,113 @@ function SystemSummaryChip({ label }: { label: string }) {
   )
 }
 
-function SpaceDetailItemRow({
-  item,
-  sourceLabel,
-}: {
-  item: ShoppingOwnedItem | ShoppingPlanWithLane
-  sourceLabel: string
-}) {
-  const isPlanItem = "currentPrice" in item
-
-  return (
-    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="min-w-0 truncate text-sm font-medium text-[color:var(--text-primary)]">
-          {item.name}
-        </span>
-        <Badge
-          variant="outline"
-          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-        >
-          {sourceLabel}
-        </Badge>
-      </div>
-
-      <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-        {item.system} · {item.category} · {item.stages.join(" / ")}
-      </div>
-
-      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {isPlanItem ? item.reason : item.replacementCue}
-      </p>
-      <p className="mt-1 text-sm leading-6 text-[color:var(--text-muted)]">{item.note}</p>
-    </div>
-  )
-}
-
-function SpaceDetailPanel({ space }: { space: SpaceOverview }) {
+function SpaceDetailTable({ space }: { space: SpaceOverview }) {
   const totalItems = space.owned.length + space.planned.length
   const isEmpty = totalItems === 0
 
+  const allItems: Array<{
+    item: ShoppingOwnedItem | ShoppingPlanWithLane
+    sourceLabel: string
+    sourceType: "owned" | "planned"
+  }> = [
+    ...space.owned.map((item) => ({
+      item,
+      sourceLabel: "已拥有" as const,
+      sourceType: "owned" as const,
+    })),
+    ...space.planned.map((item) => ({
+      item,
+      sourceLabel: item.laneTitle,
+      sourceType: "planned" as const,
+    })),
+  ]
+
   return (
-    <div className="flex h-full flex-col rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <div>
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-[color:var(--text-primary)]">
-            <House className="size-5" />
-            {space.name}
-          </h3>
-          <p className="mt-1 leading-6 text-[color:var(--text-secondary)]">
-            该空间共有 {totalItems} 项物品，涉及 {space.systems.size} 个生活系统。
-          </p>
-        </div>
+    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
+      {/* Fixed header */}
+      <div className="shrink-0 p-4 pb-0">
+        <h3 className="flex items-center gap-2 text-base font-semibold text-[color:var(--text-primary)]">
+          <House className="size-4.5" />
+          {space.name}
+        </h3>
+        <p className="mt-0.5 text-sm text-[color:var(--text-secondary)]">
+          共 {totalItems} 项 · {space.systems.size} 个系统
+        </p>
+      </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Badge
-            variant="outline"
-            className="border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
-          >
-            已有 {space.owned.length}
-          </Badge>
-          <Badge
-            variant="outline"
-            className="border border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-          >
-            待补 {space.planned.length}
-          </Badge>
-        </div>
-
-        <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
-          <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-            涉及系统
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {Array.from(space.systems).map((system) => (
-              <SystemSummaryChip key={system} label={system} />
-            ))}
-          </div>
-        </div>
-
+      {/* Scrollable table */}
+      <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto p-4 pt-2">
         {isEmpty ? (
-          <p className="mt-6 text-sm text-[color:var(--text-muted)]">当前该空间暂无物品数据。</p>
+          <p className="text-sm text-[color:var(--text-muted)]">当前该空间暂无物品数据。</p>
         ) : (
-          <div className="mt-5 grid gap-4 min-[900px]:grid-cols-2">
-            <div>
-              <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                已有 {space.owned.length} 项
-              </div>
-              {space.owned.length > 0 ? (
-                <div className="mt-3 space-y-3">
-                  {space.owned.map((item) => (
-                    <SpaceDetailItemRow key={item.id} item={item} sourceLabel="已拥有" />
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前没有已拥有条目。</p>
-              )}
-            </div>
-
-            <div>
-              <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                待补 {space.planned.length} 项
-              </div>
-              {space.planned.length > 0 ? (
-                <div className="mt-3 space-y-3">
-                  {space.planned.map((item) => (
-                    <SpaceDetailItemRow key={item.id} item={item} sourceLabel={item.laneTitle} />
-                  ))}
-                </div>
-              ) : (
-                <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前没有待补条目。</p>
-              )}
-            </div>
-          </div>
+          <Table className="whitespace-nowrap">
+            <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
+              <TableRow>
+                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                  物品名称
+                </TableHead>
+                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                  系统
+                </TableHead>
+                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                  类别
+                </TableHead>
+                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                  阶段
+                </TableHead>
+                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                  标签
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {allItems.map(({ item, sourceLabel }) => {
+                const isPlanItem = "currentPrice" in item
+                return (
+                  <TableRow key={item.id}>
+                    <TableCell>
+                      <div className="text-sm text-[color:var(--text-primary)]">{item.name}</div>
+                      <div className="truncate text-[11px] text-[color:var(--text-muted)]">
+                        {isPlanItem ? item.reason : item.replacementCue}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-[color:var(--text-secondary)]">
+                      {item.system}
+                    </TableCell>
+                    <TableCell className="text-sm text-[color:var(--text-secondary)]">
+                      {item.category}
+                    </TableCell>
+                    <TableCell className="text-sm text-[color:var(--text-secondary)]">
+                      {item.stages.join(", ")}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "h-5 px-1.5 text-[10px]",
+                          sourceLabel === "已拥有"
+                            ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
+                            : "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
+                        )}
+                      >
+                        {sourceLabel}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
         )}
+      </div>
+
+      {/* Fixed footer */}
+      <div className="shrink-0 border-t border-[color:var(--muted-surface-border)] px-4 py-3">
+        <div className="flex flex-wrap gap-1.5">
+          {Array.from(space.systems).map((system) => (
+            <SystemSummaryChip key={system} label={system} />
+          ))}
+        </div>
       </div>
     </div>
   )
@@ -251,8 +253,8 @@ export function ShoppingSpacesTab({
         className={cn(
           "grid gap-4",
           isFixedLayout
-            ? "min-h-0 flex-1 grid-cols-[2fr_1fr]"
-            : "grid-cols-1 lg:grid-cols-[2fr_1fr]",
+            ? "min-h-0 flex-1 grid-cols-[1fr_2fr]"
+            : "grid-cols-1 lg:grid-cols-[1fr_2fr]",
           isFixedLayout && "h-full",
         )}
       >
@@ -275,9 +277,9 @@ export function ShoppingSpacesTab({
         </Surface>
 
         {/* Right: Detail Panel */}
-        <div className={cn("min-h-0", isFixedLayout && "overflow-y-auto")}>
+        <div className="min-h-0 overflow-hidden">
           {selectedSpace ? (
-            <SpaceDetailPanel space={selectedSpace} />
+            <SpaceDetailTable space={selectedSpace} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
               <p className="text-sm text-[color:var(--text-muted)]">选择一个空间查看详情</p>
