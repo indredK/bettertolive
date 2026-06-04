@@ -493,28 +493,155 @@ export type LegacyWorkspaceModuleData = LegacyModuleData
 
 export type FutureModuleData = FutureBlueprint
 
+export type MealScene =
+  | "在家做"
+  | "外卖"
+  | "堂食"
+  | "路边/便利店"
+  | "应酬/聚餐"
+  | "旅行"
+  | "加餐零食"
+
+export type MealStructure = "早餐" | "午餐" | "晚餐" | "加餐" | "夜宵" | "节庆餐" | "饮品"
+
+export type BeverageKind =
+  | "含咖啡因"
+  | "含酒精"
+  | "含糖饮品"
+  | "鲜榨果汁"
+  | "茶水"
+  | "奶/豆奶"
+  | "其他"
+
+export type MealComposition =
+  | "主食为主"
+  | "蛋白为主"
+  | "蔬果为主"
+  | "综合搭配"
+  | "几乎只有碳水"
+  | "几乎只有油盐糖"
+
+export type MealOrigin = "家常" | "地方菜系" | "异国料理" | "工业速食" | "自给自种" | "节令食材"
+
+export type MealTrigger =
+  | "准时按点"
+  | "真饿了"
+  | "社交场合"
+  | "情绪驱动"
+  | "习惯反射"
+  | "不想浪费"
+  | "看到就想吃"
+
+export type ValueDensity = "高" | "中" | "低" | "不划算"
+
+export type BodyFeedback = "满足舒服" | "普通" | "偏重偏胀" | "不适" | "想再吃"
+
+export type HardConstraintType = "过敏" | "宗教/文化" | "医学限制"
+
+export type SoftStanceType = "饮食方式" | "进食节律" | "临时关注"
+
+export type DietaryIntentMode = "维持" | "稍微注意" | "在调整具体问题" | "阶段性需求"
+
+export type FoodMemoryType = "家庭味道" | "地方味道" | "关系味道" | "人生节点味道" | "已经吃不到的"
+
+export type FoodMemoryAvailability = "仍能吃到" | "偶尔能吃到" | "已经吃不到" | "自己尝试复刻"
+
+export type FoodMemoryEmotionalLoad = "很重" | "中等" | "轻微" | "平静"
+
+export type DietaryHardConstraint = {
+  id: string
+  type: HardConstraintType
+  label: string
+  note: string
+}
+
+export type DietarySoftStance = {
+  id: string
+  type: SoftStanceType
+  label: string
+  note: string
+}
+
+export type DietaryIntent = {
+  mode: DietaryIntentMode
+  note?: string
+  window?: {
+    start: string
+    end?: string
+  }
+}
+
+export type DietaryProfile = {
+  hardConstraints: DietaryHardConstraint[]
+  softStances: DietarySoftStance[]
+  currentIntent: DietaryIntent
+}
+
 export type NutritionMealEntry = {
   id: string
   date: string
-  scene: string
-  structure: string
-  composition: string
-  trigger: string
-  valueDensity: string
-  bodyFeedback: string
+  title: string
+  scene: MealScene
+  structure: MealStructure
+  beverageKind?: BeverageKind
+  composition?: MealComposition
+  origin: MealOrigin
+  trigger: MealTrigger
+  valueDensity?: ValueDensity
+  bodyFeedback?: BodyFeedback
+  cost?: number
+  companions?: string[]
+  relatedFoodMemoryId?: string
+  relatedFinanceEntryId?: string
+  relatedEmotionEntryId?: string
   note: string
+  detailSignals: string[]
 }
 
 export type NutritionFoodMemory = {
   id: string
   name: string
-  type: string
+  type: FoodMemoryType
+  flavorDescription?: string
+  recipe?: string
   story: string
+  currentAvailability: FoodMemoryAvailability
+  emotionalLoad: FoodMemoryEmotionalLoad
+  relatedPeople?: string[]
+  relatedMemoryIds?: string[]
+}
+
+export type NutritionReviewInsight = {
+  id: string
+  title: string
+  summary: string
+  evidence: string[]
+}
+
+export type NutritionCrossViewRow = {
+  label: string
+  count: number
+  valueDensity?: ValueDensity
+  bodyFeedback?: BodyFeedback
+}
+
+export type NutritionCrossView = {
+  id: string
+  title: string
+  summary: string
+  rows: NutritionCrossViewRow[]
+}
+
+export type NutritionWeeklyReview = {
+  highlights: NutritionReviewInsight[]
+  missingSignals: string[]
+  crossViews: NutritionCrossView[]
 }
 
 export type NutritionModuleData = {
+  profile: DietaryProfile
   meals: NutritionMealEntry[]
-  weeklyHighlights: string[]
+  weeklyReview: NutritionWeeklyReview
   foodMemories: NutritionFoodMemory[]
 }
 

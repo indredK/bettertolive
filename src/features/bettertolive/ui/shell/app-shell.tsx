@@ -404,9 +404,7 @@ export function BetterToLiveAppShell() {
       case "nutrition":
         return (
           <NutritionPage
-            meals={viewModel.nutritionMeals}
-            weeklyHighlights={viewModel.nutritionHighlights}
-            foodMemories={viewModel.nutritionFoodMemories}
+            nutrition={viewModel.nutritionModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />

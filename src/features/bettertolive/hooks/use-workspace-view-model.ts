@@ -400,35 +400,79 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.future.milestones],
   )
 
-  const nutritionMeals = useMemo(
-    () =>
-      workspace.nutrition.meals.filter((entry) =>
+  const nutritionModule = useMemo(
+    () => ({
+      ...workspace.nutrition,
+      meals: workspace.nutrition.meals.filter((entry) =>
         matchesQuery(
           entry.date,
+          entry.title,
           entry.scene,
           entry.structure,
+          entry.beverageKind,
           entry.composition,
+          entry.origin,
           entry.trigger,
           entry.valueDensity,
           entry.bodyFeedback,
+          entry.cost,
+          ...(entry.companions ?? []),
+          entry.relatedFoodMemoryId,
+          entry.relatedFinanceEntryId,
+          entry.relatedEmotionEntryId,
           entry.note,
+          ...entry.detailSignals,
         ),
       ),
-    [matchesQuery, workspace.nutrition.meals],
-  )
+      weeklyReview: {
+        ...workspace.nutrition.weeklyReview,
+        highlights: workspace.nutrition.weeklyReview.highlights.filter((entry) =>
+          matchesQuery(entry.title, entry.summary, ...entry.evidence),
+        ),
+        missingSignals: workspace.nutrition.weeklyReview.missingSignals.filter((entry) =>
+          matchesQuery(entry),
+        ),
+        crossViews: workspace.nutrition.weeklyReview.crossViews
+          .map((entry) => {
+            if (matchesQuery(entry.title, entry.summary)) {
+              return entry
+            }
 
-  const nutritionHighlights = useMemo(
-    () => workspace.nutrition.weeklyHighlights.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.nutrition.weeklyHighlights],
-  )
+            const rows = entry.rows.filter((row) =>
+              matchesQuery(row.label, row.count, row.valueDensity, row.bodyFeedback),
+            )
 
-  const nutritionFoodMemories = useMemo(
-    () =>
-      workspace.nutrition.foodMemories.filter((entry) =>
-        matchesQuery(entry.name, entry.type, entry.story),
+            if (rows.length === 0) {
+              return null
+            }
+
+            return {
+              ...entry,
+              rows,
+            }
+          })
+          .filter((entry) => entry !== null),
+      },
+      foodMemories: workspace.nutrition.foodMemories.filter((entry) =>
+        matchesQuery(
+          entry.name,
+          entry.type,
+          entry.flavorDescription,
+          entry.recipe,
+          entry.story,
+          entry.currentAvailability,
+          entry.emotionalLoad,
+          ...(entry.relatedPeople ?? []),
+          ...(entry.relatedMemoryIds ?? []),
+        ),
       ),
-    [matchesQuery, workspace.nutrition.foodMemories],
+    }),
+    [matchesQuery, workspace.nutrition],
   )
+
+  const nutritionMeals = nutritionModule.meals
+  const nutritionHighlights = nutritionModule.weeklyReview.highlights
+  const nutritionFoodMemories = nutritionModule.foodMemories
 
   const socioeconomicsEntries = useMemo(
     () =>
@@ -541,6 +585,7 @@ export function useWorkspaceViewModel({
     legacyPreferences,
     legacyWishes,
     milestones,
+    nutritionModule,
     nutritionMeals,
     nutritionHighlights,
     nutritionFoodMemories,
