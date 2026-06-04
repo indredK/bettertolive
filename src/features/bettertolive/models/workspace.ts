@@ -500,37 +500,48 @@ export type MemoryModuleData = {
   reviewPrompts: string[]
 }
 
-export type LegacyDirective = {
+export type LegacyCategory = "重要交代" | "留给某人的话" | "人生回顾" | "未完成的事" | "纪念偏好"
+
+export type LegacyRecipient = "特定的人" | "家人" | "朋友" | "公开" | "仅自己"
+
+export type LegacyUrgency = "关键信息" | "重要" | "锦上添花" | "可选"
+
+export type LegacyVisibility = "现在" | "某个时间后" | "我离世后" | "条件触发" | "永不交付"
+
+export type LegacyStatus = "草稿" | "基本完成" | "已完成" | "会持续更新" | "最终版"
+
+export type EmotionalLoad = "很重" | "中等" | "轻微" | "平静"
+
+export type LegacyItem = {
+  id: string
+  title: string
+  category: LegacyCategory
+  recipient: LegacyRecipient
+  recipientName?: string
+  relatedRelationshipId?: string
+  urgency: LegacyUrgency
+  visibility: LegacyVisibility
+  deliveryCondition?: string
+  status: LegacyStatus
+  emotionalLoad?: EmotionalLoad
+  summary: string
+  contentPreview: string
+  isLocked: boolean
+  updatedAt: string
+  reviewCue: string
+  tags: string[]
+}
+
+export type LegacyTrustBoundary = {
   id: string
   title: string
   detail: string
-}
-
-export type LegacyLetter = {
-  id: string
-  to: string
-  theme: string
-  excerpt: string
-}
-
-export type LegacyWish = {
-  id: string
-  title: string
-  detail: string
-}
-
-export type LegacyPreference = {
-  id: string
-  label: string
-  note: string
 }
 
 export type LegacyModuleData = {
-  directives: LegacyDirective[]
-  letters: LegacyLetter[]
-  wishes: LegacyWish[]
-  preferences: LegacyPreference[]
-  lifeReview: string[]
+  items: LegacyItem[]
+  trustBoundaries: LegacyTrustBoundary[]
+  reviewPrompts: string[]
 }
 
 export type OverviewModuleData = {

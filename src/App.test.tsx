@@ -191,15 +191,18 @@ describe("App", () => {
     expect(screen.getByText("恢复工具箱")).toBeInTheDocument()
   })
 
-  it("switches to the legacy view with letters and directives", () => {
+  it("switches to the legacy view with life organization classifications", () => {
     render(<App />)
 
     fireEvent.click(screen.getByTestId("nav-legacy"))
 
     expect(screen.getByRole("heading", { name: "生命整理" })).toBeInTheDocument()
     expect(screen.getByText("生命整理说明")).toBeInTheDocument()
-    expect(screen.getByText("重要交代与留给某人的话")).toBeInTheDocument()
-    expect(screen.getByText("未来的自己")).toBeInTheDocument()
+    expect(screen.getByText("5 维生命整理分类")).toBeInTheDocument()
+    expect(screen.getByText(/不进入主筛选器/)).toBeInTheDocument()
+    expect(screen.getByText("重要账号和文件线索")).toBeInTheDocument()
+    expect(screen.getByText("写给伴侣的一封信")).toBeInTheDocument()
+    expect(screen.getByText("信任与交付边界")).toBeInTheDocument()
   })
 
   it("switches to the shopping view with planning and stage data", () => {

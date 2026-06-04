@@ -469,11 +469,7 @@ export function BetterToLiveAppShell() {
       case "legacy":
         return (
           <LegacyPage
-            directives={viewModel.legacyDirectives}
-            letters={viewModel.legacyLetters}
-            wishes={viewModel.legacyWishes}
-            preferences={viewModel.legacyPreferences}
-            lifeReview={viewModel.legacyLifeReview}
+            legacy={viewModel.legacyModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />

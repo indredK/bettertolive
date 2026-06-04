@@ -432,33 +432,40 @@ export function useWorkspaceViewModel({
   const relationshipPatterns = relationshipsModule.patterns
   const relationshipUnsentNotes = relationshipsModule.unsentNotes
 
-  const legacyDirectives = useMemo(
-    () => workspace.legacy.directives.filter((entry) => matchesQuery(entry.title, entry.detail)),
-    [matchesQuery, workspace.legacy.directives],
-  )
-
-  const legacyLetters = useMemo(
-    () =>
-      workspace.legacy.letters.filter((entry) =>
-        matchesQuery(entry.to, entry.theme, entry.excerpt),
+  const legacyModule = useMemo(
+    () => ({
+      ...workspace.legacy,
+      items: workspace.legacy.items.filter((entry) =>
+        matchesQuery(
+          entry.title,
+          entry.category,
+          entry.recipient,
+          entry.recipientName,
+          entry.relatedRelationshipId,
+          entry.urgency,
+          entry.visibility,
+          entry.deliveryCondition,
+          entry.status,
+          entry.emotionalLoad,
+          entry.summary,
+          entry.contentPreview,
+          entry.isLocked ? "锁定" : "可修改",
+          entry.updatedAt,
+          entry.reviewCue,
+          ...entry.tags,
+        ),
       ),
-    [matchesQuery, workspace.legacy.letters],
+      trustBoundaries: workspace.legacy.trustBoundaries.filter((entry) =>
+        matchesQuery(entry.title, entry.detail),
+      ),
+      reviewPrompts: workspace.legacy.reviewPrompts.filter((entry) => matchesQuery(entry)),
+    }),
+    [matchesQuery, workspace.legacy],
   )
 
-  const legacyWishes = useMemo(
-    () => workspace.legacy.wishes.filter((entry) => matchesQuery(entry.title, entry.detail)),
-    [matchesQuery, workspace.legacy.wishes],
-  )
-
-  const legacyPreferences = useMemo(
-    () => workspace.legacy.preferences.filter((entry) => matchesQuery(entry.label, entry.note)),
-    [matchesQuery, workspace.legacy.preferences],
-  )
-
-  const legacyLifeReview = useMemo(
-    () => workspace.legacy.lifeReview.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.legacy.lifeReview],
-  )
+  const legacyItems = legacyModule.items
+  const legacyDirectives = legacyItems.filter((entry) => entry.category === "重要交代")
+  const legacyLetters = legacyItems.filter((entry) => entry.category === "留给某人的话")
 
   const milestones = useMemo(
     () =>
@@ -649,9 +656,7 @@ export function useWorkspaceViewModel({
     journeyData,
     legacyDirectives,
     legacyLetters,
-    legacyLifeReview,
-    legacyPreferences,
-    legacyWishes,
+    legacyModule,
     milestones,
     nutritionModule,
     nutritionMeals,
