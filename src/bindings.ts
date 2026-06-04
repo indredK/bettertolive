@@ -5,5 +5,204 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 /** Commands */
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
+	/**
+	 *  GET /api/bettertolive/shopping equivalent
+	 *  Returns the full shopping module content as a DTO.
+	 */
+	getShopping: () => typedError<ShoppingModuleDto_Serialize, string>(__TAURI_INVOKE("get_shopping")),
 };
+
+/* Types */
+export type ShoppingBoundaryEntryDto = {
+	id: string,
+	item: string,
+	system: string,
+	reason: string,
+};
+
+export type ShoppingItemBaseDto = ShoppingItemBaseDto_Serialize | ShoppingItemBaseDto_Deserialize;
+
+export type ShoppingItemBaseDto_Deserialize = {
+	system: string,
+	category: string,
+	spaces: string[],
+	stages: string[],
+	necessity: string,
+	lifecycle: string,
+	depreciation: string | null,
+};
+
+export type ShoppingItemBaseDto_Serialize = {
+	system: string,
+	category: string,
+	spaces: string[],
+	stages: string[],
+	necessity: string,
+	lifecycle: string,
+	depreciation?: string | null,
+};
+
+export type ShoppingLifestyleCollectionDto = {
+	id: string,
+	title: string,
+	description: string,
+	items: string[],
+};
+
+export type ShoppingModuleDto = ShoppingModuleDto_Serialize | ShoppingModuleDto_Deserialize;
+
+export type ShoppingModuleDto_Deserialize = {
+	systemDefinitions: ShoppingSystemDefinitionDto[],
+	spotlights: ShoppingSpotlightDto[],
+	ownedItems: ShoppingOwnedItemDto_Deserialize[],
+	purchaseLanes: ShoppingPurchaseLaneDto_Deserialize[],
+	stageChecklists: ShoppingStageChecklistDto[],
+	priceReferences: ShoppingPriceReferenceDto_Deserialize[],
+	boundaryEntries: ShoppingBoundaryEntryDto[],
+	lifestyleCollections: ShoppingLifestyleCollectionDto[],
+};
+
+export type ShoppingModuleDto_Serialize = {
+	systemDefinitions: ShoppingSystemDefinitionDto[],
+	spotlights: ShoppingSpotlightDto[],
+	ownedItems: ShoppingOwnedItemDto_Serialize[],
+	purchaseLanes: ShoppingPurchaseLaneDto_Serialize[],
+	stageChecklists: ShoppingStageChecklistDto[],
+	priceReferences: ShoppingPriceReferenceDto_Serialize[],
+	boundaryEntries: ShoppingBoundaryEntryDto[],
+	lifestyleCollections: ShoppingLifestyleCollectionDto[],
+};
+
+export type ShoppingOwnedItemDto = ShoppingOwnedItemDto_Serialize | ShoppingOwnedItemDto_Deserialize;
+
+export type ShoppingOwnedItemDto_Deserialize = {
+	id: string,
+	name: string,
+	quantity: number,
+	status: string,
+	replacementCue: string,
+	note: string,
+} & ShoppingItemBaseDto_Deserialize;
+
+export type ShoppingOwnedItemDto_Serialize = {
+	id: string,
+	name: string,
+	quantity: number,
+	status: string,
+	replacementCue: string,
+	note: string,
+} & ShoppingItemBaseDto_Serialize;
+
+export type ShoppingPlanItemDto = ShoppingPlanItemDto_Serialize | ShoppingPlanItemDto_Deserialize;
+
+export type ShoppingPlanItemDto_Deserialize = {
+	id: string,
+	name: string,
+	reason: string,
+	targetLifestyle: string,
+	currentPrice: number | null,
+	buyBelowPrice: number | null,
+	overpayPrice: number | null,
+	note: string,
+	tags: string[],
+	keywords: string[],
+} & ShoppingItemBaseDto_Deserialize;
+
+export type ShoppingPlanItemDto_Serialize = {
+	id: string,
+	name: string,
+	reason: string,
+	targetLifestyle: string,
+	currentPrice: number | null,
+	buyBelowPrice: number | null,
+	overpayPrice: number | null,
+	note: string,
+	tags: string[],
+	keywords: string[],
+} & ShoppingItemBaseDto_Serialize;
+
+export type ShoppingPriceReferenceDto = ShoppingPriceReferenceDto_Serialize | ShoppingPriceReferenceDto_Deserialize;
+
+export type ShoppingPriceReferenceDto_Deserialize = {
+	id: string,
+	system: string,
+	category: string,
+	lifecycle: string,
+	depreciation: string | null,
+	entryPrice: number | null,
+	sweetSpotPrice: number | null,
+	overpayPrice: number | null,
+	note: string,
+};
+
+export type ShoppingPriceReferenceDto_Serialize = {
+	id: string,
+	system: string,
+	category: string,
+	lifecycle: string,
+	depreciation?: string | null,
+	entryPrice: number | null,
+	sweetSpotPrice: number | null,
+	overpayPrice: number | null,
+	note: string,
+};
+
+export type ShoppingPurchaseLaneDto = ShoppingPurchaseLaneDto_Serialize | ShoppingPurchaseLaneDto_Deserialize;
+
+export type ShoppingPurchaseLaneDto_Deserialize = {
+	id: string,
+	title: string,
+	subtitle: string,
+	items: ShoppingPlanItemDto_Deserialize[],
+};
+
+export type ShoppingPurchaseLaneDto_Serialize = {
+	id: string,
+	title: string,
+	subtitle: string,
+	items: ShoppingPlanItemDto_Serialize[],
+};
+
+export type ShoppingSpotlightDto = {
+	id: string,
+	title: string,
+	stage: string,
+	summary: string,
+	reason: string,
+	attention: string[],
+};
+
+export type ShoppingStageChecklistDto = {
+	id: string,
+	stage: string,
+	title: string,
+	description: string,
+	focus: string,
+	sections: ShoppingStageChecklistSectionDto[],
+};
+
+export type ShoppingStageChecklistSectionDto = {
+	system: string,
+	minimum: string[],
+	essentials: string[],
+	upgrades: string[],
+};
+
+export type ShoppingSystemDefinitionDto = {
+	id: string,
+	cluster: string,
+	summary: string,
+	keyQuestion: string,
+	secondaryGroups: string[],
+};
+
+/* Tauri Specta runtime */
+async function typedError<T, E>(result: Promise<T>): Promise<{ status: "ok"; data: T } | { status: "error"; error: E }> {
+    try {
+        return { status: "ok", data: await result };
+    } catch (e) {
+        if (e instanceof Error) throw e;
+        return { status: "error", error: e as any };
+    }
+}
 

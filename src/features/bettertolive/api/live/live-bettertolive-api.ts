@@ -1,6 +1,10 @@
+import { invoke } from "@tauri-apps/api/core"
+
 import type { BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { BETTERTOLIVE_API_ENDPOINTS } from "@/features/bettertolive/api/endpoints"
+import { emptyShoppingModuleData } from "@/features/bettertolive/api/fallback/empty-shopping-module"
 import { requestJson } from "@/features/bettertolive/api/http-client"
+import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
 import type {
   BeliefsModuleData,
   EmotionWorkspaceModuleData,
@@ -18,15 +22,50 @@ import type {
   RelationshipsModuleData,
   ShoppingModuleData,
   SocioeconomicsModuleData,
+  WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
+
+function cloneData<T>(data: T): T {
+  return JSON.parse(JSON.stringify(data)) as T
+}
+
+function hasTauriRuntime() {
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
+}
+
+async function getShoppingFromRust() {
+  if (!hasTauriRuntime()) {
+    return cloneData(emptyShoppingModuleData)
+  }
+
+  try {
+    return await invoke<ShoppingModuleData>("get_shopping")
+  } catch {
+    return cloneData(emptyShoppingModuleData)
+  }
+}
 
 export function createLiveBetterToLiveApi(): BetterToLiveApi {
   return {
+    // ---- Tauri commands (Rust backend) ----
+
+    getShopping: () => getShoppingFromRust(),
+
+    async getWorkspaceSnapshot() {
+      const shopping = await getShoppingFromRust()
+
+      return {
+        ...cloneData(workspaceSnapshotMockData),
+        shopping,
+      } satisfies WorkspaceSnapshot
+    },
+
+    // ---- HTTP endpoints (not yet migrated to Rust) ----
+
     getOverview: () => requestJson<OverviewModuleData>(BETTERTOLIVE_API_ENDPOINTS.overview),
     getReflection: () => requestJson<ReflectionModuleData>(BETTERTOLIVE_API_ENDPOINTS.reflection),
     getEvents: () => requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
     getFinance: () => requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
-    getShopping: () => requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
     getNutrition: () => requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
     getEmotion: () => requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
     getBeliefs: () => requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
@@ -46,58 +85,5 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     getSocioeconomics: () =>
       requestJson<SocioeconomicsModuleData>(BETTERTOLIVE_API_ENDPOINTS.socioeconomics),
     getFuture: () => requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
-    async getWorkspaceSnapshot() {
-      const [
-        overview,
-        reflection,
-        events,
-        finance,
-        shopping,
-        nutrition,
-        emotion,
-        beliefs,
-        principles,
-        relationships,
-        growth,
-        memory,
-        legacy,
-        socioeconomics,
-        future,
-      ] = await Promise.all([
-        requestJson<OverviewModuleData>(BETTERTOLIVE_API_ENDPOINTS.overview),
-        requestJson<ReflectionModuleData>(BETTERTOLIVE_API_ENDPOINTS.reflection),
-        requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
-        requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
-        requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
-        requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
-        requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
-        requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
-        requestJson<PrinciplesModuleData>(BETTERTOLIVE_API_ENDPOINTS.principles),
-        requestJson<RelationshipsModuleData>(BETTERTOLIVE_API_ENDPOINTS.relationships),
-        requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
-        requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
-        requestJson<LegacyWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.legacy),
-        requestJson<SocioeconomicsModuleData>(BETTERTOLIVE_API_ENDPOINTS.socioeconomics),
-        requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
-      ])
-
-      return {
-        overview,
-        reflection,
-        events,
-        finance,
-        shopping,
-        nutrition,
-        emotion,
-        beliefs,
-        principles,
-        relationships,
-        growth,
-        memory,
-        legacy,
-        socioeconomics,
-        future,
-      }
-    },
   }
 }

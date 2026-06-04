@@ -1,4 +1,9 @@
+mod shopping;
+
+use shopping::commands::{get_shopping, get_workspace_snapshot, AppState};
 use specta_typescript::Typescript;
+use std::sync::Mutex;
+use tauri::Manager;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -8,7 +13,8 @@ fn greet(name: &str) -> String {
 }
 
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
-    tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![greet])
+    tauri_specta::Builder::<tauri::Wry>::new()
+        .commands(tauri_specta::collect_commands![greet, get_shopping])
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -27,7 +33,31 @@ pub fn run() {
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(builder.invoke_handler())
+        .setup(|app| {
+            // Resolve the app data directory for the database
+            let app_data_dir = app
+                .path()
+                .app_data_dir()
+                .expect("failed to resolve app data dir");
+
+            std::fs::create_dir_all(&app_data_dir).expect("failed to create app data dir");
+
+            let db_path = app_data_dir.join("bettertolive.db");
+
+            let conn =
+                shopping::db::initialize_database(&db_path).expect("failed to initialize database");
+
+            app.manage(AppState {
+                db: Mutex::new(conn),
+            });
+
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            get_shopping,
+            get_workspace_snapshot
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

@@ -89,3 +89,4 @@ src/features/bettertolive/
   - 字段：`id`、`module_key`、`content_json`、`version`、`updated_at`
 - `content_json` 直接对应 `ShoppingModuleData`
 - 等未来真的出现稳定的编辑需求，再把其中部分内容拆成关系表
+- 后端开发细化参考见 [docs/backend/shopping-backend-reference.md](/Users/apple/Documents/github/bettertolive/docs/backend/shopping-backend-reference.md:1)

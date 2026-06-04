@@ -12,7 +12,7 @@ import { overviewMockData } from "@/features/bettertolive/api/mock/data/overview
 import { principlesMockData } from "@/features/bettertolive/api/mock/data/principles/principles.mock"
 import { reflectionMockData } from "@/features/bettertolive/api/mock/data/reflection/reflection.mock"
 import { relationshipsMockData } from "@/features/bettertolive/api/mock/data/relationships/relationships.mock"
-import { shoppingMockData } from "@/features/bettertolive/api/mock/data/shopping/shopping.mock"
+import { emptyShoppingModuleData } from "@/features/bettertolive/api/fallback/empty-shopping-module"
 import { socioeconomicsMockData } from "@/features/bettertolive/api/mock/data/socioeconomics/socioeconomics.mock"
 
 export const workspaceSnapshotMockData = {
@@ -20,7 +20,7 @@ export const workspaceSnapshotMockData = {
   reflection: reflectionMockData,
   events: eventsMockData,
   finance: financeMockData,
-  shopping: shoppingMockData,
+  shopping: emptyShoppingModuleData,
   nutrition: nutritionMockData,
   emotion: emotionMockData,
   beliefs: beliefsMockData,
