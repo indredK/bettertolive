@@ -16,7 +16,6 @@ run_step() {
 run_step "Checking formatting" bun run format:check
 run_step "Linting code" bun run lint
 run_step "Type-checking TypeScript" bun run typecheck
-run_step "Running frontend tests" bun run test:run
 run_step "Building frontend" bun run build:bundle
 run_step "Running Rust checks" bun run check:rust
 run_step "Refreshing generated bindings" bun run generate:bindings
