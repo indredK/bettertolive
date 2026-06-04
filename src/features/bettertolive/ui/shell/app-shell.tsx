@@ -444,8 +444,7 @@ export function BetterToLiveAppShell() {
       case "principles":
         return (
           <PrinciplesPage
-            principles={viewModel.principles}
-            boundaries={viewModel.principleBoundaries}
+            principlesModule={viewModel.principlesModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -453,10 +452,7 @@ export function BetterToLiveAppShell() {
       case "relationships":
         return (
           <RelationshipsPage
-            relationshipCircles={viewModel.relationshipCircles}
-            moments={viewModel.relationshipMoments}
-            patterns={viewModel.relationshipPatterns}
-            unsentNotes={viewModel.relationshipUnsentNotes}
+            relationshipsModule={viewModel.relationshipsModule}
             visibleRelationshipCount={viewModel.visibleRelationshipCount}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}

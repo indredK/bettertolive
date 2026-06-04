@@ -208,27 +208,127 @@ export type BeliefProfile = {
   questions: string[]
 }
 
+export type PrincipleDomain = "关系" | "工作" | "金钱" | "健康" | "时间" | "诚信"
+
+export type PrincipleType = "边界" | "标准" | "底线"
+
+export type PrincipleStrength = "不可退让" | "强烈偏好" | "参考指引"
+
+export type PrincipleSource = "受伤后确立" | "观察他人" | "主动推导" | "家庭继承"
+
+export type PrincipleStatus = "生效中" | "正在测试" | "已修订" | "已放弃"
+
+export type PrincipleCost = "高代价" | "中等代价" | "低代价" | "零代价"
+
+export type PrincipleRelationType = "支撑" | "冲突"
+
+export type PrincipleRevision = {
+  id: string
+  date: string
+  summary: string
+  changedFields: Array<"内容" | "强度" | "状态">
+}
+
+export type PrincipleRelation = {
+  id: string
+  type: PrincipleRelationType
+  fromId: string
+  toId: string
+  note: string
+}
+
 export type PrincipleEntry = {
   id: string
   title: string
+  statement: string
   description: string
+  domain: PrincipleDomain
+  type: PrincipleType
+  strength: PrincipleStrength
+  source: PrincipleSource
+  status: PrincipleStatus
+  cost: PrincipleCost
   boundary: string
-  source: string
+  protectedValue: string
+  decisionCue: string
+  revisionHistory: PrincipleRevision[]
+  tags: string[]
 }
 
 export type PrincipleProfile = {
   entries: PrincipleEntry[]
   boundaries: string[]
+  relations: PrincipleRelation[]
+  decisionPrompts: string[]
+}
+
+export type RelationshipType = "家人" | "伴侣" | "朋友" | "同事" | "过去重要的人" | "导师/榜样"
+
+export type RelationshipDepth = "亲密" | "亲近" | "熟人" | "疏远" | "断联"
+
+export type RelationshipStage = "建立中" | "稳定" | "紧张" | "修复中" | "已结束" | "等待中"
+
+export type RelationshipImpact = "滋养" | "消耗" | "中性" | "混合"
+
+export type InteractionFrequency = "每天" | "每周" | "每月" | "每年" | "几乎不" | "已无联系"
+
+export type UnfinishedWeight = "很重" | "中等" | "轻微" | "无"
+
+export type RelationshipEventKind = "认识" | "重要谈话" | "冲突" | "和好" | "疏远" | "断联" | "重逢"
+
+export type RelationshipChangeField = "depth" | "stage"
+
+export type UnsentNoteTargetType = "关系条目" | "独立对象" | "未来的自己"
+
+export type RelationshipEvent = {
+  id: string
+  date: string
+  kind: RelationshipEventKind
+  title: string
+  summary: string
+}
+
+export type RelationshipChange = {
+  id: string
+  date: string
+  field: RelationshipChangeField
+  from: string
+  to: string
+  note: string
+}
+
+export type RelationshipUnsentNote = {
+  id: string
+  targetType: UnsentNoteTargetType
+  relationshipId?: string
+  to: string
+  theme: string
+  excerpt: string
+  unfinishedWeight?: UnfinishedWeight
 }
 
 export type RelationshipPerson = {
   id: string
   name: string
+  type: RelationshipType
   role: string
+  depth: RelationshipDepth
+  stage: RelationshipStage
+  impact: RelationshipImpact
+  interaction: InteractionFrequency
+  unfinishedWeight?: UnfinishedWeight
   influence: string
   currentState: string
   emotionalTone: string
   unspokenLine: string
+  positiveImpact: string
+  ongoingShadow: string
+  boundaryStatus: string
+  events: RelationshipEvent[]
+  emotionCues: string[]
+  unsentLineIds: string[]
+  history: RelationshipChange[]
+  tags: string[]
 }
 
 export type RelationshipCircle = {
@@ -238,24 +338,16 @@ export type RelationshipCircle = {
   entries: RelationshipPerson[]
 }
 
-export type RelationshipMoment = {
+export type RelationshipPattern = {
   id: string
-  person: string
   title: string
-  impact: string
-}
-
-export type RelationshipUnsentNote = {
-  id: string
-  to: string
-  theme: string
-  excerpt: string
+  summary: string
+  cues: string[]
 }
 
 export type RelationshipMap = {
   circles: RelationshipCircle[]
-  patterns: string[]
-  moments: RelationshipMoment[]
+  patterns: RelationshipPattern[]
   unsentNotes: RelationshipUnsentNote[]
 }
 

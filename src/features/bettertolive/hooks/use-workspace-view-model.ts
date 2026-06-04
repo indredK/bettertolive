@@ -310,59 +310,127 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.beliefs.questions],
   )
 
-  const principles = useMemo(
-    () =>
-      workspace.principles.entries.filter((entry) =>
-        matchesQuery(entry.title, entry.description, entry.boundary, entry.source),
+  const principlesModule = useMemo(() => {
+    const entries = workspace.principles.entries.filter((entry) =>
+      matchesQuery(
+        entry.title,
+        entry.statement,
+        entry.description,
+        entry.domain,
+        entry.type,
+        entry.strength,
+        entry.source,
+        entry.status,
+        entry.cost,
+        entry.boundary,
+        entry.protectedValue,
+        entry.decisionCue,
+        ...entry.tags,
+        ...entry.revisionHistory.flatMap((revision) => [
+          revision.date,
+          revision.summary,
+          ...revision.changedFields,
+        ]),
       ),
-    [matchesQuery, workspace.principles.entries],
-  )
+    )
+    const visibleEntryIds = new Set(entries.map((entry) => entry.id))
+    const relations = workspace.principles.relations.filter(
+      (entry) =>
+        matchesQuery(entry.type, entry.fromId, entry.toId, entry.note) ||
+        visibleEntryIds.has(entry.fromId) ||
+        visibleEntryIds.has(entry.toId),
+    )
+    const boundaries = workspace.principles.boundaries.filter((entry) => matchesQuery(entry))
+    const decisionPrompts = workspace.principles.decisionPrompts.filter((entry) =>
+      matchesQuery(entry),
+    )
 
-  const principleBoundaries = useMemo(
-    () => workspace.principles.boundaries.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.principles.boundaries],
-  )
+    return {
+      ...workspace.principles,
+      entries,
+      boundaries,
+      relations,
+      decisionPrompts,
+    }
+  }, [matchesQuery, workspace.principles])
 
-  const relationshipCircles = useMemo(
-    () =>
-      workspace.relationships.circles.map((circle) => ({
+  const principles = principlesModule.entries
+  const principleBoundaries = principlesModule.boundaries
+
+  const relationshipsModule = useMemo(() => {
+    const circles = workspace.relationships.circles.map((circle) => {
+      if (matchesQuery(circle.title, circle.summary)) {
+        return circle
+      }
+
+      return {
         ...circle,
         entries: circle.entries.filter((entry) =>
           matchesQuery(
-            circle.title,
-            circle.summary,
             entry.name,
+            entry.type,
             entry.role,
+            entry.depth,
+            entry.stage,
+            entry.impact,
+            entry.interaction,
+            entry.unfinishedWeight,
             entry.influence,
             entry.currentState,
             entry.emotionalTone,
             entry.unspokenLine,
+            entry.positiveImpact,
+            entry.ongoingShadow,
+            entry.boundaryStatus,
+            ...entry.emotionCues,
+            ...entry.unsentLineIds,
+            ...entry.tags,
+            ...entry.events.flatMap((event) => [
+              event.date,
+              event.kind,
+              event.title,
+              event.summary,
+            ]),
+            ...entry.history.flatMap((history) => [
+              history.date,
+              history.field,
+              history.from,
+              history.to,
+              history.note,
+            ]),
           ),
         ),
-      })),
-    [matchesQuery, workspace.relationships.circles],
-  )
+      }
+    })
+    const visibleRelationshipIds = new Set(
+      circles.flatMap((circle) => circle.entries.map((entry) => entry.id)),
+    )
+    const patterns = workspace.relationships.patterns.filter((entry) =>
+      matchesQuery(entry.title, entry.summary, ...entry.cues),
+    )
+    const unsentNotes = workspace.relationships.unsentNotes.filter(
+      (entry) =>
+        matchesQuery(
+          entry.targetType,
+          entry.relationshipId,
+          entry.to,
+          entry.theme,
+          entry.excerpt,
+          entry.unfinishedWeight,
+        ) || (entry.relationshipId ? visibleRelationshipIds.has(entry.relationshipId) : false),
+    )
 
-  const relationshipPatterns = useMemo(
-    () => workspace.relationships.patterns.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.relationships.patterns],
-  )
+    return {
+      ...workspace.relationships,
+      circles,
+      patterns,
+      unsentNotes,
+    }
+  }, [matchesQuery, workspace.relationships])
 
-  const relationshipMoments = useMemo(
-    () =>
-      workspace.relationships.moments.filter((entry) =>
-        matchesQuery(entry.person, entry.title, entry.impact),
-      ),
-    [matchesQuery, workspace.relationships.moments],
-  )
-
-  const relationshipUnsentNotes = useMemo(
-    () =>
-      workspace.relationships.unsentNotes.filter((entry) =>
-        matchesQuery(entry.to, entry.theme, entry.excerpt),
-      ),
-    [matchesQuery, workspace.relationships.unsentNotes],
-  )
+  const relationshipCircles = relationshipsModule.circles
+  const relationshipPatterns = relationshipsModule.patterns
+  const relationshipUnsentNotes = relationshipsModule.unsentNotes
 
   const legacyDirectives = useMemo(
     () => workspace.legacy.directives.filter((entry) => matchesQuery(entry.title, entry.detail)),
@@ -590,12 +658,13 @@ export function useWorkspaceViewModel({
     nutritionHighlights,
     nutritionFoodMemories,
     principleBoundaries,
+    principlesModule,
     principles,
     recentRecords,
     reflectionDraftExample: workspace.reflection.draftExample,
     reflections,
+    relationshipsModule,
     relationshipCircles,
-    relationshipMoments,
     relationshipPatterns,
     relationshipUnsentNotes,
     shoppingModule,
