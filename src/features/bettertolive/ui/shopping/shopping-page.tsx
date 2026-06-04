@@ -1,6 +1,5 @@
 import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
-import { gsap } from "gsap"
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
@@ -14,8 +13,6 @@ import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shoppin
 import {
   FAST_DEPRECIATION,
   PRIORITY_LEVELS,
-  chunkList,
-  getSystemRowTemplate,
   type ShoppingLifecycleGroups,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
@@ -40,15 +37,9 @@ export function ShoppingPage({
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
-  const [hoveredSystemId, setHoveredSystemId] = useState<string | null>(null)
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
-  const [hoveredSpaceName, setHoveredSpaceName] = useState<string | null>(null)
   const [selectedSpaceName, setSelectedSpaceName] = useState<string | null>(null)
-  const [hoveredStageId, setHoveredStageId] = useState<string | null>(null)
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null)
-  const systemRowRefs = useRef<Array<HTMLDivElement | null>>([])
-  const spaceRowRefs = useRef<Array<HTMLDivElement | null>>([])
-  const stageRowRefs = useRef<Array<HTMLDivElement | null>>([])
 
   const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
     lane.items.map((item) => ({
@@ -75,9 +66,6 @@ export function ShoppingPage({
       isActive: owned.length + planned.length > 0,
     }
   })
-
-  const selectedSystem = activeSystems.find((item) => item.id === selectedSystemId) ?? null
-  const systemRows = chunkList(activeSystems, 7)
 
   const fastDepreciationWarnings = planItems.filter(
     (item) =>
@@ -145,8 +133,6 @@ export function ShoppingPage({
     (left, right) =>
       right.owned.length + right.planned.length - (left.owned.length + left.planned.length),
   )
-  const spaceRows = chunkList(spaces, 5)
-  const stageRows = chunkList(shopping.stageChecklists, 7)
   const overlookedCollection = shopping.lifestyleCollections.find(
     (collection) => collection.id === "collection-overlooked",
   )
@@ -155,113 +141,10 @@ export function ShoppingPage({
   )
   const priorityItems = planItems.filter((item) => PRIORITY_LEVELS.has(item.necessity))
 
-  useEffect(() => {
-    if (!isFixedLayout) {
-      return
-    }
-
-    const rowElements = [...systemRowRefs.current]
-
-    systemRows.forEach((row, rowIndex) => {
-      const rowElement = rowElements[rowIndex]
-
-      if (!rowElement) {
-        return
-      }
-
-      const activeIndex = row.findIndex((item) => item.id === hoveredSystemId)
-
-      gsap.to(rowElement, {
-        gridTemplateColumns: getSystemRowTemplate(
-          row.length,
-          activeIndex === -1 ? null : activeIndex,
-        ),
-        duration: activeIndex === -1 ? 0.4 : 0.52,
-        ease: "power2.inOut",
-        overwrite: "auto",
-      })
-    })
-
-    return () => {
-      rowElements.forEach((rowElement) => {
-        if (rowElement) {
-          gsap.killTweensOf(rowElement)
-        }
-      })
-    }
-  }, [hoveredSystemId, isFixedLayout, systemRows])
-
-  useEffect(() => {
-    if (!isFixedLayout) {
-      return
-    }
-
-    const rowElements = [...spaceRowRefs.current]
-
-    spaceRows.forEach((row, rowIndex) => {
-      const rowElement = rowElements[rowIndex]
-
-      if (!rowElement) {
-        return
-      }
-
-      const activeIndex = row.findIndex((item) => item.name === hoveredSpaceName)
-
-      gsap.to(rowElement, {
-        gridTemplateColumns: getSystemRowTemplate(
-          row.length,
-          activeIndex === -1 ? null : activeIndex,
-        ),
-        duration: activeIndex === -1 ? 0.4 : 0.52,
-        ease: "power2.inOut",
-        overwrite: "auto",
-      })
-    })
-
-    return () => {
-      rowElements.forEach((rowElement) => {
-        if (rowElement) {
-          gsap.killTweensOf(rowElement)
-        }
-      })
-    }
-  }, [hoveredSpaceName, isFixedLayout, spaceRows])
-
-  useEffect(() => {
-    if (!isFixedLayout) {
-      return
-    }
-
-    const rowElements = [...stageRowRefs.current]
-
-    stageRows.forEach((row, rowIndex) => {
-      const rowElement = rowElements[rowIndex]
-
-      if (!rowElement) {
-        return
-      }
-
-      const activeIndex = row.findIndex((item) => item.id === hoveredStageId)
-
-      gsap.to(rowElement, {
-        gridTemplateColumns: getSystemRowTemplate(
-          row.length,
-          activeIndex === -1 ? null : activeIndex,
-        ),
-        duration: activeIndex === -1 ? 0.4 : 0.52,
-        ease: "power2.inOut",
-        overwrite: "auto",
-      })
-    })
-
-    return () => {
-      rowElements.forEach((rowElement) => {
-        if (rowElement) {
-          gsap.killTweensOf(rowElement)
-        }
-      })
-    }
-  }, [hoveredStageId, isFixedLayout, stageRows])
+  // Derive displayed selection — fall back to first item when nothing is selected or selection is stale
+  const displaySystemId = selectedSystemId ?? activeSystems[0]?.id ?? null
+  const displaySpaceName = selectedSpaceName ?? spaces[0]?.name ?? null
+  const displayStageId = selectedStageId ?? shopping.stageChecklists[0]?.id ?? null
 
   return (
     <div
@@ -333,55 +216,24 @@ export function ShoppingPage({
         />
 
         <ShoppingSystemsTab
-          systemRows={systemRows}
-          systemRowRefs={systemRowRefs}
-          hoveredSystemId={hoveredSystemId}
-          selectedSystem={selectedSystem}
+          systems={activeSystems}
+          selectedSystemId={displaySystemId}
           isFixedLayout={isFixedLayout}
-          onHoverSystem={setHoveredSystemId}
-          onOpenSystem={setSelectedSystemId}
-          onOpenChange={(open) => {
-            if (!open) {
-              setHoveredSystemId(null)
-              setSelectedSystemId(null)
-            }
-          }}
+          onSelectSystem={setSelectedSystemId}
         />
 
         <ShoppingSpacesTab
-          spaceRows={spaceRows}
           spaces={spaces}
-          spaceRowRefs={spaceRowRefs}
-          hoveredSpaceName={hoveredSpaceName}
-          selectedSpaceName={selectedSpaceName}
-          isWideLayout={isWideLayout}
+          selectedSpaceName={displaySpaceName}
           isFixedLayout={isFixedLayout}
-          onHoverSpace={setHoveredSpaceName}
-          onOpenSpace={setSelectedSpaceName}
-          onOpenChange={(open) => {
-            if (!open) {
-              setHoveredSpaceName(null)
-              setSelectedSpaceName(null)
-            }
-          }}
+          onSelectSpace={setSelectedSpaceName}
         />
 
         <ShoppingStagesTab
-          stageRows={stageRows}
-          shoppingStageChecklists={shopping.stageChecklists}
-          stageRowRefs={stageRowRefs}
-          hoveredStageId={hoveredStageId}
-          selectedStageId={selectedStageId}
-          isWideLayout={isWideLayout}
+          checklists={shopping.stageChecklists}
+          selectedStageId={displayStageId}
           isFixedLayout={isFixedLayout}
-          onHoverStage={setHoveredStageId}
-          onOpenStage={setSelectedStageId}
-          onOpenChange={(open) => {
-            if (!open) {
-              setHoveredStageId(null)
-              setSelectedStageId(null)
-            }
-          }}
+          onSelectStage={setSelectedStageId}
         />
 
         <ShoppingPlanningTab
