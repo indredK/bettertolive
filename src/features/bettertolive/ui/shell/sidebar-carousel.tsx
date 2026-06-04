@@ -3,33 +3,8 @@ import type { LucideIcon } from "lucide-react"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
 
-import type {
-  WorkspaceRhythmSlide,
-  WorkspaceSidebarNote,
-} from "@/features/bettertolive/config/sidebar"
+import type { WorkspaceSidebarNote } from "@/features/bettertolive/config/sidebar"
 import { cn } from "@/lib/utils"
-
-type CarouselDotButtonProps = {
-  index: number
-  isActive: boolean
-  label: string
-  onClick: (index: number) => void
-}
-
-function CarouselDotButton({ index, isActive, label, onClick }: CarouselDotButtonProps) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      aria-pressed={isActive}
-      onClick={() => onClick(index)}
-      className={cn(
-        "size-1.5 rounded-full transition-all",
-        isActive ? "w-4 bg-white/92" : "bg-white/38 hover:bg-white/58",
-      )}
-    />
-  )
-}
 
 function useSidebarCarousel(slideCount: number, delay: number) {
   const autoplay = useMemo(
@@ -90,66 +65,6 @@ function useSidebarCarousel(slideCount: number, delay: number) {
     scrollTo,
     selectedIndex,
   }
-}
-
-export function SidebarRhythmCarousel({
-  icon: Icon,
-  slides,
-  title,
-}: {
-  icon: LucideIcon
-  slides: WorkspaceRhythmSlide[]
-  title: string
-}) {
-  const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(slides.length, 4600)
-
-  return (
-    <section
-      className="mt-4 rounded-lg border border-white/10 px-3 py-2.5 shadow-[0_10px_24px_rgba(15,23,42,0.12)]"
-      data-testid="sidebar-rhythm-carousel"
-      style={{
-        backgroundColor: "var(--hero-bg)",
-        color: "var(--hero-ink)",
-      }}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2 text-[11px] tracking-[0.18em] text-[color:var(--hero-muted)] uppercase">
-          <Icon className="size-3.5" />
-          {title}
-        </div>
-        {slides.length > 1 ? (
-          <div className="flex items-center gap-1">
-            {slides.map((slide, index) => (
-              <CarouselDotButton
-                key={slide.id}
-                index={index}
-                isActive={index === selectedIndex}
-                label={`切换到今日节奏第 ${index + 1} 条`}
-                onClick={scrollTo}
-              />
-            ))}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="mt-2.5 overflow-hidden" ref={emblaRef}>
-        <div className="flex">
-          {slides.map((slide) => (
-            <article
-              key={slide.id}
-              className="min-w-0 flex-[0_0_100%] pr-2"
-              data-testid={`rhythm-slide-${slide.id}`}
-            >
-              <div className="text-[13px] font-medium tracking-[0.02em]">{slide.title}</div>
-              <p className="mt-1.5 text-[13px] leading-5 text-[color:var(--hero-muted)]">
-                {slide.body}
-              </p>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
 }
 
 export function SidebarNoteCarousel({

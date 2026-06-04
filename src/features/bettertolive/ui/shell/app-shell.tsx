@@ -1,7 +1,6 @@
 import {
   AlertTriangle,
   BookOpenText,
-  CalendarDays,
   Compass,
   HeartPulse,
   Landmark,
@@ -56,10 +55,8 @@ import { ReflectionPage } from "@/features/bettertolive/ui/reflection/reflection
 import { RelationshipsPage } from "@/features/bettertolive/ui/relationships/relationships-page"
 import { ShoppingPage } from "@/features/bettertolive/ui/shopping/shopping-page"
 import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page"
-import {
-  SidebarNoteCarousel,
-  SidebarRhythmCarousel,
-} from "@/features/bettertolive/ui/shell/sidebar-carousel"
+import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
+import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
   SidebarNavigation,
   StackedNavigation,
@@ -610,26 +607,6 @@ export function BetterToLiveAppShell() {
                   )}
                 </AnimatePresence>
               </div>
-
-              <AnimatePresence initial={false}>
-                {effectiveSidebarCollapsed ? null : (
-                  <m.div
-                    key="sidebar-rhythm-carousel-shell"
-                    layout
-                    initial={SIDEBAR_PANEL_PRESENCE.initial}
-                    animate={SIDEBAR_PANEL_PRESENCE.animate}
-                    exit={SIDEBAR_PANEL_PRESENCE.exit}
-                    transition={SIDEBAR_FADE_TRANSITION}
-                    className="overflow-hidden"
-                  >
-                    <SidebarRhythmCarousel
-                      icon={CalendarDays}
-                      slides={workspaceRhythmSlides}
-                      title="今日节奏"
-                    />
-                  </m.div>
-                )}
-              </AnimatePresence>
             </div>
 
             <SidebarNavigation
@@ -875,6 +852,7 @@ export function BetterToLiveAppShell() {
         onCloseDetail={closeNotificationDetail}
         onActivateTarget={activateNotificationTarget}
       />
+      <RhythmPopup slides={workspaceRhythmSlides} />
     </div>
   )
 }
