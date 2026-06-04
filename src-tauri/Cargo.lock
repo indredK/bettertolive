@@ -299,6 +299,7 @@ dependencies = [
  "tauri-plugin-sql",
  "tauri-plugin-store",
  "tauri-specta",
+ "uuid",
 ]
 
 [[package]]

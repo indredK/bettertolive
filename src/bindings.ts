@@ -5,14 +5,136 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 /** Commands */
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
-	/**
-	 *  GET /api/bettertolive/shopping equivalent
-	 *  Returns the full shopping module content as a DTO.
-	 */
+	/**  Returns the full shopping module content aggregated from relational tables. */
 	getShopping: () => typedError<ShoppingModuleDto_Serialize, string>(__TAURI_INVOKE("get_shopping")),
+	listOwnedItems: () => typedError<OwnedItemRow[], string>(__TAURI_INVOKE("list_owned_items")),
+	createOwnedItem: (form: OwnedItemFormDto) => typedError<ShoppingOwnedItemDto_Serialize, string>(__TAURI_INVOKE("create_owned_item", { form })),
+	updateOwnedItem: (form: OwnedItemFormDto) => typedError<ShoppingOwnedItemDto_Serialize, string>(__TAURI_INVOKE("update_owned_item", { form })),
+	deleteOwnedItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_owned_item", { id })),
+	listPlanItems: () => typedError<PlanItemRow[], string>(__TAURI_INVOKE("list_plan_items")),
+	createPlanItem: (form: PlanItemFormDto) => typedError<ShoppingPlanItemDto_Serialize, string>(__TAURI_INVOKE("create_plan_item", { form })),
+	updatePlanItem: (form: PlanItemFormDto) => typedError<ShoppingPlanItemDto_Serialize, string>(__TAURI_INVOKE("update_plan_item", { form })),
+	deletePlanItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_plan_item", { id })),
+	listShoppingPageContents: (contentType: string | null) => typedError<PageContentRow[], string>(__TAURI_INVOKE("list_shopping_page_contents", { contentType })),
+	createShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("create_shopping_page_content", { form })),
+	updateShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
+	deleteShoppingPageContent: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_page_content", { id })),
+	listPurchaseLanes: () => typedError<PurchaseLaneRow[], string>(__TAURI_INVOKE("list_purchase_lanes")),
 };
 
 /* Types */
+export type OwnedItemFormDto = {
+	id?: string | null,
+	name: string,
+	system: string,
+	category: string,
+	spaces: string[],
+	stages: string[],
+	necessity: string,
+	lifecycle: string,
+	depreciation: string | null,
+	quantity: number,
+	status: string,
+	replacementCue: string,
+	note: string,
+};
+
+export type OwnedItemRow = {
+	id: string,
+	name: string,
+	system_id: string,
+	category: string,
+	necessity: string,
+	lifecycle: string,
+	depreciation: string | null,
+	quantity: number,
+	status: string,
+	replacement_cue: string,
+	note: string,
+	sort_order: number,
+	is_archived: boolean,
+	created_at: string,
+	updated_at: string,
+};
+
+export type PageContentFormDto = {
+	id?: string | null,
+	contentType: string,
+	title: string | null,
+	stage: string | null,
+	system: string | null,
+	summary: string | null,
+	reason: string | null,
+	body: string,
+};
+
+export type PageContentRow = {
+	id: string,
+	content_type: string,
+	title: string | null,
+	stage: string | null,
+	system_id: string | null,
+	summary: string | null,
+	reason: string | null,
+	body_json: string,
+	sort_order: number,
+	is_enabled: boolean,
+	created_at: string,
+	updated_at: string,
+};
+
+export type PlanItemFormDto = {
+	id?: string | null,
+	laneId: string,
+	name: string,
+	system: string,
+	category: string,
+	spaces: string[],
+	stages: string[],
+	necessity: string,
+	lifecycle: string,
+	depreciation: string | null,
+	reason: string,
+	targetLifestyle: string,
+	currentPrice: number | null,
+	buyBelowPrice: number | null,
+	overpayPrice: number | null,
+	note: string,
+	tags: string[],
+	keywords: string[],
+};
+
+export type PlanItemRow = {
+	id: string,
+	lane_id: string,
+	name: string,
+	system_id: string,
+	category: string,
+	necessity: string,
+	lifecycle: string,
+	depreciation: string | null,
+	reason: string,
+	target_lifestyle: string,
+	current_price: number | null,
+	buy_below_price: number | null,
+	overpay_price: number | null,
+	note: string,
+	sort_order: number,
+	is_archived: boolean,
+	created_at: string,
+	updated_at: string,
+};
+
+export type PurchaseLaneRow = {
+	id: string,
+	title: string,
+	subtitle: string,
+	sort_order: number,
+	is_enabled: boolean,
+	created_at: string,
+	updated_at: string,
+};
+
 export type ShoppingBoundaryEntryDto = {
 	id: string,
 	item: string,

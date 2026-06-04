@@ -1,6 +1,11 @@
 mod shopping;
 
-use shopping::commands::{get_shopping, get_workspace_snapshot, AppState};
+use shopping::commands::{
+    create_owned_item, create_plan_item, create_shopping_page_content, delete_owned_item,
+    delete_plan_item, delete_shopping_page_content, get_shopping, get_workspace_snapshot,
+    list_owned_items, list_plan_items, list_purchase_lanes, list_shopping_page_contents,
+    update_owned_item, update_plan_item, update_shopping_page_content, AppState,
+};
 use specta_typescript::Typescript;
 use std::sync::Mutex;
 use tauri::Manager;
@@ -13,8 +18,23 @@ fn greet(name: &str) -> String {
 }
 
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
-    tauri_specta::Builder::<tauri::Wry>::new()
-        .commands(tauri_specta::collect_commands![greet, get_shopping])
+    tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
+        greet,
+        get_shopping,
+        list_owned_items,
+        create_owned_item,
+        update_owned_item,
+        delete_owned_item,
+        list_plan_items,
+        create_plan_item,
+        update_plan_item,
+        delete_plan_item,
+        list_shopping_page_contents,
+        create_shopping_page_content,
+        update_shopping_page_content,
+        delete_shopping_page_content,
+        list_purchase_lanes
+    ])
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -56,7 +76,20 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             greet,
             get_shopping,
-            get_workspace_snapshot
+            get_workspace_snapshot,
+            list_owned_items,
+            create_owned_item,
+            update_owned_item,
+            delete_owned_item,
+            list_plan_items,
+            create_plan_item,
+            update_plan_item,
+            delete_plan_item,
+            list_shopping_page_contents,
+            create_shopping_page_content,
+            update_shopping_page_content,
+            delete_shopping_page_content,
+            list_purchase_lanes
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

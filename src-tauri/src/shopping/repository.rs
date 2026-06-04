@@ -1,11 +1,157 @@
-use crate::shopping::dto::ShoppingModuleDto;
-use rusqlite::Connection;
+use crate::shopping::dto::{
+    ShoppingBoundaryEntryDto, ShoppingItemBaseDto, ShoppingLifestyleCollectionDto,
+    ShoppingModuleDto, ShoppingOwnedItemDto, ShoppingPlanItemDto, ShoppingPriceReferenceDto,
+    ShoppingPurchaseLaneDto, ShoppingSpotlightDto, ShoppingStageChecklistDto,
+    ShoppingStageChecklistSectionDto, ShoppingSystemDefinitionDto,
+};
+use crate::shopping::models::{
+    OwnedItemRow, OwnedItemSpaceRow, OwnedItemStageRow, PageContentRow, PlanItemRow,
+    PlanItemSpaceRow, PlanItemStageRow, PlanItemTagRow, PurchaseLaneRow, SystemDefinitionRow,
+};
+use rusqlite::{params, Connection};
 
 pub struct ShoppingRepository;
 
+// ---- Helpers ----
+
+fn row_to_system_definition(row: &rusqlite::Row) -> rusqlite::Result<SystemDefinitionRow> {
+    Ok(SystemDefinitionRow {
+        id: row.get("id")?,
+        cluster: row.get("cluster")?,
+        summary: row.get("summary")?,
+        key_question: row.get("key_question")?,
+        secondary_groups_json: row.get("secondary_groups_json")?,
+        sort_order: row.get("sort_order")?,
+        is_enabled: row.get("is_enabled")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
+fn row_to_owned_item(row: &rusqlite::Row) -> rusqlite::Result<OwnedItemRow> {
+    Ok(OwnedItemRow {
+        id: row.get("id")?,
+        name: row.get("name")?,
+        system_id: row.get("system_id")?,
+        category: row.get("category")?,
+        necessity: row.get("necessity")?,
+        lifecycle: row.get("lifecycle")?,
+        depreciation: row.get("depreciation")?,
+        quantity: row.get("quantity")?,
+        status: row.get("status")?,
+        replacement_cue: row.get("replacement_cue")?,
+        note: row.get("note")?,
+        sort_order: row.get("sort_order")?,
+        is_archived: row.get("is_archived")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
+fn row_to_owned_item_space(row: &rusqlite::Row) -> rusqlite::Result<OwnedItemSpaceRow> {
+    Ok(OwnedItemSpaceRow {
+        id: row.get("id")?,
+        owned_item_id: row.get("owned_item_id")?,
+        space_name: row.get("space_name")?,
+        sort_order: row.get("sort_order")?,
+    })
+}
+
+fn row_to_owned_item_stage(row: &rusqlite::Row) -> rusqlite::Result<OwnedItemStageRow> {
+    Ok(OwnedItemStageRow {
+        id: row.get("id")?,
+        owned_item_id: row.get("owned_item_id")?,
+        stage_name: row.get("stage_name")?,
+        sort_order: row.get("sort_order")?,
+    })
+}
+
+fn row_to_purchase_lane(row: &rusqlite::Row) -> rusqlite::Result<PurchaseLaneRow> {
+    Ok(PurchaseLaneRow {
+        id: row.get("id")?,
+        title: row.get("title")?,
+        subtitle: row.get("subtitle")?,
+        sort_order: row.get("sort_order")?,
+        is_enabled: row.get("is_enabled")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
+fn row_to_plan_item(row: &rusqlite::Row) -> rusqlite::Result<PlanItemRow> {
+    Ok(PlanItemRow {
+        id: row.get("id")?,
+        lane_id: row.get("lane_id")?,
+        name: row.get("name")?,
+        system_id: row.get("system_id")?,
+        category: row.get("category")?,
+        necessity: row.get("necessity")?,
+        lifecycle: row.get("lifecycle")?,
+        depreciation: row.get("depreciation")?,
+        reason: row.get("reason")?,
+        target_lifestyle: row.get("target_lifestyle")?,
+        current_price: row.get("current_price")?,
+        buy_below_price: row.get("buy_below_price")?,
+        overpay_price: row.get("overpay_price")?,
+        note: row.get("note")?,
+        sort_order: row.get("sort_order")?,
+        is_archived: row.get("is_archived")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
+fn row_to_plan_item_space(row: &rusqlite::Row) -> rusqlite::Result<PlanItemSpaceRow> {
+    Ok(PlanItemSpaceRow {
+        id: row.get("id")?,
+        plan_item_id: row.get("plan_item_id")?,
+        space_name: row.get("space_name")?,
+        sort_order: row.get("sort_order")?,
+    })
+}
+
+fn row_to_plan_item_stage(row: &rusqlite::Row) -> rusqlite::Result<PlanItemStageRow> {
+    Ok(PlanItemStageRow {
+        id: row.get("id")?,
+        plan_item_id: row.get("plan_item_id")?,
+        stage_name: row.get("stage_name")?,
+        sort_order: row.get("sort_order")?,
+    })
+}
+
+fn row_to_plan_item_tag(row: &rusqlite::Row) -> rusqlite::Result<PlanItemTagRow> {
+    Ok(PlanItemTagRow {
+        id: row.get("id")?,
+        plan_item_id: row.get("plan_item_id")?,
+        tag_value: row.get("tag_value")?,
+        tag_type: row.get("tag_type")?,
+        sort_order: row.get("sort_order")?,
+    })
+}
+
+fn row_to_page_content(row: &rusqlite::Row) -> rusqlite::Result<PageContentRow> {
+    Ok(PageContentRow {
+        id: row.get("id")?,
+        content_type: row.get("content_type")?,
+        title: row.get("title")?,
+        stage: row.get("stage")?,
+        system_id: row.get("system_id")?,
+        summary: row.get("summary")?,
+        reason: row.get("reason")?,
+        body_json: row.get("body_json")?,
+        sort_order: row.get("sort_order")?,
+        is_enabled: row.get("is_enabled")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
 impl ShoppingRepository {
-    /// Read the shopping module content from the database.
-    /// Returns the parsed DTO, or a default empty DTO if no content is found.
+    // =====================
+    // Legacy: get_shopping_module (kept for backward compatibility)
+    // =====================
+
+    #[allow(dead_code)]
     pub fn get_shopping_module(conn: &Connection) -> Result<ShoppingModuleDto, String> {
         let result: Result<String, rusqlite::Error> = conn.query_row(
             "SELECT content_json FROM shopping_module_content WHERE module_key = 'shopping' ORDER BY version DESC LIMIT 1",
@@ -16,11 +162,1054 @@ impl ShoppingRepository {
         match result {
             Ok(json_str) => serde_json::from_str::<ShoppingModuleDto>(&json_str)
                 .map_err(|e| format!("Failed to deserialize shopping module content: {}", e)),
-            Err(rusqlite::Error::QueryReturnedNoRows) => {
-                // Return default empty DTO if no data found
-                Ok(ShoppingModuleDto::default())
-            }
+            Err(rusqlite::Error::QueryReturnedNoRows) => Ok(ShoppingModuleDto::default()),
             Err(e) => Err(format!("Database error: {}", e)),
         }
+    }
+
+    // =====================
+    // Aggregation: build full ShoppingModuleDto from tables
+    // =====================
+
+    pub fn get_shopping_module_aggregated(conn: &Connection) -> Result<ShoppingModuleDto, String> {
+        Ok(ShoppingModuleDto {
+            system_definitions: Self::get_all_system_definitions(conn)?,
+            spotlights: Self::get_all_spotlights(conn)?,
+            owned_items: Self::get_all_owned_items_aggregated(conn)?,
+            purchase_lanes: Self::get_all_purchase_lanes_aggregated(conn)?,
+            stage_checklists: Self::get_all_stage_checklists(conn)?,
+            price_references: Self::get_all_price_references(conn)?,
+            boundary_entries: Self::get_all_boundary_entries(conn)?,
+            lifestyle_collections: Self::get_all_lifestyle_collections(conn)?,
+        })
+    }
+
+    // ---- System Definitions ----
+
+    pub fn get_all_system_definitions(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingSystemDefinitionDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, cluster, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_system_definitions WHERE is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_system_definition)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let secondary_groups: Vec<String> =
+                serde_json::from_str(&r.secondary_groups_json).unwrap_or_default();
+            result.push(ShoppingSystemDefinitionDto {
+                id: r.id,
+                cluster: r.cluster,
+                summary: r.summary,
+                key_question: r.key_question,
+                secondary_groups,
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Owned Items ----
+
+    pub fn get_spaces_for_owned_item(
+        conn: &Connection,
+        owned_item_id: &str,
+    ) -> Result<Vec<String>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, owned_item_id, space_name, sort_order
+                 FROM shopping_owned_item_spaces WHERE owned_item_id = ?1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![owned_item_id], row_to_owned_item_space)
+            .map_err(|e| e.to_string())?;
+
+        Ok(rows.filter_map(|r| r.ok()).map(|r| r.space_name).collect())
+    }
+
+    pub fn get_stages_for_owned_item(
+        conn: &Connection,
+        owned_item_id: &str,
+    ) -> Result<Vec<String>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, owned_item_id, stage_name, sort_order
+                 FROM shopping_owned_item_stages WHERE owned_item_id = ?1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![owned_item_id], row_to_owned_item_stage)
+            .map_err(|e| e.to_string())?;
+
+        Ok(rows.filter_map(|r| r.ok()).map(|r| r.stage_name).collect())
+    }
+
+    pub fn get_all_owned_items_aggregated(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingOwnedItemDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, name, system_id, category, necessity, lifecycle, depreciation, quantity, status, replacement_cue, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_owned_items WHERE is_archived = 0 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_owned_item)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let spaces = Self::get_spaces_for_owned_item(conn, &r.id)?;
+            let stages = Self::get_stages_for_owned_item(conn, &r.id)?;
+
+            result.push(ShoppingOwnedItemDto {
+                base: ShoppingItemBaseDto {
+                    system: r.system_id,
+                    category: r.category,
+                    spaces,
+                    stages,
+                    necessity: r.necessity,
+                    lifecycle: r.lifecycle,
+                    depreciation: r.depreciation,
+                },
+                id: r.id,
+                name: r.name,
+                quantity: r.quantity,
+                status: r.status,
+                replacement_cue: r.replacement_cue,
+                note: r.note,
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Purchase Lanes ----
+
+    pub fn get_all_purchase_lanes_aggregated(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingPurchaseLaneDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, title, subtitle, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_purchase_lanes WHERE is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_purchase_lane)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let lane = row.map_err(|e| e.to_string())?;
+            let items = Self::get_plan_items_for_lane(conn, &lane.id)?;
+            result.push(ShoppingPurchaseLaneDto {
+                id: lane.id,
+                title: lane.title,
+                subtitle: lane.subtitle,
+                items,
+            });
+        }
+        Ok(result)
+    }
+
+    fn get_plan_items_for_lane(
+        conn: &Connection,
+        lane_id: &str,
+    ) -> Result<Vec<ShoppingPlanItemDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, lane_id, name, system_id, category, necessity, lifecycle, depreciation, reason, target_lifestyle, current_price, buy_below_price, overpay_price, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_plan_items WHERE lane_id = ?1 AND is_archived = 0 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![lane_id], row_to_plan_item)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let spaces = Self::get_spaces_for_plan_item(conn, &r.id)?;
+            let stages = Self::get_stages_for_plan_item(conn, &r.id)?;
+            let tags = Self::get_tags_for_plan_item(conn, &r.id, "tag")?;
+            let keywords = Self::get_tags_for_plan_item(conn, &r.id, "keyword")?;
+
+            result.push(ShoppingPlanItemDto {
+                base: ShoppingItemBaseDto {
+                    system: r.system_id,
+                    category: r.category,
+                    spaces,
+                    stages,
+                    necessity: r.necessity,
+                    lifecycle: r.lifecycle,
+                    depreciation: r.depreciation,
+                },
+                id: r.id,
+                name: r.name,
+                reason: r.reason,
+                target_lifestyle: r.target_lifestyle,
+                current_price: r.current_price,
+                buy_below_price: r.buy_below_price,
+                overpay_price: r.overpay_price,
+                note: r.note,
+                tags,
+                keywords,
+            });
+        }
+        Ok(result)
+    }
+
+    pub fn get_spaces_for_plan_item(
+        conn: &Connection,
+        plan_item_id: &str,
+    ) -> Result<Vec<String>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, plan_item_id, space_name, sort_order
+                 FROM shopping_plan_item_spaces WHERE plan_item_id = ?1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![plan_item_id], row_to_plan_item_space)
+            .map_err(|e| e.to_string())?;
+
+        Ok(rows.filter_map(|r| r.ok()).map(|r| r.space_name).collect())
+    }
+
+    pub fn get_stages_for_plan_item(
+        conn: &Connection,
+        plan_item_id: &str,
+    ) -> Result<Vec<String>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, plan_item_id, stage_name, sort_order
+                 FROM shopping_plan_item_stages WHERE plan_item_id = ?1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![plan_item_id], row_to_plan_item_stage)
+            .map_err(|e| e.to_string())?;
+
+        Ok(rows.filter_map(|r| r.ok()).map(|r| r.stage_name).collect())
+    }
+
+    pub fn get_tags_for_plan_item(
+        conn: &Connection,
+        plan_item_id: &str,
+        tag_type: &str,
+    ) -> Result<Vec<String>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, plan_item_id, tag_value, tag_type, sort_order
+                 FROM shopping_plan_item_tags WHERE plan_item_id = ?1 AND tag_type = ?2 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map(params![plan_item_id, tag_type], row_to_plan_item_tag)
+            .map_err(|e| e.to_string())?;
+
+        Ok(rows.filter_map(|r| r.ok()).map(|r| r.tag_value).collect())
+    }
+
+    // ---- Page Content: Spotlights ----
+
+    pub fn get_all_spotlights(conn: &Connection) -> Result<Vec<ShoppingSpotlightDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'spotlight' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let body: serde_json::Value = serde_json::from_str(&r.body_json).unwrap_or_default();
+            let attention: Vec<String> = body["attention"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default();
+
+            result.push(ShoppingSpotlightDto {
+                id: r.id,
+                title: r.title.unwrap_or_default(),
+                stage: r.stage.unwrap_or_default(),
+                summary: r.summary.unwrap_or_default(),
+                reason: r.reason.unwrap_or_default(),
+                attention,
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Page Content: Stage Checklists ----
+
+    pub fn get_all_stage_checklists(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingStageChecklistDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'stage_checklist' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let body: serde_json::Value = serde_json::from_str(&r.body_json).unwrap_or_default();
+
+            let sections: Vec<ShoppingStageChecklistSectionDto> = body["sections"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .map(|s| ShoppingStageChecklistSectionDto {
+                            system: s["system"].as_str().unwrap_or_default().to_string(),
+                            minimum: s["minimum"]
+                                .as_array()
+                                .map(|arr| {
+                                    arr.iter()
+                                        .filter_map(|v| v.as_str().map(String::from))
+                                        .collect()
+                                })
+                                .unwrap_or_default(),
+                            essentials: s["essentials"]
+                                .as_array()
+                                .map(|arr| {
+                                    arr.iter()
+                                        .filter_map(|v| v.as_str().map(String::from))
+                                        .collect()
+                                })
+                                .unwrap_or_default(),
+                            upgrades: s["upgrades"]
+                                .as_array()
+                                .map(|arr| {
+                                    arr.iter()
+                                        .filter_map(|v| v.as_str().map(String::from))
+                                        .collect()
+                                })
+                                .unwrap_or_default(),
+                        })
+                        .collect()
+                })
+                .unwrap_or_default();
+
+            result.push(ShoppingStageChecklistDto {
+                id: r.id,
+                stage: r.stage.unwrap_or_default(),
+                title: r.title.unwrap_or_default(),
+                description: body["description"].as_str().unwrap_or_default().to_string(),
+                focus: body["focus"].as_str().unwrap_or_default().to_string(),
+                sections,
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Page Content: Price References ----
+
+    pub fn get_all_price_references(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingPriceReferenceDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'price_reference' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let body: serde_json::Value = serde_json::from_str(&r.body_json).unwrap_or_default();
+
+            result.push(ShoppingPriceReferenceDto {
+                id: r.id,
+                system: r.system_id.unwrap_or_default(),
+                category: body["category"].as_str().unwrap_or_default().to_string(),
+                lifecycle: body["lifecycle"].as_str().unwrap_or_default().to_string(),
+                depreciation: body["depreciation"].as_str().map(String::from),
+                entry_price: body["entryPrice"].as_f64().unwrap_or(0.0),
+                sweet_spot_price: body["sweetSpotPrice"].as_f64().unwrap_or(0.0),
+                overpay_price: body["overpayPrice"].as_f64().unwrap_or(0.0),
+                note: body["note"].as_str().unwrap_or_default().to_string(),
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Page Content: Boundary Entries ----
+
+    pub fn get_all_boundary_entries(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingBoundaryEntryDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'boundary_entry' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let body: serde_json::Value = serde_json::from_str(&r.body_json).unwrap_or_default();
+
+            result.push(ShoppingBoundaryEntryDto {
+                id: r.id,
+                item: body["item"].as_str().unwrap_or_default().to_string(),
+                system: r.system_id.unwrap_or_default(),
+                reason: body["reason"].as_str().unwrap_or_default().to_string(),
+            });
+        }
+        Ok(result)
+    }
+
+    // ---- Page Content: Lifestyle Collections ----
+
+    pub fn get_all_lifestyle_collections(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingLifestyleCollectionDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'lifestyle_collection' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            let body: serde_json::Value = serde_json::from_str(&r.body_json).unwrap_or_default();
+
+            let items: Vec<String> = body["items"]
+                .as_array()
+                .map(|a| {
+                    a.iter()
+                        .filter_map(|v| v.as_str().map(String::from))
+                        .collect()
+                })
+                .unwrap_or_default();
+
+            result.push(ShoppingLifestyleCollectionDto {
+                id: r.id,
+                title: r.title.unwrap_or_default(),
+                description: body["description"].as_str().unwrap_or_default().to_string(),
+                items,
+            });
+        }
+        Ok(result)
+    }
+
+    // =====================
+    // CRUD: Owned Items
+    // =====================
+
+    pub fn list_owned_items(conn: &Connection) -> Result<Vec<OwnedItemRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, name, system_id, category, necessity, lifecycle, depreciation, quantity, status, replacement_cue, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_owned_items WHERE is_archived = 0 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_owned_item)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(row.map_err(|e| e.to_string())?);
+        }
+        Ok(result)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_owned_item(
+        conn: &Connection,
+        id: &str,
+        name: &str,
+        system_id: &str,
+        category: &str,
+        necessity: &str,
+        lifecycle: &str,
+        depreciation: Option<&str>,
+        quantity: i32,
+        status: &str,
+        replacement_cue: &str,
+        note: &str,
+        spaces: &[String],
+        stages: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "INSERT INTO shopping_owned_items (id, name, system_id, category, necessity, lifecycle, depreciation, quantity, status, replacement_cue, note, sort_order, is_archived, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, 0, 0, ?12, ?13)",
+            params![
+                id,
+                name,
+                system_id,
+                category,
+                necessity,
+                lifecycle,
+                depreciation,
+                quantity,
+                status,
+                replacement_cue,
+                note,
+                now,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        for (i, space) in spaces.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_owned_item_spaces (id, owned_item_id, space_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_space_{}", id, i), id, space, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, stage) in stages.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_owned_item_stages (id, owned_item_id, stage_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_stage_{}", id, i), id, stage, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        Ok(())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn update_owned_item(
+        conn: &Connection,
+        id: &str,
+        name: &str,
+        system_id: &str,
+        category: &str,
+        necessity: &str,
+        lifecycle: &str,
+        depreciation: Option<&str>,
+        quantity: i32,
+        status: &str,
+        replacement_cue: &str,
+        note: &str,
+        spaces: &[String],
+        stages: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "UPDATE shopping_owned_items SET name=?1, system_id=?2, category=?3, necessity=?4, lifecycle=?5, depreciation=?6, quantity=?7, status=?8, replacement_cue=?9, note=?10, updated_at=?11
+             WHERE id=?12",
+            params![
+                name,
+                system_id,
+                category,
+                necessity,
+                lifecycle,
+                depreciation,
+                quantity,
+                status,
+                replacement_cue,
+                note,
+                now,
+                id,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        // Delete old associations and rebuild
+        conn.execute(
+            "DELETE FROM shopping_owned_item_spaces WHERE owned_item_id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        conn.execute(
+            "DELETE FROM shopping_owned_item_stages WHERE owned_item_id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+
+        for (i, space) in spaces.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_owned_item_spaces (id, owned_item_id, space_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_space_{}", id, i), id, space, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, stage) in stages.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_owned_item_stages (id, owned_item_id, stage_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_stage_{}", id, i), id, stage, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        Ok(())
+    }
+
+    pub fn delete_owned_item(conn: &Connection, id: &str) -> Result<(), String> {
+        // CASCADE will handle spaces and stages
+        conn.execute(
+            "DELETE FROM shopping_owned_items WHERE id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn get_owned_item_by_id(
+        conn: &Connection,
+        id: &str,
+    ) -> Result<Option<OwnedItemRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, name, system_id, category, necessity, lifecycle, depreciation, quantity, status, replacement_cue, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_owned_items WHERE id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let mut rows = stmt
+            .query_map(params![id], row_to_owned_item)
+            .map_err(|e| e.to_string())?;
+
+        match rows.next() {
+            Some(row) => Ok(Some(row.map_err(|e| e.to_string())?)),
+            None => Ok(None),
+        }
+    }
+
+    // =====================
+    // CRUD: Plan Items
+    // =====================
+
+    pub fn list_plan_items(conn: &Connection) -> Result<Vec<PlanItemRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, lane_id, name, system_id, category, necessity, lifecycle, depreciation, reason, target_lifestyle, current_price, buy_below_price, overpay_price, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_plan_items WHERE is_archived = 0 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_plan_item)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(row.map_err(|e| e.to_string())?);
+        }
+        Ok(result)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_plan_item(
+        conn: &Connection,
+        id: &str,
+        lane_id: &str,
+        name: &str,
+        system_id: &str,
+        category: &str,
+        necessity: &str,
+        lifecycle: &str,
+        depreciation: Option<&str>,
+        reason: &str,
+        target_lifestyle: &str,
+        current_price: f64,
+        buy_below_price: f64,
+        overpay_price: f64,
+        note: &str,
+        spaces: &[String],
+        stages: &[String],
+        tags: &[String],
+        keywords: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "INSERT INTO shopping_plan_items (id, lane_id, name, system_id, category, necessity, lifecycle, depreciation, reason, target_lifestyle, current_price, buy_below_price, overpay_price, note, sort_order, is_archived, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, 0, 0, ?15, ?16)",
+            params![
+                id,
+                lane_id,
+                name,
+                system_id,
+                category,
+                necessity,
+                lifecycle,
+                depreciation,
+                reason,
+                target_lifestyle,
+                current_price,
+                buy_below_price,
+                overpay_price,
+                note,
+                now,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        for (i, space) in spaces.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_spaces (id, plan_item_id, space_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_space_{}", id, i), id, space, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, stage) in stages.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_stages (id, plan_item_id, stage_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_stage_{}", id, i), id, stage, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, tag) in tags.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
+                 VALUES (?1, ?2, ?3, 'tag', ?4)",
+                params![format!("{}_tag_{}", id, i), id, tag, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, kw) in keywords.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
+                 VALUES (?1, ?2, ?3, 'keyword', ?4)",
+                params![format!("{}_kw_{}", id, i), id, kw, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        Ok(())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn update_plan_item(
+        conn: &Connection,
+        id: &str,
+        lane_id: &str,
+        name: &str,
+        system_id: &str,
+        category: &str,
+        necessity: &str,
+        lifecycle: &str,
+        depreciation: Option<&str>,
+        reason: &str,
+        target_lifestyle: &str,
+        current_price: f64,
+        buy_below_price: f64,
+        overpay_price: f64,
+        note: &str,
+        spaces: &[String],
+        stages: &[String],
+        tags: &[String],
+        keywords: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "UPDATE shopping_plan_items SET lane_id=?1, name=?2, system_id=?3, category=?4, necessity=?5, lifecycle=?6, depreciation=?7, reason=?8, target_lifestyle=?9, current_price=?10, buy_below_price=?11, overpay_price=?12, note=?13, updated_at=?14
+             WHERE id=?15",
+            params![
+                lane_id,
+                name,
+                system_id,
+                category,
+                necessity,
+                lifecycle,
+                depreciation,
+                reason,
+                target_lifestyle,
+                current_price,
+                buy_below_price,
+                overpay_price,
+                note,
+                now,
+                id,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        // Delete old associations and rebuild
+        conn.execute(
+            "DELETE FROM shopping_plan_item_spaces WHERE plan_item_id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        conn.execute(
+            "DELETE FROM shopping_plan_item_stages WHERE plan_item_id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        conn.execute(
+            "DELETE FROM shopping_plan_item_tags WHERE plan_item_id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+
+        for (i, space) in spaces.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_spaces (id, plan_item_id, space_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_space_{}", id, i), id, space, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, stage) in stages.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_stages (id, plan_item_id, stage_name, sort_order)
+                 VALUES (?1, ?2, ?3, ?4)",
+                params![format!("{}_stage_{}", id, i), id, stage, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, tag) in tags.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
+                 VALUES (?1, ?2, ?3, 'tag', ?4)",
+                params![format!("{}_tag_{}", id, i), id, tag, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        for (i, kw) in keywords.iter().enumerate() {
+            conn.execute(
+                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
+                 VALUES (?1, ?2, ?3, 'keyword', ?4)",
+                params![format!("{}_kw_{}", id, i), id, kw, i as i32],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        Ok(())
+    }
+
+    pub fn delete_plan_item(conn: &Connection, id: &str) -> Result<(), String> {
+        conn.execute("DELETE FROM shopping_plan_items WHERE id = ?1", params![id])
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn get_plan_item_by_id(conn: &Connection, id: &str) -> Result<Option<PlanItemRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, lane_id, name, system_id, category, necessity, lifecycle, depreciation, reason, target_lifestyle, current_price, buy_below_price, overpay_price, note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_plan_items WHERE id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let mut rows = stmt
+            .query_map(params![id], row_to_plan_item)
+            .map_err(|e| e.to_string())?;
+
+        match rows.next() {
+            Some(row) => Ok(Some(row.map_err(|e| e.to_string())?)),
+            None => Ok(None),
+        }
+    }
+
+    // =====================
+    // CRUD: Page Content
+    // =====================
+
+    pub fn list_page_contents(
+        conn: &Connection,
+        content_type: Option<&str>,
+    ) -> Result<Vec<PageContentRow>, String> {
+        let sql = if content_type.is_some() {
+            "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+             FROM shopping_page_content WHERE content_type = ?1 AND is_enabled = 1 ORDER BY sort_order"
+        } else {
+            "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+             FROM shopping_page_content WHERE is_enabled = 1 ORDER BY sort_order"
+        };
+
+        let mut stmt = conn.prepare(sql).map_err(|e| e.to_string())?;
+
+        let rows = if let Some(ct) = content_type {
+            stmt.query_map(params![ct], row_to_page_content)
+                .map_err(|e| e.to_string())?
+        } else {
+            stmt.query_map([], row_to_page_content)
+                .map_err(|e| e.to_string())?
+        };
+
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(row.map_err(|e| e.to_string())?);
+        }
+        Ok(result)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_page_content(
+        conn: &Connection,
+        id: &str,
+        content_type: &str,
+        title: Option<&str>,
+        stage: Option<&str>,
+        system_id: Option<&str>,
+        summary: Option<&str>,
+        reason: Option<&str>,
+        body_json: &str,
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "INSERT INTO shopping_page_content (id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 1, ?9, ?10)",
+            params![
+                id,
+                content_type,
+                title,
+                stage,
+                system_id,
+                summary,
+                reason,
+                body_json,
+                now,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn update_page_content(
+        conn: &Connection,
+        id: &str,
+        content_type: &str,
+        title: Option<&str>,
+        stage: Option<&str>,
+        system_id: Option<&str>,
+        summary: Option<&str>,
+        reason: Option<&str>,
+        body_json: &str,
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "UPDATE shopping_page_content SET content_type=?1, title=?2, stage=?3, system_id=?4, summary=?5, reason=?6, body_json=?7, updated_at=?8
+             WHERE id=?9",
+            params![
+                content_type,
+                title,
+                stage,
+                system_id,
+                summary,
+                reason,
+                body_json,
+                now,
+                id,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn delete_page_content(conn: &Connection, id: &str) -> Result<(), String> {
+        conn.execute(
+            "DELETE FROM shopping_page_content WHERE id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn get_page_content_by_id(
+        conn: &Connection,
+        id: &str,
+    ) -> Result<Option<PageContentRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let mut rows = stmt
+            .query_map(params![id], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        match rows.next() {
+            Some(row) => Ok(Some(row.map_err(|e| e.to_string())?)),
+            None => Ok(None),
+        }
+    }
+
+    // =====================
+    // CRUD: Purchase Lanes
+    // =====================
+
+    pub fn list_purchase_lanes(conn: &Connection) -> Result<Vec<PurchaseLaneRow>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, title, subtitle, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_purchase_lanes WHERE is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_purchase_lane)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            result.push(row.map_err(|e| e.to_string())?);
+        }
+        Ok(result)
     }
 }

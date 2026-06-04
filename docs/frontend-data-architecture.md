@@ -71,8 +71,9 @@ src/features/bettertolive/
 
 - `VITE_BETTERTOLIVE_API_MODE=mock | live`
 - `VITE_BETTERTOLIVE_API_BASE_URL=/api/bettertolive`
+- `VITE_BETTERTOLIVE_API_PROXY_TARGET=http://127.0.0.1:5000` 或 `http://127.0.0.1:5000/api/bettertolive`
 
-默认走 `mock`。
+浏览器开发预览如果要透传到独立后端，保持 `VITE_BETTERTOLIVE_API_BASE_URL=/api/bettertolive`，再配置 `VITE_BETTERTOLIVE_API_PROXY_TARGET` 即可。
 
 ## 接后端时的动作
 

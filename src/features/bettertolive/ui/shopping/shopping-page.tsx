@@ -1,4 +1,4 @@
-import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
+import { AlertTriangle, House, Package2, Settings, ShoppingBasket, Sparkles } from "lucide-react"
 import { useState } from "react"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -8,6 +8,7 @@ import type {
   ShoppingSystem,
 } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
+import { ShoppingAdminTab } from "@/features/bettertolive/ui/shopping/shopping-admin-tab"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
 import {
@@ -201,6 +202,10 @@ export function ShoppingPage({
             <ShoppingBasket />
             采购决策
           </TabsTrigger>
+          <TabsTrigger value="admin" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
+            <Settings />
+            管理
+          </TabsTrigger>
         </TabsList>
 
         <ShoppingOverviewTab
@@ -240,6 +245,8 @@ export function ShoppingPage({
           isWideLayout={isWideLayout}
           isFixedLayout={isFixedLayout}
         />
+
+        <ShoppingAdminTab isWideLayout={isWideLayout} isFixedLayout={isFixedLayout} />
       </Tabs>
     </div>
   )
