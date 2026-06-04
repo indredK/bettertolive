@@ -16,7 +16,6 @@ import {
   Scale,
   Search,
   ScrollText,
-  ShieldAlert,
   Sparkles,
   Users2,
   Wallet,
@@ -46,7 +45,6 @@ import { EventsPage } from "@/features/bettertolive/ui/events/events-page"
 import { FinancePage } from "@/features/bettertolive/ui/finance/finance-page"
 import { FuturePage } from "@/features/bettertolive/ui/future/future-page"
 import { BeliefsPage } from "@/features/bettertolive/ui/beliefs/beliefs-page"
-import { CrisisPage } from "@/features/bettertolive/ui/crisis/crisis-page"
 import { EmotionPage } from "@/features/bettertolive/ui/emotion/emotion-page"
 import { JourneyPage } from "@/features/bettertolive/ui/journey/journey-page"
 import { LegacyPage } from "@/features/bettertolive/ui/legacy/legacy-page"
@@ -148,12 +146,6 @@ const NAV_SECTIONS: Array<{
         label: "情绪情感",
         hint: "波动、触发和恢复方式",
         icon: HeartPulse,
-      },
-      {
-        view: "crisis",
-        label: "危机支持",
-        hint: "低谷时先做什么",
-        icon: ShieldAlert,
       },
     ],
   },
@@ -410,18 +402,6 @@ export function BetterToLiveAppShell() {
         return (
           <EmotionPage
             emotionModule={viewModel.emotionModule}
-            searchQuery={searchQuery}
-            isStackedLayout={isStackedLayout}
-          />
-        )
-      case "crisis":
-        return (
-          <CrisisPage
-            currentState={viewModel.crisisCurrentState}
-            warningSigns={viewModel.crisisWarningSigns}
-            contacts={viewModel.crisisContacts}
-            steps={viewModel.crisisSteps}
-            reviewNotes={viewModel.crisisReviewNotes}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />

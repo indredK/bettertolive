@@ -152,23 +152,6 @@ export const workspaceSidebarNotes: Record<AppView, WorkspaceSidebarNote> = {
       },
     ],
   },
-  crisis: {
-    heading: "危机说明",
-    lines: [
-      {
-        label: "支撑",
-        text: "状态很差时，先不要分析太多，先知道下一步该做什么。",
-      },
-      {
-        label: "适合",
-        text: "适合明显失衡、想躲起来、或已经不知道怎么继续时。",
-      },
-      {
-        label: "目的",
-        text: "把预警信号、联系人和应急步骤提前准备好。",
-      },
-    ],
-  },
   beliefs: {
     heading: "观念说明",
     lines: [

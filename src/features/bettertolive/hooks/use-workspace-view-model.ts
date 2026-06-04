@@ -299,29 +299,6 @@ export function useWorkspaceViewModel({
   const emotionTriggers = emotionModule.triggers
   const emotionTools = emotionModule.tools
 
-  const crisisWarningSigns = useMemo(
-    () => workspace.crisis.warningSigns.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.crisis.warningSigns],
-  )
-
-  const crisisContacts = useMemo(
-    () =>
-      workspace.crisis.contacts.filter((entry) =>
-        matchesQuery(entry.name, entry.role, entry.when, entry.script),
-      ),
-    [matchesQuery, workspace.crisis.contacts],
-  )
-
-  const crisisSteps = useMemo(
-    () => workspace.crisis.steps.filter((entry) => matchesQuery(entry.title, entry.description)),
-    [matchesQuery, workspace.crisis.steps],
-  )
-
-  const crisisReviewNotes = useMemo(
-    () => workspace.crisis.reviewNotes.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.crisis.reviewNotes],
-  )
-
   const recentRecords = useMemo(
     () =>
       workspace.overview.recentRecords.filter((entry) =>
@@ -728,11 +705,6 @@ export function useWorkspaceViewModel({
     beliefCards,
     beliefQuestions,
     beliefsModule,
-    crisisContacts,
-    crisisCurrentState: workspace.crisis.currentState,
-    crisisReviewNotes,
-    crisisSteps,
-    crisisWarningSigns,
     dailyPulse: workspace.overview.dailyPulse,
     emotionCheckIns,
     emotionModule,

@@ -6,7 +6,6 @@ export const BETTERTOLIVE_API_ENDPOINTS = {
   shopping: "/shopping",
   nutrition: "/nutrition",
   emotion: "/emotion",
-  crisis: "/crisis",
   beliefs: "/beliefs",
   principles: "/principles",
   relationships: "/relationships",

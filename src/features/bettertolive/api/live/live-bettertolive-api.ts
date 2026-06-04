@@ -3,7 +3,6 @@ import { BETTERTOLIVE_API_ENDPOINTS } from "@/features/bettertolive/api/endpoint
 import { requestJson } from "@/features/bettertolive/api/http-client"
 import type {
   BeliefsModuleData,
-  CrisisWorkspaceModuleData,
   EmotionWorkspaceModuleData,
   EventsModuleData,
   FinanceModuleData,
@@ -30,7 +29,6 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     getShopping: () => requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
     getNutrition: () => requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
     getEmotion: () => requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
-    getCrisis: () => requestJson<CrisisWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.crisis),
     getBeliefs: () => requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
     getPrinciples: () => requestJson<PrinciplesModuleData>(BETTERTOLIVE_API_ENDPOINTS.principles),
     getRelationships: () =>
@@ -57,7 +55,6 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         shopping,
         nutrition,
         emotion,
-        crisis,
         beliefs,
         principles,
         relationships,
@@ -74,7 +71,6 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         requestJson<ShoppingModuleData>(BETTERTOLIVE_API_ENDPOINTS.shopping),
         requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
         requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
-        requestJson<CrisisWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.crisis),
         requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
         requestJson<PrinciplesModuleData>(BETTERTOLIVE_API_ENDPOINTS.principles),
         requestJson<RelationshipsModuleData>(BETTERTOLIVE_API_ENDPOINTS.relationships),
@@ -93,7 +89,6 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
         shopping,
         nutrition,
         emotion,
-        crisis,
         beliefs,
         principles,
         relationships,

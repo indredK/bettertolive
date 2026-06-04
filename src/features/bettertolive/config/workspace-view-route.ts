@@ -10,7 +10,6 @@ const WORKSPACE_VIEWS = [
   "shopping",
   "nutrition",
   "emotion",
-  "crisis",
   "beliefs",
   "principles",
   "relationships",

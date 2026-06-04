@@ -1,4 +1,3 @@
-import { crisisMockData } from "@/features/bettertolive/api/mock/data/crisis/crisis.mock"
 import { emotionMockData } from "@/features/bettertolive/api/mock/data/emotion/emotion.mock"
 import type { WorkspaceSnapshot } from "@/features/bettertolive/models/workspace"
 import { beliefsMockData } from "@/features/bettertolive/api/mock/data/beliefs/beliefs.mock"
@@ -24,7 +23,6 @@ export const workspaceSnapshotMockData = {
   shopping: shoppingMockData,
   nutrition: nutritionMockData,
   emotion: emotionMockData,
-  crisis: crisisMockData,
   beliefs: beliefsMockData,
   principles: principlesMockData,
   relationships: relationshipsMockData,

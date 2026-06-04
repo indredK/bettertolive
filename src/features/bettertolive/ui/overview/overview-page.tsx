@@ -8,7 +8,6 @@ import {
   NotebookPen,
   Route,
   ScrollText,
-  ShieldAlert,
   Sparkles,
   Target,
   Users2,
@@ -98,8 +97,7 @@ export function OverviewPage({
                 },
                 {
                   title: "内在状态",
-                  detail:
-                    "情绪情感和危机支持，负责承接最近的心理波动，以及状态很差时该怎么撑住自己。",
+                  detail: "情绪情感页负责承接最近的心理波动、触发因素，以及对自己有效的恢复方式。",
                 },
                 {
                   title: "自我图谱",
@@ -173,12 +171,6 @@ export function OverviewPage({
                 label="看情绪波动"
                 description="把最近的心理天气和触发因素放到同一页里看。"
                 onClick={() => onNavigate("emotion")}
-              />
-              <QuickActionButton
-                icon={ShieldAlert}
-                label="打开危机支持"
-                description="状态很差的时候，先知道下一步该做什么。"
-                onClick={() => onNavigate("crisis")}
               />
               <QuickActionButton
                 icon={Compass}

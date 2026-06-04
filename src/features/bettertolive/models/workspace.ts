@@ -6,7 +6,6 @@ export type AppView =
   | "shopping"
   | "nutrition"
   | "emotion"
-  | "crisis"
   | "beliefs"
   | "principles"
   | "relationships"
@@ -619,34 +618,6 @@ export type EmotionModuleData = {
   minimalRecoverySteps: string[]
 }
 
-export type CrisisCurrentState = {
-  level: string
-  summary: string
-  firstStep: string
-}
-
-export type CrisisContact = {
-  id: string
-  name: string
-  role: string
-  when: string
-  script: string
-}
-
-export type CrisisStep = {
-  id: string
-  title: string
-  description: string
-}
-
-export type CrisisSupportModuleData = {
-  currentState: CrisisCurrentState
-  warningSigns: string[]
-  contacts: CrisisContact[]
-  steps: CrisisStep[]
-  reviewNotes: string[]
-}
-
 export type MemoryEntry = {
   id: string
   title: string
@@ -768,8 +739,6 @@ export type JourneyModuleData = GrowthModuleData & MemoryModuleData
 export type JourneyWorkspaceModuleData = JourneyModuleData
 
 export type EmotionWorkspaceModuleData = EmotionModuleData
-
-export type CrisisWorkspaceModuleData = CrisisSupportModuleData
 
 export type LegacyWorkspaceModuleData = LegacyModuleData
 
@@ -988,7 +957,6 @@ export type WorkspaceSnapshot = {
   shopping: ShoppingModuleData
   nutrition: NutritionModuleData
   emotion: EmotionWorkspaceModuleData
-  crisis: CrisisWorkspaceModuleData
   beliefs: BeliefsModuleData
   principles: PrinciplesModuleData
   relationships: RelationshipsModuleData

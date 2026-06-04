@@ -8,7 +8,6 @@ export const workspaceViewLabels: Record<AppView, string> = {
   shopping: "生活物品",
   nutrition: "饮食",
   emotion: "情绪情感",
-  crisis: "危机支持",
   beliefs: "观念",
   principles: "原则与底线",
   relationships: "关系深化",

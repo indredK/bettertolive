@@ -7,7 +7,6 @@ export const workspaceQueryKeys = {
   finance: () => [...workspaceQueryKeys.all, "finance"] as const,
   shopping: () => [...workspaceQueryKeys.all, "shopping"] as const,
   emotion: () => [...workspaceQueryKeys.all, "emotion"] as const,
-  crisis: () => [...workspaceQueryKeys.all, "crisis"] as const,
   beliefs: () => [...workspaceQueryKeys.all, "beliefs"] as const,
   principles: () => [...workspaceQueryKeys.all, "principles"] as const,
   relationships: () => [...workspaceQueryKeys.all, "relationships"] as const,
