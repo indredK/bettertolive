@@ -139,7 +139,6 @@ export function ShoppingPage({
   const featuredCollections = shopping.lifestyleCollections.filter(
     (collection) => collection.id !== "collection-overlooked",
   )
-  const priorityItems = planItems.filter((item) => PRIORITY_LEVELS.has(item.necessity))
 
   // Derive displayed selection — fall back to first item when nothing is selected or selection is stale
   const displaySystemId = selectedSystemId ?? activeSystems[0]?.id ?? null
@@ -238,7 +237,6 @@ export function ShoppingPage({
 
         <ShoppingPlanningTab
           shopping={shopping}
-          priorityItems={priorityItems}
           isWideLayout={isWideLayout}
           isFixedLayout={isFixedLayout}
         />

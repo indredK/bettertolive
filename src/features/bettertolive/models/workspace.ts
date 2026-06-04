@@ -73,8 +73,9 @@ export type ShoppingSystem =
   | "家具陈设"
   | "出行"
   | "娱乐爱好"
+  | "宠物"
 
-export type ShoppingStage = "搬家最低配" | "租房" | "长期居住" | "自有住房" | "自建房"
+export type ShoppingStage = "搬家最低配" | "租房" | "长期居住" | "自有住房" | "自建房" | "地下室"
 
 export type ShoppingLifecycle = "消耗品" | "耐用品" | "工具" | "情感物"
 
@@ -119,6 +120,7 @@ export type ShoppingPlanItem = ShoppingItemBase & {
   overpayPrice: number
   note: string
   tags: string[]
+  keywords: string[]
 }
 
 export type ShoppingPurchaseLane = {
