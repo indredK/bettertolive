@@ -6,7 +6,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -37,27 +36,6 @@ export function SocioeconomicsPage({
         description="这页不是自我评估，而是把对外部经济世界的认知放在一张地图上。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="value"
-          title="已有认知"
-          value={`${entries.length} 条`}
-          detail="按领域、层次、掌握程度看自己对外部世界的覆盖。"
-        />
-        <SummarySurface
-          tone="past"
-          title="认知缺口"
-          value={`${gaps.length} 条`}
-          detail="比起补满，先看见哪里只是听过名词更重要。"
-        />
-        <SummarySurface
-          tone="present"
-          title="离决策的距离"
-          value="按层次看"
-          detail="区分微观、中观、宏观，知道哪一块离自己最近。"
-        />
-      </div>
 
       <div
         className={cn(

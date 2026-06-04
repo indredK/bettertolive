@@ -11,7 +11,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -47,27 +46,6 @@ export function EmotionPage({
         description="这里不是简单记录心情，而是把情绪波动、触发因素和对自己有效的恢复方式放在一起看。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="present"
-          title="最近记录"
-          value={`${checkIns.length} 条`}
-          detail="先把感受留下来，再慢慢看它们怎么连成一条线。"
-        />
-        <SummarySurface
-          tone="past"
-          title="波动样本"
-          value={`${trend.length} 段`}
-          detail="波动不是随机的，常常会和节奏、关系和身体状态绑在一起。"
-        />
-        <SummarySurface
-          tone="value"
-          title="恢复工具"
-          value={`${tools.length} 个`}
-          detail="状态差的时候，不一定适合分析，但一定需要下一步。"
-        />
-      </div>
 
       <div
         className={cn(

@@ -1,6 +1,7 @@
 import { BookHeart, Camera, CheckCheck, Route, Shield, Sprout, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EmotionalWeight,
   FormativePower,
@@ -15,7 +16,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -43,9 +43,6 @@ const PRIVACY_LEVEL_ORDER = [
 ] satisfies PrivacyLevel[]
 
 const FORMATIVE_POWER_ORDER = ["极深", "较深", "中等", "轻微", "无"] satisfies FormativePower[]
-
-const HIGH_FORMATIVE_POWERS = new Set<FormativePower>(["极深", "较深"])
-const HEAVY_EMOTIONAL_WEIGHTS = new Set<EmotionalWeight>(["重", "很重"])
 
 type JourneyViewData = {
   growthNodes: GrowthNode[]
@@ -106,10 +103,6 @@ function getLinkedMemories(memoryIds: string[], memoryById: Map<string, MemoryEn
     .filter((memory): memory is MemoryEntry => memory !== undefined)
 }
 
-function isUnresolvedHeavyMemory(memory: MemoryEntry) {
-  return HEAVY_EMOTIONAL_WEIGHTS.has(memory.emotionalWeight) && memory.processing !== "已整理"
-}
-
 export function JourneyPage({
   journey,
   searchQuery,
@@ -121,13 +114,6 @@ export function JourneyPage({
 }) {
   const isFixedLayout = !isStackedLayout
   const memoryById = createMemoryLookup(journey.memories)
-  const highFormativeMemories = journey.memories.filter(
-    (memory) => memory.formativePower && HIGH_FORMATIVE_POWERS.has(memory.formativePower),
-  )
-  const unresolvedHeavyMemories = journey.memories.filter(isUnresolvedHeavyMemory)
-  const protectedMemoryCount = journey.memories.filter(
-    (memory) => memory.privacy === "需二次确认" || memory.processing === "暂不触碰",
-  ).length
   const classificationSections = [
     {
       title: "内容类型",
@@ -181,38 +167,6 @@ export function JourneyPage({
         description="每条记忆用 5 个分类标签安放，用塑造力标出它如何影响今天的你。成长节点不是单条记忆，而是一组记忆显现出的变化模式。"
         searchQuery={searchQuery}
       />
-
-      <div
-        className={cn(
-          "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4",
-          isFixedLayout && "shrink-0",
-        )}
-      >
-        <SummarySurface
-          tone="past"
-          title="记忆档案"
-          value={`${journey.memories.length} 条`}
-          detail="事件、地点、物件、人物、照片和领悟都可以成为入口。"
-        />
-        <SummarySurface
-          tone="value"
-          title="高塑造力"
-          value={`${highFormativeMemories.length} 条`}
-          detail="塑造力只做标注和回看，不放入主筛选器。"
-        />
-        <SummarySurface
-          tone="present"
-          title="需要轻放"
-          value={`${unresolvedHeavyMemories.length} 条`}
-          detail="情感较重且尚未整理好的记忆，先允许它只是存在。"
-        />
-        <SummarySurface
-          tone="future"
-          title="成长节点"
-          value={`${journey.growthNodes.length} 个`}
-          detail={`${protectedMemoryCount} 条记忆带有二次确认或暂不触碰保护。`}
-        />
-      </div>
 
       {isFixedLayout ? (
         <JourneyFixedDashboard
@@ -422,90 +376,118 @@ function JourneyFixedDashboard({
 
   return (
     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.95fr)_minmax(0,1.06fr)_minmax(320px,0.9fr)] grid-rows-[minmax(0,0.9fr)_minmax(0,1fr)] gap-3 overflow-hidden">
-      <Surface className="col-span-2 min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={Waypoints}
-          title="5 维分类概览"
-          description="先看记忆结构，再打开具体经历。塑造力只做评估标记。"
-        />
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="grid gap-2 min-[1240px]:grid-cols-5">
+            {classificationSections.map((section) => (
+              <CompactDistributionPanel
+                key={section.title}
+                title={section.title}
+                rows={section.rows}
+              />
+            ))}
+          </div>
 
-        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-5">
-          {classificationSections.map((section) => (
-            <CompactDistributionPanel
-              key={section.title}
-              title={section.title}
-              rows={section.rows}
-            />
-          ))}
-        </div>
-
-        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <CompactBadgeBlock title="塑造力标注" rows={formativePowerRows} />
-          <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
-            <div className="text-xs font-medium text-[color:var(--text-primary)]">默认时期提示</div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {journey.eraSuggestions.slice(0, 5).map((era) => (
-                <Badge
-                  key={era}
-                  variant="outline"
-                  className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                >
-                  {era}
-                </Badge>
-              ))}
+          <div className="grid gap-2 min-[1240px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+            <CompactBadgeBlock title="塑造力标注" rows={formativePowerRows} />
+            <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+              <div className="text-xs font-medium text-[color:var(--text-primary)]">
+                默认时期提示
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {journey.eraSuggestions.slice(0, 5).map((era) => (
+                  <Badge
+                    key={era}
+                    variant="outline"
+                    className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                  >
+                    {era}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </Surface>
 
-      <Surface className="row-span-2 min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={Route}
-          title="记忆时间线"
-          description="精选几条代表性记忆，避免把时间线变成滚动长河。"
-        />
-
-        <div className="mt-3 grid gap-2">
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {featuredMemories.length > 0 ? (
             featuredMemories.map((memory) => <CompactMemoryCard key={memory.id} memory={memory} />)
           ) : (
             <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
           )}
-          {remainingMemoryCount > 0 ? (
-            <RemainingLine label={`还有 ${remainingMemoryCount} 条记忆未展开`} />
-          ) : null}
+          <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+            {featuredGrowthNodes.map((node) => (
+              <CompactGrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
+            ))}
+          </div>
         </div>
       </Surface>
 
-      <Surface className="min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={Sprout}
-          title="成长节点"
-          description="只展示最关键的变化方向。"
-        />
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <Tabs defaultValue="timeline" className="min-h-0 flex-1">
+          <TabsList className="w-full justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
+            <TabsTrigger value="timeline">记忆时间线</TabsTrigger>
+            <TabsTrigger value="growth">成长节点</TabsTrigger>
+            <TabsTrigger value="signals">锚点与影响</TabsTrigger>
+          </TabsList>
 
-        <div className="mt-3 grid gap-2">
-          {featuredGrowthNodes.map((node) => (
-            <CompactGrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
-          ))}
-          {remainingGrowthCount > 0 ? (
-            <RemainingLine label={`还有 ${remainingGrowthCount} 个成长节点未展开`} />
-          ) : null}
-        </div>
+          <TabsContent value="timeline" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {journey.memories.length > 0 ? (
+                journey.memories.map((memory) => (
+                  <CompactMemoryCard key={memory.id} memory={memory} />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="growth" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {journey.growthNodes.length > 0 ? (
+                journey.growthNodes.map((node) => (
+                  <CompactGrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="signals" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {journey.anchors.map((anchor) => {
+                const linkedMemories = getLinkedMemories(anchor.linkedMemoryIds, memoryById)
+
+                return (
+                  <CompactTextBlock
+                    key={anchor.id}
+                    title={`${anchor.type} · ${anchor.label}`}
+                    detail={`${anchor.note} · ${linkedMemories.length} 条相关记忆`}
+                  />
+                )
+              })}
+              {journey.reviewPrompts.map((prompt) => (
+                <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
+              ))}
+              {journey.threads.map((thread) => (
+                <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
+              ))}
+              {journey.anchors.length === 0 &&
+              journey.reviewPrompts.length === 0 &&
+              journey.threads.length === 0 ? (
+                <EmptyState message="当前筛选下没有辅助线索。" compact />
+              ) : null}
+            </div>
+          </TabsContent>
+        </Tabs>
       </Surface>
 
-      <Surface className="min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={BookHeart}
-          title="锚点、问题与影响"
-          description="把辅助信息压到同一视图里扫描。"
-        />
-
-        <div className="mt-3 grid gap-2">
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {featuredAnchors.map((anchor) => {
             const linkedMemories = getLinkedMemories(anchor.linkedMemoryIds, memoryById)
 
@@ -517,12 +499,20 @@ function JourneyFixedDashboard({
               />
             )
           })}
-          {featuredPrompts.map((prompt) => (
-            <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
-          ))}
-          {featuredThreads.map((thread) => (
-            <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
-          ))}
+          <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+            {featuredPrompts.map((prompt) => (
+              <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
+            ))}
+            {featuredThreads.map((thread) => (
+              <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
+            ))}
+          </div>
+          {remainingMemoryCount > 0 ? (
+            <RemainingLine label={`还有 ${remainingMemoryCount} 条记忆未展开`} />
+          ) : null}
+          {remainingGrowthCount > 0 ? (
+            <RemainingLine label={`还有 ${remainingGrowthCount} 个成长节点未展开`} />
+          ) : null}
         </div>
       </Surface>
     </div>

@@ -6,7 +6,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -37,27 +36,6 @@ export function FuturePage({
         description="未来不是系统替你预测的结果，而是你主动写下的方向。这里先承接理想自我、理想生活和阶段路径。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="present"
-          title="理想自我"
-          value="更稳定、更清醒"
-          detail={futureBlueprint.identity}
-        />
-        <SummarySurface
-          tone="future"
-          title="理想生活"
-          value="自由但不漂浮"
-          detail={futureBlueprint.lifestyle}
-        />
-        <SummarySurface
-          tone="value"
-          title="重要价值"
-          value={futureBlueprint.values.join(" / ")}
-          detail="用价值观筛掉不属于你的路径。"
-        />
-      </div>
 
       <div
         className={cn(

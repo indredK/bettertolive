@@ -1,6 +1,7 @@
 import { Activity, MessageCircleMore, Users2, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   InteractionFrequency,
   RelationshipDepth,
@@ -16,7 +17,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -107,27 +107,16 @@ function sortUnsentNotes(notes: RelationshipUnsentNote[]) {
 
 export function RelationshipsPage({
   relationshipsModule,
-  visibleRelationshipCount,
   searchQuery,
   isStackedLayout = false,
 }: {
   relationshipsModule: RelationshipMap
-  visibleRelationshipCount: number
   searchQuery: string
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
   const relationships = getRelationships(relationshipsModule)
   const relationshipById = createRelationshipLookup(relationships)
-  const nourishingCount = relationships.filter(
-    (relationship) => relationship.impact === "滋养",
-  ).length
-  const drainingCount = relationships.filter(
-    (relationship) => relationship.impact === "消耗",
-  ).length
-  const heavyUnfinishedCount = relationships.filter(
-    (relationship) => relationship.unfinishedWeight === "很重",
-  ).length
   const classificationSections = [
     {
       title: "类型",
@@ -196,47 +185,167 @@ export function RelationshipsPage({
         searchQuery={searchQuery}
       />
 
-      <div
-        className={cn(
-          "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4",
-          isFixedLayout && "shrink-0",
-        )}
-      >
-        <SummarySurface
-          tone="value"
-          title="关系条目"
-          value={`${visibleRelationshipCount} 人`}
-          detail={`${relationshipsModule.circles.length} 个圈层里正在呈现不同关系状态。`}
+      {isFixedLayout ? (
+        <RelationshipsFixedDashboard
+          classificationSections={classificationSections}
+          relationshipById={relationshipById}
+          relationships={relationships}
+          relationshipsModule={relationshipsModule}
+          sortedUnsentNotes={sortedUnsentNotes}
+          unfinishedRows={unfinishedRows}
         />
-        <SummarySurface
-          tone="present"
-          title="滋养关系"
-          value={`${nourishingCount} 段`}
-          detail="不是谁热闹，而是谁让你更能做自己。"
-        />
-        <SummarySurface
-          tone="past"
-          title="消耗关系"
-          value={`${drainingCount} 段`}
-          detail="消耗不是定罪，只是提醒需要看见边界。"
-        />
-        <SummarySurface
-          tone="future"
-          title="未完成很重"
-          value={`${heavyUnfinishedCount} 段`}
-          detail={`${relationshipsModule.unsentNotes.length} 条想说的话正在等待被安放。`}
-        />
-      </div>
+      ) : (
+        <div className="space-y-4">
+          <Surface className="p-5">
+            <SectionHeading
+              icon={Waypoints}
+              title="5 维关系分类"
+              description="这些维度负责分组和观察关系世界；unfinished_weight 留在详情和想说的话里。"
+            />
 
-      <div className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
-        <Surface className="p-5">
-          <SectionHeading
-            icon={Waypoints}
-            title="5 维关系分类"
-            description="这些维度负责分组和观察关系世界；unfinished_weight 留在详情和想说的话里。"
-          />
+            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+              {classificationSections.map((section) => (
+                <ClassificationPanel
+                  key={section.title}
+                  title={section.title}
+                  description={section.description}
+                  rows={section.rows}
+                  total={relationships.length}
+                />
+              ))}
+            </div>
 
-          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+            <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+              <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                unfinished_weight 标注
+              </div>
+              <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                未完成重量是单段关系的评估属性，用来判断还有多少没说完的话，不进入主筛选器。
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {unfinishedRows
+                  .filter((row) => row.count > 0)
+                  .map((row) => (
+                    <Badge
+                      key={row.label}
+                      variant="outline"
+                      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                    >
+                      {row.label} · {row.count}
+                    </Badge>
+                  ))}
+              </div>
+            </div>
+          </Surface>
+
+          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
+            <Surface className="p-5">
+              <SectionHeading
+                icon={Users2}
+                title="关系档案"
+                description="每段关系都带着状态、影响、互动事件、边界和未完成重量。"
+              />
+
+              <div className="mt-5 space-y-4">
+                {relationshipsModule.circles.some((circle) => circle.entries.length > 0) ? (
+                  relationshipsModule.circles.map((circle) => (
+                    <RelationshipCircleSection
+                      key={circle.id}
+                      circleTitle={circle.title}
+                      entries={circle.entries}
+                    />
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下还没有可展示的关系条目。" compact />
+                )}
+              </div>
+            </Surface>
+
+            <div className="space-y-4">
+              <Surface className="p-5">
+                <SectionHeading
+                  icon={MessageCircleMore}
+                  title="想说的话"
+                  description="它支持写给现有关系、独立对象，也支持写给未来的自己。"
+                />
+
+                <div className="mt-5 space-y-3">
+                  {sortedUnsentNotes.length > 0 ? (
+                    sortedUnsentNotes.map((note) => (
+                      <UnsentNoteCard
+                        key={note.id}
+                        note={note}
+                        relationshipById={relationshipById}
+                      />
+                    ))
+                  ) : (
+                    <EmptyState message="当前筛选下没有未发送表达。" compact />
+                  )}
+                </div>
+              </Surface>
+
+              <Surface className="p-5">
+                <SectionHeading
+                  icon={Activity}
+                  title="跨关系模式"
+                  description="从单段关系跳出来，看自己在关系里反复扮演什么角色。"
+                />
+
+                <div className="mt-5 space-y-3">
+                  {relationshipsModule.patterns.length > 0 ? (
+                    relationshipsModule.patterns.map((pattern) => (
+                      <RelationshipPatternCard key={pattern.id} pattern={pattern} />
+                    ))
+                  ) : (
+                    <EmptyState message="当前筛选下没有可展示的关系模式。" compact />
+                  )}
+                </div>
+              </Surface>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function RelationshipsFixedDashboard({
+  classificationSections,
+  relationshipById,
+  relationships,
+  relationshipsModule,
+  sortedUnsentNotes,
+  unfinishedRows,
+}: {
+  classificationSections: Array<{
+    title: string
+    description: string
+    rows: DistributionRow[]
+  }>
+  relationshipById: Map<string, RelationshipPerson>
+  relationships: RelationshipPerson[]
+  relationshipsModule: RelationshipMap
+  sortedUnsentNotes: RelationshipUnsentNote[]
+  unfinishedRows: DistributionRow[]
+}) {
+  const featuredHeavyRelationships = relationships
+    .filter((relationship) => relationship.unfinishedWeight === "很重")
+    .slice(0, 3)
+  const fallbackFeaturedRelationships = relationships
+    .filter((relationship) => relationship.impact === "消耗")
+    .slice(0, 3)
+  const visibleFeaturedRelationships =
+    featuredHeavyRelationships.length > 0
+      ? featuredHeavyRelationships
+      : fallbackFeaturedRelationships
+  const visiblePatterns = relationshipsModule.patterns.slice(0, 3)
+  const visibleUnsentNotes = sortedUnsentNotes.slice(0, 2)
+
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.94fr)_minmax(0,1.08fr)_minmax(320px,0.9fr)] grid-rows-[minmax(0,0.9fr)_minmax(0,1fr)] gap-3 overflow-hidden">
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+          <div className="grid gap-2 min-[1240px]:grid-cols-5">
             {classificationSections.map((section) => (
               <ClassificationPanel
                 key={section.title}
@@ -248,7 +357,7 @@ export function RelationshipsPage({
             ))}
           </div>
 
-          <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+          <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
               unfinished_weight 标注
             </div>
@@ -269,91 +378,105 @@ export function RelationshipsPage({
                 ))}
             </div>
           </div>
-        </Surface>
+        </div>
+      </Surface>
 
-        <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(0,0.82fr)]">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Users2}
-              title="关系档案"
-              description="每段关系都带着状态、影响、互动事件、边界和未完成重量。"
-            />
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="space-y-2">
+            {visibleFeaturedRelationships.length > 0 ? (
+              visibleFeaturedRelationships.map((relationship) => (
+                <RelationshipSignalCard key={relationship.id} relationship={relationship} />
+              ))
+            ) : (
+              <EmptyState message="当前筛选下没有重点关系。" compact />
+            )}
+          </div>
 
-            <div className="mt-5 space-y-4">
+          <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+            {visibleUnsentNotes.length > 0 ? (
+              visibleUnsentNotes.map((note) => (
+                <UnsentNoteCard
+                  key={note.id}
+                  note={note}
+                  relationshipById={relationshipById}
+                  compact
+                />
+              ))
+            ) : (
+              <EmptyState message="当前筛选下没有未发送表达。" compact />
+            )}
+          </div>
+        </div>
+      </Surface>
+
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <Tabs defaultValue="directory" className="min-h-0 flex-1">
+          <TabsList className="w-full justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
+            <TabsTrigger value="directory">关系档案</TabsTrigger>
+            <TabsTrigger value="unsent">想说的话</TabsTrigger>
+            <TabsTrigger value="patterns">跨关系模式</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="directory" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-3">
               {relationshipsModule.circles.some((circle) => circle.entries.length > 0) ? (
                 relationshipsModule.circles.map((circle) => (
                   <RelationshipCircleSection
                     key={circle.id}
                     circleTitle={circle.title}
                     entries={circle.entries}
+                    compact
                   />
                 ))
               ) : (
                 <EmptyState message="当前筛选下还没有可展示的关系条目。" compact />
               )}
             </div>
-          </Surface>
+          </TabsContent>
 
-          <div className="space-y-4">
-            <Surface className="p-5">
-              <SectionHeading
-                icon={MessageCircleMore}
-                title="想说的话"
-                description="它支持写给现有关系、独立对象，也支持写给未来的自己。"
-              />
+          <TabsContent value="unsent" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {sortedUnsentNotes.length > 0 ? (
+                sortedUnsentNotes.map((note) => (
+                  <UnsentNoteCard
+                    key={note.id}
+                    note={note}
+                    relationshipById={relationshipById}
+                    compact
+                  />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下没有未发送表达。" compact />
+              )}
+            </div>
+          </TabsContent>
 
-              <div className="mt-5 space-y-3">
-                {sortedUnsentNotes.length > 0 ? (
-                  sortedUnsentNotes.map((note) => (
-                    <UnsentNoteCard key={note.id} note={note} relationshipById={relationshipById} />
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下没有未发送表达。" compact />
-                )}
-              </div>
-            </Surface>
+          <TabsContent value="patterns" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {relationshipsModule.patterns.length > 0 ? (
+                relationshipsModule.patterns.map((pattern) => (
+                  <RelationshipPatternCard key={pattern.id} pattern={pattern} compact />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下没有可展示的关系模式。" compact />
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </Surface>
 
-            <Surface className="p-5">
-              <SectionHeading
-                icon={Activity}
-                title="跨关系模式"
-                description="从单段关系跳出来，看自己在关系里反复扮演什么角色。"
-              />
-
-              <div className="mt-5 space-y-3">
-                {relationshipsModule.patterns.length > 0 ? (
-                  relationshipsModule.patterns.map((pattern) => (
-                    <div
-                      key={pattern.id}
-                      className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
-                    >
-                      <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                        {pattern.title}
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {pattern.summary}
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {pattern.cues.map((cue) => (
-                          <Badge
-                            key={cue}
-                            variant="outline"
-                            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-                          >
-                            {cue}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下没有可展示的关系模式。" compact />
-                )}
-              </div>
-            </Surface>
-          </div>
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          {visiblePatterns.length > 0 ? (
+            visiblePatterns.map((pattern) => (
+              <RelationshipPatternCard key={pattern.id} pattern={pattern} compact />
+            ))
+          ) : (
+            <EmptyState message="当前筛选下没有可展示的关系模式。" compact />
+          )}
         </div>
-      </div>
+      </Surface>
     </div>
   )
 }
@@ -410,14 +533,28 @@ function ClassificationPanel({
 function RelationshipCircleSection({
   circleTitle,
   entries,
+  compact = false,
 }: {
   circleTitle: string
   entries: RelationshipPerson[]
+  compact?: boolean
 }) {
   return (
-    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+    <div
+      className={cn(
+        "rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4",
+        compact && "px-3 py-3",
+      )}
+    >
       <div className="flex flex-wrap items-center gap-2">
-        <h3 className="text-base font-medium text-[color:var(--text-primary)]">{circleTitle}</h3>
+        <h3
+          className={cn(
+            "text-base font-medium text-[color:var(--text-primary)]",
+            compact && "text-sm",
+          )}
+        >
+          {circleTitle}
+        </h3>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
@@ -429,7 +566,7 @@ function RelationshipCircleSection({
       <div className="mt-4 space-y-3">
         {entries.length > 0 ? (
           entries.map((relationship) => (
-            <RelationshipCard key={relationship.id} relationship={relationship} />
+            <RelationshipCard key={relationship.id} relationship={relationship} compact={compact} />
           ))
         ) : (
           <EmptyState message="当前筛选下这个圈层没有可展示的人物。" compact />
@@ -439,9 +576,20 @@ function RelationshipCircleSection({
   )
 }
 
-function RelationshipCard({ relationship }: { relationship: RelationshipPerson }) {
+function RelationshipCard({
+  relationship,
+  compact = false,
+}: {
+  relationship: RelationshipPerson
+  compact?: boolean
+}) {
   return (
-    <article className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+    <article
+      className={cn(
+        "rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 py-4",
+        compact && "px-3 py-3",
+      )}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
           {relationship.type}
@@ -467,13 +615,23 @@ function RelationshipCard({ relationship }: { relationship: RelationshipPerson }
       </div>
 
       <div className="mt-3 flex flex-wrap items-baseline gap-2">
-        <h4 className="text-base font-medium text-[color:var(--text-primary)]">
+        <h4
+          className={cn(
+            "text-base font-medium text-[color:var(--text-primary)]",
+            compact && "text-sm",
+          )}
+        >
           {relationship.name}
         </h4>
         <span className="text-xs text-[color:var(--text-muted)]">{relationship.role}</span>
       </div>
 
-      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+      <p
+        className={cn(
+          "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
+          compact && "text-xs leading-5",
+        )}
+      >
         {relationship.influence}
       </p>
 
@@ -587,14 +745,21 @@ function RelationshipMeta({
 function UnsentNoteCard({
   note,
   relationshipById,
+  compact = false,
 }: {
   note: RelationshipUnsentNote
   relationshipById: Map<string, RelationshipPerson>
+  compact?: boolean
 }) {
   const relationship = note.relationshipId ? relationshipById.get(note.relationshipId) : null
 
   return (
-    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+    <article
+      className={cn(
+        "rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4",
+        compact && "px-3 py-3",
+      )}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <Badge
           variant="outline"
@@ -614,7 +779,80 @@ function UnsentNoteCard({
           关联关系：{relationship.name}
         </div>
       ) : null}
-      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{note.excerpt}</p>
+      <p
+        className={cn(
+          "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
+          compact && "text-xs leading-5",
+        )}
+      >
+        {note.excerpt}
+      </p>
     </article>
+  )
+}
+
+function RelationshipPatternCard({
+  pattern,
+  compact = false,
+}: {
+  pattern: RelationshipMap["patterns"][number]
+  compact?: boolean
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4",
+        compact && "px-3 py-3",
+      )}
+    >
+      <div
+        className={cn("text-sm font-medium text-[color:var(--text-primary)]", compact && "text-xs")}
+      >
+        {pattern.title}
+      </div>
+      <p
+        className={cn(
+          "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
+          compact && "text-xs leading-5",
+        )}
+      >
+        {pattern.summary}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {pattern.cues.map((cue) => (
+          <Badge
+            key={cue}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {cue}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function RelationshipSignalCard({ relationship }: { relationship: RelationshipPerson }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
+          {relationship.type}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {relationship.unfinishedWeight ?? relationship.impact}
+        </Badge>
+      </div>
+      <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">
+        {relationship.name}
+      </div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
+        {relationship.currentState}
+      </p>
+    </div>
   )
 }

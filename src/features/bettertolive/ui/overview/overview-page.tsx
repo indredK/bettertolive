@@ -16,74 +16,33 @@ import {
   Waypoints,
 } from "lucide-react"
 
-import type {
-  AppView,
-  EventEntry,
-  RecentRecord,
-  ReflectionEntry,
-  TransactionEntry,
-} from "@/features/bettertolive/types"
+import type { AppView, RecentRecord } from "@/features/bettertolive/types"
 import {
   EmptyState,
   PageIntro,
   QuickActionButton,
   RecordStream,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
 import { cn } from "@/lib/utils"
 
 export function OverviewPage({
   greeting,
   dailyPulse,
-  reflections,
-  events,
-  transactions,
   recentRecords,
-  emotionCheckInCount,
-  emotionTrendCount,
-  crisisStepCount,
-  beliefCount,
-  principleCount,
-  relationshipCount,
-  journeyStageCount,
-  journeyNodeCount,
-  legacyDirectiveCount,
-  legacyLetterCount,
-  shoppingCount,
-  futureMilestoneCount,
   onNavigate,
   searchQuery,
   isStackedLayout = false,
 }: {
   greeting: string
   dailyPulse: string[]
-  reflections: ReflectionEntry[]
-  events: EventEntry[]
-  transactions: TransactionEntry[]
   recentRecords: RecentRecord[]
-  emotionCheckInCount: number
-  emotionTrendCount: number
-  crisisStepCount: number
-  beliefCount: number
-  principleCount: number
-  relationshipCount: number
-  journeyStageCount: number
-  journeyNodeCount: number
-  legacyDirectiveCount: number
-  legacyLetterCount: number
-  shoppingCount: number
-  futureMilestoneCount: number
   onNavigate: (view: AppView) => void
   searchQuery: string
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
-  const expenseTotal = transactions
-    .filter((entry) => entry.direction === "expense")
-    .reduce((sum, entry) => sum + entry.amount, 0)
 
   return (
     <div
@@ -106,50 +65,6 @@ export function OverviewPage({
         )}
       >
         <div className={cn("space-y-4", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
-          <div
-            className={cn(
-              "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-3",
-              isFixedLayout && "shrink-0",
-            )}
-          >
-            <SummarySurface
-              tone="value"
-              title="形成"
-              value={`${journeyStageCount + journeyNodeCount} 段线索`}
-              detail={`${relationshipCount} 个关键关系、${principleCount} 条原则和 ${journeyNodeCount} 段人生节点正在解释你为什么会这样。`}
-            />
-            <SummarySurface
-              tone="past"
-              title="过去"
-              value={`${reflections.length + events.length} 条记录`}
-              detail={`${events.length} 条记事和 ${journeyNodeCount} 段人生节点正在补全你的来路。`}
-            />
-            <SummarySurface
-              tone="present"
-              title="现在"
-              value={MONEY_FORMATTER.format(expenseTotal)}
-              detail={`${shoppingCount} 个购物条目和 ${emotionCheckInCount} 条情绪记录一起反映最近生活。`}
-            />
-            <SummarySurface
-              tone="present"
-              title="内在状态"
-              value={`${emotionTrendCount} 段波动`}
-              detail={`${crisisStepCount} 条危机支持步骤，让低谷时也能知道下一步。`}
-            />
-            <SummarySurface
-              tone="future"
-              title="生命整理"
-              value={`${legacyLetterCount} 条留言`}
-              detail={`${legacyDirectiveCount} 项重要交代正在把重要的话和托付安放下来。`}
-            />
-            <SummarySurface
-              tone="future"
-              title="未来"
-              value={`${futureMilestoneCount} 条阶段路径`}
-              detail={`${beliefCount} 个观念角度正在帮你定义自己想去哪里。`}
-            />
-          </div>
-
           <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-1 flex-col")}>
             <SectionHeading
               icon={CalendarDays}

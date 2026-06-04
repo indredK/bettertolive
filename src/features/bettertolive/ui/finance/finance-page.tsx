@@ -6,7 +6,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
@@ -14,18 +13,17 @@ import { cn } from "@/lib/utils"
 
 export function FinancePage({
   transactions,
-  expenseTotal,
-  incomeTotal,
   searchQuery,
   isStackedLayout = false,
 }: {
   transactions: TransactionEntry[]
-  expenseTotal: number
-  incomeTotal: number
   searchQuery: string
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
+  const expenseTotal = transactions
+    .filter((entry) => entry.direction === "expense")
+    .reduce((sum, entry) => sum + entry.amount, 0)
   const spendingByCategory = transactions
     .filter((entry) => entry.direction === "expense")
     .reduce<Record<string, number>>((accumulator, entry) => {
@@ -48,27 +46,6 @@ export function FinancePage({
         description="这里先不追求复杂财务管理，而是帮助你看清自己到底正在怎样生活。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="present"
-          title="本周支出"
-          value={MONEY_FORMATTER.format(expenseTotal)}
-          detail="把钱花向哪里，通常比说自己重视什么更诚实。"
-        />
-        <SummarySurface
-          tone="value"
-          title="最近收入"
-          value={MONEY_FORMATTER.format(incomeTotal)}
-          detail="自由度需要被现金流支撑，现实感也值得被看见。"
-        />
-        <SummarySurface
-          tone="past"
-          title="消费类别"
-          value={`${categoryRows.length} 类`}
-          detail="先看类型，再谈优化。趋势会慢慢浮出来。"
-        />
-      </div>
 
       <div
         className={cn(

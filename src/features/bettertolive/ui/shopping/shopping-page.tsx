@@ -35,7 +35,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import {
@@ -832,13 +831,11 @@ function PurchaseDecisionCard({
 
 export function ShoppingPage({
   shopping,
-  visibleCount,
   searchQuery,
   isWideLayout = false,
   isStackedLayout = false,
 }: {
   shopping: ShoppingModuleData
-  visibleCount: number
   searchQuery: string
   isWideLayout?: boolean
   isStackedLayout?: boolean
@@ -877,7 +874,6 @@ export function ShoppingPage({
       isActive: owned.length + planned.length > 0,
     }
   })
-  const activeSystemCount = activeSystems.filter((item) => item.isActive).length
   const selectedSystem = activeSystems.find((item) => item.id === selectedSystemId) ?? null
   const systemRows = chunkList(activeSystems, 7)
 
@@ -1082,43 +1078,6 @@ export function ShoppingPage({
         description="先用只读方式把分类体系立起来，再决定以后要不要做录入和操作。"
         searchQuery={searchQuery}
       />
-
-      <div
-        className={cn(
-          "grid gap-4 min-[960px]:grid-cols-2 min-[1440px]:grid-cols-4",
-          isFixedLayout && "shrink-0",
-          isWideLayout && "gap-3",
-        )}
-      >
-        <SummarySurface
-          tone="present"
-          title="系统覆盖"
-          value={`${activeSystemCount} / ${shopping.systemDefinitions.length} 个系统`}
-          detail="先看生活哪些系统已经有条目，哪些还只是模糊感受。"
-          compact={isWideLayout}
-        />
-        <SummarySurface
-          tone="value"
-          title="必要缺口"
-          value={`${priorityItems.length} 条`}
-          detail="最低配置和必要项是当前最真实的待补清单。"
-          compact={isWideLayout}
-        />
-        <SummarySurface
-          tone="past"
-          title="采购判断"
-          value={`${visibleCount} 条`}
-          detail="先把立即补齐、等好价和先不买分开，再把动作节奏放回生命周期里看。"
-          compact={isWideLayout}
-        />
-        <SummarySurface
-          tone="future"
-          title="折旧提醒"
-          value={`${fastDepreciationWarnings.length} 条`}
-          detail="depreciation 只服务单件决策，尤其用来拦住高折旧的幸福感消费。"
-          compact={isWideLayout}
-        />
-      </div>
 
       <Tabs
         defaultValue="overview"

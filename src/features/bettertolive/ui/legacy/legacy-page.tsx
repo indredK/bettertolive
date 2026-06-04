@@ -1,6 +1,7 @@
 import { BookOpenText, CheckCheck, Lock, ScrollText, Shield, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EmotionalLoad,
   LegacyCategory,
@@ -15,7 +16,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -89,7 +89,6 @@ export function LegacyPage({
 }) {
   const isFixedLayout = !isStackedLayout
   const items = legacy.items
-  const keyInformationCount = items.filter((item) => item.urgency === "关键信息").length
   const delayedDeliveryCount = items.filter(
     (item) => item.visibility === "我离世后" || item.visibility === "条件触发",
   ).length
@@ -137,38 +136,6 @@ export function LegacyPage({
         description="这页承接告别、托付、人生回顾和纪念偏好。它保持冷静和私密，不把沉重内容做成催促。"
         searchQuery={searchQuery}
       />
-
-      <div
-        className={cn(
-          "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4",
-          isFixedLayout && "shrink-0",
-        )}
-      >
-        <SummarySurface
-          tone="present"
-          title="整理内容"
-          value={`${items.length} 份`}
-          detail="每份内容都带着 5 维分类，便于看覆盖度和完成度。"
-        />
-        <SummarySurface
-          tone="value"
-          title="关键信息"
-          value={`${keyInformationCount} 份`}
-          detail="这类内容缺失时，后续事务最容易无法接手。"
-        />
-        <SummarySurface
-          tone="future"
-          title="延后交付"
-          value={`${delayedDeliveryCount} 份`}
-          detail="离世后或条件触发的内容，必须有清楚的交付描述。"
-        />
-        <SummarySurface
-          tone="past"
-          title="心力与锁定"
-          value={`${heavyLoadCount} 重 / ${lockedCount} 锁`}
-          detail="情感负荷只做温和标注；最终版修改需要主动解锁。"
-        />
-      </div>
 
       {isFixedLayout ? (
         <LegacyFixedDashboard
@@ -366,94 +333,115 @@ function LegacyFixedDashboard({
 
   return (
     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.95fr)_minmax(0,1.12fr)_minmax(320px,0.82fr)] grid-rows-[minmax(0,0.86fr)_minmax(0,1fr)] gap-3 overflow-hidden">
-      <Surface className="col-span-2 min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={Waypoints}
-          title="5 维生命整理分类"
-          description="把内容先压成分布图，再把重的部分留到条目里温和提示。"
-        />
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="grid gap-2 min-[1240px]:grid-cols-5">
+            {classificationSections.map((section) => (
+              <CompactDistributionPanel
+                key={section.title}
+                title={section.title}
+                rows={section.rows}
+              />
+            ))}
+          </div>
 
-        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-5">
-          {classificationSections.map((section) => (
-            <CompactDistributionPanel
-              key={section.title}
-              title={section.title}
-              rows={section.rows}
+          <div className="grid gap-2 min-[1240px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <CompactAssessmentPanel
+              title="emotional_load"
+              description="不进入主筛选器，只提示打开这份内容需要多少心力。"
+              rows={emotionalLoadRows}
             />
-          ))}
-        </div>
-
-        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <CompactAssessmentPanel
-            title="emotional_load"
-            description="不进入主筛选器，只提示打开这份内容需要多少心力。"
-            rows={emotionalLoadRows}
-          />
-          <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
-            <div className="text-xs font-medium text-[color:var(--text-primary)]">交付与锁定</div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <Badge className="bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]">
-                延后/条件 {delayedDeliveryCount}
-              </Badge>
-              <Badge className="bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]">
-                最终锁定 {lockedCount}
-              </Badge>
-              <Badge
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-              >
-                不自动汇总私密内容
-              </Badge>
+            <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+              <div className="text-xs font-medium text-[color:var(--text-primary)]">交付与锁定</div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <Badge className="bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]">
+                  延后/条件 {delayedDeliveryCount}
+                </Badge>
+                <Badge className="bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]">
+                  最终锁定 {lockedCount}
+                </Badge>
+                <Badge
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                >
+                  不自动汇总私密内容
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
       </Surface>
 
-      <Surface className="row-span-2 min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={ScrollText}
-          title="生命整理条目"
-          description="只展开最需要扫描的几份，剩余数量留作导航提示。"
-        />
-
-        <div className="mt-3 grid gap-2">
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {featuredItems.length > 0 ? (
             featuredItems.map((item) => <LegacyCompactItemCard key={item.id} item={item} />)
           ) : (
             <EmptyState message="当前筛选下没有生命整理内容。" compact />
           )}
-          {remainingItemCount > 0 ? (
-            <RemainingLine label={`还有 ${remainingItemCount} 份内容未展开`} />
-          ) : null}
+          <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+            {visibleTrustBoundaries.map((boundary) => (
+              <CompactTextBlock key={boundary.id} title={boundary.title} detail={boundary.detail} />
+            ))}
+          </div>
         </div>
       </Surface>
 
-      <Surface className="min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={Shield}
-          title="信任与交付边界"
-          description="先看边界，再决定打开哪一份。"
-        />
+      <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
+        <Tabs defaultValue="entries" className="min-h-0 flex-1">
+          <TabsList className="w-full justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
+            <TabsTrigger value="entries">生命整理条目</TabsTrigger>
+            <TabsTrigger value="boundaries">交付边界</TabsTrigger>
+            <TabsTrigger value="review">回看问题</TabsTrigger>
+          </TabsList>
 
-        <div className="mt-3 grid gap-2">
-          {visibleTrustBoundaries.map((boundary) => (
-            <CompactTextBlock key={boundary.id} title={boundary.title} detail={boundary.detail} />
-          ))}
-        </div>
+          <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {items.length > 0 ? (
+                items.map((item) => <LegacyCompactItemCard key={item.id} item={item} />)
+              ) : (
+                <EmptyState message="当前筛选下没有生命整理内容。" compact />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="boundaries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {legacy.trustBoundaries.length > 0 ? (
+                legacy.trustBoundaries.map((boundary) => (
+                  <CompactTextBlock
+                    key={boundary.id}
+                    title={boundary.title}
+                    detail={boundary.detail}
+                  />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下没有边界说明。" compact />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="review" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              {legacy.reviewPrompts.length > 0 ? (
+                legacy.reviewPrompts.map((prompt) => (
+                  <div
+                    key={prompt}
+                    className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs leading-5 text-[color:var(--text-secondary)]"
+                  >
+                    {prompt}
+                  </div>
+                ))
+              ) : (
+                <EmptyState message="当前筛选下没有回看问题。" compact />
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </Surface>
 
-      <Surface className="min-h-0 overflow-hidden p-4">
-        <SectionHeading
-          compact
-          icon={CheckCheck}
-          title="回看与完成度"
-          description="用少量提示替代长列表滚动。"
-        />
-
-        <div className="mt-3 grid gap-2">
+      <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+        <div className="grid min-h-0 flex-1 gap-2 overflow-y-auto pr-1">
           <CompletionLine
             label="最终版锁定"
             value={`${lockedCount} 份`}
@@ -464,14 +452,19 @@ function LegacyFixedDashboard({
             value={`${heavyLoadCount} 份`}
             detail="适合在状态稳定时再打开。"
           />
-          {visiblePrompts.map((prompt) => (
-            <div
-              key={prompt}
-              className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs leading-5 text-[color:var(--text-secondary)]"
-            >
-              {prompt}
-            </div>
-          ))}
+          <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+            {visiblePrompts.map((prompt) => (
+              <div
+                key={prompt}
+                className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs leading-5 text-[color:var(--text-secondary)]"
+              >
+                {prompt}
+              </div>
+            ))}
+            {remainingItemCount > 0 ? (
+              <RemainingLine label={`还有 ${remainingItemCount} 份内容未展开`} />
+            ) : null}
+          </div>
         </div>
       </Surface>
     </div>

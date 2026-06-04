@@ -6,7 +6,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -37,27 +36,6 @@ export function BeliefsPage({
         description="这里承接人生观、世界观和价值观。它不是口号区，而是帮助你理解自己为什么会这样判断、这样选择。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="past"
-          title="观念层"
-          value={`${beliefCards.length} 个角度`}
-          detail="先把世界观、人生观、价值观分开写清。"
-        />
-        <SummarySurface
-          tone="value"
-          title="核心问题"
-          value={`${questions.length} 条`}
-          detail="很多观念不是答案，而是反复出现的问题。"
-        />
-        <SummarySurface
-          tone="future"
-          title="作用"
-          value="解释选择"
-          detail="理解自己怎么看世界，才能看懂日常判断的来源。"
-        />
-      </div>
 
       <div
         className={cn(

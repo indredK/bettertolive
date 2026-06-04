@@ -6,7 +6,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -43,27 +42,6 @@ export function CrisisPage({
         description="这页不是替代现实支持，而是在你已经明显失衡的时候，给出一个足够简单、能立刻执行的支撑层。"
         searchQuery={searchQuery}
       />
-
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
-        <SummarySurface
-          tone="future"
-          title="当前判断"
-          value={currentState.level}
-          detail={currentState.summary}
-        />
-        <SummarySurface
-          tone="past"
-          title="预警信号"
-          value={`${warningSigns.length} 个`}
-          detail="越早认出下滑信号，越容易在彻底崩住前做动作。"
-        />
-        <SummarySurface
-          tone="value"
-          title="支持资源"
-          value={`${contacts.length + steps.length} 条`}
-          detail="低谷时别追求全面，只要先找到一条能执行的路。"
-        />
-      </div>
 
       <div
         className={cn(

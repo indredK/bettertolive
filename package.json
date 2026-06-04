@@ -18,7 +18,6 @@
     "fix:precommit": "bash ./scripts/pre-commit-auto-fix.sh",
     "check:precommit": "bash ./scripts/pre-commit-strict.sh",
     "test": "vitest",
-    "test:run": "vitest run",
     "analyze:bundle": "bun run lint && bun run typecheck && vite build --mode analyze",
     "changeset": "changeset",
     "version:packages": "changeset version",

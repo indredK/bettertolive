@@ -385,8 +385,6 @@ export function BetterToLiveAppShell() {
         return (
           <FinancePage
             transactions={viewModel.transactions}
-            expenseTotal={viewModel.visibleExpenseTotal}
-            incomeTotal={viewModel.visibleIncomeTotal}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -395,7 +393,6 @@ export function BetterToLiveAppShell() {
         return (
           <ShoppingPage
             shopping={viewModel.shoppingModule}
-            visibleCount={viewModel.visibleShoppingCount}
             searchQuery={searchQuery}
             isWideLayout={isWideLayout}
             isStackedLayout={isStackedLayout}
@@ -453,7 +450,6 @@ export function BetterToLiveAppShell() {
         return (
           <RelationshipsPage
             relationshipsModule={viewModel.relationshipsModule}
-            visibleRelationshipCount={viewModel.visibleRelationshipCount}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -497,23 +493,8 @@ export function BetterToLiveAppShell() {
         return (
           <OverviewPage
             dailyPulse={viewModel.dailyPulse}
-            reflections={viewModel.reflections}
-            events={viewModel.events}
-            futureMilestoneCount={viewModel.futureBlueprint.milestones.length}
             greeting={viewModel.greeting}
-            transactions={viewModel.transactions}
             recentRecords={viewModel.recentRecords}
-            emotionCheckInCount={viewModel.emotionCheckIns.length}
-            emotionTrendCount={viewModel.emotionTrend.length}
-            crisisStepCount={viewModel.crisisSteps.length}
-            beliefCount={viewModel.beliefCards.length}
-            principleCount={viewModel.principles.length}
-            relationshipCount={viewModel.visibleRelationshipCount}
-            journeyStageCount={viewModel.journeyData.growthNodes.length}
-            journeyNodeCount={viewModel.journeyData.memories.length}
-            legacyDirectiveCount={viewModel.legacyDirectives.length}
-            legacyLetterCount={viewModel.legacyLetters.length}
-            shoppingCount={viewModel.visibleShoppingCount}
             onNavigate={setActiveView}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}

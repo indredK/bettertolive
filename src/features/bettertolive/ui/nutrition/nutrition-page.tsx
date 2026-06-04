@@ -27,7 +27,6 @@ import {
   EmptyState,
   PageIntro,
   SectionHeading,
-  SummarySurface,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
@@ -132,12 +131,6 @@ export function NutritionPage({
   const meals = nutrition.meals
   const weeklyReview = nutrition.weeklyReview
   const foodMemories = nutrition.foodMemories
-  const homeCookedCount = meals.filter((meal) => meal.scene === "在家做").length
-  const beverageCount = meals.filter((meal) => meal.structure === "饮品").length
-  const highValueComfortCount = meals.filter(
-    (meal) => meal.valueDensity === "高" && meal.bodyFeedback === "满足舒服",
-  ).length
-  const totalCost = meals.reduce((sum, meal) => sum + (meal.cost ?? 0), 0)
   const classificationSections = [
     {
       title: "场景",
@@ -206,38 +199,6 @@ export function NutritionPage({
         description="这页不做卡路里精算，而是把场景、结构、构成、来源、触发和身体反馈放在一起看。"
         searchQuery={searchQuery}
       />
-
-      <div
-        className={cn(
-          "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4",
-          isFixedLayout && "shrink-0",
-        )}
-      >
-        <SummarySurface
-          tone="present"
-          title="进食记录"
-          value={`${meals.length} 次`}
-          detail="每次进食都带着 5 维分类和饭后评估。"
-        />
-        <SummarySurface
-          tone="value"
-          title="高密度舒服"
-          value={`${highValueComfortCount} 次`}
-          detail="钱花得值，身体也接得住的组合。"
-        />
-        <SummarySurface
-          tone="past"
-          title="本周花费"
-          value={MONEY_FORMATTER.format(totalCost)}
-          detail="花费只作为 value_density 的参考，不替代身体反馈。"
-        />
-        <SummarySurface
-          tone="future"
-          title="食物记忆"
-          value={`${foodMemories.length} 条`}
-          detail={`${homeCookedCount} 次在家做，${beverageCount} 次饮品单独进入视图。`}
-        />
-      </div>
 
       {isFixedLayout ? (
         <NutritionFixedDashboard
