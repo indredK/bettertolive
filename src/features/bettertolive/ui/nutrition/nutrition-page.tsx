@@ -239,195 +239,505 @@ export function NutritionPage({
         />
       </div>
 
-      <div className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
-        <Surface className="p-5">
-          <SectionHeading
-            icon={Waypoints}
-            title="5 维饮食分类"
-            description="这些维度负责分组和观察饮食结构；value_density 与 body_feedback 留在条目详情和交叉视图里。"
-          />
+      {isFixedLayout ? (
+        <NutritionFixedDashboard
+          beverageRows={beverageRows}
+          bodyFeedbackRows={bodyFeedbackRows}
+          classificationSections={classificationSections}
+          foodMemories={foodMemories}
+          meals={meals}
+          nutrition={nutrition}
+          valueDensityRows={valueDensityRows}
+          weeklyReview={weeklyReview}
+        />
+      ) : null}
 
-          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
-            {classificationSections.map((section) => (
-              <ClassificationPanel
-                key={section.title}
-                title={section.title}
-                description={section.description}
-                rows={section.rows}
-                total={meals.length}
-              />
-            ))}
-          </div>
-
-          <div className="mt-4 grid gap-3 min-[960px]:grid-cols-3">
-            <AssessmentPanel
-              title="饮品子标签"
-              description="structure=饮品 时，用它区分咖啡因、酒精、糖等影响。"
-              rows={beverageRows}
-            />
-            <AssessmentPanel
-              title="value_density"
-              description="判断这一顿钱花得值不值，不进入主筛选器。"
-              rows={valueDensityRows}
-            />
-            <AssessmentPanel
-              title="body_feedback"
-              description="饭后一段时间再看身体怎么说，不做道德提醒。"
-              rows={bodyFeedbackRows}
-            />
-          </div>
-        </Surface>
-
-        <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.16fr)_minmax(0,0.84fr)]">
+      {!isFixedLayout ? (
+        <div className="space-y-4">
           <Surface className="p-5">
             <SectionHeading
-              icon={Utensils}
-              title="最近进食"
-              description="条目里始终显示两个评估属性，让“这一顿”本身可被判断。"
+              icon={Waypoints}
+              title="5 维饮食分类"
+              description="这些维度负责分组和观察饮食结构；value_density 与 body_feedback 留在条目详情和交叉视图里。"
             />
 
-            <div className="mt-5 space-y-4">
-              {meals.length > 0 ? (
-                meals.map((meal) => (
-                  <MealCard key={meal.id} meal={meal} foodMemories={foodMemories} />
-                ))
-              ) : (
-                <EmptyState message="当前筛选下没有进食记录。" compact />
-              )}
+            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+              {classificationSections.map((section) => (
+                <ClassificationPanel
+                  key={section.title}
+                  title={section.title}
+                  description={section.description}
+                  rows={section.rows}
+                  total={meals.length}
+                />
+              ))}
+            </div>
+
+            <div className="mt-4 grid gap-3 min-[960px]:grid-cols-3">
+              <AssessmentPanel
+                title="饮品子标签"
+                description="structure=饮品 时，用它区分咖啡因、酒精、糖等影响。"
+                rows={beverageRows}
+              />
+              <AssessmentPanel
+                title="value_density"
+                description="判断这一顿钱花得值不值，不进入主筛选器。"
+                rows={valueDensityRows}
+              />
+              <AssessmentPanel
+                title="body_feedback"
+                description="饭后一段时间再看身体怎么说，不做道德提醒。"
+                rows={bodyFeedbackRows}
+              />
             </div>
           </Surface>
 
-          <div className="space-y-4">
+          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.16fr)_minmax(0,0.84fr)]">
             <Surface className="p-5">
               <SectionHeading
-                icon={Shield}
-                title="饮食档案"
-                description="立场与意图是用户档案级设置，不塞进每顿饭的录入流程。"
+                icon={Utensils}
+                title="最近进食"
+                description="条目里始终显示两个评估属性，让“这一顿”本身可被判断。"
               />
 
-              <DietaryProfilePanel nutrition={nutrition} />
+              <div className="mt-5 space-y-4">
+                {meals.length > 0 ? (
+                  meals.map((meal) => (
+                    <MealCard key={meal.id} meal={meal} foodMemories={foodMemories} />
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下没有进食记录。" compact />
+                )}
+              </div>
+            </Surface>
+
+            <div className="space-y-4">
+              <Surface className="p-5">
+                <SectionHeading
+                  icon={Shield}
+                  title="饮食档案"
+                  description="立场与意图是用户档案级设置，不塞进每顿饭的录入流程。"
+                />
+
+                <DietaryProfilePanel nutrition={nutrition} />
+              </Surface>
+
+              <Surface className="p-5">
+                <SectionHeading
+                  icon={Salad}
+                  title="周回顾"
+                  description="看结构性发现，而不是给单顿贴好坏标签。"
+                />
+
+                <div className="mt-5 space-y-3">
+                  {weeklyReview.highlights.length > 0 ? (
+                    weeklyReview.highlights.map((highlight) => (
+                      <div
+                        key={highlight.id}
+                        className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
+                      >
+                        <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                          {highlight.title}
+                        </div>
+                        <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+                          {highlight.summary}
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <EmptyState message="当前筛选下没有周回顾发现。" compact />
+                  )}
+                </div>
+
+                {weeklyReview.missingSignals.length > 0 ? (
+                  <div className="mt-4 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                      本周几乎没出现的
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {weeklyReview.missingSignals.map((signal) => (
+                        <Badge
+                          key={signal}
+                          variant="outline"
+                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                        >
+                          {signal}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </Surface>
+            </div>
+          </div>
+
+          <div className="grid gap-4 min-[960px]:grid-cols-2">
+            <Surface className="p-5">
+              <SectionHeading
+                icon={Activity}
+                title="交叉视图"
+                description="评估属性不做主筛选，但适合放到回顾里和场景、触发交叉看。"
+              />
+
+              <div className="mt-5 space-y-4">
+                {weeklyReview.crossViews.length > 0 ? (
+                  weeklyReview.crossViews.map((crossView) => (
+                    <CrossViewCard key={crossView.id} crossView={crossView} />
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下没有交叉视图。" compact />
+                )}
+              </div>
             </Surface>
 
             <Surface className="p-5">
               <SectionHeading
-                icon={Salad}
-                title="周回顾"
-                description="看结构性发现，而不是给单顿贴好坏标签。"
+                icon={BookHeart}
+                title="食物记忆"
+                description="它记录一类食物在你心里的位置，不属于任何一次进食。"
               />
 
               <div className="mt-5 space-y-3">
-                {weeklyReview.highlights.length > 0 ? (
-                  weeklyReview.highlights.map((highlight) => (
-                    <div
-                      key={highlight.id}
-                      className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
-                    >
-                      <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                        {highlight.title}
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {highlight.summary}
-                      </p>
-                    </div>
+                {foodMemories.length > 0 ? (
+                  foodMemories.map((foodMemory) => (
+                    <FoodMemoryCard key={foodMemory.id} foodMemory={foodMemory} />
                   ))
                 ) : (
-                  <EmptyState message="当前筛选下没有周回顾发现。" compact />
+                  <EmptyState message="当前筛选下还没有食物记忆。" compact />
                 )}
               </div>
-
-              {weeklyReview.missingSignals.length > 0 ? (
-                <div className="mt-4 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    本周几乎没出现的
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {weeklyReview.missingSignals.map((signal) => (
-                      <Badge
-                        key={signal}
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                      >
-                        {signal}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
             </Surface>
           </div>
-        </div>
-
-        <div className="grid gap-4 min-[960px]:grid-cols-2">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Activity}
-              title="交叉视图"
-              description="评估属性不做主筛选，但适合放到回顾里和场景、触发交叉看。"
-            />
-
-            <div className="mt-5 space-y-4">
-              {weeklyReview.crossViews.length > 0 ? (
-                weeklyReview.crossViews.map((crossView) => (
-                  <CrossViewCard key={crossView.id} crossView={crossView} />
-                ))
-              ) : (
-                <EmptyState message="当前筛选下没有交叉视图。" compact />
-              )}
-            </div>
-          </Surface>
 
           <Surface className="p-5">
             <SectionHeading
-              icon={BookHeart}
-              title="食物记忆"
-              description="它记录一类食物在你心里的位置，不属于任何一次进食。"
+              icon={CheckCheck}
+              title="模块边界"
+              description="饮食模块承接自我观察，不替代食谱库、营养计算器或专业营养建议。"
             />
 
-            <div className="mt-5 space-y-3">
-              {foodMemories.length > 0 ? (
-                foodMemories.map((foodMemory) => (
-                  <FoodMemoryCard key={foodMemory.id} foodMemory={foodMemory} />
-                ))
-              ) : (
-                <EmptyState message="当前筛选下还没有食物记忆。" compact />
-              )}
+            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-3">
+              {[
+                {
+                  title: "不做食谱库",
+                  detail: "在家做可以记录做法，但核心不是收藏菜谱，而是看自己如何吃。",
+                },
+                {
+                  title: "不精算卡路里",
+                  detail: "用 composition 和周回顾看结构性缺口，默认保持轻量。",
+                },
+                {
+                  title: "不做指责提示",
+                  detail: "硬约束只做事实标注，情绪性进食也只被记录，不被审判。",
+                },
+              ].map((entry) => (
+                <div
+                  key={entry.title}
+                  className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+                >
+                  <div className="font-medium text-[color:var(--text-primary)]">{entry.title}</div>
+                  <div className="mt-1">{entry.detail}</div>
+                </div>
+              ))}
             </div>
           </Surface>
         </div>
+      ) : null}
+    </div>
+  )
+}
 
-        <Surface className="p-5">
-          <SectionHeading
-            icon={CheckCheck}
-            title="模块边界"
-            description="饮食模块承接自我观察，不替代食谱库、营养计算器或专业营养建议。"
+function NutritionFixedDashboard({
+  beverageRows,
+  bodyFeedbackRows,
+  classificationSections,
+  foodMemories,
+  meals,
+  nutrition,
+  valueDensityRows,
+  weeklyReview,
+}: {
+  beverageRows: DistributionRow[]
+  bodyFeedbackRows: DistributionRow[]
+  classificationSections: Array<{
+    title: string
+    description: string
+    rows: DistributionRow[]
+  }>
+  foodMemories: NutritionFoodMemory[]
+  meals: NutritionMealEntry[]
+  nutrition: NutritionModuleData
+  valueDensityRows: DistributionRow[]
+  weeklyReview: NutritionModuleData["weeklyReview"]
+}) {
+  const featuredMeals = meals.slice(0, 3)
+  const featuredHighlights = weeklyReview.highlights.slice(0, 2)
+  const featuredCrossViews = weeklyReview.crossViews.slice(0, 2)
+  const featuredFoodMemories = foodMemories.slice(0, 2)
+  const remainingMealCount = Math.max(meals.length - featuredMeals.length, 0)
+
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.96fr)_minmax(0,1.08fr)_minmax(320px,0.86fr)] grid-rows-[minmax(0,0.9fr)_minmax(0,1fr)] gap-3 overflow-hidden">
+      <Surface className="col-span-2 min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Waypoints}
+          title="5 维饮食分类"
+          description="先把一周吃法压成结构分布，再看具体条目。"
+        />
+
+        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-5">
+          {classificationSections.map((section) => (
+            <CompactDistributionPanel
+              key={section.title}
+              title={section.title}
+              rows={section.rows}
+            />
+          ))}
+        </div>
+
+        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-3">
+          <CompactBadgeBlock title="饮品子标签" rows={beverageRows} />
+          <CompactBadgeBlock title="value_density" rows={valueDensityRows} />
+          <CompactBadgeBlock title="body_feedback" rows={bodyFeedbackRows} />
+        </div>
+      </Surface>
+
+      <Surface className="row-span-2 min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Utensils}
+          title="最近进食"
+          description="只展开近期几顿，避免记录区变成流水账。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          {featuredMeals.length > 0 ? (
+            featuredMeals.map((meal) => <CompactMealCard key={meal.id} meal={meal} />)
+          ) : (
+            <EmptyState message="当前筛选下没有进食记录。" compact />
+          )}
+          {remainingMealCount > 0 ? (
+            <RemainingLine label={`还有 ${remainingMealCount} 次进食未展开`} />
+          ) : null}
+        </div>
+      </Surface>
+
+      <Surface className="min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Shield}
+          title="饮食档案与周回顾"
+          description="档案级约束和结构性发现放在一起看。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          <CompactTextBlock
+            title="当前意图"
+            detail={`${nutrition.profile.currentIntent.mode}${
+              nutrition.profile.currentIntent.note
+                ? `：${nutrition.profile.currentIntent.note}`
+                : ""
+            }`}
           />
-
-          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-3">
-            {[
-              {
-                title: "不做食谱库",
-                detail: "在家做可以记录做法，但核心不是收藏菜谱，而是看自己如何吃。",
-              },
-              {
-                title: "不精算卡路里",
-                detail: "用 composition 和周回顾看结构性缺口，默认保持轻量。",
-              },
-              {
-                title: "不做指责提示",
-                detail: "硬约束只做事实标注，情绪性进食也只被记录，不被审判。",
-              },
-            ].map((entry) => (
-              <div
-                key={entry.title}
-                className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
-              >
-                <div className="font-medium text-[color:var(--text-primary)]">{entry.title}</div>
-                <div className="mt-1">{entry.detail}</div>
+          {featuredHighlights.map((highlight) => (
+            <CompactTextBlock
+              key={highlight.id}
+              title={highlight.title}
+              detail={highlight.summary}
+            />
+          ))}
+          {weeklyReview.missingSignals.length > 0 ? (
+            <div className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2">
+              <div className="text-xs font-medium text-[color:var(--text-primary)]">
+                本周几乎没出现的
               </div>
-            ))}
-          </div>
-        </Surface>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {weeklyReview.missingSignals.slice(0, 4).map((signal) => (
+                  <Badge
+                    key={signal}
+                    variant="outline"
+                    className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                  >
+                    {signal}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </Surface>
+
+      <Surface className="min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Activity}
+          title="交叉视图与食物记忆"
+          description="评估属性和记忆内容合并成扫描区。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          {featuredCrossViews.map((crossView) => (
+            <CompactCrossViewCard key={crossView.id} crossView={crossView} />
+          ))}
+          {featuredFoodMemories.map((foodMemory) => (
+            <CompactFoodMemoryCard key={foodMemory.id} foodMemory={foodMemory} />
+          ))}
+        </div>
+      </Surface>
+    </div>
+  )
+}
+
+function CompactDistributionPanel({ title, rows }: { title: string; rows: DistributionRow[] }) {
+  const visibleRows = rows.filter((row) => row.count > 0).slice(0, 3)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {visibleRows.length > 0 ? (
+          visibleRows.map((row) => (
+            <Badge
+              key={row.label}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {row.label} · {row.count}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+        )}
       </div>
+    </div>
+  )
+}
+
+function CompactBadgeBlock({ title, rows }: { title: string; rows: DistributionRow[] }) {
+  const visibleRows = rows.filter((row) => row.count > 0).slice(0, 4)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {visibleRows.length > 0 ? (
+          visibleRows.map((row) => (
+            <Badge
+              key={row.label}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {row.label} · {row.count}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function CompactMealCard({ meal }: { meal: NutritionMealEntry }) {
+  return (
+    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs font-medium text-[color:var(--text-primary)]">{meal.date}</span>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+        >
+          {meal.scene}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {meal.structure}
+        </Badge>
+      </div>
+      <div className="mt-2 truncate text-sm font-medium text-[color:var(--text-primary)]">
+        {meal.title}
+      </div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{meal.note}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {meal.composition ?? "饮品"}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {meal.valueDensity ?? "待评估"}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {meal.bodyFeedback ?? "待反馈"}
+        </Badge>
+      </div>
+    </article>
+  )
+}
+
+function CompactCrossViewCard({ crossView }: { crossView: NutritionCrossView }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{crossView.title}</div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
+        {crossView.summary}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {crossView.rows.slice(0, 3).map((row) => (
+          <Badge
+            key={`${crossView.id}-${row.label}`}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {row.label} · {row.count}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CompactFoodMemoryCard({ foodMemory }: { foodMemory: NutritionFoodMemory }) {
+  return (
+    <article className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <span className="text-xs font-medium text-[color:var(--text-primary)]">
+          {foodMemory.name}
+        </span>
+        <Badge className="bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]">
+          {foodMemory.emotionalLoad}
+        </Badge>
+      </div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
+        {foodMemory.story}
+      </p>
+    </article>
+  )
+}
+
+function CompactTextBlock({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{detail}</p>
+    </div>
+  )
+}
+
+function RemainingLine({ label }: { label: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs text-[color:var(--text-muted)]">
+      {label}
     </div>
   )
 }

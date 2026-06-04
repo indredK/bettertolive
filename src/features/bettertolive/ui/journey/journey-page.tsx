@@ -214,174 +214,468 @@ export function JourneyPage({
         />
       </div>
 
-      <div className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
-        <Surface className="p-5">
-          <SectionHeading
-            icon={Waypoints}
-            title="5 维分类概览"
-            description="这些维度负责组织和过滤人生档案；塑造力留在时间线和条目详情里。"
-          />
+      {isFixedLayout ? (
+        <JourneyFixedDashboard
+          classificationSections={classificationSections}
+          formativePowerRows={formativePowerRows}
+          journey={journey}
+          memoryById={memoryById}
+        />
+      ) : null}
 
-          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
-            {classificationSections.map((section) => (
-              <ClassificationPanel
-                key={section.title}
-                title={section.title}
-                description={section.description}
-                rows={section.rows}
-                total={journey.memories.length}
+      {!isFixedLayout ? (
+        <div className="space-y-4">
+          <Surface className="p-5">
+            <SectionHeading
+              icon={Waypoints}
+              title="5 维分类概览"
+              description="这些维度负责组织和过滤人生档案；塑造力留在时间线和条目详情里。"
+            />
+
+            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+              {classificationSections.map((section) => (
+                <ClassificationPanel
+                  key={section.title}
+                  title={section.title}
+                  description={section.description}
+                  rows={section.rows}
+                  total={journey.memories.length}
+                />
+              ))}
+            </div>
+
+            {journey.eraSuggestions.length > 0 || formativePowerRows.length > 0 ? (
+              <div className="mt-4 grid gap-3 min-[960px]:grid-cols-2">
+                {journey.eraSuggestions.length > 0 ? (
+                  <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                      默认时期提示
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {journey.eraSuggestions.map((era) => (
+                        <Badge
+                          key={era}
+                          variant="outline"
+                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                        >
+                          {era}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {formativePowerRows.length > 0 ? (
+                  <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                      塑造力标注
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                      跟随单条记忆显示，用来解释影响深度，不作为主筛选维度。
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {formativePowerRows.map((row) => (
+                        <Badge
+                          key={row.label}
+                          variant="outline"
+                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                        >
+                          {row.label} · {row.count}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </Surface>
+
+          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+            <Surface className="p-5">
+              <SectionHeading
+                icon={Route}
+                title="记忆时间线"
+                description="时间线按主时期排列，条目里始终显示塑造力，便于看清哪些经历真正改变了你。"
               />
-            ))}
+
+              <div className="mt-5 space-y-3">
+                {journey.memories.length > 0 ? (
+                  journey.memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
+                ) : (
+                  <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+                )}
+              </div>
+            </Surface>
+
+            <Surface className="p-5">
+              <SectionHeading
+                icon={Sprout}
+                title="成长节点"
+                description="当多条记忆指向同一个变化方向，它们就组成一个成长节点。"
+              />
+
+              <div className="mt-5 space-y-4">
+                {journey.growthNodes.length > 0 ? (
+                  journey.growthNodes.map((node) => (
+                    <GrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
+                )}
+              </div>
+            </Surface>
           </div>
 
-          {journey.eraSuggestions.length > 0 || formativePowerRows.length > 0 ? (
-            <div className="mt-4 grid gap-3 min-[960px]:grid-cols-2">
-              {journey.eraSuggestions.length > 0 ? (
-                <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    默认时期提示
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {journey.eraSuggestions.map((era) => (
-                      <Badge
-                        key={era}
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                      >
-                        {era}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+          <div className="grid gap-4 min-[960px]:grid-cols-2">
+            <Surface className="p-5">
+              <SectionHeading
+                icon={Camera}
+                title="感官锚点"
+                description="很多记忆不是从事件开始，而是被一个地点、一件物品或一张照片唤起来。"
+              />
 
-              {formativePowerRows.length > 0 ? (
-                <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    塑造力标注
-                  </div>
-                  <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                    跟随单条记忆显示，用来解释影响深度，不作为主筛选维度。
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {formativePowerRows.map((row) => (
-                      <Badge
-                        key={row.label}
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                      >
-                        {row.label} · {row.count}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </Surface>
+              <div className="mt-5 space-y-3">
+                {journey.anchors.length > 0 ? (
+                  journey.anchors.map((anchor) => (
+                    <AnchorRow key={anchor.id} anchor={anchor} memoryById={memoryById} />
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下还没有记忆锚点。" compact />
+                )}
+              </div>
+            </Surface>
 
-        <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Route}
-              title="记忆时间线"
-              description="时间线按主时期排列，条目里始终显示塑造力，便于看清哪些经历真正改变了你。"
-            />
+            <Surface className="p-5">
+              <SectionHeading
+                icon={BookHeart}
+                title="回看问题"
+                description="这些问题帮助你看见过去如何继续影响现在，而不是逼自己一次讲完。"
+              />
 
-            <div className="mt-5 space-y-3">
-              {journey.memories.length > 0 ? (
-                journey.memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
-              ) : (
-                <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
-              )}
-            </div>
-          </Surface>
+              <div className="mt-5 space-y-3">
+                {journey.reviewPrompts.length > 0 ? (
+                  journey.reviewPrompts.map((prompt) => (
+                    <div
+                      key={prompt}
+                      className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+                    >
+                      {prompt}
+                    </div>
+                  ))
+                ) : (
+                  <EmptyState message="当前筛选下没有回看问题。" compact />
+                )}
+              </div>
+            </Surface>
+          </div>
 
           <Surface className="p-5">
             <SectionHeading
-              icon={Sprout}
-              title="成长节点"
-              description="当多条记忆指向同一个变化方向，它们就组成一个成长节点。"
+              icon={CheckCheck}
+              title="当前还在生效的影响"
+              description="这些线索从成长节点里浮出来，适合和观念、原则、关系页面交叉回看。"
             />
 
-            <div className="mt-5 space-y-4">
-              {journey.growthNodes.length > 0 ? (
-                journey.growthNodes.map((node) => (
-                  <GrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
-                ))
-              ) : (
-                <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
-              )}
-            </div>
-          </Surface>
-        </div>
-
-        <div className="grid gap-4 min-[960px]:grid-cols-2">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Camera}
-              title="感官锚点"
-              description="很多记忆不是从事件开始，而是被一个地点、一件物品或一张照片唤起来。"
-            />
-
-            <div className="mt-5 space-y-3">
-              {journey.anchors.length > 0 ? (
-                journey.anchors.map((anchor) => (
-                  <AnchorRow key={anchor.id} anchor={anchor} memoryById={memoryById} />
-                ))
-              ) : (
-                <EmptyState message="当前筛选下还没有记忆锚点。" compact />
-              )}
-            </div>
-          </Surface>
-
-          <Surface className="p-5">
-            <SectionHeading
-              icon={BookHeart}
-              title="回看问题"
-              description="这些问题帮助你看见过去如何继续影响现在，而不是逼自己一次讲完。"
-            />
-
-            <div className="mt-5 space-y-3">
-              {journey.reviewPrompts.length > 0 ? (
-                journey.reviewPrompts.map((prompt) => (
+            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
+              {journey.threads.length > 0 ? (
+                journey.threads.map((thread) => (
                   <div
-                    key={prompt}
+                    key={thread}
                     className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
                   >
-                    {prompt}
+                    {thread}
                   </div>
                 ))
               ) : (
-                <EmptyState message="当前筛选下没有回看问题。" compact />
+                <EmptyState message="当前筛选下没有可展示的影响线索。" compact />
               )}
             </div>
           </Surface>
         </div>
+      ) : null}
+    </div>
+  )
+}
 
-        <Surface className="p-5">
-          <SectionHeading
-            icon={CheckCheck}
-            title="当前还在生效的影响"
-            description="这些线索从成长节点里浮出来，适合和观念、原则、关系页面交叉回看。"
-          />
+function JourneyFixedDashboard({
+  classificationSections,
+  formativePowerRows,
+  journey,
+  memoryById,
+}: {
+  classificationSections: Array<{
+    title: string
+    description: string
+    rows: DistributionRow[]
+  }>
+  formativePowerRows: DistributionRow[]
+  journey: JourneyViewData
+  memoryById: Map<string, MemoryEntry>
+}) {
+  const featuredMemories = journey.memories.slice(0, 3)
+  const featuredGrowthNodes = journey.growthNodes.slice(0, 2)
+  const featuredAnchors = journey.anchors.slice(0, 2)
+  const featuredThreads = journey.threads.slice(0, 2)
+  const featuredPrompts = journey.reviewPrompts.slice(0, 2)
+  const remainingMemoryCount = Math.max(journey.memories.length - featuredMemories.length, 0)
+  const remainingGrowthCount = Math.max(journey.growthNodes.length - featuredGrowthNodes.length, 0)
 
-          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
-            {journey.threads.length > 0 ? (
-              journey.threads.map((thread) => (
-                <div
-                  key={thread}
-                  className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+  return (
+    <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.95fr)_minmax(0,1.06fr)_minmax(320px,0.9fr)] grid-rows-[minmax(0,0.9fr)_minmax(0,1fr)] gap-3 overflow-hidden">
+      <Surface className="col-span-2 min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Waypoints}
+          title="5 维分类概览"
+          description="先看记忆结构，再打开具体经历。塑造力只做评估标记。"
+        />
+
+        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-5">
+          {classificationSections.map((section) => (
+            <CompactDistributionPanel
+              key={section.title}
+              title={section.title}
+              rows={section.rows}
+            />
+          ))}
+        </div>
+
+        <div className="mt-3 grid gap-2 min-[1240px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <CompactBadgeBlock title="塑造力标注" rows={formativePowerRows} />
+          <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+            <div className="text-xs font-medium text-[color:var(--text-primary)]">默认时期提示</div>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {journey.eraSuggestions.slice(0, 5).map((era) => (
+                <Badge
+                  key={era}
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
                 >
-                  {thread}
-                </div>
-              ))
-            ) : (
-              <EmptyState message="当前筛选下没有可展示的影响线索。" compact />
-            )}
+                  {era}
+                </Badge>
+              ))}
+            </div>
           </div>
-        </Surface>
+        </div>
+      </Surface>
+
+      <Surface className="row-span-2 min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Route}
+          title="记忆时间线"
+          description="精选几条代表性记忆，避免把时间线变成滚动长河。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          {featuredMemories.length > 0 ? (
+            featuredMemories.map((memory) => <CompactMemoryCard key={memory.id} memory={memory} />)
+          ) : (
+            <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+          )}
+          {remainingMemoryCount > 0 ? (
+            <RemainingLine label={`还有 ${remainingMemoryCount} 条记忆未展开`} />
+          ) : null}
+        </div>
+      </Surface>
+
+      <Surface className="min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={Sprout}
+          title="成长节点"
+          description="只展示最关键的变化方向。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          {featuredGrowthNodes.map((node) => (
+            <CompactGrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
+          ))}
+          {remainingGrowthCount > 0 ? (
+            <RemainingLine label={`还有 ${remainingGrowthCount} 个成长节点未展开`} />
+          ) : null}
+        </div>
+      </Surface>
+
+      <Surface className="min-h-0 overflow-hidden p-4">
+        <SectionHeading
+          compact
+          icon={BookHeart}
+          title="锚点、问题与影响"
+          description="把辅助信息压到同一视图里扫描。"
+        />
+
+        <div className="mt-3 grid gap-2">
+          {featuredAnchors.map((anchor) => {
+            const linkedMemories = getLinkedMemories(anchor.linkedMemoryIds, memoryById)
+
+            return (
+              <CompactTextBlock
+                key={anchor.id}
+                title={`${anchor.type} · ${anchor.label}`}
+                detail={`${anchor.note} · ${linkedMemories.length} 条相关记忆`}
+              />
+            )
+          })}
+          {featuredPrompts.map((prompt) => (
+            <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
+          ))}
+          {featuredThreads.map((thread) => (
+            <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
+          ))}
+        </div>
+      </Surface>
+    </div>
+  )
+}
+
+function CompactDistributionPanel({ title, rows }: { title: string; rows: DistributionRow[] }) {
+  const visibleRows = rows.filter((row) => row.count > 0).slice(0, 3)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {visibleRows.length > 0 ? (
+          visibleRows.map((row) => (
+            <Badge
+              key={row.label}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {row.label} · {row.count}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+        )}
       </div>
+    </div>
+  )
+}
+
+function CompactBadgeBlock({ title, rows }: { title: string; rows: DistributionRow[] }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {rows.length > 0 ? (
+          rows.map((row) => (
+            <Badge
+              key={row.label}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {row.label} · {row.count}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function CompactMemoryCard({ memory }: { memory: MemoryEntry }) {
+  return (
+    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+        >
+          {memory.type}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {memory.primaryEra}
+        </Badge>
+        <Badge className="bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]">
+          塑造力 · {memory.formativePower ?? "未评估"}
+        </Badge>
+      </div>
+      <div className="mt-2 truncate text-sm font-medium text-[color:var(--text-primary)]">
+        {memory.title}
+      </div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{memory.summary}</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {memory.emotionalWeight}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {memory.processing}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {memory.privacy}
+        </Badge>
+      </div>
+    </article>
+  )
+}
+
+function CompactGrowthNodeCard({
+  node,
+  memoryById,
+}: {
+  node: GrowthNode
+  memoryById: Map<string, MemoryEntry>
+}) {
+  const triggerMemory = memoryById.get(node.triggerMemoryId)
+
+  return (
+    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="flex flex-wrap items-center gap-1.5">
+        <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
+          {node.domain}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {node.stability}
+        </Badge>
+      </div>
+      <div className="mt-2 truncate text-sm font-medium text-[color:var(--text-primary)]">
+        {node.title}
+      </div>
+      <div className="mt-1 grid gap-2 text-xs leading-5 text-[color:var(--text-secondary)]">
+        <div>前：{node.before}</div>
+        <div>后：{node.after}</div>
+      </div>
+      {triggerMemory ? (
+        <div className="mt-2 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-2.5 py-1 text-xs text-[color:var(--text-muted)]">
+          触发：{triggerMemory.title}
+        </div>
+      ) : null}
+    </article>
+  )
+}
+
+function CompactTextBlock({ title, detail }: { title: string; detail: string }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{detail}</p>
+    </div>
+  )
+}
+
+function RemainingLine({ label }: { label: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs text-[color:var(--text-muted)]">
+      {label}
     </div>
   )
 }
