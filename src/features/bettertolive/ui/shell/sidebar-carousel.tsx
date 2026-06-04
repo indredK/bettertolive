@@ -78,7 +78,7 @@ export function SidebarNoteCarousel({
 
   return (
     <section
-      className="mt-3 hidden shrink-0 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-2.5 text-sm text-[color:var(--text-muted)] min-[1240px]:block"
+      className="hidden shrink-0 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-2.5 text-sm text-[color:var(--text-muted)] min-[1240px]:block"
       data-testid="sidebar-note-carousel"
     >
       <div className="flex items-center justify-between gap-3">

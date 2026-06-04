@@ -21,7 +21,7 @@ import {
   Waypoints,
   type LucideIcon,
 } from "lucide-react"
-import { AnimatePresence, m } from "motion/react"
+import { AnimatePresence, m, useReducedMotion } from "motion/react"
 import { useEffect, useState } from "react"
 
 import { Badge } from "@/components/ui/badge"
@@ -58,6 +58,15 @@ import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/so
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
+  getSidebarBrandIconOffset,
+  getSidebarHeaderTransition,
+  getSidebarNoteContentTransition,
+  getSidebarPadding,
+  getSidebarTransitionStyle,
+  getSidebarWidth,
+  SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH,
+} from "@/features/bettertolive/ui/shell/sidebar-shell-motion"
+import {
   SidebarNavigation,
   StackedNavigation,
 } from "@/features/bettertolive/ui/shell/sidebar-navigation"
@@ -66,11 +75,11 @@ import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
 import {
   APP_FADE_TRANSITION,
+  SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE,
   CONTENT_ENTER_PRESENCE,
-  SIDEBAR_COPY_PRESENCE,
+  SIDEBAR_BOTTOM_PANEL_PRESENCE,
   SIDEBAR_FADE_TRANSITION,
-  SIDEBAR_LAYOUT_TRANSITION,
-  SIDEBAR_PANEL_PRESENCE,
+  SIDEBAR_HEADER_CONTENT_PRESENCE,
 } from "@/lib/app-motion"
 
 type NavItem = {
@@ -248,6 +257,8 @@ function useWorkspaceLayoutMode() {
 }
 
 export function BetterToLiveAppShell() {
+  const reduceMotion = useReducedMotion()
+  const prefersReducedMotion = reduceMotion ?? false
   const activeView = useWorkspaceUiStore((state) => state.activeView)
   const isSidebarCollapsed = useWorkspaceUiStore((state) => state.isSidebarCollapsed)
   const isCompactSidebarExpanded = useWorkspaceUiStore((state) => state.isCompactSidebarExpanded)
@@ -302,6 +313,11 @@ export function BetterToLiveAppShell() {
     : isCompactLayout
       ? !isCompactSidebarExpanded
       : isSidebarCollapsed
+  const sidebarWidth = getSidebarWidth(effectiveSidebarCollapsed)
+  const sidebarPadding = getSidebarPadding(effectiveSidebarCollapsed)
+  const sidebarTransitionStyle = getSidebarTransitionStyle(prefersReducedMotion)
+  const sidebarHeaderTransition = getSidebarHeaderTransition(prefersReducedMotion)
+  const sidebarNoteContentTransition = getSidebarNoteContentTransition(prefersReducedMotion)
   const currentViewLabel = getWorkspaceViewLabel(activeView)
 
   useEffect(() => {
@@ -489,9 +505,7 @@ export function BetterToLiveAppShell() {
       )}
     >
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(var(--app-grid)_1px,transparent_1px),linear-gradient(90deg,var(--app-grid)_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
-      <m.div
-        layout
-        transition={SIDEBAR_LAYOUT_TRANSITION}
+      <div
         className={cn(
           "relative flex flex-col",
           isStackedLayout ? "min-h-full" : "h-full",
@@ -499,36 +513,38 @@ export function BetterToLiveAppShell() {
         )}
       >
         {showSidebar ? (
-          <m.aside
-            layout
-            transition={SIDEBAR_LAYOUT_TRANSITION}
+          <aside
             data-testid="workspace-sidebar"
             data-collapsed={effectiveSidebarCollapsed ? "true" : "false"}
             data-layout-mode={layoutMode}
-            className={cn(
-              "relative shrink-0 border-r border-[color:var(--surface-border)] backdrop-blur-xl",
-              effectiveSidebarCollapsed
-                ? "flex h-full w-[92px] flex-col overflow-hidden px-3 py-4"
-                : "flex h-full w-[292px] flex-col overflow-hidden px-5 py-5",
-            )}
+            className="relative flex h-full shrink-0 flex-col overflow-hidden border-r border-[color:var(--surface-border)] backdrop-blur-xl"
+            style={{
+              width: `${sidebarWidth}px`,
+              minWidth: `${sidebarWidth}px`,
+              maxWidth: `${sidebarWidth}px`,
+              paddingLeft: `${sidebarPadding.x}px`,
+              paddingRight: `${sidebarPadding.x}px`,
+              paddingTop: `${sidebarPadding.y}px`,
+              paddingBottom: `${sidebarPadding.y}px`,
+              transition: sidebarTransitionStyle,
+              willChange: "width, padding",
+            }}
           >
             <div className="absolute inset-0 -z-10" style={{ background: "var(--aside-bg)" }} />
 
             <div className="shrink-0">
-              <div
-                className={cn(
-                  "flex items-start",
-                  effectiveSidebarCollapsed ? "justify-center" : "justify-between gap-3",
-                )}
+              <m.div
+                layout="position"
+                transition={sidebarHeaderTransition}
+                className="flex items-start"
               >
-                <div
-                  className={cn(
-                    "flex items-center gap-2",
-                    effectiveSidebarCollapsed && "justify-center",
-                  )}
-                >
+                <div className="flex min-w-0 flex-1 items-start gap-2">
                   <m.button
-                    layout
+                    initial={false}
+                    animate={{
+                      x: getSidebarBrandIconOffset(effectiveSidebarCollapsed),
+                    }}
+                    transition={sidebarHeaderTransition}
                     type="button"
                     data-testid={
                       effectiveSidebarCollapsed && isSidebarInteractive
@@ -559,54 +575,45 @@ export function BetterToLiveAppShell() {
                   <AnimatePresence initial={false}>
                     {effectiveSidebarCollapsed ? null : (
                       <m.div
-                        key="sidebar-brand-copy"
-                        layout
-                        initial={SIDEBAR_COPY_PRESENCE.initial}
-                        animate={SIDEBAR_COPY_PRESENCE.animate}
-                        exit={SIDEBAR_COPY_PRESENCE.exit}
-                        transition={SIDEBAR_FADE_TRANSITION}
-                        className="overflow-hidden"
+                        key="sidebar-header-content"
+                        initial={SIDEBAR_HEADER_CONTENT_PRESENCE.initial}
+                        animate={SIDEBAR_HEADER_CONTENT_PRESENCE.animate}
+                        exit={SIDEBAR_HEADER_CONTENT_PRESENCE.exit}
+                        transition={sidebarHeaderTransition}
+                        className="flex min-w-0 flex-1 items-start justify-between gap-3 overflow-hidden"
                       >
-                        <h1 className="text-[1.15rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
-                          BetterToLive
-                        </h1>
-                        <p className="text-sm text-[color:var(--text-muted)]">个人的人生工作台</p>
+                        <div className="min-w-0 overflow-hidden">
+                          <h1 className="truncate text-[1.15rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
+                            BetterToLive
+                          </h1>
+                          <p className="truncate text-sm text-[color:var(--text-muted)]">
+                            个人的人生工作台
+                          </p>
+                        </div>
+                        <div className="flex shrink-0 flex-col items-end gap-2">
+                          <Badge
+                            variant="outline"
+                            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+                          >
+                            V1 Mock
+                          </Badge>
+
+                          <button
+                            type="button"
+                            data-testid="sidebar-toggle"
+                            onClick={handleSidebarCollapseToggle}
+                            aria-expanded={!effectiveSidebarCollapsed}
+                            aria-label="收起菜单列"
+                            className="flex size-8 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
+                          >
+                            <PanelLeftClose className="size-4" />
+                          </button>
+                        </div>
                       </m.div>
                     )}
                   </AnimatePresence>
                 </div>
-                <AnimatePresence initial={false}>
-                  {effectiveSidebarCollapsed ? null : (
-                    <m.div
-                      key="sidebar-meta-panel"
-                      layout
-                      initial={SIDEBAR_PANEL_PRESENCE.initial}
-                      animate={SIDEBAR_PANEL_PRESENCE.animate}
-                      exit={SIDEBAR_PANEL_PRESENCE.exit}
-                      transition={SIDEBAR_FADE_TRANSITION}
-                      className="flex shrink-0 flex-col items-end gap-2 overflow-hidden"
-                    >
-                      <Badge
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                      >
-                        V1 Mock
-                      </Badge>
-
-                      <button
-                        type="button"
-                        data-testid="sidebar-toggle"
-                        onClick={handleSidebarCollapseToggle}
-                        aria-expanded={!effectiveSidebarCollapsed}
-                        aria-label="收起菜单列"
-                        className="flex size-8 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
-                      >
-                        <PanelLeftClose className="size-4" />
-                      </button>
-                    </m.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              </m.div>
             </div>
 
             <SidebarNavigation
@@ -620,29 +627,36 @@ export function BetterToLiveAppShell() {
               {effectiveSidebarCollapsed ? null : (
                 <m.div
                   key="sidebar-note-carousel-shell"
-                  layout
-                  initial={SIDEBAR_PANEL_PRESENCE.initial}
-                  animate={SIDEBAR_PANEL_PRESENCE.animate}
-                  exit={SIDEBAR_PANEL_PRESENCE.exit}
+                  initial={SIDEBAR_BOTTOM_PANEL_PRESENCE.initial}
+                  animate={SIDEBAR_BOTTOM_PANEL_PRESENCE.animate}
+                  exit={SIDEBAR_BOTTOM_PANEL_PRESENCE.exit}
                   transition={SIDEBAR_FADE_TRANSITION}
-                  className="overflow-hidden"
+                  className="mt-3 overflow-hidden"
                 >
-                  <SidebarNoteCarousel
-                    key={activeView}
-                    icon={Waypoints}
-                    note={currentSidebarNote}
-                  />
+                  <m.div
+                    initial={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.initial}
+                    animate={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.animate}
+                    exit={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.exit}
+                    transition={sidebarNoteContentTransition}
+                    style={{
+                      width: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
+                      minWidth: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
+                      maxWidth: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
+                    }}
+                  >
+                    <SidebarNoteCarousel
+                      key={activeView}
+                      icon={Waypoints}
+                      note={currentSidebarNote}
+                    />
+                  </m.div>
                 </m.div>
               )}
             </AnimatePresence>
-          </m.aside>
+          </aside>
         ) : null}
 
-        <m.main
-          layout
-          transition={SIDEBAR_LAYOUT_TRANSITION}
-          className={cn("min-w-0", !isStackedLayout && "flex flex-1 flex-col overflow-hidden")}
-        >
+        <main className={cn("min-w-0", !isStackedLayout && "flex flex-1 flex-col overflow-hidden")}>
           {isStackedLayout ? (
             <>
               <section
@@ -842,8 +856,8 @@ export function BetterToLiveAppShell() {
               {pageContent}
             </m.div>
           </div>
-        </m.main>
-      </m.div>
+        </main>
+      </div>
       <NotificationLayer
         notifications={notifications}
         selectedNotification={selectedNotification}

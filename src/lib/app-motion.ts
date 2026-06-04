@@ -71,6 +71,54 @@ export const SIDEBAR_PANEL_PRESENCE: PresenceMotion = {
   },
 }
 
+export const SIDEBAR_HEADER_CONTENT_PRESENCE: PresenceMotion = {
+  initial: {
+    opacity: 0,
+    x: 10,
+  },
+  animate: {
+    opacity: 1,
+    x: 0,
+  },
+  exit: {
+    opacity: 0,
+    x: 10,
+    transition: SIDEBAR_SOFT_EXIT_TRANSITION,
+  },
+}
+
+export const SIDEBAR_BOTTOM_PANEL_PRESENCE: PresenceMotion = {
+  initial: {
+    opacity: 0,
+    height: 0,
+  },
+  animate: {
+    opacity: 1,
+    height: "auto",
+  },
+  exit: {
+    opacity: 0,
+    height: 0,
+    transition: SIDEBAR_SOFT_EXIT_TRANSITION,
+  },
+}
+
+export const SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE: PresenceMotion = {
+  initial: {
+    opacity: 0,
+    y: 12,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+  },
+  exit: {
+    opacity: 0,
+    y: 8,
+    transition: SIDEBAR_SOFT_EXIT_TRANSITION,
+  },
+}
+
 export const UTILITY_PANEL_PRESENCE: PresenceMotion = {
   initial: {
     opacity: 0,
