@@ -409,10 +409,7 @@ export function BetterToLiveAppShell() {
       case "emotion":
         return (
           <EmotionPage
-            checkIns={viewModel.emotionCheckIns}
-            trend={viewModel.emotionTrend}
-            triggers={viewModel.emotionTriggers}
-            tools={viewModel.emotionTools}
+            emotionModule={viewModel.emotionModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -432,8 +429,7 @@ export function BetterToLiveAppShell() {
       case "beliefs":
         return (
           <BeliefsPage
-            beliefCards={viewModel.beliefCards}
-            questions={viewModel.beliefQuestions}
+            beliefsModule={viewModel.beliefsModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -473,8 +469,7 @@ export function BetterToLiveAppShell() {
       case "socioeconomics":
         return (
           <SocioeconomicsPage
-            entries={viewModel.socioeconomicsEntries}
-            gaps={viewModel.socioeconomicsGaps}
+            socioeconomicsModule={viewModel.socioeconomicsModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />

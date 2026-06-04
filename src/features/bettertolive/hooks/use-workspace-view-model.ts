@@ -227,44 +227,77 @@ export function useWorkspaceViewModel({
     [matchesQuery, normalizedQuery.length, workspace.shopping],
   )
 
-  const emotionCheckIns = useMemo(
-    () =>
-      workspace.emotion.checkIns.filter((entry) =>
-        matchesQuery(
-          entry.date,
-          entry.summary,
-          entry.state,
-          entry.intensity,
-          entry.bodySignal,
-          ...entry.tags,
-        ),
+  const emotionModule = useMemo(() => {
+    const hasQuery = normalizedQuery.length > 0
+    const checkIns = workspace.emotion.checkIns.filter((entry) =>
+      matchesQuery(
+        entry.date,
+        entry.summary,
+        entry.state,
+        entry.intensity,
+        entry.bodySignal,
+        entry.triggerEvent,
+        entry.impulse,
+        entry.needRightNow,
+        ...entry.tags,
+        ...(entry.emotionTags ?? []),
       ),
-    [matchesQuery, workspace.emotion.checkIns],
-  )
+    )
+    const trend = workspace.emotion.trend.filter((entry) =>
+      matchesQuery(entry.label, entry.score, entry.note, entry.primaryState),
+    )
+    const triggers = workspace.emotion.triggers
+      .map((entry) => filterEmotionTriggerByQuery(entry, hasQuery, matchesQuery))
+      .filter((entry) => entry !== null)
+    const tools = workspace.emotion.tools.filter((entry) =>
+      matchesQuery(entry.title, entry.description, entry.when, entry.kind, entry.contactScript),
+    )
+    const timelineSegments = workspace.emotion.timelineSegments.filter((entry) =>
+      matchesQuery(entry.range, entry.trend, entry.summary),
+    )
+    const loopPatterns = workspace.emotion.loopPatterns.filter((entry) =>
+      matchesQuery(entry.title, entry.description, entry.frequency),
+    )
+    const lifestyleLinks = workspace.emotion.lifestyleLinks.filter((entry) =>
+      matchesQuery(entry.factor, entry.observation, entry.direction),
+    )
+    const environmentCues = workspace.emotion.environmentCues.filter((entry) =>
+      matchesQuery(entry.context, entry.description),
+    )
+    const relationshipCues = workspace.emotion.relationshipCues.filter((entry) =>
+      matchesQuery(entry.who, entry.pattern),
+    )
+    const recoveryNotes = workspace.emotion.recoveryNotes.filter((entry) =>
+      matchesQuery(entry.date, entry.what, entry.effect),
+    )
+    const ineffectiveActions = workspace.emotion.ineffectiveActions.filter((entry) =>
+      matchesQuery(entry),
+    )
+    const minimalRecoverySteps = workspace.emotion.minimalRecoverySteps.filter((entry) =>
+      matchesQuery(entry),
+    )
 
-  const emotionTrend = useMemo(
-    () =>
-      workspace.emotion.trend.filter((entry) => matchesQuery(entry.label, entry.score, entry.note)),
-    [matchesQuery, workspace.emotion.trend],
-  )
+    return {
+      ...workspace.emotion,
+      checkIns,
+      trend,
+      triggers,
+      tools,
+      timelineSegments,
+      loopPatterns,
+      lifestyleLinks,
+      environmentCues,
+      relationshipCues,
+      recoveryNotes,
+      ineffectiveActions,
+      minimalRecoverySteps,
+    }
+  }, [matchesQuery, normalizedQuery.length, workspace.emotion])
 
-  const emotionTriggers = useMemo(
-    () =>
-      workspace.emotion.triggers
-        .map((entry) =>
-          filterEmotionTriggerByQuery(entry, normalizedQuery.length > 0, matchesQuery),
-        )
-        .filter((entry) => entry !== null),
-    [matchesQuery, normalizedQuery.length, workspace.emotion.triggers],
-  )
-
-  const emotionTools = useMemo(
-    () =>
-      workspace.emotion.tools.filter((entry) =>
-        matchesQuery(entry.title, entry.description, entry.when),
-      ),
-    [matchesQuery, workspace.emotion.tools],
-  )
+  const emotionCheckIns = emotionModule.checkIns
+  const emotionTrend = emotionModule.trend
+  const emotionTriggers = emotionModule.triggers
+  const emotionTools = emotionModule.tools
 
   const crisisWarningSigns = useMemo(
     () => workspace.crisis.warningSigns.filter((entry) => matchesQuery(entry)),
@@ -297,18 +330,53 @@ export function useWorkspaceViewModel({
     [matchesQuery, workspace.overview.recentRecords],
   )
 
-  const beliefCards = useMemo(
-    () =>
-      workspace.beliefs.cards.filter((entry) =>
-        matchesQuery(entry.label, entry.summary, entry.note, ...entry.keywords),
+  const beliefsModule = useMemo(() => {
+    const cards = workspace.beliefs.cards.filter((entry) =>
+      matchesQuery(entry.label, entry.summary, entry.note, ...entry.keywords),
+    )
+    const questions = workspace.beliefs.questions.filter((entry) => matchesQuery(entry))
+    const entries = workspace.beliefs.entries.filter((entry) =>
+      matchesQuery(
+        entry.title,
+        entry.statement,
+        entry.description,
+        entry.domain,
+        entry.layer,
+        entry.stability,
+        entry.source,
+        entry.impact,
+        ...(entry.secondaryDomains ?? []),
+        entry.cbtLayer,
+        ...(entry.cognitiveDistortions ?? []),
+        entry.defenseMechanism,
+        entry.attachmentNote,
+        ...entry.tags,
+        ...entry.revisionHistory.flatMap((revision) => [
+          revision.date,
+          revision.summary,
+          ...revision.changedFields,
+        ]),
       ),
-    [matchesQuery, workspace.beliefs.cards],
-  )
+    )
+    const visibleEntryIds = new Set(entries.map((entry) => entry.id))
+    const relations = workspace.beliefs.relations.filter(
+      (relation) =>
+        matchesQuery(relation.type, relation.fromId, relation.toId, relation.note) ||
+        visibleEntryIds.has(relation.fromId) ||
+        visibleEntryIds.has(relation.toId),
+    )
 
-  const beliefQuestions = useMemo(
-    () => workspace.beliefs.questions.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.beliefs.questions],
-  )
+    return {
+      ...workspace.beliefs,
+      cards,
+      questions,
+      entries,
+      relations,
+    }
+  }, [matchesQuery, workspace.beliefs])
+
+  const beliefCards = beliefsModule.cards
+  const beliefQuestions = beliefsModule.questions
 
   const principlesModule = useMemo(() => {
     const entries = workspace.principles.entries.filter((entry) =>
@@ -549,25 +617,44 @@ export function useWorkspaceViewModel({
   const nutritionHighlights = nutritionModule.weeklyReview.highlights
   const nutritionFoodMemories = nutritionModule.foodMemories
 
-  const socioeconomicsEntries = useMemo(
-    () =>
-      workspace.socioeconomics.entries.filter((entry) =>
-        matchesQuery(
-          entry.title,
-          entry.domain,
-          entry.layer,
-          entry.confidence,
-          entry.source,
-          entry.summary,
-        ),
+  const socioeconomicsModule = useMemo(() => {
+    const entries = workspace.socioeconomics.entries.filter((entry) =>
+      matchesQuery(
+        entry.title,
+        entry.domain,
+        entry.layer,
+        entry.confidence,
+        entry.source,
+        entry.relevance,
+        entry.summary,
+        entry.understandingNote,
+        ...(entry.relatedConcepts ?? []),
+        ...(entry.tags ?? []),
+        ...(entry.confidenceHistory ?? []).flatMap((history) => [
+          history.date,
+          history.from,
+          history.to,
+          history.trigger,
+        ]),
       ),
-    [matchesQuery, workspace.socioeconomics.entries],
-  )
+    )
+    const gaps = workspace.socioeconomics.gaps.filter((entry) =>
+      matchesQuery(entry.domain, entry.summary, entry.nextStep),
+    )
+    const reviewPrompts = workspace.socioeconomics.reviewPrompts.filter((entry) =>
+      matchesQuery(entry),
+    )
 
-  const socioeconomicsGaps = useMemo(
-    () => workspace.socioeconomics.gaps.filter((entry) => matchesQuery(entry)),
-    [matchesQuery, workspace.socioeconomics.gaps],
-  )
+    return {
+      ...workspace.socioeconomics,
+      entries,
+      gaps,
+      reviewPrompts,
+    }
+  }, [matchesQuery, workspace.socioeconomics])
+
+  const socioeconomicsEntries = socioeconomicsModule.entries
+  const socioeconomicsGaps = socioeconomicsModule.gaps
 
   const visibleShoppingCount = shoppingModule.purchaseLanes.reduce(
     (count, column) => count + column.items.length,
@@ -640,6 +727,7 @@ export function useWorkspaceViewModel({
   return {
     beliefCards,
     beliefQuestions,
+    beliefsModule,
     crisisContacts,
     crisisCurrentState: workspace.crisis.currentState,
     crisisReviewNotes,
@@ -647,6 +735,7 @@ export function useWorkspaceViewModel({
     crisisWarningSigns,
     dailyPulse: workspace.overview.dailyPulse,
     emotionCheckIns,
+    emotionModule,
     emotionTools,
     emotionTrend,
     emotionTriggers,
@@ -675,6 +764,7 @@ export function useWorkspaceViewModel({
     shoppingModule,
     socioeconomicsEntries,
     socioeconomicsGaps,
+    socioeconomicsModule,
     transactions,
     visibleExpenseTotal,
     visibleIncomeTotal,

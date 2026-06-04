@@ -195,6 +195,66 @@ export type FutureBlueprint = {
   experiments: string[]
 }
 
+export type BeliefDomain = "关系" | "工作" | "金钱" | "自我" | "社会" | "时间" | "意义"
+
+export type BeliefLayer = "世界观" | "人生观" | "价值观"
+
+export type BeliefStability = "稳定" | "正在松动" | "正在形成" | "已放弃"
+
+export type BeliefSource = "亲身经历" | "家庭继承" | "社会环境" | "主动反思" | "创伤反应"
+
+export type BeliefImpact = "支撑性" | "限制性" | "中性" | "冲突中"
+
+export type BeliefCbtLayer = "自动思维" | "中间信念" | "核心信念"
+
+export type CognitiveDistortion =
+  | "全有或全无"
+  | "过度概括"
+  | "灾难化"
+  | "读心术"
+  | "应该陈述"
+  | "个人化"
+  | "情绪推理"
+  | "贴标签"
+
+export type DefenseMechanism = "否认" | "投射" | "合理化" | "理智化" | "反向形成" | "升华"
+
+export type BeliefRelationType = "相似" | "冲突" | "派生"
+
+export type BeliefRevision = {
+  id: string
+  date: string
+  summary: string
+  changedFields: Array<"内容" | "稳定性" | "影响">
+}
+
+export type BeliefRelation = {
+  id: string
+  type: BeliefRelationType
+  fromId: string
+  toId: string
+  note: string
+}
+
+export type BeliefEntry = {
+  id: string
+  title: string
+  statement: string
+  description: string
+  domain: BeliefDomain
+  layer: BeliefLayer
+  stability: BeliefStability
+  source: BeliefSource
+  impact: BeliefImpact
+  secondaryDomains?: BeliefDomain[]
+  cbtLayer?: BeliefCbtLayer
+  cognitiveDistortions?: CognitiveDistortion[]
+  defenseMechanism?: DefenseMechanism
+  attachmentNote?: string
+  revisionHistory: BeliefRevision[]
+  tags: string[]
+}
+
 export type BeliefCard = {
   id: string
   label: string
@@ -206,6 +266,9 @@ export type BeliefCard = {
 export type BeliefProfile = {
   cards: BeliefCard[]
   questions: string[]
+  entries: BeliefEntry[]
+  relations: BeliefRelation[]
+  attachmentReflection: string
 }
 
 export type PrincipleDomain = "关系" | "工作" | "金钱" | "健康" | "时间" | "诚信"
@@ -402,14 +465,55 @@ export type GrowthProfile = {
   threads: string[]
 }
 
+export type EmotionState =
+  | "平静"
+  | "回稳"
+  | "低压焦虑"
+  | "易怒"
+  | "麻木"
+  | "空"
+  | "委屈"
+  | "难过"
+  | "高压后空掉"
+  | "松弛"
+  | "期待"
+
+export type EmotionEmotionTag =
+  | "难过"
+  | "焦虑"
+  | "空"
+  | "平静"
+  | "委屈"
+  | "愤怒"
+  | "松弛"
+  | "期待"
+  | "羞愧"
+  | "恐惧"
+  | "孤独"
+  | "兴奋"
+
+export type EmotionImpulse =
+  | "逃避"
+  | "倾诉"
+  | "睡觉"
+  | "吃东西"
+  | "出门"
+  | "沉默"
+  | "运动"
+  | "刷手机"
+
 export type EmotionCheckIn = {
   id: string
   date: string
   summary: string
-  state: string
+  state: EmotionState
   intensity: string
   bodySignal: string
   tags: string[]
+  emotionTags?: EmotionEmotionTag[]
+  triggerEvent?: string
+  impulse?: EmotionImpulse
+  needRightNow?: string
 }
 
 export type EmotionTrendPoint = {
@@ -417,20 +521,86 @@ export type EmotionTrendPoint = {
   label: string
   score: number
   note: string
+  primaryState?: EmotionState
 }
+
+export type EmotionTriggerCategory =
+  | "工作"
+  | "家庭"
+  | "亲密关系"
+  | "金钱"
+  | "睡眠"
+  | "社交"
+  | "自我否定"
+  | "环境"
 
 export type EmotionTriggerGroup = {
   id: string
   title: string
   summary: string
   cues: string[]
+  category?: EmotionTriggerCategory
+  recentExamples?: string[]
 }
+
+export type EmotionSupportToolKind = "有效" | "无效" | "极简三步" | "可联系"
 
 export type EmotionSupportTool = {
   id: string
   title: string
   description: string
   when: string
+  kind?: EmotionSupportToolKind
+  contactScript?: string
+}
+
+export type EmotionTimelineSegment = {
+  id: string
+  range: string
+  trend: "持续恶化" | "逐渐恢复" | "起伏波动" | "平稳"
+  summary: string
+}
+
+export type EmotionLoopPattern = {
+  id: string
+  title: string
+  description: string
+  frequency: string
+}
+
+export type EmotionLifestyleLink = {
+  id: string
+  factor: "睡眠" | "饮食" | "运动" | "经期" | "饮酒" | "屏幕时长" | "通勤" | "独处"
+  observation: string
+  direction: "正相关" | "负相关" | "混合"
+}
+
+export type EmotionEnvironmentCue = {
+  id: string
+  context: string
+  description: string
+}
+
+export type EmotionRelationshipCue = {
+  id: string
+  who: string
+  pattern: string
+}
+
+export type EmotionRecoveryNote = {
+  id: string
+  date: string
+  what: string
+  effect: string
+}
+
+export type EmotionOverviewSummary = {
+  windowLabel: string
+  averageScore: number
+  topEmotionTags: Array<{ tag: EmotionEmotionTag; count: number }>
+  bestWindow: string
+  worstWindow: string
+  conclusion: string
 }
 
 export type EmotionModuleData = {
@@ -438,6 +608,15 @@ export type EmotionModuleData = {
   trend: EmotionTrendPoint[]
   triggers: EmotionTriggerGroup[]
   tools: EmotionSupportTool[]
+  overview: EmotionOverviewSummary
+  timelineSegments: EmotionTimelineSegment[]
+  loopPatterns: EmotionLoopPattern[]
+  lifestyleLinks: EmotionLifestyleLink[]
+  environmentCues: EmotionEnvironmentCue[]
+  relationshipCues: EmotionRelationshipCue[]
+  recoveryNotes: EmotionRecoveryNote[]
+  ineffectiveActions: string[]
+  minimalRecoverySteps: string[]
 }
 
 export type CrisisCurrentState = {
@@ -748,19 +927,57 @@ export type NutritionModuleData = {
   foodMemories: NutritionFoodMemory[]
 }
 
+export type EconDomain =
+  | "货币与物价"
+  | "个人财务"
+  | "劳动力市场"
+  | "产业与公司"
+  | "财政与政策"
+  | "金融市场"
+  | "全球与宏观"
+
+export type EconLayer = "微观" | "中观" | "宏观"
+
+export type EconConfidence = "听过名词" | "知道大致逻辑" | "能预判常见情境" | "有自己的判断框架"
+
+export type EconSource = "系统学习" | "新闻媒体" | "亲身经历" | "他人叙述" | "专业讨论"
+
+export type EconRelevance = "直接影响当前决策" | "影响中期规划" | "影响长期方向" | "纯认知储备"
+
+export type EconConfidenceRevision = {
+  id: string
+  date: string
+  from: EconConfidence
+  to: EconConfidence
+  trigger: string
+}
+
 export type SocioeconomicsEntry = {
   id: string
   title: string
-  domain: string
-  layer: string
-  confidence: string
-  source: string
+  domain: EconDomain
+  layer: EconLayer
+  confidence: EconConfidence
+  source: EconSource
+  relevance: EconRelevance
   summary: string
+  understandingNote?: string
+  relatedConcepts?: string[]
+  confidenceHistory?: EconConfidenceRevision[]
+  tags?: string[]
+}
+
+export type SocioeconomicsGap = {
+  id: string
+  domain: EconDomain
+  summary: string
+  nextStep: string
 }
 
 export type SocioeconomicsModuleData = {
   entries: SocioeconomicsEntry[]
-  gaps: string[]
+  gaps: SocioeconomicsGap[]
+  reviewPrompts: string[]
 }
 
 export type WorkspaceSnapshot = {
