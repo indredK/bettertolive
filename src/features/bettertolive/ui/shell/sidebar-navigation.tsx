@@ -1,17 +1,130 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react"
-import { AnimatePresence, m } from "motion/react"
+import { AnimatePresence, m, useReducedMotion, type Transition, type Variants } from "motion/react"
 
 import type { AppView } from "@/features/bettertolive/types"
-import {
-  SIDEBAR_COLLAPSED_PRESENCE,
-  SIDEBAR_EXPANDED_PRESENCE,
-  SIDEBAR_FADE_TRANSITION,
-} from "@/lib/app-motion"
 import { cn } from "@/lib/utils"
 
 const PREVIEW_LIMIT = 4
 const VISIBILITY_OFFSET = 12
+
+// ---------------------------------------------------------------------------
+// 组件级 motion 配置(刻意不放进公共 app-motion.ts,与组件耦合在一起)
+//
+// 展开→缩起:
+//   1. 展开 panel 整体向左滑出 + 渐隐,里面的标题/按钮反向 stagger 退场
+//   2. AnimatePresence mode="wait" 等老 panel 完全离场
+//   3. collapsed panel 从右轻微滑入 + 渐显,图标依次淡入浮现
+// 缩起→展开: 完全反向
+// ---------------------------------------------------------------------------
+
+const SIDEBAR_NAV_EASE = [0.22, 1, 0.36, 1] as const
+
+const PANEL_BASE_TRANSITION: Transition = {
+  duration: 0.42,
+  ease: SIDEBAR_NAV_EASE,
+}
+
+const EXPANDED_PANEL_VARIANTS: Variants = {
+  initial: { opacity: 0, x: -36 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      ...PANEL_BASE_TRANSITION,
+      staggerChildren: 0.04,
+      delayChildren: 0.06,
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -48,
+    transition: {
+      ...PANEL_BASE_TRANSITION,
+      duration: 0.34,
+      staggerChildren: 0.012,
+      staggerDirection: -1,
+    },
+  },
+}
+
+const COLLAPSED_PANEL_VARIANTS: Variants = {
+  initial: { opacity: 0, x: 24 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      ...PANEL_BASE_TRANSITION,
+      staggerChildren: 0.045,
+      delayChildren: 0.08,
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: 24,
+    transition: {
+      ...PANEL_BASE_TRANSITION,
+      duration: 0.3,
+      staggerChildren: 0.014,
+      staggerDirection: -1,
+    },
+  },
+}
+
+const GROUP_VARIANTS: Variants = {
+  initial: { opacity: 0, x: -5 },
+  animate: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.36,
+      ease: SIDEBAR_NAV_EASE,
+      staggerChildren: 0.028,
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -4,
+    transition: {
+      duration: 0.22,
+      ease: SIDEBAR_NAV_EASE,
+      staggerChildren: 0.01,
+      staggerDirection: -1,
+    },
+  },
+}
+
+const ITEM_VARIANTS: Variants = {
+  initial: { opacity: 0, y: 6, scale: 0.97 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.34, ease: SIDEBAR_NAV_EASE },
+  },
+  exit: {
+    opacity: 0,
+    y: -3,
+    scale: 0.98,
+    transition: { duration: 0.2, ease: SIDEBAR_NAV_EASE },
+  },
+}
+
+// 用户开启 prefers-reduced-motion 时,只做温和的 opacity 切换
+const REDUCED_PANEL_VARIANTS: Variants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.18, staggerChildren: 0 },
+  },
+  exit: { opacity: 0, transition: { duration: 0.14 } },
+}
+
+const REDUCED_ITEM_VARIANTS: Variants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1, transition: { duration: 0.14 } },
+  exit: { opacity: 0, transition: { duration: 0.1 } },
+}
 
 export type SidebarNavigationItem = {
   view: AppView
@@ -144,6 +257,11 @@ export function SidebarNavigation({
     firstVisibleIndex: 0,
     lastVisibleIndex: Math.max(0, flattenedItems.length - 1),
   }))
+  const reduceMotion = useReducedMotion()
+  const expandedPanelVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : EXPANDED_PANEL_VARIANTS
+  const collapsedPanelVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : COLLAPSED_PANEL_VARIANTS
+  const groupVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : GROUP_VARIANTS
+  const itemVariants = reduceMotion ? REDUCED_ITEM_VARIANTS : ITEM_VARIANTS
 
   const measureVisibleRange = useCallback(() => {
     const container = scrollViewportRef.current
@@ -321,68 +439,64 @@ export function SidebarNavigation({
         <m.section
           key="collapsed"
           layout
-          initial={SIDEBAR_COLLAPSED_PRESENCE.initial}
-          animate={SIDEBAR_COLLAPSED_PRESENCE.animate}
-          exit={SIDEBAR_COLLAPSED_PRESENCE.exit}
-          transition={SIDEBAR_FADE_TRANSITION}
+          variants={collapsedPanelVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-2 py-2"
         >
-          <nav
+          <m.nav
             ref={scrollViewportRef}
             data-testid="sidebar-nav-scroll"
-            className="hide-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain"
+            variants={groupVariants}
+            className="hide-scrollbar grid min-h-0 flex-1 content-start justify-items-center gap-2.5 overflow-y-auto overscroll-contain py-1"
           >
-            <div className="grid content-start gap-2 py-0.5">
-              {sections.map((section) => (
-                <div key={section.title} className="grid justify-items-center gap-2.5 py-1.5">
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    const isActive = item.view === activeView
+            {flattenedItems.map((item) => {
+              const Icon = item.icon
+              const isActive = item.view === activeView
 
-                    return (
-                      <button
-                        key={item.view}
-                        ref={(node) => {
-                          itemRefs.current[item.view] = node
-                        }}
-                        type="button"
-                        data-testid={`nav-${item.view}`}
-                        onClick={() => onSelectView(item.view)}
-                        aria-current={isActive ? "page" : undefined}
-                        aria-label={`导航 ${item.label}`}
-                        title={item.label}
-                        className={cn(
-                          "flex size-11 items-center justify-center rounded-xl border transition-all",
-                          isActive
-                            ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)] text-[color:var(--nav-active-icon-ink)]"
-                            : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] text-[color:var(--text-muted)] hover:bg-[color:var(--surface-bg)] hover:text-[color:var(--text-primary)]",
-                        )}
-                        style={
-                          isActive
-                            ? {
-                                boxShadow: "var(--surface-shadow)",
-                                backgroundColor: "var(--nav-active-icon-bg)",
-                              }
-                            : undefined
+              return (
+                <m.button
+                  key={item.view}
+                  ref={(node) => {
+                    itemRefs.current[item.view] = node
+                  }}
+                  type="button"
+                  variants={itemVariants}
+                  data-testid={`nav-${item.view}`}
+                  onClick={() => onSelectView(item.view)}
+                  aria-current={isActive ? "page" : undefined}
+                  aria-label={`导航 ${item.label}`}
+                  title={item.label}
+                  className={cn(
+                    "flex size-11 items-center justify-center rounded-xl border transition-colors",
+                    isActive
+                      ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)] text-[color:var(--nav-active-icon-ink)]"
+                      : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] text-[color:var(--text-muted)] hover:bg-[color:var(--surface-bg)] hover:text-[color:var(--text-primary)]",
+                  )}
+                  style={
+                    isActive
+                      ? {
+                          boxShadow: "var(--surface-shadow)",
+                          backgroundColor: "var(--nav-active-icon-bg)",
                         }
-                      >
-                        <Icon className="size-4.5" />
-                      </button>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
-          </nav>
+                      : undefined
+                  }
+                >
+                  <Icon className="size-4.5" />
+                </m.button>
+              )
+            })}
+          </m.nav>
         </m.section>
       ) : (
         <m.section
           key="expanded"
           layout
-          initial={SIDEBAR_EXPANDED_PRESENCE.initial}
-          animate={SIDEBAR_EXPANDED_PRESENCE.animate}
-          exit={SIDEBAR_EXPANDED_PRESENCE.exit}
-          transition={SIDEBAR_FADE_TRANSITION}
+          variants={expandedPanelVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
           className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-2.5 py-2"
         >
           <SidebarPreviewBand
@@ -394,68 +508,73 @@ export function SidebarNavigation({
             strength={topStrength}
           />
 
-          <nav
+          <m.nav
             ref={scrollViewportRef}
             data-testid="sidebar-nav-scroll"
-            className="hide-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain pr-0.5"
+            variants={groupVariants}
+            className="hide-scrollbar grid min-h-0 flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain py-2 pr-0.5"
           >
-            <div className="grid content-start gap-2.5 py-2">
-              {sections.map((section) => (
-                <div key={section.title}>
-                  <div className="mb-1.5 px-1 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                    {section.title}
-                  </div>
-                  <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1">
-                    {section.items.map((item) => {
-                      const Icon = item.icon
-                      const isActive = item.view === activeView
+            {sections.map((section) => (
+              <m.div
+                key={section.title}
+                variants={groupVariants}
+                className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1"
+              >
+                <m.div
+                  variants={itemVariants}
+                  className="col-span-full mb-0.5 px-1 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase"
+                >
+                  {section.title}
+                </m.div>
+                {section.items.map((item) => {
+                  const Icon = item.icon
+                  const isActive = item.view === activeView
 
-                      return (
-                        <button
-                          key={item.view}
-                          ref={(node) => {
-                            itemRefs.current[item.view] = node
-                          }}
-                          type="button"
-                          data-testid={`nav-${item.view}`}
-                          onClick={() => onSelectView(item.view)}
-                          aria-current={isActive ? "page" : undefined}
-                          aria-label={`导航 ${item.label}`}
-                          className={cn(
-                            "grid h-[56px] grid-cols-[auto_1fr_auto] items-center gap-2.5 rounded-lg border px-3 text-left transition-all",
-                            isActive
-                              ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
-                              : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
-                          )}
-                          style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
-                        >
-                          <div
-                            className={cn(
-                              "flex size-8 items-center justify-center rounded-lg border",
-                              isActive
-                                ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
-                                : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
-                            )}
-                          >
-                            <Icon className="size-4" />
-                          </div>
-                          <div className="min-w-0">
-                            <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-                              {item.label}
-                            </div>
-                            <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
-                              {item.hint}
-                            </div>
-                          </div>
-                          <span className="text-[color:var(--text-muted)]">&rsaquo;</span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </nav>
+                  return (
+                    <m.button
+                      key={item.view}
+                      ref={(node) => {
+                        itemRefs.current[item.view] = node
+                      }}
+                      type="button"
+                      variants={itemVariants}
+                      data-testid={`nav-${item.view}`}
+                      onClick={() => onSelectView(item.view)}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`导航 ${item.label}`}
+                      className={cn(
+                        "grid h-[56px] grid-cols-[auto_1fr_auto] items-center gap-2.5 rounded-lg border px-3 text-left transition-colors",
+                        isActive
+                          ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
+                          : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
+                      )}
+                      style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
+                    >
+                      <div
+                        className={cn(
+                          "flex size-8 items-center justify-center rounded-lg border",
+                          isActive
+                            ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
+                            : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
+                        )}
+                      >
+                        <Icon className="size-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+                          {item.label}
+                        </div>
+                        <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
+                          {item.hint}
+                        </div>
+                      </div>
+                      <span className="text-[color:var(--text-muted)]">&rsaquo;</span>
+                    </m.button>
+                  )
+                })}
+              </m.div>
+            ))}
+          </m.nav>
 
           <SidebarPreviewBand
             activeView={activeView}
