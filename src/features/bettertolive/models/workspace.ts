@@ -259,17 +259,54 @@ export type RelationshipMap = {
   unsentNotes: RelationshipUnsentNote[]
 }
 
-export type GrowthStage = {
+export type MemoryType = "事件" | "地点" | "物件" | "人物" | "照片" | "领悟"
+
+export type EmotionalWeight = "轻" | "中性" | "重" | "很重"
+
+export type ProcessingStatus =
+  | "已整理"
+  | "正在理解"
+  | "暂不触碰"
+  | "决定不再细究"
+  | "开放问题"
+  | "想留给某人"
+  | "记不清的裂缝"
+
+export type PrivacyLevel = "仅自己" | "需二次确认" | "指定的人" | "未来可公开" | "离世后可看"
+
+export type FormativePower = "极深" | "较深" | "中等" | "轻微" | "无"
+
+export type MemorySourceModule =
+  | "手动录入"
+  | "反思"
+  | "记事"
+  | "记账"
+  | "关系"
+  | "情绪"
+  | "原则"
+  | "未来"
+  | "生命整理"
+
+export type GrowthDomain = "关系" | "自我" | "工作" | "情绪能力" | "生活方式"
+
+export type GrowthStability = "偶尔还会退回去" | "基本稳定" | "已经完全内化"
+
+export type GrowthNode = {
   id: string
-  stage: string
   title: string
-  environment: string
-  impact: string
-  traces: string[]
+  domain: GrowthDomain
+  stability: GrowthStability
+  before: string
+  after: string
+  keyEvent: string
+  beforeMemoryIds: string[]
+  afterMemoryIds: string[]
+  triggerMemoryId: string
+  evidence: string[]
 }
 
 export type GrowthProfile = {
-  stages: GrowthStage[]
+  growthNodes: GrowthNode[]
   threads: string[]
 }
 
@@ -339,25 +376,35 @@ export type CrisisSupportModuleData = {
   reviewNotes: string[]
 }
 
-export type MemoryNode = {
+export type MemoryEntry = {
   id: string
-  period: string
   title: string
+  type: MemoryType
+  era: string[]
+  primaryEra: string
+  emotionalWeight: EmotionalWeight
+  processing: ProcessingStatus
+  privacy: PrivacyLevel
+  formativePower?: FormativePower
   summary: string
   impact: string
+  sourceModules: MemorySourceModule[]
+  sensoryCue?: string
   tags: string[]
 }
 
 export type MemoryAnchor = {
   id: string
-  type: string
+  type: Extract<MemoryType, "地点" | "物件" | "照片" | "人物">
   label: string
   note: string
+  linkedMemoryIds: string[]
 }
 
 export type MemoryModuleData = {
-  nodes: MemoryNode[]
+  memories: MemoryEntry[]
   anchors: MemoryAnchor[]
+  eraSuggestions: string[]
   reviewPrompts: string[]
 }
 

@@ -461,19 +461,53 @@ export function useWorkspaceViewModel({
   )
 
   const journeyData = useMemo(() => {
-    const stages = workspace.growth.stages.filter((entry) =>
-      matchesQuery(entry.stage, entry.title, entry.environment, entry.impact, ...entry.traces),
+    const memories = workspace.memory.memories.filter((entry) =>
+      matchesQuery(
+        entry.title,
+        entry.type,
+        entry.primaryEra,
+        ...entry.era,
+        entry.emotionalWeight,
+        entry.processing,
+        entry.privacy,
+        entry.formativePower,
+        entry.summary,
+        entry.impact,
+        entry.sensoryCue,
+        ...entry.sourceModules,
+        ...entry.tags,
+      ),
     )
+    const visibleMemoryIds = new Set(memories.map((entry) => entry.id))
+    const growthNodes = workspace.growth.growthNodes.filter((entry) => {
+      const linkedMemoryIds = [
+        ...entry.beforeMemoryIds,
+        ...entry.afterMemoryIds,
+        entry.triggerMemoryId,
+      ]
+
+      return (
+        matchesQuery(
+          entry.title,
+          entry.domain,
+          entry.stability,
+          entry.before,
+          entry.after,
+          entry.keyEvent,
+          ...entry.evidence,
+        ) || linkedMemoryIds.some((memoryId) => visibleMemoryIds.has(memoryId))
+      )
+    })
     const threads = workspace.growth.threads.filter((entry) => matchesQuery(entry))
-    const nodes = workspace.memory.nodes.filter((entry) =>
-      matchesQuery(entry.period, entry.title, entry.summary, entry.impact, ...entry.tags),
+    const anchors = workspace.memory.anchors.filter(
+      (entry) =>
+        matchesQuery(entry.type, entry.label, entry.note, ...entry.linkedMemoryIds) ||
+        entry.linkedMemoryIds.some((memoryId) => visibleMemoryIds.has(memoryId)),
     )
-    const anchors = workspace.memory.anchors.filter((entry) =>
-      matchesQuery(entry.type, entry.label, entry.note),
-    )
+    const eraSuggestions = workspace.memory.eraSuggestions.filter((entry) => matchesQuery(entry))
     const reviewPrompts = workspace.memory.reviewPrompts.filter((entry) => matchesQuery(entry))
-    const traceCount = stages.reduce((count, entry) => count + entry.traces.length, 0)
-    return { stages, threads, nodes, anchors, reviewPrompts, traceCount }
+
+    return { growthNodes, threads, memories, anchors, eraSuggestions, reviewPrompts }
   }, [matchesQuery, workspace.growth, workspace.memory])
 
   const visibleExpenseTotal = transactions

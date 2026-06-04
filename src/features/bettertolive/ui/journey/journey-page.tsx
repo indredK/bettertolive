@@ -1,7 +1,16 @@
-import { BookHeart, Camera, Route, Sprout } from "lucide-react"
+import { BookHeart, Camera, CheckCheck, Route, Shield, Sprout, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import type { GrowthStage, MemoryAnchor, MemoryNode } from "@/features/bettertolive/types"
+import type {
+  EmotionalWeight,
+  FormativePower,
+  GrowthNode,
+  MemoryAnchor,
+  MemoryEntry,
+  MemoryType,
+  PrivacyLevel,
+  ProcessingStatus,
+} from "@/features/bettertolive/types"
 import {
   EmptyState,
   PageIntro,
@@ -11,26 +20,153 @@ import {
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
+const MEMORY_TYPES = ["事件", "地点", "物件", "人物", "照片", "领悟"] satisfies MemoryType[]
+
+const EMOTIONAL_WEIGHT_ORDER = ["轻", "中性", "重", "很重"] satisfies EmotionalWeight[]
+
+const PROCESSING_STATUS_ORDER = [
+  "已整理",
+  "正在理解",
+  "暂不触碰",
+  "决定不再细究",
+  "开放问题",
+  "想留给某人",
+  "记不清的裂缝",
+] satisfies ProcessingStatus[]
+
+const PRIVACY_LEVEL_ORDER = [
+  "仅自己",
+  "需二次确认",
+  "指定的人",
+  "未来可公开",
+  "离世后可看",
+] satisfies PrivacyLevel[]
+
+const FORMATIVE_POWER_ORDER = ["极深", "较深", "中等", "轻微", "无"] satisfies FormativePower[]
+
+const HIGH_FORMATIVE_POWERS = new Set<FormativePower>(["极深", "较深"])
+const HEAVY_EMOTIONAL_WEIGHTS = new Set<EmotionalWeight>(["重", "很重"])
+
+type JourneyViewData = {
+  growthNodes: GrowthNode[]
+  threads: string[]
+  memories: MemoryEntry[]
+  anchors: MemoryAnchor[]
+  eraSuggestions: string[]
+  reviewPrompts: string[]
+}
+
+type DistributionRow = {
+  label: string
+  count: number
+}
+
+function createMemoryLookup(memories: MemoryEntry[]) {
+  return new Map(memories.map((memory) => [memory.id, memory]))
+}
+
+function createDistribution<T extends string>(
+  order: readonly T[],
+  memories: MemoryEntry[],
+  getValue: (memory: MemoryEntry) => T | T[],
+) {
+  const counts = new Map<T, number>()
+
+  memories.forEach((memory) => {
+    const values = getValue(memory)
+    const valueList = Array.isArray(values) ? values : [values]
+    valueList.forEach((value) => {
+      counts.set(value, (counts.get(value) ?? 0) + 1)
+    })
+  })
+
+  return order.map((label) => ({
+    label,
+    count: counts.get(label) ?? 0,
+  }))
+}
+
+function createEraDistribution(memories: MemoryEntry[]) {
+  const counts = new Map<string, number>()
+
+  memories.forEach((memory) => {
+    memory.era.forEach((era) => {
+      counts.set(era, (counts.get(era) ?? 0) + 1)
+    })
+  })
+
+  return [...counts.entries()]
+    .sort((first, second) => second[1] - first[1] || first[0].localeCompare(second[0], "zh-CN"))
+    .map(([label, count]) => ({ label, count }))
+}
+
+function getLinkedMemories(memoryIds: string[], memoryById: Map<string, MemoryEntry>) {
+  return memoryIds
+    .map((memoryId) => memoryById.get(memoryId))
+    .filter((memory): memory is MemoryEntry => memory !== undefined)
+}
+
+function isUnresolvedHeavyMemory(memory: MemoryEntry) {
+  return HEAVY_EMOTIONAL_WEIGHTS.has(memory.emotionalWeight) && memory.processing !== "已整理"
+}
+
 export function JourneyPage({
-  stages,
-  threads,
-  nodes,
-  anchors,
-  reviewPrompts,
-  traceCount,
+  journey,
   searchQuery,
   isStackedLayout = false,
 }: {
-  stages: GrowthStage[]
-  threads: string[]
-  nodes: MemoryNode[]
-  anchors: MemoryAnchor[]
-  reviewPrompts: string[]
-  traceCount: number
+  journey: JourneyViewData
   searchQuery: string
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
+  const memoryById = createMemoryLookup(journey.memories)
+  const highFormativeMemories = journey.memories.filter(
+    (memory) => memory.formativePower && HIGH_FORMATIVE_POWERS.has(memory.formativePower),
+  )
+  const unresolvedHeavyMemories = journey.memories.filter(isUnresolvedHeavyMemory)
+  const protectedMemoryCount = journey.memories.filter(
+    (memory) => memory.privacy === "需二次确认" || memory.processing === "暂不触碰",
+  ).length
+  const classificationSections = [
+    {
+      title: "内容类型",
+      description: "先看这段记忆以什么形式被记住。",
+      rows: createDistribution(MEMORY_TYPES, journey.memories, (memory) => memory.type),
+    },
+    {
+      title: "人生时期",
+      description: "时期允许多选，主时期只用于时间线标注。",
+      rows: createEraDistribution(journey.memories),
+    },
+    {
+      title: "情感重量",
+      description: "它现在碰起来轻不轻。",
+      rows: createDistribution(
+        EMOTIONAL_WEIGHT_ORDER,
+        journey.memories,
+        (memory) => memory.emotionalWeight,
+      ),
+    },
+    {
+      title: "整理状态",
+      description: "不是所有过去都需要被整理完。",
+      rows: createDistribution(
+        PROCESSING_STATUS_ORDER,
+        journey.memories,
+        (memory) => memory.processing,
+      ),
+    },
+    {
+      title: "隐私级别",
+      description: "敏感记忆先有清晰边界。",
+      rows: createDistribution(PRIVACY_LEVEL_ORDER, journey.memories, (memory) => memory.privacy),
+    },
+  ]
+  const formativePowerRows = FORMATIVE_POWER_ORDER.map((label) => ({
+    label,
+    count: journey.memories.filter((memory) => memory.formativePower === label).length,
+  })).filter((row) => row.count > 0)
 
   return (
     <div
@@ -41,180 +177,160 @@ export function JourneyPage({
     >
       <PageIntro
         eyebrow="成长记忆"
-        title="把人生脉络整理成可理解的轨迹"
-        description="左边是塑造你的阶段背景，右边是发生在其中的关键节点。看清来路，是为了慢慢松开旧惯性。"
+        title="把记忆分类，再看见成长发生在哪里"
+        description="每条记忆用 5 个分类标签安放，用塑造力标出它如何影响今天的你。成长节点不是单条记忆，而是一组记忆显现出的变化模式。"
         searchQuery={searchQuery}
       />
 
-      <div className={cn("grid gap-4 min-[960px]:grid-cols-3", isFixedLayout && "shrink-0")}>
+      <div
+        className={cn(
+          "grid gap-4 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4",
+          isFixedLayout && "shrink-0",
+        )}
+      >
         <SummarySurface
           tone="past"
-          title="人生阶段"
-          value={`${stages.length} 段`}
-          detail="先按阶段把塑造你的环境排开。"
+          title="记忆档案"
+          value={`${journey.memories.length} 条`}
+          detail="事件、地点、物件、人物、照片和领悟都可以成为入口。"
         />
         <SummarySurface
           tone="value"
-          title="关键节点"
-          value={`${nodes.length} 个`}
-          detail="过去的事件如何还在影响现在的你。"
+          title="高塑造力"
+          value={`${highFormativeMemories.length} 条`}
+          detail="塑造力只做标注和回看，不放入主筛选器。"
+        />
+        <SummarySurface
+          tone="present"
+          title="需要轻放"
+          value={`${unresolvedHeavyMemories.length} 条`}
+          detail="情感较重且尚未整理好的记忆，先允许它只是存在。"
         />
         <SummarySurface
           tone="future"
-          title="留下来的痕迹"
-          value={`${traceCount + anchors.length} 处`}
-          detail="痕迹与锚点合起来，就是回看的入口。"
+          title="成长节点"
+          value={`${journey.growthNodes.length} 个`}
+          detail={`${protectedMemoryCount} 条记忆带有二次确认或暂不触碰保护。`}
         />
       </div>
 
       <div className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
         <Surface className="p-5">
           <SectionHeading
-            icon={Route}
-            title="人生脉络"
-            description="左边是塑造你的阶段背景，右边是发生在其中的具体节点。两层视角对应着同一段过去。"
+            icon={Waypoints}
+            title="5 维分类概览"
+            description="这些维度负责组织和过滤人生档案；塑造力留在时间线和条目详情里。"
           />
 
-          <div className="mt-5 grid gap-4 min-[1240px]:grid-cols-2">
-            <div className="space-y-4">
-              <div className="text-xs font-medium tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                成长阶段
-              </div>
-              {stages.length > 0 ? (
-                stages.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                      >
-                        {entry.stage}
-                      </Badge>
-                      <h3 className="text-base font-medium text-[color:var(--text-primary)]">
-                        {entry.title}
-                      </h3>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      环境：{entry.environment}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      影响：{entry.impact}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {entry.traces.map((trace) => (
-                        <Badge
-                          key={trace}
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-                        >
-                          {trace}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <EmptyState message="当前筛选下还没有可展示的成长阶段。" compact />
-              )}
-            </div>
-
-            <div className="space-y-4">
-              <div className="text-xs font-medium tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                人生节点
-              </div>
-              {nodes.length > 0 ? (
-                nodes.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
-                  >
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-                      >
-                        {entry.period}
-                      </Badge>
-                      <h3 className="text-base font-medium text-[color:var(--text-primary)]">
-                        {entry.title}
-                      </h3>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-                      {entry.summary}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-                      留下来的影响：{entry.impact}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {entry.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <EmptyState message="当前筛选下还没有可展示的人生节点。" compact />
-              )}
-            </div>
+          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+            {classificationSections.map((section) => (
+              <ClassificationPanel
+                key={section.title}
+                title={section.title}
+                description={section.description}
+                rows={section.rows}
+                total={journey.memories.length}
+              />
+            ))}
           </div>
 
-          {anchors.length > 0 ? (
-            <div className="mt-5 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-              <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-                <Camera className="size-4" />
-                记忆锚点
-              </div>
-              <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                很多回忆并不是从事件开始，而是从一个地方、一件东西或一张照片被唤起。
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {anchors.map((entry) => (
-                  <span
-                    key={entry.id}
-                    className="inline-flex items-center gap-2 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-1.5 text-xs text-[color:var(--text-secondary)]"
-                    title={entry.note}
-                  >
-                    <span className="font-medium text-[color:var(--text-primary)]">
-                      {entry.type}
-                    </span>
-                    <span className="text-[color:var(--text-muted)]">·</span>
-                    <span>{entry.label}</span>
-                  </span>
-                ))}
-              </div>
+          {journey.eraSuggestions.length > 0 || formativePowerRows.length > 0 ? (
+            <div className="mt-4 grid gap-3 min-[960px]:grid-cols-2">
+              {journey.eraSuggestions.length > 0 ? (
+                <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                    默认时期提示
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {journey.eraSuggestions.map((era) => (
+                      <Badge
+                        key={era}
+                        variant="outline"
+                        className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                      >
+                        {era}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {formativePowerRows.length > 0 ? (
+                <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                    塑造力标注
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                    跟随单条记忆显示，用来解释影响深度，不作为主筛选维度。
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {formativePowerRows.map((row) => (
+                      <Badge
+                        key={row.label}
+                        variant="outline"
+                        className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                      >
+                        {row.label} · {row.count}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
           ) : null}
         </Surface>
 
-        <div className="grid gap-4 min-[960px]:grid-cols-2">
+        <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
           <Surface className="p-5">
             <SectionHeading
-              icon={Sprout}
-              title="当前还在生效的影响"
-              description="不是为了怪过去，而是为了识别今天仍在自动运行的部分。"
+              icon={Route}
+              title="记忆时间线"
+              description="时间线按主时期排列，条目里始终显示塑造力，便于看清哪些经历真正改变了你。"
             />
 
             <div className="mt-5 space-y-3">
-              {threads.length > 0 ? (
-                threads.map((entry) => (
-                  <div
-                    key={entry}
-                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
-                  >
-                    {entry}
-                  </div>
+              {journey.memories.length > 0 ? (
+                journey.memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
+              ) : (
+                <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+              )}
+            </div>
+          </Surface>
+
+          <Surface className="p-5">
+            <SectionHeading
+              icon={Sprout}
+              title="成长节点"
+              description="当多条记忆指向同一个变化方向，它们就组成一个成长节点。"
+            />
+
+            <div className="mt-5 space-y-4">
+              {journey.growthNodes.length > 0 ? (
+                journey.growthNodes.map((node) => (
+                  <GrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
                 ))
               ) : (
-                <EmptyState message="当前筛选下没有可展示的影响线索。" compact />
+                <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
+              )}
+            </div>
+          </Surface>
+        </div>
+
+        <div className="grid gap-4 min-[960px]:grid-cols-2">
+          <Surface className="p-5">
+            <SectionHeading
+              icon={Camera}
+              title="感官锚点"
+              description="很多记忆不是从事件开始，而是被一个地点、一件物品或一张照片唤起来。"
+            />
+
+            <div className="mt-5 space-y-3">
+              {journey.anchors.length > 0 ? (
+                journey.anchors.map((anchor) => (
+                  <AnchorRow key={anchor.id} anchor={anchor} memoryById={memoryById} />
+                ))
+              ) : (
+                <EmptyState message="当前筛选下还没有记忆锚点。" compact />
               )}
             </div>
           </Surface>
@@ -223,17 +339,17 @@ export function JourneyPage({
             <SectionHeading
               icon={BookHeart}
               title="回看问题"
-              description="不是为了把过去说得更漂亮，而是让你更诚实地重新理解它。"
+              description="这些问题帮助你看见过去如何继续影响现在，而不是逼自己一次讲完。"
             />
 
             <div className="mt-5 space-y-3">
-              {reviewPrompts.length > 0 ? (
-                reviewPrompts.map((entry) => (
+              {journey.reviewPrompts.length > 0 ? (
+                journey.reviewPrompts.map((prompt) => (
                   <div
-                    key={entry}
+                    key={prompt}
                     className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
                   >
-                    {entry}
+                    {prompt}
                   </div>
                 ))
               ) : (
@@ -241,6 +357,304 @@ export function JourneyPage({
               )}
             </div>
           </Surface>
+        </div>
+
+        <Surface className="p-5">
+          <SectionHeading
+            icon={CheckCheck}
+            title="当前还在生效的影响"
+            description="这些线索从成长节点里浮出来，适合和观念、原则、关系页面交叉回看。"
+          />
+
+          <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
+            {journey.threads.length > 0 ? (
+              journey.threads.map((thread) => (
+                <div
+                  key={thread}
+                  className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+                >
+                  {thread}
+                </div>
+              ))
+            ) : (
+              <EmptyState message="当前筛选下没有可展示的影响线索。" compact />
+            )}
+          </div>
+        </Surface>
+      </div>
+    </div>
+  )
+}
+
+function ClassificationPanel({
+  title,
+  description,
+  rows,
+  total,
+}: {
+  title: string
+  description: string
+  rows: DistributionRow[]
+  total: number
+}) {
+  const visibleRows = rows.filter((row) => row.count > 0)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+      <div className="text-sm font-medium text-[color:var(--text-primary)]">{title}</div>
+      <p className="mt-1 min-h-[2.25rem] text-xs leading-5 text-[color:var(--text-muted)]">
+        {description}
+      </p>
+      <div className="mt-4 space-y-3">
+        {visibleRows.length > 0 ? (
+          visibleRows.map((row) => {
+            const width = total > 0 ? `${Math.max((row.count / total) * 100, 10)}%` : "0%"
+
+            return (
+              <div key={row.label} className="space-y-1.5">
+                <div className="flex items-center justify-between gap-3 text-xs">
+                  <span className="min-w-0 truncate text-[color:var(--text-secondary)]">
+                    {row.label}
+                  </span>
+                  <span className="shrink-0 text-[color:var(--text-muted)]">{row.count}</span>
+                </div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-[color:var(--chip-bg)]">
+                  <div
+                    className="h-full rounded-full bg-[color:var(--text-primary)] opacity-70"
+                    style={{ width }}
+                  />
+                </div>
+              </div>
+            )
+          })
+        ) : (
+          <div className="text-xs leading-5 text-[color:var(--text-muted)]">暂无分布数据。</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function MemoryCard({ memory }: { memory: MemoryEntry }) {
+  const formativePower = memory.formativePower ?? "未评估"
+  const needsSecondLook = memory.privacy === "需二次确认"
+
+  return (
+    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+        >
+          {memory.type}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {memory.primaryEra}
+        </Badge>
+        {needsSecondLook ? (
+          <Badge className="bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]">
+            需确认
+          </Badge>
+        ) : null}
+      </div>
+
+      <h3 className="mt-3 text-base font-medium text-[color:var(--text-primary)]">
+        {memory.title}
+      </h3>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{memory.summary}</p>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+        留下来的影响：{memory.impact}
+      </p>
+
+      <div className="mt-4 grid gap-2 min-[640px]:grid-cols-2">
+        <MemoryMeta label="情感重量" value={memory.emotionalWeight} />
+        <MemoryMeta label="整理状态" value={memory.processing} />
+        <MemoryMeta label="隐私级别" value={memory.privacy} />
+        <MemoryMeta label="塑造力" value={formativePower} accent />
+      </div>
+
+      {memory.sensoryCue ? (
+        <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs leading-5 text-[color:var(--text-muted)]">
+          感官线索：{memory.sensoryCue}
+        </div>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {memory.era.map((era) => (
+          <Badge
+            key={era}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {era}
+          </Badge>
+        ))}
+        {memory.sourceModules.map((source) => (
+          <Badge
+            key={source}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+          >
+            来源：{source}
+          </Badge>
+        ))}
+      </div>
+    </article>
+  )
+}
+
+function MemoryMeta({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string
+  value: string
+  accent?: boolean
+}) {
+  return (
+    <div className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-2">
+      <div className="text-[11px] text-[color:var(--text-muted)]">{label}</div>
+      <div
+        className={cn(
+          "mt-1 text-sm font-medium text-[color:var(--text-primary)]",
+          accent && "text-[color:var(--tone-value-ink)]",
+        )}
+      >
+        {value}
+      </div>
+    </div>
+  )
+}
+
+function GrowthNodeCard({
+  node,
+  memoryById,
+}: {
+  node: GrowthNode
+  memoryById: Map<string, MemoryEntry>
+}) {
+  const beforeMemories = getLinkedMemories(node.beforeMemoryIds, memoryById)
+  const afterMemories = getLinkedMemories(node.afterMemoryIds, memoryById)
+  const triggerMemory = memoryById.get(node.triggerMemoryId)
+
+  return (
+    <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
+          {node.domain}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {node.stability}
+        </Badge>
+      </div>
+      <h3 className="mt-3 text-base font-medium text-[color:var(--text-primary)]">{node.title}</h3>
+
+      <div className="mt-4 grid gap-3 min-[640px]:grid-cols-2">
+        <GrowthState label="变化前" value={node.before} />
+        <GrowthState label="变化后" value={node.after} />
+      </div>
+
+      <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+        关键转折：{node.keyEvent}
+      </div>
+
+      <div className="mt-3 space-y-2">
+        <MemoryLinkGroup title="变化前记忆" memories={beforeMemories} />
+        <MemoryLinkGroup title="变化后记忆" memories={afterMemories} />
+        {triggerMemory ? <MemoryLinkGroup title="触发记忆" memories={[triggerMemory]} /> : null}
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {node.evidence.map((entry) => (
+          <Badge
+            key={entry}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {entry}
+          </Badge>
+        ))}
+      </div>
+    </article>
+  )
+}
+
+function GrowthState({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-3">
+      <div className="text-xs text-[color:var(--text-muted)]">{label}</div>
+      <div className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{value}</div>
+    </div>
+  )
+}
+
+function MemoryLinkGroup({ title, memories }: { title: string; memories: MemoryEntry[] }) {
+  if (memories.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <span className="text-[color:var(--text-muted)]">{title}</span>
+      {memories.map((memory) => (
+        <span
+          key={memory.id}
+          className="inline-flex max-w-full items-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-2.5 py-1 text-[color:var(--text-secondary)]"
+          title={memory.summary}
+        >
+          {memory.title}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function AnchorRow({
+  anchor,
+  memoryById,
+}: {
+  anchor: MemoryAnchor
+  memoryById: Map<string, MemoryEntry>
+}) {
+  const memories = getLinkedMemories(anchor.linkedMemoryIds, memoryById)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+      <div className="flex items-start gap-3">
+        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]">
+          {anchor.type === "人物" ? <Shield className="size-4" /> : <Camera className="size-4" />}
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+            >
+              {anchor.type}
+            </Badge>
+            <h3 className="text-sm font-medium text-[color:var(--text-primary)]">{anchor.label}</h3>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{anchor.note}</p>
+          {memories.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {memories.map((memory) => (
+                <Badge
+                  key={memory.id}
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+                >
+                  {memory.title}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

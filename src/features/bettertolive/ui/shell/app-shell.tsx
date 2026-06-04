@@ -467,12 +467,7 @@ export function BetterToLiveAppShell() {
       case "journey":
         return (
           <JourneyPage
-            stages={viewModel.journeyData.stages}
-            threads={viewModel.journeyData.threads}
-            nodes={viewModel.journeyData.nodes}
-            anchors={viewModel.journeyData.anchors}
-            reviewPrompts={viewModel.journeyData.reviewPrompts}
-            traceCount={viewModel.journeyData.traceCount}
+            journey={viewModel.journeyData}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
@@ -524,8 +519,8 @@ export function BetterToLiveAppShell() {
             beliefCount={viewModel.beliefCards.length}
             principleCount={viewModel.principles.length}
             relationshipCount={viewModel.visibleRelationshipCount}
-            journeyStageCount={viewModel.journeyData.stages.length}
-            journeyNodeCount={viewModel.journeyData.nodes.length}
+            journeyStageCount={viewModel.journeyData.growthNodes.length}
+            journeyNodeCount={viewModel.journeyData.memories.length}
             legacyDirectiveCount={viewModel.legacyDirectives.length}
             legacyLetterCount={viewModel.legacyLetters.length}
             shoppingCount={viewModel.visibleShoppingCount}
