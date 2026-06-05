@@ -40,10 +40,12 @@ import { cn } from "@/lib/utils"
 
 function SpaceDetailTable({
   space,
+  isManagementMode,
   onEditOwned,
   onEditPlan,
 }: {
   space: SpaceOverview
+  isManagementMode?: boolean
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
@@ -95,7 +97,7 @@ function SpaceDetailTable({
           <Table className="whitespace-nowrap">
             <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
               <TableRow>
-                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                <TableHead className="sticky left-0 z-10 bg-[color:var(--surface-bg)] text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
                   {t("shopping.spaces.table.itemName")}
                 </TableHead>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
@@ -107,10 +109,15 @@ function SpaceDetailTable({
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
                   {t("shopping.spaces.table.stage")}
                 </TableHead>
-                <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
+                <TableHead
+                  className={cn(
+                    "z-10 bg-[color:var(--surface-bg)] text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase",
+                    isManagementMode ? "sticky right-[40px]" : "sticky right-0",
+                  )}
+                >
                   {t("shopping.spaces.table.tag")}
                 </TableHead>
-                <TableHead className="w-[40px]" />
+                <TableHead className="sticky right-0 z-10 w-[40px] bg-[color:var(--surface-bg)]" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,7 +125,7 @@ function SpaceDetailTable({
                 const isPlanItem = "currentPrice" in item
                 return (
                   <TableRow key={item.id}>
-                    <TableCell>
+                    <TableCell className="sticky left-0 z-10 bg-[color:var(--surface-bg)]">
                       <div className="text-sm text-[color:var(--text-primary)]">{item.name}</div>
                       <div className="truncate text-[11px] text-[color:var(--text-muted)]">
                         {isPlanItem ? item.reason : item.replacementCue}
@@ -133,7 +140,12 @@ function SpaceDetailTable({
                     <TableCell className="text-sm text-[color:var(--text-secondary)]">
                       {item.stages.map((stage) => stageLikeDisplayName(stage, t)).join(", ")}
                     </TableCell>
-                    <TableCell>
+                    <TableCell
+                      className={cn(
+                        "z-10 bg-[color:var(--surface-bg)]",
+                        isManagementMode ? "sticky right-[40px]" : "sticky right-0",
+                      )}
+                    >
                       <Badge
                         variant="outline"
                         className={cn(
@@ -146,22 +158,24 @@ function SpaceDetailTable({
                         {sourceLabel}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <Button
-                        size="icon-sm"
-                        variant="ghost"
-                        className="text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (sourceType === "planned" && onEditPlan) {
-                            onEditPlan(item as ShoppingPlanWithLane)
-                          } else if (sourceType === "owned" && onEditOwned) {
-                            onEditOwned(item as ShoppingOwnedItem)
-                          }
-                        }}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
+                    <TableCell className="sticky right-0 z-10 bg-[color:var(--surface-bg)]">
+                      {isManagementMode ? (
+                        <Button
+                          size="icon-sm"
+                          variant="ghost"
+                          className="text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            if (sourceType === "planned" && onEditPlan) {
+                              onEditPlan(item as ShoppingPlanWithLane)
+                            } else if (sourceType === "owned" && onEditOwned) {
+                              onEditOwned(item as ShoppingOwnedItem)
+                            }
+                          }}
+                        >
+                          <Pencil className="size-3.5" />
+                        </Button>
+                      ) : null}
                     </TableCell>
                   </TableRow>
                 )
@@ -421,6 +435,7 @@ export function ShoppingSpacesTab({
           {selectedSpace ? (
             <SpaceDetailTable
               space={selectedSpace}
+              isManagementMode={isManagementMode}
               onEditOwned={onEditOwned}
               onEditPlan={onEditPlan}
             />

@@ -50,11 +50,13 @@ const SHOPPING_SEGMENT_TRIGGER_CLASSNAME =
 function SystemDetailItemRow({
   item,
   sourceLabel,
+  isManagementMode,
   onEditOwned,
   onEditPlan,
 }: {
   item: ShoppingSystemOverview["owned"][number] | ShoppingSystemOverview["planned"][number]
   sourceLabel: string
+  isManagementMode?: boolean
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
@@ -78,21 +80,23 @@ function SystemDetailItemRow({
           </p>
         </div>
 
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-          onClick={(e) => {
-            e.stopPropagation()
-            if (isPlanItem && onEditPlan) {
-              onEditPlan(item)
-            } else if (!isPlanItem && onEditOwned) {
-              onEditOwned(item)
-            }
-          }}
-        >
-          <Pencil className="size-3.5" />
-        </Button>
+        {isManagementMode ? (
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (isPlanItem && onEditPlan) {
+                onEditPlan(item)
+              } else if (!isPlanItem && onEditOwned) {
+                onEditOwned(item)
+              }
+            }}
+          >
+            <Pencil className="size-3.5" />
+          </Button>
+        ) : null}
       </div>
     </div>
   )
@@ -100,10 +104,12 @@ function SystemDetailItemRow({
 
 function SystemDetailPanel({
   system,
+  isManagementMode,
   onEditOwned,
   onEditPlan,
 }: {
   system: ShoppingSystemOverview
+  isManagementMode?: boolean
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
@@ -180,6 +186,7 @@ function SystemDetailPanel({
                     key={item.id}
                     item={item}
                     sourceLabel={t("shopping.systems.ownedLabel")}
+                    isManagementMode={isManagementMode}
                     onEditOwned={onEditOwned}
                   />
                 ))}
@@ -199,6 +206,7 @@ function SystemDetailPanel({
                     key={item.id}
                     item={item}
                     sourceLabel={laneDisplayName(item.laneId, item.laneTitle, t)}
+                    isManagementMode={isManagementMode}
                     onEditPlan={onEditPlan}
                   />
                 ))}
@@ -431,6 +439,7 @@ export function ShoppingSystemsTab({
           {selectedSystem ? (
             <SystemDetailPanel
               system={selectedSystem}
+              isManagementMode={isManagementMode}
               onEditOwned={onEditOwned}
               onEditPlan={onEditPlan}
             />
