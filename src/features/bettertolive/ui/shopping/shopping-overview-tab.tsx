@@ -20,7 +20,7 @@ import type {
   ShoppingSpotlight,
 } from "@/features/bettertolive/types"
 import { Surface, EmptyState, SectionHeading } from "@/features/bettertolive/ui/shared/shared"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
   type ShoppingLifecycleGroups,
   getOverviewDimensions,

@@ -18,7 +18,7 @@ import type {
   ShoppingOwnedItem,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
   DEPRECIATION_STYLES,
   getLifecycleCopy,
@@ -66,6 +66,17 @@ export function SystemChip({ system }: { system: ShoppingSystem }) {
       className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
     >
       {system}
+    </Badge>
+  )
+}
+
+export function SystemSummaryChip({ label }: { label: string }) {
+  return (
+    <Badge
+      variant="outline"
+      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+    >
+      {label}
     </Badge>
   )
 }

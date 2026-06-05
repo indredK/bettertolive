@@ -33,7 +33,42 @@ import {
 } from "@/features/bettertolive/api/shopping-crud-api"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/models/workspace"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
+import type {
+  ShoppingDepreciation,
+  ShoppingLifecycle,
+  ShoppingNeedLevel,
+  ShoppingSystem,
+} from "@/features/bettertolive/types"
+
+const SYSTEM_OPTIONS: ShoppingSystem[] = [
+  "睡眠",
+  "饮食",
+  "清洁",
+  "收纳",
+  "照明",
+  "环境",
+  "电力网络",
+  "工作学习",
+  "应急健康",
+  "个人护理",
+  "穿着",
+  "家具陈设",
+  "出行",
+  "娱乐爱好",
+]
+
+const NECESSITY_OPTIONS: ShoppingNeedLevel[] = ["最低配置", "必要", "改善体验", "提升幸福感"]
+
+const LIFECYCLE_OPTIONS: ShoppingLifecycle[] = ["消耗品", "耐用品", "工具", "情感物"]
+
+const DEPRECIATION_OPTIONS: ShoppingDepreciation[] = [
+  "极快折旧",
+  "较快折旧",
+  "中等折旧",
+  "慢折旧",
+  "不折旧或升值",
+]
 
 export type EditingOwnedItem = {
   type: "owned"
@@ -294,11 +329,21 @@ function ItemDialogContent({
           ) : null}
 
           <FormField label={t("shopping.admin.items.form.systemId")} required>
-            <Input
-              value={form.system}
-              onChange={(e) => update({ system: e.target.value })}
-              placeholder={t("shopping.admin.items.form.systemPlaceholder")}
-            />
+            <Select
+              value={`${form.system}`}
+              onValueChange={(v) => setForm((prev) => ({ ...prev, system: v }) as FormState)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("shopping.admin.items.form.systemPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {SYSTEM_OPTIONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormField>
           <FormField label={t("shopping.admin.items.form.category")} required>
             <Input
@@ -308,25 +353,56 @@ function ItemDialogContent({
             />
           </FormField>
           <FormField label={t("shopping.admin.items.form.necessity")} required>
-            <Input
-              value={form.necessity}
-              onChange={(e) => update({ necessity: e.target.value })}
-              placeholder={t("shopping.admin.items.form.necessityPlaceholder")}
-            />
+            <Select
+              value={`${form.necessity}`}
+              onValueChange={(v) => setForm((prev) => ({ ...prev, necessity: v }) as FormState)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("shopping.admin.items.form.necessityPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {NECESSITY_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={n}>
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormField>
           <FormField label={t("shopping.admin.items.form.lifecycle")} required>
-            <Input
-              value={form.lifecycle}
-              onChange={(e) => update({ lifecycle: e.target.value })}
-              placeholder={t("shopping.admin.items.form.lifecyclePlaceholder")}
-            />
+            <Select
+              value={`${form.lifecycle}`}
+              onValueChange={(v) => setForm((prev) => ({ ...prev, lifecycle: v }) as FormState)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("shopping.admin.items.form.lifecyclePlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                {LIFECYCLE_OPTIONS.map((l) => (
+                  <SelectItem key={l} value={l}>
+                    {l}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormField>
           <FormField label={t("shopping.admin.items.form.depreciation")}>
-            <Input
-              value={form.depreciation ?? ""}
-              onChange={(e) => update({ depreciation: e.target.value || null })}
-              placeholder={t("shopping.admin.items.form.depreciationPlaceholder")}
-            />
+            <Select
+              value={form.depreciation ?? undefined}
+              onValueChange={(v) => update({ depreciation: v || undefined })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t("shopping.admin.items.form.depreciationPlaceholder")} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="unset">—</SelectItem>
+                {DEPRECIATION_OPTIONS.map((d) => (
+                  <SelectItem key={d} value={d}>
+                    {d}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormField>
           <FormField label={t("shopping.admin.items.form.spaces")}>
             <Input

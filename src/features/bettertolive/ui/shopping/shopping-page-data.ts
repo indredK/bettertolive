@@ -8,7 +8,7 @@ import type {
 } from "@/features/bettertolive/types"
 import i18next from "@/i18n/config"
 import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 
 export const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
   最低配置:

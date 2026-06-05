@@ -33,7 +33,7 @@ import {
   ClassificationBadge,
   ShoppingPriceRow,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import { cn } from "@/lib/utils"
 
 const ALL_DEPRECIATIONS: ShoppingDepreciation[] = [
@@ -413,6 +413,7 @@ export function ShoppingPlanningTab({
   isManagementMode,
   onEditPlan,
   onAddNew,
+  planItems,
 }: {
   shopping: ShoppingModuleData
   isWideLayout: boolean
@@ -420,11 +421,9 @@ export function ShoppingPlanningTab({
   isManagementMode?: boolean
   onEditPlan?: (item: ShoppingPlanWithLane) => void
   onAddNew?: () => void
+  planItems: ShoppingPlanWithLane[]
 }) {
   const { t } = useTranslation()
-  const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
-    lane.items.map((item) => ({ ...item, laneId: lane.id, laneTitle: lane.title })),
-  )
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [filterDepreciation, setFilterDepreciation] = useState<ShoppingDepreciation | "all">("all")

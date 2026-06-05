@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button"
 import { TabsContent } from "@/components/ui/tabs"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
-import { AddCard } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import {
+  AddCard,
+  SystemSummaryChip,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type {
   ShoppingPlanWithLane,
   ShoppingSystemOverview,
-} from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+} from "@/features/bettertolive/ui/shopping/shopping-types"
 import { cn } from "@/lib/utils"
 
 const SYSTEM_STATUS_STYLES = {
@@ -17,17 +20,6 @@ const SYSTEM_STATUS_STYLES = {
     "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
   pending:
     "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
-}
-
-function SystemSummaryChip({ label }: { label: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-    >
-      {label}
-    </Badge>
-  )
 }
 
 function SystemDetailItemRow({

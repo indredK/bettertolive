@@ -11,23 +11,15 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
-import type { SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
+import type { SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
-import { AddCard } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
+import {
+  AddCard,
+  SystemSummaryChip,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
-
-function SystemSummaryChip({ label }: { label: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-    >
-      {label}
-    </Badge>
-  )
-}
 
 function SpaceDetailTable({
   space,

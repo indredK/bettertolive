@@ -25,8 +25,8 @@ import { ShoppingStageEditDialog } from "@/features/bettertolive/ui/shopping/sho
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
-import { type ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
-import { type SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
+import { type ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
+import { type SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
 import { cn } from "@/lib/utils"
 
 export function ShoppingPage({
@@ -356,6 +356,7 @@ export function ShoppingPage({
 
         <ShoppingPlanningTab
           shopping={shopping}
+          planItems={planItems}
           isWideLayout={isWideLayout}
           isFixedLayout={isFixedLayout}
           isManagementMode={isManagementMode}
