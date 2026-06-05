@@ -514,7 +514,7 @@ export function AddCard({ onClick, className }: { onClick: () => void; className
       type="button"
       onClick={onClick}
       className={cn(
-        "flex w-[200px] shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-[color:var(--chip-border)] px-3 py-4 text-[color:var(--text-muted)] transition-all duration-200 hover:border-[color:var(--tone-present-border)] hover:text-[color:var(--text-primary)]",
+        "flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-[color:var(--chip-border)] px-3 py-4 text-[color:var(--text-muted)] transition-all duration-200 hover:border-[color:var(--tone-present-border)] hover:text-[color:var(--text-primary)]",
         className,
       )}
     >

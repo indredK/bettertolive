@@ -105,7 +105,7 @@ function PlanItemRow({
   const signal = getPriceSignal(item, t)
 
   return (
-    <div className="relative w-[210px] shrink-0">
+    <div className="relative w-full">
       <button
         type="button"
         onClick={() => onSelect(item.id)}
@@ -592,7 +592,7 @@ export function ShoppingPlanningTab({
 
               <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto">
                 {filteredItems.length > 0 || (isManagementMode && onAddNew) ? (
-                  <div className="flex flex-wrap content-start gap-2">
+                  <div className="grid auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2">
                     {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
                     {filteredItems.map((item) => (
                       <PlanItemRow

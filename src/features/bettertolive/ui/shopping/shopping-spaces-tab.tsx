@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next"
-import { GripVertical, House, Pencil } from "lucide-react"
+import { House, Pencil } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -222,8 +222,7 @@ function SpaceMapCard({
         type="button"
         onClick={() => onSelect(space.name)}
         className={cn(
-          "flex w-[210px] shrink-0 flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
-          isManagementMode && "pl-0",
+          "flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
           isActive
             ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
             : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
@@ -234,8 +233,10 @@ function SpaceMapCard({
       >
         <div className="flex min-w-0 items-start gap-2 pr-6">
           {isManagementMode ? (
-            <div className="flex size-6 shrink-0 items-center justify-center text-[color:var(--text-muted)]">
-              <GripVertical className="size-3.5" />
+            <div className="mr-0.5 flex shrink-0 flex-col items-center gap-[1.5px] self-center py-0.5">
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
             </div>
           ) : null}
           <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
@@ -251,12 +252,7 @@ function SpaceMapCard({
           </div>
         </div>
 
-        <div
-          className={cn(
-            "flex min-w-0 items-center gap-1.5 overflow-hidden",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden")}>
           <Badge
             variant="outline"
             className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
@@ -273,21 +269,11 @@ function SpaceMapCard({
           ) : null}
         </div>
 
-        <p
-          className={cn(
-            "truncate text-[12px] leading-5 text-[color:var(--text-secondary)]",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <p className={cn("truncate text-[12px] leading-5 text-[color:var(--text-secondary)]")}>
           {summaryText}
         </p>
 
-        <div
-          className={cn(
-            "flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45")}>
           {Array.from(space.systems)
             .slice(0, 3)
             .map((system) => (
@@ -387,7 +373,7 @@ export function ShoppingSpacesTab({
       >
         {/* Left: Space Cards */}
         <Surface className={cn("flex min-h-0 flex-col p-3", isFixedLayout && "min-h-0")}>
-          <div className="flex min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] flex-wrap content-start gap-2 overflow-y-auto pr-1">
+          <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
             {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
             {spaces.length > 0 ? (
               spaces.map((space) => (

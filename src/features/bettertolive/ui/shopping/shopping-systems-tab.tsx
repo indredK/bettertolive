@@ -1,4 +1,4 @@
-import { GripVertical, Pencil } from "lucide-react"
+import { Pencil } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -232,8 +232,7 @@ function SystemMapCard({
         type="button"
         onClick={() => onSelect(definition.id)}
         className={cn(
-          "flex w-[210px] shrink-0 flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
-          isManagementMode && "pl-0",
+          "flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
           isSelected
             ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]"
             : "border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)] hover:border-[color:var(--surface-border)] hover:shadow-[0_2px_8px_rgba(15,23,42,0.04)]",
@@ -242,8 +241,10 @@ function SystemMapCard({
       >
         <div className="flex min-w-0 items-start gap-2 pr-6">
           {isManagementMode ? (
-            <div className="flex size-6 shrink-0 items-center justify-center text-[color:var(--text-muted)]">
-              <GripVertical className="size-3.5" />
+            <div className="mr-0.5 flex shrink-0 flex-col items-center gap-[1.5px] self-center py-0.5">
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
+              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
             </div>
           ) : null}
           <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
@@ -260,12 +261,7 @@ function SystemMapCard({
         </div>
 
         {/* Row 2: Badges — no wrapping, overflow hidden */}
-        <div
-          className={cn(
-            "flex min-w-0 items-center gap-1.5 overflow-hidden",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden")}>
           <Badge
             variant="outline"
             className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
@@ -283,22 +279,12 @@ function SystemMapCard({
         </div>
 
         {/* Row 3: Summary — single line with ellipsis truncation */}
-        <p
-          className={cn(
-            "truncate text-[12px] leading-5 text-[color:var(--text-secondary)]",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <p className={cn("truncate text-[12px] leading-5 text-[color:var(--text-secondary)]")}>
           {definition.summary}
         </p>
 
         {/* Row 4: Secondary group badges — no wrapping, overflow hidden */}
-        <div
-          className={cn(
-            "flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45",
-            isManagementMode && "pl-8",
-          )}
-        >
+        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45")}>
           {definition.secondaryGroups.slice(0, 2).map((group) => (
             <Badge
               key={group}
@@ -396,7 +382,7 @@ export function ShoppingSystemsTab({
       >
         {/* Left: System Cards */}
         <Surface className={cn("flex min-h-0 flex-col p-3", isFixedLayout && "min-h-0")}>
-          <div className="flex min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] flex-wrap content-start gap-2 overflow-y-auto pr-1">
+          <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
             {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
             {systems.length > 0 ? (
               systems.map((definition) => (
