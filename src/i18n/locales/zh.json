@@ -1,0 +1,667 @@
+{
+  "shopping": {
+    "page": {
+      "eyebrow": "生活物品",
+      "title": "生活物品分类工作台",
+      "description": "先用只读方式把分类体系立起来，再决定以后要不要做录入和操作。"
+    },
+    "tabs": {
+      "overview": "总览",
+      "systems": "系统地图",
+      "spaces": "空间巡检",
+      "stages": "阶段模板",
+      "planning": "采购决策",
+      "admin": "管理"
+    },
+    "overview": {
+      "currentFocus": "当前该先看什么",
+      "currentFocusDesc": "这些不是随机想法，而是从系统缺口、动作节奏和购买判断里冒出来的提醒。",
+      "prevSpotlight": "上一条提醒",
+      "nextSpotlight": "下一条提醒",
+      "switchToNth": "切换到第 {{n}} 条提醒",
+      "noSpotlights": "当前筛选下没有需要注意的系统提醒。",
+      "dimensions": "五维分类",
+      "lifestyle": "生活方式",
+      "boundary": "边界约定",
+      "actionRhythm": "动作节奏",
+      "actionRhythmDesc": "同样都是\u201c需要\u201d，但下一步完全不同：补货、等好价、一次备齐，还是别乱动。",
+      "purchaseAlerts": "购买提醒",
+      "purchaseAlertsDesc": "把折旧、慢慢买好和基础补齐放在同一块里看，方便快速切换。",
+      "highDepreciation": "高折旧",
+      "buySlowly": "慢慢买好",
+      "essentials": "基础件",
+      "ownedAndPlanned": "已有 {{owned}} 项 · 待看 {{planned}} 项",
+      "noItemsUnderFilter": "当前筛选下还没有条目。",
+      "noHighDepreciationWarnings": "当前筛选下没有需要额外冷静的高折旧幸福感物品。",
+      "noSlowDepreciationSuggestions": "当前筛选下没有慢折旧的长期件建议。",
+      "noEssentialsReminder": "当前筛选下没有基础提醒。"
+    },
+    "dimensions": {
+      "system": {
+        "answer": "它在撑哪个生活功能？",
+        "detail": "睡眠、饮食、清洁、工作学习这类系统，帮助你先看缺口。",
+        "cue": "先确认它在补哪个生活缺口，再决定是不是现在要处理。"
+      },
+      "space": {
+        "answer": "它放在哪？",
+        "detail": "卧室、书桌、厨房、玄关，帮助你按空间巡检。",
+        "cue": "把它放回真实空间里看，你会更容易发现缺件和重复购买。"
+      },
+      "stage": {
+        "answer": "当前阶段需要它吗？",
+        "detail": "搬家最低配、租房、长期居住、自有住房，对应不同深度。",
+        "cue": "先按当前居住阶段配齐，不要提前为下一阶段囤太多东西。"
+      },
+      "necessity": {
+        "answer": "没有它会不会塌？",
+        "detail": "最低配置和必要项决定优先级，幸福感项留到基础更稳以后。",
+        "cue": "它帮你排先后顺序，把真正影响连续性的东西提到前面。"
+      },
+      "lifecycle": {
+        "answer": "它以什么节奏出现？",
+        "detail": "消耗品补货、耐用品等好价、工具一次备齐、情感物单独对待。",
+        "cue": "同样都是需要，补货、等好价和一次备齐的下一步完全不同。"
+      }
+    },
+    "lifecycle": {
+      "consumables": {
+        "title": "补货节奏",
+        "detail": "它会被用完，重点不是值不值，而是别让库存突然归零。"
+      },
+      "durables": {
+        "title": "长期使用",
+        "detail": "它应该陪伴你很多年，判断重点是规格、频率和长期回报。"
+      },
+      "tools": {
+        "title": "一次补齐",
+        "detail": "平时存在感很低，但少一个就会卡住，适合提前备好。"
+      },
+      "emotional": {
+        "title": "单独对待",
+        "detail": "它不靠功能存在，不应该和别的物品用同一套淘汰逻辑。"
+      }
+    },
+    "priceSignal": {
+      "inBuyZone": "已进可买区间",
+      "overpriced": "当前偏贵",
+      "watchOnly": "先观察"
+    },
+    "systems": {
+      "coreQuestion": "核心问题：{{question}}",
+      "secondaryGroups": "二级分组",
+      "spaces": "空间",
+      "noSpaceData": "暂无空间数据",
+      "ownedLabel": "已拥有",
+      "ownedCount": "已有 {{count}} 项",
+      "pendingCount": "待补 {{count}} 项",
+      "noOwnedItems": "当前没有已拥有条目。",
+      "noPendingItems": "当前没有待补条目。",
+      "pendingBadge": "待补 {{count}}",
+      "ownedBadge": "已有 {{count}}",
+      "selectPrompt": "选择一个系统查看详情",
+      "noSystemData": "当前筛选下没有系统地图数据。"
+    },
+    "spaces": {
+      "totalItemsAndSystems": "共 {{total}} 项 · {{systems}} 个系统",
+      "noItemsInSpace": "当前该空间暂无物品数据。",
+      "associatedSystemsCount": "{{count}} 个关联系统",
+      "itemSummary": "已有 {{owned}}，待补 {{planned}}",
+      "itemSummaryMore": "已有 {{ownedList}} 等，待补 {{plannedList}} 等",
+      "noItemData": "暂无物品数据",
+      "pendingBadge": "待补 {{count}}",
+      "selectPrompt": "选择一个空间查看详情",
+      "noSpaceData": "当前筛选下没有空间视角数据。",
+      "table": {
+        "itemName": "物品名称",
+        "system": "系统",
+        "category": "类别",
+        "stage": "阶段",
+        "tag": "标签",
+        "owned": "已拥有"
+      }
+    },
+    "stages": {
+      "systemCount": "{{count}} 个系统",
+      "itemCount": "{{count}} 条物品",
+      "selectPrompt": "选择一个阶段查看详情",
+      "noTemplates": "当前筛选下没有阶段模板。",
+      "table": {
+        "system": "系统",
+        "minimum": "最低配置",
+        "upgrades": "升级配置"
+      },
+      "noStageItems": "当前阶段暂时没有这一层。"
+    },
+    "planning": {
+      "filter": "筛选",
+      "clear": "清除",
+      "depreciation": "折旧率",
+      "system": "系统",
+      "necessity": "必要性",
+      "lifecycle": "生命周期",
+      "all": "全部",
+      "itemCount": "{{count}} 个物件",
+      "selectPrompt": "选择一个物件查看采购详情",
+      "noMatchingItems": "当前筛选条件下没有匹配的物件。",
+      "decisionReason": "决策理由",
+      "priceReference": "价格参考",
+      "systemInfo": "系统信息",
+      "similarPriceRef": "同类价格参考",
+      "relatedTags": "相关标签",
+      "searchKeywords": "搜索关键词",
+      "currentPrice": "当前价格",
+      "buyBelowPrice": "可购入价格",
+      "overpayPrice": "偏贵价格",
+      "coreQuestion": "核心问题：{{question}}",
+      "table": {
+        "item": "物品",
+        "system": "系统",
+        "entryPrice": "入门价",
+        "comfortZone": "舒适区间",
+        "overpay": "偏贵"
+      }
+    },
+    "shared": {
+      "boundaryTable": {
+        "item": "物品",
+        "ownership": "归属",
+        "reason": "理由"
+      },
+      "relatedReminders": "相关提醒",
+      "noItemsInLayer": "当前阶段暂时没有这一层。"
+    },
+    "admin": {
+      "itemsManagement": "物件管理",
+      "itemsManagementDesc": "已有与计划物件",
+      "items": {
+        "unifiedManagement": "统一管理",
+        "unifiedDesc": "已有物件与计划物件共用同一张清单",
+        "searchPlaceholder": "搜索名称、系统、分类、状态",
+        "addItem": "添加物件",
+        "newOwnedItem": "新增已有物件",
+        "newPlanItem": "新增计划物件",
+        "loading": "加载中...",
+        "itemList": "物件列表",
+        "itemListDesc": "支持从列表中直接进入编辑，按系统、状态和必要性快速查看。",
+        "currentResults": "当前结果 {{count}} 条",
+        "confirmDelete": "确定删除这个物件？",
+        "noMatchingItems": "没有匹配的物件。",
+        "newOwnedTitle": "新增已有物件",
+        "newPlanTitle": "新增计划物件",
+        "editTitle": "编辑物件：{{name}}",
+        "saveInstructions": "填写物件信息后点击保存。",
+        "editInstructions": "修改物件信息后点击保存。",
+        "cancel": "取消",
+        "save": "保存",
+        "table": {
+          "name": "名称",
+          "classification": "分类",
+          "system": "系统",
+          "category": "品类",
+          "necessity": "必要性",
+          "lifecycle": "生命周期",
+          "info": "信息",
+          "actions": "操作"
+        },
+        "classification": {
+          "owned": "已有",
+          "planned": "计划"
+        },
+        "statusNotSet": "未设置状态",
+        "quantity": "数量 {{n}}",
+        "noPrice": "未填价格",
+        "form": {
+          "name": "名称",
+          "laneId": "采购分栏 (laneId)",
+          "selectLane": "选择采购分栏",
+          "systemId": "系统ID (system)",
+          "category": "分类 (category)",
+          "necessity": "必要性 (necessity)",
+          "lifecycle": "生命周期 (lifecycle)",
+          "depreciation": "折旧 (depreciation)",
+          "spaces": "空间 (spaces，逗号分隔)",
+          "stages": "阶段 (stages，逗号分隔)",
+          "quantity": "数量 (quantity)",
+          "status": "状态 (status)",
+          "replacementCue": "替换提示 (replacementCue)",
+          "tags": "标签 (tags，逗号分隔)",
+          "keywords": "关键词 (keywords，逗号分隔)",
+          "reason": "理由 (reason)",
+          "targetLifestyle": "目标生活方式 (targetLifestyle)",
+          "currentPrice": "当前价格 (currentPrice)",
+          "buyBelowPrice": "购入价格 (buyBelowPrice)",
+          "overpayPrice": "超付价格 (overpayPrice)",
+          "note": "备注 (note)",
+          "namePlaceholder": "物件名称",
+          "systemPlaceholder": "e.g. sleep",
+          "categoryPlaceholder": "e.g. 卧室",
+          "necessityPlaceholder": "e.g. 核心刚需",
+          "lifecyclePlaceholder": "e.g. 耐用品",
+          "depreciationPlaceholder": "e.g. 慢折旧",
+          "spacesPlaceholder": "e.g. 卧室, 客厅",
+          "stagesPlaceholder": "e.g. 搭建, 优化",
+          "statusPlaceholder": "e.g. 在用",
+          "cuePlaceholder": "e.g. 舒适度下降或塌陷",
+          "tagsPlaceholder": "e.g. 高频, 刚需",
+          "keywordsPlaceholder": "e.g. 床垫, 睡眠",
+          "reasonPlaceholder": "为什么要购买",
+          "lifestylePlaceholder": "e.g. 舒服",
+          "pricePlaceholder": "0.00",
+          "notePlaceholder": "其他备注"
+        }
+      },
+      "pageContentLabel": "页面内容",
+      "pageContentDesc": "模板与说明内容",
+      "pageContent": {
+        "contentGroup": "内容分组",
+        "contentGroupDesc": "不同内容类型共用一个管理界面",
+        "selectType": "选择内容类型",
+        "addContent": "新增内容",
+        "count": "{{count}} 条",
+        "contentList": "{{type}} 内容列表",
+        "contentListDesc": "集中维护当前分类下的标题、摘要与关联字段。",
+        "noContent": "暂无 {{type}} 内容，点击\u201c新增内容\u201d开始添加。",
+        "newContentTitle": "新增页面内容",
+        "editContentTitle": "编辑内容：{{title}}",
+        "saveInstructions": "填写内容信息后点击保存。",
+        "editInstructions": "修改内容信息后点击保存。",
+        "confirmDelete": "确定删除这条内容？",
+        "cancel": "取消",
+        "save": "保存",
+        "loading": "加载中...",
+        "table": {
+          "title": "标题",
+          "stage": "阶段",
+          "system": "系统",
+          "summary": "摘要",
+          "actions": "操作"
+        },
+        "type": {
+          "spotlight": "焦点提醒",
+          "stageChecklist": "阶段模板",
+          "priceReference": "价格参考",
+          "boundaryEntry": "边界约定",
+          "lifestyleCollection": "生活方式"
+        },
+        "form": {
+          "contentType": "内容类型 (contentType)",
+          "title": "标题 (title)",
+          "titlePlaceholder": "内容标题",
+          "stage": "阶段 (stage)",
+          "stagePlaceholder": "e.g. 搭建",
+          "system": "系统 (system)",
+          "systemPlaceholder": "e.g. sleep",
+          "summary": "摘要 (summary)",
+          "summaryPlaceholder": "简短摘要",
+          "reason": "理由 (reason)",
+          "reasonPlaceholder": "理由说明",
+          "body": "内容体 JSON (body)",
+          "bodyPlaceholder": "{\"key\": \"value\"}"
+        }
+      }
+    }
+  },
+  "shell": {
+    "brandSubtitle": "个人的人生工作台",
+    "tagline": "本地优先 / 自我认知系统",
+    "modeBadge": "V1 Mock",
+    "expandSidebar": "展开菜单列",
+    "collapseSidebar": "收起菜单列",
+    "searchPlaceholder": "搜索记录、观念、关系或成长线索",
+    "searchAria": "搜索记录和页面内容",
+    "quickRecord": "快速记录",
+    "language": {
+      "switchToEnglish": "Switch to English",
+      "switchToChinese": "切换到中文",
+      "englishTitle": "English",
+      "chineseTitle": "中文"
+    },
+    "views": {
+      "overview": "总览",
+      "reflection": "反思",
+      "events": "记事",
+      "finance": "记账",
+      "shopping": "生活物品",
+      "nutrition": "饮食",
+      "emotion": "情绪情感",
+      "beliefs": "观念",
+      "principles": "原则与底线",
+      "relationships": "关系深化",
+      "journey": "成长记忆",
+      "legacy": "生命整理",
+      "socioeconomics": "社会经济",
+      "future": "未来蓝图"
+    },
+    "nav": {
+      "groups": {
+        "workbench": "工作台",
+        "records": "记录",
+        "innerState": "内在状态",
+        "selfMap": "自我图谱",
+        "lifeOrganizing": "生命整理",
+        "externalWorld": "外部世界",
+        "direction": "方向"
+      },
+      "items": {
+        "overview": {
+          "label": "总览",
+          "hint": "先看整张桌子"
+        },
+        "reflection": {
+          "label": "反思",
+          "hint": "情绪和想法入口"
+        },
+        "events": {
+          "label": "记事",
+          "hint": "生活时间线"
+        },
+        "finance": {
+          "label": "记账",
+          "hint": "现实资源流向"
+        },
+        "shopping": {
+          "label": "购物",
+          "hint": "欲望和日常选择"
+        },
+        "nutrition": {
+          "label": "饮食",
+          "hint": "吃在生活里的位置"
+        },
+        "emotion": {
+          "label": "情绪情感",
+          "hint": "波动、触发和恢复方式"
+        },
+        "beliefs": {
+          "label": "观念",
+          "hint": "人生观世界观价值观"
+        },
+        "principles": {
+          "label": "原则",
+          "hint": "原则底线和边界"
+        },
+        "relationships": {
+          "label": "关系深化",
+          "hint": "重要人物、关系事件与模式"
+        },
+        "journey": {
+          "label": "成长记忆",
+          "hint": "人生阶段、节点与影响"
+        },
+        "legacy": {
+          "label": "生命整理",
+          "hint": "重要交代和留给未来的话"
+        },
+        "socioeconomics": {
+          "label": "社会经济",
+          "hint": "外部经济世界的认知地图"
+        },
+        "future": {
+          "label": "未来",
+          "hint": "理想自我和生活方向"
+        }
+      }
+    },
+    "rhythm": {
+      "capture": {
+        "title": "先记录",
+        "body": "先记录，再整理，再理解自己为什么会这样想、这样活。"
+      },
+      "review": {
+        "title": "轻一点回看",
+        "body": "不急着得出答案，先看最近的情绪、选择和生活节奏。"
+      },
+      "future": {
+        "title": "给未来留位置",
+        "body": "把理想生活写具体一点，方向才会慢慢从模糊变成行动。"
+      }
+    },
+    "rhythmPopup": {
+      "eyebrow": "今日节奏",
+      "title": "慢一点，先看看今天",
+      "switchToNth": "切换到今日节奏第 {{n}} 条"
+    },
+    "sidebarCarousel": {
+      "switchToNth": "切换到说明第 {{n}} 条"
+    },
+    "sidebarNotes": {
+      "overview": {
+        "heading": "总览说明",
+        "lines": {
+          "look": {
+            "label": "先看",
+            "text": "这里先汇总最近记录、关系、成长和未来线索。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合还没决定从哪里开始，或只想先看全局的时候。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "帮你先判断此刻最值得进入的模块。"
+          }
+        }
+      },
+      "reflection": {
+        "heading": "反思说明",
+        "lines": {
+          "write": {
+            "label": "先写",
+            "text": "先写下情绪、念头和困惑，不急着整理。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合心里有点乱、刚经历完事情或想复盘时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "把模糊感受写清楚，留一个可回看的入口。"
+          }
+        }
+      },
+      "events": {
+        "heading": "记事说明",
+        "lines": {
+          "record": {
+            "label": "记录",
+            "text": "把事情、对话和转折留进自己的时间线。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合记住具体经历，或回头还原事情经过时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "让生活不只剩印象，而能被重新看见。"
+          }
+        }
+      },
+      "finance": {
+        "heading": "记账说明",
+        "lines": {
+          "record": {
+            "label": "记录",
+            "text": "收入、支出和分类能看出你最近把资源放在哪。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合看生活重心、消费习惯和阶段压力时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "把花钱和生活选择连起来，而不只看数字。"
+          }
+        }
+      },
+      "shopping": {
+        "heading": "生活物品说明",
+        "lines": {
+          "record": {
+            "label": "记录",
+            "text": "把 system、space、stage、necessity、lifecycle 放到同一张桌上看。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合整理生活缺口，判断什么该补、什么该等、什么只是想象中的好物时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "让物品真正服务生活系统，而不是只堆成更多待买项。"
+          }
+        }
+      },
+      "nutrition": {
+        "heading": "饮食说明",
+        "lines": {
+          "record": {
+            "label": "记录",
+            "text": "按场景、构成、触发记录每一顿，再补一段身体反馈。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合发现自己吃得乱、吃完不舒服或想看饮食结构时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "不算卡路里，而是把吃和生活、关系、心情连起来。"
+          }
+        }
+      },
+      "emotion": {
+        "heading": "情绪说明",
+        "lines": {
+          "observe": {
+            "label": "观察",
+            "text": "把波动、触发因素和恢复方式放到一起看，不只记录心情。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合最近状态不稳、想知道自己为什么这样时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "让模糊的内在感受慢慢出现结构和节律。"
+          }
+        }
+      },
+      "beliefs": {
+        "heading": "观念说明",
+        "lines": {
+          "organize": {
+            "label": "整理",
+            "text": "把你对世界、关系和生活的看法放到一起。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合发现自己总在重复某种判断的时候。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "把隐性想法说清楚，才知道它在帮你还是限你。"
+          }
+        }
+      },
+      "principles": {
+        "heading": "原则说明",
+        "lines": {
+          "clarify": {
+            "label": "厘清",
+            "text": "这里放你的原则、边界、底线和不愿退让的部分。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合决定犹豫、反复退让或想校准标准时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "让重要决定不只靠情绪，而有稳定依据。"
+          }
+        }
+      },
+      "relationships": {
+        "heading": "关系深化说明",
+        "lines": {
+          "see": {
+            "label": "看见",
+            "text": "把重要的人、关系事件、未说出口的话和你的感受放回一张图里。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合梳理谁在影响你、支持你，或关系卡住时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "不只记得情绪，也看见关系模式和反复出现的反应。"
+          }
+        }
+      },
+      "journey": {
+        "heading": "成长记忆说明",
+        "lines": {
+          "trace": {
+            "label": "追溯",
+            "text": "把人生节点、经历背景和留下的影响放在同一条时间线上回看。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "你想理解自己怎么形成，或追溯某个反应、模式从哪里开始时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "把散落的过去整理成可理解的人生脉络，慢慢松开旧惯性。"
+          }
+        }
+      },
+      "legacy": {
+        "heading": "生命整理说明",
+        "lines": {
+          "place": {
+            "label": "安放",
+            "text": "把重要交代、留给某人的话和未完成的牵挂安放下来。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合想留下重要表达、整理托付或回看此生在意什么的时候。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "让重要的话不只留在脑子里，也不必被迫一次说完。"
+          }
+        }
+      },
+      "socioeconomics": {
+        "heading": "社会经济说明",
+        "lines": {
+          "sort": {
+            "label": "梳理",
+            "text": "按领域和层次梳理对外部经济世界的认知。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合想看清楚自己对宏观、行业、个人财务到底懂多少时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "认知地图覆盖到哪、缺口在哪，先让它显形。"
+          }
+        }
+      },
+      "future": {
+        "heading": "未来说明",
+        "lines": {
+          "draw": {
+            "label": "描画",
+            "text": "把理想自我、理想生活和下一步写得更具体。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合重新校准方向，或想知道该靠近什么时。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "未来蓝图不是预测，而是你愿意靠近的定义。"
+          }
+        }
+      }
+    }
+  }
+}

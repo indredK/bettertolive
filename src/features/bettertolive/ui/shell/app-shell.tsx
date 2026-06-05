@@ -22,15 +22,17 @@ import {
   type LucideIcon,
 } from "lucide-react"
 import { AnimatePresence, m, useReducedMotion } from "motion/react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import type { TFunction } from "i18next"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import type { AppView } from "@/features/bettertolive/types"
 import {
-  workspaceRhythmSlides,
-  workspaceSidebarNotes,
+  createWorkspaceRhythmSlides,
+  createWorkspaceSidebarNotes,
 } from "@/features/bettertolive/config/sidebar"
 import { useWorkspaceNotifications } from "@/features/bettertolive/hooks/use-workspace-notifications"
 import { useWorkspaceMusic } from "@/features/bettertolive/hooks/use-workspace-music"
@@ -39,7 +41,6 @@ import { useWorkspaceViewRoute } from "@/features/bettertolive/hooks/use-workspa
 import { useWorkspaceViewModel } from "@/features/bettertolive/hooks/use-workspace-view-model"
 import { useWorkspaceSnapshotQuery } from "@/features/bettertolive/queries/use-workspace-snapshot-query"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
 import { EventsPage } from "@/features/bettertolive/ui/events/events-page"
 import { FinancePage } from "@/features/bettertolive/ui/finance/finance-page"
 import { FuturePage } from "@/features/bettertolive/ui/future/future-page"
@@ -56,6 +57,7 @@ import { RelationshipsPage } from "@/features/bettertolive/ui/relationships/rela
 import { ShoppingPage } from "@/features/bettertolive/ui/shopping/shopping-page"
 import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page"
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
+import { LanguageToggle } from "@/features/bettertolive/ui/shell/language-toggle"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
   getSidebarBrandIconOffset,
@@ -71,6 +73,7 @@ import {
   StackedNavigation,
 } from "@/features/bettertolive/ui/shell/sidebar-navigation"
 import { WorkspaceUtilities } from "@/features/bettertolive/ui/workspace-utilities"
+import { formatWorkspaceDate } from "@/features/bettertolive/ui/shared/formatters"
 import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
 import {
@@ -94,130 +97,132 @@ type WorkspaceLayoutMode = "wide" | "compact" | "stacked"
 const WIDE_LAYOUT_MIN_WIDTH = 1240
 const COMPACT_LAYOUT_MIN_WIDTH = 960
 
-const NAV_SECTIONS: Array<{
+function createNavSections(t: TFunction): Array<{
   title: string
   items: NavItem[]
-}> = [
-  {
-    title: "工作台",
-    items: [
-      {
-        view: "overview",
-        label: "总览",
-        hint: "先看整张桌子",
-        icon: LayoutDashboard,
-      },
-    ],
-  },
-  {
-    title: "记录",
-    items: [
-      {
-        view: "reflection",
-        label: "反思",
-        hint: "情绪和想法入口",
-        icon: NotebookPen,
-      },
-      {
-        view: "events",
-        label: "记事",
-        hint: "生活时间线",
-        icon: BookOpenText,
-      },
-      {
-        view: "finance",
-        label: "记账",
-        hint: "现实资源流向",
-        icon: Wallet,
-      },
-      {
-        view: "shopping",
-        label: "购物",
-        hint: "欲望和日常选择",
-        icon: ListTodo,
-      },
-      {
-        view: "nutrition",
-        label: "饮食",
-        hint: "吃在生活里的位置",
-        icon: Salad,
-      },
-    ],
-  },
-  {
-    title: "内在状态",
-    items: [
-      {
-        view: "emotion",
-        label: "情绪情感",
-        hint: "波动、触发和恢复方式",
-        icon: HeartPulse,
-      },
-    ],
-  },
-  {
-    title: "自我图谱",
-    items: [
-      {
-        view: "beliefs",
-        label: "观念",
-        hint: "人生观世界观价值观",
-        icon: Lightbulb,
-      },
-      {
-        view: "principles",
-        label: "原则",
-        hint: "原则底线和边界",
-        icon: Scale,
-      },
-      {
-        view: "relationships",
-        label: "关系深化",
-        hint: "重要人物、关系事件与模式",
-        icon: Users2,
-      },
-      {
-        view: "journey",
-        label: "成长记忆",
-        hint: "人生阶段、节点与影响",
-        icon: Route,
-      },
-    ],
-  },
-  {
-    title: "生命整理",
-    items: [
-      {
-        view: "legacy",
-        label: "生命整理",
-        hint: "重要交代和留给未来的话",
-        icon: ScrollText,
-      },
-    ],
-  },
-  {
-    title: "外部世界",
-    items: [
-      {
-        view: "socioeconomics",
-        label: "社会经济",
-        hint: "外部经济世界的认知地图",
-        icon: Landmark,
-      },
-    ],
-  },
-  {
-    title: "方向",
-    items: [
-      {
-        view: "future",
-        label: "未来",
-        hint: "理想自我和生活方向",
-        icon: Compass,
-      },
-    ],
-  },
-]
+}> {
+  return [
+    {
+      title: t("shell.nav.groups.workbench"),
+      items: [
+        {
+          view: "overview",
+          label: t("shell.nav.items.overview.label"),
+          hint: t("shell.nav.items.overview.hint"),
+          icon: LayoutDashboard,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.records"),
+      items: [
+        {
+          view: "reflection",
+          label: t("shell.nav.items.reflection.label"),
+          hint: t("shell.nav.items.reflection.hint"),
+          icon: NotebookPen,
+        },
+        {
+          view: "events",
+          label: t("shell.nav.items.events.label"),
+          hint: t("shell.nav.items.events.hint"),
+          icon: BookOpenText,
+        },
+        {
+          view: "finance",
+          label: t("shell.nav.items.finance.label"),
+          hint: t("shell.nav.items.finance.hint"),
+          icon: Wallet,
+        },
+        {
+          view: "shopping",
+          label: t("shell.nav.items.shopping.label"),
+          hint: t("shell.nav.items.shopping.hint"),
+          icon: ListTodo,
+        },
+        {
+          view: "nutrition",
+          label: t("shell.nav.items.nutrition.label"),
+          hint: t("shell.nav.items.nutrition.hint"),
+          icon: Salad,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.innerState"),
+      items: [
+        {
+          view: "emotion",
+          label: t("shell.nav.items.emotion.label"),
+          hint: t("shell.nav.items.emotion.hint"),
+          icon: HeartPulse,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.selfMap"),
+      items: [
+        {
+          view: "beliefs",
+          label: t("shell.nav.items.beliefs.label"),
+          hint: t("shell.nav.items.beliefs.hint"),
+          icon: Lightbulb,
+        },
+        {
+          view: "principles",
+          label: t("shell.nav.items.principles.label"),
+          hint: t("shell.nav.items.principles.hint"),
+          icon: Scale,
+        },
+        {
+          view: "relationships",
+          label: t("shell.nav.items.relationships.label"),
+          hint: t("shell.nav.items.relationships.hint"),
+          icon: Users2,
+        },
+        {
+          view: "journey",
+          label: t("shell.nav.items.journey.label"),
+          hint: t("shell.nav.items.journey.hint"),
+          icon: Route,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.lifeOrganizing"),
+      items: [
+        {
+          view: "legacy",
+          label: t("shell.nav.items.legacy.label"),
+          hint: t("shell.nav.items.legacy.hint"),
+          icon: ScrollText,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.externalWorld"),
+      items: [
+        {
+          view: "socioeconomics",
+          label: t("shell.nav.items.socioeconomics.label"),
+          hint: t("shell.nav.items.socioeconomics.hint"),
+          icon: Landmark,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.direction"),
+      items: [
+        {
+          view: "future",
+          label: t("shell.nav.items.future.label"),
+          hint: t("shell.nav.items.future.hint"),
+          icon: Compass,
+        },
+      ],
+    },
+  ]
+}
 
 function getWorkspaceLayoutMode(width: number): WorkspaceLayoutMode {
   if (width >= WIDE_LAYOUT_MIN_WIDTH) {
@@ -257,6 +262,7 @@ function useWorkspaceLayoutMode() {
 }
 
 export function BetterToLiveAppShell() {
+  const { t, i18n } = useTranslation()
   const reduceMotion = useReducedMotion()
   const prefersReducedMotion = reduceMotion ?? false
   const activeView = useWorkspaceUiStore((state) => state.activeView)
@@ -301,6 +307,9 @@ export function BetterToLiveAppShell() {
     volume,
     nudgeVolume,
   } = useWorkspaceMusic()
+  const navSections = useMemo(() => createNavSections(t), [t])
+  const workspaceRhythmSlides = useMemo(() => createWorkspaceRhythmSlides(t), [t])
+  const workspaceSidebarNotes = useMemo(() => createWorkspaceSidebarNotes(t), [t])
   const currentSidebarNote = workspaceSidebarNotes[activeView]
   const isWideLayout = layoutMode === "wide"
   const isCompactLayout = layoutMode === "compact"
@@ -318,7 +327,8 @@ export function BetterToLiveAppShell() {
   const sidebarTransitionStyle = getSidebarTransitionStyle(prefersReducedMotion)
   const sidebarHeaderTransition = getSidebarHeaderTransition(prefersReducedMotion)
   const sidebarNoteContentTransition = getSidebarNoteContentTransition(prefersReducedMotion)
-  const currentViewLabel = getWorkspaceViewLabel(activeView)
+  const currentViewLabel = t(`shell.views.${activeView}`)
+  const currentLocale = i18n.resolvedLanguage ?? i18n.language
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -557,7 +567,9 @@ export function BetterToLiveAppShell() {
                         : undefined
                     }
                     aria-label={
-                      effectiveSidebarCollapsed && isSidebarInteractive ? "展开菜单列" : undefined
+                      effectiveSidebarCollapsed && isSidebarInteractive
+                        ? t("shell.expandSidebar")
+                        : undefined
                     }
                     aria-hidden={effectiveSidebarCollapsed ? undefined : true}
                     tabIndex={effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1}
@@ -587,7 +599,7 @@ export function BetterToLiveAppShell() {
                             BetterToLive
                           </h1>
                           <p className="truncate text-sm text-[color:var(--text-muted)]">
-                            个人的人生工作台
+                            {t("shell.brandSubtitle")}
                           </p>
                         </div>
                         <div className="flex shrink-0 flex-col items-end gap-2">
@@ -595,7 +607,7 @@ export function BetterToLiveAppShell() {
                             variant="outline"
                             className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
                           >
-                            V1 Mock
+                            {t("shell.modeBadge")}
                           </Badge>
 
                           <button
@@ -603,11 +615,12 @@ export function BetterToLiveAppShell() {
                             data-testid="sidebar-toggle"
                             onClick={handleSidebarCollapseToggle}
                             aria-expanded={!effectiveSidebarCollapsed}
-                            aria-label="收起菜单列"
+                            aria-label={t("shell.collapseSidebar")}
                             className="flex size-8 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
                           >
                             <PanelLeftClose className="size-4" />
                           </button>
+                          <LanguageToggle />
                         </div>
                       </m.div>
                     )}
@@ -620,7 +633,7 @@ export function BetterToLiveAppShell() {
               activeView={activeView}
               isCollapsed={effectiveSidebarCollapsed}
               onSelectView={setActiveView}
-              sections={NAV_SECTIONS}
+              sections={navSections}
             />
 
             <AnimatePresence initial={false}>
@@ -678,21 +691,26 @@ export function BetterToLiveAppShell() {
                       <h1 className="truncate text-[1.05rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
                         BetterToLive
                       </h1>
-                      <p className="text-sm text-[color:var(--text-muted)]">个人的人生工作台</p>
+                      <p className="text-sm text-[color:var(--text-muted)]">
+                        {t("shell.brandSubtitle")}
+                      </p>
                     </div>
                   </div>
-                  <Badge
-                    variant="outline"
-                    className="shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                  >
-                    V1 Mock
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <LanguageToggle />
+                    <Badge
+                      variant="outline"
+                      className="shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+                    >
+                      {t("shell.modeBadge")}
+                    </Badge>
+                  </div>
                 </div>
               </section>
               <StackedNavigation
                 activeView={activeView}
                 onSelectView={setActiveView}
-                sections={NAV_SECTIONS}
+                sections={navSections}
               />
             </>
           ) : null}
@@ -719,7 +737,7 @@ export function BetterToLiveAppShell() {
             >
               <div className="min-w-0">
                 <div className="text-xs tracking-[0.22em] text-[color:var(--text-muted)] uppercase">
-                  本地优先 / 自我认知系统
+                  {t("shell.tagline")}
                 </div>
                 <div className="mt-1 flex flex-wrap items-center gap-3">
                   <h2
@@ -734,11 +752,7 @@ export function BetterToLiveAppShell() {
                     variant="outline"
                     className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
                   >
-                    {new Intl.DateTimeFormat("zh-CN", {
-                      month: "long",
-                      day: "numeric",
-                      weekday: "long",
-                    }).format(new Date())}
+                    {formatWorkspaceDate(new Date(), currentLocale)}
                   </Badge>
                 </div>
               </div>
@@ -765,8 +779,8 @@ export function BetterToLiveAppShell() {
                       "h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]",
                       isWideLayout && "h-8",
                     )}
-                    placeholder="搜索记录、观念、关系或成长线索"
-                    aria-label="搜索记录和页面内容"
+                    placeholder={t("shell.searchPlaceholder")}
+                    aria-label={t("shell.searchAria")}
                   />
                 </div>
                 <div
@@ -809,7 +823,7 @@ export function BetterToLiveAppShell() {
                     onClick={() => setActiveView("reflection")}
                   >
                     <NotebookPen className="size-4" />
-                    快速记录
+                    {t("shell.quickRecord")}
                   </Button>
                 </div>
               </div>

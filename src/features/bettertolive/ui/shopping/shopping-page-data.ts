@@ -1,3 +1,4 @@
+import type { TFunction } from "i18next"
 import type {
   ShoppingDepreciation,
   ShoppingLifecycle,
@@ -5,7 +6,8 @@ import type {
   ShoppingOwnedItem,
   ShoppingPlanItem,
 } from "@/features/bettertolive/types"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
+import i18next from "@/i18n/config"
+import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 
 export const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
@@ -49,68 +51,68 @@ const SYSTEM_ROW_NEIGHBOR_WEIGHT = 2 / 3
 const SYSTEM_ROW_EDGE_ACTIVE_WEIGHT = 1.4
 const SYSTEM_ROW_EDGE_NEIGHBOR_WEIGHT = 0.6
 
-export const LIFECYCLE_COPY: Record<
-  ShoppingLifecycle,
-  {
-    title: string
-    detail: string
+export function getLifecycleCopy(
+  t: TFunction,
+): Record<ShoppingLifecycle, { title: string; detail: string }> {
+  return {
+    消耗品: {
+      title: t("shopping.lifecycle.consumables.title"),
+      detail: t("shopping.lifecycle.consumables.detail"),
+    },
+    耐用品: {
+      title: t("shopping.lifecycle.durables.title"),
+      detail: t("shopping.lifecycle.durables.detail"),
+    },
+    工具: {
+      title: t("shopping.lifecycle.tools.title"),
+      detail: t("shopping.lifecycle.tools.detail"),
+    },
+    情感物: {
+      title: t("shopping.lifecycle.emotional.title"),
+      detail: t("shopping.lifecycle.emotional.detail"),
+    },
   }
-> = {
-  消耗品: {
-    title: "补货节奏",
-    detail: "它会被用完，重点不是值不值，而是别让库存突然归零。",
-  },
-  耐用品: {
-    title: "长期使用",
-    detail: "它应该陪伴你很多年，判断重点是规格、频率和长期回报。",
-  },
-  工具: {
-    title: "一次补齐",
-    detail: "平时存在感很低，但少一个就会卡住，适合提前备好。",
-  },
-  情感物: {
-    title: "单独对待",
-    detail: "它不靠功能存在，不应该和别的物品用同一套淘汰逻辑。",
-  },
 }
 
-export const OVERVIEW_DIMENSIONS = [
-  {
-    id: "system",
-    title: "system",
-    answer: "它在撑哪个生活功能？",
-    detail: "睡眠、饮食、清洁、工作学习这类系统，帮助你先看缺口。",
-    cue: "先确认它在补哪个生活缺口，再决定是不是现在要处理。",
-  },
-  {
-    id: "space",
-    title: "space",
-    answer: "它放在哪？",
-    detail: "卧室、书桌、厨房、玄关，帮助你按空间巡检。",
-    cue: "把它放回真实空间里看，你会更容易发现缺件和重复购买。",
-  },
-  {
-    id: "stage",
-    title: "stage",
-    answer: "当前阶段需要它吗？",
-    detail: "搬家最低配、租房、长期居住、自有住房，对应不同深度。",
-    cue: "先按当前居住阶段配齐，不要提前为下一阶段囤太多东西。",
-  },
-  {
-    id: "necessity",
-    title: "necessity",
-    answer: "没有它会不会塌？",
-    detail: "最低配置和必要项决定优先级，幸福感项留到基础更稳以后。",
-    cue: "它帮你排先后顺序，把真正影响连续性的东西提到前面。",
-  },
-  {
-    id: "lifecycle",
-    title: "lifecycle",
-    answer: "它以什么节奏出现？",
-    detail: "消耗品补货、耐用品等好价、工具一次备齐、情感物单独对待。",
-    cue: "同样都是需要，补货、等好价和一次备齐的下一步完全不同。",
-  },
-] as const
+export function getOverviewDimensions(t: TFunction) {
+  return [
+    {
+      id: "system" as const,
+      title: "system",
+      answer: t("shopping.dimensions.system.answer"),
+      detail: t("shopping.dimensions.system.detail"),
+      cue: t("shopping.dimensions.system.cue"),
+    },
+    {
+      id: "space" as const,
+      title: "space",
+      answer: t("shopping.dimensions.space.answer"),
+      detail: t("shopping.dimensions.space.detail"),
+      cue: t("shopping.dimensions.space.cue"),
+    },
+    {
+      id: "stage" as const,
+      title: "stage",
+      answer: t("shopping.dimensions.stage.answer"),
+      detail: t("shopping.dimensions.stage.detail"),
+      cue: t("shopping.dimensions.stage.cue"),
+    },
+    {
+      id: "necessity" as const,
+      title: "necessity",
+      answer: t("shopping.dimensions.necessity.answer"),
+      detail: t("shopping.dimensions.necessity.detail"),
+      cue: t("shopping.dimensions.necessity.cue"),
+    },
+    {
+      id: "lifecycle" as const,
+      title: "lifecycle",
+      answer: t("shopping.dimensions.lifecycle.answer"),
+      detail: t("shopping.dimensions.lifecycle.detail"),
+      cue: t("shopping.dimensions.lifecycle.cue"),
+    },
+  ] as const
+}
 
 export type ShoppingLifecycleGroups = Record<
   ShoppingLifecycle,
@@ -128,13 +130,13 @@ export function chunkList<T>(items: T[], size: number) {
 }
 
 export function formatPrice(amount: number) {
-  return MONEY_FORMATTER.format(amount)
+  return formatCurrency(amount, i18next.resolvedLanguage ?? i18next.language)
 }
 
-export function getPriceSignal(item: ShoppingPlanItem) {
+export function getPriceSignal(item: ShoppingPlanItem, t: TFunction) {
   if (item.currentPrice <= item.buyBelowPrice) {
     return {
-      label: "已进可买区间",
+      label: t("shopping.priceSignal.inBuyZone"),
       className:
         "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
     }
@@ -142,14 +144,14 @@ export function getPriceSignal(item: ShoppingPlanItem) {
 
   if (item.currentPrice >= item.overpayPrice) {
     return {
-      label: "当前偏贵",
+      label: t("shopping.priceSignal.overpriced"),
       className:
         "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
     }
   }
 
   return {
-    label: "先观察",
+    label: t("shopping.priceSignal.watchOnly"),
     className:
       "border-[color:var(--tone-past-border)] bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]",
   }

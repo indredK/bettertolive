@@ -27,5 +27,6 @@
     }
   },
   "include": ["src"],
+  "exclude": ["src/i18n/locales"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

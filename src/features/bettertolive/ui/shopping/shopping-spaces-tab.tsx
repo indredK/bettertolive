@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { House } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -27,8 +28,10 @@ function SystemSummaryChip({ label }: { label: string }) {
 }
 
 function SpaceDetailTable({ space }: { space: SpaceOverview }) {
+  const { t } = useTranslation()
   const totalItems = space.owned.length + space.planned.length
   const isEmpty = totalItems === 0
+  const ownedLabel = t("shopping.spaces.table.owned")
 
   const allItems: Array<{
     item: ShoppingOwnedItem | ShoppingPlanWithLane
@@ -37,7 +40,7 @@ function SpaceDetailTable({ space }: { space: SpaceOverview }) {
   }> = [
     ...space.owned.map((item) => ({
       item,
-      sourceLabel: "已拥有" as const,
+      sourceLabel: ownedLabel,
       sourceType: "owned" as const,
     })),
     ...space.planned.map((item) => ({
@@ -56,32 +59,37 @@ function SpaceDetailTable({ space }: { space: SpaceOverview }) {
           {space.name}
         </h3>
         <p className="mt-0.5 text-sm text-[color:var(--text-secondary)]">
-          共 {totalItems} 项 · {space.systems.size} 个系统
+          {t("shopping.spaces.totalItemsAndSystems", {
+            total: totalItems,
+            systems: space.systems.size,
+          })}
         </p>
       </div>
 
       {/* Scrollable table */}
       <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto p-4 pt-2">
         {isEmpty ? (
-          <p className="text-sm text-[color:var(--text-muted)]">当前该空间暂无物品数据。</p>
+          <p className="text-sm text-[color:var(--text-muted)]">
+            {t("shopping.spaces.noItemsInSpace")}
+          </p>
         ) : (
           <Table className="whitespace-nowrap">
             <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
               <TableRow>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                  物品名称
+                  {t("shopping.spaces.table.itemName")}
                 </TableHead>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                  系统
+                  {t("shopping.spaces.table.system")}
                 </TableHead>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                  类别
+                  {t("shopping.spaces.table.category")}
                 </TableHead>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                  阶段
+                  {t("shopping.spaces.table.stage")}
                 </TableHead>
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                  标签
+                  {t("shopping.spaces.table.tag")}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -110,7 +118,7 @@ function SpaceDetailTable({ space }: { space: SpaceOverview }) {
                         variant="outline"
                         className={cn(
                           "h-5 px-1.5 text-[10px]",
-                          sourceLabel === "已拥有"
+                          sourceLabel === ownedLabel
                             ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
                             : "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
                         )}
@@ -147,8 +155,26 @@ function SpaceMapCard({
   isSelected: boolean
   onSelect: (spaceName: string) => void
 }) {
+  const { t } = useTranslation()
   const totalItems = space.owned.length + space.planned.length
   const isActive = totalItems > 0
+
+  const summaryText = isActive
+    ? (() => {
+        const ownedList = space.owned.map((i) => i.name).slice(0, 3)
+        const plannedList = space.planned.map((i) => i.name).slice(0, 2)
+        if (space.owned.length > 3 || space.planned.length > 2) {
+          return t("shopping.spaces.itemSummaryMore", {
+            ownedList: ownedList.join("、"),
+            plannedList: plannedList.join("、"),
+          })
+        }
+        return t("shopping.spaces.itemSummary", {
+          owned: ownedList.join("、"),
+          planned: plannedList.join("、"),
+        })
+      })()
+    : t("shopping.spaces.noItemData")
 
   return (
     <button
@@ -172,7 +198,7 @@ function SpaceMapCard({
             {space.name}
           </div>
           <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {space.systems.size} 个关联系统
+            {t("shopping.spaces.associatedSystemsCount", { count: space.systems.size })}
           </div>
         </div>
       </div>
@@ -189,21 +215,13 @@ function SpaceMapCard({
             variant="outline"
             className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
           >
-            待补 {space.planned.length}
+            {t("shopping.spaces.pendingBadge", { count: space.planned.length })}
           </Badge>
         ) : null}
       </div>
 
       <p className="truncate text-[12px] leading-5 text-[color:var(--text-secondary)]">
-        {isActive
-          ? `已有 ${space.owned
-              .map((i) => i.name)
-              .slice(0, 3)
-              .join("、")}${space.owned.length > 3 ? " 等" : ""}，待补 ${space.planned
-              .map((i) => i.name)
-              .slice(0, 2)
-              .join("、")}${space.planned.length > 2 ? " 等" : ""}`
-          : "暂无物品数据"}
+        {summaryText}
       </p>
 
       <div className="flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45">
@@ -242,6 +260,7 @@ export function ShoppingSpacesTab({
   isFixedLayout: boolean
   onSelectSpace: (spaceName: string) => void
 }) {
+  const { t } = useTranslation()
   const selectedSpace = spaces.find((s) => s.name === selectedSpaceName) ?? null
 
   return (
@@ -272,7 +291,7 @@ export function ShoppingSpacesTab({
               ))}
             </div>
           ) : (
-            <EmptyState message="当前筛选下没有空间视角数据。" />
+            <EmptyState message={t("shopping.spaces.noSpaceData")} />
           )}
         </Surface>
 
@@ -282,7 +301,9 @@ export function ShoppingSpacesTab({
             <SpaceDetailTable space={selectedSpace} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
-              <p className="text-sm text-[color:var(--text-muted)]">选择一个空间查看详情</p>
+              <p className="text-sm text-[color:var(--text-muted)]">
+                {t("shopping.spaces.selectPrompt")}
+              </p>
             </div>
           )}
         </div>

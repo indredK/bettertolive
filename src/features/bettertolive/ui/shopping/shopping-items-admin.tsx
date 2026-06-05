@@ -1,5 +1,6 @@
 import { Plus, Search, Trash2 } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -51,6 +52,7 @@ import {
   updateOwnedItem,
   updatePlanItem,
 } from "@/features/bettertolive/api/shopping-crud-api"
+import { formatPrice } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
 type ItemType = "owned" | "plan"
@@ -69,7 +71,7 @@ type UnifiedItemRow =
       name: string
       systemId: string
       itemCategory: string
-      classification: "已有"
+      classification: string
       necessity: string
       lifecycle: string
       metaPrimary: string
@@ -82,7 +84,7 @@ type UnifiedItemRow =
       name: string
       systemId: string
       itemCategory: string
-      classification: "计划"
+      classification: string
       necessity: string
       lifecycle: string
       metaPrimary: string
@@ -143,6 +145,7 @@ export function ShoppingItemsAdmin({
   isWideLayout?: boolean
   isFixedLayout?: boolean
 }) {
+  const { t } = useTranslation()
   const [ownedItems, setOwnedItems] = useState<ShoppingOwnedItemRow[]>([])
   const [planItems, setPlanItems] = useState<ShoppingPlanItemRow[]>([])
   const [lanes, setLanes] = useState<ShoppingPurchaseLaneRow[]>([])
@@ -206,7 +209,7 @@ export function ShoppingItemsAdmin({
   }
 
   async function handleDelete(itemType: ItemType, id: string) {
-    if (!window.confirm("确定删除这个物件？")) return
+    if (!window.confirm(t("shopping.admin.items.confirmDelete"))) return
     try {
       if (itemType === "owned") {
         await deleteOwnedItem(id)
@@ -286,11 +289,11 @@ export function ShoppingItemsAdmin({
       name: item.name,
       systemId: item.system_id,
       itemCategory: item.category,
-      classification: "已有" as const,
+      classification: t("shopping.admin.items.classification.owned"),
       necessity: item.necessity,
       lifecycle: item.lifecycle,
-      metaPrimary: item.status || "未设置状态",
-      metaSecondary: `数量 ${item.quantity}`,
+      metaPrimary: item.status || t("shopping.admin.items.statusNotSet"),
+      metaSecondary: t("shopping.admin.items.quantity", { n: item.quantity }),
       raw: item,
     })),
     ...planItems.map((item) => ({
@@ -299,11 +302,14 @@ export function ShoppingItemsAdmin({
       name: item.name,
       systemId: item.system_id,
       itemCategory: item.category,
-      classification: "计划" as const,
+      classification: t("shopping.admin.items.classification.planned"),
       necessity: item.necessity,
       lifecycle: item.lifecycle,
       metaPrimary: laneLabel(item.lane_id),
-      metaSecondary: item.current_price != null ? `¥${item.current_price}` : "未填价格",
+      metaSecondary:
+        item.current_price != null
+          ? formatPrice(item.current_price)
+          : t("shopping.admin.items.noPrice"),
       raw: item,
     })),
   ]
@@ -341,10 +347,10 @@ export function ShoppingItemsAdmin({
                 variant="outline"
                 className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
               >
-                统一管理
+                {t("shopping.admin.items.unifiedManagement")}
               </Badge>
               <span className="text-xs text-[color:var(--text-muted)]">
-                已有物件与计划物件共用同一张清单
+                {t("shopping.admin.items.unifiedDesc")}
               </span>
             </div>
             <div className="relative w-full md:max-w-md">
@@ -352,7 +358,7 @@ export function ShoppingItemsAdmin({
               <Input
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="搜索名称、系统、分类、状态"
+                placeholder={t("shopping.admin.items.searchPlaceholder")}
                 className="h-10 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 shadow-none"
               />
             </div>
@@ -369,16 +375,16 @@ export function ShoppingItemsAdmin({
                 render={
                   <Button className={cn("h-9 px-3", isWideLayout && "h-8")}>
                     <Plus />
-                    添加物件
+                    {t("shopping.admin.items.addItem")}
                   </Button>
                 }
               />
               <DropdownMenuContent align="end" className="w-44">
                 <DropdownMenuItem onClick={() => setEditing({ ...EMPTY_OWNED })}>
-                  新增已有物件
+                  {t("shopping.admin.items.newOwnedItem")}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setEditing({ ...EMPTY_PLAN })}>
-                  新增计划物件
+                  {t("shopping.admin.items.newPlanItem")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -395,7 +401,7 @@ export function ShoppingItemsAdmin({
       <div className={cn(isFixedLayout && "min-h-0 flex-1 overflow-hidden")}>
         {loading ? (
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-5 py-10 text-sm text-[color:var(--text-muted)] shadow-[var(--surface-shadow)]">
-            加载中...
+            {t("shopping.admin.items.loading")}
           </div>
         ) : (
           <section
@@ -406,13 +412,15 @@ export function ShoppingItemsAdmin({
           >
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[color:var(--muted-surface-border)] px-5 py-4">
               <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-[color:var(--text-primary)]">物件列表</h3>
+                <h3 className="text-sm font-semibold text-[color:var(--text-primary)]">
+                  {t("shopping.admin.items.itemList")}
+                </h3>
                 <p className="mt-1 text-xs text-[color:var(--text-muted)]">
-                  支持从列表中直接进入编辑，按系统、状态和必要性快速查看。
+                  {t("shopping.admin.items.itemListDesc")}
                 </p>
               </div>
               <span className="text-xs text-[color:var(--text-muted)]">
-                当前结果 {filteredItems.length} 条
+                {t("shopping.admin.items.currentResults", { count: filteredItems.length })}
               </span>
             </div>
             <div className={cn("min-h-0 px-2 pb-2", isFixedLayout && "flex-1")}>
@@ -448,20 +456,22 @@ export function ShoppingItemsAdmin({
               <DialogTitle>
                 {editing.itemType === "owned"
                   ? editing.isNew
-                    ? "新增已有物件"
-                    : `编辑物件：${editing.name}`
+                    ? t("shopping.admin.items.newOwnedTitle")
+                    : t("shopping.admin.items.editTitle", { name: editing.name })
                   : editing.isNew
-                    ? "新增计划物件"
-                    : `编辑物件：${editing.name}`}
+                    ? t("shopping.admin.items.newPlanTitle")
+                    : t("shopping.admin.items.editTitle", { name: editing.name })}
               </DialogTitle>
               <DialogDescription>
-                {editing.isNew ? "填写物件信息后点击保存。" : "修改物件信息后点击保存。"}
+                {editing.isNew
+                  ? t("shopping.admin.items.saveInstructions")
+                  : t("shopping.admin.items.editInstructions")}
               </DialogDescription>
             </DialogHeader>
             <ItemForm form={editing} onChange={setEditing} lanes={lanes} error={error} />
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditing(null)}>
-                取消
+                {t("shopping.admin.items.cancel")}
               </Button>
               <Button
                 onClick={() => handleSave(editing)}
@@ -471,7 +481,7 @@ export function ShoppingItemsAdmin({
                   (editing.itemType === "plan" && !("laneId" in editing && editing.laneId))
                 }
               >
-                保存
+                {t("shopping.admin.items.save")}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -483,8 +493,8 @@ export function ShoppingItemsAdmin({
 
 // ---- Table components ----
 
-function getClassificationBadgeClassName(classification: UnifiedItemRow["classification"]) {
-  return classification === "已有"
+function getClassificationBadgeClassName(rowType: UnifiedItemRow["rowType"]) {
+  return rowType === "owned"
     ? "border-emerald-200 bg-emerald-50 text-emerald-700"
     : "border-sky-200 bg-sky-50 text-sky-700"
 }
@@ -515,34 +525,35 @@ function UnifiedItemsTable({
   scrollAreaClassName?: string
   isFixedLayout?: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div className={cn("min-h-0", isFixedLayout && "flex min-h-0 flex-1 flex-col overflow-hidden")}>
       <Table containerClassName={scrollAreaClassName} className="min-w-[980px]">
         <TableHeader>
           <TableRow className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]">
             <TableHead className="sticky top-0 left-0 z-20 h-11 border-r border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              名称
+              {t("shopping.admin.items.table.name")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              分类
+              {t("shopping.admin.items.table.classification")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              系统
+              {t("shopping.admin.items.table.system")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              品类
+              {t("shopping.admin.items.table.category")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              必要性
+              {t("shopping.admin.items.table.necessity")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              生命周期
+              {t("shopping.admin.items.table.lifecycle")}
             </TableHead>
             <TableHead className="sticky top-0 z-10 h-11 bg-[color:var(--chip-bg)] px-4 text-[12px] font-semibold text-[color:var(--text-muted)]">
-              信息
+              {t("shopping.admin.items.table.info")}
             </TableHead>
             <TableHead className="sticky top-0 right-0 z-20 h-11 border-l border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-4 text-right text-[12px] font-semibold text-[color:var(--text-muted)]">
-              操作
+              {t("shopping.admin.items.table.actions")}
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -550,7 +561,7 @@ function UnifiedItemsTable({
           {items.length === 0 ? (
             <TableRow className="border-[color:var(--muted-surface-border)]">
               <TableCell colSpan={8} className="px-4 py-8 text-sm text-[color:var(--text-muted)]">
-                没有匹配的物件。
+                {t("shopping.admin.items.noMatchingItems")}
               </TableCell>
             </TableRow>
           ) : (
@@ -572,7 +583,7 @@ function UnifiedItemsTable({
                 <TableCell className="px-4 py-3 text-[color:var(--text-secondary)]">
                   <Badge
                     variant="outline"
-                    className={cn("border", getClassificationBadgeClassName(item.classification))}
+                    className={cn("border", getClassificationBadgeClassName(item.rowType))}
                   >
                     {item.classification}
                   </Badge>
@@ -659,6 +670,7 @@ function ItemForm({
     onChange(nextForm)
   }
 
+  const { t } = useTranslation()
   const isOwned = form.itemType === "owned"
 
   return (
@@ -670,22 +682,22 @@ function ItemForm({
       ) : null}
 
       <div className="grid gap-4 md:grid-cols-2">
-        <FormField label="名称" required>
+        <FormField label={t("shopping.admin.items.form.name")} required>
           <Input
             value={form.name}
             onChange={(e) => update({ name: e.target.value })}
-            placeholder="物件名称"
+            placeholder={t("shopping.admin.items.form.namePlaceholder")}
           />
         </FormField>
 
         {!isOwned ? (
-          <FormField label="采购分栏 (laneId)" required>
+          <FormField label={t("shopping.admin.items.form.laneId")} required>
             <Select
               value={"laneId" in form ? form.laneId : ""}
               onValueChange={(v) => update({ laneId: v ?? "" })}
             >
               <SelectTrigger>
-                <SelectValue placeholder="选择采购分栏" />
+                <SelectValue placeholder={t("shopping.admin.items.form.selectLane")} />
               </SelectTrigger>
               <SelectContent>
                 {lanes.map((lane) => (
@@ -698,59 +710,59 @@ function ItemForm({
           </FormField>
         ) : null}
 
-        <FormField label="系统ID (system)" required>
+        <FormField label={t("shopping.admin.items.form.systemId")} required>
           <Input
             value={form.system}
             onChange={(e) => update({ system: e.target.value })}
-            placeholder="e.g. sleep"
+            placeholder={t("shopping.admin.items.form.systemPlaceholder")}
           />
         </FormField>
-        <FormField label="分类 (category)" required>
+        <FormField label={t("shopping.admin.items.form.category")} required>
           <Input
             value={form.category}
             onChange={(e) => update({ category: e.target.value })}
-            placeholder="e.g. 卧室"
+            placeholder={t("shopping.admin.items.form.categoryPlaceholder")}
           />
         </FormField>
-        <FormField label="必要性 (necessity)" required>
+        <FormField label={t("shopping.admin.items.form.necessity")} required>
           <Input
             value={form.necessity}
             onChange={(e) => update({ necessity: e.target.value })}
-            placeholder="e.g. 核心刚需"
+            placeholder={t("shopping.admin.items.form.necessityPlaceholder")}
           />
         </FormField>
-        <FormField label="生命周期 (lifecycle)" required>
+        <FormField label={t("shopping.admin.items.form.lifecycle")} required>
           <Input
             value={form.lifecycle}
             onChange={(e) => update({ lifecycle: e.target.value })}
-            placeholder="e.g. 耐用品"
+            placeholder={t("shopping.admin.items.form.lifecyclePlaceholder")}
           />
         </FormField>
-        <FormField label="折旧 (depreciation)">
+        <FormField label={t("shopping.admin.items.form.depreciation")}>
           <Input
             value={form.depreciation ?? ""}
             onChange={(e) => update({ depreciation: e.target.value || null })}
-            placeholder="e.g. 慢折旧"
+            placeholder={t("shopping.admin.items.form.depreciationPlaceholder")}
           />
         </FormField>
-        <FormField label="空间 (spaces，逗号分隔)">
+        <FormField label={t("shopping.admin.items.form.spaces")}>
           <Input
             value={(form.spaces ?? []).join(", ")}
             onChange={(e) => update({ spaces: parseArray(e.target.value) })}
-            placeholder="e.g. 卧室, 客厅"
+            placeholder={t("shopping.admin.items.form.spacesPlaceholder")}
           />
         </FormField>
-        <FormField label="阶段 (stages，逗号分隔)">
+        <FormField label={t("shopping.admin.items.form.stages")}>
           <Input
             value={(form.stages ?? []).join(", ")}
             onChange={(e) => update({ stages: parseArray(e.target.value) })}
-            placeholder="e.g. 搭建, 优化"
+            placeholder={t("shopping.admin.items.form.stagesPlaceholder")}
           />
         </FormField>
 
         {isOwned ? (
           <>
-            <FormField label="数量 (quantity)">
+            <FormField label={t("shopping.admin.items.form.quantity")}>
               <Input
                 type="number"
                 value={"quantity" in form ? form.quantity : 1}
@@ -758,52 +770,52 @@ function ItemForm({
                 min={0}
               />
             </FormField>
-            <FormField label="状态 (status)" required>
+            <FormField label={t("shopping.admin.items.form.status")} required>
               <Input
                 value={"status" in form ? form.status : ""}
                 onChange={(e) => update({ status: e.target.value })}
-                placeholder="e.g. 在用"
+                placeholder={t("shopping.admin.items.form.statusPlaceholder")}
               />
             </FormField>
-            <FormField label="替换提示 (replacementCue)" required>
+            <FormField label={t("shopping.admin.items.form.replacementCue")} required>
               <Input
                 value={"replacementCue" in form ? form.replacementCue : ""}
                 onChange={(e) => update({ replacementCue: e.target.value })}
-                placeholder="e.g. 舒适度下降或塌陷"
+                placeholder={t("shopping.admin.items.form.cuePlaceholder")}
               />
             </FormField>
           </>
         ) : (
           <>
-            <FormField label="标签 (tags，逗号分隔)">
+            <FormField label={t("shopping.admin.items.form.tags")}>
               <Input
                 value={("tags" in form ? form.tags : []).join(", ")}
                 onChange={(e) => update({ tags: parseArray(e.target.value) })}
-                placeholder="e.g. 高频, 刚需"
+                placeholder={t("shopping.admin.items.form.tagsPlaceholder")}
               />
             </FormField>
-            <FormField label="关键词 (keywords，逗号分隔)">
+            <FormField label={t("shopping.admin.items.form.keywords")}>
               <Input
                 value={("keywords" in form ? form.keywords : []).join(", ")}
                 onChange={(e) => update({ keywords: parseArray(e.target.value) })}
-                placeholder="e.g. 床垫, 睡眠"
+                placeholder={t("shopping.admin.items.form.keywordsPlaceholder")}
               />
             </FormField>
-            <FormField label="理由 (reason)" required>
+            <FormField label={t("shopping.admin.items.form.reason")} required>
               <Input
                 value={"reason" in form ? form.reason : ""}
                 onChange={(e) => update({ reason: e.target.value })}
-                placeholder="为什么要购买"
+                placeholder={t("shopping.admin.items.form.reasonPlaceholder")}
               />
             </FormField>
-            <FormField label="目标生活方式 (targetLifestyle)" required>
+            <FormField label={t("shopping.admin.items.form.targetLifestyle")} required>
               <Input
                 value={"targetLifestyle" in form ? form.targetLifestyle : ""}
                 onChange={(e) => update({ targetLifestyle: e.target.value })}
-                placeholder="e.g. 舒服"
+                placeholder={t("shopping.admin.items.form.lifestylePlaceholder")}
               />
             </FormField>
-            <FormField label="当前价格 (currentPrice)">
+            <FormField label={t("shopping.admin.items.form.currentPrice")}>
               <Input
                 type="number"
                 value={"currentPrice" in form ? (form.currentPrice ?? "") : ""}
@@ -812,12 +824,12 @@ function ItemForm({
                     currentPrice: e.target.value ? Number(e.target.value) : null,
                   })
                 }
-                placeholder="0.00"
+                placeholder={t("shopping.admin.items.form.pricePlaceholder")}
                 min={0}
                 step={0.01}
               />
             </FormField>
-            <FormField label="购入价格 (buyBelowPrice)">
+            <FormField label={t("shopping.admin.items.form.buyBelowPrice")}>
               <Input
                 type="number"
                 value={"buyBelowPrice" in form ? (form.buyBelowPrice ?? "") : ""}
@@ -826,12 +838,12 @@ function ItemForm({
                     buyBelowPrice: e.target.value ? Number(e.target.value) : null,
                   })
                 }
-                placeholder="0.00"
+                placeholder={t("shopping.admin.items.form.pricePlaceholder")}
                 min={0}
                 step={0.01}
               />
             </FormField>
-            <FormField label="超付价格 (overpayPrice)">
+            <FormField label={t("shopping.admin.items.form.overpayPrice")}>
               <Input
                 type="number"
                 value={"overpayPrice" in form ? (form.overpayPrice ?? "") : ""}
@@ -840,7 +852,7 @@ function ItemForm({
                     overpayPrice: e.target.value ? Number(e.target.value) : null,
                   })
                 }
-                placeholder="0.00"
+                placeholder={t("shopping.admin.items.form.pricePlaceholder")}
                 min={0}
                 step={0.01}
               />
@@ -848,11 +860,11 @@ function ItemForm({
           </>
         )}
 
-        <FormField label="备注 (note)" className="md:col-span-2">
+        <FormField label={t("shopping.admin.items.form.note")} className="md:col-span-2">
           <Input
             value={form.note}
             onChange={(e) => update({ note: e.target.value })}
-            placeholder="其他备注"
+            placeholder={t("shopping.admin.items.form.notePlaceholder")}
           />
         </FormField>
       </div>

@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -22,7 +23,7 @@ import { Surface, EmptyState, SectionHeading } from "@/features/bettertolive/ui/
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import {
   type ShoppingLifecycleGroups,
-  OVERVIEW_DIMENSIONS,
+  getOverviewDimensions,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   BoundaryTable,
@@ -33,6 +34,7 @@ import {
 import { cn } from "@/lib/utils"
 
 function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) {
+  const { t } = useTranslation()
   const [selectedIndex, setSelectedIndex] = useState(0)
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -88,7 +90,7 @@ function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) 
   }, [emblaApi])
 
   if (spotlights.length === 0) {
-    return <EmptyState message="当前筛选下没有需要注意的系统提醒。" compact />
+    return <EmptyState message={t("shopping.overview.noSpotlights")} compact />
   }
 
   return (
@@ -136,7 +138,7 @@ function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) 
           <div className="flex justify-start">
             <button
               type="button"
-              aria-label="上一条提醒"
+              aria-label={t("shopping.overview.prevSpotlight")}
               onClick={scrollPrev}
               className="inline-flex size-7 items-center justify-center rounded-full border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
             >
@@ -151,7 +153,7 @@ function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) 
                 <button
                   key={spotlight.id}
                   type="button"
-                  aria-label={`切换到第 ${index + 1} 条提醒`}
+                  aria-label={t("shopping.overview.switchToNth", { n: index + 1 })}
                   aria-pressed={isActive}
                   onClick={() => scrollTo(index)}
                   className={cn(
@@ -167,7 +169,7 @@ function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) 
           <div className="flex justify-end">
             <button
               type="button"
-              aria-label="下一条提醒"
+              aria-label={t("shopping.overview.nextSpotlight")}
               onClick={scrollNext}
               className="inline-flex size-7 items-center justify-center rounded-full border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
             >
@@ -199,6 +201,8 @@ export function ShoppingOverviewTab({
   isWideLayout: boolean
   isFixedLayout: boolean
 }) {
+  const { t } = useTranslation()
+  const overviewDimensions = getOverviewDimensions(t)
   return (
     <TabsContent
       value="overview"
@@ -221,8 +225,8 @@ export function ShoppingOverviewTab({
             <InlineSectionHeader
               compact={isWideLayout}
               icon={AlertTriangle}
-              title="当前该先看什么"
-              description="这些不是随机想法，而是从系统缺口、动作节奏和购买判断里冒出来的提醒。"
+              title={t("shopping.overview.currentFocus")}
+              description={t("shopping.overview.currentFocusDesc")}
             />
             <div className="mt-5">
               <SpotlightCarousel spotlights={shopping.spotlights} />
@@ -231,19 +235,19 @@ export function ShoppingOverviewTab({
             <Tabs defaultValue="classification" className="mt-5 min-h-0 gap-4">
               <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
                 <TabsTrigger value="classification" className="h-8 px-3 text-xs">
-                  五维分类
+                  {t("shopping.overview.dimensions")}
                 </TabsTrigger>
                 <TabsTrigger value="collections" className="h-8 px-3 text-xs">
-                  生活方式
+                  {t("shopping.overview.lifestyle")}
                 </TabsTrigger>
                 <TabsTrigger value="boundary" className="h-8 px-3 text-xs">
-                  边界约定
+                  {t("shopping.overview.boundary")}
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="classification" className="mt-4">
                 <div className="grid gap-3 min-[1120px]:grid-cols-2 min-[1440px]:grid-cols-3">
-                  {OVERVIEW_DIMENSIONS.map((dimension) => (
+                  {overviewDimensions.map((dimension) => (
                     <div
                       key={dimension.id}
                       className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
@@ -313,8 +317,8 @@ export function ShoppingOverviewTab({
           <InlineSectionHeader
             compact={isWideLayout}
             icon={Package2}
-            title="动作节奏"
-            description="同样都是“需要”，但下一步完全不同：补货、等好价、一次备齐，还是别乱动。"
+            title={t("shopping.overview.actionRhythm")}
+            description={t("shopping.overview.actionRhythmDesc")}
           />
 
           <div className="mt-5 min-h-0 flex-1 overflow-auto pr-1">
@@ -341,8 +345,8 @@ export function ShoppingOverviewTab({
           <InlineSectionHeader
             compact={isWideLayout}
             icon={CircleDollarSign}
-            title="购买提醒"
-            description="把折旧、慢慢买好和基础补齐放在同一块里看，方便快速切换。"
+            title={t("shopping.overview.purchaseAlerts")}
+            description={t("shopping.overview.purchaseAlertsDesc")}
           />
 
           <Tabs
@@ -351,13 +355,13 @@ export function ShoppingOverviewTab({
           >
             <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
               <TabsTrigger value="fast-depreciation" className="h-8 px-3 text-xs">
-                高折旧
+                {t("shopping.overview.highDepreciation")}
               </TabsTrigger>
               <TabsTrigger value="buy-slowly" className="h-8 px-3 text-xs">
-                慢慢买好
+                {t("shopping.overview.buySlowly")}
               </TabsTrigger>
               <TabsTrigger value="overlooked" className="h-8 px-3 text-xs">
-                基础件
+                {t("shopping.overview.essentials")}
               </TabsTrigger>
             </TabsList>
 
@@ -378,7 +382,7 @@ export function ShoppingOverviewTab({
                 </div>
               ) : (
                 <p className="text-sm text-[color:var(--text-muted)]">
-                  当前筛选下没有需要额外冷静的高折旧幸福感物品。
+                  {t("shopping.overview.noHighDepreciationWarnings")}
                 </p>
               )}
             </TabsContent>
@@ -397,7 +401,7 @@ export function ShoppingOverviewTab({
                 </div>
               ) : (
                 <p className="text-sm text-[color:var(--text-muted)]">
-                  当前筛选下没有慢折旧的长期件建议。
+                  {t("shopping.overview.noSlowDepreciationSuggestions")}
                 </p>
               )}
             </TabsContent>
@@ -415,7 +419,7 @@ export function ShoppingOverviewTab({
                   ))}
                 </ul>
               ) : (
-                <EmptyState message="当前筛选下没有基础提醒。" compact />
+                <EmptyState message={t("shopping.overview.noEssentialsReminder")} compact />
               )}
             </TabsContent>
           </Tabs>

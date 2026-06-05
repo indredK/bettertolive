@@ -4,4 +4,5 @@ export const UI_LAYERS = {
   notifications: "z-[100]",
   dialogOverlay: "z-[140]",
   dialogContent: "z-[150]",
+  floatingContent: "z-[160]",
 } as const

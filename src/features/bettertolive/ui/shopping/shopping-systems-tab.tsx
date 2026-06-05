@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { TabsContent } from "@/components/ui/tabs"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
@@ -58,6 +59,7 @@ function SystemDetailItemRow({
 }
 
 function SystemDetailPanel({ system }: { system: ShoppingSystemOverview }) {
+  const { t } = useTranslation()
   return (
     <div className="flex h-full flex-col rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
@@ -70,21 +72,21 @@ function SystemDetailPanel({ system }: { system: ShoppingSystemOverview }) {
           <SystemSummaryChip label={system.id} />
           <SystemSummaryChip label={system.cluster} />
           <Badge variant="outline" className={cn("border", SYSTEM_STATUS_STYLES.active)}>
-            已有 {system.owned.length}
+            {t("shopping.systems.ownedBadge", { count: system.owned.length })}
           </Badge>
           <Badge variant="outline" className={cn("border", SYSTEM_STATUS_STYLES.pending)}>
-            待补 {system.planned.length}
+            {t("shopping.systems.pendingBadge", { count: system.planned.length })}
           </Badge>
         </div>
 
         <p className="mt-4 text-sm leading-6 text-[color:var(--text-secondary)]">
-          核心问题：{system.keyQuestion}
+          {t("shopping.systems.coreQuestion", { question: system.keyQuestion })}
         </p>
 
         <div className="mt-5 grid gap-4">
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              二级分组
+              {t("shopping.systems.secondaryGroups")}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {system.secondaryGroups.map((group) => (
@@ -95,13 +97,15 @@ function SystemDetailPanel({ system }: { system: ShoppingSystemOverview }) {
 
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              空间
+              {t("shopping.systems.spaces")}
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               {system.spaces.length > 0 ? (
                 system.spaces.map((space) => <SystemSummaryChip key={space} label={space} />)
               ) : (
-                <span className="text-sm text-[color:var(--text-muted)]">暂无空间数据</span>
+                <span className="text-sm text-[color:var(--text-muted)]">
+                  {t("shopping.systems.noSpaceData")}
+                </span>
               )}
             </div>
           </div>
@@ -110,22 +114,28 @@ function SystemDetailPanel({ system }: { system: ShoppingSystemOverview }) {
         <div className="mt-5 grid gap-5">
           <div>
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              已有 {system.owned.length} 项
+              {t("shopping.systems.ownedCount", { count: system.owned.length })}
             </div>
             {system.owned.length > 0 ? (
               <div className="mt-3 space-y-3">
                 {system.owned.map((item) => (
-                  <SystemDetailItemRow key={item.id} item={item} sourceLabel="已拥有" />
+                  <SystemDetailItemRow
+                    key={item.id}
+                    item={item}
+                    sourceLabel={t("shopping.systems.ownedLabel")}
+                  />
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前没有已拥有条目。</p>
+              <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+                {t("shopping.systems.noOwnedItems")}
+              </p>
             )}
           </div>
 
           <div>
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              待补 {system.planned.length} 项
+              {t("shopping.systems.pendingCount", { count: system.planned.length })}
             </div>
             {system.planned.length > 0 ? (
               <div className="mt-3 space-y-3">
@@ -134,7 +144,9 @@ function SystemDetailPanel({ system }: { system: ShoppingSystemOverview }) {
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前没有待补条目。</p>
+              <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+                {t("shopping.systems.noPendingItems")}
+              </p>
             )}
           </div>
         </div>
@@ -236,6 +248,7 @@ export function ShoppingSystemsTab({
   isFixedLayout: boolean
   onSelectSystem: (systemId: string) => void
 }) {
+  const { t } = useTranslation()
   const selectedSystem = systems.find((s) => s.id === selectedSystemId) ?? null
 
   return (
@@ -266,7 +279,7 @@ export function ShoppingSystemsTab({
               ))}
             </div>
           ) : (
-            <EmptyState message="当前筛选下没有系统地图数据。" />
+            <EmptyState message={t("shopping.systems.noSystemData")} />
           )}
         </Surface>
 
@@ -276,7 +289,9 @@ export function ShoppingSystemsTab({
             <SystemDetailPanel system={selectedSystem} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
-              <p className="text-sm text-[color:var(--text-muted)]">选择一个系统查看详情</p>
+              <p className="text-sm text-[color:var(--text-muted)]">
+                {t("shopping.systems.selectPrompt")}
+              </p>
             </div>
           )}
         </div>

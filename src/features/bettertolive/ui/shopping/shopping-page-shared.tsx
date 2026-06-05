@@ -1,4 +1,5 @@
 import { type LucideIcon } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -18,7 +19,7 @@ import type {
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import {
   DEPRECIATION_STYLES,
-  LIFECYCLE_COPY,
+  getLifecycleCopy,
   LIFECYCLE_STYLES,
   NEED_LEVEL_STYLES,
   formatPrice,
@@ -77,6 +78,7 @@ export function ShoppingPriceRow({
 }
 
 export function ChecklistBlock({ title, items }: { title: string; items: string[] }) {
+  const { t } = useTranslation()
   return (
     <div>
       <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
@@ -94,7 +96,9 @@ export function ChecklistBlock({ title, items }: { title: string; items: string[
           ))}
         </ul>
       ) : (
-        <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前阶段暂时没有这一层。</p>
+        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+          {t("shopping.shared.noItemsInLayer")}
+        </p>
       )}
     </div>
   )
@@ -226,6 +230,7 @@ export function BoundaryTable({
   entries: ShoppingBoundaryEntry[]
   className?: string
 }) {
+  const { t } = useTranslation()
   return (
     <div
       className={cn(
@@ -236,9 +241,15 @@ export function BoundaryTable({
       <Table className="min-w-[720px]">
         <TableHeader>
           <TableRow className="border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)]">
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">物品</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">归属</TableHead>
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">理由</TableHead>
+            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
+              {t("shopping.shared.boundaryTable.item")}
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
+              {t("shopping.shared.boundaryTable.ownership")}
+            </TableHead>
+            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
+              {t("shopping.shared.boundaryTable.reason")}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -272,19 +283,21 @@ export function LifecycleLane({
   plannedCount: number
   highlights: string[]
 }) {
+  const { t } = useTranslation()
+  const lifecycleCopy = getLifecycleCopy(t)
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
       <div className="flex flex-wrap items-center gap-2">
         <ClassificationBadge label={lifecycle} className={LIFECYCLE_STYLES[lifecycle]} />
         <span className="text-sm font-medium text-[color:var(--text-primary)]">
-          {LIFECYCLE_COPY[lifecycle].title}
+          {lifecycleCopy[lifecycle].title}
         </span>
       </div>
       <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {LIFECYCLE_COPY[lifecycle].detail}
+        {lifecycleCopy[lifecycle].detail}
       </p>
       <div className="mt-3 text-xs text-[color:var(--text-muted)]">
-        已有 {ownedCount} 项 · 待看 {plannedCount} 项
+        {t("shopping.overview.ownedAndPlanned", { owned: ownedCount, planned: plannedCount })}
       </div>
       {highlights.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-2">
@@ -299,7 +312,9 @@ export function LifecycleLane({
           ))}
         </div>
       ) : (
-        <p className="mt-3 text-sm text-[color:var(--text-muted)]">当前筛选下还没有条目。</p>
+        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+          {t("shopping.overview.noItemsUnderFilter")}
+        </p>
       )}
     </div>
   )
@@ -312,7 +327,8 @@ export function PurchaseDecisionCard({
   item: ShoppingPlanWithLane
   compact?: boolean
 }) {
-  const signal = getPriceSignal(item)
+  const { t } = useTranslation()
+  const signal = getPriceSignal(item, t)
 
   return (
     <div
@@ -376,24 +392,24 @@ export function PurchaseDecisionCard({
         <div className="space-y-2">
           <ShoppingPriceRow
             compact={compact}
-            label="当前价格"
+            label={t("shopping.planning.currentPrice")}
             value={formatPrice(item.currentPrice)}
           />
           <ShoppingPriceRow
             compact={compact}
-            label="什么价格可以购入"
+            label={t("shopping.planning.buyBelowPrice")}
             value={`<= ${formatPrice(item.buyBelowPrice)}`}
           />
           <ShoppingPriceRow
             compact={compact}
-            label="什么价格性价比低"
+            label={t("shopping.planning.overpayPrice")}
             value={`>= ${formatPrice(item.overpayPrice)}`}
           />
         </div>
 
         <div>
           <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-            相关提醒
+            {t("shopping.shared.relatedReminders")}
           </div>
           <div className={cn("mt-3 flex flex-wrap gap-2", compact && "mt-2 gap-1.5")}>
             <Badge

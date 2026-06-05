@@ -8,7 +8,8 @@ import {
   SectionHeading,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
+import i18next from "@/i18n/config"
+import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 import { cn } from "@/lib/utils"
 
 export function FinancePage({
@@ -21,6 +22,7 @@ export function FinancePage({
   isStackedLayout?: boolean
 }) {
   const isFixedLayout = !isStackedLayout
+  const locale = i18next.resolvedLanguage ?? i18next.language
   const expenseTotal = transactions
     .filter((entry) => entry.direction === "expense")
     .reduce((sum, entry) => sum + entry.amount, 0)
@@ -96,7 +98,7 @@ export function FinancePage({
                       }
                     >
                       {entry.direction === "income" ? "+" : "-"}
-                      {MONEY_FORMATTER.format(entry.amount)}
+                      {formatCurrency(entry.amount, locale)}
                     </div>
                   </div>
                 </div>
@@ -131,7 +133,7 @@ export function FinancePage({
                         {category}
                       </span>
                       <span className="text-[color:var(--text-muted)]">
-                        {MONEY_FORMATTER.format(amount)}
+                        {formatCurrency(amount, locale)}
                       </span>
                     </div>
                     <div className="h-2 rounded-full bg-[color:var(--muted-surface-border)]">

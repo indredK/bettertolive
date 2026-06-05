@@ -1,5 +1,6 @@
 import { X } from "lucide-react"
 import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -101,7 +102,8 @@ function PlanItemRow({
   isSelected: boolean
   onSelect: (id: string) => void
 }) {
-  const signal = getPriceSignal(item)
+  const { t } = useTranslation()
+  const signal = getPriceSignal(item, t)
 
   return (
     <button
@@ -155,7 +157,8 @@ function PlanItemDetail({
   item: ShoppingPlanWithLane
   shopping: ShoppingModuleData
 }) {
-  const signal = getPriceSignal(item)
+  const { t } = useTranslation()
+  const signal = getPriceSignal(item, t)
   const systemDef = shopping.systemDefinitions.find((s) => s.id === item.system)
   const priceRefs = shopping.priceReferences.filter(
     (ref) => ref.system === item.system || ref.category === item.category,
@@ -196,7 +199,7 @@ function PlanItemDetail({
         <div className="p-5 pb-0">
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              决策理由
+              {t("shopping.planning.decisionReason")}
             </div>
             <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
               {item.reason}
@@ -210,12 +213,21 @@ function PlanItemDetail({
         {/* Price Info */}
         <div className="p-5 pb-0">
           <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-            价格参考
+            {t("shopping.planning.priceReference")}
           </div>
           <div className="mt-3 space-y-2">
-            <ShoppingPriceRow label="当前价格" value={formatPrice(item.currentPrice)} />
-            <ShoppingPriceRow label="可购入价格" value={`<= ${formatPrice(item.buyBelowPrice)}`} />
-            <ShoppingPriceRow label="偏贵价格" value={`>= ${formatPrice(item.overpayPrice)}`} />
+            <ShoppingPriceRow
+              label={t("shopping.planning.currentPrice")}
+              value={formatPrice(item.currentPrice)}
+            />
+            <ShoppingPriceRow
+              label={t("shopping.planning.buyBelowPrice")}
+              value={`<= ${formatPrice(item.buyBelowPrice)}`}
+            />
+            <ShoppingPriceRow
+              label={t("shopping.planning.overpayPrice")}
+              value={`>= ${formatPrice(item.overpayPrice)}`}
+            />
           </div>
         </div>
 
@@ -223,13 +235,13 @@ function PlanItemDetail({
         {systemDef ? (
           <div className="p-5 pb-0">
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              系统信息
+              {t("shopping.planning.systemInfo")}
             </div>
             <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
               {systemDef.summary}
             </p>
             <p className="mt-2 text-[13px] leading-5 text-[color:var(--text-muted)]">
-              核心问题：{systemDef.keyQuestion}
+              {t("shopping.planning.coreQuestion", { question: systemDef.keyQuestion })}
             </p>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {systemDef.secondaryGroups.map((group) => (
@@ -249,26 +261,26 @@ function PlanItemDetail({
         {priceRefs.length > 0 ? (
           <div className="p-5">
             <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              同类价格参考
+              {t("shopping.planning.similarPriceRef")}
             </div>
             <div className="mt-3 rounded-lg border border-[color:var(--muted-surface-border)]">
               <Table className="whitespace-nowrap">
                 <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
                   <TableRow>
                     <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      物品
+                      {t("shopping.planning.table.item")}
                     </TableHead>
                     <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      系统
+                      {t("shopping.planning.table.system")}
                     </TableHead>
                     <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      入门价
+                      {t("shopping.planning.table.entryPrice")}
                     </TableHead>
                     <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      舒适区间
+                      {t("shopping.planning.table.comfortZone")}
                     </TableHead>
                     <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      偏贵
+                      {t("shopping.planning.table.overpay")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -314,7 +326,7 @@ function PlanItemDetail({
         {/* Tags */}
         <div className="p-5">
           <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-            相关标签
+            {t("shopping.planning.relatedTags")}
           </div>
           <div className="mt-3 flex flex-wrap gap-1.5">
             <Badge
@@ -344,7 +356,7 @@ function PlanItemDetail({
           {item.keywords.length > 0 ? (
             <div className="mt-4">
               <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                搜索关键词
+                {t("shopping.planning.searchKeywords")}
               </div>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {item.keywords.map((kw) => (
@@ -374,6 +386,7 @@ export function ShoppingPlanningTab({
   isWideLayout: boolean
   isFixedLayout: boolean
 }) {
+  const { t } = useTranslation()
   const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
     lane.items.map((item) => ({ ...item, laneId: lane.id, laneTitle: lane.title })),
   )
@@ -428,7 +441,9 @@ export function ShoppingPlanningTab({
           {/* Filters */}
           <Surface className={cn("shrink-0 overflow-hidden p-4", isWideLayout && "p-3")}>
             <div className="flex items-center justify-between">
-              <span className="text-[13px] font-medium text-[color:var(--text-primary)]">筛选</span>
+              <span className="text-[13px] font-medium text-[color:var(--text-primary)]">
+                {t("shopping.planning.filter")}
+              </span>
               {hasActiveFilters ? (
                 <button
                   type="button"
@@ -436,7 +451,7 @@ export function ShoppingPlanningTab({
                   className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
                 >
                   <X className="size-3" />
-                  清除
+                  {t("shopping.planning.clear")}
                 </button>
               ) : null}
             </div>
@@ -445,11 +460,11 @@ export function ShoppingPlanningTab({
               {/* Depreciation */}
               <div>
                 <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                  折旧率
+                  {t("shopping.planning.depreciation")}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <FilterChip
-                    label="全部"
+                    label={t("shopping.planning.all")}
                     isSelected={filterDepreciation === "all"}
                     onClick={() => setFilterDepreciation("all")}
                   />
@@ -467,11 +482,11 @@ export function ShoppingPlanningTab({
               {/* System */}
               <div>
                 <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                  系统
+                  {t("shopping.planning.system")}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <FilterChip
-                    label="全部"
+                    label={t("shopping.planning.all")}
                     isSelected={filterSystem === "all"}
                     onClick={() => setFilterSystem("all")}
                   />
@@ -489,11 +504,11 @@ export function ShoppingPlanningTab({
               {/* Necessity */}
               <div>
                 <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                  必要性
+                  {t("shopping.planning.necessity")}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <FilterChip
-                    label="全部"
+                    label={t("shopping.planning.all")}
                     isSelected={filterNecessity === "all"}
                     onClick={() => setFilterNecessity("all")}
                   />
@@ -511,11 +526,11 @@ export function ShoppingPlanningTab({
               {/* Lifecycle */}
               <div>
                 <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                  生命周期
+                  {t("shopping.planning.lifecycle")}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   <FilterChip
-                    label="全部"
+                    label={t("shopping.planning.all")}
                     isSelected={filterLifecycle === "all"}
                     onClick={() => setFilterLifecycle("all")}
                   />
@@ -537,7 +552,7 @@ export function ShoppingPlanningTab({
             <div className="flex h-full flex-col">
               <div className="mb-3 flex shrink-0 items-center justify-between">
                 <span className="text-[13px] font-medium text-[color:var(--text-primary)]">
-                  {filteredItems.length} 个物件
+                  {t("shopping.planning.itemCount", { count: filteredItems.length })}
                 </span>
               </div>
 
@@ -554,7 +569,7 @@ export function ShoppingPlanningTab({
                     ))}
                   </div>
                 ) : (
-                  <EmptyState message="当前筛选条件下没有匹配的物件。" compact />
+                  <EmptyState message={t("shopping.planning.noMatchingItems")} compact />
                 )}
               </div>
             </div>
@@ -567,7 +582,9 @@ export function ShoppingPlanningTab({
             <PlanItemDetail item={selectedItem} shopping={shopping} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
-              <p className="text-sm text-[color:var(--text-muted)]">选择一个物件查看采购详情</p>
+              <p className="text-sm text-[color:var(--text-muted)]">
+                {t("shopping.planning.selectPrompt")}
+              </p>
             </div>
           )}
         </div>

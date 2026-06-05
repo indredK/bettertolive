@@ -1,5 +1,6 @@
 import { AlertTriangle, House, Package2, Settings, ShoppingBasket, Sparkles } from "lucide-react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
@@ -37,6 +38,7 @@ export function ShoppingPage({
   isWideLayout?: boolean
   isStackedLayout?: boolean
 }) {
+  const { t } = useTranslation()
   const isFixedLayout = !isStackedLayout
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
   const [selectedSpaceName, setSelectedSpaceName] = useState<string | null>(null)
@@ -154,9 +156,9 @@ export function ShoppingPage({
       )}
     >
       <PageIntro
-        eyebrow="生活物品"
-        title="生活物品分类工作台"
-        description="先用只读方式把分类体系立起来，再决定以后要不要做录入和操作。"
+        eyebrow={t("shopping.page.eyebrow")}
+        title={t("shopping.page.title")}
+        description={t("shopping.page.description")}
         searchQuery={searchQuery}
       />
 
@@ -181,30 +183,30 @@ export function ShoppingPage({
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
             <AlertTriangle />
-            总览
+            {t("shopping.tabs.overview")}
           </TabsTrigger>
           <TabsTrigger value="systems" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
             <Package2 />
-            系统地图
+            {t("shopping.tabs.systems")}
           </TabsTrigger>
           <TabsTrigger value="spaces" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
             <House />
-            空间巡检
+            {t("shopping.tabs.spaces")}
           </TabsTrigger>
           <TabsTrigger value="stages" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
             <Sparkles />
-            阶段模板
+            {t("shopping.tabs.stages")}
           </TabsTrigger>
           <TabsTrigger
             value="planning"
             className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
           >
             <ShoppingBasket />
-            采购决策
+            {t("shopping.tabs.planning")}
           </TabsTrigger>
           <TabsTrigger value="admin" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
             <Settings />
-            管理
+            {t("shopping.tabs.admin")}
           </TabsTrigger>
         </TabsList>
 

@@ -29,7 +29,8 @@ import {
   SectionHeading,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
-import { MONEY_FORMATTER } from "@/features/bettertolive/ui/shared/formatters"
+import i18next from "@/i18n/config"
+import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 import { cn } from "@/lib/utils"
 
 const MEAL_SCENES = [
@@ -793,6 +794,8 @@ function MealCard({
   meal: NutritionMealEntry
   foodMemories: NutritionFoodMemory[]
 }) {
+  const locale =
+    typeof i18next.resolvedLanguage === "string" ? i18next.resolvedLanguage : i18next.language
   const relatedFoodMemory = foodMemories.find(
     (foodMemory) => foodMemory.id === meal.relatedFoodMemoryId,
   )
@@ -827,7 +830,7 @@ function MealCard({
         <MealMeta label="构成" value={meal.composition ?? "饮品不填"} />
         <MealMeta label="来源/风味" value={meal.origin} />
         <MealMeta label="触发" value={meal.trigger} />
-        <MealMeta label="花费参考" value={meal.cost ? MONEY_FORMATTER.format(meal.cost) : "未填"} />
+        <MealMeta label="花费参考" value={meal.cost ? formatCurrency(meal.cost, locale) : "未填"} />
         <MealMeta label="value_density" value={meal.valueDensity ?? "待补"} accent />
         <MealMeta label="body_feedback" value={meal.bodyFeedback ?? "待补"} accent />
         <MealMeta label="关联记账" value={meal.relatedFinanceEntryId ?? "未关联"} />

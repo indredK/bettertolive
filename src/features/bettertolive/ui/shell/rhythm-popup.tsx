@@ -3,6 +3,7 @@ import { CalendarDays } from "lucide-react"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
 import { AnimatePresence, m } from "motion/react"
+import { useTranslation } from "react-i18next"
 
 import {
   PopupNotification,
@@ -21,6 +22,7 @@ type RhythmPopupProps = {
 }
 
 export function RhythmPopup({ slides }: RhythmPopupProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState<boolean>(slides.length > 0)
 
   if (slides.length === 0) {
@@ -36,8 +38,8 @@ export function RhythmPopup({ slides }: RhythmPopupProps) {
     >
       <PopupNotificationHeader
         icon={CalendarDays}
-        eyebrow="今日节奏"
-        title="慢一点，先看看今天"
+        eyebrow={t("shell.rhythmPopup.eyebrow")}
+        title={t("shell.rhythmPopup.title")}
         onClose={() => setOpen(false)}
       />
       <PopupNotificationBody>
@@ -48,6 +50,7 @@ export function RhythmPopup({ slides }: RhythmPopupProps) {
 }
 
 function RhythmCarousel({ slides }: { slides: WorkspaceRhythmSlide[] }) {
+  const { t } = useTranslation()
   const { isPaused } = usePopupNotification()
   const [selectedIndex, setSelectedIndex] = useState(0)
 
@@ -154,7 +157,7 @@ function RhythmCarousel({ slides }: { slides: WorkspaceRhythmSlide[] }) {
               <button
                 key={slide.id}
                 type="button"
-                aria-label={`切换到今日节奏第 ${index + 1} 条`}
+                aria-label={t("shell.rhythmPopup.switchToNth", { n: index + 1 })}
                 aria-pressed={isActive}
                 onClick={() => scrollTo(index)}
                 className={cn(

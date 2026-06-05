@@ -1,25 +1,11 @@
 import { FileText, Pencil } from "lucide-react"
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ShoppingItemsAdmin } from "@/features/bettertolive/ui/shopping/shopping-items-admin"
 import { ShoppingPageContentAdmin } from "@/features/bettertolive/ui/shopping/shopping-page-content-admin"
 import { cn } from "@/lib/utils"
-
-const ADMIN_SECTIONS = [
-  {
-    value: "items",
-    label: "物件管理",
-    description: "已有与计划物件",
-    icon: Pencil,
-  },
-  {
-    value: "page-content",
-    label: "页面内容",
-    description: "模板与说明内容",
-    icon: FileText,
-  },
-] as const
 
 export function ShoppingAdminTab({
   isWideLayout = false,
@@ -28,7 +14,23 @@ export function ShoppingAdminTab({
   isWideLayout?: boolean
   isFixedLayout?: boolean
 }) {
+  const { t } = useTranslation()
   const [activeSection, setActiveSection] = useState("items")
+
+  const ADMIN_SECTIONS = [
+    {
+      value: "items" as const,
+      label: t("shopping.admin.itemsManagement"),
+      description: t("shopping.admin.itemsManagementDesc"),
+      icon: Pencil,
+    },
+    {
+      value: "page-content" as const,
+      label: t("shopping.admin.pageContentLabel"),
+      description: t("shopping.admin.pageContentDesc"),
+      icon: FileText,
+    },
+  ]
 
   return (
     <TabsContent

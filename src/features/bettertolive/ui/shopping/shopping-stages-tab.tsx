@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { Sparkles } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -14,6 +15,7 @@ import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageChecklist }) {
+  const { t } = useTranslation()
   const sectionCount = checklist.sections.length
   const totalItems = checklist.sections.reduce(
     (sum, s) => sum + s.minimum.length + s.essentials.length + s.upgrades.length,
@@ -42,13 +44,13 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
                 variant="outline"
                 className="border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
               >
-                {sectionCount} 个系统
+                {t("shopping.stages.systemCount", { count: sectionCount })}
               </Badge>
               <Badge
                 variant="outline"
                 className="border border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
               >
-                {totalItems} 条物品
+                {t("shopping.stages.itemCount", { count: totalItems })}
               </Badge>
             </div>
             <p className="truncate text-right text-[13px] leading-5 text-[color:var(--text-secondary)]">
@@ -67,13 +69,13 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
           <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
             <TableRow>
               <TableHead className="w-[30%] text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                系统
+                {t("shopping.stages.table.system")}
               </TableHead>
               <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                最低配置
+                {t("shopping.stages.table.minimum")}
               </TableHead>
               <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                升级配置
+                {t("shopping.stages.table.upgrades")}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -142,6 +144,7 @@ function StageMapCard({
   isSelected: boolean
   onSelect: (stageId: string) => void
 }) {
+  const { t } = useTranslation()
   const sectionCount = checklist.sections.length
   const totalItems = checklist.sections.reduce(
     (sum, section) =>
@@ -182,13 +185,13 @@ function StageMapCard({
           variant="outline"
           className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
         >
-          {sectionCount} 系统
+          {t("shopping.stages.systemCount", { count: sectionCount })}
         </Badge>
         <Badge
           variant="outline"
           className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
         >
-          {totalItems} 条物品
+          {t("shopping.stages.itemCount", { count: totalItems })}
         </Badge>
       </div>
 
@@ -230,6 +233,7 @@ export function ShoppingStagesTab({
   isFixedLayout: boolean
   onSelectStage: (stageId: string) => void
 }) {
+  const { t } = useTranslation()
   const selectedChecklist = checklists.find((c) => c.id === selectedStageId) ?? null
 
   return (
@@ -260,7 +264,7 @@ export function ShoppingStagesTab({
               ))}
             </div>
           ) : (
-            <EmptyState message="当前筛选下没有阶段模板。" />
+            <EmptyState message={t("shopping.stages.noTemplates")} />
           )}
         </Surface>
 
@@ -270,7 +274,9 @@ export function ShoppingStagesTab({
             <StageDetailGroupedTable checklist={selectedChecklist} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
-              <p className="text-sm text-[color:var(--text-muted)]">选择一个阶段查看详情</p>
+              <p className="text-sm text-[color:var(--text-muted)]">
+                {t("shopping.stages.selectPrompt")}
+              </p>
             </div>
           )}
         </div>

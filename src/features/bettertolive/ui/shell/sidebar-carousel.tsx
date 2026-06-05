@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import type { LucideIcon } from "lucide-react"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
+import { useTranslation } from "react-i18next"
 
 import type { WorkspaceSidebarNote } from "@/features/bettertolive/config/sidebar"
 import { cn } from "@/lib/utils"
@@ -74,6 +75,7 @@ export function SidebarNoteCarousel({
   icon: LucideIcon
   note: WorkspaceSidebarNote
 }) {
+  const { t } = useTranslation()
   const { emblaRef, scrollTo, selectedIndex } = useSidebarCarousel(note.lines.length, 4200)
 
   return (
@@ -92,7 +94,7 @@ export function SidebarNoteCarousel({
               <button
                 key={`${note.heading}-${line.label}`}
                 type="button"
-                aria-label={`切换到说明第 ${index + 1} 条`}
+                aria-label={t("shell.sidebarCarousel.switchToNth", { n: index + 1 })}
                 aria-pressed={index === selectedIndex}
                 onClick={() => scrollTo(index)}
                 className={cn(
