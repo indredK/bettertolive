@@ -135,10 +135,6 @@
         "SelfBuilt": "自建房",
         "Basement": "地下室"
       },
-      "cluster": {
-        "BasicSystems": "基础系统",
-        "HomeAndLifestyle": "家居与生活方式"
-      },
       "necessity": {
         "MinimalConfig": "最低配置",
         "Necessary": "必要",
@@ -194,12 +190,11 @@
       "noSystemData": "当前筛选下没有系统地图数据。",
       "form": {
         "system": "系统",
-        "cluster": "系统分组",
+        "systemPlaceholder": "例如：睡眠系统",
         "summary": "摘要",
         "keyQuestion": "核心问题",
         "secondaryGroups": "二级分组",
         "secondaryGroupsHelp": "使用逗号分隔多个二级分组",
-        "noAvailable": "当前系统卡片已经全部建立，没有可新增的系统卡位。",
         "cancel": "取消",
         "save": "保存"
       }

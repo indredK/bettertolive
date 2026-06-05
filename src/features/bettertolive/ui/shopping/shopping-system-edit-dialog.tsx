@@ -12,13 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import {
   createSystemDefinition,
@@ -27,14 +21,7 @@ import {
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type { ShoppingSystemOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
-import type { ShoppingSystem } from "@/features/bettertolive/types"
-import { ShoppingSystemCluster } from "@/features/bettertolive/types"
-import {
-  clusterDisplayName,
-  SHOPPING_SYSTEM_CLUSTER_OPTIONS,
-  SHOPPING_SYSTEM_OPTIONS,
-  systemDisplayName,
-} from "@/features/bettertolive/ui/shopping/shopping-page-data"
+import { systemDisplayName } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
 type EditingState = {
   isNew: boolean
@@ -43,14 +30,14 @@ type EditingState = {
 
 type FormState = {
   isNew: boolean
-  id: ShoppingSystem
-  cluster: ShoppingSystemCluster
+  id: string
   summary: string
   keyQuestion: string
   secondaryGroupsText: string
 }
 
 const SYSTEM_LIMITS = {
+  id: 40,
   summary: 180,
   keyQuestion: 180,
   group: 32,
@@ -64,25 +51,20 @@ function parseGroups(value: string): string[] {
     .filter(Boolean)
 }
 
-function buildForm(editing: EditingState, availableSystemIds: ShoppingSystem[]): FormState | null {
+function buildForm(editing: EditingState): FormState {
   if (!editing.isNew && editing.system) {
     return {
       isNew: false,
       id: editing.system.id,
-      cluster: editing.system.cluster,
       summary: editing.system.summary,
       keyQuestion: editing.system.keyQuestion,
       secondaryGroupsText: editing.system.secondaryGroups.join(", "),
     }
   }
 
-  const nextId = availableSystemIds[0]
-  if (!nextId) return null
-
   return {
     isNew: true,
-    id: nextId,
-    cluster: ShoppingSystemCluster.BasicSystems,
+    id: "",
     summary: "",
     keyQuestion: "",
     secondaryGroupsText: "",
@@ -90,16 +72,7 @@ function buildForm(editing: EditingState, availableSystemIds: ShoppingSystem[]):
 }
 
 const schema = z.object({
-  id: z
-    .string()
-    .refine((value): value is ShoppingSystem =>
-      SHOPPING_SYSTEM_OPTIONS.includes(value as ShoppingSystem),
-    ),
-  cluster: z
-    .string()
-    .refine((value): value is ShoppingSystemCluster =>
-      SHOPPING_SYSTEM_CLUSTER_OPTIONS.includes(value as ShoppingSystemCluster),
-    ),
+  id: z.string().trim().min(1).max(SYSTEM_LIMITS.id),
   summary: z.string().trim().min(1).max(SYSTEM_LIMITS.summary),
   keyQuestion: z.string().trim().min(1).max(SYSTEM_LIMITS.keyQuestion),
   secondaryGroupsText: z.string(),
@@ -107,36 +80,20 @@ const schema = z.object({
 
 export function ShoppingSystemEditDialog({
   editing,
-  availableSystemIds,
+  existingSystemIds,
   onClose,
   onSaved,
 }: {
   editing: EditingState | null
-  availableSystemIds: ShoppingSystem[]
+  existingSystemIds: string[]
   onClose: () => void
   onSaved: () => void
 }) {
   if (!editing) return null
 
-  if (editing.isNew && availableSystemIds.length === 0) {
-    return (
-      <Dialog
-        open
-        onOpenChange={(open) => {
-          if (!open) onClose()
-        }}
-      >
-        <SystemUnavailableDialog onClose={onClose} />
-      </Dialog>
-    )
-  }
+  const initialForm = buildForm(editing)
 
-  const initialForm = buildForm(editing, availableSystemIds)
-  if (!initialForm) return null
-
-  const dialogKey = editing.isNew
-    ? `new-system-${availableSystemIds.join(",")}`
-    : editing.system?.id
+  const dialogKey = editing.isNew ? "new-system" : editing.system?.id
 
   return (
     <Dialog
@@ -148,7 +105,7 @@ export function ShoppingSystemEditDialog({
     >
       <SystemDialogContent
         initialForm={initialForm}
-        systemOptions={editing.isNew ? availableSystemIds : [initialForm.id]}
+        existingSystemIds={existingSystemIds}
         onClose={onClose}
         onSaved={onSaved}
       />
@@ -156,33 +113,14 @@ export function ShoppingSystemEditDialog({
   )
 }
 
-function SystemUnavailableDialog({ onClose }: { onClose: () => void }) {
-  const { t } = useTranslation()
-
-  return (
-    <DialogContent className="sm:max-w-lg">
-      <DialogHeader>
-        <DialogTitle>{t("shopping.systems.newTitle")}</DialogTitle>
-        <DialogDescription>{t("shopping.systems.form.noAvailable")}</DialogDescription>
-      </DialogHeader>
-
-      <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
-          {t("shopping.systems.form.cancel")}
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  )
-}
-
 function SystemDialogContent({
   initialForm,
-  systemOptions,
+  existingSystemIds,
   onClose,
   onSaved,
 }: {
   initialForm: FormState
-  systemOptions: ShoppingSystem[]
+  existingSystemIds: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -203,6 +141,18 @@ function SystemDialogContent({
       const parsed = schema.safeParse(form)
       if (!parsed.success) {
         setError(t("shopping.validation.invalidForm"))
+        return
+      }
+
+      const nextId = parsed.data.id.trim()
+      const normalizedCurrentId = form.isNew ? null : form.id.trim().toLocaleLowerCase()
+      const hasDuplicate = existingSystemIds.some((systemId) => {
+        const normalizedId = systemId.trim().toLocaleLowerCase()
+        return normalizedId === nextId.toLocaleLowerCase() && normalizedId !== normalizedCurrentId
+      })
+
+      if (hasDuplicate) {
+        setError(t("shopping.validation.duplicateName"))
         return
       }
 
@@ -227,8 +177,7 @@ function SystemDialogContent({
       }
 
       const payload = {
-        id: parsed.data.id,
-        cluster: parsed.data.cluster,
+        id: nextId,
         summary: parsed.data.summary.trim(),
         keyQuestion: parsed.data.keyQuestion.trim(),
         secondaryGroups: groups,
@@ -291,40 +240,13 @@ function SystemDialogContent({
 
           <div className="grid items-start gap-4 md:grid-cols-2">
             <FormField label={t("shopping.systems.form.system")} required>
-              <Select
+              <Input
                 value={form.id}
-                onValueChange={(value) => update({ id: value as ShoppingSystem })}
+                onChange={(event) => update({ id: event.target.value })}
+                maxLength={SYSTEM_LIMITS.id}
                 disabled={!form.isNew}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue>{systemDisplayName(form.id, t)}</SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {systemOptions.map((systemId) => (
-                    <SelectItem key={systemId} value={systemId}>
-                      {systemDisplayName(systemId, t)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
-            <FormField label={t("shopping.systems.form.cluster")} required>
-              <Select
-                value={form.cluster}
-                onValueChange={(value) => update({ cluster: value as ShoppingSystemCluster })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue>{clusterDisplayName(form.cluster, t)}</SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {SHOPPING_SYSTEM_CLUSTER_OPTIONS.map((cluster) => (
-                    <SelectItem key={cluster} value={cluster}>
-                      {clusterDisplayName(cluster, t)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder={t("shopping.systems.form.systemPlaceholder")}
+              />
             </FormField>
           </div>
 

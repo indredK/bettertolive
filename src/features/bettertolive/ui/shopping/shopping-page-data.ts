@@ -7,7 +7,6 @@ import {
   ShoppingOwnedStatus,
   ShoppingStage,
   ShoppingSystem,
-  ShoppingSystemCluster,
 } from "@/features/bettertolive/types"
 import i18next from "@/i18n/config"
 import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
@@ -114,11 +113,6 @@ export const SHOPPING_DEPRECIATION_OPTIONS: ShoppingDepreciation[] = [
   ShoppingDepreciation.Medium,
   ShoppingDepreciation.Slow,
   ShoppingDepreciation.NoDepreciation,
-]
-
-export const SHOPPING_SYSTEM_CLUSTER_OPTIONS: ShoppingSystemCluster[] = [
-  ShoppingSystemCluster.BasicSystems,
-  ShoppingSystemCluster.HomeAndLifestyle,
 ]
 
 export const SHOPPING_OWNED_STATUS_OPTIONS: ShoppingOwnedStatus[] = [
@@ -318,7 +312,7 @@ export function getSystemRowTemplate(length: number, activeIndex: number | null)
 
 /** Translate a ShoppingSystem value through i18n, falling back to the raw Chinese value. */
 export function systemDisplayName(system: ShoppingSystem, t: TFunction): string {
-  return t(`shopping.enumNames.system.${system}`, system as string)
+  return t(`shopping.enumNames.system.${system}`, system)
 }
 
 /** Translate a ShoppingStage value through i18n, falling back to the raw Chinese value. */
@@ -360,11 +354,6 @@ export function stageLikeDisplayName(stage: string, t: TFunction): string {
   }
 
   return normalizedStage
-}
-
-/** Translate a ShoppingSystemCluster value through i18n, falling back to the raw Chinese value. */
-export function clusterDisplayName(cluster: ShoppingSystemCluster, t: TFunction): string {
-  return t(`shopping.enumNames.cluster.${cluster}`, cluster as string)
 }
 
 /** Translate a ShoppingNeedLevel value through i18n, falling back to the raw Chinese value. */

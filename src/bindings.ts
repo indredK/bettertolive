@@ -313,7 +313,6 @@ export type ShoppingStageChecklistSectionDto = {
 
 export type ShoppingSystemDefinitionDto = {
 	id: string,
-	cluster: string,
 	summary: string,
 	keyQuestion: string,
 	secondaryGroups: string[],
@@ -321,7 +320,6 @@ export type ShoppingSystemDefinitionDto = {
 
 export type SystemDefinitionFormDto = {
 	id: string,
-	cluster: string,
 	summary: string,
 	keyQuestion: string,
 	secondaryGroups: string[],

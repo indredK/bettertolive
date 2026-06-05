@@ -512,7 +512,6 @@ pub fn delete_shopping_page_content(state: State<AppState>, id: String) -> Resul
 #[serde(rename_all = "camelCase")]
 pub struct SystemDefinitionFormDto {
     pub id: String,
-    pub cluster: String,
     pub summary: String,
     pub key_question: String,
     pub secondary_groups: Vec<String>,
@@ -529,7 +528,6 @@ pub fn create_system_definition(
     ShoppingRepository::create_system_definition(
         &conn,
         &form.id,
-        &form.cluster,
         &form.summary,
         &form.key_question,
         &form.secondary_groups,
@@ -548,7 +546,6 @@ pub fn update_system_definition(
     ShoppingRepository::update_system_definition(
         &conn,
         &form.id,
-        &form.cluster,
         &form.summary,
         &form.key_question,
         &form.secondary_groups,

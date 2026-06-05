@@ -33,11 +33,10 @@ import type {
   ShoppingStageChecklistSection,
   ShoppingStage,
 } from "@/features/bettertolive/types"
-import { ShoppingSystem } from "@/features/bettertolive/types"
+import type { ShoppingSystem } from "@/features/bettertolive/types"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import {
   SHOPPING_STAGE_OPTIONS,
-  SHOPPING_SYSTEM_OPTIONS,
   stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
@@ -77,7 +76,7 @@ function invalidOptionMessage(t: TFunction, field: string) {
   return t("shopping.validation.invalidOption", { field })
 }
 
-function buildStageSchema(t: TFunction) {
+function buildStageSchema(t: TFunction, systemOptions: string[]) {
   const fields = {
     title: cleanFieldLabel(t("shopping.stages.form.title")),
     stage: cleanFieldLabel(t("shopping.stages.form.stage")),
@@ -116,16 +115,9 @@ function buildStageSchema(t: TFunction) {
           system: z
             .string()
             .min(1, requiredMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))))
-            .refine(
-              (value): value is ShoppingSystem =>
-                SHOPPING_SYSTEM_OPTIONS.includes(value as ShoppingSystem),
-              {
-                message: invalidOptionMessage(
-                  t,
-                  cleanFieldLabel(t("shopping.stages.table.system")),
-                ),
-              },
-            ),
+            .refine((value): value is ShoppingSystem => systemOptions.includes(value), {
+              message: invalidOptionMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))),
+            }),
           minimum: z
             .array(
               z
@@ -215,16 +207,19 @@ function buildStageSchema(t: TFunction) {
   })
 }
 
-function createEmptySection(preferredSystem?: ShoppingSystem): ShoppingStageChecklistSection {
+function createEmptySection(preferredSystem = ""): ShoppingStageChecklistSection {
   return {
-    system: preferredSystem ?? ShoppingSystem.Sleep,
+    system: preferredSystem,
     minimum: [""],
     essentials: [],
     upgrades: [],
   }
 }
 
-function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
+function buildForm(
+  checklist: ShoppingStageChecklist | null,
+  systemOptions: string[],
+): StageFormState {
   if (!checklist) {
     return {
       isNew: true,
@@ -232,7 +227,7 @@ function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
       stage: "",
       description: "",
       focus: "",
-      sections: [createEmptySection()],
+      sections: [createEmptySection(systemOptions[0] ?? "")],
     }
   }
   return {
@@ -250,21 +245,23 @@ function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
             essentials: [...section.essentials],
             upgrades: [...section.upgrades],
           }))
-        : [createEmptySection()],
+        : [createEmptySection(systemOptions[0] ?? "")],
   }
 }
 export function ShoppingStageEditDialog({
   editing,
+  systemOptions,
   onClose,
   onSaved,
 }: {
   editing: { isNew: boolean; checklist: ShoppingStageChecklist | null } | null
+  systemOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
   if (!editing) return null
 
-  const initialForm = buildForm(editing.checklist)
+  const initialForm = buildForm(editing.checklist, systemOptions)
   const dialogKey = editing.checklist?.id ?? "new-stage"
 
   return (
@@ -275,17 +272,24 @@ export function ShoppingStageEditDialog({
         if (!open) onClose()
       }}
     >
-      <StageDialogContent initialForm={initialForm} onClose={onClose} onSaved={onSaved} />
+      <StageDialogContent
+        initialForm={initialForm}
+        systemOptions={systemOptions}
+        onClose={onClose}
+        onSaved={onSaved}
+      />
     </Dialog>
   )
 }
 
 function StageDialogContent({
   initialForm,
+  systemOptions,
   onClose,
   onSaved,
 }: {
   initialForm: StageFormState
+  systemOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -313,7 +317,7 @@ function StageDialogContent({
   const addSection = () => {
     const usedSystems = new Set(form.sections.map((section) => section.system))
     const nextSystem =
-      SHOPPING_SYSTEM_OPTIONS.find((system) => !usedSystems.has(system)) ?? ShoppingSystem.Sleep
+      systemOptions.find((system) => !usedSystems.has(system)) ?? systemOptions[0] ?? ""
 
     setForm((prev) => ({
       ...prev,
@@ -329,7 +333,7 @@ function StageDialogContent({
       ...prev,
       sections:
         prev.sections.length <= 1
-          ? [createEmptySection()]
+          ? [createEmptySection(systemOptions[0] ?? "")]
           : prev.sections.filter((_, index) => index !== sectionIndex),
     }))
   }
@@ -376,7 +380,7 @@ function StageDialogContent({
       setSaving(true)
       setError(null)
 
-      const parsed = buildStageSchema(t).safeParse(form)
+      const parsed = buildStageSchema(t, systemOptions).safeParse(form)
       if (!parsed.success) {
         setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
         return
@@ -546,7 +550,7 @@ function StageDialogContent({
                             <SelectValue>{systemDisplayName(section.system, t)}</SelectValue>
                           </SelectTrigger>
                           <SelectContent>
-                            {SHOPPING_SYSTEM_OPTIONS.map((system) => (
+                            {systemOptions.map((system) => (
                               <SelectItem key={system} value={system}>
                                 {systemDisplayName(system, t)}
                               </SelectItem>

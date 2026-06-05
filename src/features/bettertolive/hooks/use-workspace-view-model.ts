@@ -153,13 +153,7 @@ export function useWorkspaceViewModel({
     () => ({
       ...workspace.shopping,
       systemDefinitions: workspace.shopping.systemDefinitions.filter((entry) =>
-        matchesQuery(
-          entry.id,
-          entry.cluster,
-          entry.summary,
-          entry.keyQuestion,
-          ...entry.secondaryGroups,
-        ),
+        matchesQuery(entry.id, entry.summary, entry.keyQuestion, ...entry.secondaryGroups),
       ),
       spaceDefinitions: workspace.shopping.spaceDefinitions.filter((entry) =>
         matchesQuery(entry.name),

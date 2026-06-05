@@ -8,12 +8,12 @@ import type {
   ShoppingModuleData,
   ShoppingOwnedItem,
   ShoppingStageChecklist,
+  ShoppingSystem,
 } from "@/features/bettertolive/types"
 import {
   ShoppingDepreciation,
   ShoppingLifecycle,
   ShoppingNeedLevel,
-  ShoppingSystem,
 } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
@@ -21,7 +21,6 @@ import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shoppin
 import {
   FAST_DEPRECIATION,
   PRIORITY_LEVELS,
-  SHOPPING_SYSTEM_OPTIONS,
   type ShoppingLifecycleGroups,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
@@ -186,10 +185,11 @@ export function ShoppingPage({
 
   const startAddPlan = () => {
     const firstLane = shopping.purchaseLanes[0]
+    const firstSystemId = shopping.systemDefinitions[0]?.id ?? ""
     const newPlanItem: ShoppingPlanWithLane = {
       id: `new-${Date.now()}`,
       name: "",
-      system: ShoppingSystem.Sleep,
+      system: firstSystemId,
       category: "",
       spaces: [],
       stages: [],
@@ -370,14 +370,6 @@ export function ShoppingPage({
     })
   }, [shopping.spaceDefinitions, shopping.ownedItems, planItems])
 
-  const availableSystemIds = useMemo(
-    () =>
-      SHOPPING_SYSTEM_OPTIONS.filter(
-        (systemId) => !shopping.systemDefinitions.some((definition) => definition.id === systemId),
-      ),
-    [shopping.systemDefinitions],
-  )
-
   const orderedSpaces = useMemo(() => {
     if (!spacesOrder) return spaces
     const orderMap = new Map(spacesOrder.map((name, i) => [name, i]))
@@ -528,19 +520,21 @@ export function ShoppingPage({
         <ShoppingItemEditDialog
           editing={editingItem}
           lanes={lanes}
+          systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
           onClose={() => setEditingItem(null)}
           onSaved={handleSaved}
         />
 
         <ShoppingStageEditDialog
           editing={editingStage}
+          systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
           onClose={() => setEditingStage(null)}
           onSaved={handleStageSaved}
         />
 
         <ShoppingSystemEditDialog
           editing={editingSystem}
-          availableSystemIds={availableSystemIds}
+          existingSystemIds={shopping.systemDefinitions.map((definition) => definition.id)}
           onClose={() => setEditingSystem(null)}
           onSaved={handleSystemSaved}
         />

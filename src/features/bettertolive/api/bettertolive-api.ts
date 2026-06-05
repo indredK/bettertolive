@@ -75,7 +75,6 @@ export type ShoppingPageContentForm = {
 
 export type ShoppingSystemDefinitionForm = {
   id: string
-  cluster: string
   summary: string
   keyQuestion: string
   secondaryGroups: string[]

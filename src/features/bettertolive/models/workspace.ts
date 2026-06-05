@@ -63,23 +63,25 @@ export enum ShoppingNeedLevel {
   HappinessBoost = "HappinessBoost",
 }
 
-export enum ShoppingSystem {
-  Sleep = "Sleep",
-  Diet = "Diet",
-  Cleaning = "Cleaning",
-  Storage = "Storage",
-  Lighting = "Lighting",
-  Environment = "Environment",
-  PowerNetwork = "PowerNetwork",
-  WorkStudy = "WorkStudy",
-  EmergencyHealth = "EmergencyHealth",
-  PersonalCare = "PersonalCare",
-  Clothing = "Clothing",
-  Furniture = "Furniture",
-  Transportation = "Transportation",
-  Entertainment = "Entertainment",
-  Pets = "Pets",
-}
+export const ShoppingSystem = {
+  Sleep: "Sleep",
+  Diet: "Diet",
+  Cleaning: "Cleaning",
+  Storage: "Storage",
+  Lighting: "Lighting",
+  Environment: "Environment",
+  PowerNetwork: "PowerNetwork",
+  WorkStudy: "WorkStudy",
+  EmergencyHealth: "EmergencyHealth",
+  PersonalCare: "PersonalCare",
+  Clothing: "Clothing",
+  Furniture: "Furniture",
+  Transportation: "Transportation",
+  Entertainment: "Entertainment",
+  Pets: "Pets",
+} as const
+
+export type ShoppingSystem = (typeof ShoppingSystem)[keyof typeof ShoppingSystem] | (string & {})
 
 export enum ShoppingStage {
   MovingMinimal = "MovingMinimal",
@@ -113,14 +115,8 @@ export enum ShoppingOwnedStatus {
   NeedComplete = "NeedComplete",
 }
 
-export enum ShoppingSystemCluster {
-  BasicSystems = "BasicSystems",
-  HomeAndLifestyle = "HomeAndLifestyle",
-}
-
 export type ShoppingSystemDefinition = {
   id: ShoppingSystem
-  cluster: ShoppingSystemCluster
   summary: string
   keyQuestion: string
   secondaryGroups: string[]

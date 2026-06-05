@@ -135,10 +135,6 @@
         "SelfBuilt": "Self-Built",
         "Basement": "Basement"
       },
-      "cluster": {
-        "BasicSystems": "Basic Systems",
-        "HomeAndLifestyle": "Home & Lifestyle"
-      },
       "necessity": {
         "MinimalConfig": "Minimum Config",
         "Necessary": "Essential",
@@ -194,12 +190,11 @@
       "noSystemData": "No system map data under current filter.",
       "form": {
         "system": "System",
-        "cluster": "Cluster",
+        "systemPlaceholder": "e.g. Sleep System",
         "summary": "Summary",
         "keyQuestion": "Core Question",
         "secondaryGroups": "Secondary Groups",
         "secondaryGroupsHelp": "Separate multiple secondary groups with commas",
-        "noAvailable": "All system cards already exist. There are no remaining system slots to add.",
         "cancel": "Cancel",
         "save": "Save"
       }

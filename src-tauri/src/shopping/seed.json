@@ -2,105 +2,90 @@
   "systemDefinitions": [
     {
       "id": "Sleep",
-      "cluster": "BasicSystems",
       "summary": "睡眠不是一件单品，而是一整套恢复力基础设施。",
       "keyQuestion": "我睡得着、睡得好吗？",
       "secondaryGroups": ["骨架", "寝具", "温控", "环境", "睡眠辅助"]
     },
     {
       "id": "Diet",
-      "cluster": "BasicSystems",
       "summary": "饮食系统决定了家里能不能稳定地做饭、吃饭和储存食物。",
       "keyQuestion": "我能舒服地做和吃三餐吗？",
       "secondaryGroups": ["烹饪工具", "餐具", "储存", "食材消耗", "家具"]
     },
     {
       "id": "Cleaning",
-      "cluster": "BasicSystems",
       "summary": "清洁系统决定家能不能持续回到可住、可放松的状态。",
       "keyQuestion": "家在变干净还是变脏？",
       "secondaryGroups": ["日常打扫", "洗衣", "厨卫深度清洁", "垃圾处理", "消毒杀菌"]
     },
     {
       "id": "Storage",
-      "cluster": "BasicSystems",
       "summary": "收纳不是把东西塞进去，而是让它们有家、有顺手路径。",
       "keyQuestion": "找东西会不会卡住？",
       "secondaryGroups": ["大件容器", "小件容器", "挂收纳", "标签与索引"]
     },
     {
       "id": "Lighting",
-      "cluster": "BasicSystems",
       "summary": "照明系统影响清醒、专注、休息和夜晚收尾的节奏。",
       "keyQuestion": "白天、夜晚、睡前的光都对吗？",
       "secondaryGroups": ["主照明", "任务照明", "睡前照明", "夜间照明"]
     },
     {
       "id": "Environment",
-      "cluster": "BasicSystems",
       "summary": "温度、湿度、空气和噪音，是生活舒适度最难忽略的底层变量。",
       "keyQuestion": "家里待着舒服吗？",
       "secondaryGroups": ["温度", "湿度", "空气", "噪音"]
     },
     {
       "id": "PowerNetwork",
-      "cluster": "BasicSystems",
       "summary": "电和网络一旦不稳，工作、休息和应急都会一起受影响。",
       "keyQuestion": "用电用网会卡吗？",
       "secondaryGroups": ["供电", "充电", "网络", "理线"]
     },
     {
       "id": "WorkStudy",
-      "cluster": "BasicSystems",
       "summary": "工作学习系统决定你能不能把注意力稳稳放在输出上。",
       "keyQuestion": "我能坐住吗？",
       "secondaryGroups": ["桌椅与支撑", "显示与输入", "文具与纸面", "辅助"]
     },
     {
       "id": "EmergencyHealth",
-      "cluster": "BasicSystems",
       "summary": "平时最容易忘，但真出事时最能决定慌不慌的系统。",
       "keyQuestion": "突发情况能不能先撑过去？",
       "secondaryGroups": ["常备药与护理", "文件与备份", "工具与应急", "停电备用"]
     },
     {
       "id": "PersonalCare",
-      "cluster": "BasicSystems",
       "summary": "身体被照顾着，很多生活摩擦就不会无限放大。",
       "keyQuestion": "身体有没有被稳定地照顾着？",
       "secondaryGroups": ["洗护", "护肤化妆", "口腔", "形象修整"]
     },
     {
       "id": "Clothing",
-      "cluster": "BasicSystems",
       "summary": "穿着系统让你一年四季都能体面、舒服地出门或留在家里。",
       "keyQuestion": "下楼、见人、出差都有合适衣物吗？",
       "secondaryGroups": ["基础件", "日常衣", "外套", "鞋", "配饰", "特殊场合"]
     },
     {
       "id": "Furniture",
-      "cluster": "HomeAndLifestyle",
       "summary": "它不只是在填满空间，而是在塑造你愿不愿意待在家里。",
       "keyQuestion": "这个空间有没有让我想坐下来的理由？",
       "secondaryGroups": ["大件家具", "软装", "装饰物", "改善型小件"]
     },
     {
       "id": "Transportation",
-      "cluster": "HomeAndLifestyle",
       "summary": "出行系统让人和东西能平稳地离开家，又完整地回来。",
       "keyQuestion": "出门这件事顺不顺手？",
       "secondaryGroups": ["代步", "承载", "应对天气", "户外"]
     },
     {
       "id": "Entertainment",
-      "cluster": "HomeAndLifestyle",
       "summary": "兴趣和沉浸感不该只靠冲动消费，而要看它能否真的被生活容纳。",
       "keyQuestion": "我真的会反复使用它吗？",
       "secondaryGroups": ["阅读", "影音", "运动器材", "乐器与艺术", "收藏与情感"]
     },
     {
       "id": "Pets",
-      "cluster": "HomeAndLifestyle",
       "summary": "宠物系统让它们在家过得舒服，也让你的生活不会被意外状况打断。",
       "keyQuestion": "它的吃、睡、玩、看病都安排好了吗？",
       "secondaryGroups": ["饮食", "生活空间", "外出与随行", "健康护理", "清洁与排泄", "娱乐与训练"]

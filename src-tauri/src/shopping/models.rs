@@ -6,7 +6,6 @@ use specta::Type;
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct SystemDefinitionRow {
     pub id: String,
-    pub cluster: String,
     pub summary: String,
     pub key_question: String,
     pub secondary_groups_json: String,

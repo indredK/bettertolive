@@ -59,7 +59,6 @@ import {
   SHOPPING_NEED_LEVEL_OPTIONS,
   SHOPPING_OWNED_STATUS_OPTIONS,
   SHOPPING_STAGE_OPTIONS,
-  SHOPPING_SYSTEM_OPTIONS,
   stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
@@ -167,7 +166,7 @@ function enumArrayFieldSchema<T extends string>(
     })
 }
 
-function buildOwnedItemSchema(t: TFunction) {
+function buildOwnedItemSchema(t: TFunction, systemOptions: string[]) {
   const fields = {
     name: cleanFieldLabel(t("shopping.admin.items.form.name")),
     system: cleanFieldLabel(t("shopping.admin.items.form.systemId")),
@@ -187,7 +186,7 @@ function buildOwnedItemSchema(t: TFunction) {
       .trim()
       .min(1, requiredMessage(t, fields.name))
       .max(ITEM_LIMITS.name, maxLengthMessage(t, fields.name, ITEM_LIMITS.name)),
-    system: enumFieldSchema(SHOPPING_SYSTEM_OPTIONS, t, fields.system),
+    system: enumFieldSchema(systemOptions, t, fields.system),
     category: z
       .string()
       .trim()
@@ -227,7 +226,7 @@ function buildOwnedItemSchema(t: TFunction) {
   })
 }
 
-function buildPlanItemSchema(t: TFunction) {
+function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
   const fields = {
     laneId: cleanFieldLabel(t("shopping.admin.items.form.laneId")),
     name: cleanFieldLabel(t("shopping.admin.items.form.name")),
@@ -255,7 +254,7 @@ function buildPlanItemSchema(t: TFunction) {
         .trim()
         .min(1, requiredMessage(t, fields.name))
         .max(ITEM_LIMITS.name, maxLengthMessage(t, fields.name, ITEM_LIMITS.name)),
-      system: enumFieldSchema(SHOPPING_SYSTEM_OPTIONS, t, fields.system),
+      system: enumFieldSchema(systemOptions, t, fields.system),
       category: z
         .string()
         .trim()
@@ -455,11 +454,13 @@ function StageMultiSelectField({
 export function ShoppingItemEditDialog({
   editing,
   lanes,
+  systemOptions,
   onClose,
   onSaved,
 }: {
   editing: EditingItem | null
   lanes: LaneOption[]
+  systemOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -484,6 +485,7 @@ export function ShoppingItemEditDialog({
         initialForm={initialForm}
         editing={editing}
         lanes={lanes}
+        systemOptions={systemOptions}
         onClose={onClose}
         onSaved={onSaved}
       />
@@ -495,12 +497,14 @@ function ItemDialogContent({
   initialForm,
   editing,
   lanes,
+  systemOptions,
   onClose,
   onSaved,
 }: {
   initialForm: FormState
   editing: EditingItem
   lanes: LaneOption[]
+  systemOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -535,7 +539,7 @@ function ItemDialogContent({
 
       const { id, ...formData } = form
       if (form.itemType === "owned") {
-        const parsed = buildOwnedItemSchema(t).safeParse(formData)
+        const parsed = buildOwnedItemSchema(t, systemOptions).safeParse(formData)
         if (!parsed.success) {
           setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
           return
@@ -552,7 +556,7 @@ function ItemDialogContent({
           await createOwnedItem(apiForm)
         }
       } else {
-        const parsed = buildPlanItemSchema(t).safeParse(formData)
+        const parsed = buildPlanItemSchema(t, systemOptions).safeParse(formData)
         if (!parsed.success) {
           setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
           return
@@ -668,11 +672,11 @@ function ItemDialogContent({
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("shopping.admin.items.form.systemPlaceholder")}>
-                    {form.system ? systemDisplayName(form.system as ShoppingSystem, t) : null}
+                    {form.system ? systemDisplayName(form.system, t) : null}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {SHOPPING_SYSTEM_OPTIONS.map((s) => (
+                  {systemOptions.map((s) => (
                     <SelectItem key={s} value={s}>
                       {systemDisplayName(s, t)}
                     </SelectItem>

@@ -19,7 +19,6 @@ pub struct ShoppingRepository;
 fn row_to_system_definition(row: &rusqlite::Row) -> rusqlite::Result<SystemDefinitionRow> {
     Ok(SystemDefinitionRow {
         id: row.get("id")?,
-        cluster: row.get("cluster")?,
         summary: row.get("summary")?,
         key_question: row.get("key_question")?,
         secondary_groups_json: row.get("secondary_groups_json")?,
@@ -228,7 +227,7 @@ impl ShoppingRepository {
     ) -> Result<Vec<ShoppingSystemDefinitionDto>, String> {
         let mut stmt = conn
             .prepare(
-                "SELECT id, cluster, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at
+                "SELECT id, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at
                  FROM shopping_system_definitions WHERE is_enabled = 1 ORDER BY sort_order",
             )
             .map_err(|e| e.to_string())?;
@@ -244,7 +243,6 @@ impl ShoppingRepository {
                 serde_json::from_str(&r.secondary_groups_json).unwrap_or_default();
             result.push(ShoppingSystemDefinitionDto {
                 id: r.id,
-                cluster: r.cluster,
                 summary: r.summary,
                 key_question: r.key_question,
                 secondary_groups,
@@ -1394,7 +1392,6 @@ impl ShoppingRepository {
     pub fn update_system_definition(
         conn: &Connection,
         id: &str,
-        cluster: &str,
         summary: &str,
         key_question: &str,
         secondary_groups: &[String],
@@ -1402,10 +1399,9 @@ impl ShoppingRepository {
     ) -> Result<(), String> {
         conn.execute(
             "UPDATE shopping_system_definitions
-             SET cluster = ?1, summary = ?2, key_question = ?3, secondary_groups_json = ?4, updated_at = ?5
-             WHERE id = ?6",
+             SET summary = ?1, key_question = ?2, secondary_groups_json = ?3, updated_at = ?4
+             WHERE id = ?5",
             params![
-                cluster,
                 summary,
                 key_question,
                 serde_json::to_string(secondary_groups).map_err(|e| e.to_string())?,
@@ -1420,7 +1416,6 @@ impl ShoppingRepository {
     pub fn create_system_definition(
         conn: &Connection,
         id: &str,
-        cluster: &str,
         summary: &str,
         key_question: &str,
         secondary_groups: &[String],
@@ -1436,11 +1431,10 @@ impl ShoppingRepository {
 
         conn.execute(
             "INSERT INTO shopping_system_definitions
-             (id, cluster, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+             (id, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, ?7)",
             params![
                 id,
-                cluster,
                 summary,
                 key_question,
                 serde_json::to_string(secondary_groups).map_err(|e| e.to_string())?,

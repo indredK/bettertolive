@@ -32,7 +32,6 @@ import type {
   ShoppingSystemOverview,
 } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
-  clusterDisplayName,
   laneDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
@@ -123,7 +122,6 @@ function SystemDetailPanel({
 
         <div className="mt-4 flex flex-wrap gap-2">
           <SystemSummaryChip label={systemDisplayName(system.id, t)} />
-          <SystemSummaryChip label={clusterDisplayName(system.cluster, t)} />
           <Badge variant="outline" className={cn("border", SYSTEM_STATUS_STYLES.active)}>
             {t("shopping.systems.ownedBadge", { count: system.owned.length })}
           </Badge>
@@ -259,9 +257,6 @@ function SystemMapCard({
           <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
             {systemName}
           </div>
-          <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {clusterDisplayName(definition.cluster, t)}
-          </div>
         </div>
       </div>
 
@@ -357,7 +352,7 @@ export function ShoppingSystemsTab({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  const systemIdStrings = systems.map((s) => s.id as string)
+  const systemIdStrings = systems.map((s) => s.id)
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event

@@ -26,7 +26,6 @@ import {
   SHOPPING_DEPRECIATION_OPTIONS,
   SHOPPING_LIFECYCLE_OPTIONS,
   SHOPPING_NEED_LEVEL_OPTIONS,
-  SHOPPING_SYSTEM_OPTIONS,
   stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
@@ -44,7 +43,7 @@ const ALL_NECESSITIES: ShoppingNeedLevel[] = SHOPPING_NEED_LEVEL_OPTIONS
 
 const ALL_LIFECYCLES: ShoppingLifecycle[] = SHOPPING_LIFECYCLE_OPTIONS
 
-const ALL_SYSTEMS: ShoppingSystem[] = SHOPPING_SYSTEM_OPTIONS
+const ALL_SYSTEM_FILTER = "__all_systems__"
 
 function FilterChip({
   label,
@@ -339,14 +338,26 @@ export function ShoppingPlanningTab({
 
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null)
   const [filterDepreciation, setFilterDepreciation] = useState<ShoppingDepreciation | "all">("all")
-  const [filterSystem, setFilterSystem] = useState<ShoppingSystem | "all">("all")
+  const [filterSystem, setFilterSystem] = useState<ShoppingSystem | typeof ALL_SYSTEM_FILTER>(
+    ALL_SYSTEM_FILTER,
+  )
   const [filterNecessity, setFilterNecessity] = useState<ShoppingNeedLevel | "all">("all")
   const [filterLifecycle, setFilterLifecycle] = useState<ShoppingLifecycle | "all">("all")
+  const systemOptions = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...shopping.systemDefinitions.map((definition) => definition.id),
+          ...planItems.map((item) => item.system),
+        ]),
+      ),
+    [shopping.systemDefinitions, planItems],
+  )
 
   const filteredItems = useMemo(() => {
     return planItems.filter((item) => {
       if (filterDepreciation !== "all" && item.depreciation !== filterDepreciation) return false
-      if (filterSystem !== "all" && item.system !== filterSystem) return false
+      if (filterSystem !== ALL_SYSTEM_FILTER && item.system !== filterSystem) return false
       if (filterNecessity !== "all" && item.necessity !== filterNecessity) return false
       if (filterLifecycle !== "all" && item.lifecycle !== filterLifecycle) return false
       return true
@@ -357,13 +368,13 @@ export function ShoppingPlanningTab({
 
   const hasActiveFilters =
     filterDepreciation !== "all" ||
-    filterSystem !== "all" ||
+    filterSystem !== ALL_SYSTEM_FILTER ||
     filterNecessity !== "all" ||
     filterLifecycle !== "all"
 
   const clearFilters = () => {
     setFilterDepreciation("all")
-    setFilterSystem("all")
+    setFilterSystem(ALL_SYSTEM_FILTER)
     setFilterNecessity("all")
     setFilterLifecycle("all")
   }
@@ -433,10 +444,10 @@ export function ShoppingPlanningTab({
                 <div className="flex flex-wrap gap-1">
                   <FilterChip
                     label={t("shopping.planning.all")}
-                    isSelected={filterSystem === "all"}
-                    onClick={() => setFilterSystem("all")}
+                    isSelected={filterSystem === ALL_SYSTEM_FILTER}
+                    onClick={() => setFilterSystem(ALL_SYSTEM_FILTER)}
                   />
-                  {ALL_SYSTEMS.map((s) => (
+                  {systemOptions.map((s) => (
                     <FilterChip
                       key={s}
                       label={systemDisplayName(s, t)}

@@ -28,7 +28,6 @@ pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS shopping_system_definitions (
             id TEXT PRIMARY KEY,
-            cluster TEXT NOT NULL,
             summary TEXT NOT NULL,
             key_question TEXT NOT NULL,
             secondary_groups_json TEXT NOT NULL,
@@ -39,6 +38,8 @@ pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
         )",
         [],
     )?;
+
+    migrate_system_definitions_drop_cluster(&conn)?;
 
     conn.execute(
         "CREATE TABLE IF NOT EXISTS shopping_owned_items (
@@ -213,11 +214,10 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
     if let Some(defs) = seed["systemDefinitions"].as_array() {
         for (i, def) in defs.iter().enumerate() {
             conn.execute(
-                "INSERT INTO shopping_system_definitions (id, cluster, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
-                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+                "INSERT INTO shopping_system_definitions (id, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, ?7)",
                 rusqlite::params![
                     def["id"].as_str().unwrap_or(""),
-                    def["cluster"].as_str().unwrap_or(""),
                     def["summary"].as_str().unwrap_or(""),
                     def["keyQuestion"].as_str().unwrap_or(""),
                     serde_json::to_string(&def["secondaryGroups"]).unwrap_or_default(),
@@ -518,6 +518,50 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
             )?;
         }
     }
+
+    Ok(())
+}
+
+fn migrate_system_definitions_drop_cluster(conn: &Connection) -> SqliteResult<()> {
+    let mut stmt = conn.prepare("PRAGMA table_info(shopping_system_definitions)")?;
+    let columns = stmt.query_map([], |row| row.get::<_, String>(1))?;
+
+    let mut has_cluster = false;
+    for column in columns {
+        if column? == "cluster" {
+            has_cluster = true;
+            break;
+        }
+    }
+
+    if !has_cluster {
+        return Ok(());
+    }
+
+    conn.execute_batch(
+        "PRAGMA foreign_keys=OFF;
+         BEGIN;
+         CREATE TABLE shopping_system_definitions_new (
+             id TEXT PRIMARY KEY,
+             summary TEXT NOT NULL,
+             key_question TEXT NOT NULL,
+             secondary_groups_json TEXT NOT NULL,
+             sort_order INTEGER NOT NULL DEFAULT 0,
+             is_enabled INTEGER NOT NULL DEFAULT 1,
+             created_at TEXT NOT NULL,
+             updated_at TEXT NOT NULL
+         );
+         INSERT INTO shopping_system_definitions_new (
+             id, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at
+         )
+         SELECT
+             id, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at
+         FROM shopping_system_definitions;
+         DROP TABLE shopping_system_definitions;
+         ALTER TABLE shopping_system_definitions_new RENAME TO shopping_system_definitions;
+         COMMIT;
+         PRAGMA foreign_keys=ON;",
+    )?;
 
     Ok(())
 }

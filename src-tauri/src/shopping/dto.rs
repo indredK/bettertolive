@@ -8,7 +8,6 @@ pub type ShoppingSystem = String;
 pub type ShoppingStage = String;
 pub type ShoppingLifecycle = String;
 pub type ShoppingDepreciation = String;
-pub type ShoppingSystemCluster = String;
 
 // ---- DTOs ----
 
@@ -27,7 +26,6 @@ pub struct ShoppingSpotlightDto {
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingSystemDefinitionDto {
     pub id: ShoppingSystem,
-    pub cluster: ShoppingSystemCluster,
     pub summary: String,
     pub key_question: String,
     pub secondary_groups: Vec<String>,
