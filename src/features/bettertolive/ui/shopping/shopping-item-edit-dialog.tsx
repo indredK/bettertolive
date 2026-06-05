@@ -32,7 +32,7 @@ import {
   updatePlanItem,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/models/workspace"
-import { cn } from "@/lib/utils"
+import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 
 export type EditingOwnedItem = {
@@ -171,8 +171,22 @@ function ItemDialogContent({
   const [form, setForm] = useState<FormState>(initialForm)
   const isOwned = editing.type === "owned"
 
-  const update = (partial: Record<string, unknown>) => {
-    setForm((prev) => ({ ...prev, ...partial }))
+  const update = <T extends Partial<FormState>>(partial: T) => {
+    setForm((prev) => ({ ...prev, ...partial }) as FormState)
+  }
+
+  function toOwnedForm(
+    id: string | undefined | null,
+    formData: ShoppingOwnedItemForm,
+  ): ShoppingOwnedItemForm {
+    return id ? { ...formData, id } : formData
+  }
+
+  function toPlanForm(
+    id: string | undefined | null,
+    formData: ShoppingPlanItemForm,
+  ): ShoppingPlanItemForm {
+    return id ? { ...formData, id } : formData
   }
 
   async function handleSave() {
@@ -180,19 +194,20 @@ function ItemDialogContent({
       setSaving(true)
       setError(null)
 
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { isNew, itemType, id, ...formData } = form
+      const { id, ...formData } = form
       if (form.itemType === "owned") {
+        const apiForm = toOwnedForm(id, formData as unknown as ShoppingOwnedItemForm)
         if (id) {
-          await updateOwnedItem({ ...formData, id } as ShoppingOwnedItemForm)
+          await updateOwnedItem(apiForm)
         } else {
-          await createOwnedItem(formData as ShoppingOwnedItemForm)
+          await createOwnedItem(apiForm)
         }
       } else {
+        const apiForm = toPlanForm(id, formData as unknown as ShoppingPlanItemForm)
         if (id) {
-          await updatePlanItem({ ...formData, id } as ShoppingPlanItemForm)
+          await updatePlanItem(apiForm)
         } else {
-          await createPlanItem(formData as ShoppingPlanItemForm)
+          await createPlanItem(apiForm)
         }
       }
 
@@ -463,27 +478,5 @@ function ItemDialogContent({
         </div>
       </DialogFooter>
     </DialogContent>
-  )
-}
-
-function FormField({
-  label,
-  required,
-  className,
-  children,
-}: {
-  label: string
-  required?: boolean
-  className?: string
-  children: React.ReactNode
-}) {
-  return (
-    <label className={cn("space-y-1.5", className)}>
-      <span className="text-xs font-medium text-[color:var(--text-secondary)]">
-        {label}
-        {required ? <span className="ml-0.5 text-red-400">*</span> : null}
-      </span>
-      {children}
-    </label>
   )
 }

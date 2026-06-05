@@ -19,7 +19,7 @@ import {
   updatePageContent,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
-import { cn } from "@/lib/utils"
+import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 
 type StageFormState = {
   isNew: boolean
@@ -230,27 +230,5 @@ function StageDialogContent({
         </div>
       </DialogFooter>
     </DialogContent>
-  )
-}
-
-function FormField({
-  label,
-  required,
-  className,
-  children,
-}: {
-  label: string
-  required?: boolean
-  className?: string
-  children: React.ReactNode
-}) {
-  return (
-    <label className={cn("space-y-1.5", className)}>
-      <span className="text-xs font-medium text-[color:var(--text-secondary)]">
-        {label}
-        {required ? <span className="ml-0.5 text-red-400">*</span> : null}
-      </span>
-      {children}
-    </label>
   )
 }

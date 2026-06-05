@@ -1,5 +1,5 @@
 import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -25,10 +25,7 @@ import { ShoppingStageEditDialog } from "@/features/bettertolive/ui/shopping/sho
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
-import {
-  type ShoppingPlanWithLane,
-  type ShoppingSystemOverview,
-} from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import { type ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import { type SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
 import { cn } from "@/lib/utils"
 
@@ -109,108 +106,144 @@ export function ShoppingPage({
     setEditingItem({ type: "plan", item: newPlanItem, isNew: true })
   }
 
-  const lanes = shopping.purchaseLanes.map((lane) => ({
-    id: lane.id,
-    title: lane.title,
-  }))
-
-  const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
-    lane.items.map((item) => ({
-      ...item,
-      laneId: lane.id,
-      laneTitle: lane.title,
-    })),
+  const lanes = useMemo(
+    () =>
+      shopping.purchaseLanes.map((lane) => ({
+        id: lane.id,
+        title: lane.title,
+      })),
+    [shopping.purchaseLanes],
   )
 
-  const activeSystems: ShoppingSystemOverview[] = shopping.systemDefinitions.map((definition) => {
-    const owned = shopping.ownedItems.filter((item) => item.system === definition.id)
-    const planned = planItems.filter((item) => item.system === definition.id)
-    const spaces = Array.from(
-      new Set([...owned.flatMap((item) => item.spaces), ...planned.flatMap((item) => item.spaces)]),
+  const planItems = useMemo(
+    () =>
+      shopping.purchaseLanes.flatMap((lane) =>
+        lane.items.map((item) => ({
+          ...item,
+          laneId: lane.id,
+          laneTitle: lane.title,
+        })),
+      ),
+    [shopping.purchaseLanes],
+  )
+
+  const activeSystems = useMemo(
+    () =>
+      shopping.systemDefinitions.map((definition) => {
+        const owned = shopping.ownedItems.filter((item) => item.system === definition.id)
+        const planned = planItems.filter((item) => item.system === definition.id)
+        const spaces = Array.from(
+          new Set([
+            ...owned.flatMap((item) => item.spaces),
+            ...planned.flatMap((item) => item.spaces),
+          ]),
+        )
+        const urgentCount = planned.filter((item) => PRIORITY_LEVELS.has(item.necessity)).length
+
+        return {
+          ...definition,
+          owned,
+          planned,
+          spaces,
+          urgentCount,
+          isActive: owned.length + planned.length > 0,
+        }
+      }),
+    [shopping.systemDefinitions, shopping.ownedItems, planItems],
+  )
+
+  const fastDepreciationWarnings = useMemo(
+    () =>
+      planItems.filter(
+        (item) =>
+          item.depreciation &&
+          FAST_DEPRECIATION.has(item.depreciation) &&
+          item.necessity === "提升幸福感",
+      ),
+    [planItems],
+  )
+
+  const worthBuyingSlowly = useMemo(
+    () =>
+      planItems.filter((item) => item.depreciation === "慢折旧" && item.necessity !== "提升幸福感"),
+    [planItems],
+  )
+
+  const lifecycleGroups = useMemo((): ShoppingLifecycleGroups => {
+    const groups: ShoppingLifecycleGroups = {
+      消耗品: { owned: [], planned: [] },
+      耐用品: { owned: [], planned: [] },
+      工具: { owned: [], planned: [] },
+      情感物: { owned: [], planned: [] },
+    }
+
+    shopping.ownedItems.forEach((item) => {
+      groups[item.lifecycle].owned.push(item)
+    })
+    planItems.forEach((item) => {
+      groups[item.lifecycle].planned.push(item)
+    })
+
+    return groups
+  }, [shopping.ownedItems, planItems])
+
+  const spaces = useMemo((): SpaceOverview[] => {
+    const spaceMap = new Map<
+      string,
+      {
+        name: string
+        owned: ShoppingOwnedItem[]
+        planned: ShoppingPlanWithLane[]
+        systems: Set<ShoppingSystem>
+      }
+    >()
+
+    shopping.ownedItems.forEach((item) => {
+      item.spaces.forEach((space) => {
+        const current = spaceMap.get(space) ?? {
+          name: space,
+          owned: [],
+          planned: [],
+          systems: new Set<ShoppingSystem>(),
+        }
+        current.owned.push(item)
+        current.systems.add(item.system)
+        spaceMap.set(space, current)
+      })
+    })
+
+    planItems.forEach((item) => {
+      item.spaces.forEach((space) => {
+        const current = spaceMap.get(space) ?? {
+          name: space,
+          owned: [],
+          planned: [],
+          systems: new Set<ShoppingSystem>(),
+        }
+        current.planned.push(item)
+        current.systems.add(item.system)
+        spaceMap.set(space, current)
+      })
+    })
+
+    return Array.from(spaceMap.values()).sort(
+      (left, right) =>
+        right.owned.length + right.planned.length - (left.owned.length + left.planned.length),
     )
-    const urgentCount = planned.filter((item) => PRIORITY_LEVELS.has(item.necessity)).length
+  }, [shopping.ownedItems, planItems])
 
-    return {
-      ...definition,
-      owned,
-      planned,
-      spaces,
-      urgentCount,
-      isActive: owned.length + planned.length > 0,
-    }
-  })
-
-  const fastDepreciationWarnings = planItems.filter(
-    (item) =>
-      item.depreciation &&
-      FAST_DEPRECIATION.has(item.depreciation) &&
-      item.necessity === "提升幸福感",
-  )
-  const worthBuyingSlowly = planItems.filter(
-    (item) => item.depreciation === "慢折旧" && item.necessity !== "提升幸福感",
+  const overlookedCollection = useMemo(
+    () =>
+      shopping.lifestyleCollections.find((collection) => collection.id === "collection-overlooked"),
+    [shopping.lifestyleCollections],
   )
 
-  const lifecycleGroups: ShoppingLifecycleGroups = {
-    消耗品: { owned: [], planned: [] },
-    耐用品: { owned: [], planned: [] },
-    工具: { owned: [], planned: [] },
-    情感物: { owned: [], planned: [] },
-  }
-
-  shopping.ownedItems.forEach((item) => {
-    lifecycleGroups[item.lifecycle].owned.push(item)
-  })
-  planItems.forEach((item) => {
-    lifecycleGroups[item.lifecycle].planned.push(item)
-  })
-
-  const spaceMap = new Map<
-    string,
-    {
-      name: string
-      owned: ShoppingOwnedItem[]
-      planned: ShoppingPlanWithLane[]
-      systems: Set<ShoppingSystem>
-    }
-  >()
-
-  shopping.ownedItems.forEach((item) => {
-    item.spaces.forEach((space) => {
-      const current = spaceMap.get(space) ?? {
-        name: space,
-        owned: [],
-        planned: [],
-        systems: new Set<ShoppingSystem>(),
-      }
-      current.owned.push(item)
-      current.systems.add(item.system)
-      spaceMap.set(space, current)
-    })
-  })
-
-  planItems.forEach((item) => {
-    item.spaces.forEach((space) => {
-      const current = spaceMap.get(space) ?? {
-        name: space,
-        owned: [],
-        planned: [],
-        systems: new Set<ShoppingSystem>(),
-      }
-      current.planned.push(item)
-      current.systems.add(item.system)
-      spaceMap.set(space, current)
-    })
-  })
-
-  const spaces: SpaceOverview[] = Array.from(spaceMap.values()).sort(
-    (left, right) =>
-      right.owned.length + right.planned.length - (left.owned.length + left.planned.length),
-  )
-  const overlookedCollection = shopping.lifestyleCollections.find(
-    (collection) => collection.id === "collection-overlooked",
-  )
-  const featuredCollections = shopping.lifestyleCollections.filter(
-    (collection) => collection.id !== "collection-overlooked",
+  const featuredCollections = useMemo(
+    () =>
+      shopping.lifestyleCollections.filter(
+        (collection) => collection.id !== "collection-overlooked",
+      ),
+    [shopping.lifestyleCollections],
   )
 
   // Derive displayed selection — fall back to first item when nothing is selected or selection is stale

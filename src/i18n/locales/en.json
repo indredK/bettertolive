@@ -100,6 +100,7 @@
       "noOwnedItems": "No owned items currently.",
       "noPendingItems": "No pending items currently.",
       "pendingBadge": "Pending {{count}}",
+      "urgentBadge": "Urgent {{count}}",
       "ownedBadge": "Owned {{count}}",
       "selectPrompt": "Select a system to view details",
       "noSystemData": "No system map data under current filter."

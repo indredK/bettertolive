@@ -100,6 +100,7 @@
       "noOwnedItems": "当前没有已拥有条目。",
       "noPendingItems": "当前没有待补条目。",
       "pendingBadge": "待补 {{count}}",
+      "urgentBadge": "待补 {{count}}",
       "ownedBadge": "已有 {{count}}",
       "selectPrompt": "选择一个系统查看详情",
       "noSystemData": "当前筛选下没有系统地图数据。"

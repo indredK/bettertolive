@@ -221,6 +221,7 @@ function SystemMapCard({
   onDragOver?: (e: React.DragEvent) => void
   onDrop?: (e: React.DragEvent, id: string) => void
 }) {
+  const { t } = useTranslation()
   const hasItems = definition.owned.length > 0 || definition.planned.length > 0
   const firstOwned = definition.owned[0]
   const firstPlanned = definition.planned[0]
@@ -284,7 +285,7 @@ function SystemMapCard({
               variant="outline"
               className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
             >
-              待补 {definition.urgentCount}
+              {t("shopping.systems.urgentBadge", { count: definition.urgentCount })}
             </Badge>
           ) : null}
         </div>

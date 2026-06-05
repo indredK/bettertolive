@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use crate::shopping::dto::{
     ShoppingBoundaryEntryDto, ShoppingItemBaseDto, ShoppingLifestyleCollectionDto,
     ShoppingModuleDto, ShoppingOwnedItemDto, ShoppingPlanItemDto, ShoppingPriceReferenceDto,
@@ -254,9 +256,11 @@ impl ShoppingRepository {
         Ok(rows.filter_map(|r| r.ok()).map(|r| r.stage_name).collect())
     }
 
+    /// Batch-load all owned items with their spaces and stages in 3 queries instead of 2N+1.
     pub fn get_all_owned_items_aggregated(
         conn: &Connection,
     ) -> Result<Vec<ShoppingOwnedItemDto>, String> {
+        // 1. Load all owned items
         let mut stmt = conn
             .prepare(
                 "SELECT id, name, system_id, category, necessity, lifecycle, depreciation, quantity, status, replacement_cue, note, sort_order, is_archived, created_at, updated_at
@@ -264,42 +268,96 @@ impl ShoppingRepository {
             )
             .map_err(|e| e.to_string())?;
 
-        let rows = stmt
+        let owned_items: Vec<OwnedItemRow> = stmt
             .query_map([], row_to_owned_item)
+            .map_err(|e| e.to_string())?
+            .filter_map(|r| r.ok())
+            .collect();
+
+        // 2. Batch-load all spaces for all non-archived owned items at once
+        let mut spaces_stmt = conn
+            .prepare(
+                "SELECT s.owned_item_id, s.space_name
+                 FROM shopping_owned_item_spaces s
+                 INNER JOIN shopping_owned_items i ON s.owned_item_id = i.id
+                 WHERE i.is_archived = 0
+                 ORDER BY s.owned_item_id, s.sort_order",
+            )
             .map_err(|e| e.to_string())?;
 
-        let mut result = Vec::new();
-        for row in rows {
-            let r = row.map_err(|e| e.to_string())?;
-            let spaces = Self::get_spaces_for_owned_item(conn, &r.id)?;
-            let stages = Self::get_stages_for_owned_item(conn, &r.id)?;
-
-            result.push(ShoppingOwnedItemDto {
-                base: ShoppingItemBaseDto {
-                    system: r.system_id,
-                    category: r.category,
-                    spaces,
-                    stages,
-                    necessity: r.necessity,
-                    lifecycle: r.lifecycle,
-                    depreciation: r.depreciation,
-                },
-                id: r.id,
-                name: r.name,
-                quantity: r.quantity,
-                status: r.status,
-                replacement_cue: r.replacement_cue,
-                note: r.note,
-            });
+        let mut spaces_map: HashMap<String, Vec<String>> = HashMap::new();
+        {
+            let rows = spaces_stmt
+                .query_map([], |row| {
+                    Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+                })
+                .map_err(|e| e.to_string())?;
+            for row in rows {
+                let (item_id, space_name) = row.map_err(|e| e.to_string())?;
+                spaces_map.entry(item_id).or_default().push(space_name);
+            }
         }
+
+        // 3. Batch-load all stages for all non-archived owned items at once
+        let mut stages_stmt = conn
+            .prepare(
+                "SELECT s.owned_item_id, s.stage_name
+                 FROM shopping_owned_item_stages s
+                 INNER JOIN shopping_owned_items i ON s.owned_item_id = i.id
+                 WHERE i.is_archived = 0
+                 ORDER BY s.owned_item_id, s.sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let mut stages_map: HashMap<String, Vec<String>> = HashMap::new();
+        {
+            let rows = stages_stmt
+                .query_map([], |row| {
+                    Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+                })
+                .map_err(|e| e.to_string())?;
+            for row in rows {
+                let (item_id, stage_name) = row.map_err(|e| e.to_string())?;
+                stages_map.entry(item_id).or_default().push(stage_name);
+            }
+        }
+
+        // 4. Build DTOs from loaded data
+        let result: Vec<ShoppingOwnedItemDto> = owned_items
+            .into_iter()
+            .map(|r| {
+                let spaces = spaces_map.remove(&r.id).unwrap_or_default();
+                let stages = stages_map.remove(&r.id).unwrap_or_default();
+                ShoppingOwnedItemDto {
+                    base: ShoppingItemBaseDto {
+                        system: r.system_id,
+                        category: r.category,
+                        spaces,
+                        stages,
+                        necessity: r.necessity,
+                        lifecycle: r.lifecycle,
+                        depreciation: r.depreciation,
+                    },
+                    id: r.id,
+                    name: r.name,
+                    quantity: r.quantity,
+                    status: r.status,
+                    replacement_cue: r.replacement_cue,
+                    note: r.note,
+                }
+            })
+            .collect();
+
         Ok(result)
     }
 
     // ---- Purchase Lanes ----
 
+    /// Batch-load all purchase lanes with their plan items in 5 queries instead of N*M*5+1.
     pub fn get_all_purchase_lanes_aggregated(
         conn: &Connection,
     ) -> Result<Vec<ShoppingPurchaseLaneDto>, String> {
+        // 1. Load all enabled lanes
         let mut stmt = conn
             .prepare(
                 "SELECT id, title, subtitle, sort_order, is_enabled, created_at, updated_at
@@ -307,48 +365,55 @@ impl ShoppingRepository {
             )
             .map_err(|e| e.to_string())?;
 
-        let rows = stmt
+        let lanes: Vec<PurchaseLaneRow> = stmt
             .query_map([], row_to_purchase_lane)
-            .map_err(|e| e.to_string())?;
+            .map_err(|e| e.to_string())?
+            .filter_map(|r| r.ok())
+            .collect();
 
-        let mut result = Vec::new();
-        for row in rows {
-            let lane = row.map_err(|e| e.to_string())?;
-            let items = Self::get_plan_items_for_lane(conn, &lane.id)?;
-            result.push(ShoppingPurchaseLaneDto {
-                id: lane.id,
-                title: lane.title,
-                subtitle: lane.subtitle,
-                items,
-            });
-        }
-        Ok(result)
-    }
-
-    fn get_plan_items_for_lane(
-        conn: &Connection,
-        lane_id: &str,
-    ) -> Result<Vec<ShoppingPlanItemDto>, String> {
-        let mut stmt = conn
+        // 2. Batch-load all non-archived plan items
+        let mut plan_stmt = conn
             .prepare(
-                "SELECT id, lane_id, name, system_id, category, necessity, lifecycle, depreciation, reason, target_lifestyle, current_price, buy_below_price, overpay_price, note, sort_order, is_archived, created_at, updated_at
-                 FROM shopping_plan_items WHERE lane_id = ?1 AND is_archived = 0 ORDER BY sort_order",
+                "SELECT id, lane_id, name, system_id, category, necessity, lifecycle, depreciation,
+                        reason, target_lifestyle, current_price, buy_below_price, overpay_price,
+                        note, sort_order, is_archived, created_at, updated_at
+                 FROM shopping_plan_items WHERE is_archived = 0 ORDER BY sort_order",
             )
             .map_err(|e| e.to_string())?;
 
-        let rows = stmt
-            .query_map(params![lane_id], row_to_plan_item)
-            .map_err(|e| e.to_string())?;
+        let plan_items: Vec<PlanItemRow> = plan_stmt
+            .query_map([], row_to_plan_item)
+            .map_err(|e| e.to_string())?
+            .filter_map(|r| r.ok())
+            .collect();
 
-        let mut result = Vec::new();
-        for row in rows {
-            let r = row.map_err(|e| e.to_string())?;
-            let spaces = Self::get_spaces_for_plan_item(conn, &r.id)?;
-            let stages = Self::get_stages_for_plan_item(conn, &r.id)?;
-            let tags = Self::get_tags_for_plan_item(conn, &r.id, "tag")?;
-            let keywords = Self::get_tags_for_plan_item(conn, &r.id, "keyword")?;
+        let plan_item_ids: Vec<&str> = plan_items.iter().map(|p| p.id.as_str()).collect();
+        if plan_item_ids.is_empty() {
+            return Ok(lanes
+                .into_iter()
+                .map(|lane| ShoppingPurchaseLaneDto {
+                    id: lane.id,
+                    title: lane.title,
+                    subtitle: lane.subtitle,
+                    items: vec![],
+                })
+                .collect());
+        }
 
-            result.push(ShoppingPlanItemDto {
+        // 3. Batch-load all spaces, stages, tags, keywords for all plan items
+        let spaces_map = Self::batch_load_plan_item_spaces(conn)?;
+        let stages_map = Self::batch_load_plan_item_stages(conn)?;
+        let tags_map = Self::batch_load_plan_item_tags_by_type(conn, "tag")?;
+        let keywords_map = Self::batch_load_plan_item_tags_by_type(conn, "keyword")?;
+
+        // 4. Build plan item DTOs and group by lane_id
+        let mut plan_by_lane: HashMap<String, Vec<ShoppingPlanItemDto>> = HashMap::new();
+        for r in plan_items {
+            let spaces = spaces_map.get(&r.id).cloned().unwrap_or_default();
+            let stages = stages_map.get(&r.id).cloned().unwrap_or_default();
+            let tags = tags_map.get(&r.id).cloned().unwrap_or_default();
+            let keywords = keywords_map.get(&r.id).cloned().unwrap_or_default();
+            let dto = ShoppingPlanItemDto {
                 base: ShoppingItemBaseDto {
                     system: r.system_id,
                     category: r.category,
@@ -368,9 +433,88 @@ impl ShoppingRepository {
                 note: r.note,
                 tags,
                 keywords,
-            });
+            };
+            plan_by_lane.entry(r.lane_id).or_default().push(dto);
         }
+
+        let result: Vec<ShoppingPurchaseLaneDto> = lanes
+            .into_iter()
+            .map(|lane| {
+                let items = plan_by_lane.remove(&lane.id).unwrap_or_default();
+                ShoppingPurchaseLaneDto {
+                    id: lane.id,
+                    title: lane.title,
+                    subtitle: lane.subtitle,
+                    items,
+                }
+            })
+            .collect();
+
         Ok(result)
+    }
+
+    fn batch_load_plan_item_spaces(
+        conn: &Connection,
+    ) -> Result<HashMap<String, Vec<String>>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT plan_item_id, space_name FROM shopping_plan_item_spaces ORDER BY plan_item_id, sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+        let mut map: HashMap<String, Vec<String>> = HashMap::new();
+        let rows = stmt
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
+        for row in rows {
+            let (item_id, val) = row.map_err(|e| e.to_string())?;
+            map.entry(item_id).or_default().push(val);
+        }
+        Ok(map)
+    }
+
+    fn batch_load_plan_item_stages(
+        conn: &Connection,
+    ) -> Result<HashMap<String, Vec<String>>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT plan_item_id, stage_name FROM shopping_plan_item_stages ORDER BY plan_item_id, sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+        let mut map: HashMap<String, Vec<String>> = HashMap::new();
+        let rows = stmt
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
+        for row in rows {
+            let (item_id, val) = row.map_err(|e| e.to_string())?;
+            map.entry(item_id).or_default().push(val);
+        }
+        Ok(map)
+    }
+
+    fn batch_load_plan_item_tags_by_type(
+        conn: &Connection,
+        tag_type: &str,
+    ) -> Result<HashMap<String, Vec<String>>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT plan_item_id, tag_value FROM shopping_plan_item_tags WHERE tag_type = ?1 ORDER BY plan_item_id, sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+        let mut map: HashMap<String, Vec<String>> = HashMap::new();
+        let rows = stmt
+            .query_map(params![tag_type], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
+        for row in rows {
+            let (item_id, val) = row.map_err(|e| e.to_string())?;
+            map.entry(item_id).or_default().push(val);
+        }
+        Ok(map)
     }
 
     pub fn get_spaces_for_plan_item(

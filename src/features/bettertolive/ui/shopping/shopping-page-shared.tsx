@@ -1,4 +1,5 @@
 import { type LucideIcon, Pencil, Plus } from "lucide-react"
+import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
@@ -28,11 +29,33 @@ import {
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
-function ClassificationBadge({ label, className }: { label: string; className: string }) {
+export function ClassificationBadge({ label, className }: { label: string; className: string }) {
   return (
     <Badge variant="outline" className={className}>
       {label}
     </Badge>
+  )
+}
+
+export function FormField({
+  label,
+  required,
+  className,
+  children,
+}: {
+  label: string
+  required?: boolean
+  className?: string
+  children: ReactNode
+}) {
+  return (
+    <label className={cn("space-y-1.5", className)}>
+      <span className="text-xs font-medium text-[color:var(--text-secondary)]">
+        {label}
+        {required ? <span className="ml-0.5 text-red-400">*</span> : null}
+      </span>
+      {children}
+    </label>
   )
 }
 

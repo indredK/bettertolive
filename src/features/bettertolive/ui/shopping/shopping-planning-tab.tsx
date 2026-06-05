@@ -28,7 +28,11 @@ import {
   formatPrice,
   getPriceSignal,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import { AddCard, ShoppingPriceRow } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import {
+  AddCard,
+  ClassificationBadge,
+  ShoppingPriceRow,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import { cn } from "@/lib/utils"
 
@@ -60,14 +64,6 @@ const ALL_SYSTEMS: ShoppingSystem[] = [
   "出行",
   "娱乐爱好",
 ]
-
-function ClassificationBadge({ label, className }: { label: string; className: string }) {
-  return (
-    <Badge variant="outline" className={className}>
-      {label}
-    </Badge>
-  )
-}
 
 function FilterChip({
   label,
