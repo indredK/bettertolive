@@ -7,6 +7,8 @@ import type {
   ShoppingPageContentForm,
   ShoppingPageContentRow,
   ShoppingPurchaseLaneRow,
+  ShoppingSpaceDefinitionForm,
+  ShoppingSystemDefinitionForm,
 } from "@/features/bettertolive/api/bettertolive-api"
 import type { ShoppingModuleData } from "@/features/bettertolive/models/workspace"
 
@@ -111,4 +113,50 @@ export async function reorderSystemDefinitions(orderedIds: string[]): Promise<vo
 export async function reorderShoppingPageContents(orderedIds: string[]): Promise<void> {
   if (!hasTauriRuntime()) return
   return invoke("reorder_shopping_page_contents", { orderedIds })
+}
+
+// ---- System Definitions ----
+
+export async function createSystemDefinition(form: ShoppingSystemDefinitionForm): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("create_system_definition", { form })
+}
+
+export async function updateSystemDefinition(form: ShoppingSystemDefinitionForm): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("update_system_definition", { form })
+}
+
+// ---- Space Definitions ----
+
+export async function createSpaceDefinition(
+  form: ShoppingSpaceDefinitionForm,
+): Promise<ShoppingPageContentRow> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return createPageContent({
+    id: form.id,
+    contentType: "space_definition",
+    title: form.name,
+    stage: null,
+    system: null,
+    summary: null,
+    reason: null,
+    body: "{}",
+  })
+}
+
+export async function updateSpaceDefinition(
+  form: ShoppingSpaceDefinitionForm & { id: string },
+): Promise<ShoppingPageContentRow> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return updatePageContent({
+    id: form.id,
+    contentType: "space_definition",
+    title: form.name,
+    stage: null,
+    system: null,
+    summary: null,
+    reason: null,
+    body: "{}",
+  })
 }

@@ -13,10 +13,10 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
+import type { ShoppingModuleData } from "@/features/bettertolive/types"
 import type {
   ShoppingDepreciation,
   ShoppingLifecycle,
-  ShoppingModuleData,
   ShoppingNeedLevel,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
@@ -25,8 +25,18 @@ import {
   DEPRECIATION_STYLES,
   LIFECYCLE_STYLES,
   NEED_LEVEL_STYLES,
+  depreciationDisplayName,
   formatPrice,
   getPriceSignal,
+  laneDisplayName,
+  lifecycleDisplayName,
+  needLevelDisplayName,
+  SHOPPING_DEPRECIATION_OPTIONS,
+  SHOPPING_LIFECYCLE_OPTIONS,
+  SHOPPING_NEED_LEVEL_OPTIONS,
+  SHOPPING_SYSTEM_OPTIONS,
+  stageDisplayName,
+  systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   AddCard,
@@ -36,34 +46,13 @@ import {
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import { cn } from "@/lib/utils"
 
-const ALL_DEPRECIATIONS: ShoppingDepreciation[] = [
-  "极快折旧",
-  "较快折旧",
-  "中等折旧",
-  "慢折旧",
-  "不折旧或升值",
-]
+const ALL_DEPRECIATIONS: ShoppingDepreciation[] = SHOPPING_DEPRECIATION_OPTIONS
 
-const ALL_NECESSITIES: ShoppingNeedLevel[] = ["最低配置", "必要", "改善体验", "提升幸福感"]
+const ALL_NECESSITIES: ShoppingNeedLevel[] = SHOPPING_NEED_LEVEL_OPTIONS
 
-const ALL_LIFECYCLES: ShoppingLifecycle[] = ["消耗品", "耐用品", "工具", "情感物"]
+const ALL_LIFECYCLES: ShoppingLifecycle[] = SHOPPING_LIFECYCLE_OPTIONS
 
-const ALL_SYSTEMS: ShoppingSystem[] = [
-  "睡眠",
-  "饮食",
-  "清洁",
-  "收纳",
-  "照明",
-  "环境",
-  "电力网络",
-  "工作学习",
-  "应急健康",
-  "个人护理",
-  "穿着",
-  "家具陈设",
-  "出行",
-  "娱乐爱好",
-]
+const ALL_SYSTEMS: ShoppingSystem[] = SHOPPING_SYSTEM_OPTIONS
 
 function FilterChip({
   label,
@@ -121,18 +110,18 @@ function PlanItemRow({
             {item.name}
           </span>
           <ClassificationBadge
-            label={item.necessity}
+            label={needLevelDisplayName(item.necessity, t)}
             className={cn("h-5 shrink-0 text-[10px]", NEED_LEVEL_STYLES[item.necessity])}
           />
         </div>
         <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
           <ClassificationBadge
-            label={item.lifecycle}
+            label={lifecycleDisplayName(item.lifecycle, t)}
             className={cn("h-5 shrink-0 text-[10px]", LIFECYCLE_STYLES[item.lifecycle])}
           />
           {item.depreciation ? (
             <ClassificationBadge
-              label={item.depreciation}
+              label={depreciationDisplayName(item.depreciation, t)}
               className={cn("h-5 shrink-0 text-[10px]", DEPRECIATION_STYLES[item.depreciation])}
             />
           ) : null}
@@ -142,7 +131,7 @@ function PlanItemRow({
           />
         </div>
         <div className="flex min-w-0 items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
-          <span>{item.system}</span>
+          <span>{systemDisplayName(item.system, t)}</span>
           <span>·</span>
           <span className="truncate">{formatPrice(item.currentPrice)}</span>
         </div>
@@ -201,26 +190,26 @@ function PlanItemDetail({
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <ClassificationBadge
-              label={item.necessity}
+              label={needLevelDisplayName(item.necessity, t)}
               className={NEED_LEVEL_STYLES[item.necessity]}
             />
             <ClassificationBadge
-              label={item.lifecycle}
+              label={lifecycleDisplayName(item.lifecycle, t)}
               className={LIFECYCLE_STYLES[item.lifecycle]}
             />
             {item.depreciation ? (
               <ClassificationBadge
-                label={item.depreciation}
+                label={depreciationDisplayName(item.depreciation, t)}
                 className={DEPRECIATION_STYLES[item.depreciation]}
               />
             ) : null}
             <ClassificationBadge label={signal.label} className={signal.className} />
           </div>
           <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-[color:var(--text-muted)]">
-            <span>{item.system}</span>
+            <span>{systemDisplayName(item.system, t)}</span>
             <span>{item.category}</span>
             <span>{item.spaces.join(" / ")}</span>
-            <span>{item.stages.join(" / ")}</span>
+            <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
           </div>
         </div>
 
@@ -320,20 +309,20 @@ function PlanItemDetail({
                         <div>{entry.category}</div>
                         <div className="mt-1 flex flex-wrap gap-1">
                           <Badge variant="outline" className={LIFECYCLE_STYLES[entry.lifecycle]}>
-                            {entry.lifecycle}
+                            {lifecycleDisplayName(entry.lifecycle, t)}
                           </Badge>
                           {entry.depreciation ? (
                             <Badge
                               variant="outline"
                               className={DEPRECIATION_STYLES[entry.depreciation]}
                             >
-                              {entry.depreciation}
+                              {depreciationDisplayName(entry.depreciation, t)}
                             </Badge>
                           ) : null}
                         </div>
                       </TableCell>
                       <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                        {entry.system}
+                        {systemDisplayName(entry.system, t)}
                       </TableCell>
                       <TableCell className="text-sm text-[color:var(--text-secondary)]">
                         {formatPrice(entry.entryPrice)}
@@ -362,7 +351,7 @@ function PlanItemDetail({
               variant="outline"
               className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
             >
-              {item.laneTitle}
+              {laneDisplayName(item.laneId, item.laneTitle, t)}
             </Badge>
             <Badge
               variant="outline"
@@ -505,7 +494,7 @@ export function ShoppingPlanningTab({
                   {ALL_DEPRECIATIONS.map((d) => (
                     <FilterChip
                       key={d}
-                      label={d}
+                      label={depreciationDisplayName(d, t)}
                       isSelected={filterDepreciation === d}
                       onClick={() => setFilterDepreciation(d)}
                     />
@@ -527,7 +516,7 @@ export function ShoppingPlanningTab({
                   {ALL_SYSTEMS.map((s) => (
                     <FilterChip
                       key={s}
-                      label={s}
+                      label={systemDisplayName(s, t)}
                       isSelected={filterSystem === s}
                       onClick={() => setFilterSystem(s)}
                     />
@@ -549,7 +538,7 @@ export function ShoppingPlanningTab({
                   {ALL_NECESSITIES.map((n) => (
                     <FilterChip
                       key={n}
-                      label={n}
+                      label={needLevelDisplayName(n, t)}
                       isSelected={filterNecessity === n}
                       onClick={() => setFilterNecessity(n)}
                     />
@@ -571,7 +560,7 @@ export function ShoppingPlanningTab({
                   {ALL_LIFECYCLES.map((l) => (
                     <FilterChip
                       key={l}
-                      label={l}
+                      label={lifecycleDisplayName(l, t)}
                       isSelected={filterLifecycle === l}
                       onClick={() => setFilterLifecycle(l)}
                     />

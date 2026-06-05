@@ -1,6 +1,8 @@
-import { Trash2 } from "lucide-react"
+import { Plus, Trash2 } from "lucide-react"
 import { useState } from "react"
+import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -12,14 +14,33 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import type { ShoppingPageContentForm } from "@/features/bettertolive/api/bettertolive-api"
 import {
   createPageContent,
   deletePageContent,
   updatePageContent,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
+import type {
+  ShoppingStageChecklist,
+  ShoppingStageChecklistSection,
+  ShoppingStage,
+} from "@/features/bettertolive/types"
+import { ShoppingSystem } from "@/features/bettertolive/types"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import {
+  SHOPPING_STAGE_OPTIONS,
+  SHOPPING_SYSTEM_OPTIONS,
+  stageDisplayName,
+  systemDisplayName,
+} from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
 type StageFormState = {
   isNew: boolean
@@ -28,7 +49,179 @@ type StageFormState = {
   stage: string
   description: string
   focus: string
-  body: string
+  sections: ShoppingStageChecklistSection[]
+}
+
+const STAGE_LIMITS = {
+  title: 80,
+  description: 240,
+  focus: 240,
+  sections: 16,
+  itemsPerGroup: 12,
+  itemLength: 60,
+} as const
+
+function cleanFieldLabel(label: string) {
+  return label.replace(/\s*\([^)]*\)$/, "")
+}
+
+function requiredMessage(t: TFunction, field: string) {
+  return t("shopping.validation.required", { field })
+}
+
+function maxLengthMessage(t: TFunction, field: string, count: number) {
+  return t("shopping.validation.maxLength", { field, count })
+}
+
+function invalidOptionMessage(t: TFunction, field: string) {
+  return t("shopping.validation.invalidOption", { field })
+}
+
+function buildStageSchema(t: TFunction) {
+  const fields = {
+    title: cleanFieldLabel(t("shopping.stages.form.title")),
+    stage: cleanFieldLabel(t("shopping.stages.form.stage")),
+    description: cleanFieldLabel(t("shopping.stages.form.description")),
+    focus: cleanFieldLabel(t("shopping.stages.form.focus")),
+    sections: cleanFieldLabel(t("shopping.stages.form.sections")),
+  }
+
+  return z.object({
+    title: z
+      .string()
+      .trim()
+      .min(1, requiredMessage(t, fields.title))
+      .max(STAGE_LIMITS.title, maxLengthMessage(t, fields.title, STAGE_LIMITS.title)),
+    stage: z
+      .string()
+      .min(1, requiredMessage(t, fields.stage))
+      .refine(
+        (value): value is ShoppingStage => SHOPPING_STAGE_OPTIONS.includes(value as ShoppingStage),
+        { message: invalidOptionMessage(t, fields.stage) },
+      ),
+    description: z
+      .string()
+      .trim()
+      .max(
+        STAGE_LIMITS.description,
+        maxLengthMessage(t, fields.description, STAGE_LIMITS.description),
+      ),
+    focus: z
+      .string()
+      .trim()
+      .max(STAGE_LIMITS.focus, maxLengthMessage(t, fields.focus, STAGE_LIMITS.focus)),
+    sections: z
+      .array(
+        z.object({
+          system: z
+            .string()
+            .min(1, requiredMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))))
+            .refine(
+              (value): value is ShoppingSystem =>
+                SHOPPING_SYSTEM_OPTIONS.includes(value as ShoppingSystem),
+              {
+                message: invalidOptionMessage(
+                  t,
+                  cleanFieldLabel(t("shopping.stages.table.system")),
+                ),
+              },
+            ),
+          minimum: z
+            .array(
+              z
+                .string()
+                .trim()
+                .min(1)
+                .max(
+                  STAGE_LIMITS.itemLength,
+                  maxLengthMessage(t, t("shopping.stages.table.minimum"), STAGE_LIMITS.itemLength),
+                ),
+            )
+            .max(
+              STAGE_LIMITS.itemsPerGroup,
+              t("shopping.validation.maxItems", {
+                field: t("shopping.stages.table.minimum"),
+                count: STAGE_LIMITS.itemsPerGroup,
+              }),
+            ),
+          essentials: z
+            .array(
+              z
+                .string()
+                .trim()
+                .min(1)
+                .max(
+                  STAGE_LIMITS.itemLength,
+                  maxLengthMessage(
+                    t,
+                    t("shopping.stages.table.essentials"),
+                    STAGE_LIMITS.itemLength,
+                  ),
+                ),
+            )
+            .max(
+              STAGE_LIMITS.itemsPerGroup,
+              t("shopping.validation.maxItems", {
+                field: t("shopping.stages.table.essentials"),
+                count: STAGE_LIMITS.itemsPerGroup,
+              }),
+            ),
+          upgrades: z
+            .array(
+              z
+                .string()
+                .trim()
+                .min(1)
+                .max(
+                  STAGE_LIMITS.itemLength,
+                  maxLengthMessage(t, t("shopping.stages.table.upgrades"), STAGE_LIMITS.itemLength),
+                ),
+            )
+            .max(
+              STAGE_LIMITS.itemsPerGroup,
+              t("shopping.validation.maxItems", {
+                field: t("shopping.stages.table.upgrades"),
+                count: STAGE_LIMITS.itemsPerGroup,
+              }),
+            ),
+        }),
+      )
+      .min(1, requiredMessage(t, fields.sections))
+      .max(
+        STAGE_LIMITS.sections,
+        t("shopping.validation.maxItems", { field: fields.sections, count: STAGE_LIMITS.sections }),
+      )
+      .superRefine((sections, ctx) => {
+        const usedSystems = new Set<string>()
+        sections.forEach((section, index) => {
+          if (usedSystems.has(section.system)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [index, "system"],
+              message: t("shopping.validation.duplicateSystem"),
+            })
+          }
+          usedSystems.add(section.system)
+
+          if (section.minimum.length + section.essentials.length + section.upgrades.length === 0) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: [index],
+              message: t("shopping.validation.emptySection"),
+            })
+          }
+        })
+      }),
+  })
+}
+
+function createEmptySection(preferredSystem?: ShoppingSystem): ShoppingStageChecklistSection {
+  return {
+    system: preferredSystem ?? ShoppingSystem.Sleep,
+    minimum: [""],
+    essentials: [],
+    upgrades: [],
+  }
 }
 
 function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
@@ -39,7 +232,7 @@ function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
       stage: "",
       description: "",
       focus: "",
-      body: "[]",
+      sections: [createEmptySection()],
     }
   }
   return {
@@ -49,10 +242,17 @@ function buildForm(checklist: ShoppingStageChecklist | null): StageFormState {
     stage: checklist.stage,
     description: checklist.description,
     focus: checklist.focus,
-    body: JSON.stringify(checklist.sections),
+    sections:
+      checklist.sections.length > 0
+        ? checklist.sections.map((section) => ({
+            system: section.system,
+            minimum: section.minimum.length > 0 ? [...section.minimum] : [""],
+            essentials: [...section.essentials],
+            upgrades: [...section.upgrades],
+          }))
+        : [createEmptySection()],
   }
 }
-
 export function ShoppingStageEditDialog({
   editing,
   onClose,
@@ -98,20 +298,108 @@ function StageDialogContent({
     setForm((prev) => ({ ...prev, ...partial }))
   }
 
+  const updateSection = (
+    sectionIndex: number,
+    updater: (section: ShoppingStageChecklistSection) => ShoppingStageChecklistSection,
+  ) => {
+    setForm((prev) => ({
+      ...prev,
+      sections: prev.sections.map((section, index) =>
+        index === sectionIndex ? updater(section) : section,
+      ),
+    }))
+  }
+
+  const addSection = () => {
+    const usedSystems = new Set(form.sections.map((section) => section.system))
+    const nextSystem =
+      SHOPPING_SYSTEM_OPTIONS.find((system) => !usedSystems.has(system)) ?? ShoppingSystem.Sleep
+
+    setForm((prev) => ({
+      ...prev,
+      sections:
+        prev.sections.length >= STAGE_LIMITS.sections
+          ? prev.sections
+          : [...prev.sections, createEmptySection(nextSystem)],
+    }))
+  }
+
+  const removeSection = (sectionIndex: number) => {
+    setForm((prev) => ({
+      ...prev,
+      sections:
+        prev.sections.length <= 1
+          ? [createEmptySection()]
+          : prev.sections.filter((_, index) => index !== sectionIndex),
+    }))
+  }
+
+  const addSectionItem = (
+    sectionIndex: number,
+    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
+  ) => {
+    updateSection(sectionIndex, (section) => ({
+      ...section,
+      [key]:
+        section[key].length >= STAGE_LIMITS.itemsPerGroup ? section[key] : [...section[key], ""],
+    }))
+  }
+
+  const updateSectionItem = (
+    sectionIndex: number,
+    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
+    itemIndex: number,
+    value: string,
+  ) => {
+    updateSection(sectionIndex, (section) => ({
+      ...section,
+      [key]: section[key].map((item, index) => (index === itemIndex ? value : item)),
+    }))
+  }
+
+  const removeSectionItem = (
+    sectionIndex: number,
+    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
+    itemIndex: number,
+  ) => {
+    updateSection(sectionIndex, (section) => {
+      const nextItems = section[key].filter((_, index) => index !== itemIndex)
+      return {
+        ...section,
+        [key]: key === "minimum" && nextItems.length === 0 ? [""] : nextItems,
+      }
+    })
+  }
+
   async function handleSave() {
     try {
       setSaving(true)
       setError(null)
 
+      const parsed = buildStageSchema(t).safeParse(form)
+      if (!parsed.success) {
+        setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
+        return
+      }
+
       const apiForm: ShoppingPageContentForm = {
         id: form.isNew ? undefined : form.id,
         contentType: "stage_checklist",
-        title: form.title || null,
-        stage: form.stage || null,
+        title: parsed.data.title || null,
+        stage: parsed.data.stage || null,
         system: null,
-        summary: form.description || null,
-        reason: form.focus || null,
-        body: form.body,
+        summary: parsed.data.description || null,
+        reason: parsed.data.focus || null,
+        body: JSON.stringify({
+          description: parsed.data.description,
+          focus: parsed.data.focus,
+          sections: parsed.data.sections.map((section) => ({
+            ...section,
+            minimum: section.minimum.map((item) => item.trim()).filter(Boolean),
+            essentials: section.essentials.map((item) => item.trim()).filter(Boolean),
+            upgrades: section.upgrades.map((item) => item.trim()).filter(Boolean),
+          })),
+        }),
       }
 
       if (form.isNew) {
@@ -143,7 +431,7 @@ function StageDialogContent({
   }
 
   return (
-    <DialogContent className="sm:max-w-xl">
+    <DialogContent className="flex max-h-[min(90vh,900px)] flex-col sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle>
           {form.isNew
@@ -155,55 +443,181 @@ function StageDialogContent({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="space-y-4">
-        {error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50/90 px-4 py-3 text-sm text-red-800">
-            {error}
+      <div className="min-h-0 overflow-y-auto pr-1">
+        <div className="space-y-4">
+          {error ? (
+            <div className="rounded-lg border border-red-200 bg-red-50/90 px-4 py-3 text-sm text-red-800">
+              {error}
+            </div>
+          ) : null}
+
+          <div className="grid items-start gap-4 md:grid-cols-2">
+            <FormField label={t("shopping.stages.form.title")} required>
+              <Input
+                value={form.title}
+                onChange={(e) => update({ title: e.target.value })}
+                placeholder={t("shopping.stages.form.titlePlaceholder")}
+                maxLength={STAGE_LIMITS.title}
+              />
+            </FormField>
+
+            <FormField label={t("shopping.stages.form.stage")} required>
+              <Select
+                value={form.stage || undefined}
+                onValueChange={(value) => update({ stage: value ?? "" })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("shopping.stages.form.stagePlaceholder")}>
+                    {form.stage ? stageDisplayName(form.stage as ShoppingStage, t) : undefined}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {SHOPPING_STAGE_OPTIONS.map((stage) => (
+                    <SelectItem key={stage} value={stage}>
+                      {stageDisplayName(stage, t)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            <FormField label={t("shopping.stages.form.description")} className="md:col-span-2">
+              <Textarea
+                value={form.description}
+                onChange={(e) => update({ description: e.target.value })}
+                placeholder={t("shopping.stages.form.descriptionPlaceholder")}
+                maxLength={STAGE_LIMITS.description}
+                rows={3}
+              />
+            </FormField>
+
+            <FormField label={t("shopping.stages.form.focus")} className="md:col-span-2">
+              <Textarea
+                value={form.focus}
+                onChange={(e) => update({ focus: e.target.value })}
+                placeholder={t("shopping.stages.form.focusPlaceholder")}
+                maxLength={STAGE_LIMITS.focus}
+                rows={3}
+              />
+            </FormField>
+
+            <div className="space-y-3 md:col-span-2">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-xs font-medium text-[color:var(--text-secondary)]">
+                    {t("shopping.stages.form.sections")}
+                  </div>
+                  <div className="text-[11px] leading-5 text-[color:var(--text-muted)]">
+                    {t("shopping.stages.form.sectionsHelp")}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={addSection}
+                  disabled={form.sections.length >= STAGE_LIMITS.sections}
+                >
+                  <Plus />
+                  {t("shopping.stages.form.addSection")}
+                </Button>
+              </div>
+
+              <div className="space-y-3">
+                {form.sections.map((section, sectionIndex) => (
+                  <div
+                    key={`${section.system}-${sectionIndex}`}
+                    className="rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-4"
+                  >
+                    <div className="mb-4 flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">
+                          {t("shopping.stages.table.system")}
+                        </div>
+                        <Select
+                          value={section.system}
+                          onValueChange={(value) =>
+                            updateSection(sectionIndex, (current) => ({
+                              ...current,
+                              system: value as ShoppingSystem,
+                            }))
+                          }
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue>{systemDisplayName(section.system, t)}</SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SHOPPING_SYSTEM_OPTIONS.map((system) => (
+                              <SelectItem key={system} value={system}>
+                                {systemDisplayName(system, t)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="mt-5 text-red-500 hover:bg-red-50 hover:text-red-700"
+                        onClick={() => removeSection(sectionIndex)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-3">
+                      {(
+                        [
+                          ["minimum", t("shopping.stages.table.minimum")],
+                          ["essentials", t("shopping.stages.table.essentials")],
+                          ["upgrades", t("shopping.stages.table.upgrades")],
+                        ] as const
+                      ).map(([key, label]) => (
+                        <div key={key} className="space-y-2">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="text-xs font-medium text-[color:var(--text-secondary)]">
+                              {label}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => addSectionItem(sectionIndex, key)}
+                              disabled={section[key].length >= STAGE_LIMITS.itemsPerGroup}
+                            >
+                              <Plus />
+                              {t("shopping.stages.form.addItem")}
+                            </Button>
+                          </div>
+
+                          <div className="space-y-2">
+                            {section[key].map((item, itemIndex) => (
+                              <div key={`${key}-${itemIndex}`} className="flex items-start gap-2">
+                                <Input
+                                  value={item}
+                                  onChange={(e) =>
+                                    updateSectionItem(sectionIndex, key, itemIndex, e.target.value)
+                                  }
+                                  maxLength={STAGE_LIMITS.itemLength}
+                                  placeholder={t("shopping.stages.form.itemPlaceholder")}
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  className="text-[color:var(--text-muted)]"
+                                  onClick={() => removeSectionItem(sectionIndex, key, itemIndex)}
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        ) : null}
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <FormField label={t("shopping.stages.form.title")} required>
-            <Input
-              value={form.title}
-              onChange={(e) => update({ title: e.target.value })}
-              placeholder={t("shopping.stages.form.titlePlaceholder")}
-            />
-          </FormField>
-
-          <FormField label={t("shopping.stages.form.stage")} required>
-            <Input
-              value={form.stage}
-              onChange={(e) => update({ stage: e.target.value })}
-              placeholder={t("shopping.stages.form.stagePlaceholder")}
-            />
-          </FormField>
-
-          <FormField label={t("shopping.stages.form.description")} className="md:col-span-2">
-            <Input
-              value={form.description}
-              onChange={(e) => update({ description: e.target.value })}
-              placeholder={t("shopping.stages.form.descriptionPlaceholder")}
-            />
-          </FormField>
-
-          <FormField label={t("shopping.stages.form.focus")} className="md:col-span-2">
-            <Input
-              value={form.focus}
-              onChange={(e) => update({ focus: e.target.value })}
-              placeholder={t("shopping.stages.form.focusPlaceholder")}
-            />
-          </FormField>
-
-          <FormField label={t("shopping.stages.form.sections")} className="md:col-span-2">
-            <textarea
-              value={form.body}
-              onChange={(e) => update({ body: e.target.value })}
-              placeholder={t("shopping.stages.form.sectionsPlaceholder")}
-              rows={8}
-              className="w-full rounded-md border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] px-3 py-2 font-mono text-sm text-[color:var(--text-primary)] placeholder:text-[color:var(--text-muted)] focus-visible:ring-2 focus-visible:ring-[color:var(--ring)] focus-visible:ring-offset-2 focus-visible:outline-none"
-            />
-          </FormField>
         </div>
       </div>
 

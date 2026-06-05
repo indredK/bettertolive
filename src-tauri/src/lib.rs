@@ -1,11 +1,12 @@
 mod shopping;
 
 use shopping::commands::{
-    create_owned_item, create_plan_item, create_shopping_page_content, delete_owned_item,
-    delete_plan_item, delete_shopping_page_content, get_shopping, get_workspace_snapshot,
-    list_owned_items, list_plan_items, list_purchase_lanes, list_shopping_page_contents,
-    reorder_shopping_page_contents, reorder_system_definitions, update_owned_item,
-    update_plan_item, update_shopping_page_content, AppState,
+    create_owned_item, create_plan_item, create_shopping_page_content, create_system_definition,
+    delete_owned_item, delete_plan_item, delete_shopping_page_content, get_shopping,
+    get_workspace_snapshot, list_owned_items, list_plan_items, list_purchase_lanes,
+    list_shopping_page_contents, reorder_shopping_page_contents, reorder_system_definitions,
+    update_owned_item, update_plan_item, update_shopping_page_content, update_system_definition,
+    AppState,
 };
 use specta_typescript::Typescript;
 use std::sync::Mutex;
@@ -34,6 +35,8 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         create_shopping_page_content,
         update_shopping_page_content,
         delete_shopping_page_content,
+        create_system_definition,
+        update_system_definition,
         list_purchase_lanes,
         reorder_system_definitions,
         reorder_shopping_page_contents
@@ -92,6 +95,8 @@ pub fn run() {
             create_shopping_page_content,
             update_shopping_page_content,
             delete_shopping_page_content,
+            create_system_definition,
+            update_system_definition,
             list_purchase_lanes,
             reorder_system_definitions,
             reorder_shopping_page_contents

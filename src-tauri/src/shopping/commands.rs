@@ -508,6 +508,54 @@ pub fn delete_shopping_page_content(state: State<AppState>, id: String) -> Resul
     ShoppingRepository::delete_page_content(&conn, &id)
 }
 
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SystemDefinitionFormDto {
+    pub id: String,
+    pub cluster: String,
+    pub summary: String,
+    pub key_question: String,
+    pub secondary_groups: Vec<String>,
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn create_system_definition(
+    state: State<AppState>,
+    form: SystemDefinitionFormDto,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::create_system_definition(
+        &conn,
+        &form.id,
+        &form.cluster,
+        &form.summary,
+        &form.key_question,
+        &form.secondary_groups,
+        &now,
+    )
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_system_definition(
+    state: State<AppState>,
+    form: SystemDefinitionFormDto,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::update_system_definition(
+        &conn,
+        &form.id,
+        &form.cluster,
+        &form.summary,
+        &form.key_question,
+        &form.secondary_groups,
+        &now,
+    )
+}
+
 // =====================
 // Reorder commands
 // =====================

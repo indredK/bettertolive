@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from "react"
+import i18next from "@/i18n/config"
 
 import type {
   EmotionTriggerGroup,
@@ -6,6 +7,7 @@ import type {
   ShoppingStageChecklist,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
+import { ownedStatusDisplayName } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
 function filterChecklistByQuery(
   checklist: ShoppingStageChecklist,
@@ -159,6 +161,9 @@ export function useWorkspaceViewModel({
           ...entry.secondaryGroups,
         ),
       ),
+      spaceDefinitions: workspace.shopping.spaceDefinitions.filter((entry) =>
+        matchesQuery(entry.name),
+      ),
       spotlights: workspace.shopping.spotlights.filter((entry) =>
         matchesQuery(entry.title, entry.stage, entry.summary, entry.reason, ...entry.attention),
       ),
@@ -173,6 +178,7 @@ export function useWorkspaceViewModel({
           entry.lifecycle,
           entry.depreciation,
           entry.status,
+          ownedStatusDisplayName(entry.status, i18next.t.bind(i18next)),
           entry.replacementCue,
           entry.note,
           entry.quantity,

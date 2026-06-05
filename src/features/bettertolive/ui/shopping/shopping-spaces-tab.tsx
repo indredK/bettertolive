@@ -31,6 +31,11 @@ import {
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
+import {
+  laneDisplayName,
+  stageLikeDisplayName,
+  systemDisplayName,
+} from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
 function SpaceDetailTable({
@@ -59,7 +64,7 @@ function SpaceDetailTable({
     })),
     ...space.planned.map((item) => ({
       item,
-      sourceLabel: item.laneTitle,
+      sourceLabel: laneDisplayName(item.laneId, item.laneTitle, t),
       sourceType: "planned" as const,
     })),
   ]
@@ -120,13 +125,13 @@ function SpaceDetailTable({
                       </div>
                     </TableCell>
                     <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                      {item.system}
+                      {systemDisplayName(item.system, t)}
                     </TableCell>
                     <TableCell className="text-sm text-[color:var(--text-secondary)]">
                       {item.category}
                     </TableCell>
                     <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                      {item.stages.join(", ")}
+                      {item.stages.map((stage) => stageLikeDisplayName(stage, t)).join(", ")}
                     </TableCell>
                     <TableCell>
                       <Badge
@@ -170,7 +175,7 @@ function SpaceDetailTable({
       <div className="shrink-0 border-t border-[color:var(--muted-surface-border)] px-4 py-3">
         <div className="flex flex-wrap gap-1.5">
           {Array.from(space.systems).map((system) => (
-            <SystemSummaryChip key={system} label={system} />
+            <SystemSummaryChip key={system} label={systemDisplayName(system, t)} />
           ))}
         </div>
       </div>
@@ -183,21 +188,17 @@ function SpaceMapCard({
   isSelected,
   onSelect,
   isManagementMode,
-  onEditOwned,
-  onEditPlan,
+  onEditSpace,
 }: {
   space: SpaceOverview
   isSelected: boolean
   onSelect: (spaceName: string) => void
   isManagementMode?: boolean
-  onEditOwned?: (item: ShoppingOwnedItem) => void
-  onEditPlan?: (item: ShoppingPlanWithLane) => void
+  onEditSpace?: (space: SpaceOverview) => void
 }) {
   const { t } = useTranslation()
   const totalItems = space.owned.length + space.planned.length
   const isActive = totalItems > 0
-  const firstOwned = space.owned[0]
-  const firstPlanned = space.planned[0]
 
   const summaryText = isActive
     ? (() => {
@@ -280,7 +281,7 @@ function SpaceMapCard({
               variant="outline"
               className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
             >
-              {system}
+              {systemDisplayName(system, t)}
             </Badge>
           ))}
         {space.systems.size > 3 ? (
@@ -293,18 +294,14 @@ function SpaceMapCard({
         ) : null}
       </div>
 
-      {isManagementMode && isActive ? (
+      {isManagementMode && onEditSpace ? (
         <Button
           size="icon-sm"
           variant="ghost"
           className="absolute top-2 right-2 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
           onClick={(e) => {
             e.stopPropagation()
-            if (firstOwned && onEditOwned) {
-              onEditOwned(firstOwned)
-            } else if (firstPlanned && onEditPlan) {
-              onEditPlan(firstPlanned)
-            }
+            onEditSpace(space)
           }}
         >
           <Pencil className="size-3.5" />
@@ -320,9 +317,10 @@ export function ShoppingSpacesTab({
   isFixedLayout,
   isManagementMode,
   onSelectSpace,
+  onAddNew,
+  onEditSpace,
   onEditOwned,
   onEditPlan,
-  onAddNew,
   onReorder,
 }: {
   spaces: SpaceOverview[]
@@ -330,9 +328,10 @@ export function ShoppingSpacesTab({
   isFixedLayout: boolean
   isManagementMode?: boolean
   onSelectSpace: (spaceName: string) => void
+  onAddNew?: () => void
+  onEditSpace?: (space: SpaceOverview) => void
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
-  onAddNew?: () => void
   onReorder?: (orderedNames: string[]) => void
 }) {
   const { t } = useTranslation()
@@ -370,8 +369,7 @@ export function ShoppingSpacesTab({
                 isSelected={selectedSpaceName === space.name}
                 onSelect={onSelectSpace}
                 isManagementMode={isManagementMode}
-                onEditOwned={onEditOwned}
-                onEditPlan={onEditPlan}
+                onEditSpace={onEditSpace}
               />
             </SortableShoppingCard>
           ) : (

@@ -13,7 +13,13 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { TabsContent } from "@/components/ui/tabs"
+import {
+  Tabs as InlineTabs,
+  TabsContent as InlineTabsContent,
+  TabsList as InlineTabsList,
+  TabsTrigger as InlineTabsTrigger,
+  TabsContent,
+} from "@/components/ui/tabs"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import {
@@ -25,6 +31,11 @@ import type {
   ShoppingPlanWithLane,
   ShoppingSystemOverview,
 } from "@/features/bettertolive/ui/shopping/shopping-types"
+import {
+  clusterDisplayName,
+  laneDisplayName,
+  systemDisplayName,
+} from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
 const SYSTEM_STATUS_STYLES = {
@@ -33,6 +44,9 @@ const SYSTEM_STATUS_STYLES = {
   pending:
     "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
 }
+
+const SHOPPING_SEGMENT_TRIGGER_CLASSNAME =
+  "h-8 rounded-md border border-transparent bg-transparent px-3 text-xs text-[color:var(--text-muted)] shadow-none transition-colors data-active:border-[color:var(--muted-surface-border)] data-active:bg-[color:var(--surface-bg)] data-active:text-[color:var(--text-primary)] data-active:shadow-none"
 
 function SystemDetailItemRow({
   item,
@@ -46,31 +60,23 @@ function SystemDetailItemRow({
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const isPlanItem = "currentPrice" in item
+  const summaryParts = [
+    sourceLabel,
+    item.category,
+    item.spaces.length > 0 ? item.spaces.join(" / ") : null,
+    isPlanItem ? item.reason : item.replacementCue,
+  ].filter(Boolean)
 
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="min-w-0 truncate text-sm font-medium text-[color:var(--text-primary)]">
-              {item.name}
-            </span>
-            <Badge
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-            >
-              {sourceLabel}
-            </Badge>
+          <div className="min-w-0 truncate text-sm font-medium text-[color:var(--text-primary)]">
+            {item.name}
           </div>
-
-          <div className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
-            {item.category} · {item.spaces.join(" / ")}
-          </div>
-
-          <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-            {isPlanItem ? item.reason : item.replacementCue}
+          <p className="mt-1 truncate text-sm leading-6 text-[color:var(--text-secondary)]">
+            {summaryParts.join(" · ")}
           </p>
-          <p className="mt-1 text-sm leading-6 text-[color:var(--text-muted)]">{item.note}</p>
         </div>
 
         <Button
@@ -103,17 +109,21 @@ function SystemDetailPanel({
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const { t } = useTranslation()
+  const defaultItemTab = system.owned.length > 0 ? "owned" : "planned"
+
   return (
     <div className="flex h-full flex-col rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
       <div className="min-h-0 flex-1 overflow-y-auto p-5">
         <div>
-          <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">{system.id}</h3>
+          <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">
+            {systemDisplayName(system.id, t)}
+          </h3>
           <p className="mt-1 leading-6 text-[color:var(--text-secondary)]">{system.summary}</p>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          <SystemSummaryChip label={system.id} />
-          <SystemSummaryChip label={system.cluster} />
+          <SystemSummaryChip label={systemDisplayName(system.id, t)} />
+          <SystemSummaryChip label={clusterDisplayName(system.cluster, t)} />
           <Badge variant="outline" className={cn("border", SYSTEM_STATUS_STYLES.active)}>
             {t("shopping.systems.ownedBadge", { count: system.owned.length })}
           </Badge>
@@ -154,13 +164,19 @@ function SystemDetailPanel({
           </div>
         </div>
 
-        <div className="mt-5 grid gap-5">
-          <div>
-            <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              {t("shopping.systems.ownedCount", { count: system.owned.length })}
-            </div>
+        <InlineTabs defaultValue={defaultItemTab} className="mt-5">
+          <InlineTabsList className="grid h-auto w-full grid-cols-2 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
+            <InlineTabsTrigger value="owned" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+              {t("shopping.systems.ownedLabel")} ({system.owned.length})
+            </InlineTabsTrigger>
+            <InlineTabsTrigger value="planned" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+              {t("shopping.systems.pendingLabel")} ({system.planned.length})
+            </InlineTabsTrigger>
+          </InlineTabsList>
+
+          <InlineTabsContent value="owned" className="mt-4">
             {system.owned.length > 0 ? (
-              <div className="mt-3 space-y-3">
+              <div className="space-y-3">
                 {system.owned.map((item) => (
                   <SystemDetailItemRow
                     key={item.id}
@@ -171,34 +187,31 @@ function SystemDetailPanel({
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+              <p className="text-sm text-[color:var(--text-muted)]">
                 {t("shopping.systems.noOwnedItems")}
               </p>
             )}
-          </div>
+          </InlineTabsContent>
 
-          <div>
-            <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              {t("shopping.systems.pendingCount", { count: system.planned.length })}
-            </div>
+          <InlineTabsContent value="planned" className="mt-4">
             {system.planned.length > 0 ? (
-              <div className="mt-3 space-y-3">
+              <div className="space-y-3">
                 {system.planned.map((item) => (
                   <SystemDetailItemRow
                     key={item.id}
                     item={item}
-                    sourceLabel={item.laneTitle}
+                    sourceLabel={laneDisplayName(item.laneId, item.laneTitle, t)}
                     onEditPlan={onEditPlan}
                   />
                 ))}
               </div>
             ) : (
-              <p className="mt-3 text-sm text-[color:var(--text-muted)]">
+              <p className="text-sm text-[color:var(--text-muted)]">
                 {t("shopping.systems.noPendingItems")}
               </p>
             )}
-          </div>
-        </div>
+          </InlineTabsContent>
+        </InlineTabs>
       </div>
     </div>
   )
@@ -209,20 +222,16 @@ function SystemMapCard({
   isSelected,
   onSelect,
   isManagementMode,
-  onEditOwned,
-  onEditPlan,
+  onEditSystem,
 }: {
   definition: ShoppingSystemOverview
   isSelected: boolean
   onSelect: (systemId: string) => void
   isManagementMode?: boolean
-  onEditOwned?: (item: ShoppingOwnedItem) => void
-  onEditPlan?: (item: ShoppingPlanWithLane) => void
+  onEditSystem?: (system: ShoppingSystemOverview) => void
 }) {
   const { t } = useTranslation()
-  const hasItems = definition.owned.length > 0 || definition.planned.length > 0
-  const firstOwned = definition.owned[0]
-  const firstPlanned = definition.planned[0]
+  const systemName = systemDisplayName(definition.id, t)
 
   return (
     <div
@@ -244,14 +253,14 @@ function SystemMapCard({
     >
       <div className="flex min-w-0 items-start gap-2 pr-6">
         <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
-          {definition.id.slice(0, 1)}
+          {systemName.slice(0, 1)}
         </div>
         <div className="min-w-0 flex-1">
           <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-            {definition.id}
+            {systemName}
           </div>
           <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {definition.cluster}
+            {clusterDisplayName(definition.cluster, t)}
           </div>
         </div>
       </div>
@@ -300,18 +309,14 @@ function SystemMapCard({
         ) : null}
       </div>
 
-      {isManagementMode && hasItems ? (
+      {isManagementMode && onEditSystem ? (
         <Button
           size="icon-sm"
           variant="ghost"
           className="absolute top-2 right-2 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
           onClick={(e) => {
             e.stopPropagation()
-            if (firstOwned && onEditOwned) {
-              onEditOwned(firstOwned)
-            } else if (firstPlanned && onEditPlan) {
-              onEditPlan(firstPlanned)
-            }
+            onEditSystem(definition)
           }}
         >
           <Pencil className="size-3.5" />
@@ -327,9 +332,10 @@ export function ShoppingSystemsTab({
   isFixedLayout,
   isManagementMode,
   onSelectSystem,
+  onAddNew,
+  onEditSystem,
   onEditOwned,
   onEditPlan,
-  onAddNew,
   onReorder,
 }: {
   systems: ShoppingSystemOverview[]
@@ -337,9 +343,10 @@ export function ShoppingSystemsTab({
   isFixedLayout: boolean
   isManagementMode?: boolean
   onSelectSystem: (systemId: string) => void
+  onAddNew?: () => void
+  onEditSystem?: (system: ShoppingSystemOverview) => void
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
-  onAddNew?: () => void
   onReorder?: (orderedIds: string[]) => void
 }) {
   const { t } = useTranslation()
@@ -377,8 +384,7 @@ export function ShoppingSystemsTab({
                 isSelected={selectedSystemId === definition.id}
                 onSelect={onSelectSystem}
                 isManagementMode={isManagementMode}
-                onEditOwned={onEditOwned}
-                onEditPlan={onEditPlan}
+                onEditSystem={onEditSystem}
               />
             </SortableShoppingCard>
           ) : (

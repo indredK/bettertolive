@@ -22,6 +22,7 @@ export type ShoppingSystemOverview = ShoppingSystemDefinition & {
 
 /** Aggregated space with owned and planned items. */
 export type SpaceOverview = {
+  definitionId: string | null
   name: string
   owned: ShoppingOwnedItem[]
   planned: ShoppingPlanWithLane[]

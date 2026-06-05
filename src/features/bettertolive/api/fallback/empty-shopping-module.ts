@@ -2,6 +2,7 @@ import type { ShoppingModuleData } from "@/features/bettertolive/models/workspac
 
 export const emptyShoppingModuleData = {
   systemDefinitions: [],
+  spaceDefinitions: [],
   spotlights: [],
   ownedItems: [],
   purchaseLanes: [],

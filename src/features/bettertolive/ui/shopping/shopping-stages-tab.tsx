@@ -26,6 +26,10 @@ import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
 import { AddCard } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
+import {
+  stageDisplayName,
+  systemDisplayName,
+} from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
 function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageChecklist }) {
@@ -38,101 +42,64 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
-      {/* Fixed header */}
-      <div className="shrink-0 p-5 pb-0">
-        {/* Line 1: Title left, badges + focus right */}
+      <div className="shrink-0 border-b border-[color:var(--muted-surface-border)] px-5 py-4">
         <div className="flex items-start justify-between gap-4">
-          <h3 className="flex shrink-0 items-center gap-2 text-lg font-semibold text-[color:var(--text-primary)]">
-            <Sparkles className="size-5" />
-            {checklist.title}
-          </h3>
-          <div className="flex min-w-0 flex-col items-end gap-1.5">
-            <div className="flex flex-wrap justify-end gap-1.5">
-              <Badge
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-              >
-                {checklist.stage}
-              </Badge>
-              <Badge
-                variant="outline"
-                className="border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
-              >
-                {t("shopping.stages.systemCount", { count: sectionCount })}
-              </Badge>
-              <Badge
-                variant="outline"
-                className="border border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-              >
-                {t("shopping.stages.itemCount", { count: totalItems })}
-              </Badge>
-            </div>
-            <p className="truncate text-right text-[13px] leading-5 text-[color:var(--text-secondary)]">
-              {checklist.focus}
+          <div className="min-w-0">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">
+              {checklist.title}
+            </h3>
+            <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
+              {checklist.description}
             </p>
           </div>
+          <div className="shrink-0 text-right text-xs text-[color:var(--text-muted)]">
+            <div>{stageDisplayName(checklist.stage, t)}</div>
+            <div className="mt-1">{t("shopping.stages.systemCount", { count: sectionCount })}</div>
+            <div>{t("shopping.stages.itemCount", { count: totalItems })}</div>
+          </div>
         </div>
-
-        {/* Line 2: Description */}
-        <p className="mt-2 leading-6 text-[color:var(--text-secondary)]">{checklist.description}</p>
+        {checklist.focus ? (
+          <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+            {checklist.focus}
+          </p>
+        ) : null}
       </div>
 
-      {/* Scrollable table */}
-      <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto p-5 pt-3">
-        <Table className="whitespace-nowrap">
-          <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
+      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+        <Table>
+          <TableHeader className="bg-[color:var(--surface-bg)]">
             <TableRow>
-              <TableHead className="w-[30%] text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                {t("shopping.stages.table.system")}
-              </TableHead>
-              <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                {t("shopping.stages.table.minimum")}
-              </TableHead>
-              <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                {t("shopping.stages.table.upgrades")}
-              </TableHead>
+              <TableHead className="w-44">{t("shopping.stages.table.system")}</TableHead>
+              <TableHead className="w-32">{t("shopping.stages.table.group")}</TableHead>
+              <TableHead>{t("shopping.stages.table.items")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {checklist.sections.map((section) => {
-              const upgradeItems = [...section.essentials, ...section.upgrades]
+            {checklist.sections.flatMap((section) => {
+              const groups = [
+                { label: t("shopping.stages.table.minimum"), items: section.minimum },
+                { label: t("shopping.stages.table.essentials"), items: section.essentials },
+                { label: t("shopping.stages.table.upgrades"), items: section.upgrades },
+              ]
 
-              return (
-                <TableRow key={section.system} className="hover:bg-transparent">
-                  <TableCell className="align-top">
-                    <Badge
-                      variant="outline"
-                      className="border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[12px] text-[color:var(--tone-present-ink)]"
+              return groups.map((group, index) => (
+                <TableRow key={`${section.system}-${group.label}`} className="hover:bg-transparent">
+                  {index === 0 ? (
+                    <TableCell
+                      rowSpan={groups.length}
+                      className="align-top font-medium text-[color:var(--text-primary)]"
                     >
-                      {section.system}
-                    </Badge>
+                      {systemDisplayName(section.system, t)}
+                    </TableCell>
+                  ) : null}
+                  <TableCell className="align-top text-[color:var(--text-secondary)]">
+                    {group.label}
                   </TableCell>
-                  <TableCell className="align-top">
-                    {section.minimum.length > 0 ? (
-                      <ul className="space-y-1">
-                        {section.minimum.map((name) => (
-                          <li
-                            key={name}
-                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-2.5 py-1.5 text-sm leading-5 text-[color:var(--text-secondary)]"
-                          >
-                            {name}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span className="text-sm text-[color:var(--text-muted)]">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="align-top">
-                    {upgradeItems.length > 0 ? (
-                      <ul className="space-y-1">
-                        {upgradeItems.map((name) => (
-                          <li
-                            key={name}
-                            className="rounded-md border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-2.5 py-1.5 text-sm leading-5 text-[color:var(--text-secondary)]"
-                          >
-                            {name}
-                          </li>
+                  <TableCell className="align-top whitespace-normal">
+                    {group.items.length > 0 ? (
+                      <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[color:var(--text-secondary)]">
+                        {group.items.map((item) => (
+                          <li key={item}>{item}</li>
                         ))}
                       </ul>
                     ) : (
@@ -140,7 +107,7 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
                     )}
                   </TableCell>
                 </TableRow>
-              )
+              ))
             })}
           </TableBody>
         </Table>
@@ -200,7 +167,7 @@ function StageMapCard({
             {checklist.title}
           </div>
           <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {checklist.stage}
+            {stageDisplayName(checklist.stage, t)}
           </div>
         </div>
       </div>
@@ -231,7 +198,7 @@ function StageMapCard({
             variant="outline"
             className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
           >
-            {system}
+            {systemDisplayName(system, t)}
           </Badge>
         ))}
         {systemNames.length > 3 ? (

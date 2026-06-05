@@ -8,6 +8,11 @@ import type {
   ShoppingModuleData,
   ShoppingOwnedItem,
   ShoppingStageChecklist,
+} from "@/features/bettertolive/types"
+import {
+  ShoppingDepreciation,
+  ShoppingLifecycle,
+  ShoppingNeedLevel,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
@@ -16,6 +21,7 @@ import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shoppin
 import {
   FAST_DEPRECIATION,
   PRIORITY_LEVELS,
+  SHOPPING_SYSTEM_OPTIONS,
   type ShoppingLifecycleGroups,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
@@ -23,12 +29,18 @@ import {
   ShoppingItemEditDialog,
 } from "@/features/bettertolive/ui/shopping/shopping-item-edit-dialog"
 import { ShoppingStageEditDialog } from "@/features/bettertolive/ui/shopping/shopping-stage-edit-dialog"
+import { ShoppingSpaceEditDialog } from "@/features/bettertolive/ui/shopping/shopping-space-edit-dialog"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
+import { ShoppingSystemEditDialog } from "@/features/bettertolive/ui/shopping/shopping-system-edit-dialog"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
-import { type ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
-import { type SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
+  type ShoppingPlanWithLane,
+  type ShoppingSystemOverview,
+  type SpaceOverview,
+} from "@/features/bettertolive/ui/shopping/shopping-types"
+import {
+  createSpaceDefinition,
   reorderShoppingPageContents,
   reorderSystemDefinitions,
 } from "@/features/bettertolive/api/shopping-crud-api"
@@ -59,6 +71,14 @@ export function ShoppingPage({
     isNew: boolean
     checklist: ShoppingStageChecklist | null
   } | null>(null)
+  const [editingSystem, setEditingSystem] = useState<{
+    isNew: boolean
+    system: ShoppingSystemOverview | null
+  } | null>(null)
+  const [editingSpace, setEditingSpace] = useState<{
+    isNew: boolean
+    space: SpaceOverview | null
+  } | null>(null)
   const [spacesOrder, setSpacesOrder] = useState<string[] | null>(null)
 
   // ---- Reorder handlers ----
@@ -73,9 +93,33 @@ export function ShoppingPage({
     }
   }
 
-  const handleReorderSpaces = (orderedNames: string[]) => {
+  const handleReorderSpaces = async (orderedNames: string[]) => {
     setSpacesOrder(orderedNames)
-    toast.success(t("shopping.toast.reorderSuccess"))
+    try {
+      const definitionIdsByName = new Map<string, string>(
+        shopping.spaceDefinitions.map((definition) => [definition.name, definition.id]),
+      )
+      const orderedIds: string[] = []
+
+      for (const name of orderedNames) {
+        let definitionId = definitionIdsByName.get(name)
+        if (!definitionId) {
+          const created = await createSpaceDefinition({ name })
+          definitionId = created.id
+          definitionIdsByName.set(name, definitionId)
+        }
+        if (!definitionId) {
+          throw new Error(`Missing space definition id for ${name}`)
+        }
+        orderedIds.push(definitionId)
+      }
+
+      await reorderShoppingPageContents(orderedIds)
+      toast.success(t("shopping.toast.reorderSuccess"))
+      onRefresh?.()
+    } catch {
+      toast.error(t("shopping.toast.reorderFailed"))
+    }
   }
 
   const handleReorderStages = async (orderedIds: string[]) => {
@@ -98,12 +142,38 @@ export function ShoppingPage({
     onRefresh?.()
   }
 
+  const handleSystemSaved = () => {
+    setEditingSystem(null)
+    onRefresh?.()
+  }
+
+  const handleSpaceSaved = () => {
+    setEditingSpace(null)
+    onRefresh?.()
+  }
+
   const startEditStage = (checklist: ShoppingStageChecklist) => {
     setEditingStage({ isNew: false, checklist })
   }
 
   const startAddStage = () => {
     setEditingStage({ isNew: true, checklist: null })
+  }
+
+  const startEditSystem = (system: ShoppingSystemOverview) => {
+    setEditingSystem({ isNew: false, system })
+  }
+
+  const startAddSystem = () => {
+    setEditingSystem({ isNew: true, system: null })
+  }
+
+  const startEditSpace = (space: SpaceOverview) => {
+    setEditingSpace({ isNew: false, space })
+  }
+
+  const startAddSpace = () => {
+    setEditingSpace({ isNew: true, space: null })
   }
 
   const startEditOwned = (item: ShoppingOwnedItem) => {
@@ -119,12 +189,12 @@ export function ShoppingPage({
     const newPlanItem: ShoppingPlanWithLane = {
       id: `new-${Date.now()}`,
       name: "",
-      system: "睡眠",
+      system: ShoppingSystem.Sleep,
       category: "",
       spaces: [],
       stages: [],
-      necessity: "必要",
-      lifecycle: "耐用品",
+      necessity: ShoppingNeedLevel.Necessary,
+      lifecycle: ShoppingLifecycle.Durable,
       reason: "",
       targetLifestyle: "",
       currentPrice: 0,
@@ -191,23 +261,27 @@ export function ShoppingPage({
         (item) =>
           item.depreciation &&
           FAST_DEPRECIATION.has(item.depreciation) &&
-          item.necessity === "提升幸福感",
+          item.necessity === ShoppingNeedLevel.HappinessBoost,
       ),
     [planItems],
   )
 
   const worthBuyingSlowly = useMemo(
     () =>
-      planItems.filter((item) => item.depreciation === "慢折旧" && item.necessity !== "提升幸福感"),
+      planItems.filter(
+        (item) =>
+          item.depreciation === ShoppingDepreciation.Slow &&
+          item.necessity !== ShoppingNeedLevel.HappinessBoost,
+      ),
     [planItems],
   )
 
   const lifecycleGroups = useMemo((): ShoppingLifecycleGroups => {
     const groups: ShoppingLifecycleGroups = {
-      消耗品: { owned: [], planned: [] },
-      耐用品: { owned: [], planned: [] },
-      工具: { owned: [], planned: [] },
-      情感物: { owned: [], planned: [] },
+      [ShoppingLifecycle.Consumable]: { owned: [], planned: [] },
+      [ShoppingLifecycle.Durable]: { owned: [], planned: [] },
+      [ShoppingLifecycle.Tool]: { owned: [], planned: [] },
+      [ShoppingLifecycle.Emotional]: { owned: [], planned: [] },
     }
 
     shopping.ownedItems.forEach((item) => {
@@ -224,6 +298,7 @@ export function ShoppingPage({
     const spaceMap = new Map<
       string,
       {
+        definitionId: string | null
         name: string
         owned: ShoppingOwnedItem[]
         planned: ShoppingPlanWithLane[]
@@ -231,9 +306,20 @@ export function ShoppingPage({
       }
     >()
 
+    shopping.spaceDefinitions.forEach((definition) => {
+      spaceMap.set(definition.name, {
+        definitionId: definition.id,
+        name: definition.name,
+        owned: [],
+        planned: [],
+        systems: new Set<ShoppingSystem>(),
+      })
+    })
+
     shopping.ownedItems.forEach((item) => {
       item.spaces.forEach((space) => {
         const current = spaceMap.get(space) ?? {
+          definitionId: null,
           name: space,
           owned: [],
           planned: [],
@@ -248,6 +334,7 @@ export function ShoppingPage({
     planItems.forEach((item) => {
       item.spaces.forEach((space) => {
         const current = spaceMap.get(space) ?? {
+          definitionId: null,
           name: space,
           owned: [],
           planned: [],
@@ -259,11 +346,37 @@ export function ShoppingPage({
       })
     })
 
-    return Array.from(spaceMap.values()).sort(
-      (left, right) =>
-        right.owned.length + right.planned.length - (left.owned.length + left.planned.length),
+    const definitionOrder = new Map(
+      shopping.spaceDefinitions.map((definition, index) => [definition.id, index]),
     )
-  }, [shopping.ownedItems, planItems])
+
+    return Array.from(spaceMap.values()).sort((left, right) => {
+      const leftOrder =
+        left.definitionId === null
+          ? Number.POSITIVE_INFINITY
+          : (definitionOrder.get(left.definitionId) ?? Number.POSITIVE_INFINITY)
+      const rightOrder =
+        right.definitionId === null
+          ? Number.POSITIVE_INFINITY
+          : (definitionOrder.get(right.definitionId) ?? Number.POSITIVE_INFINITY)
+
+      if (leftOrder !== rightOrder) return leftOrder - rightOrder
+
+      const countDiff =
+        right.owned.length + right.planned.length - (left.owned.length + left.planned.length)
+      if (countDiff !== 0) return countDiff
+
+      return left.name.localeCompare(right.name, "zh-Hans-CN")
+    })
+  }, [shopping.spaceDefinitions, shopping.ownedItems, planItems])
+
+  const availableSystemIds = useMemo(
+    () =>
+      SHOPPING_SYSTEM_OPTIONS.filter(
+        (systemId) => !shopping.systemDefinitions.some((definition) => definition.id === systemId),
+      ),
+    [shopping.systemDefinitions],
+  )
 
   const orderedSpaces = useMemo(() => {
     if (!spacesOrder) return spaces
@@ -371,9 +484,10 @@ export function ShoppingPage({
           isFixedLayout={isFixedLayout}
           isManagementMode={isManagementMode}
           onSelectSystem={setSelectedSystemId}
+          onAddNew={isManagementMode ? startAddSystem : undefined}
+          onEditSystem={isManagementMode ? startEditSystem : undefined}
           onEditOwned={isManagementMode ? startEditOwned : undefined}
           onEditPlan={isManagementMode ? startEditPlan : undefined}
-          onAddNew={isManagementMode ? startAddPlan : undefined}
           onReorder={isManagementMode ? handleReorderSystems : undefined}
         />
 
@@ -383,9 +497,10 @@ export function ShoppingPage({
           isFixedLayout={isFixedLayout}
           isManagementMode={isManagementMode}
           onSelectSpace={setSelectedSpaceName}
+          onAddNew={isManagementMode ? startAddSpace : undefined}
+          onEditSpace={isManagementMode ? startEditSpace : undefined}
           onEditOwned={isManagementMode ? startEditOwned : undefined}
           onEditPlan={isManagementMode ? startEditPlan : undefined}
-          onAddNew={isManagementMode ? startAddPlan : undefined}
           onReorder={isManagementMode ? handleReorderSpaces : undefined}
         />
 
@@ -421,6 +536,20 @@ export function ShoppingPage({
           editing={editingStage}
           onClose={() => setEditingStage(null)}
           onSaved={handleStageSaved}
+        />
+
+        <ShoppingSystemEditDialog
+          editing={editingSystem}
+          availableSystemIds={availableSystemIds}
+          onClose={() => setEditingSystem(null)}
+          onSaved={handleSystemSaved}
+        />
+
+        <ShoppingSpaceEditDialog
+          editing={editingSpace}
+          existingSpaceNames={spaces.map((space) => space.name)}
+          onClose={() => setEditingSpace(null)}
+          onSaved={handleSpaceSaved}
         />
       </Tabs>
     </div>

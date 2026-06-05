@@ -56,32 +56,67 @@ export type ShoppingSpotlight = {
   attention: string[]
 }
 
-export type ShoppingNeedLevel = "最低配置" | "必要" | "改善体验" | "提升幸福感"
+export enum ShoppingNeedLevel {
+  MinimalConfig = "MinimalConfig",
+  Necessary = "Necessary",
+  Comfortable = "Comfortable",
+  HappinessBoost = "HappinessBoost",
+}
 
-export type ShoppingSystem =
-  | "睡眠"
-  | "饮食"
-  | "清洁"
-  | "收纳"
-  | "照明"
-  | "环境"
-  | "电力网络"
-  | "工作学习"
-  | "应急健康"
-  | "个人护理"
-  | "穿着"
-  | "家具陈设"
-  | "出行"
-  | "娱乐爱好"
-  | "宠物"
+export enum ShoppingSystem {
+  Sleep = "Sleep",
+  Diet = "Diet",
+  Cleaning = "Cleaning",
+  Storage = "Storage",
+  Lighting = "Lighting",
+  Environment = "Environment",
+  PowerNetwork = "PowerNetwork",
+  WorkStudy = "WorkStudy",
+  EmergencyHealth = "EmergencyHealth",
+  PersonalCare = "PersonalCare",
+  Clothing = "Clothing",
+  Furniture = "Furniture",
+  Transportation = "Transportation",
+  Entertainment = "Entertainment",
+  Pets = "Pets",
+}
 
-export type ShoppingStage = "搬家最低配" | "租房" | "长期居住" | "自有住房" | "自建房" | "地下室"
+export enum ShoppingStage {
+  MovingMinimal = "MovingMinimal",
+  Renting = "Renting",
+  LongTermLiving = "LongTermLiving",
+  OwnHome = "OwnHome",
+  SelfBuilt = "SelfBuilt",
+  Basement = "Basement",
+}
 
-export type ShoppingLifecycle = "消耗品" | "耐用品" | "工具" | "情感物"
+export enum ShoppingLifecycle {
+  Consumable = "Consumable",
+  Durable = "Durable",
+  Tool = "Tool",
+  Emotional = "Emotional",
+}
 
-export type ShoppingDepreciation = "极快折旧" | "较快折旧" | "中等折旧" | "慢折旧" | "不折旧或升值"
+export enum ShoppingDepreciation {
+  VeryFast = "VeryFast",
+  Fast = "Fast",
+  Medium = "Medium",
+  Slow = "Slow",
+  NoDepreciation = "NoDepreciation",
+}
 
-export type ShoppingSystemCluster = "基础系统" | "家居与生活方式"
+export enum ShoppingOwnedStatus {
+  StableUse = "StableUse",
+  ConsiderUpgrade = "ConsiderUpgrade",
+  NeedRestock = "NeedRestock",
+  MissingParts = "MissingParts",
+  NeedComplete = "NeedComplete",
+}
+
+export enum ShoppingSystemCluster {
+  BasicSystems = "BasicSystems",
+  HomeAndLifestyle = "HomeAndLifestyle",
+}
 
 export type ShoppingSystemDefinition = {
   id: ShoppingSystem
@@ -89,6 +124,11 @@ export type ShoppingSystemDefinition = {
   summary: string
   keyQuestion: string
   secondaryGroups: string[]
+}
+
+export type ShoppingSpaceDefinition = {
+  id: string
+  name: string
 }
 
 export type ShoppingItemBase = {
@@ -105,7 +145,7 @@ export type ShoppingOwnedItem = ShoppingItemBase & {
   id: string
   name: string
   quantity: number
-  status: string
+  status: ShoppingOwnedStatus
   replacementCue: string
   note: string
 }
@@ -717,6 +757,7 @@ export type FinanceModuleData = {
 
 export type ShoppingModuleData = {
   systemDefinitions: ShoppingSystemDefinition[]
+  spaceDefinitions: ShoppingSpaceDefinition[]
   spotlights: ShoppingSpotlight[]
   ownedItems: ShoppingOwnedItem[]
   purchaseLanes: ShoppingPurchaseLane[]

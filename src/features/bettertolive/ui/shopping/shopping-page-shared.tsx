@@ -16,16 +16,22 @@ import type {
   ShoppingBoundaryEntry,
   ShoppingLifecycle,
   ShoppingOwnedItem,
-  ShoppingSystem,
 } from "@/features/bettertolive/types"
+import type { ShoppingSystem } from "@/features/bettertolive/types"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
   DEPRECIATION_STYLES,
   getLifecycleCopy,
   LIFECYCLE_STYLES,
   NEED_LEVEL_STYLES,
+  depreciationDisplayName,
   formatPrice,
   getPriceSignal,
+  laneDisplayName,
+  lifecycleDisplayName,
+  needLevelDisplayName,
+  stageDisplayName,
+  systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
@@ -39,11 +45,13 @@ export function ClassificationBadge({ label, className }: { label: string; class
 
 export function FormField({
   label,
+  description,
   required,
   className,
   children,
 }: {
   label: string
+  description?: string
   required?: boolean
   className?: string
   children: ReactNode
@@ -55,17 +63,23 @@ export function FormField({
         {required ? <span className="ml-0.5 text-red-400">*</span> : null}
       </span>
       {children}
+      {description ? (
+        <span className="block text-[11px] leading-5 text-[color:var(--text-muted)]">
+          {description}
+        </span>
+      ) : null}
     </label>
   )
 }
 
 export function SystemChip({ system }: { system: ShoppingSystem }) {
+  const { t } = useTranslation()
   return (
     <Badge
       variant="outline"
       className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
     >
-      {system}
+      {systemDisplayName(system, t)}
     </Badge>
   )
 }
@@ -152,6 +166,7 @@ export function CompactItemRow({
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
+  const { t } = useTranslation()
   const isPlanItem = "currentPrice" in item
 
   return (
@@ -173,16 +188,16 @@ export function CompactItemRow({
               {item.name}
             </h3>
             <ClassificationBadge
-              label={item.necessity}
+              label={needLevelDisplayName(item.necessity, t)}
               className={NEED_LEVEL_STYLES[item.necessity]}
             />
             <ClassificationBadge
-              label={item.lifecycle}
+              label={lifecycleDisplayName(item.lifecycle, t)}
               className={LIFECYCLE_STYLES[item.lifecycle]}
             />
             {item.depreciation ? (
               <ClassificationBadge
-                label={item.depreciation}
+                label={depreciationDisplayName(item.depreciation, t)}
                 className={DEPRECIATION_STYLES[item.depreciation]}
               />
             ) : null}
@@ -200,13 +215,13 @@ export function CompactItemRow({
               compact && "text-[11px]",
             )}
           >
-            <span>{item.system}</span>
+            <span>{systemDisplayName(item.system, t)}</span>
             <span>·</span>
             <span>{item.category}</span>
             <span>·</span>
             <span>{item.spaces.join(" / ")}</span>
             <span>·</span>
-            <span>{item.stages.join(" / ")}</span>
+            <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
           </div>
 
           <p
@@ -355,7 +370,10 @@ export function LifecycleLane({
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
       <div className="flex flex-wrap items-center gap-2">
-        <ClassificationBadge label={lifecycle} className={LIFECYCLE_STYLES[lifecycle]} />
+        <ClassificationBadge
+          label={lifecycleDisplayName(lifecycle, t)}
+          className={LIFECYCLE_STYLES[lifecycle]}
+        />
         <span className="text-sm font-medium text-[color:var(--text-primary)]">
           {lifecycleCopy[lifecycle].title}
         </span>
@@ -413,11 +431,17 @@ export function PurchaseDecisionCard({
         >
           {item.name}
         </h3>
-        <ClassificationBadge label={item.necessity} className={NEED_LEVEL_STYLES[item.necessity]} />
-        <ClassificationBadge label={item.lifecycle} className={LIFECYCLE_STYLES[item.lifecycle]} />
+        <ClassificationBadge
+          label={needLevelDisplayName(item.necessity, t)}
+          className={NEED_LEVEL_STYLES[item.necessity]}
+        />
+        <ClassificationBadge
+          label={lifecycleDisplayName(item.lifecycle, t)}
+          className={LIFECYCLE_STYLES[item.lifecycle]}
+        />
         {item.depreciation ? (
           <ClassificationBadge
-            label={item.depreciation}
+            label={depreciationDisplayName(item.depreciation, t)}
             className={DEPRECIATION_STYLES[item.depreciation]}
           />
         ) : null}
@@ -430,7 +454,7 @@ export function PurchaseDecisionCard({
         <span>·</span>
         <span>{item.spaces.join(" / ")}</span>
         <span>·</span>
-        <span>{item.stages.join(" / ")}</span>
+        <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
       </div>
 
       <p
@@ -483,7 +507,7 @@ export function PurchaseDecisionCard({
               variant="outline"
               className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
             >
-              {item.laneTitle}
+              {laneDisplayName(item.laneId, item.laneTitle, t)}
             </Badge>
             <Badge
               variant="outline"

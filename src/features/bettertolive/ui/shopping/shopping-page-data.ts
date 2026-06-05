@@ -1,50 +1,160 @@
 import type { TFunction } from "i18next"
-import type {
+import type { ShoppingOwnedItem, ShoppingPlanItem } from "@/features/bettertolive/types"
+import {
   ShoppingDepreciation,
   ShoppingLifecycle,
   ShoppingNeedLevel,
-  ShoppingOwnedItem,
-  ShoppingPlanItem,
+  ShoppingOwnedStatus,
+  ShoppingStage,
+  ShoppingSystem,
+  ShoppingSystemCluster,
 } from "@/features/bettertolive/types"
 import i18next from "@/i18n/config"
 import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 
 export const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
-  最低配置:
+  [ShoppingNeedLevel.MinimalConfig]:
     "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
-  必要: "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
-  改善体验:
+  [ShoppingNeedLevel.Necessary]:
+    "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
+  [ShoppingNeedLevel.Comfortable]:
     "border-[color:var(--tone-past-border)] bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]",
-  提升幸福感:
+  [ShoppingNeedLevel.HappinessBoost]:
     "border-[color:var(--tone-future-border)] bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]",
 }
 
 export const LIFECYCLE_STYLES: Record<ShoppingLifecycle, string> = {
-  消耗品:
+  [ShoppingLifecycle.Consumable]:
     "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-200",
-  耐用品:
+  [ShoppingLifecycle.Durable]:
     "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200",
-  工具: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200",
-  情感物:
+  [ShoppingLifecycle.Tool]:
+    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200",
+  [ShoppingLifecycle.Emotional]:
     "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-800/60 dark:bg-fuchsia-950/40 dark:text-fuchsia-200",
 }
 
 export const DEPRECIATION_STYLES: Record<ShoppingDepreciation, string> = {
-  极快折旧:
+  [ShoppingDepreciation.VeryFast]:
     "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/40 dark:text-rose-200",
-  较快折旧:
+  [ShoppingDepreciation.Fast]:
     "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/40 dark:text-orange-200",
-  中等折旧:
+  [ShoppingDepreciation.Medium]:
     "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200",
-  慢折旧:
+  [ShoppingDepreciation.Slow]:
     "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200",
-  不折旧或升值:
+  [ShoppingDepreciation.NoDepreciation]:
     "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200",
 }
 
-export const FAST_DEPRECIATION = new Set<ShoppingDepreciation>(["极快折旧", "较快折旧"])
-export const PRIORITY_LEVELS = new Set<ShoppingNeedLevel>(["最低配置", "必要"])
+export const SHOPPING_SYSTEM_OPTIONS: ShoppingSystem[] = [
+  ShoppingSystem.Sleep,
+  ShoppingSystem.Diet,
+  ShoppingSystem.Cleaning,
+  ShoppingSystem.Storage,
+  ShoppingSystem.Lighting,
+  ShoppingSystem.Environment,
+  ShoppingSystem.PowerNetwork,
+  ShoppingSystem.WorkStudy,
+  ShoppingSystem.EmergencyHealth,
+  ShoppingSystem.PersonalCare,
+  ShoppingSystem.Clothing,
+  ShoppingSystem.Furniture,
+  ShoppingSystem.Transportation,
+  ShoppingSystem.Entertainment,
+  ShoppingSystem.Pets,
+]
+
+export const SHOPPING_STAGE_OPTIONS: ShoppingStage[] = [
+  ShoppingStage.MovingMinimal,
+  ShoppingStage.Renting,
+  ShoppingStage.LongTermLiving,
+  ShoppingStage.OwnHome,
+  ShoppingStage.SelfBuilt,
+  ShoppingStage.Basement,
+]
+
+const SHOPPING_STAGE_ALIASES: Record<string, ShoppingStage> = {
+  [ShoppingStage.MovingMinimal]: ShoppingStage.MovingMinimal,
+  [ShoppingStage.Renting]: ShoppingStage.Renting,
+  [ShoppingStage.LongTermLiving]: ShoppingStage.LongTermLiving,
+  [ShoppingStage.OwnHome]: ShoppingStage.OwnHome,
+  [ShoppingStage.SelfBuilt]: ShoppingStage.SelfBuilt,
+  [ShoppingStage.Basement]: ShoppingStage.Basement,
+  搬家最低配: ShoppingStage.MovingMinimal,
+  "Moving Essentials": ShoppingStage.MovingMinimal,
+  租房: ShoppingStage.Renting,
+  长期居住: ShoppingStage.LongTermLiving,
+  "Long-Term Living": ShoppingStage.LongTermLiving,
+  自有住房: ShoppingStage.OwnHome,
+  "Home Ownership": ShoppingStage.OwnHome,
+  自建房: ShoppingStage.SelfBuilt,
+  "Self-Built": ShoppingStage.SelfBuilt,
+  地下室: ShoppingStage.Basement,
+}
+
+export const SHOPPING_NEED_LEVEL_OPTIONS: ShoppingNeedLevel[] = [
+  ShoppingNeedLevel.MinimalConfig,
+  ShoppingNeedLevel.Necessary,
+  ShoppingNeedLevel.Comfortable,
+  ShoppingNeedLevel.HappinessBoost,
+]
+
+export const SHOPPING_LIFECYCLE_OPTIONS: ShoppingLifecycle[] = [
+  ShoppingLifecycle.Consumable,
+  ShoppingLifecycle.Durable,
+  ShoppingLifecycle.Tool,
+  ShoppingLifecycle.Emotional,
+]
+
+export const SHOPPING_DEPRECIATION_OPTIONS: ShoppingDepreciation[] = [
+  ShoppingDepreciation.VeryFast,
+  ShoppingDepreciation.Fast,
+  ShoppingDepreciation.Medium,
+  ShoppingDepreciation.Slow,
+  ShoppingDepreciation.NoDepreciation,
+]
+
+export const SHOPPING_SYSTEM_CLUSTER_OPTIONS: ShoppingSystemCluster[] = [
+  ShoppingSystemCluster.BasicSystems,
+  ShoppingSystemCluster.HomeAndLifestyle,
+]
+
+export const SHOPPING_OWNED_STATUS_OPTIONS: ShoppingOwnedStatus[] = [
+  ShoppingOwnedStatus.StableUse,
+  ShoppingOwnedStatus.ConsiderUpgrade,
+  ShoppingOwnedStatus.NeedRestock,
+  ShoppingOwnedStatus.MissingParts,
+  ShoppingOwnedStatus.NeedComplete,
+]
+
+const SHOPPING_OWNED_STATUS_ALIASES: Record<string, ShoppingOwnedStatus> = {
+  [ShoppingOwnedStatus.StableUse]: ShoppingOwnedStatus.StableUse,
+  [ShoppingOwnedStatus.ConsiderUpgrade]: ShoppingOwnedStatus.ConsiderUpgrade,
+  [ShoppingOwnedStatus.NeedRestock]: ShoppingOwnedStatus.NeedRestock,
+  [ShoppingOwnedStatus.MissingParts]: ShoppingOwnedStatus.MissingParts,
+  [ShoppingOwnedStatus.NeedComplete]: ShoppingOwnedStatus.NeedComplete,
+  稳定使用: ShoppingOwnedStatus.StableUse,
+  "In Stable Use": ShoppingOwnedStatus.StableUse,
+  考虑升级: ShoppingOwnedStatus.ConsiderUpgrade,
+  "Consider Upgrade": ShoppingOwnedStatus.ConsiderUpgrade,
+  需要补货: ShoppingOwnedStatus.NeedRestock,
+  "Need Restock": ShoppingOwnedStatus.NeedRestock,
+  缺补件: ShoppingOwnedStatus.MissingParts,
+  "Missing Parts": ShoppingOwnedStatus.MissingParts,
+  需要补齐: ShoppingOwnedStatus.NeedComplete,
+  "Need Completion": ShoppingOwnedStatus.NeedComplete,
+}
+
+export const FAST_DEPRECIATION = new Set<ShoppingDepreciation>([
+  ShoppingDepreciation.VeryFast,
+  ShoppingDepreciation.Fast,
+])
+export const PRIORITY_LEVELS = new Set<ShoppingNeedLevel>([
+  ShoppingNeedLevel.MinimalConfig,
+  ShoppingNeedLevel.Necessary,
+])
 
 const SYSTEM_ROW_ACTIVE_WEIGHT = 5 / 3
 const SYSTEM_ROW_NEIGHBOR_WEIGHT = 2 / 3
@@ -55,19 +165,19 @@ export function getLifecycleCopy(
   t: TFunction,
 ): Record<ShoppingLifecycle, { title: string; detail: string }> {
   return {
-    消耗品: {
+    [ShoppingLifecycle.Consumable]: {
       title: t("shopping.lifecycle.consumables.title"),
       detail: t("shopping.lifecycle.consumables.detail"),
     },
-    耐用品: {
+    [ShoppingLifecycle.Durable]: {
       title: t("shopping.lifecycle.durables.title"),
       detail: t("shopping.lifecycle.durables.detail"),
     },
-    工具: {
+    [ShoppingLifecycle.Tool]: {
       title: t("shopping.lifecycle.tools.title"),
       detail: t("shopping.lifecycle.tools.detail"),
     },
-    情感物: {
+    [ShoppingLifecycle.Emotional]: {
       title: t("shopping.lifecycle.emotional.title"),
       detail: t("shopping.lifecycle.emotional.detail"),
     },
@@ -204,4 +314,86 @@ export function getSystemRowTemplate(length: number, activeIndex: number | null)
   }
 
   return weights.map((weight) => `minmax(0, ${weight}fr)`).join(" ")
+}
+
+/** Translate a ShoppingSystem value through i18n, falling back to the raw Chinese value. */
+export function systemDisplayName(system: ShoppingSystem, t: TFunction): string {
+  return t(`shopping.enumNames.system.${system}`, system as string)
+}
+
+/** Translate a ShoppingStage value through i18n, falling back to the raw Chinese value. */
+export function stageDisplayName(stage: ShoppingStage, t: TFunction): string {
+  return t(`shopping.enumNames.stage.${stage}`, stage as string)
+}
+
+export function normalizeStageLikeValue(stage: string): ShoppingStage | string {
+  const trimmedStage = stage.trim()
+  return SHOPPING_STAGE_ALIASES[trimmedStage] ?? trimmedStage
+}
+
+export function normalizeStageLikeValues(stages: string[]): string[] {
+  return stages.map((stage) => normalizeStageLikeValue(stage)).filter((stage) => Boolean(stage))
+}
+
+/** Normalize stage-like values to known ShoppingStage enum codes only. */
+export function normalizeStageValues(stages: string[]): ShoppingStage[] {
+  return Array.from(
+    new Set(
+      normalizeStageLikeValues(stages).filter((stage): stage is ShoppingStage =>
+        SHOPPING_STAGE_OPTIONS.includes(stage as ShoppingStage),
+      ),
+    ),
+  )
+}
+
+export function normalizeOwnedStatusValue(status: string): ShoppingOwnedStatus | string {
+  const trimmedStatus = status.trim()
+  return SHOPPING_OWNED_STATUS_ALIASES[trimmedStatus] ?? trimmedStatus
+}
+
+/** Translate a stage-like value, using i18n for known enum values and falling back to the raw text. */
+export function stageLikeDisplayName(stage: string, t: TFunction): string {
+  const normalizedStage = normalizeStageLikeValue(stage)
+
+  if (SHOPPING_STAGE_OPTIONS.includes(normalizedStage as ShoppingStage)) {
+    return stageDisplayName(normalizedStage as ShoppingStage, t)
+  }
+
+  return normalizedStage
+}
+
+/** Translate a ShoppingSystemCluster value through i18n, falling back to the raw Chinese value. */
+export function clusterDisplayName(cluster: ShoppingSystemCluster, t: TFunction): string {
+  return t(`shopping.enumNames.cluster.${cluster}`, cluster as string)
+}
+
+/** Translate a ShoppingNeedLevel value through i18n, falling back to the raw Chinese value. */
+export function needLevelDisplayName(level: ShoppingNeedLevel, t: TFunction): string {
+  return t(`shopping.enumNames.necessity.${level}`, level as string)
+}
+
+/** Translate a ShoppingLifecycle value through i18n, falling back to the raw Chinese value. */
+export function lifecycleDisplayName(lc: ShoppingLifecycle, t: TFunction): string {
+  return t(`shopping.enumNames.lifecycle.${lc}`, lc as string)
+}
+
+/** Translate a ShoppingDepreciation value through i18n, falling back to the raw Chinese value. */
+export function depreciationDisplayName(dep: ShoppingDepreciation, t: TFunction): string {
+  return t(`shopping.enumNames.depreciation.${dep}`, dep as string)
+}
+
+/** Translate an owned-item status through i18n, falling back to the raw status text. */
+export function ownedStatusDisplayName(status: ShoppingOwnedStatus | string, t: TFunction): string {
+  const normalizedStatus = normalizeOwnedStatusValue(status)
+
+  if (SHOPPING_OWNED_STATUS_OPTIONS.includes(normalizedStatus as ShoppingOwnedStatus)) {
+    return t(`shopping.enumNames.ownedStatus.${normalizedStatus}`, normalizedStatus)
+  }
+
+  return normalizedStatus
+}
+
+/** Translate a purchase lane ID to localized name, falling back to the stored title. */
+export function laneDisplayName(laneId: string, fallback: string, t: TFunction): string {
+  return t(`shopping.laneName.${laneId}`, fallback)
 }

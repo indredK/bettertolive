@@ -17,6 +17,8 @@ import type {
   ReflectionModuleData,
   RelationshipsModuleData,
   ShoppingModuleData,
+  ShoppingOwnedStatus,
+  ShoppingStage,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
@@ -29,12 +31,12 @@ export type ShoppingOwnedItemForm = {
   system: string
   category: string
   spaces: string[]
-  stages: string[]
+  stages: ShoppingStage[]
   necessity: string
   lifecycle: string
   depreciation?: string | null
   quantity: number
-  status: string
+  status: ShoppingOwnedStatus
   replacementCue: string
   note: string
 }
@@ -46,7 +48,7 @@ export type ShoppingPlanItemForm = {
   system: string
   category: string
   spaces: string[]
-  stages: string[]
+  stages: ShoppingStage[]
   necessity: string
   lifecycle: string
   depreciation?: string | null
@@ -69,6 +71,19 @@ export type ShoppingPageContentForm = {
   summary?: string | null
   reason?: string | null
   body: string
+}
+
+export type ShoppingSystemDefinitionForm = {
+  id: string
+  cluster: string
+  summary: string
+  keyQuestion: string
+  secondaryGroups: string[]
+}
+
+export type ShoppingSpaceDefinitionForm = {
+  id?: string | null
+  name: string
 }
 
 export type ShoppingOwnedItemRow = {

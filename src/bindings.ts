@@ -19,6 +19,8 @@ export const commands = {
 	createShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("create_shopping_page_content", { form })),
 	updateShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
 	deleteShoppingPageContent: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_page_content", { id })),
+	createSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("create_system_definition", { form })),
+	updateSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("update_system_definition", { form })),
 	listPurchaseLanes: () => typedError<PurchaseLaneRow[], string>(__TAURI_INVOKE("list_purchase_lanes")),
 	reorderSystemDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_system_definitions", { orderedIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
@@ -177,6 +179,7 @@ export type ShoppingModuleDto = ShoppingModuleDto_Serialize | ShoppingModuleDto_
 
 export type ShoppingModuleDto_Deserialize = {
 	systemDefinitions: ShoppingSystemDefinitionDto[],
+	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
 	ownedItems: ShoppingOwnedItemDto_Deserialize[],
 	purchaseLanes: ShoppingPurchaseLaneDto_Deserialize[],
@@ -188,6 +191,7 @@ export type ShoppingModuleDto_Deserialize = {
 
 export type ShoppingModuleDto_Serialize = {
 	systemDefinitions: ShoppingSystemDefinitionDto[],
+	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
 	ownedItems: ShoppingOwnedItemDto_Serialize[],
 	purchaseLanes: ShoppingPurchaseLaneDto_Serialize[],
@@ -287,6 +291,11 @@ export type ShoppingPurchaseLaneDto_Serialize = {
 	items: ShoppingPlanItemDto_Serialize[],
 };
 
+export type ShoppingSpaceDefinitionDto = {
+	id: string,
+	name: string,
+};
+
 export type ShoppingSpotlightDto = {
 	id: string,
 	title: string,
@@ -313,6 +322,14 @@ export type ShoppingStageChecklistSectionDto = {
 };
 
 export type ShoppingSystemDefinitionDto = {
+	id: string,
+	cluster: string,
+	summary: string,
+	keyQuestion: string,
+	secondaryGroups: string[],
+};
+
+export type SystemDefinitionFormDto = {
 	id: string,
 	cluster: string,
 	summary: string,

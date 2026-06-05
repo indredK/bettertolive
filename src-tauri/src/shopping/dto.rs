@@ -35,6 +35,13 @@ pub struct ShoppingSystemDefinitionDto {
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
+pub struct ShoppingSpaceDefinitionDto {
+    pub id: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
 pub struct ShoppingItemBaseDto {
     pub system: ShoppingSystem,
     pub category: String,
@@ -142,6 +149,7 @@ pub struct ShoppingLifestyleCollectionDto {
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingModuleDto {
     pub system_definitions: Vec<ShoppingSystemDefinitionDto>,
+    pub space_definitions: Vec<ShoppingSpaceDefinitionDto>,
     pub spotlights: Vec<ShoppingSpotlightDto>,
     pub owned_items: Vec<ShoppingOwnedItemDto>,
     pub purchase_lanes: Vec<ShoppingPurchaseLaneDto>,

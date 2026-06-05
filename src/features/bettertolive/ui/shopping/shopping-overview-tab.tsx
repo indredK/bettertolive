@@ -24,6 +24,8 @@ import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/s
 import {
   type ShoppingLifecycleGroups,
   getOverviewDimensions,
+  laneDisplayName,
+  stageLikeDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   BoundaryTable,
@@ -32,6 +34,9 @@ import {
   LifecycleLane,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { cn } from "@/lib/utils"
+
+const SHOPPING_SEGMENT_TRIGGER_CLASSNAME =
+  "h-8 rounded-md border border-transparent bg-transparent px-3 text-xs text-[color:var(--text-muted)] shadow-none transition-colors data-active:border-[color:var(--muted-surface-border)] data-active:bg-[color:var(--surface-bg)] data-active:text-[color:var(--text-primary)] data-active:shadow-none"
 
 function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) {
   const { t } = useTranslation()
@@ -108,7 +113,7 @@ function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) 
                     variant="outline"
                     className="shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
                   >
-                    {spotlight.stage}
+                    {stageLikeDisplayName(spotlight.stage, t)}
                   </Badge>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
@@ -238,13 +243,13 @@ export function ShoppingOverviewTab({
 
             <Tabs defaultValue="classification" className="mt-5 min-h-0 gap-4">
               <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
-                <TabsTrigger value="classification" className="h-8 px-3 text-xs">
+                <TabsTrigger value="classification" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                   {t("shopping.overview.dimensions")}
                 </TabsTrigger>
-                <TabsTrigger value="collections" className="h-8 px-3 text-xs">
+                <TabsTrigger value="collections" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                   {t("shopping.overview.lifestyle")}
                 </TabsTrigger>
-                <TabsTrigger value="boundary" className="h-8 px-3 text-xs">
+                <TabsTrigger value="boundary" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                   {t("shopping.overview.boundary")}
                 </TabsTrigger>
               </TabsList>
@@ -358,13 +363,13 @@ export function ShoppingOverviewTab({
             className="mt-5 min-h-0 flex-1 gap-4 overflow-hidden"
           >
             <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
-              <TabsTrigger value="fast-depreciation" className="h-8 px-3 text-xs">
+              <TabsTrigger value="fast-depreciation" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                 {t("shopping.overview.highDepreciation")}
               </TabsTrigger>
-              <TabsTrigger value="buy-slowly" className="h-8 px-3 text-xs">
+              <TabsTrigger value="buy-slowly" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                 {t("shopping.overview.buySlowly")}
               </TabsTrigger>
-              <TabsTrigger value="overlooked" className="h-8 px-3 text-xs">
+              <TabsTrigger value="overlooked" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
                 {t("shopping.overview.essentials")}
               </TabsTrigger>
             </TabsList>
@@ -379,7 +384,7 @@ export function ShoppingOverviewTab({
                     <CompactItemRow
                       key={item.id}
                       item={item}
-                      sourceLabel={item.laneTitle}
+                      sourceLabel={laneDisplayName(item.laneId, item.laneTitle, t)}
                       compact
                       onEditPlan={isManagementMode ? onEditPlan : undefined}
                     />
@@ -399,7 +404,7 @@ export function ShoppingOverviewTab({
                     <CompactItemRow
                       key={item.id}
                       item={item}
-                      sourceLabel={item.laneTitle}
+                      sourceLabel={laneDisplayName(item.laneId, item.laneTitle, t)}
                       compact
                       onEditPlan={isManagementMode ? onEditPlan : undefined}
                     />

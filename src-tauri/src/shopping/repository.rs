@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::shopping::dto::{
     ShoppingBoundaryEntryDto, ShoppingItemBaseDto, ShoppingLifestyleCollectionDto,
     ShoppingModuleDto, ShoppingOwnedItemDto, ShoppingPlanItemDto, ShoppingPriceReferenceDto,
-    ShoppingPurchaseLaneDto, ShoppingSpotlightDto, ShoppingStageChecklistDto,
-    ShoppingStageChecklistSectionDto, ShoppingSystemDefinitionDto,
+    ShoppingPurchaseLaneDto, ShoppingSpaceDefinitionDto, ShoppingSpotlightDto,
+    ShoppingStageChecklistDto, ShoppingStageChecklistSectionDto, ShoppingSystemDefinitionDto,
 };
 use crate::shopping::models::{
     OwnedItemRow, OwnedItemSpaceRow, OwnedItemStageRow, PageContentRow, PlanItemRow,
@@ -148,6 +148,40 @@ fn row_to_page_content(row: &rusqlite::Row) -> rusqlite::Result<PageContentRow> 
     })
 }
 
+fn ensure_unique_space_definition_title(
+    conn: &Connection,
+    current_id: Option<&str>,
+    title: Option<&str>,
+) -> Result<(), String> {
+    let Some(title) = title.map(str::trim).filter(|value| !value.is_empty()) else {
+        return Ok(());
+    };
+
+    let count: i64 = if let Some(id) = current_id {
+        conn.query_row(
+            "SELECT COUNT(*) FROM shopping_page_content
+             WHERE content_type = 'space_definition' AND title = ?1 AND id != ?2 AND is_enabled = 1",
+            params![title, id],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?
+    } else {
+        conn.query_row(
+            "SELECT COUNT(*) FROM shopping_page_content
+             WHERE content_type = 'space_definition' AND title = ?1 AND is_enabled = 1",
+            params![title],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?
+    };
+
+    if count > 0 {
+        return Err("Space definition title already exists".to_string());
+    }
+
+    Ok(())
+}
+
 impl ShoppingRepository {
     // =====================
     // Legacy: get_shopping_module (kept for backward compatibility)
@@ -176,6 +210,7 @@ impl ShoppingRepository {
     pub fn get_shopping_module_aggregated(conn: &Connection) -> Result<ShoppingModuleDto, String> {
         Ok(ShoppingModuleDto {
             system_definitions: Self::get_all_system_definitions(conn)?,
+            space_definitions: Self::get_all_space_definitions(conn)?,
             spotlights: Self::get_all_spotlights(conn)?,
             owned_items: Self::get_all_owned_items_aggregated(conn)?,
             purchase_lanes: Self::get_all_purchase_lanes_aggregated(conn)?,
@@ -214,6 +249,30 @@ impl ShoppingRepository {
                 key_question: r.key_question,
                 secondary_groups,
             });
+        }
+        Ok(result)
+    }
+
+    pub fn get_all_space_definitions(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingSpaceDefinitionDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at
+                 FROM shopping_page_content WHERE content_type = 'space_definition' AND is_enabled = 1 ORDER BY sort_order",
+            )
+            .map_err(|e| e.to_string())?;
+
+        let rows = stmt
+            .query_map([], row_to_page_content)
+            .map_err(|e| e.to_string())?;
+
+        let mut result = Vec::new();
+        for row in rows {
+            let r = row.map_err(|e| e.to_string())?;
+            if let Some(name) = r.title.filter(|title| !title.trim().is_empty()) {
+                result.push(ShoppingSpaceDefinitionDto { id: r.id, name });
+            }
         }
         Ok(result)
     }
@@ -1252,9 +1311,21 @@ impl ShoppingRepository {
         body_json: &str,
         now: &str,
     ) -> Result<(), String> {
+        if content_type == "space_definition" {
+            ensure_unique_space_definition_title(conn, None, title)?;
+        }
+
+        let sort_order: i32 = conn
+            .query_row(
+                "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM shopping_page_content WHERE content_type = ?1",
+                params![content_type],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+
         conn.execute(
             "INSERT INTO shopping_page_content (id, content_type, title, stage, system_id, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, 0, 1, ?9, ?10)",
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, 1, ?10, ?11)",
             params![
                 id,
                 content_type,
@@ -1264,6 +1335,7 @@ impl ShoppingRepository {
                 summary,
                 reason,
                 body_json,
+                sort_order,
                 now,
                 now,
             ],
@@ -1285,6 +1357,10 @@ impl ShoppingRepository {
         body_json: &str,
         now: &str,
     ) -> Result<(), String> {
+        if content_type == "space_definition" {
+            ensure_unique_space_definition_title(conn, Some(id), title)?;
+        }
+
         conn.execute(
             "UPDATE shopping_page_content SET content_type=?1, title=?2, stage=?3, system_id=?4, summary=?5, reason=?6, body_json=?7, updated_at=?8
              WHERE id=?9",
@@ -1314,6 +1390,68 @@ impl ShoppingRepository {
     }
 
     // ---- Reordering ----
+
+    pub fn update_system_definition(
+        conn: &Connection,
+        id: &str,
+        cluster: &str,
+        summary: &str,
+        key_question: &str,
+        secondary_groups: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        conn.execute(
+            "UPDATE shopping_system_definitions
+             SET cluster = ?1, summary = ?2, key_question = ?3, secondary_groups_json = ?4, updated_at = ?5
+             WHERE id = ?6",
+            params![
+                cluster,
+                summary,
+                key_question,
+                serde_json::to_string(secondary_groups).map_err(|e| e.to_string())?,
+                now,
+                id,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn create_system_definition(
+        conn: &Connection,
+        id: &str,
+        cluster: &str,
+        summary: &str,
+        key_question: &str,
+        secondary_groups: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        let sort_order: i32 = conn
+            .query_row(
+                "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM shopping_system_definitions",
+                [],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+
+        conn.execute(
+            "INSERT INTO shopping_system_definitions
+             (id, cluster, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+            params![
+                id,
+                cluster,
+                summary,
+                key_question,
+                serde_json::to_string(secondary_groups).map_err(|e| e.to_string())?,
+                sort_order,
+                now,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
 
     pub fn reorder_system_definitions(
         conn: &Connection,
