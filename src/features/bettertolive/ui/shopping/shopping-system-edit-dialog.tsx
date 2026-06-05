@@ -1,5 +1,5 @@
 import { Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
 
@@ -17,15 +17,28 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   createSystemDefinition,
   deleteSystemDefinition,
+  updateOwnedItem,
+  updatePlanItem,
   updateSystemDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
+import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
-import type { ShoppingSystemOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
+import { ShoppingItemShuttle } from "@/features/bettertolive/ui/shopping/shopping-item-shuttle"
+import type {
+  ShoppingPlanWithLane,
+  ShoppingSystemOverview,
+} from "@/features/bettertolive/ui/shopping/shopping-types"
 import { systemDisplayName } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
 type EditingState = {
   isNew: boolean
   system: ShoppingSystemOverview | null
+}
+
+// 系统编辑对话框接受全量物品池作为穿梭框候选 — 见方案 §3
+export type SystemDialogAllItems = {
+  owned: ShoppingOwnedItem[]
+  plan: ShoppingPlanWithLane[]
 }
 
 type FormState = {
@@ -34,6 +47,7 @@ type FormState = {
   summary: string
   keyQuestion: string
   secondaryGroupsText: string
+  selectedItemIds: string[]
 }
 
 const SYSTEM_LIMITS = {
@@ -46,19 +60,26 @@ const SYSTEM_LIMITS = {
 
 function parseGroups(value: string): string[] {
   return value
-    .split(/[，,]/)
+    .split(/[,,]/)
     .map((item) => item.trim())
     .filter(Boolean)
 }
 
-function buildForm(editing: EditingState): FormState {
+function buildForm(editing: EditingState, allItems: SystemDialogAllItems): FormState {
   if (!editing.isNew && editing.system) {
+    const systemId = editing.system.id
+    // 初始选中:任何 system 字段等于本系统的物品
+    const selectedIds = [
+      ...allItems.owned.filter((item) => item.system === systemId).map((item) => item.id),
+      ...allItems.plan.filter((item) => item.system === systemId).map((item) => item.id),
+    ]
     return {
       isNew: false,
-      id: editing.system.id,
+      id: systemId,
       summary: editing.system.summary,
       keyQuestion: editing.system.keyQuestion,
       secondaryGroupsText: editing.system.secondaryGroups.join(", "),
+      selectedItemIds: selectedIds,
     }
   }
 
@@ -68,6 +89,7 @@ function buildForm(editing: EditingState): FormState {
     summary: "",
     keyQuestion: "",
     secondaryGroupsText: "",
+    selectedItemIds: [],
   }
 }
 
@@ -81,17 +103,19 @@ const schema = z.object({
 export function ShoppingSystemEditDialog({
   editing,
   existingSystemIds,
+  allItems,
   onClose,
   onSaved,
 }: {
   editing: EditingState | null
   existingSystemIds: string[]
+  allItems: SystemDialogAllItems
   onClose: () => void
   onSaved: () => void
 }) {
   if (!editing) return null
 
-  const initialForm = buildForm(editing)
+  const initialForm = buildForm(editing, allItems)
 
   const dialogKey = editing.isNew ? "new-system" : editing.system?.id
 
@@ -106,6 +130,7 @@ export function ShoppingSystemEditDialog({
       <SystemDialogContent
         initialForm={initialForm}
         existingSystemIds={existingSystemIds}
+        allItems={allItems}
         onClose={onClose}
         onSaved={onSaved}
       />
@@ -116,11 +141,13 @@ export function ShoppingSystemEditDialog({
 function SystemDialogContent({
   initialForm,
   existingSystemIds,
+  allItems,
   onClose,
   onSaved,
 }: {
   initialForm: FormState
   existingSystemIds: string[]
+  allItems: SystemDialogAllItems
   onClose: () => void
   onSaved: () => void
 }) {
@@ -132,6 +159,28 @@ function SystemDialogContent({
   const update = (partial: Partial<FormState>) => {
     setForm((prev) => ({ ...prev, ...partial }))
   }
+
+  // 穿梭框候选 — 所有物品。提示当前归属系统
+  const shuttleCandidates = useMemo(
+    () => [
+      ...allItems.owned.map((item) => ({
+        id: item.id,
+        name: item.name,
+        hint: item.system ? systemDisplayName(item.system, t) : undefined,
+      })),
+      ...allItems.plan.map((item) => ({
+        id: item.id,
+        name: item.name,
+        hint: item.system ? systemDisplayName(item.system, t) : undefined,
+      })),
+    ],
+    [allItems, t],
+  )
+
+  const initialSelectedSet = useMemo(
+    () => new Set(initialForm.selectedItemIds),
+    [initialForm.selectedItemIds],
+  )
 
   async function handleSave() {
     try {
@@ -183,11 +232,50 @@ function SystemDialogContent({
         secondaryGroups: groups,
       }
 
+      // 1. 写系统定义
       if (form.isNew) {
         await createSystemDefinition(payload)
       } else {
         await updateSystemDefinition(payload)
       }
+
+      // 2. 处理物品归属变化(set-only 策略:勾选 = 把物品 system 改成本系统,取消勾选 = 不动)
+      //    见方案 §3 — 每个物品至少要属于一个系统,因此取消选中不会清空 system 字段
+      const ownedById = new Map(allItems.owned.map((item) => [item.id, item]))
+      const planById = new Map(allItems.plan.map((item) => [item.id, item]))
+      const tasks: Promise<unknown>[] = []
+      for (const id of form.selectedItemIds) {
+        const wasIn = initialSelectedSet.has(id)
+        if (wasIn) continue // 已经属于本系统,不动
+
+        const ownedItem = ownedById.get(id)
+        if (ownedItem && ownedItem.system !== nextId) {
+          tasks.push(
+            updateOwnedItem({
+              ...ownedItem,
+              depreciation: ownedItem.depreciation ?? null,
+              system: nextId,
+            }),
+          )
+          continue
+        }
+        const planItem = planById.get(id)
+        if (planItem && planItem.system !== nextId) {
+          tasks.push(
+            updatePlanItem({
+              ...planItem,
+              laneId: planItem.laneId,
+              depreciation: planItem.depreciation ?? null,
+              currentPrice: planItem.currentPrice ?? null,
+              buyBelowPrice: planItem.buyBelowPrice ?? null,
+              overpayPrice: planItem.overpayPrice ?? null,
+              system: nextId,
+            }),
+          )
+        }
+      }
+
+      await Promise.all(tasks)
 
       onClose()
       onSaved()
@@ -216,7 +304,7 @@ function SystemDialogContent({
   }
 
   return (
-    <DialogContent className="flex max-h-[min(90vh,760px)] flex-col sm:max-w-2xl">
+    <DialogContent className="flex max-h-[min(90vh,860px)] flex-col sm:max-w-3xl">
       <DialogHeader>
         <DialogTitle>
           {form.isNew
@@ -230,7 +318,7 @@ function SystemDialogContent({
         </DialogDescription>
       </DialogHeader>
 
-      <div className="min-h-0 overflow-y-auto pr-1">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
         <div className="space-y-4">
           {error ? (
             <div className="rounded-lg border border-red-200 bg-red-50/90 px-4 py-3 text-sm text-red-800">
@@ -277,6 +365,21 @@ function SystemDialogContent({
               onChange={(event) => update({ secondaryGroupsText: event.target.value })}
               maxLength={SYSTEM_LIMITS.group * SYSTEM_LIMITS.groups + SYSTEM_LIMITS.groups * 2}
               rows={3}
+            />
+          </FormField>
+
+          {/* 穿梭框 — 把别处的物品挪到本系统(set-only:取消选中 = 无动作,物品仍归原系统) */}
+          <FormField
+            label={t("shopping.systems.form.assignItems")}
+            description={t("shopping.systems.form.assignItemsHelp")}
+          >
+            <ShoppingItemShuttle
+              candidates={shuttleCandidates}
+              selectedIds={form.selectedItemIds}
+              onChange={(nextIds) => update({ selectedItemIds: nextIds })}
+              leftTitle={t("shopping.shuttle.candidates")}
+              rightTitle={t("shopping.shuttle.selected")}
+              note={t("shopping.shuttle.systemAssignNote")}
             />
           </FormField>
         </div>

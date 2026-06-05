@@ -391,7 +391,7 @@ impl ShoppingRepository {
                         category: r.category,
                         spaces,
                         stages,
-                        necessity: r.necessity,
+                        // 注:DB 列 necessity 仍存在,但 DTO 不再暴露给前端
                         lifecycle: r.lifecycle,
                         depreciation: r.depreciation,
                     },
@@ -457,10 +457,10 @@ impl ShoppingRepository {
                 .collect());
         }
 
-        // 3. Batch-load all spaces, stages, tags, keywords for all plan items
+        // 3. Batch-load all spaces, stages, keywords for all plan items
+        // 注:tags 表内的 'tag' 类型数据保留但不再读取(物品的标签由 system/spaces/stages 在显示层渲染)
         let spaces_map = Self::batch_load_plan_item_spaces(conn)?;
         let stages_map = Self::batch_load_plan_item_stages(conn)?;
-        let tags_map = Self::batch_load_plan_item_tags_by_type(conn, "tag")?;
         let keywords_map = Self::batch_load_plan_item_tags_by_type(conn, "keyword")?;
 
         // 4. Build plan item DTOs and group by lane_id
@@ -468,7 +468,6 @@ impl ShoppingRepository {
         for r in plan_items {
             let spaces = spaces_map.get(&r.id).cloned().unwrap_or_default();
             let stages = stages_map.get(&r.id).cloned().unwrap_or_default();
-            let tags = tags_map.get(&r.id).cloned().unwrap_or_default();
             let keywords = keywords_map.get(&r.id).cloned().unwrap_or_default();
             let dto = ShoppingPlanItemDto {
                 base: ShoppingItemBaseDto {
@@ -476,7 +475,7 @@ impl ShoppingRepository {
                     category: r.category,
                     spaces,
                     stages,
-                    necessity: r.necessity,
+                    // 注:DB 列 necessity 仍存在,但 DTO 不再暴露给前端
                     lifecycle: r.lifecycle,
                     depreciation: r.depreciation,
                 },
@@ -488,7 +487,6 @@ impl ShoppingRepository {
                 buy_below_price: r.buy_below_price,
                 overpay_price: r.overpay_price,
                 note: r.note,
-                tags,
                 keywords,
             };
             plan_by_lane.entry(r.lane_id).or_default().push(dto);
@@ -695,7 +693,8 @@ impl ShoppingRepository {
                     a.iter()
                         .map(|s| ShoppingStageChecklistSectionDto {
                             system: s["system"].as_str().unwrap_or_default().to_string(),
-                            minimum: s["minimum"]
+                            // 注:新 shape — 各档位存物品 ID 数组
+                            minimum_item_ids: s["minimumItemIds"]
                                 .as_array()
                                 .map(|arr| {
                                     arr.iter()
@@ -703,7 +702,7 @@ impl ShoppingRepository {
                                         .collect()
                                 })
                                 .unwrap_or_default(),
-                            essentials: s["essentials"]
+                            essential_item_ids: s["essentialItemIds"]
                                 .as_array()
                                 .map(|arr| {
                                     arr.iter()
@@ -711,7 +710,7 @@ impl ShoppingRepository {
                                         .collect()
                                 })
                                 .unwrap_or_default(),
-                            upgrades: s["upgrades"]
+                            upgrade_item_ids: s["upgradeItemIds"]
                                 .as_array()
                                 .map(|arr| {
                                     arr.iter()
@@ -873,7 +872,7 @@ impl ShoppingRepository {
         name: &str,
         system_id: &str,
         category: &str,
-        necessity: &str,
+        // 注:necessity 参数已删除 — DB 列仍存在,这里硬写空串占位
         lifecycle: &str,
         depreciation: Option<&str>,
         quantity: i32,
@@ -892,7 +891,7 @@ impl ShoppingRepository {
                 name,
                 system_id,
                 category,
-                necessity,
+                "",
                 lifecycle,
                 depreciation,
                 quantity,
@@ -933,7 +932,7 @@ impl ShoppingRepository {
         name: &str,
         system_id: &str,
         category: &str,
-        necessity: &str,
+        // 注:necessity 参数已删除
         lifecycle: &str,
         depreciation: Option<&str>,
         quantity: i32,
@@ -945,13 +944,12 @@ impl ShoppingRepository {
         now: &str,
     ) -> Result<(), String> {
         conn.execute(
-            "UPDATE shopping_owned_items SET name=?1, system_id=?2, category=?3, necessity=?4, lifecycle=?5, depreciation=?6, quantity=?7, status=?8, replacement_cue=?9, note=?10, updated_at=?11
-             WHERE id=?12",
+            "UPDATE shopping_owned_items SET name=?1, system_id=?2, category=?3, lifecycle=?4, depreciation=?5, quantity=?6, status=?7, replacement_cue=?8, note=?9, updated_at=?10
+             WHERE id=?11",
             params![
                 name,
                 system_id,
                 category,
-                necessity,
                 lifecycle,
                 depreciation,
                 quantity,
@@ -1059,7 +1057,7 @@ impl ShoppingRepository {
         name: &str,
         system_id: &str,
         category: &str,
-        necessity: &str,
+        // 注:necessity 与 tags 参数已删除
         lifecycle: &str,
         depreciation: Option<&str>,
         reason: &str,
@@ -1070,7 +1068,6 @@ impl ShoppingRepository {
         note: &str,
         spaces: &[String],
         stages: &[String],
-        tags: &[String],
         keywords: &[String],
         now: &str,
     ) -> Result<(), String> {
@@ -1083,7 +1080,7 @@ impl ShoppingRepository {
                 name,
                 system_id,
                 category,
-                necessity,
+                "",
                 lifecycle,
                 depreciation,
                 reason,
@@ -1116,14 +1113,7 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
         }
 
-        for (i, tag) in tags.iter().enumerate() {
-            conn.execute(
-                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
-                 VALUES (?1, ?2, ?3, 'tag', ?4)",
-                params![format!("{}_tag_{}", id, i), id, tag, i as i32],
-            )
-            .map_err(|e| e.to_string())?;
-        }
+        // 注:tags 不再写入 — 物品的标签由 system/spaces/stages 在显示层渲染
 
         for (i, kw) in keywords.iter().enumerate() {
             conn.execute(
@@ -1145,7 +1135,7 @@ impl ShoppingRepository {
         name: &str,
         system_id: &str,
         category: &str,
-        necessity: &str,
+        // 注:necessity 与 tags 参数已删除
         lifecycle: &str,
         depreciation: Option<&str>,
         reason: &str,
@@ -1156,19 +1146,17 @@ impl ShoppingRepository {
         note: &str,
         spaces: &[String],
         stages: &[String],
-        tags: &[String],
         keywords: &[String],
         now: &str,
     ) -> Result<(), String> {
         conn.execute(
-            "UPDATE shopping_plan_items SET lane_id=?1, name=?2, system_id=?3, category=?4, necessity=?5, lifecycle=?6, depreciation=?7, reason=?8, target_lifestyle=?9, current_price=?10, buy_below_price=?11, overpay_price=?12, note=?13, updated_at=?14
-             WHERE id=?15",
+            "UPDATE shopping_plan_items SET lane_id=?1, name=?2, system_id=?3, category=?4, lifecycle=?5, depreciation=?6, reason=?7, target_lifestyle=?8, current_price=?9, buy_below_price=?10, overpay_price=?11, note=?12, updated_at=?13
+             WHERE id=?14",
             params![
                 lane_id,
                 name,
                 system_id,
                 category,
-                necessity,
                 lifecycle,
                 depreciation,
                 reason,
@@ -1194,8 +1182,9 @@ impl ShoppingRepository {
             params![id],
         )
         .map_err(|e| e.to_string())?;
+        // 注:仅清理 'keyword' 类型;'tag' 类型已停止维护,旧数据保留但不再读取
         conn.execute(
-            "DELETE FROM shopping_plan_item_tags WHERE plan_item_id = ?1",
+            "DELETE FROM shopping_plan_item_tags WHERE plan_item_id = ?1 AND tag_type = 'keyword'",
             params![id],
         )
         .map_err(|e| e.to_string())?;
@@ -1214,15 +1203,6 @@ impl ShoppingRepository {
                 "INSERT INTO shopping_plan_item_stages (id, plan_item_id, stage_name, sort_order)
                  VALUES (?1, ?2, ?3, ?4)",
                 params![format!("{}_stage_{}", id, i), id, stage, i as i32],
-            )
-            .map_err(|e| e.to_string())?;
-        }
-
-        for (i, tag) in tags.iter().enumerate() {
-            conn.execute(
-                "INSERT INTO shopping_plan_item_tags (id, plan_item_id, tag_value, tag_type, sort_order)
-                 VALUES (?1, ?2, ?3, 'tag', ?4)",
-                params![format!("{}_tag_{}", id, i), id, tag, i as i32],
             )
             .map_err(|e| e.to_string())?;
         }

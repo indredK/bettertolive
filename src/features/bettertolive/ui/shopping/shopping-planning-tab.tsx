@@ -9,37 +9,31 @@ import type { ShoppingModuleData } from "@/features/bettertolive/types"
 import type {
   ShoppingDepreciation,
   ShoppingLifecycle,
-  ShoppingNeedLevel,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import {
   DEPRECIATION_STYLES,
   LIFECYCLE_STYLES,
-  NEED_LEVEL_STYLES,
   depreciationDisplayName,
   formatPrice,
   getPriceSignal,
   laneDisplayName,
   lifecycleDisplayName,
-  needLevelDisplayName,
   SHOPPING_DEPRECIATION_OPTIONS,
   SHOPPING_LIFECYCLE_OPTIONS,
-  SHOPPING_NEED_LEVEL_OPTIONS,
-  stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   AddCard,
   ClassificationBadge,
+  ItemMetadataChips,
   ShoppingPriceRow,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import { cn } from "@/lib/utils"
 
 const ALL_DEPRECIATIONS: ShoppingDepreciation[] = SHOPPING_DEPRECIATION_OPTIONS
-
-const ALL_NECESSITIES: ShoppingNeedLevel[] = SHOPPING_NEED_LEVEL_OPTIONS
 
 const ALL_LIFECYCLES: ShoppingLifecycle[] = SHOPPING_LIFECYCLE_OPTIONS
 
@@ -100,11 +94,8 @@ function PlanItemRow({
           <span className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
             {item.name}
           </span>
-          <ClassificationBadge
-            label={needLevelDisplayName(item.necessity, t)}
-            className={cn("h-5 shrink-0 text-[10px]", NEED_LEVEL_STYLES[item.necessity])}
-          />
         </div>
+        {/* 物品物理属性 + 价格信号 */}
         <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
           <ClassificationBadge
             label={lifecycleDisplayName(item.lifecycle, t)}
@@ -121,9 +112,9 @@ function PlanItemRow({
             className={cn("h-5 shrink-0 text-[10px]", signal.className)}
           />
         </div>
+        {/* 归属标签:三行不同颜色 */}
+        <ItemMetadataChips item={item} compact />
         <div className="flex min-w-0 items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
-          <span>{systemDisplayName(item.system, t)}</span>
-          <span>·</span>
           <span className="truncate">{formatPrice(item.currentPrice)}</span>
         </div>
       </button>
@@ -177,10 +168,7 @@ function PlanItemDetail({
             ) : null}
           </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
-            <ClassificationBadge
-              label={needLevelDisplayName(item.necessity, t)}
-              className={NEED_LEVEL_STYLES[item.necessity]}
-            />
+            {/* 物品物理属性 + 价格信号(归属信息走下面的 ItemMetadataChips) */}
             <ClassificationBadge
               label={lifecycleDisplayName(item.lifecycle, t)}
               className={LIFECYCLE_STYLES[item.lifecycle]}
@@ -193,11 +181,12 @@ function PlanItemDetail({
             ) : null}
             <ClassificationBadge label={signal.label} className={signal.className} />
           </div>
+          {/* 归属标签:三行不同颜色 — 系统(蓝)/ 空间(绿)/ 阶段(紫) */}
+          <div className="mt-2">
+            <ItemMetadataChips item={item} />
+          </div>
           <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[13px] text-[color:var(--text-muted)]">
-            <span>{systemDisplayName(item.system, t)}</span>
             <span>{item.category}</span>
-            <span>{item.spaces.join(" / ")}</span>
-            <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
           </div>
         </div>
 
@@ -263,7 +252,7 @@ function PlanItemDetail({
           </div>
         ) : null}
 
-        {/* Tags */}
+        {/* Tags — 现在只剩 lane + targetLifestyle;归属标签由上方的 ItemMetadataChips 承担 */}
         <div className="p-5">
           <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
             {t("shopping.planning.relatedTags")}
@@ -281,15 +270,6 @@ function PlanItemDetail({
             >
               {item.targetLifestyle}
             </Badge>
-            {item.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-              >
-                {tag}
-              </Badge>
-            ))}
           </div>
 
           {/* Keywords */}
@@ -341,7 +321,7 @@ export function ShoppingPlanningTab({
   const [filterSystem, setFilterSystem] = useState<ShoppingSystem | typeof ALL_SYSTEM_FILTER>(
     ALL_SYSTEM_FILTER,
   )
-  const [filterNecessity, setFilterNecessity] = useState<ShoppingNeedLevel | "all">("all")
+  // 注:filterNecessity 已删除 — 物品不再有 necessity 字段
   const [filterLifecycle, setFilterLifecycle] = useState<ShoppingLifecycle | "all">("all")
   const systemOptions = useMemo(
     () =>
@@ -358,24 +338,20 @@ export function ShoppingPlanningTab({
     return planItems.filter((item) => {
       if (filterDepreciation !== "all" && item.depreciation !== filterDepreciation) return false
       if (filterSystem !== ALL_SYSTEM_FILTER && item.system !== filterSystem) return false
-      if (filterNecessity !== "all" && item.necessity !== filterNecessity) return false
       if (filterLifecycle !== "all" && item.lifecycle !== filterLifecycle) return false
       return true
     })
-  }, [planItems, filterDepreciation, filterSystem, filterNecessity, filterLifecycle])
+  }, [planItems, filterDepreciation, filterSystem, filterLifecycle])
 
   const selectedItem = planItems.find((item) => item.id === selectedItemId) ?? null
 
   const hasActiveFilters =
-    filterDepreciation !== "all" ||
-    filterSystem !== ALL_SYSTEM_FILTER ||
-    filterNecessity !== "all" ||
-    filterLifecycle !== "all"
+    filterDepreciation !== "all" || filterSystem !== ALL_SYSTEM_FILTER || filterLifecycle !== "all"
 
   const clearFilters = () => {
     setFilterDepreciation("all")
     setFilterSystem(ALL_SYSTEM_FILTER)
-    setFilterNecessity("all")
+    // 注:filterNecessity 已删除
     setFilterLifecycle("all")
   }
 
@@ -458,27 +434,7 @@ export function ShoppingPlanningTab({
                 </div>
               </div>
 
-              {/* Necessity */}
-              <div>
-                <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-                  {t("shopping.planning.necessity")}
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  <FilterChip
-                    label={t("shopping.planning.all")}
-                    isSelected={filterNecessity === "all"}
-                    onClick={() => setFilterNecessity("all")}
-                  />
-                  {ALL_NECESSITIES.map((n) => (
-                    <FilterChip
-                      key={n}
-                      label={needLevelDisplayName(n, t)}
-                      isSelected={filterNecessity === n}
-                      onClick={() => setFilterNecessity(n)}
-                    />
-                  ))}
-                </div>
-              </div>
+              {/* 注:Necessity filter 已删除 — 物品不再有 necessity 字段 */}
 
               {/* Lifecycle */}
               <div>

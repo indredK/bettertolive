@@ -195,6 +195,8 @@
         "keyQuestion": "Core Question",
         "secondaryGroups": "Secondary Groups",
         "secondaryGroupsHelp": "Separate multiple secondary groups with commas",
+        "assignItems": "Items under this system",
+        "assignItemsHelp": "Pick items that belong to this system. Unchecking does not detach from their existing system.",
         "cancel": "Cancel",
         "save": "Save"
       }
@@ -216,6 +218,8 @@
       "noSpaceData": "No space data under current filter.",
       "form": {
         "name": "Space Name",
+        "assignItems": "Items in this space",
+        "assignItemsHelp": "Pick items that belong to this space. Checking adds the space; unchecking removes the space from the item.",
         "cancel": "Cancel",
         "save": "Save"
       },
@@ -257,12 +261,17 @@
         "focus": "Focus",
         "focusPlaceholder": "What needs the most attention in this stage",
         "sections": "System Checklist",
-        "sectionsHelp": "Maintain minimum, essentials, and upgrades under each system",
+        "sectionsHelp": "Pick minimum / essentials / upgrade items from each system",
         "addSection": "Add System",
         "addItem": "Add Item",
         "itemPlaceholder": "Enter one item",
+        "confirmSystemReset": "Changing the system will clear the picked items. Continue?",
         "cancel": "Cancel",
         "save": "Save"
+      },
+      "itemPicker": {
+        "noItemsForSystem": "No items under this system yet. Create them on the Purchase Decisions tab.",
+        "unresolved": "(item deleted or not found)"
       }
     },
     "planning": {
@@ -302,6 +311,18 @@
       },
       "relatedReminders": "Related Reminders",
       "noItemsInLayer": "No items in this layer for the current stage."
+    },
+    "shuttle": {
+      "candidates": "Candidates",
+      "selected": "Selected",
+      "search": "Search items",
+      "empty": "No candidates",
+      "noSelected": "None selected",
+      "addAll": "Add all",
+      "addChecked": "Add checked",
+      "removeChecked": "Remove checked",
+      "removeAll": "Remove all",
+      "systemAssignNote": "Check = assign the item to this system. Uncheck = no-op (item stays under its existing system; pick it in another system's dialog)"
     },
     "admin": {
       "itemsManagement": "Item Management",

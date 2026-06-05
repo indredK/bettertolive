@@ -132,7 +132,7 @@ export type ShoppingItemBase = {
   category: string
   spaces: string[]
   stages: ShoppingStage[]
-  necessity: ShoppingNeedLevel
+  // 注:necessity 字段已迁移到阶段模板的档位(最低/基础/升级),物品本身不再持有
   lifecycle: ShoppingLifecycle
   depreciation?: ShoppingDepreciation
 }
@@ -155,7 +155,7 @@ export type ShoppingPlanItem = ShoppingItemBase & {
   buyBelowPrice: number
   overpayPrice: number
   note: string
-  tags: string[]
+  // 注:tags 字段已删除 — 物品的标签由 system/spaces/stages 三字段在显示层渲染
   keywords: string[]
 }
 
@@ -168,9 +168,10 @@ export type ShoppingPurchaseLane = {
 
 export type ShoppingStageChecklistSection = {
   system: ShoppingSystem
-  minimum: string[]
-  essentials: string[]
-  upgrades: string[]
+  // 注:各档位现在存物品 ID 数组(指向 owned 或 plan item),不再是手写文本
+  minimumItemIds: string[]
+  essentialItemIds: string[]
+  upgradeItemIds: string[]
 }
 
 export type ShoppingStageChecklist = {

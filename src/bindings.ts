@@ -34,7 +34,6 @@ export type OwnedItemFormDto = {
 	category: string,
 	spaces: string[],
 	stages: string[],
-	necessity: string,
 	lifecycle: string,
 	depreciation: string | null,
 	quantity: number,
@@ -95,7 +94,6 @@ export type PlanItemFormDto = {
 	category: string,
 	spaces: string[],
 	stages: string[],
-	necessity: string,
 	lifecycle: string,
 	depreciation: string | null,
 	reason: string,
@@ -104,7 +102,6 @@ export type PlanItemFormDto = {
 	buyBelowPrice: number | null,
 	overpayPrice: number | null,
 	note: string,
-	tags: string[],
 	keywords: string[],
 };
 
@@ -143,7 +140,6 @@ export type ShoppingItemBaseDto_Deserialize = {
 	category: string,
 	spaces: string[],
 	stages: string[],
-	necessity: string,
 	lifecycle: string,
 	depreciation: string | null,
 };
@@ -153,7 +149,6 @@ export type ShoppingItemBaseDto_Serialize = {
 	category: string,
 	spaces: string[],
 	stages: string[],
-	necessity: string,
 	lifecycle: string,
 	depreciation?: string | null,
 };
@@ -222,7 +217,6 @@ export type ShoppingPlanItemDto_Deserialize = {
 	buyBelowPrice: number | null,
 	overpayPrice: number | null,
 	note: string,
-	tags: string[],
 	keywords: string[],
 } & ShoppingItemBaseDto_Deserialize;
 
@@ -235,7 +229,6 @@ export type ShoppingPlanItemDto_Serialize = {
 	buyBelowPrice: number | null,
 	overpayPrice: number | null,
 	note: string,
-	tags: string[],
 	keywords: string[],
 } & ShoppingItemBaseDto_Serialize;
 
@@ -306,9 +299,9 @@ export type ShoppingStageChecklistDto = {
 
 export type ShoppingStageChecklistSectionDto = {
 	system: string,
-	minimum: string[],
-	essentials: string[],
-	upgrades: string[],
+	minimumItemIds?: string[],
+	essentialItemIds?: string[],
+	upgradeItemIds?: string[],
 };
 
 export type ShoppingSystemDefinitionDto = {

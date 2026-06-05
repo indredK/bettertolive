@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -14,6 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import {
   updatePageContent,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import type {
+  ShoppingOwnedItem,
   ShoppingStageChecklist,
   ShoppingStageChecklistSection,
   ShoppingStage,
@@ -40,6 +42,14 @@ import {
   stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
+import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
+import { cn } from "@/lib/utils"
+
+// 阶段编辑对话框现在需要全量物品池(按系统过滤后作为各档位 picker 的候选)— 见方案 §5
+export type StageDialogAllItems = {
+  owned: ShoppingOwnedItem[]
+  plan: ShoppingPlanWithLane[]
+}
 
 type StageFormState = {
   isNew: boolean
@@ -56,8 +66,8 @@ const STAGE_LIMITS = {
   description: 240,
   focus: 240,
   sections: 16,
-  itemsPerGroup: 12,
-  itemLength: 60,
+  itemsPerGroup: 24,
+  // 注:itemLength 已删除 — 各档位现在存物品 ID 不是手写文本
 } as const
 
 function cleanFieldLabel(label: string) {
@@ -84,6 +94,15 @@ function buildStageSchema(t: TFunction, systemOptions: string[]) {
     focus: cleanFieldLabel(t("shopping.stages.form.focus")),
     sections: cleanFieldLabel(t("shopping.stages.form.sections")),
   }
+
+  const itemIdsArraySchema = (label: string) =>
+    z.array(z.string().trim().min(1)).max(
+      STAGE_LIMITS.itemsPerGroup,
+      t("shopping.validation.maxItems", {
+        field: label,
+        count: STAGE_LIMITS.itemsPerGroup,
+      }),
+    )
 
   return z.object({
     title: z
@@ -118,64 +137,9 @@ function buildStageSchema(t: TFunction, systemOptions: string[]) {
             .refine((value): value is ShoppingSystem => systemOptions.includes(value), {
               message: invalidOptionMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))),
             }),
-          minimum: z
-            .array(
-              z
-                .string()
-                .trim()
-                .min(1)
-                .max(
-                  STAGE_LIMITS.itemLength,
-                  maxLengthMessage(t, t("shopping.stages.table.minimum"), STAGE_LIMITS.itemLength),
-                ),
-            )
-            .max(
-              STAGE_LIMITS.itemsPerGroup,
-              t("shopping.validation.maxItems", {
-                field: t("shopping.stages.table.minimum"),
-                count: STAGE_LIMITS.itemsPerGroup,
-              }),
-            ),
-          essentials: z
-            .array(
-              z
-                .string()
-                .trim()
-                .min(1)
-                .max(
-                  STAGE_LIMITS.itemLength,
-                  maxLengthMessage(
-                    t,
-                    t("shopping.stages.table.essentials"),
-                    STAGE_LIMITS.itemLength,
-                  ),
-                ),
-            )
-            .max(
-              STAGE_LIMITS.itemsPerGroup,
-              t("shopping.validation.maxItems", {
-                field: t("shopping.stages.table.essentials"),
-                count: STAGE_LIMITS.itemsPerGroup,
-              }),
-            ),
-          upgrades: z
-            .array(
-              z
-                .string()
-                .trim()
-                .min(1)
-                .max(
-                  STAGE_LIMITS.itemLength,
-                  maxLengthMessage(t, t("shopping.stages.table.upgrades"), STAGE_LIMITS.itemLength),
-                ),
-            )
-            .max(
-              STAGE_LIMITS.itemsPerGroup,
-              t("shopping.validation.maxItems", {
-                field: t("shopping.stages.table.upgrades"),
-                count: STAGE_LIMITS.itemsPerGroup,
-              }),
-            ),
+          minimumItemIds: itemIdsArraySchema(t("shopping.stages.table.minimum")),
+          essentialItemIds: itemIdsArraySchema(t("shopping.stages.table.essentials")),
+          upgradeItemIds: itemIdsArraySchema(t("shopping.stages.table.upgrades")),
         }),
       )
       .min(1, requiredMessage(t, fields.sections))
@@ -195,7 +159,12 @@ function buildStageSchema(t: TFunction, systemOptions: string[]) {
           }
           usedSystems.add(section.system)
 
-          if (section.minimum.length + section.essentials.length + section.upgrades.length === 0) {
+          if (
+            section.minimumItemIds.length +
+              section.essentialItemIds.length +
+              section.upgradeItemIds.length ===
+            0
+          ) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
               path: [index],
@@ -210,9 +179,9 @@ function buildStageSchema(t: TFunction, systemOptions: string[]) {
 function createEmptySection(preferredSystem = ""): ShoppingStageChecklistSection {
   return {
     system: preferredSystem,
-    minimum: [""],
-    essentials: [],
-    upgrades: [],
+    minimumItemIds: [],
+    essentialItemIds: [],
+    upgradeItemIds: [],
   }
 }
 
@@ -241,21 +210,25 @@ function buildForm(
       checklist.sections.length > 0
         ? checklist.sections.map((section) => ({
             system: section.system,
-            minimum: section.minimum.length > 0 ? [...section.minimum] : [""],
-            essentials: [...section.essentials],
-            upgrades: [...section.upgrades],
+            // 字段缺失或老数据 → 默认为空数组
+            minimumItemIds: [...(section.minimumItemIds ?? [])],
+            essentialItemIds: [...(section.essentialItemIds ?? [])],
+            upgradeItemIds: [...(section.upgradeItemIds ?? [])],
           }))
         : [createEmptySection(systemOptions[0] ?? "")],
   }
 }
+
 export function ShoppingStageEditDialog({
   editing,
   systemOptions,
+  allItems,
   onClose,
   onSaved,
 }: {
   editing: { isNew: boolean; checklist: ShoppingStageChecklist | null } | null
   systemOptions: string[]
+  allItems: StageDialogAllItems
   onClose: () => void
   onSaved: () => void
 }) {
@@ -275,6 +248,7 @@ export function ShoppingStageEditDialog({
       <StageDialogContent
         initialForm={initialForm}
         systemOptions={systemOptions}
+        allItems={allItems}
         onClose={onClose}
         onSaved={onSaved}
       />
@@ -285,11 +259,13 @@ export function ShoppingStageEditDialog({
 function StageDialogContent({
   initialForm,
   systemOptions,
+  allItems,
   onClose,
   onSaved,
 }: {
   initialForm: StageFormState
   systemOptions: string[]
+  allItems: StageDialogAllItems
   onClose: () => void
   onSaved: () => void
 }) {
@@ -297,6 +273,22 @@ function StageDialogContent({
   const [form, setForm] = useState<StageFormState>(initialForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // 把全量物品按系统聚合,方便每个 section 拿 picker 候选
+  const itemsBySystem = useMemo(() => {
+    const map = new Map<string, Array<{ id: string; name: string }>>()
+    for (const item of allItems.owned) {
+      const list = map.get(item.system) ?? []
+      list.push({ id: item.id, name: item.name })
+      map.set(item.system, list)
+    }
+    for (const item of allItems.plan) {
+      const list = map.get(item.system) ?? []
+      list.push({ id: item.id, name: item.name })
+      map.set(item.system, list)
+    }
+    return map
+  }, [allItems])
 
   const update = (partial: Partial<StageFormState>) => {
     setForm((prev) => ({ ...prev, ...partial }))
@@ -338,39 +330,24 @@ function StageDialogContent({
     }))
   }
 
-  const addSectionItem = (
-    sectionIndex: number,
-    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
-  ) => {
-    updateSection(sectionIndex, (section) => ({
-      ...section,
-      [key]:
-        section[key].length >= STAGE_LIMITS.itemsPerGroup ? section[key] : [...section[key], ""],
-    }))
-  }
-
-  const updateSectionItem = (
-    sectionIndex: number,
-    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
-    itemIndex: number,
-    value: string,
-  ) => {
-    updateSection(sectionIndex, (section) => ({
-      ...section,
-      [key]: section[key].map((item, index) => (index === itemIndex ? value : item)),
-    }))
-  }
-
-  const removeSectionItem = (
-    sectionIndex: number,
-    key: keyof Pick<ShoppingStageChecklistSection, "minimum" | "essentials" | "upgrades">,
-    itemIndex: number,
-  ) => {
+  // 切换 section 的系统时,清空三档 ID 数组(旧系统的 ID 不再有效)
+  const changeSectionSystem = (sectionIndex: number, nextSystem: string) => {
     updateSection(sectionIndex, (section) => {
-      const nextItems = section[key].filter((_, index) => index !== itemIndex)
+      const hasAny =
+        section.minimumItemIds.length +
+          section.essentialItemIds.length +
+          section.upgradeItemIds.length >
+        0
+      if (hasAny) {
+        if (!window.confirm(t("shopping.stages.form.confirmSystemReset"))) {
+          return section
+        }
+      }
       return {
-        ...section,
-        [key]: key === "minimum" && nextItems.length === 0 ? [""] : nextItems,
+        system: nextSystem,
+        minimumItemIds: [],
+        essentialItemIds: [],
+        upgradeItemIds: [],
       }
     })
   }
@@ -397,11 +374,12 @@ function StageDialogContent({
         body: JSON.stringify({
           description: parsed.data.description,
           focus: parsed.data.focus,
+          // 新 shape:各档位存物品 ID 数组
           sections: parsed.data.sections.map((section) => ({
-            ...section,
-            minimum: section.minimum.map((item) => item.trim()).filter(Boolean),
-            essentials: section.essentials.map((item) => item.trim()).filter(Boolean),
-            upgrades: section.upgrades.map((item) => item.trim()).filter(Boolean),
+            system: section.system,
+            minimumItemIds: section.minimumItemIds,
+            essentialItemIds: section.essentialItemIds,
+            upgradeItemIds: section.upgradeItemIds,
           })),
         }),
       }
@@ -527,98 +505,73 @@ function StageDialogContent({
               </div>
 
               <div className="space-y-3">
-                {form.sections.map((section, sectionIndex) => (
-                  <div
-                    key={`${section.system}-${sectionIndex}`}
-                    className="rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-4"
-                  >
-                    <div className="mb-4 flex items-center justify-between gap-3">
-                      <div className="min-w-0 flex-1">
-                        <div className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">
-                          {t("shopping.stages.table.system")}
+                {form.sections.map((section, sectionIndex) => {
+                  const candidatesForSystem = itemsBySystem.get(section.system) ?? []
+                  return (
+                    <div
+                      key={`${section.system}-${sectionIndex}`}
+                      className="rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-4"
+                    >
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">
+                            {t("shopping.stages.table.system")}
+                          </div>
+                          <Select
+                            value={section.system}
+                            onValueChange={(value) =>
+                              changeSectionSystem(sectionIndex, value ?? "")
+                            }
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue>{systemDisplayName(section.system, t)}</SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                              {systemOptions.map((system) => (
+                                <SelectItem key={system} value={system}>
+                                  {systemDisplayName(system, t)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
-                        <Select
-                          value={section.system}
-                          onValueChange={(value) =>
-                            updateSection(sectionIndex, (current) => ({
-                              ...current,
-                              system: value as ShoppingSystem,
-                            }))
-                          }
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="mt-5 text-red-500 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => removeSection(sectionIndex)}
                         >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>{systemDisplayName(section.system, t)}</SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            {systemOptions.map((system) => (
-                              <SelectItem key={system} value={system}>
-                                {systemDisplayName(system, t)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          <Trash2 />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        className="mt-5 text-red-500 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => removeSection(sectionIndex)}
-                      >
-                        <Trash2 />
-                      </Button>
-                    </div>
 
-                    <div className="grid gap-4 md:grid-cols-3">
-                      {(
-                        [
-                          ["minimum", t("shopping.stages.table.minimum")],
-                          ["essentials", t("shopping.stages.table.essentials")],
-                          ["upgrades", t("shopping.stages.table.upgrades")],
-                        ] as const
-                      ).map(([key, label]) => (
-                        <div key={key} className="space-y-2">
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="text-xs font-medium text-[color:var(--text-secondary)]">
-                              {label}
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => addSectionItem(sectionIndex, key)}
-                              disabled={section[key].length >= STAGE_LIMITS.itemsPerGroup}
-                            >
-                              <Plus />
-                              {t("shopping.stages.form.addItem")}
-                            </Button>
-                          </div>
-
-                          <div className="space-y-2">
-                            {section[key].map((item, itemIndex) => (
-                              <div key={`${key}-${itemIndex}`} className="flex items-start gap-2">
-                                <Input
-                                  value={item}
-                                  onChange={(e) =>
-                                    updateSectionItem(sectionIndex, key, itemIndex, e.target.value)
-                                  }
-                                  maxLength={STAGE_LIMITS.itemLength}
-                                  placeholder={t("shopping.stages.form.itemPlaceholder")}
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="icon-sm"
-                                  className="text-[color:var(--text-muted)]"
-                                  onClick={() => removeSectionItem(sectionIndex, key, itemIndex)}
-                                >
-                                  <Trash2 />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                      {/* 三档 picker:从该系统下的物品中多选 */}
+                      <div className="grid gap-4 md:grid-cols-3">
+                        {(
+                          [
+                            ["minimumItemIds", t("shopping.stages.table.minimum")],
+                            ["essentialItemIds", t("shopping.stages.table.essentials")],
+                            ["upgradeItemIds", t("shopping.stages.table.upgrades")],
+                          ] as const
+                        ).map(([key, label]) => (
+                          <StageItemPickerColumn
+                            key={key}
+                            label={label}
+                            candidates={candidatesForSystem}
+                            value={section[key]}
+                            onChange={(nextIds) =>
+                              updateSection(sectionIndex, (current) => ({
+                                ...current,
+                                [key]: nextIds,
+                              }))
+                            }
+                            noItemsHint={t("shopping.stages.itemPicker.noItemsForSystem")}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -648,5 +601,61 @@ function StageDialogContent({
         </div>
       </DialogFooter>
     </DialogContent>
+  )
+}
+
+// 单档物品 picker — checkbox grid 样式,复用 StageMultiSelectField 的设计语言(见方案 §5)
+function StageItemPickerColumn({
+  label,
+  candidates,
+  value,
+  onChange,
+  noItemsHint,
+}: {
+  label: string
+  candidates: Array<{ id: string; name: string }>
+  value: string[]
+  onChange: (nextIds: string[]) => void
+  noItemsHint: string
+}) {
+  const valueSet = new Set(value)
+  return (
+    <div className="space-y-2">
+      <div className="text-xs font-medium text-[color:var(--text-secondary)]">{label}</div>
+      <div className="space-y-1">
+        {candidates.length === 0 ? (
+          <p className="text-[11px] leading-5 text-[color:var(--text-muted)]">{noItemsHint}</p>
+        ) : (
+          candidates.map((item) => {
+            const checked = valueSet.has(item.id)
+            return (
+              <Label
+                key={item.id}
+                className={cn(
+                  "flex min-h-9 cursor-pointer items-start rounded-md border px-2 py-1.5 text-[12px] leading-5 transition-colors",
+                  checked
+                    ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/35 text-[color:var(--text-primary)]"
+                    : "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)] hover:bg-[color:var(--muted-surface-bg)]",
+                )}
+              >
+                <input
+                  type="checkbox"
+                  checked={checked}
+                  onChange={(event) => {
+                    if (event.target.checked) {
+                      onChange([...value, item.id])
+                    } else {
+                      onChange(value.filter((id) => id !== item.id))
+                    }
+                  }}
+                  className="mt-0.5 size-3.5 rounded border-[color:var(--surface-border)]"
+                />
+                <span className="ml-2 truncate">{item.name}</span>
+              </Label>
+            )
+          })
+        )}
+      </div>
+    </div>
   )
 }

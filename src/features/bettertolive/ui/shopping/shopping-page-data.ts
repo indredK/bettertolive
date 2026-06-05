@@ -3,7 +3,6 @@ import type { ShoppingOwnedItem, ShoppingPlanItem } from "@/features/bettertoliv
 import {
   ShoppingDepreciation,
   ShoppingLifecycle,
-  ShoppingNeedLevel,
   ShoppingOwnedStatus,
   ShoppingStage,
   ShoppingSystem,
@@ -12,16 +11,15 @@ import i18next from "@/i18n/config"
 import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 
-export const NEED_LEVEL_STYLES: Record<ShoppingNeedLevel, string> = {
-  [ShoppingNeedLevel.MinimalConfig]:
-    "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
-  [ShoppingNeedLevel.Necessary]:
-    "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]",
-  [ShoppingNeedLevel.Comfortable]:
-    "border-[color:var(--tone-past-border)] bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]",
-  [ShoppingNeedLevel.HappinessBoost]:
-    "border-[color:var(--tone-future-border)] bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]",
-}
+// 注:NEED_LEVEL_STYLES 已删除 — 物品不再有 necessity 字段
+
+// 三类归属标签的样式(显示层) — 物品的标签由 system/spaces/stages 三字段在显示层渲染成三行不同颜色
+export const SYSTEM_CHIP_STYLE =
+  "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-200"
+export const SPACE_CHIP_STYLE =
+  "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200"
+export const STAGE_CHIP_STYLE =
+  "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200"
 
 export const LIFECYCLE_STYLES: Record<ShoppingLifecycle, string> = {
   [ShoppingLifecycle.Consumable]:
@@ -93,13 +91,6 @@ const SHOPPING_STAGE_ALIASES: Record<string, ShoppingStage> = {
   地下室: ShoppingStage.Basement,
 }
 
-export const SHOPPING_NEED_LEVEL_OPTIONS: ShoppingNeedLevel[] = [
-  ShoppingNeedLevel.MinimalConfig,
-  ShoppingNeedLevel.Necessary,
-  ShoppingNeedLevel.Comfortable,
-  ShoppingNeedLevel.HappinessBoost,
-]
-
 export const SHOPPING_LIFECYCLE_OPTIONS: ShoppingLifecycle[] = [
   ShoppingLifecycle.Consumable,
   ShoppingLifecycle.Durable,
@@ -145,10 +136,7 @@ export const FAST_DEPRECIATION = new Set<ShoppingDepreciation>([
   ShoppingDepreciation.VeryFast,
   ShoppingDepreciation.Fast,
 ])
-export const PRIORITY_LEVELS = new Set<ShoppingNeedLevel>([
-  ShoppingNeedLevel.MinimalConfig,
-  ShoppingNeedLevel.Necessary,
-])
+// 注:PRIORITY_LEVELS 已删除 — 物品不再有 necessity 字段
 
 const SYSTEM_ROW_ACTIVE_WEIGHT = 5 / 3
 const SYSTEM_ROW_NEIGHBOR_WEIGHT = 2 / 3
@@ -201,13 +189,7 @@ export function getOverviewDimensions(t: TFunction) {
       detail: t("shopping.dimensions.stage.detail"),
       cue: t("shopping.dimensions.stage.cue"),
     },
-    {
-      id: "necessity" as const,
-      title: "necessity",
-      answer: t("shopping.dimensions.necessity.answer"),
-      detail: t("shopping.dimensions.necessity.detail"),
-      cue: t("shopping.dimensions.necessity.cue"),
-    },
+    // 注:necessity 维度已删除 — 物品不再有 necessity 字段
     {
       id: "lifecycle" as const,
       title: "lifecycle",
@@ -356,10 +338,7 @@ export function stageLikeDisplayName(stage: string, t: TFunction): string {
   return normalizedStage
 }
 
-/** Translate a ShoppingNeedLevel value through i18n, falling back to the raw Chinese value. */
-export function needLevelDisplayName(level: ShoppingNeedLevel, t: TFunction): string {
-  return t(`shopping.enumNames.necessity.${level}`, level as string)
-}
+// 注:needLevelDisplayName 已删除 — 物品不再有 necessity 字段
 
 /** Translate a ShoppingLifecycle value through i18n, falling back to the raw Chinese value. */
 export function lifecycleDisplayName(lc: ShoppingLifecycle, t: TFunction): string {

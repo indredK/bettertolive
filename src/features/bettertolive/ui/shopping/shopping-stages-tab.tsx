@@ -32,11 +32,22 @@ import {
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
-function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageChecklist }) {
+function StageDetailGroupedTable({
+  checklist,
+  itemsById,
+}: {
+  checklist: ShoppingStageChecklist
+  // 物品 ID → 名字 的解析表。section 各档位现在存的是物品 ID;在这里 resolve 出名字渲染
+  itemsById: Map<string, { id: string; name: string }>
+}) {
   const { t } = useTranslation()
   const sectionCount = checklist.sections.length
   const totalItems = checklist.sections.reduce(
-    (sum, s) => sum + s.minimum.length + s.essentials.length + s.upgrades.length,
+    (sum, s) =>
+      sum +
+      (s.minimumItemIds?.length ?? 0) +
+      (s.essentialItemIds?.length ?? 0) +
+      (s.upgradeItemIds?.length ?? 0),
     0,
   )
 
@@ -77,9 +88,12 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
           <TableBody>
             {checklist.sections.flatMap((section) => {
               const groups = [
-                { label: t("shopping.stages.table.minimum"), items: section.minimum },
-                { label: t("shopping.stages.table.essentials"), items: section.essentials },
-                { label: t("shopping.stages.table.upgrades"), items: section.upgrades },
+                { label: t("shopping.stages.table.minimum"), ids: section.minimumItemIds ?? [] },
+                {
+                  label: t("shopping.stages.table.essentials"),
+                  ids: section.essentialItemIds ?? [],
+                },
+                { label: t("shopping.stages.table.upgrades"), ids: section.upgradeItemIds ?? [] },
               ]
 
               return groups.map((group, index) => (
@@ -96,11 +110,23 @@ function StageDetailGroupedTable({ checklist }: { checklist: ShoppingStageCheckl
                     {group.label}
                   </TableCell>
                   <TableCell className="align-top whitespace-normal">
-                    {group.items.length > 0 ? (
+                    {group.ids.length > 0 ? (
                       <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {group.items.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
+                        {group.ids.map((id) => {
+                          const item = itemsById.get(id)
+                          return (
+                            <li
+                              key={id}
+                              className={
+                                item
+                                  ? undefined
+                                  : "text-[color:var(--text-muted)] italic opacity-60"
+                              }
+                            >
+                              {item?.name ?? t("shopping.stages.itemPicker.unresolved")}
+                            </li>
+                          )
+                        })}
                       </ul>
                     ) : (
                       <span className="text-sm text-[color:var(--text-muted)]">—</span>
@@ -133,7 +159,10 @@ function StageMapCard({
   const sectionCount = checklist.sections.length
   const totalItems = checklist.sections.reduce(
     (sum, section) =>
-      sum + section.minimum.length + section.essentials.length + section.upgrades.length,
+      sum +
+      (section.minimumItemIds?.length ?? 0) +
+      (section.essentialItemIds?.length ?? 0) +
+      (section.upgradeItemIds?.length ?? 0),
     0,
   )
   const systemNames = checklist.sections.map((section) => section.system)
@@ -233,6 +262,7 @@ export function ShoppingStagesTab({
   selectedStageId,
   isFixedLayout,
   isManagementMode,
+  itemsById,
   onSelectStage,
   onEditStage,
   onAddNew,
@@ -242,6 +272,8 @@ export function ShoppingStagesTab({
   selectedStageId: string | null
   isFixedLayout: boolean
   isManagementMode?: boolean
+  // 物品 ID → 名字 的解析表(在 shopping-page.tsx 由 owned + plan 聚合)
+  itemsById: Map<string, { id: string; name: string }>
   onSelectStage: (stageId: string) => void
   onEditStage?: (checklist: ShoppingStageChecklist) => void
   onAddNew?: () => void
@@ -332,7 +364,7 @@ export function ShoppingStagesTab({
         {/* Right: Detail Panel */}
         <div className="min-h-0 overflow-hidden">
           {selectedChecklist ? (
-            <StageDetailGroupedTable checklist={selectedChecklist} />
+            <StageDetailGroupedTable checklist={selectedChecklist} itemsById={itemsById} />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
               <p className="text-sm text-[color:var(--text-muted)]">

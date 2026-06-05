@@ -32,7 +32,7 @@ export type ShoppingOwnedItemForm = {
   category: string
   spaces: string[]
   stages: ShoppingStage[]
-  necessity: string
+  // 注:已删除 necessity — 该信息由阶段模板的档位承载
   lifecycle: string
   depreciation?: string | null
   quantity: number
@@ -49,7 +49,7 @@ export type ShoppingPlanItemForm = {
   category: string
   spaces: string[]
   stages: ShoppingStage[]
-  necessity: string
+  // 注:已删除 necessity 与 tags — 物品的"标签"在显示层由 system/spaces/stages 渲染
   lifecycle: string
   depreciation?: string | null
   reason: string
@@ -58,7 +58,6 @@ export type ShoppingPlanItemForm = {
   buyBelowPrice: number | null
   overpayPrice: number | null
   note: string
-  tags: string[]
   keywords: string[]
 }
 
@@ -90,7 +89,7 @@ export type ShoppingOwnedItemRow = {
   name: string
   system_id: string
   category: string
-  necessity: string
+  // 注:DB 列 necessity 仍存在但已停止使用;Rust 端 struct 字段用 #[serde(default)] 容忍
   lifecycle: string
   depreciation: string | null
   quantity: number
@@ -109,7 +108,7 @@ export type ShoppingPlanItemRow = {
   name: string
   system_id: string
   category: string
-  necessity: string
+  // 注:DB 列 necessity/tags 仍存在但已停止使用
   lifecycle: string
   depreciation: string | null
   reason: string

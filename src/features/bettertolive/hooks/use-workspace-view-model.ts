@@ -24,24 +24,12 @@ function filterChecklistByQuery(
 
   const sections = checklist.sections
     .map((section) => {
+      // 注:旧文本字段(minimum/essentials/upgrades)已改为物品 ID 数组,
+      // 搜索匹配只看 section.system;其下的物品 ID 不参与文本匹配。
       if (matchesQuery(section.system)) {
         return section
       }
-
-      const minimum = section.minimum.filter((entry) => matchesQuery(entry))
-      const essentials = section.essentials.filter((entry) => matchesQuery(entry))
-      const upgrades = section.upgrades.filter((entry) => matchesQuery(entry))
-
-      if (minimum.length === 0 && essentials.length === 0 && upgrades.length === 0) {
-        return null
-      }
-
-      return {
-        ...section,
-        minimum,
-        essentials,
-        upgrades,
-      }
+      return null
     })
     .filter((section) => section !== null)
 
@@ -168,7 +156,6 @@ export function useWorkspaceViewModel({
           entry.category,
           ...entry.spaces,
           ...entry.stages,
-          entry.necessity,
           entry.lifecycle,
           entry.depreciation,
           entry.status,
@@ -189,7 +176,7 @@ export function useWorkspaceViewModel({
             entry.category,
             ...entry.stages,
             ...entry.spaces,
-            entry.necessity,
+            // 注:necessity 与 tags 字段已删除
             entry.lifecycle,
             entry.depreciation,
             entry.reason,
@@ -198,7 +185,7 @@ export function useWorkspaceViewModel({
             entry.buyBelowPrice,
             entry.overpayPrice,
             entry.note,
-            ...entry.tags,
+            ...entry.keywords,
           ),
         ),
       })),

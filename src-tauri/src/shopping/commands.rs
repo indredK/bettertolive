@@ -64,7 +64,7 @@ pub struct OwnedItemFormDto {
     pub category: String,
     pub spaces: Vec<String>,
     pub stages: Vec<String>,
-    pub necessity: String,
+    // 注:necessity 字段已删除 — 该信息由阶段模板的档位承载
     pub lifecycle: String,
     pub depreciation: Option<String>,
     pub quantity: i32,
@@ -100,7 +100,6 @@ pub fn create_owned_item(
         &form.name,
         &form.system,
         &form.category,
-        &form.necessity,
         &form.lifecycle,
         form.depreciation.as_deref(),
         form.quantity,
@@ -134,7 +133,6 @@ pub fn create_owned_item(
             category: item.category,
             spaces,
             stages,
-            necessity: item.necessity,
             lifecycle: item.lifecycle,
             depreciation: item.depreciation,
         },
@@ -166,7 +164,6 @@ pub fn update_owned_item(
         &form.name,
         &form.system,
         &form.category,
-        &form.necessity,
         &form.lifecycle,
         form.depreciation.as_deref(),
         form.quantity,
@@ -199,7 +196,6 @@ pub fn update_owned_item(
             category: item.category,
             spaces,
             stages,
-            necessity: item.necessity,
             lifecycle: item.lifecycle,
             depreciation: item.depreciation,
         },
@@ -235,7 +231,7 @@ pub struct PlanItemFormDto {
     pub category: String,
     pub spaces: Vec<String>,
     pub stages: Vec<String>,
-    pub necessity: String,
+    // 注:necessity 与 tags 字段已删除 — 物品的"标签"在显示层由 system/spaces/stages 渲染
     pub lifecycle: String,
     pub depreciation: Option<String>,
     pub reason: String,
@@ -248,7 +244,6 @@ pub struct PlanItemFormDto {
     #[serde(rename = "overpayPrice")]
     pub overpay_price: f64,
     pub note: String,
-    pub tags: Vec<String>,
     pub keywords: Vec<String>,
 }
 
@@ -279,7 +274,6 @@ pub fn create_plan_item(
         &form.name,
         &form.system,
         &form.category,
-        &form.necessity,
         &form.lifecycle,
         form.depreciation.as_deref(),
         &form.reason,
@@ -290,7 +284,6 @@ pub fn create_plan_item(
         &form.note,
         &form.spaces,
         &form.stages,
-        &form.tags,
         &form.keywords,
         &now,
     );
@@ -309,7 +302,6 @@ pub fn create_plan_item(
 
     let spaces = ShoppingRepository::get_spaces_for_plan_item(&conn, &id)?;
     let stages = ShoppingRepository::get_stages_for_plan_item(&conn, &id)?;
-    let tags = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "tag")?;
     let keywords = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "keyword")?;
 
     Ok(ShoppingPlanItemDto {
@@ -318,7 +310,6 @@ pub fn create_plan_item(
             category: item.category,
             spaces,
             stages,
-            necessity: item.necessity,
             lifecycle: item.lifecycle,
             depreciation: item.depreciation,
         },
@@ -330,7 +321,6 @@ pub fn create_plan_item(
         buy_below_price: item.buy_below_price,
         overpay_price: item.overpay_price,
         note: item.note,
-        tags,
         keywords,
     })
 }
@@ -355,7 +345,6 @@ pub fn update_plan_item(
         &form.name,
         &form.system,
         &form.category,
-        &form.necessity,
         &form.lifecycle,
         form.depreciation.as_deref(),
         &form.reason,
@@ -366,7 +355,6 @@ pub fn update_plan_item(
         &form.note,
         &form.spaces,
         &form.stages,
-        &form.tags,
         &form.keywords,
         &now,
     );
@@ -385,7 +373,6 @@ pub fn update_plan_item(
 
     let spaces = ShoppingRepository::get_spaces_for_plan_item(&conn, &id)?;
     let stages = ShoppingRepository::get_stages_for_plan_item(&conn, &id)?;
-    let tags = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "tag")?;
     let keywords = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "keyword")?;
 
     Ok(ShoppingPlanItemDto {
@@ -394,7 +381,6 @@ pub fn update_plan_item(
             category: item.category,
             spaces,
             stages,
-            necessity: item.necessity,
             lifecycle: item.lifecycle,
             depreciation: item.depreciation,
         },
@@ -406,7 +392,6 @@ pub fn update_plan_item(
         buy_below_price: item.buy_below_price,
         overpay_price: item.overpay_price,
         note: item.note,
-        tags,
         keywords,
     })
 }

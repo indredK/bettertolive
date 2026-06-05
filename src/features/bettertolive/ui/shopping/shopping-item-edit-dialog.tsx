@@ -41,7 +41,6 @@ import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/s
 import type {
   ShoppingDepreciation,
   ShoppingLifecycle,
-  ShoppingNeedLevel,
   ShoppingOwnedStatus,
   ShoppingStage,
   ShoppingSystem,
@@ -50,13 +49,11 @@ import {
   depreciationDisplayName,
   laneDisplayName,
   lifecycleDisplayName,
-  needLevelDisplayName,
   normalizeStageValues,
   normalizeOwnedStatusValue,
   ownedStatusDisplayName,
   SHOPPING_DEPRECIATION_OPTIONS,
   SHOPPING_LIFECYCLE_OPTIONS,
-  SHOPPING_NEED_LEVEL_OPTIONS,
   SHOPPING_OWNED_STATUS_OPTIONS,
   SHOPPING_STAGE_OPTIONS,
   stageDisplayName,
@@ -91,8 +88,7 @@ const ITEM_LIMITS = {
   spacesCount: 8,
   quantity: 9999,
   replacementCue: 240,
-  tagsPerItem: 24,
-  tagsCount: 12,
+  // 注:tags 限制已删除 — 物品的标签由 system/spaces/stages 在显示层渲染
   keywordsPerItem: 40,
   keywordsCount: 16,
   reason: 280,
@@ -173,7 +169,7 @@ function buildOwnedItemSchema(t: TFunction, systemOptions: string[]) {
     category: cleanFieldLabel(t("shopping.admin.items.form.category")),
     spaces: cleanFieldLabel(t("shopping.admin.items.form.spaces")),
     stages: cleanFieldLabel(t("shopping.admin.items.form.stages")),
-    necessity: cleanFieldLabel(t("shopping.admin.items.form.necessity")),
+    // 注:necessity 字段已删除
     lifecycle: cleanFieldLabel(t("shopping.admin.items.form.lifecycle")),
     status: cleanFieldLabel(t("shopping.admin.items.form.status")),
     replacementCue: cleanFieldLabel(t("shopping.admin.items.form.replacementCue")),
@@ -194,7 +190,6 @@ function buildOwnedItemSchema(t: TFunction, systemOptions: string[]) {
       .max(ITEM_LIMITS.category, maxLengthMessage(t, fields.category, ITEM_LIMITS.category)),
     spaces: arrayFieldSchema(t, fields.spaces, ITEM_LIMITS.spacesPerItem, ITEM_LIMITS.spacesCount),
     stages: enumArrayFieldSchema(SHOPPING_STAGE_OPTIONS, t, fields.stages),
-    necessity: enumFieldSchema(SHOPPING_NEED_LEVEL_OPTIONS, t, fields.necessity),
     lifecycle: enumFieldSchema(SHOPPING_LIFECYCLE_OPTIONS, t, fields.lifecycle),
     depreciation: z
       .string()
@@ -234,9 +229,8 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
     category: cleanFieldLabel(t("shopping.admin.items.form.category")),
     spaces: cleanFieldLabel(t("shopping.admin.items.form.spaces")),
     stages: cleanFieldLabel(t("shopping.admin.items.form.stages")),
-    necessity: cleanFieldLabel(t("shopping.admin.items.form.necessity")),
+    // 注:necessity 与 tags 字段已删除 — 必要程度由阶段档位承载;标签由 system/spaces/stages 在显示层渲染
     lifecycle: cleanFieldLabel(t("shopping.admin.items.form.lifecycle")),
-    tags: cleanFieldLabel(t("shopping.admin.items.form.tags")),
     keywords: cleanFieldLabel(t("shopping.admin.items.form.keywords")),
     reason: cleanFieldLabel(t("shopping.admin.items.form.reason")),
     targetLifestyle: cleanFieldLabel(t("shopping.admin.items.form.targetLifestyle")),
@@ -267,7 +261,6 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
         ITEM_LIMITS.spacesCount,
       ),
       stages: enumArrayFieldSchema(SHOPPING_STAGE_OPTIONS, t, fields.stages),
-      necessity: enumFieldSchema(SHOPPING_NEED_LEVEL_OPTIONS, t, fields.necessity),
       lifecycle: enumFieldSchema(SHOPPING_LIFECYCLE_OPTIONS, t, fields.lifecycle),
       depreciation: z
         .string()
@@ -327,7 +320,6 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
         .string()
         .trim()
         .max(ITEM_LIMITS.note, maxLengthMessage(t, fields.note, ITEM_LIMITS.note)),
-      tags: arrayFieldSchema(t, fields.tags, ITEM_LIMITS.tagsPerItem, ITEM_LIMITS.tagsCount),
       keywords: arrayFieldSchema(
         t,
         fields.keywords,
@@ -360,7 +352,7 @@ function buildOwnedForm(
     category: item.category,
     spaces: [...item.spaces],
     stages: normalizeStageValues(item.stages),
-    necessity: item.necessity,
+    // 注:necessity 字段已删除
     lifecycle: item.lifecycle,
     depreciation: item.depreciation ?? null,
     quantity: item.quantity,
@@ -384,7 +376,7 @@ function buildPlanForm(
     category: item.category,
     spaces: [...item.spaces],
     stages: normalizeStageValues(item.stages),
-    necessity: item.necessity,
+    // 注:necessity 与 tags 字段已删除
     lifecycle: item.lifecycle,
     depreciation: item.depreciation ?? null,
     reason: item.reason,
@@ -393,7 +385,6 @@ function buildPlanForm(
     buyBelowPrice: item.buyBelowPrice ?? null,
     overpayPrice: item.overpayPrice ?? null,
     note: item.note,
-    tags: [...item.tags],
     keywords: [...item.keywords],
   }
 }
@@ -692,29 +683,7 @@ function ItemDialogContent({
                 maxLength={ITEM_LIMITS.category}
               />
             </FormField>
-            <FormField label={t("shopping.admin.items.form.necessity")} required>
-              <Select
-                value={`${form.necessity}`}
-                onValueChange={(v) =>
-                  setForm((prev) => ({ ...prev, necessity: v as ShoppingNeedLevel }))
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t("shopping.admin.items.form.necessityPlaceholder")}>
-                    {form.necessity
-                      ? needLevelDisplayName(form.necessity as ShoppingNeedLevel, t)
-                      : null}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {SHOPPING_NEED_LEVEL_OPTIONS.map((n) => (
-                    <SelectItem key={n} value={n}>
-                      {needLevelDisplayName(n, t)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
+            {/* 注:necessity 字段已删除 — 物品的必要程度由阶段模板的档位(最低/基础/升级)承载 */}
             <FormField label={t("shopping.admin.items.form.lifecycle")} required>
               <Select
                 value={`${form.lifecycle}`}
@@ -831,18 +800,7 @@ function ItemDialogContent({
               </>
             ) : (
               <>
-                <FormField
-                  label={t("shopping.admin.items.form.tags")}
-                  description={t("shopping.admin.items.form.help.tags")}
-                >
-                  <Textarea
-                    value={("tags" in form ? form.tags : []).join(", ")}
-                    onChange={(e) => update({ tags: parseArray(e.target.value) })}
-                    placeholder={t("shopping.admin.items.form.tagsPlaceholder")}
-                    maxLength={ITEM_LIMITS.tagsPerItem * ITEM_LIMITS.tagsCount}
-                    rows={3}
-                  />
-                </FormField>
+                {/* 注:tags FormField 已删除 — 物品的标签由 system/spaces/stages 在显示层渲染 */}
                 <FormField
                   label={t("shopping.admin.items.form.keywords")}
                   description={t("shopping.admin.items.form.help.keywords")}

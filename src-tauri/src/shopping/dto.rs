@@ -3,7 +3,7 @@ use specta::Type;
 
 // ---- Enums (as strings) ----
 
-pub type ShoppingNeedLevel = String;
+// 注:ShoppingNeedLevel 已删除 — 物品的必要程度由阶段模板的档位承载
 pub type ShoppingSystem = String;
 pub type ShoppingStage = String;
 pub type ShoppingLifecycle = String;
@@ -45,7 +45,7 @@ pub struct ShoppingItemBaseDto {
     pub category: String,
     pub spaces: Vec<String>,
     pub stages: Vec<ShoppingStage>,
-    pub necessity: ShoppingNeedLevel,
+    // 注:necessity 字段已迁移到阶段模板的档位,这里通过 #[serde(default)] 容忍旧数据
     pub lifecycle: ShoppingLifecycle,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depreciation: Option<ShoppingDepreciation>,
@@ -77,7 +77,7 @@ pub struct ShoppingPlanItemDto {
     pub buy_below_price: f64,
     pub overpay_price: f64,
     pub note: String,
-    pub tags: Vec<String>,
+    // 注:tags 字段已删除 — 物品的标签由 system/spaces/stages 三字段在显示层渲染
     pub keywords: Vec<String>,
 }
 
@@ -94,9 +94,13 @@ pub struct ShoppingPurchaseLaneDto {
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingStageChecklistSectionDto {
     pub system: ShoppingSystem,
-    pub minimum: Vec<String>,
-    pub essentials: Vec<String>,
-    pub upgrades: Vec<String>,
+    // 注:各档位现在存物品 ID 数组(指向 owned 或 plan item),不再是手写文本
+    #[serde(default)]
+    pub minimum_item_ids: Vec<String>,
+    #[serde(default)]
+    pub essential_item_ids: Vec<String>,
+    #[serde(default)]
+    pub upgrade_item_ids: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]

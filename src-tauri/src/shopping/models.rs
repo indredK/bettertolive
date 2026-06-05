@@ -21,6 +21,7 @@ pub struct OwnedItemRow {
     pub name: String,
     pub system_id: String,
     pub category: String,
+    // 注:DB 列 necessity 仍存在,Rust 端继续读出来但前端 DTO 已不再暴露
     pub necessity: String,
     pub lifecycle: String,
     pub depreciation: Option<String>,

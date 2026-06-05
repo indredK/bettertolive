@@ -23,13 +23,14 @@ import {
   DEPRECIATION_STYLES,
   getLifecycleCopy,
   LIFECYCLE_STYLES,
-  NEED_LEVEL_STYLES,
+  SPACE_CHIP_STYLE,
+  STAGE_CHIP_STYLE,
+  SYSTEM_CHIP_STYLE,
   depreciationDisplayName,
   formatPrice,
   getPriceSignal,
   laneDisplayName,
   lifecycleDisplayName,
-  needLevelDisplayName,
   stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
@@ -92,6 +93,56 @@ export function SystemSummaryChip({ label }: { label: string }) {
     >
       {label}
     </Badge>
+  )
+}
+
+// 物品的"标签"由 system / spaces / stages 三字段组合而成,按三行不同颜色显示。
+// — 第 1 行:系统(蓝)— 第 2 行:空间(绿)— 第 3 行:阶段(紫)。
+// 空的行自动隐藏。compact 模式下行间距更紧。
+export function ItemMetadataChips({
+  item,
+  compact = false,
+}: {
+  item: ShoppingOwnedItem | ShoppingPlanWithLane
+  compact?: boolean
+}) {
+  const { t } = useTranslation()
+  const systemLabel = item.system ? systemDisplayName(item.system, t) : ""
+  const rows: Array<{ key: "system" | "space" | "stage"; chips: string[]; className: string }> = [
+    {
+      key: "system",
+      chips: systemLabel ? [systemLabel] : [],
+      className: SYSTEM_CHIP_STYLE,
+    },
+    {
+      key: "space",
+      chips: item.spaces,
+      className: SPACE_CHIP_STYLE,
+    },
+    {
+      key: "stage",
+      chips: item.stages.map((stage) => stageDisplayName(stage, t)),
+      className: STAGE_CHIP_STYLE,
+    },
+  ]
+  const visibleRows = rows.filter((row) => row.chips.length > 0)
+  if (visibleRows.length === 0) return null
+  return (
+    <div className={cn("flex flex-col", compact ? "gap-0.5" : "gap-1")}>
+      {visibleRows.map((row) => (
+        <div key={row.key} className="flex flex-wrap items-center gap-1">
+          {row.chips.map((chip, index) => (
+            <Badge
+              key={`${row.key}-${chip}-${index}`}
+              variant="outline"
+              className={cn("h-5 px-1.5 text-[10px] font-normal", row.className)}
+            >
+              {chip}
+            </Badge>
+          ))}
+        </div>
+      ))}
+    </div>
   )
 }
 
@@ -187,10 +238,7 @@ export function CompactItemRow({
             >
               {item.name}
             </h3>
-            <ClassificationBadge
-              label={needLevelDisplayName(item.necessity, t)}
-              className={NEED_LEVEL_STYLES[item.necessity]}
-            />
+            {/* 物品物理属性 chip:lifecycle、depreciation;来源标签 — 与归属无关,所以与三色 chip 分开 */}
             <ClassificationBadge
               label={lifecycleDisplayName(item.lifecycle, t)}
               className={LIFECYCLE_STYLES[item.lifecycle]}
@@ -209,19 +257,18 @@ export function CompactItemRow({
             </Badge>
           </div>
 
+          {/* 归属标签:系统/空间/阶段 — 三行不同颜色 */}
+          <div className="mt-2">
+            <ItemMetadataChips item={item} compact={compact} />
+          </div>
+
           <div
             className={cn(
               "mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]",
               compact && "text-[11px]",
             )}
           >
-            <span>{systemDisplayName(item.system, t)}</span>
-            <span>·</span>
             <span>{item.category}</span>
-            <span>·</span>
-            <span>{item.spaces.join(" / ")}</span>
-            <span>·</span>
-            <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
           </div>
 
           <p
@@ -431,10 +478,7 @@ export function PurchaseDecisionCard({
         >
           {item.name}
         </h3>
-        <ClassificationBadge
-          label={needLevelDisplayName(item.necessity, t)}
-          className={NEED_LEVEL_STYLES[item.necessity]}
-        />
+        {/* 物品物理属性 chip + 价格信号 — 与归属解耦 */}
         <ClassificationBadge
           label={lifecycleDisplayName(item.lifecycle, t)}
           className={LIFECYCLE_STYLES[item.lifecycle]}
@@ -445,16 +489,16 @@ export function PurchaseDecisionCard({
             className={DEPRECIATION_STYLES[item.depreciation]}
           />
         ) : null}
-        <SystemChip system={item.system} />
         <ClassificationBadge label={signal.label} className={signal.className} />
+      </div>
+
+      {/* 归属标签 — 三行不同颜色 */}
+      <div className="mt-2">
+        <ItemMetadataChips item={item} compact={compact} />
       </div>
 
       <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]">
         <span>{item.category}</span>
-        <span>·</span>
-        <span>{item.spaces.join(" / ")}</span>
-        <span>·</span>
-        <span>{item.stages.map((s) => stageDisplayName(s, t)).join(" / ")}</span>
       </div>
 
       <p
@@ -515,15 +559,7 @@ export function PurchaseDecisionCard({
             >
               {item.targetLifestyle}
             </Badge>
-            {item.tags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-              >
-                {tag}
-              </Badge>
-            ))}
+            {/* 注:item.tags 已废弃 — 物品的"标签"由上方的 ItemMetadataChips 三行 chip 呈现 */}
           </div>
         </div>
       </div>

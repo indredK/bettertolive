@@ -10,17 +10,12 @@ import type {
   ShoppingStageChecklist,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
-import {
-  ShoppingDepreciation,
-  ShoppingLifecycle,
-  ShoppingNeedLevel,
-} from "@/features/bettertolive/types"
+import { ShoppingDepreciation, ShoppingLifecycle } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
 import {
   FAST_DEPRECIATION,
-  PRIORITY_LEVELS,
   type ShoppingLifecycleGroups,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
@@ -193,7 +188,7 @@ export function ShoppingPage({
       category: "",
       spaces: [],
       stages: [],
-      necessity: ShoppingNeedLevel.Necessary,
+      // 注:necessity 与 tags 字段已删除
       lifecycle: ShoppingLifecycle.Durable,
       reason: "",
       targetLifestyle: "",
@@ -201,7 +196,6 @@ export function ShoppingPage({
       buyBelowPrice: 0,
       overpayPrice: 0,
       note: "",
-      tags: [],
       keywords: [],
       laneId: firstLane?.id ?? "",
       laneTitle: firstLane?.title ?? "",
@@ -241,7 +235,8 @@ export function ShoppingPage({
             ...planned.flatMap((item) => item.spaces),
           ]),
         )
-        const urgentCount = planned.filter((item) => PRIORITY_LEVELS.has(item.necessity)).length
+        // 注:原本按 necessity ∈ PRIORITY_LEVELS 计算紧急数;字段删除后,改为该系统下规划中的物品总数作为关注度指标
+        const urgentCount = planned.length
 
         return {
           ...definition,
@@ -255,23 +250,25 @@ export function ShoppingPage({
     [shopping.systemDefinitions, shopping.ownedItems, planItems],
   )
 
+  // 快折旧警示:原本规则是"高折旧 + 幸福加成"。necessity 删除后改为"高折旧 + 情绪型物品"(lifecycle === Emotional)作为近似启发式
   const fastDepreciationWarnings = useMemo(
     () =>
       planItems.filter(
         (item) =>
           item.depreciation &&
           FAST_DEPRECIATION.has(item.depreciation) &&
-          item.necessity === ShoppingNeedLevel.HappinessBoost,
+          item.lifecycle === ShoppingLifecycle.Emotional,
       ),
     [planItems],
   )
 
+  // 值得慢慢买:原本排除"幸福加成"。necessity 删除后改为排除情绪型物品
   const worthBuyingSlowly = useMemo(
     () =>
       planItems.filter(
         (item) =>
           item.depreciation === ShoppingDepreciation.Slow &&
-          item.necessity !== ShoppingNeedLevel.HappinessBoost,
+          item.lifecycle !== ShoppingLifecycle.Emotional,
       ),
     [planItems],
   )
@@ -379,6 +376,18 @@ export function ShoppingPage({
       return ai - bi
     })
   }, [spaces, spacesOrder])
+
+  // 物品 ID → 名字 的解析表 — 阶段模板的 section 各档位现在存物品 ID,详情页需要 resolve 出名字
+  const itemsById = useMemo(() => {
+    const map = new Map<string, { id: string; name: string }>()
+    for (const item of shopping.ownedItems) {
+      map.set(item.id, { id: item.id, name: item.name })
+    }
+    for (const item of planItems) {
+      map.set(item.id, { id: item.id, name: item.name })
+    }
+    return map
+  }, [shopping.ownedItems, planItems])
 
   const overlookedCollection = useMemo(
     () =>
@@ -501,6 +510,7 @@ export function ShoppingPage({
           selectedStageId={displayStageId}
           isFixedLayout={isFixedLayout}
           isManagementMode={isManagementMode}
+          itemsById={itemsById}
           onSelectStage={setSelectedStageId}
           onEditStage={isManagementMode ? startEditStage : undefined}
           onAddNew={isManagementMode ? startAddStage : undefined}
@@ -528,6 +538,7 @@ export function ShoppingPage({
         <ShoppingStageEditDialog
           editing={editingStage}
           systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
+          allItems={{ owned: shopping.ownedItems, plan: planItems }}
           onClose={() => setEditingStage(null)}
           onSaved={handleStageSaved}
         />
@@ -535,6 +546,7 @@ export function ShoppingPage({
         <ShoppingSystemEditDialog
           editing={editingSystem}
           existingSystemIds={shopping.systemDefinitions.map((definition) => definition.id)}
+          allItems={{ owned: shopping.ownedItems, plan: planItems }}
           onClose={() => setEditingSystem(null)}
           onSaved={handleSystemSaved}
         />
@@ -542,6 +554,7 @@ export function ShoppingPage({
         <ShoppingSpaceEditDialog
           editing={editingSpace}
           existingSpaceNames={spaces.map((space) => space.name)}
+          allItems={{ owned: shopping.ownedItems, plan: planItems }}
           onClose={() => setEditingSpace(null)}
           onSaved={handleSpaceSaved}
         />

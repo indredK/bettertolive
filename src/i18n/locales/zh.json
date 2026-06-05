@@ -195,6 +195,8 @@
         "keyQuestion": "核心问题",
         "secondaryGroups": "二级分组",
         "secondaryGroupsHelp": "使用逗号分隔多个二级分组",
+        "assignItems": "本系统下的物品",
+        "assignItemsHelp": "从所有物品中挑出归属本系统的物品；取消选中不会从原系统中移除",
         "cancel": "取消",
         "save": "保存"
       }
@@ -216,6 +218,8 @@
       "noSpaceData": "当前筛选下没有空间视角数据。",
       "form": {
         "name": "空间名称",
+        "assignItems": "本空间下的物品",
+        "assignItemsHelp": "从所有物品中挑出归属本空间的物品;勾选 = 加入该空间,取消勾选 = 从该空间移除",
         "cancel": "取消",
         "save": "保存"
       },
@@ -249,7 +253,7 @@
       "editDescription": "修改阶段模板的标题、描述或系统清单结构。",
       "form": {
         "title": "标题",
-        "titlePlaceholder": "例如：刚搬进来",
+        "titlePlaceholder": "例如:刚搬进来",
         "stage": "阶段",
         "stagePlaceholder": "选择阶段",
         "description": "描述",
@@ -257,12 +261,17 @@
         "focus": "重点关注",
         "focusPlaceholder": "这个阶段最需要关注什么",
         "sections": "系统清单",
-        "sectionsHelp": "按系统维护最低配置、基础配置和升级配置",
+        "sectionsHelp": "按系统逐组挑选最低/基础/升级配置的物品",
         "addSection": "新增系统",
         "addItem": "新增项",
         "itemPlaceholder": "填写一项内容",
+        "confirmSystemReset": "切换系统会清空该系统下已选的物品,确认继续?",
         "cancel": "取消",
         "save": "保存"
+      },
+      "itemPicker": {
+        "noItemsForSystem": "该系统下还没有物品,先去采购决策里创建",
+        "unresolved": "(物品已删除或不存在)"
       }
     },
     "planning": {
@@ -302,6 +311,18 @@
       },
       "relatedReminders": "相关提醒",
       "noItemsInLayer": "当前阶段暂时没有这一层。"
+    },
+    "shuttle": {
+      "candidates": "候选",
+      "selected": "已选",
+      "search": "搜索物品名",
+      "empty": "暂无候选",
+      "noSelected": "尚未选择",
+      "addAll": "全部加入",
+      "addChecked": "加入勾选",
+      "removeChecked": "移除勾选",
+      "removeAll": "全部移除",
+      "systemAssignNote": "勾选 = 把该物品的系统改为本系统;取消勾选 = 无动作(物品仍归原系统,需要在其他系统的对话框里挑出)"
     },
     "admin": {
       "itemsManagement": "物件管理",
