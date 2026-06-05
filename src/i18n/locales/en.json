@@ -16,6 +16,10 @@
     "cardGrid": {
       "addNew": "Add New"
     },
+    "toast": {
+      "reorderSuccess": "Order updated",
+      "reorderFailed": "Reorder failed, please try again"
+    },
     "overview": {
       "currentFocus": "What to Focus On Now",
       "currentFocusDesc": "These aren't random thoughts, but reminders emerging from system gaps, action rhythm, and purchase judgment.",

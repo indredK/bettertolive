@@ -509,6 +509,32 @@ pub fn delete_shopping_page_content(state: State<AppState>, id: String) -> Resul
 }
 
 // =====================
+// Reorder commands
+// =====================
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_system_definitions(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::reorder_system_definitions(&conn, &ordered_ids, &now)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_shopping_page_contents(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::reorder_page_contents(&conn, &ordered_ids, &now)
+}
+
+// =====================
 // Purchase Lane queries
 // =====================
 

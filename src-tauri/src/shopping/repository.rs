@@ -1313,6 +1313,38 @@ impl ShoppingRepository {
         Ok(())
     }
 
+    // ---- Reordering ----
+
+    pub fn reorder_system_definitions(
+        conn: &Connection,
+        ordered_ids: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        for (index, id) in ordered_ids.iter().enumerate() {
+            conn.execute(
+                "UPDATE shopping_system_definitions SET sort_order = ?1, updated_at = ?2 WHERE id = ?3",
+                params![index as i32, now, id],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    }
+
+    pub fn reorder_page_contents(
+        conn: &Connection,
+        ordered_ids: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        for (index, id) in ordered_ids.iter().enumerate() {
+            conn.execute(
+                "UPDATE shopping_page_content SET sort_order = ?1, updated_at = ?2 WHERE id = ?3",
+                params![index as i32, now, id],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    }
+
     pub fn get_page_content_by_id(
         conn: &Connection,
         id: &str,

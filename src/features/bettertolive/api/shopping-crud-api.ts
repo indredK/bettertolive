@@ -100,3 +100,15 @@ export async function listPurchaseLanes(): Promise<ShoppingPurchaseLaneRow[]> {
   if (!hasTauriRuntime()) return []
   return invoke<ShoppingPurchaseLaneRow[]>("list_purchase_lanes")
 }
+
+// ---- Reorder ----
+
+export async function reorderSystemDefinitions(orderedIds: string[]): Promise<void> {
+  if (!hasTauriRuntime()) return
+  return invoke("reorder_system_definitions", { orderedIds })
+}
+
+export async function reorderShoppingPageContents(orderedIds: string[]): Promise<void> {
+  if (!hasTauriRuntime()) return
+  return invoke("reorder_shopping_page_contents", { orderedIds })
+}

@@ -4,7 +4,8 @@ use shopping::commands::{
     create_owned_item, create_plan_item, create_shopping_page_content, delete_owned_item,
     delete_plan_item, delete_shopping_page_content, get_shopping, get_workspace_snapshot,
     list_owned_items, list_plan_items, list_purchase_lanes, list_shopping_page_contents,
-    update_owned_item, update_plan_item, update_shopping_page_content, AppState,
+    reorder_shopping_page_contents, reorder_system_definitions, update_owned_item,
+    update_plan_item, update_shopping_page_content, AppState,
 };
 use specta_typescript::Typescript;
 use std::sync::Mutex;
@@ -33,7 +34,9 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         create_shopping_page_content,
         update_shopping_page_content,
         delete_shopping_page_content,
-        list_purchase_lanes
+        list_purchase_lanes,
+        reorder_system_definitions,
+        reorder_shopping_page_contents
     ])
 }
 
@@ -89,7 +92,9 @@ pub fn run() {
             create_shopping_page_content,
             update_shopping_page_content,
             delete_shopping_page_content,
-            list_purchase_lanes
+            list_purchase_lanes,
+            reorder_system_definitions,
+            reorder_shopping_page_contents
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

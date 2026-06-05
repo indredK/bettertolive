@@ -49,6 +49,7 @@ import { EmotionPage } from "@/features/bettertolive/ui/emotion/emotion-page"
 import { JourneyPage } from "@/features/bettertolive/ui/journey/journey-page"
 import { LegacyPage } from "@/features/bettertolive/ui/legacy/legacy-page"
 import { NotificationLayer } from "@/features/bettertolive/ui/shared/notification-layer"
+import { Toaster } from "@/components/ui/sonner"
 import { NutritionPage } from "@/features/bettertolive/ui/nutrition/nutrition-page"
 import { OverviewPage } from "@/features/bettertolive/ui/overview/overview-page"
 import { PrinciplesPage } from "@/features/bettertolive/ui/principles/principles-page"
@@ -883,6 +884,7 @@ export function BetterToLiveAppShell() {
         onCloseDetail={closeNotificationDetail}
         onActivateTarget={activateNotificationTarget}
       />
+      <Toaster />
       <RhythmPopup slides={workspaceRhythmSlides} />
     </div>
   )

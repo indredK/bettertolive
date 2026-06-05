@@ -1,6 +1,7 @@
 import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
@@ -27,6 +28,10 @@ import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
 import { type ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import { type SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-types"
+import {
+  reorderShoppingPageContents,
+  reorderSystemDefinitions,
+} from "@/features/bettertolive/api/shopping-crud-api"
 import { cn } from "@/lib/utils"
 
 export function ShoppingPage({
@@ -54,6 +59,34 @@ export function ShoppingPage({
     isNew: boolean
     checklist: ShoppingStageChecklist | null
   } | null>(null)
+  const [spacesOrder, setSpacesOrder] = useState<string[] | null>(null)
+
+  // ---- Reorder handlers ----
+
+  const handleReorderSystems = async (orderedIds: string[]) => {
+    try {
+      await reorderSystemDefinitions(orderedIds)
+      toast.success(t("shopping.toast.reorderSuccess"))
+      onRefresh?.()
+    } catch {
+      toast.error(t("shopping.toast.reorderFailed"))
+    }
+  }
+
+  const handleReorderSpaces = (orderedNames: string[]) => {
+    setSpacesOrder(orderedNames)
+    toast.success(t("shopping.toast.reorderSuccess"))
+  }
+
+  const handleReorderStages = async (orderedIds: string[]) => {
+    try {
+      await reorderShoppingPageContents(orderedIds)
+      toast.success(t("shopping.toast.reorderSuccess"))
+      onRefresh?.()
+    } catch {
+      toast.error(t("shopping.toast.reorderFailed"))
+    }
+  }
 
   const handleSaved = () => {
     setEditingItem(null)
@@ -232,6 +265,16 @@ export function ShoppingPage({
     )
   }, [shopping.ownedItems, planItems])
 
+  const orderedSpaces = useMemo(() => {
+    if (!spacesOrder) return spaces
+    const orderMap = new Map(spacesOrder.map((name, i) => [name, i]))
+    return [...spaces].sort((a, b) => {
+      const ai = orderMap.get(a.name) ?? Infinity
+      const bi = orderMap.get(b.name) ?? Infinity
+      return ai - bi
+    })
+  }, [spaces, spacesOrder])
+
   const overlookedCollection = useMemo(
     () =>
       shopping.lifestyleCollections.find((collection) => collection.id === "collection-overlooked"),
@@ -331,10 +374,11 @@ export function ShoppingPage({
           onEditOwned={isManagementMode ? startEditOwned : undefined}
           onEditPlan={isManagementMode ? startEditPlan : undefined}
           onAddNew={isManagementMode ? startAddPlan : undefined}
+          onReorder={isManagementMode ? handleReorderSystems : undefined}
         />
 
         <ShoppingSpacesTab
-          spaces={spaces}
+          spaces={orderedSpaces}
           selectedSpaceName={displaySpaceName}
           isFixedLayout={isFixedLayout}
           isManagementMode={isManagementMode}
@@ -342,6 +386,7 @@ export function ShoppingPage({
           onEditOwned={isManagementMode ? startEditOwned : undefined}
           onEditPlan={isManagementMode ? startEditPlan : undefined}
           onAddNew={isManagementMode ? startAddPlan : undefined}
+          onReorder={isManagementMode ? handleReorderSpaces : undefined}
         />
 
         <ShoppingStagesTab
@@ -352,6 +397,7 @@ export function ShoppingPage({
           onSelectStage={setSelectedStageId}
           onEditStage={isManagementMode ? startEditStage : undefined}
           onAddNew={isManagementMode ? startAddStage : undefined}
+          onReorder={isManagementMode ? handleReorderStages : undefined}
         />
 
         <ShoppingPlanningTab

@@ -1,5 +1,16 @@
 import { Pencil } from "lucide-react"
+import { useCallback } from "react"
 import { useTranslation } from "react-i18next"
+import {
+  DndContext,
+  PointerSensor,
+  KeyboardSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core"
+import { SortableContext, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { TabsContent } from "@/components/ui/tabs"
@@ -9,6 +20,7 @@ import {
   AddCard,
   SystemSummaryChip,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
 import type {
   ShoppingPlanWithLane,
   ShoppingSystemOverview,
@@ -199,9 +211,6 @@ function SystemMapCard({
   isManagementMode,
   onEditOwned,
   onEditPlan,
-  onDragStart,
-  onDragOver,
-  onDrop,
 }: {
   definition: ShoppingSystemOverview
   isSelected: boolean
@@ -209,9 +218,6 @@ function SystemMapCard({
   isManagementMode?: boolean
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
-  onDragStart?: (e: React.DragEvent, id: string) => void
-  onDragOver?: (e: React.DragEvent) => void
-  onDrop?: (e: React.DragEvent, id: string) => void
 }) {
   const { t } = useTranslation()
   const hasItems = definition.owned.length > 0 || definition.planned.length > 0
@@ -220,90 +226,79 @@ function SystemMapCard({
 
   return (
     <div
-      className="relative"
-      draggable={isManagementMode}
-      onDragStart={
-        isManagementMode && onDragStart ? (e) => onDragStart(e, definition.id) : undefined
-      }
-      onDragOver={isManagementMode && onDragOver ? onDragOver : undefined}
-      onDrop={isManagementMode && onDrop ? (e) => onDrop(e, definition.id) : undefined}
+      role="button"
+      tabIndex={0}
+      className={cn(
+        "relative flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
+        isSelected
+          ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]"
+          : "border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)] hover:border-[color:var(--surface-border)] hover:shadow-[0_2px_8px_rgba(15,23,42,0.04)]",
+      )}
+      onClick={() => onSelect(definition.id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          onSelect(definition.id)
+        }
+      }}
     >
-      <button
-        type="button"
-        onClick={() => onSelect(definition.id)}
-        className={cn(
-          "flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
-          isSelected
-            ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]"
-            : "border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)] hover:border-[color:var(--surface-border)] hover:shadow-[0_2px_8px_rgba(15,23,42,0.04)]",
-          isManagementMode && "cursor-grab active:cursor-grabbing",
-        )}
-      >
-        <div className="flex min-w-0 items-start gap-2 pr-6">
-          {isManagementMode ? (
-            <div className="mr-0.5 flex shrink-0 flex-col items-center gap-[1.5px] self-center py-0.5">
-              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
-              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
-              <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
-            </div>
-          ) : null}
-          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
-            {definition.id.slice(0, 1)}
+      <div className="flex min-w-0 items-start gap-2 pr-6">
+        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
+          {definition.id.slice(0, 1)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+            {definition.id}
           </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-              {definition.id}
-            </div>
-            <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-              {definition.cluster}
-            </div>
+          <div className="truncate text-[11px] text-[color:var(--text-muted)]">
+            {definition.cluster}
           </div>
         </div>
+      </div>
 
-        {/* Row 2: Badges — no wrapping, overflow hidden */}
-        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden")}>
+      {/* Row 2: Badges — no wrapping, overflow hidden */}
+      <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden")}>
+        <Badge
+          variant="outline"
+          className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        >
+          {definition.owned.length} / {definition.planned.length}
+        </Badge>
+        {definition.urgentCount > 0 ? (
           <Badge
             variant="outline"
-            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+            className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
           >
-            {definition.owned.length} / {definition.planned.length}
+            {t("shopping.systems.urgentBadge", { count: definition.urgentCount })}
           </Badge>
-          {definition.urgentCount > 0 ? (
-            <Badge
-              variant="outline"
-              className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
-            >
-              {t("shopping.systems.urgentBadge", { count: definition.urgentCount })}
-            </Badge>
-          ) : null}
-        </div>
+        ) : null}
+      </div>
 
-        {/* Row 3: Summary — single line with ellipsis truncation */}
-        <p className={cn("truncate text-[12px] leading-5 text-[color:var(--text-secondary)]")}>
-          {definition.summary}
-        </p>
+      {/* Row 3: Summary — single line with ellipsis truncation */}
+      <p className={cn("truncate text-[12px] leading-5 text-[color:var(--text-secondary)]")}>
+        {definition.summary}
+      </p>
 
-        {/* Row 4: Secondary group badges — no wrapping, overflow hidden */}
-        <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45")}>
-          {definition.secondaryGroups.slice(0, 2).map((group) => (
-            <Badge
-              key={group}
-              variant="outline"
-              className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-            >
-              {group}
-            </Badge>
-          ))}
-          {definition.secondaryGroups.length > 2 ? (
-            <Badge
-              variant="outline"
-              className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-            >
-              +{definition.secondaryGroups.length - 2}
-            </Badge>
-          ) : null}
-        </div>
-      </button>
+      {/* Row 4: Secondary group badges — no wrapping, overflow hidden */}
+      <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45")}>
+        {definition.secondaryGroups.slice(0, 2).map((group) => (
+          <Badge
+            key={group}
+            variant="outline"
+            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            {group}
+          </Badge>
+        ))}
+        {definition.secondaryGroups.length > 2 ? (
+          <Badge
+            variant="outline"
+            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+          >
+            +{definition.secondaryGroups.length - 2}
+          </Badge>
+        ) : null}
+      </div>
 
       {isManagementMode && hasItems ? (
         <Button
@@ -335,6 +330,7 @@ export function ShoppingSystemsTab({
   onEditOwned,
   onEditPlan,
   onAddNew,
+  onReorder,
 }: {
   systems: ShoppingSystemOverview[]
   selectedSystemId: string | null
@@ -344,27 +340,61 @@ export function ShoppingSystemsTab({
   onEditOwned?: (item: ShoppingOwnedItem) => void
   onEditPlan?: (item: ShoppingPlanWithLane) => void
   onAddNew?: () => void
+  onReorder?: (orderedIds: string[]) => void
 }) {
   const { t } = useTranslation()
   const selectedSystem = systems.find((s) => s.id === selectedSystemId) ?? null
 
-  const handleDragStart = (e: React.DragEvent, id: string) => {
-    e.dataTransfer.setData("text/plain", id)
-    e.dataTransfer.effectAllowed = "move"
-    ;(e.currentTarget as HTMLElement).style.opacity = "0.5"
-  }
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = "move"
-  }
+  const systemIdStrings = systems.map((s) => s.id as string)
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
 
-  const handleDrop = (e: React.DragEvent, targetId: string) => {
-    e.preventDefault()
-    const dragId = e.dataTransfer.getData("text/plain")
-    if (dragId === targetId) return
-    onSelectSystem(dragId)
-  }
+      const oldIndex = systemIdStrings.indexOf(active.id as string)
+      const newIndex = systemIdStrings.indexOf(over.id as string)
+      if (oldIndex === -1 || newIndex === -1) return
+
+      onReorder?.(arrayMove(systemIdStrings, oldIndex, newIndex))
+    },
+    [systemIdStrings, onReorder],
+  )
+
+  const gridContent = (
+    <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
+      {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
+      {systems.length > 0 ? (
+        systems.map((definition) =>
+          isManagementMode ? (
+            <SortableShoppingCard key={definition.id} id={definition.id}>
+              <SystemMapCard
+                definition={definition}
+                isSelected={selectedSystemId === definition.id}
+                onSelect={onSelectSystem}
+                isManagementMode={isManagementMode}
+                onEditOwned={onEditOwned}
+                onEditPlan={onEditPlan}
+              />
+            </SortableShoppingCard>
+          ) : (
+            <SystemMapCard
+              key={definition.id}
+              definition={definition}
+              isSelected={selectedSystemId === definition.id}
+              onSelect={onSelectSystem}
+            />
+          ),
+        )
+      ) : !isManagementMode ? (
+        <EmptyState message={t("shopping.systems.noSystemData")} />
+      ) : null}
+    </div>
+  )
 
   return (
     <TabsContent
@@ -382,27 +412,17 @@ export function ShoppingSystemsTab({
       >
         {/* Left: System Cards */}
         <Surface className={cn("flex min-h-0 flex-col p-3", isFixedLayout && "min-h-0")}>
-          <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
-            {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
-            {systems.length > 0 ? (
-              systems.map((definition) => (
-                <SystemMapCard
-                  key={definition.id}
-                  definition={definition}
-                  isSelected={selectedSystemId === definition.id}
-                  onSelect={onSelectSystem}
-                  isManagementMode={isManagementMode}
-                  onEditOwned={onEditOwned}
-                  onEditPlan={onEditPlan}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                />
-              ))
-            ) : !isManagementMode ? (
-              <EmptyState message={t("shopping.systems.noSystemData")} />
-            ) : null}
-          </div>
+          {isManagementMode ? (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext items={systemIdStrings}>{gridContent}</SortableContext>
+            </DndContext>
+          ) : (
+            gridContent
+          )}
         </Surface>
 
         {/* Right: Detail Panel */}

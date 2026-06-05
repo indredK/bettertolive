@@ -20,6 +20,8 @@ export const commands = {
 	updateShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
 	deleteShoppingPageContent: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_page_content", { id })),
 	listPurchaseLanes: () => typedError<PurchaseLaneRow[], string>(__TAURI_INVOKE("list_purchase_lanes")),
+	reorderSystemDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_system_definitions", { orderedIds })),
+	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 };
 
 /* Types */
