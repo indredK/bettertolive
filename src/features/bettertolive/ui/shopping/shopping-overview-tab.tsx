@@ -191,6 +191,8 @@ export function ShoppingOverviewTab({
   overlookedCollection,
   isWideLayout,
   isFixedLayout,
+  isManagementMode,
+  onEditPlan,
 }: {
   shopping: ShoppingModuleData
   lifecycleGroups: ShoppingLifecycleGroups
@@ -200,6 +202,8 @@ export function ShoppingOverviewTab({
   overlookedCollection: ShoppingLifestyleCollection | undefined
   isWideLayout: boolean
   isFixedLayout: boolean
+  isManagementMode?: boolean
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const { t } = useTranslation()
   const overviewDimensions = getOverviewDimensions(t)
@@ -377,6 +381,7 @@ export function ShoppingOverviewTab({
                       item={item}
                       sourceLabel={item.laneTitle}
                       compact
+                      onEditPlan={isManagementMode ? onEditPlan : undefined}
                     />
                   ))}
                 </div>
@@ -396,6 +401,7 @@ export function ShoppingOverviewTab({
                       item={item}
                       sourceLabel={item.laneTitle}
                       compact
+                      onEditPlan={isManagementMode ? onEditPlan : undefined}
                     />
                   ))}
                 </div>

@@ -10,12 +10,14 @@ type WorkspaceUiState = {
   isSidebarCollapsed: boolean
   isCompactSidebarExpanded: boolean
   searchQuery: string
+  isShoppingManagementMode: boolean
   setActiveView: (view: AppView) => void
   toggleSidebarCollapsed: () => void
   setSidebarCollapsed: (isCollapsed: boolean) => void
   toggleCompactSidebarExpanded: () => void
   setCompactSidebarExpanded: (isExpanded: boolean) => void
   setSearchQuery: (searchQuery: string) => void
+  toggleShoppingManagementMode: () => void
 }
 
 type PersistedWorkspaceUiState = Pick<
@@ -28,6 +30,7 @@ const defaultWorkspaceUiState = {
   isSidebarCollapsed: false,
   isCompactSidebarExpanded: false,
   searchQuery: "",
+  isShoppingManagementMode: false,
 }
 
 function readPersistedWorkspaceUiState(): PersistedWorkspaceUiState {
@@ -104,6 +107,8 @@ export const useWorkspaceUiStore = create<WorkspaceUiState>((set) => ({
     })),
   setCompactSidebarExpanded: (isCompactSidebarExpanded) => set({ isCompactSidebarExpanded }),
   setSearchQuery: (searchQuery) => set({ searchQuery }),
+  toggleShoppingManagementMode: () =>
+    set((state) => ({ isShoppingManagementMode: !state.isShoppingManagementMode })),
 }))
 
 useWorkspaceUiStore.subscribe((state) => {

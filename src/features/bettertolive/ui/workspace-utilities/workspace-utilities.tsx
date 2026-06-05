@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from "react"
-import { BellRing, Music4, Palette } from "lucide-react"
+import { BellRing, Music4, Palette, Wrench } from "lucide-react"
 
 import type {
   WorkspaceNotification,
@@ -14,6 +14,7 @@ import type {
 } from "@/features/bettertolive/config/notifications"
 import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
+import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
 import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"
 import { ThemeUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/theme-utility-panel"
@@ -90,6 +91,10 @@ export function WorkspaceUtilities({
   const musicTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   const currentTheme = themes.find((item) => item.id === themeId) ?? themes[0]
+  const isShoppingManagementMode = useWorkspaceUiStore((state) => state.isShoppingManagementMode)
+  const toggleShoppingManagementMode = useWorkspaceUiStore(
+    (state) => state.toggleShoppingManagementMode,
+  )
 
   const updatePanelPosition = useCallback(() => {
     if (openPanel === null || typeof window === "undefined") {
@@ -233,6 +238,15 @@ export function WorkspaceUtilities({
           onClick={() => setOpenPanel((current) => (current === "music" ? null : "music"))}
         >
           <Music4 className="size-4" />
+        </UtilityIconButton>
+
+        <UtilityIconButton
+          isActive={isShoppingManagementMode}
+          label="管理模式"
+          testId="management-mode-trigger"
+          onClick={toggleShoppingManagementMode}
+        >
+          <Wrench className="size-4" />
         </UtilityIconButton>
       </div>
 

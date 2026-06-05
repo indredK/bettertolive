@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next"
-import { House } from "lucide-react"
+import { GripVertical, House, Pencil } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -13,6 +14,7 @@ import { TabsContent } from "@/components/ui/tabs"
 import type { SpaceOverview } from "@/features/bettertolive/ui/shopping/shopping-space-detail-dialog"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
+import { AddCard } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
@@ -27,7 +29,15 @@ function SystemSummaryChip({ label }: { label: string }) {
   )
 }
 
-function SpaceDetailTable({ space }: { space: SpaceOverview }) {
+function SpaceDetailTable({
+  space,
+  onEditOwned,
+  onEditPlan,
+}: {
+  space: SpaceOverview
+  onEditOwned?: (item: ShoppingOwnedItem) => void
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
+}) {
   const { t } = useTranslation()
   const totalItems = space.owned.length + space.planned.length
   const isEmpty = totalItems === 0
@@ -91,10 +101,11 @@ function SpaceDetailTable({ space }: { space: SpaceOverview }) {
                 <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
                   {t("shopping.spaces.table.tag")}
                 </TableHead>
+                <TableHead className="w-[40px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allItems.map(({ item, sourceLabel }) => {
+              {allItems.map(({ item, sourceLabel, sourceType }) => {
                 const isPlanItem = "currentPrice" in item
                 return (
                   <TableRow key={item.id}>
@@ -126,6 +137,23 @@ function SpaceDetailTable({ space }: { space: SpaceOverview }) {
                         {sourceLabel}
                       </Badge>
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        size="icon-sm"
+                        variant="ghost"
+                        className="text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (sourceType === "planned" && onEditPlan) {
+                            onEditPlan(item as ShoppingPlanWithLane)
+                          } else if (sourceType === "owned" && onEditOwned) {
+                            onEditOwned(item as ShoppingOwnedItem)
+                          }
+                        }}
+                      >
+                        <Pencil className="size-3.5" />
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 )
               })}
@@ -150,14 +178,28 @@ function SpaceMapCard({
   space,
   isSelected,
   onSelect,
+  isManagementMode,
+  onEditOwned,
+  onEditPlan,
+  onDragStart,
+  onDragOver,
+  onDrop,
 }: {
   space: SpaceOverview
   isSelected: boolean
   onSelect: (spaceName: string) => void
+  isManagementMode?: boolean
+  onEditOwned?: (item: ShoppingOwnedItem) => void
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
+  onDragStart?: (e: React.DragEvent, name: string) => void
+  onDragOver?: (e: React.DragEvent) => void
+  onDrop?: (e: React.DragEvent, name: string) => void
 }) {
   const { t } = useTranslation()
   const totalItems = space.owned.length + space.planned.length
   const isActive = totalItems > 0
+  const firstOwned = space.owned[0]
+  const firstPlanned = space.planned[0]
 
   const summaryText = isActive
     ? (() => {
@@ -177,75 +219,123 @@ function SpaceMapCard({
     : t("shopping.spaces.noItemData")
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(space.name)}
-      className={cn(
-        "flex w-full min-w-0 flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
-        isActive
-          ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
-          : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
-        isSelected &&
-          "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]",
-      )}
+    <div
+      className="relative"
+      draggable={isManagementMode}
+      onDragStart={isManagementMode && onDragStart ? (e) => onDragStart(e, space.name) : undefined}
+      onDragOver={isManagementMode && onDragOver ? onDragOver : undefined}
+      onDrop={isManagementMode && onDrop ? (e) => onDrop(e, space.name) : undefined}
     >
-      <div className="flex min-w-0 items-start gap-2">
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
-          <House className="size-3.5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-            {space.name}
+      <button
+        type="button"
+        onClick={() => onSelect(space.name)}
+        className={cn(
+          "flex w-[210px] shrink-0 flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
+          isManagementMode && "pl-0",
+          isActive
+            ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
+            : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
+          isSelected &&
+            "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]",
+          isManagementMode && "cursor-grab active:cursor-grabbing",
+        )}
+      >
+        <div className="flex min-w-0 items-start gap-2 pr-6">
+          {isManagementMode ? (
+            <div className="flex size-6 shrink-0 items-center justify-center text-[color:var(--text-muted)]">
+              <GripVertical className="size-3.5" />
+            </div>
+          ) : null}
+          <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
+            <House className="size-3.5" />
           </div>
-          <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {t("shopping.spaces.associatedSystemsCount", { count: space.systems.size })}
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+              {space.name}
+            </div>
+            <div className="truncate text-[11px] text-[color:var(--text-muted)]">
+              {t("shopping.spaces.associatedSystemsCount", { count: space.systems.size })}
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
-        <Badge
-          variant="outline"
-          className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-1.5 overflow-hidden",
+            isManagementMode && "pl-8",
+          )}
         >
-          {space.owned.length} / {space.planned.length}
-        </Badge>
-        {space.planned.length > 0 ? (
           <Badge
             variant="outline"
-            className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
+            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
           >
-            {t("shopping.spaces.pendingBadge", { count: space.planned.length })}
+            {space.owned.length} / {space.planned.length}
           </Badge>
-        ) : null}
-      </div>
-
-      <p className="truncate text-[12px] leading-5 text-[color:var(--text-secondary)]">
-        {summaryText}
-      </p>
-
-      <div className="flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45">
-        {Array.from(space.systems)
-          .slice(0, 3)
-          .map((system) => (
+          {space.planned.length > 0 ? (
             <Badge
-              key={system}
+              variant="outline"
+              className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
+            >
+              {t("shopping.spaces.pendingBadge", { count: space.planned.length })}
+            </Badge>
+          ) : null}
+        </div>
+
+        <p
+          className={cn(
+            "truncate text-[12px] leading-5 text-[color:var(--text-secondary)]",
+            isManagementMode && "pl-8",
+          )}
+        >
+          {summaryText}
+        </p>
+
+        <div
+          className={cn(
+            "flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45",
+            isManagementMode && "pl-8",
+          )}
+        >
+          {Array.from(space.systems)
+            .slice(0, 3)
+            .map((system) => (
+              <Badge
+                key={system}
+                variant="outline"
+                className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
+              >
+                {system}
+              </Badge>
+            ))}
+          {space.systems.size > 3 ? (
+            <Badge
               variant="outline"
               className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
             >
-              {system}
+              +{space.systems.size - 3}
             </Badge>
-          ))}
-        {space.systems.size > 3 ? (
-          <Badge
-            variant="outline"
-            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-          >
-            +{space.systems.size - 3}
-          </Badge>
-        ) : null}
-      </div>
-    </button>
+          ) : null}
+        </div>
+      </button>
+
+      {isManagementMode && isActive ? (
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          className="absolute top-2 right-2 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+          onClick={(e) => {
+            e.stopPropagation()
+            if (firstOwned && onEditOwned) {
+              onEditOwned(firstOwned)
+            } else if (firstPlanned && onEditPlan) {
+              onEditPlan(firstPlanned)
+            }
+          }}
+        >
+          <Pencil className="size-3.5" />
+        </Button>
+      ) : null}
+    </div>
   )
 }
 
@@ -253,15 +343,41 @@ export function ShoppingSpacesTab({
   spaces,
   selectedSpaceName,
   isFixedLayout,
+  isManagementMode,
   onSelectSpace,
+  onEditOwned,
+  onEditPlan,
+  onAddNew,
 }: {
   spaces: SpaceOverview[]
   selectedSpaceName: string | null
   isFixedLayout: boolean
+  isManagementMode?: boolean
   onSelectSpace: (spaceName: string) => void
+  onEditOwned?: (item: ShoppingOwnedItem) => void
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
+  onAddNew?: () => void
 }) {
   const { t } = useTranslation()
   const selectedSpace = spaces.find((s) => s.name === selectedSpaceName) ?? null
+
+  const handleDragStart = (e: React.DragEvent, name: string) => {
+    e.dataTransfer.setData("text/plain", name)
+    e.dataTransfer.effectAllowed = "move"
+    ;(e.currentTarget as HTMLElement).style.opacity = "0.5"
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+  }
+
+  const handleDrop = (e: React.DragEvent, targetName: string) => {
+    e.preventDefault()
+    const dragName = e.dataTransfer.getData("text/plain")
+    if (dragName === targetName) return
+    onSelectSpace(dragName)
+  }
 
   return (
     <TabsContent
@@ -278,27 +394,38 @@ export function ShoppingSpacesTab({
         )}
       >
         {/* Left: Space Cards */}
-        <Surface className={cn("overflow-hidden p-3", isFixedLayout && "min-h-0")}>
-          {spaces.length > 0 ? (
-            <div className="grid h-full grid-cols-2 gap-2 lg:grid-cols-3 xl:grid-cols-3">
-              {spaces.map((space) => (
+        <Surface className={cn("flex min-h-0 flex-col p-3", isFixedLayout && "min-h-0")}>
+          <div className="flex min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] flex-wrap content-start gap-2 overflow-y-auto pr-1">
+            {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
+            {spaces.length > 0 ? (
+              spaces.map((space) => (
                 <SpaceMapCard
                   key={space.name}
                   space={space}
                   isSelected={selectedSpaceName === space.name}
                   onSelect={onSelectSpace}
+                  isManagementMode={isManagementMode}
+                  onEditOwned={onEditOwned}
+                  onEditPlan={onEditPlan}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
                 />
-              ))}
-            </div>
-          ) : (
-            <EmptyState message={t("shopping.spaces.noSpaceData")} />
-          )}
+              ))
+            ) : !isManagementMode ? (
+              <EmptyState message={t("shopping.spaces.noSpaceData")} />
+            ) : null}
+          </div>
         </Surface>
 
         {/* Right: Detail Panel */}
         <div className="min-h-0 overflow-hidden">
           {selectedSpace ? (
-            <SpaceDetailTable space={selectedSpace} />
+            <SpaceDetailTable
+              space={selectedSpace}
+              onEditOwned={onEditOwned}
+              onEditPlan={onEditPlan}
+            />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
               <p className="text-sm text-[color:var(--text-muted)]">

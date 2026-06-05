@@ -1,4 +1,4 @@
-import { AlertTriangle, House, Package2, Settings, ShoppingBasket, Sparkles } from "lucide-react"
+import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -6,10 +6,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   ShoppingModuleData,
   ShoppingOwnedItem,
+  ShoppingStageChecklist,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
-import { ShoppingAdminTab } from "@/features/bettertolive/ui/shopping/shopping-admin-tab"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
 import {
@@ -17,6 +17,11 @@ import {
   PRIORITY_LEVELS,
   type ShoppingLifecycleGroups,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
+import {
+  type EditingItem,
+  ShoppingItemEditDialog,
+} from "@/features/bettertolive/ui/shopping/shopping-item-edit-dialog"
+import { ShoppingStageEditDialog } from "@/features/bettertolive/ui/shopping/shopping-stage-edit-dialog"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
@@ -32,17 +37,82 @@ export function ShoppingPage({
   searchQuery,
   isWideLayout = false,
   isStackedLayout = false,
+  isManagementMode = false,
+  onRefresh,
 }: {
   shopping: ShoppingModuleData
   searchQuery: string
   isWideLayout?: boolean
   isStackedLayout?: boolean
+  isManagementMode?: boolean
+  onRefresh?: () => void
 }) {
   const { t } = useTranslation()
   const isFixedLayout = !isStackedLayout
   const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
   const [selectedSpaceName, setSelectedSpaceName] = useState<string | null>(null)
   const [selectedStageId, setSelectedStageId] = useState<string | null>(null)
+  const [editingItem, setEditingItem] = useState<EditingItem | null>(null)
+  const [editingStage, setEditingStage] = useState<{
+    isNew: boolean
+    checklist: ShoppingStageChecklist | null
+  } | null>(null)
+
+  const handleSaved = () => {
+    setEditingItem(null)
+    onRefresh?.()
+  }
+
+  const handleStageSaved = () => {
+    setEditingStage(null)
+    onRefresh?.()
+  }
+
+  const startEditStage = (checklist: ShoppingStageChecklist) => {
+    setEditingStage({ isNew: false, checklist })
+  }
+
+  const startAddStage = () => {
+    setEditingStage({ isNew: true, checklist: null })
+  }
+
+  const startEditOwned = (item: ShoppingOwnedItem) => {
+    setEditingItem({ type: "owned", item, isNew: false })
+  }
+
+  const startEditPlan = (item: ShoppingPlanWithLane) => {
+    setEditingItem({ type: "plan", item, isNew: false })
+  }
+
+  const startAddPlan = () => {
+    const firstLane = shopping.purchaseLanes[0]
+    const newPlanItem: ShoppingPlanWithLane = {
+      id: `new-${Date.now()}`,
+      name: "",
+      system: "睡眠",
+      category: "",
+      spaces: [],
+      stages: [],
+      necessity: "必要",
+      lifecycle: "耐用品",
+      reason: "",
+      targetLifestyle: "",
+      currentPrice: 0,
+      buyBelowPrice: 0,
+      overpayPrice: 0,
+      note: "",
+      tags: [],
+      keywords: [],
+      laneId: firstLane?.id ?? "",
+      laneTitle: firstLane?.title ?? "",
+    }
+    setEditingItem({ type: "plan", item: newPlanItem, isNew: true })
+  }
+
+  const lanes = shopping.purchaseLanes.map((lane) => ({
+    id: lane.id,
+    title: lane.title,
+  }))
 
   const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
     lane.items.map((item) => ({
@@ -204,10 +274,6 @@ export function ShoppingPage({
             <ShoppingBasket />
             {t("shopping.tabs.planning")}
           </TabsTrigger>
-          <TabsTrigger value="admin" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
-            <Settings />
-            {t("shopping.tabs.admin")}
-          </TabsTrigger>
         </TabsList>
 
         <ShoppingOverviewTab
@@ -219,36 +285,63 @@ export function ShoppingPage({
           overlookedCollection={overlookedCollection}
           isWideLayout={isWideLayout}
           isFixedLayout={isFixedLayout}
+          isManagementMode={isManagementMode}
+          onEditPlan={isManagementMode ? startEditPlan : undefined}
         />
 
         <ShoppingSystemsTab
           systems={activeSystems}
           selectedSystemId={displaySystemId}
           isFixedLayout={isFixedLayout}
+          isManagementMode={isManagementMode}
           onSelectSystem={setSelectedSystemId}
+          onEditOwned={isManagementMode ? startEditOwned : undefined}
+          onEditPlan={isManagementMode ? startEditPlan : undefined}
+          onAddNew={isManagementMode ? startAddPlan : undefined}
         />
 
         <ShoppingSpacesTab
           spaces={spaces}
           selectedSpaceName={displaySpaceName}
           isFixedLayout={isFixedLayout}
+          isManagementMode={isManagementMode}
           onSelectSpace={setSelectedSpaceName}
+          onEditOwned={isManagementMode ? startEditOwned : undefined}
+          onEditPlan={isManagementMode ? startEditPlan : undefined}
+          onAddNew={isManagementMode ? startAddPlan : undefined}
         />
 
         <ShoppingStagesTab
           checklists={shopping.stageChecklists}
           selectedStageId={displayStageId}
           isFixedLayout={isFixedLayout}
+          isManagementMode={isManagementMode}
           onSelectStage={setSelectedStageId}
+          onEditStage={isManagementMode ? startEditStage : undefined}
+          onAddNew={isManagementMode ? startAddStage : undefined}
         />
 
         <ShoppingPlanningTab
           shopping={shopping}
           isWideLayout={isWideLayout}
           isFixedLayout={isFixedLayout}
+          isManagementMode={isManagementMode}
+          onEditPlan={isManagementMode ? startEditPlan : undefined}
+          onAddNew={isManagementMode ? startAddPlan : undefined}
         />
 
-        <ShoppingAdminTab isWideLayout={isWideLayout} isFixedLayout={isFixedLayout} />
+        <ShoppingItemEditDialog
+          editing={editingItem}
+          lanes={lanes}
+          onClose={() => setEditingItem(null)}
+          onSaved={handleSaved}
+        />
+
+        <ShoppingStageEditDialog
+          editing={editingStage}
+          onClose={() => setEditingStage(null)}
+          onSaved={handleStageSaved}
+        />
       </Tabs>
     </div>
   )

@@ -1,8 +1,9 @@
-import { X } from "lucide-react"
+import { Pencil, X } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -27,7 +28,7 @@ import {
   formatPrice,
   getPriceSignal,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import { ShoppingPriceRow } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import { AddCard, ShoppingPriceRow } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-system-detail-dialog"
 import { cn } from "@/lib/utils"
 
@@ -97,65 +98,85 @@ function PlanItemRow({
   item,
   isSelected,
   onSelect,
+  onEditPlan,
 }: {
   item: ShoppingPlanWithLane
   isSelected: boolean
   onSelect: (id: string) => void
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const { t } = useTranslation()
   const signal = getPriceSignal(item, t)
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(item.id)}
-      className={cn(
-        "flex w-full flex-col gap-1.5 rounded-lg border px-3 py-2.5 text-left transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tone-present-border)]",
-        isSelected
-          ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
-          : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] hover:border-[color:var(--surface-border)]",
-      )}
-    >
-      <div className="flex min-w-0 items-center gap-2">
-        <span className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-          {item.name}
-        </span>
-        <ClassificationBadge
-          label={item.necessity}
-          className={cn("h-5 shrink-0 text-[10px]", NEED_LEVEL_STYLES[item.necessity])}
-        />
-      </div>
-      <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
-        <ClassificationBadge
-          label={item.lifecycle}
-          className={cn("h-5 shrink-0 text-[10px]", LIFECYCLE_STYLES[item.lifecycle])}
-        />
-        {item.depreciation ? (
+    <div className="relative w-[210px] shrink-0">
+      <button
+        type="button"
+        onClick={() => onSelect(item.id)}
+        className={cn(
+          "flex w-full flex-col gap-1.5 rounded-lg border px-3 py-2.5 text-left transition-all duration-150 outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--tone-present-border)]",
+          isSelected
+            ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_2px_8px_rgba(15,23,42,0.06)]"
+            : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] hover:border-[color:var(--surface-border)]",
+        )}
+      >
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
+            {item.name}
+          </span>
           <ClassificationBadge
-            label={item.depreciation}
-            className={cn("h-5 shrink-0 text-[10px]", DEPRECIATION_STYLES[item.depreciation])}
+            label={item.necessity}
+            className={cn("h-5 shrink-0 text-[10px]", NEED_LEVEL_STYLES[item.necessity])}
           />
-        ) : null}
-        <ClassificationBadge
-          label={signal.label}
-          className={cn("h-5 shrink-0 text-[10px]", signal.className)}
-        />
-      </div>
-      <div className="flex min-w-0 items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
-        <span>{item.system}</span>
-        <span>·</span>
-        <span className="truncate">{formatPrice(item.currentPrice)}</span>
-      </div>
-    </button>
+        </div>
+        <div className="flex min-w-0 items-center gap-1.5 overflow-hidden">
+          <ClassificationBadge
+            label={item.lifecycle}
+            className={cn("h-5 shrink-0 text-[10px]", LIFECYCLE_STYLES[item.lifecycle])}
+          />
+          {item.depreciation ? (
+            <ClassificationBadge
+              label={item.depreciation}
+              className={cn("h-5 shrink-0 text-[10px]", DEPRECIATION_STYLES[item.depreciation])}
+            />
+          ) : null}
+          <ClassificationBadge
+            label={signal.label}
+            className={cn("h-5 shrink-0 text-[10px]", signal.className)}
+          />
+        </div>
+        <div className="flex min-w-0 items-center gap-2 text-[11px] text-[color:var(--text-muted)]">
+          <span>{item.system}</span>
+          <span>·</span>
+          <span className="truncate">{formatPrice(item.currentPrice)}</span>
+        </div>
+      </button>
+
+      {onEditPlan ? (
+        <Button
+          size="icon-sm"
+          variant="ghost"
+          className="absolute top-1.5 right-1.5 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+          onClick={(e) => {
+            e.stopPropagation()
+            onEditPlan(item)
+          }}
+        >
+          <Pencil className="size-3.5" />
+        </Button>
+      ) : null}
+    </div>
   )
 }
 
 function PlanItemDetail({
   item,
   shopping,
+  onEditPlan,
 }: {
   item: ShoppingPlanWithLane
   shopping: ShoppingModuleData
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const { t } = useTranslation()
   const signal = getPriceSignal(item, t)
@@ -169,7 +190,19 @@ function PlanItemDetail({
       <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto">
         {/* Basic Info */}
         <div className="p-5 pb-0">
-          <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">{item.name}</h3>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">{item.name}</h3>
+            {onEditPlan ? (
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+                onClick={() => onEditPlan(item)}
+              >
+                <Pencil className="size-4" />
+              </Button>
+            ) : null}
+          </div>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <ClassificationBadge
               label={item.necessity}
@@ -381,10 +414,16 @@ export function ShoppingPlanningTab({
   shopping,
   isWideLayout,
   isFixedLayout,
+  isManagementMode,
+  onEditPlan,
+  onAddNew,
 }: {
   shopping: ShoppingModuleData
   isWideLayout: boolean
   isFixedLayout: boolean
+  isManagementMode?: boolean
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
+  onAddNew?: () => void
 }) {
   const { t } = useTranslation()
   const planItems: ShoppingPlanWithLane[] = shopping.purchaseLanes.flatMap((lane) =>
@@ -557,14 +596,16 @@ export function ShoppingPlanningTab({
               </div>
 
               <div className="min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] overflow-y-auto">
-                {filteredItems.length > 0 ? (
-                  <div className="grid grid-cols-1 gap-2 min-[520px]:grid-cols-2">
+                {filteredItems.length > 0 || (isManagementMode && onAddNew) ? (
+                  <div className="flex flex-wrap content-start gap-2">
+                    {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
                     {filteredItems.map((item) => (
                       <PlanItemRow
                         key={item.id}
                         item={item}
                         isSelected={selectedItemId === item.id}
                         onSelect={setSelectedItemId}
+                        onEditPlan={isManagementMode ? onEditPlan : undefined}
                       />
                     ))}
                   </div>
@@ -579,7 +620,11 @@ export function ShoppingPlanningTab({
         {/* Right: Detail */}
         <div className="min-h-0 overflow-hidden">
           {selectedItem ? (
-            <PlanItemDetail item={selectedItem} shopping={shopping} />
+            <PlanItemDetail
+              item={selectedItem}
+              shopping={shopping}
+              onEditPlan={isManagementMode ? onEditPlan : undefined}
+            />
           ) : (
             <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
               <p className="text-sm text-[color:var(--text-muted)]">

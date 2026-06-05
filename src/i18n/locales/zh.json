@@ -13,6 +13,9 @@
       "planning": "采购决策",
       "admin": "管理"
     },
+    "cardGrid": {
+      "addNew": "新增"
+    },
     "overview": {
       "currentFocus": "当前该先看什么",
       "currentFocusDesc": "这些不是随机想法，而是从系统缺口、动作节奏和购买判断里冒出来的提醒。",
@@ -130,7 +133,26 @@
         "minimum": "最低配置",
         "upgrades": "升级配置"
       },
-      "noStageItems": "当前阶段暂时没有这一层。"
+      "noStageItems": "当前阶段暂时没有这一层。",
+      "confirmDelete": "确定要删除这个阶段模板吗？",
+      "newTitle": "新建阶段模板",
+      "editTitle": "编辑 {{title}}",
+      "newDescription": "填写阶段模板的基本信息，你可以手动编辑下方的 JSON 来调整系统清单。",
+      "editDescription": "修改阶段模板的标题、描述或系统清单结构。",
+      "form": {
+        "title": "标题",
+        "titlePlaceholder": "例如：刚搬进来",
+        "stage": "阶段标签",
+        "stagePlaceholder": "例如：探索、稳定、优化",
+        "description": "描述",
+        "descriptionPlaceholder": "描述这个阶段的目标和特点",
+        "focus": "重点关注",
+        "focusPlaceholder": "这个阶段最需要关注什么",
+        "sections": "系统清单 (JSON)",
+        "sectionsPlaceholder": "[{\"system\":\"睡眠\",\"minimum\":[\"床垫\"],\"essentials\":[],\"upgrades\":[]}]",
+        "cancel": "取消",
+        "save": "保存"
+      }
     },
     "planning": {
       "filter": "筛选",
@@ -310,6 +332,8 @@
     "searchPlaceholder": "搜索记录、观念、关系或成长线索",
     "searchAria": "搜索记录和页面内容",
     "quickRecord": "快速记录",
+    "apiErrorFallback": "当前接口请求失败，页面已回退到本地 mock 数据。",
+    "apiErrorRetry": "重试",
     "language": {
       "switchToEnglish": "Switch to English",
       "switchToChinese": "切换到中文",

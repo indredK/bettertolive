@@ -269,6 +269,7 @@ export function BetterToLiveAppShell() {
   const isSidebarCollapsed = useWorkspaceUiStore((state) => state.isSidebarCollapsed)
   const isCompactSidebarExpanded = useWorkspaceUiStore((state) => state.isCompactSidebarExpanded)
   const searchQuery = useWorkspaceUiStore((state) => state.searchQuery)
+  const isShoppingManagementMode = useWorkspaceUiStore((state) => state.isShoppingManagementMode)
   const setActiveView = useWorkspaceUiStore((state) => state.setActiveView)
   const setSearchQuery = useWorkspaceUiStore((state) => state.setSearchQuery)
   const toggleSidebarCollapsed = useWorkspaceUiStore((state) => state.toggleSidebarCollapsed)
@@ -411,6 +412,8 @@ export function BetterToLiveAppShell() {
             searchQuery={searchQuery}
             isWideLayout={isWideLayout}
             isStackedLayout={isStackedLayout}
+            isManagementMode={isShoppingManagementMode}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "nutrition":
@@ -846,7 +849,7 @@ export function BetterToLiveAppShell() {
               >
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="size-4" />
-                  当前接口请求失败，页面已回退到本地 mock 数据。
+                  {t("shell.apiErrorFallback")}
                 </div>
                 <Button
                   size="sm"
@@ -855,7 +858,7 @@ export function BetterToLiveAppShell() {
                   onClick={() => void workspaceQuery.refetch()}
                 >
                   <RefreshCcw className="size-3.5" />
-                  重试
+                  {t("shell.apiErrorRetry")}
                 </Button>
               </div>
             ) : null}

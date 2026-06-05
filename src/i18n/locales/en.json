@@ -13,6 +13,9 @@
       "planning": "Purchase Decisions",
       "admin": "Admin"
     },
+    "cardGrid": {
+      "addNew": "Add New"
+    },
     "overview": {
       "currentFocus": "What to Focus On Now",
       "currentFocusDesc": "These aren't random thoughts, but reminders emerging from system gaps, action rhythm, and purchase judgment.",
@@ -130,7 +133,26 @@
         "minimum": "Minimum",
         "upgrades": "Upgrades"
       },
-      "noStageItems": "No items in this layer for the current stage."
+      "noStageItems": "No items in this layer for the current stage.",
+      "confirmDelete": "Are you sure you want to delete this stage template?",
+      "newTitle": "New Stage Template",
+      "editTitle": "Edit {{title}}",
+      "newDescription": "Fill in the basic info for the stage template. You can manually edit the JSON below to adjust the system checklist.",
+      "editDescription": "Modify the stage template title, description, or system checklist structure.",
+      "form": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. Just Moved In",
+        "stage": "Stage Label",
+        "stagePlaceholder": "e.g. Explore, Stabilize, Optimize",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the goal and characteristics of this stage",
+        "focus": "Focus",
+        "focusPlaceholder": "What needs the most attention in this stage",
+        "sections": "System Checklist (JSON)",
+        "sectionsPlaceholder": "[{\"system\":\"Sleep\",\"minimum\":[\"Mattress\"],\"essentials\":[],\"upgrades\":[]}]",
+        "cancel": "Cancel",
+        "save": "Save"
+      }
     },
     "planning": {
       "filter": "Filter",
@@ -310,6 +332,8 @@
     "searchPlaceholder": "Search records, beliefs, relationships, or growth clues",
     "searchAria": "Search records and page content",
     "quickRecord": "Quick Record",
+    "apiErrorFallback": "API request failed, page has fallen back to local mock data.",
+    "apiErrorRetry": "Retry",
     "language": {
       "switchToEnglish": "Switch to English",
       "switchToChinese": "切换到中文",

@@ -1,7 +1,8 @@
-import { type LucideIcon } from "lucide-react"
+import { type LucideIcon, Pencil, Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -108,10 +109,14 @@ export function CompactItemRow({
   item,
   sourceLabel,
   compact = false,
+  onEditOwned,
+  onEditPlan,
 }: {
   item: ShoppingOwnedItem | ShoppingPlanWithLane
   sourceLabel: string
   compact?: boolean
+  onEditOwned?: (item: ShoppingOwnedItem) => void
+  onEditPlan?: (item: ShoppingPlanWithLane) => void
 }) {
   const isPlanItem = "currentPrice" in item
 
@@ -122,62 +127,90 @@ export function CompactItemRow({
         compact && "px-3 py-2.5",
       )}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <h3
-          className={cn(
-            "text-sm font-medium text-[color:var(--text-primary)]",
-            compact && "text-[13px]",
-          )}
-        >
-          {item.name}
-        </h3>
-        <ClassificationBadge label={item.necessity} className={NEED_LEVEL_STYLES[item.necessity]} />
-        <ClassificationBadge label={item.lifecycle} className={LIFECYCLE_STYLES[item.lifecycle]} />
-        {item.depreciation ? (
-          <ClassificationBadge
-            label={item.depreciation}
-            className={DEPRECIATION_STYLES[item.depreciation]}
-          />
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3
+              className={cn(
+                "text-sm font-medium text-[color:var(--text-primary)]",
+                compact && "text-[13px]",
+              )}
+            >
+              {item.name}
+            </h3>
+            <ClassificationBadge
+              label={item.necessity}
+              className={NEED_LEVEL_STYLES[item.necessity]}
+            />
+            <ClassificationBadge
+              label={item.lifecycle}
+              className={LIFECYCLE_STYLES[item.lifecycle]}
+            />
+            {item.depreciation ? (
+              <ClassificationBadge
+                label={item.depreciation}
+                className={DEPRECIATION_STYLES[item.depreciation]}
+              />
+            ) : null}
+            <Badge
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+            >
+              {sourceLabel}
+            </Badge>
+          </div>
+
+          <div
+            className={cn(
+              "mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]",
+              compact && "text-[11px]",
+            )}
+          >
+            <span>{item.system}</span>
+            <span>·</span>
+            <span>{item.category}</span>
+            <span>·</span>
+            <span>{item.spaces.join(" / ")}</span>
+            <span>·</span>
+            <span>{item.stages.join(" / ")}</span>
+          </div>
+
+          <p
+            className={cn(
+              "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
+              compact && "text-[13px] leading-5",
+            )}
+          >
+            {isPlanItem ? item.reason : item.replacementCue}
+          </p>
+          <p
+            className={cn(
+              "mt-1 text-sm leading-6 text-[color:var(--text-muted)]",
+              compact && "text-[13px] leading-5",
+            )}
+          >
+            {item.note}
+          </p>
+        </div>
+
+        {onEditOwned || onEditPlan ? (
+          <Button
+            size="icon-sm"
+            variant="ghost"
+            className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+            onClick={(e) => {
+              e.stopPropagation()
+              if (isPlanItem && onEditPlan) {
+                onEditPlan(item)
+              } else if (!isPlanItem && onEditOwned) {
+                onEditOwned(item)
+              }
+            }}
+          >
+            <Pencil className="size-3.5" />
+          </Button>
         ) : null}
-        <Badge
-          variant="outline"
-          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-        >
-          {sourceLabel}
-        </Badge>
       </div>
-
-      <div
-        className={cn(
-          "mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]",
-          compact && "text-[11px]",
-        )}
-      >
-        <span>{item.system}</span>
-        <span>·</span>
-        <span>{item.category}</span>
-        <span>·</span>
-        <span>{item.spaces.join(" / ")}</span>
-        <span>·</span>
-        <span>{item.stages.join(" / ")}</span>
-      </div>
-
-      <p
-        className={cn(
-          "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
-          compact && "text-[13px] leading-5",
-        )}
-      >
-        {isPlanItem ? item.reason : item.replacementCue}
-      </p>
-      <p
-        className={cn(
-          "mt-1 text-sm leading-6 text-[color:var(--text-muted)]",
-          compact && "text-[13px] leading-5",
-        )}
-      >
-        {item.note}
-      </p>
     </div>
   )
 }
@@ -437,5 +470,22 @@ export function PurchaseDecisionCard({
         </div>
       </div>
     </div>
+  )
+}
+
+export function AddCard({ onClick, className }: { onClick: () => void; className?: string }) {
+  const { t } = useTranslation()
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex w-[200px] shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-[color:var(--chip-border)] px-3 py-4 text-[color:var(--text-muted)] transition-all duration-200 hover:border-[color:var(--tone-present-border)] hover:text-[color:var(--text-primary)]",
+        className,
+      )}
+    >
+      <Plus className="size-5" />
+      <span className="text-xs">{t("shopping.cardGrid.addNew")}</span>
+    </button>
   )
 }
