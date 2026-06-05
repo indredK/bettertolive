@@ -21,7 +21,7 @@ export const commands = {
 	deleteShoppingPageContent: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_page_content", { id })),
 	createSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("create_system_definition", { form })),
 	updateSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("update_system_definition", { form })),
-	listPurchaseLanes: () => typedError<PurchaseLaneRow[], string>(__TAURI_INVOKE("list_purchase_lanes")),
+	deleteSystemDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_system_definition", { id })),
 	reorderSystemDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_system_definitions", { orderedIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 };
@@ -125,16 +125,6 @@ export type PlanItemRow = {
 	note: string,
 	sort_order: number,
 	is_archived: boolean,
-	created_at: string,
-	updated_at: string,
-};
-
-export type PurchaseLaneRow = {
-	id: string,
-	title: string,
-	subtitle: string,
-	sort_order: number,
-	is_enabled: boolean,
 	created_at: string,
 	updated_at: string,
 };

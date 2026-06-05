@@ -189,6 +189,7 @@
       "newDescription": "新增一个系统卡片，并补充它的分组、摘要和核心问题。",
       "editTitle": "编辑系统卡片：{{title}}",
       "editDescription": "修改系统卡片的分组、摘要和核心问题。",
+      "confirmDelete": "确定要删除这个系统卡片吗？",
       "selectPrompt": "选择一个系统查看详情",
       "noSystemData": "当前筛选下没有系统地图数据。",
       "form": {
@@ -215,6 +216,7 @@
       "newDescription": "新增一个空间卡片，后续可在物件里关联到这个空间。",
       "editTitle": "编辑空间卡片：{{title}}",
       "editDescription": "修改空间名称后，会同步更新关联物件的空间归属。",
+      "confirmDelete": "确定要删除这个空间卡片吗？",
       "selectPrompt": "选择一个空间查看详情",
       "noSpaceData": "当前筛选下没有空间视角数据。",
       "form": {
@@ -348,8 +350,8 @@
         "noPrice": "未填价格",
         "form": {
           "name": "名称",
-          "laneId": "采购分栏",
-          "selectLane": "选择采购分栏",
+          "laneId": "购买策略",
+          "selectLane": "选择购买策略",
           "systemId": "系统",
           "category": "分类",
           "necessity": "必要性",

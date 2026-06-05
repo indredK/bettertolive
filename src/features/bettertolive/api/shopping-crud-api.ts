@@ -6,7 +6,6 @@ import type {
   ShoppingPlanItemRow,
   ShoppingPageContentForm,
   ShoppingPageContentRow,
-  ShoppingPurchaseLaneRow,
   ShoppingSpaceDefinitionForm,
   ShoppingSystemDefinitionForm,
 } from "@/features/bettertolive/api/bettertolive-api"
@@ -96,13 +95,6 @@ export async function deletePageContent(id: string): Promise<void> {
   return invoke("delete_shopping_page_content", { id })
 }
 
-// ---- Purchase Lanes ----
-
-export async function listPurchaseLanes(): Promise<ShoppingPurchaseLaneRow[]> {
-  if (!hasTauriRuntime()) return []
-  return invoke<ShoppingPurchaseLaneRow[]>("list_purchase_lanes")
-}
-
 // ---- Reorder ----
 
 export async function reorderSystemDefinitions(orderedIds: string[]): Promise<void> {
@@ -125,6 +117,11 @@ export async function createSystemDefinition(form: ShoppingSystemDefinitionForm)
 export async function updateSystemDefinition(form: ShoppingSystemDefinitionForm): Promise<void> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
   return invoke("update_system_definition", { form })
+}
+
+export async function deleteSystemDefinition(id: string): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("delete_system_definition", { id })
 }
 
 // ---- Space Definitions ----

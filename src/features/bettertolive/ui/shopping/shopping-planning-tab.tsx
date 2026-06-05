@@ -4,14 +4,6 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { TabsContent } from "@/components/ui/tabs"
 import type { ShoppingModuleData } from "@/features/bettertolive/types"
 import type {
@@ -166,9 +158,6 @@ function PlanItemDetail({
   const { t } = useTranslation()
   const signal = getPriceSignal(item, t)
   const systemDef = shopping.systemDefinitions.find((s) => s.id === item.system)
-  const priceRefs = shopping.priceReferences.filter(
-    (ref) => ref.system === item.system || ref.category === item.category,
-  )
 
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
@@ -271,72 +260,6 @@ function PlanItemDetail({
                   {group}
                 </Badge>
               ))}
-            </div>
-          </div>
-        ) : null}
-
-        {/* Price Reference Table */}
-        {priceRefs.length > 0 ? (
-          <div className="p-5">
-            <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-              {t("shopping.planning.similarPriceRef")}
-            </div>
-            <div className="mt-3 rounded-lg border border-[color:var(--muted-surface-border)]">
-              <Table className="whitespace-nowrap">
-                <TableHeader className="sticky top-0 z-10 bg-[color:var(--surface-bg)] shadow-[0_1px_0_0_var(--muted-surface-border)]">
-                  <TableRow>
-                    <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      {t("shopping.planning.table.item")}
-                    </TableHead>
-                    <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      {t("shopping.planning.table.system")}
-                    </TableHead>
-                    <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      {t("shopping.planning.table.entryPrice")}
-                    </TableHead>
-                    <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      {t("shopping.planning.table.comfortZone")}
-                    </TableHead>
-                    <TableHead className="text-xs tracking-[0.1em] text-[color:var(--text-muted)] uppercase">
-                      {t("shopping.planning.table.overpay")}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {priceRefs.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell className="text-sm text-[color:var(--text-primary)]">
-                        <div>{entry.category}</div>
-                        <div className="mt-1 flex flex-wrap gap-1">
-                          <Badge variant="outline" className={LIFECYCLE_STYLES[entry.lifecycle]}>
-                            {lifecycleDisplayName(entry.lifecycle, t)}
-                          </Badge>
-                          {entry.depreciation ? (
-                            <Badge
-                              variant="outline"
-                              className={DEPRECIATION_STYLES[entry.depreciation]}
-                            >
-                              {depreciationDisplayName(entry.depreciation, t)}
-                            </Badge>
-                          ) : null}
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                        {systemDisplayName(entry.system, t)}
-                      </TableCell>
-                      <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                        {formatPrice(entry.entryPrice)}
-                      </TableCell>
-                      <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                        {formatPrice(entry.sweetSpotPrice)}
-                      </TableCell>
-                      <TableCell className="text-sm text-[color:var(--text-secondary)]">
-                        {formatPrice(entry.overpayPrice)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </div>
           </div>
         ) : null}

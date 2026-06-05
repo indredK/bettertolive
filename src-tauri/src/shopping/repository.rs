@@ -1453,6 +1453,15 @@ impl ShoppingRepository {
         Ok(())
     }
 
+    pub fn delete_system_definition(conn: &Connection, id: &str) -> Result<(), String> {
+        conn.execute(
+            "DELETE FROM shopping_system_definitions WHERE id = ?1",
+            params![id],
+        )
+        .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
     pub fn reorder_system_definitions(
         conn: &Connection,
         ordered_ids: &[String],
@@ -1502,28 +1511,5 @@ impl ShoppingRepository {
             Some(row) => Ok(Some(row.map_err(|e| e.to_string())?)),
             None => Ok(None),
         }
-    }
-
-    // =====================
-    // CRUD: Purchase Lanes
-    // =====================
-
-    pub fn list_purchase_lanes(conn: &Connection) -> Result<Vec<PurchaseLaneRow>, String> {
-        let mut stmt = conn
-            .prepare(
-                "SELECT id, title, subtitle, sort_order, is_enabled, created_at, updated_at
-                 FROM shopping_purchase_lanes WHERE is_enabled = 1 ORDER BY sort_order",
-            )
-            .map_err(|e| e.to_string())?;
-
-        let rows = stmt
-            .query_map([], row_to_purchase_lane)
-            .map_err(|e| e.to_string())?;
-
-        let mut result = Vec::new();
-        for row in rows {
-            result.push(row.map_err(|e| e.to_string())?);
-        }
-        Ok(result)
     }
 }

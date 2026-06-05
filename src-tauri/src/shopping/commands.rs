@@ -2,7 +2,7 @@ use crate::shopping::db::chrono_now;
 use crate::shopping::dto::{
     ShoppingModuleDto, ShoppingOwnedItemDto, ShoppingPlanItemDto, WorkspaceSnapshotDto,
 };
-use crate::shopping::models::{OwnedItemRow, PageContentRow, PlanItemRow, PurchaseLaneRow};
+use crate::shopping::models::{OwnedItemRow, PageContentRow, PlanItemRow};
 use crate::shopping::repository::ShoppingRepository;
 use rusqlite::params;
 use std::sync::Mutex;
@@ -556,6 +556,13 @@ pub fn update_system_definition(
     )
 }
 
+#[tauri::command]
+#[specta::specta]
+pub fn delete_system_definition(state: State<AppState>, id: String) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::delete_system_definition(&conn, &id)
+}
+
 // =====================
 // Reorder commands
 // =====================
@@ -580,15 +587,4 @@ pub fn reorder_shopping_page_contents(
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
     ShoppingRepository::reorder_page_contents(&conn, &ordered_ids, &now)
-}
-
-// =====================
-// Purchase Lane queries
-// =====================
-
-#[tauri::command]
-#[specta::specta]
-pub fn list_purchase_lanes(state: State<AppState>) -> Result<Vec<PurchaseLaneRow>, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::list_purchase_lanes(&conn)
 }

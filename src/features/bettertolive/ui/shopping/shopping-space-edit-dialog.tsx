@@ -1,3 +1,4 @@
+import { Trash2 } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { z } from "zod"
@@ -14,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import {
   createSpaceDefinition,
+  deletePageContent,
   updateOwnedItem,
   updatePlanItem,
   updateSpaceDefinition,
@@ -195,6 +197,23 @@ function SpaceDialogContent({
     }
   }
 
+  async function handleDelete() {
+    if (form.isNew || !form.id) return
+    if (!window.confirm(t("shopping.spaces.confirmDelete"))) return
+
+    try {
+      setSaving(true)
+      setError(null)
+      await deletePageContent(form.id)
+      onClose()
+      onSaved()
+    } catch (e) {
+      setError(String(e))
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
     <DialogContent className="sm:max-w-lg">
       <DialogHeader>
@@ -224,13 +243,28 @@ function SpaceDialogContent({
         </FormField>
       </div>
 
-      <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
-          {t("shopping.spaces.form.cancel")}
-        </Button>
-        <Button onClick={() => void handleSave()} disabled={saving}>
-          {t("shopping.spaces.form.save")}
-        </Button>
+      <DialogFooter className="flex items-center justify-between">
+        {!form.isNew && form.id ? (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+            onClick={() => void handleDelete()}
+            disabled={saving}
+          >
+            <Trash2 />
+          </Button>
+        ) : (
+          <span />
+        )}
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={onClose}>
+            {t("shopping.spaces.form.cancel")}
+          </Button>
+          <Button onClick={() => void handleSave()} disabled={saving}>
+            {t("shopping.spaces.form.save")}
+          </Button>
+        </div>
       </DialogFooter>
     </DialogContent>
   )

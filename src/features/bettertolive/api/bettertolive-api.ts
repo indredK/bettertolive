@@ -140,16 +140,6 @@ export type ShoppingPageContentRow = {
   updated_at: string
 }
 
-export type ShoppingPurchaseLaneRow = {
-  id: string
-  title: string
-  subtitle: string
-  sort_order: number
-  is_enabled: boolean
-  created_at: string
-  updated_at: string
-}
-
 export type BetterToLiveApi = {
   getOverview: () => Promise<OverviewModuleData>
   getReflection: () => Promise<ReflectionModuleData>
