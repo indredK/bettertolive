@@ -189,8 +189,8 @@
       "selectPrompt": "选择一个系统查看详情",
       "noSystemData": "当前筛选下没有系统地图数据。",
       "form": {
-        "system": "系统",
-        "systemPlaceholder": "例如：睡眠系统",
+        "system": "名称",
+        "systemPlaceholder": "例如：睡眠",
         "summary": "摘要",
         "keyQuestion": "核心问题",
         "secondaryGroups": "二级分组",
@@ -270,6 +270,8 @@
         "save": "保存"
       },
       "itemPicker": {
+        "search": "搜索...",
+        "placeholder": "未选(可空)",
         "noItemsForSystem": "该系统下还没有物品,先去采购决策里创建",
         "unresolved": "(物品已删除或不存在)"
       }
@@ -283,6 +285,7 @@
       "lifecycle": "生命周期",
       "all": "全部",
       "itemCount": "{{count}} 个物件",
+      "searchPlaceholder": "搜索物件...",
       "selectPrompt": "选择一个物件查看采购详情",
       "noMatchingItems": "当前筛选条件下没有匹配的物件。",
       "decisionReason": "决策理由",
@@ -368,12 +371,12 @@
           "name": "名称",
           "laneId": "购买策略",
           "selectLane": "选择购买策略",
-          "systemId": "系统",
+          "systemId": "系统地图",
           "category": "分类",
           "necessity": "必要性",
           "lifecycle": "生命周期",
           "depreciation": "折旧程度",
-          "spaces": "空间",
+          "spaces": "空间巡检",
           "stages": "适用阶段",
           "quantity": "数量",
           "status": "状态",
@@ -402,12 +405,17 @@
           "lifestylePlaceholder": "e.g. 舒服",
           "pricePlaceholder": "0.00",
           "notePlaceholder": "其他备注",
+          "itemType": "物品类型",
           "help": {
             "spaces": "使用逗号分隔多个空间，例如：卧室, 客厅",
             "stages": "可多选适用阶段，保存时会自动写入标准阶段编码",
             "tags": "使用逗号分隔多个标签",
             "keywords": "使用逗号分隔多个搜索关键词"
           }
+        },
+        "itemType": {
+          "owned": "已拥有",
+          "plan": "待补"
         }
       },
       "pageContentLabel": "页面内容",

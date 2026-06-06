@@ -64,6 +64,7 @@ export function ShoppingPage({
   const [editingStage, setEditingStage] = useState<{
     isNew: boolean
     checklist: ShoppingStageChecklist | null
+    stage: string
   } | null>(null)
   const [editingSystem, setEditingSystem] = useState<{
     isNew: boolean
@@ -147,11 +148,11 @@ export function ShoppingPage({
   }
 
   const startEditStage = (checklist: ShoppingStageChecklist) => {
-    setEditingStage({ isNew: false, checklist })
+    setEditingStage({ isNew: false, checklist, stage: checklist.stage })
   }
 
-  const startAddStage = () => {
-    setEditingStage({ isNew: true, checklist: null })
+  const startAddStage = (stage: string) => {
+    setEditingStage({ isNew: true, checklist: null, stage })
   }
 
   const startEditSystem = (system: ShoppingSystemOverview) => {
@@ -531,6 +532,7 @@ export function ShoppingPage({
           editing={editingItem}
           lanes={lanes}
           systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
+          spaceOptions={spaces.map((s) => s.name)}
           onClose={() => setEditingItem(null)}
           onSaved={handleSaved}
         />
@@ -539,6 +541,7 @@ export function ShoppingPage({
           editing={editingStage}
           systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
           allItems={{ owned: shopping.ownedItems, plan: planItems }}
+          preferredStage={editingStage?.stage ?? ""}
           onClose={() => setEditingStage(null)}
           onSaved={handleStageSaved}
         />

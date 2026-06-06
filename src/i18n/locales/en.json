@@ -189,8 +189,8 @@
       "selectPrompt": "Select a system to view details",
       "noSystemData": "No system map data under current filter.",
       "form": {
-        "system": "System",
-        "systemPlaceholder": "e.g. Sleep System",
+        "system": "Name",
+        "systemPlaceholder": "e.g. Sleep",
         "summary": "Summary",
         "keyQuestion": "Core Question",
         "secondaryGroups": "Secondary Groups",
@@ -270,6 +270,8 @@
         "save": "Save"
       },
       "itemPicker": {
+        "search": "Search...",
+        "placeholder": "None selected (optional)",
         "noItemsForSystem": "No items under this system yet. Create them on the Purchase Decisions tab.",
         "unresolved": "(item deleted or not found)"
       }
@@ -283,6 +285,7 @@
       "lifecycle": "Lifecycle",
       "all": "All",
       "itemCount": "{{count}} items",
+      "searchPlaceholder": "Search items...",
       "selectPrompt": "Select an item to view purchase details",
       "noMatchingItems": "No matching items under current filters.",
       "decisionReason": "Decision Rationale",
@@ -368,12 +371,12 @@
           "name": "Name",
           "laneId": "Purchase Strategy",
           "selectLane": "Select purchase strategy",
-          "systemId": "System",
+          "systemId": "System Map",
           "category": "Category",
           "necessity": "Necessity",
           "lifecycle": "Lifecycle",
           "depreciation": "Depreciation",
-          "spaces": "Spaces",
+          "spaces": "Space Inspection",
           "stages": "Stages",
           "quantity": "Quantity",
           "status": "Status",
@@ -402,12 +405,17 @@
           "lifestylePlaceholder": "e.g. comfort",
           "pricePlaceholder": "0.00",
           "notePlaceholder": "Additional notes",
+          "itemType": "Item Type",
           "help": {
             "spaces": "Separate multiple spaces with commas, for example: bedroom, living room",
             "stages": "Select one or more applicable stages; saving stores the canonical stage codes",
             "tags": "Separate multiple tags with commas",
             "keywords": "Separate multiple search keywords with commas"
           }
+        },
+        "itemType": {
+          "owned": "Owned",
+          "plan": "To Buy"
         }
       },
       "pageContentLabel": "Page Content",

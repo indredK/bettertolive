@@ -309,7 +309,7 @@ function SystemDialogContent({
         <DialogTitle>
           {form.isNew
             ? t("shopping.systems.newTitle")
-            : t("shopping.systems.editTitle", { title: systemDisplayName(form.id, t) })}
+            : t("shopping.systems.editTitle", { title: form.id })}
         </DialogTitle>
         <DialogDescription>
           {form.isNew

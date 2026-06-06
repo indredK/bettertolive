@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { MultiSelect } from "@/components/ui/multi-select"
 import {
   Select,
   SelectContent,
@@ -41,25 +41,20 @@ import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/s
 import type {
   ShoppingDepreciation,
   ShoppingLifecycle,
-  ShoppingOwnedStatus,
-  ShoppingStage,
   ShoppingSystem,
 } from "@/features/bettertolive/types"
+import { ShoppingOwnedStatus } from "@/features/bettertolive/types"
 import {
   depreciationDisplayName,
   laneDisplayName,
   lifecycleDisplayName,
-  normalizeStageValues,
   normalizeOwnedStatusValue,
   ownedStatusDisplayName,
   SHOPPING_DEPRECIATION_OPTIONS,
   SHOPPING_LIFECYCLE_OPTIONS,
   SHOPPING_OWNED_STATUS_OPTIONS,
-  SHOPPING_STAGE_OPTIONS,
-  stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import { cn } from "@/lib/utils"
 
 export type EditingOwnedItem = {
   type: "owned"
@@ -77,9 +72,30 @@ export type EditingItem = EditingOwnedItem | EditingPlanItem
 
 type LaneOption = { id: string; title: string }
 
-type FormState =
-  | (ShoppingOwnedItemForm & { isNew: boolean; itemType: "owned" })
-  | (ShoppingPlanItemForm & { isNew: boolean; itemType: "plan" })
+type FormState = {
+  isNew: boolean
+  itemType: "owned" | "plan"
+  id?: string | null
+  name: string
+  system: string
+  category: string
+  spaces: string[]
+  lifecycle: string
+  depreciation?: string | null
+  note: string
+  // owned-only
+  quantity: number
+  status: ShoppingOwnedStatus
+  replacementCue: string
+  // plan-only
+  laneId: string
+  reason: string
+  targetLifestyle: string
+  currentPrice: number | null
+  buyBelowPrice: number | null
+  overpayPrice: number | null
+  keywords: string[]
+}
 
 const ITEM_LIMITS = {
   name: 80,
@@ -146,91 +162,16 @@ function arrayFieldSchema(t: TFunction, field: string, itemMaxLength: number, ma
     .max(maxItems, maxItemsMessage(t, field, maxItems))
 }
 
-function enumArrayFieldSchema<T extends string>(
-  options: readonly T[],
-  t: TFunction,
-  field: string,
-) {
-  return z
-    .array(z.string())
-    .max(options.length, maxItemsMessage(t, field, options.length))
-    .refine((values) => values.every((value): value is T => options.includes(value as T)), {
-      message: invalidOptionMessage(t, field),
-    })
-    .refine((values) => new Set(values).size === values.length, {
-      message: invalidOptionMessage(t, field),
-    })
-}
-
-function buildOwnedItemSchema(t: TFunction, systemOptions: string[]) {
-  const fields = {
-    name: cleanFieldLabel(t("shopping.admin.items.form.name")),
-    system: cleanFieldLabel(t("shopping.admin.items.form.systemId")),
-    category: cleanFieldLabel(t("shopping.admin.items.form.category")),
-    spaces: cleanFieldLabel(t("shopping.admin.items.form.spaces")),
-    stages: cleanFieldLabel(t("shopping.admin.items.form.stages")),
-    // 注:necessity 字段已删除
-    lifecycle: cleanFieldLabel(t("shopping.admin.items.form.lifecycle")),
-    status: cleanFieldLabel(t("shopping.admin.items.form.status")),
-    replacementCue: cleanFieldLabel(t("shopping.admin.items.form.replacementCue")),
-    note: cleanFieldLabel(t("shopping.admin.items.form.note")),
-  }
-
-  return z.object({
-    name: z
-      .string()
-      .trim()
-      .min(1, requiredMessage(t, fields.name))
-      .max(ITEM_LIMITS.name, maxLengthMessage(t, fields.name, ITEM_LIMITS.name)),
-    system: enumFieldSchema(systemOptions, t, fields.system),
-    category: z
-      .string()
-      .trim()
-      .min(1, requiredMessage(t, fields.category))
-      .max(ITEM_LIMITS.category, maxLengthMessage(t, fields.category, ITEM_LIMITS.category)),
-    spaces: arrayFieldSchema(t, fields.spaces, ITEM_LIMITS.spacesPerItem, ITEM_LIMITS.spacesCount),
-    stages: enumArrayFieldSchema(SHOPPING_STAGE_OPTIONS, t, fields.stages),
-    lifecycle: enumFieldSchema(SHOPPING_LIFECYCLE_OPTIONS, t, fields.lifecycle),
-    depreciation: z
-      .string()
-      .nullable()
-      .optional()
-      .refine(
-        (value) => !value || SHOPPING_DEPRECIATION_OPTIONS.includes(value as ShoppingDepreciation),
-        {
-          message: invalidOptionMessage(
-            t,
-            cleanFieldLabel(t("shopping.admin.items.form.depreciation")),
-          ),
-        },
-      ),
-    quantity: z.number().int().min(0).max(ITEM_LIMITS.quantity),
-    status: enumFieldSchema(SHOPPING_OWNED_STATUS_OPTIONS, t, fields.status),
-    replacementCue: z
-      .string()
-      .trim()
-      .min(1, requiredMessage(t, fields.replacementCue))
-      .max(
-        ITEM_LIMITS.replacementCue,
-        maxLengthMessage(t, fields.replacementCue, ITEM_LIMITS.replacementCue),
-      ),
-    note: z
-      .string()
-      .trim()
-      .max(ITEM_LIMITS.note, maxLengthMessage(t, fields.note, ITEM_LIMITS.note)),
-  })
-}
-
-function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
+function buildItemSchema(t: TFunction, systemOptions: string[]) {
   const fields = {
     laneId: cleanFieldLabel(t("shopping.admin.items.form.laneId")),
     name: cleanFieldLabel(t("shopping.admin.items.form.name")),
     system: cleanFieldLabel(t("shopping.admin.items.form.systemId")),
     category: cleanFieldLabel(t("shopping.admin.items.form.category")),
     spaces: cleanFieldLabel(t("shopping.admin.items.form.spaces")),
-    stages: cleanFieldLabel(t("shopping.admin.items.form.stages")),
-    // 注:necessity 与 tags 字段已删除 — 必要程度由阶段档位承载;标签由 system/spaces/stages 在显示层渲染
     lifecycle: cleanFieldLabel(t("shopping.admin.items.form.lifecycle")),
+    status: cleanFieldLabel(t("shopping.admin.items.form.status")),
+    replacementCue: cleanFieldLabel(t("shopping.admin.items.form.replacementCue")),
     keywords: cleanFieldLabel(t("shopping.admin.items.form.keywords")),
     reason: cleanFieldLabel(t("shopping.admin.items.form.reason")),
     targetLifestyle: cleanFieldLabel(t("shopping.admin.items.form.targetLifestyle")),
@@ -260,7 +201,6 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
         ITEM_LIMITS.spacesPerItem,
         ITEM_LIMITS.spacesCount,
       ),
-      stages: enumArrayFieldSchema(SHOPPING_STAGE_OPTIONS, t, fields.stages),
       lifecycle: enumFieldSchema(SHOPPING_LIFECYCLE_OPTIONS, t, fields.lifecycle),
       depreciation: z
         .string()
@@ -276,6 +216,22 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
             ),
           },
         ),
+      quantity: z.number().int().min(0).max(ITEM_LIMITS.quantity),
+      status: enumFieldSchema(SHOPPING_OWNED_STATUS_OPTIONS, t, fields.status),
+      replacementCue: z
+        .string()
+        .trim()
+        .min(1, requiredMessage(t, fields.replacementCue))
+        .max(
+          ITEM_LIMITS.replacementCue,
+          maxLengthMessage(t, fields.replacementCue, ITEM_LIMITS.replacementCue),
+        ),
+      keywords: arrayFieldSchema(
+        t,
+        fields.keywords,
+        ITEM_LIMITS.keywordsPerItem,
+        ITEM_LIMITS.keywordsCount,
+      ),
       reason: z
         .string()
         .trim()
@@ -320,12 +276,6 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
         .string()
         .trim()
         .max(ITEM_LIMITS.note, maxLengthMessage(t, fields.note, ITEM_LIMITS.note)),
-      keywords: arrayFieldSchema(
-        t,
-        fields.keywords,
-        ITEM_LIMITS.keywordsPerItem,
-        ITEM_LIMITS.keywordsCount,
-      ),
     })
     .refine(
       (value) =>
@@ -339,52 +289,52 @@ function buildPlanItemSchema(t: TFunction, systemOptions: string[]) {
     )
 }
 
-function buildOwnedForm(
-  item: ShoppingOwnedItem,
-  isNew: boolean,
-): ShoppingOwnedItemForm & { isNew: boolean; itemType: "owned" } {
+function buildOwnedForm(item: ShoppingOwnedItem, isNew: boolean): FormState {
   return {
     isNew,
-    itemType: "owned" as const,
+    itemType: "owned",
     id: isNew ? undefined : item.id,
     name: item.name,
     system: item.system,
     category: item.category,
     spaces: [...item.spaces],
-    stages: normalizeStageValues(item.stages),
-    // 注:necessity 字段已删除
     lifecycle: item.lifecycle,
     depreciation: item.depreciation ?? null,
+    note: item.note,
     quantity: item.quantity,
     status: normalizeOwnedStatusValue(item.status) as ShoppingOwnedStatus,
     replacementCue: item.replacementCue,
-    note: item.note,
+    laneId: "",
+    reason: "",
+    targetLifestyle: "",
+    currentPrice: null,
+    buyBelowPrice: null,
+    overpayPrice: null,
+    keywords: [],
   }
 }
 
-function buildPlanForm(
-  item: ShoppingPlanWithLane,
-  isNew: boolean,
-): ShoppingPlanItemForm & { isNew: boolean; itemType: "plan" } {
+function buildPlanForm(item: ShoppingPlanWithLane, isNew: boolean): FormState {
   return {
     isNew,
-    itemType: "plan" as const,
+    itemType: "plan",
     id: isNew ? undefined : item.id,
-    laneId: item.laneId,
     name: item.name,
     system: item.system,
     category: item.category,
     spaces: [...item.spaces],
-    stages: normalizeStageValues(item.stages),
-    // 注:necessity 与 tags 字段已删除
     lifecycle: item.lifecycle,
     depreciation: item.depreciation ?? null,
+    note: item.note,
+    quantity: 1,
+    status: ShoppingOwnedStatus.StableUse,
+    replacementCue: "",
+    laneId: item.laneId,
     reason: item.reason,
     targetLifestyle: item.targetLifestyle,
     currentPrice: item.currentPrice ?? null,
     buyBelowPrice: item.buyBelowPrice ?? null,
     overpayPrice: item.overpayPrice ?? null,
-    note: item.note,
     keywords: [...item.keywords],
   }
 }
@@ -396,62 +346,18 @@ function parseArray(value: string): string[] {
     .filter(Boolean)
 }
 
-function StageMultiSelectField({
-  value,
-  onChange,
-  t,
-}: {
-  value: ShoppingStage[]
-  onChange: (value: ShoppingStage[]) => void
-  t: TFunction
-}) {
-  return (
-    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-      {SHOPPING_STAGE_OPTIONS.map((stage) => {
-        const checked = value.includes(stage)
-
-        return (
-          <Label
-            key={stage}
-            className={cn(
-              "min-h-11 cursor-pointer items-start rounded-lg border px-3 py-2.5 leading-5 transition-colors",
-              checked
-                ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/35 text-[color:var(--text-primary)]"
-                : "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)] hover:bg-[color:var(--muted-surface-bg)]",
-            )}
-          >
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={(event) => {
-                onChange(
-                  event.target.checked
-                    ? [...value, stage]
-                    : value.filter(
-                        (currentStage): currentStage is ShoppingStage => currentStage !== stage,
-                      ),
-                )
-              }}
-              className="mt-0.5 size-4 rounded border-[color:var(--surface-border)]"
-            />
-            <span>{stageDisplayName(stage, t)}</span>
-          </Label>
-        )
-      })}
-    </div>
-  )
-}
-
 export function ShoppingItemEditDialog({
   editing,
   lanes,
   systemOptions,
+  spaceOptions,
   onClose,
   onSaved,
 }: {
   editing: EditingItem | null
   lanes: LaneOption[]
   systemOptions: string[]
+  spaceOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -477,6 +383,7 @@ export function ShoppingItemEditDialog({
         editing={editing}
         lanes={lanes}
         systemOptions={systemOptions}
+        spaceOptions={spaceOptions}
         onClose={onClose}
         onSaved={onSaved}
       />
@@ -489,6 +396,7 @@ function ItemDialogContent({
   editing,
   lanes,
   systemOptions,
+  spaceOptions,
   onClose,
   onSaved,
 }: {
@@ -496,6 +404,7 @@ function ItemDialogContent({
   editing: EditingItem
   lanes: LaneOption[]
   systemOptions: string[]
+  spaceOptions: string[]
   onClose: () => void
   onSaved: () => void
 }) {
@@ -503,10 +412,15 @@ function ItemDialogContent({
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [form, setForm] = useState<FormState>(initialForm)
-  const isOwned = editing.type === "owned"
+  const isOwned = form.itemType === "owned"
 
   const update = <T extends Partial<FormState>>(partial: T) => {
-    setForm((prev) => ({ ...prev, ...partial }) as FormState)
+    setForm((prev) => ({ ...prev, ...partial }))
+  }
+
+  function handleTypeSwitch(nextType: "owned" | "plan") {
+    if (form.itemType === nextType) return
+    setForm((prev) => ({ ...prev, itemType: nextType }))
   }
 
   function toOwnedForm(
@@ -528,36 +442,42 @@ function ItemDialogContent({
       setSaving(true)
       setError(null)
 
+      const typeChanged = editing.type !== form.itemType
       const { id, ...formData } = form
-      if (form.itemType === "owned") {
-        const parsed = buildOwnedItemSchema(t, systemOptions).safeParse(formData)
-        if (!parsed.success) {
-          setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
-          return
-        }
 
-        const apiForm = toOwnedForm(id, {
+      const parsed = buildItemSchema(t, systemOptions).safeParse(formData)
+      if (!parsed.success) {
+        setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
+        return
+      }
+
+      if (form.itemType === "owned") {
+        const apiForm = toOwnedForm(typeChanged ? undefined : id, {
           ...(parsed.data as unknown as ShoppingOwnedItemForm),
-          stages: normalizeStageValues(parsed.data.stages),
           status: normalizeOwnedStatusValue(parsed.data.status) as ShoppingOwnedStatus,
         })
-        if (id) {
+
+        if (typeChanged && editing.item.id && !editing.isNew) {
+          // 类型变了:先删旧的(plan),再建新的(owned)
+          if (editing.type === "plan") await deletePlanItem(editing.item.id)
+          else await deleteOwnedItem(editing.item.id)
+          await createOwnedItem(apiForm)
+        } else if (id) {
           await updateOwnedItem(apiForm)
         } else {
           await createOwnedItem(apiForm)
         }
       } else {
-        const parsed = buildPlanItemSchema(t, systemOptions).safeParse(formData)
-        if (!parsed.success) {
-          setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
-          return
-        }
-
-        const apiForm = toPlanForm(id, {
+        const apiForm = toPlanForm(typeChanged ? undefined : id, {
           ...(parsed.data as unknown as ShoppingPlanItemForm),
-          stages: normalizeStageValues(parsed.data.stages),
         })
-        if (id) {
+
+        if (typeChanged && editing.item.id && !editing.isNew) {
+          // 类型变了:先删旧的(owned),再建新的(plan)
+          if (editing.type === "owned") await deleteOwnedItem(editing.item.id)
+          else await deletePlanItem(editing.item.id)
+          await createPlanItem(apiForm)
+        } else if (id) {
           await updatePlanItem(apiForm)
         } else {
           await createPlanItem(apiForm)
@@ -579,7 +499,7 @@ function ItemDialogContent({
 
     try {
       setError(null)
-      if (editing.type === "owned") {
+      if (form.itemType === "owned") {
         await deleteOwnedItem(editing.item.id)
       } else {
         await deletePlanItem(editing.item.id)
@@ -628,53 +548,106 @@ function ItemDialogContent({
               />
             </FormField>
 
-            {!isOwned ? (
-              <FormField label={t("shopping.admin.items.form.laneId")} required>
-                <Select
-                  value={"laneId" in form ? form.laneId : ""}
-                  onValueChange={(v) => update({ laneId: v ?? "" })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("shopping.admin.items.form.selectLane")}>
-                      {"laneId" in form && form.laneId
-                        ? laneDisplayName(
-                            form.laneId,
-                            lanes.find((l) => l.id === form.laneId)?.title ?? form.laneId,
-                            t,
-                          )
-                        : null}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {lanes.map((lane) => (
-                      <SelectItem key={lane.id} value={lane.id}>
-                        {laneDisplayName(lane.id, lane.title, t)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            ) : null}
-
-            <FormField label={t("shopping.admin.items.form.systemId")} required>
+            <FormField label={t("shopping.admin.items.form.itemType")} required>
               <Select
-                value={`${form.system}`}
-                onValueChange={(v) => setForm((prev) => ({ ...prev, system: v as ShoppingSystem }))}
+                value={form.itemType}
+                onValueChange={(v) => {
+                  if (v && v !== form.itemType) handleTypeSwitch(v)
+                }}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t("shopping.admin.items.form.systemPlaceholder")}>
-                    {form.system ? systemDisplayName(form.system, t) : null}
+                  <SelectValue>
+                    {form.itemType === "owned"
+                      ? t("shopping.admin.items.itemType.owned")
+                      : t("shopping.admin.items.itemType.plan")}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {systemOptions.map((s) => (
-                    <SelectItem key={s} value={s}>
-                      {systemDisplayName(s, t)}
+                  <SelectItem value="owned">{t("shopping.admin.items.itemType.owned")}</SelectItem>
+                  <SelectItem value="plan">{t("shopping.admin.items.itemType.plan")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            <FormField label={t("shopping.admin.items.form.laneId")} required>
+              <Select value={form.laneId} onValueChange={(v) => update({ laneId: v ?? "" })}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("shopping.admin.items.form.selectLane")}>
+                    {form.laneId
+                      ? laneDisplayName(
+                          form.laneId,
+                          lanes.find((l) => l.id === form.laneId)?.title ?? form.laneId,
+                          t,
+                        )
+                      : null}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {lanes.map((lane) => (
+                    <SelectItem key={lane.id} value={lane.id}>
+                      {laneDisplayName(lane.id, lane.title, t)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </FormField>
+
+            <FormField label={t("shopping.admin.items.form.status")} required>
+              <Select
+                value={form.status}
+                onValueChange={(value) => update({ status: value as ShoppingOwnedStatus })}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("shopping.admin.items.form.statusPlaceholder")}>
+                    {form.status ? ownedStatusDisplayName(form.status, t) : null}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {SHOPPING_OWNED_STATUS_OPTIONS.map((status) => (
+                    <SelectItem key={status} value={status}>
+                      {ownedStatusDisplayName(status, t)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+
+            <div className="grid grid-cols-2 gap-4 md:col-span-2">
+              <FormField label={t("shopping.admin.items.form.systemId")} required>
+                <Select
+                  value={`${form.system}`}
+                  onValueChange={(v) =>
+                    setForm((prev) => ({ ...prev, system: v as ShoppingSystem }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder={t("shopping.admin.items.form.systemPlaceholder")}>
+                      {form.system ? systemDisplayName(form.system, t) : null}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {systemOptions.map((s) => (
+                      <SelectItem key={s} value={s}>
+                        {systemDisplayName(s, t)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormField>
+              <FormField
+                label={t("shopping.admin.items.form.spaces")}
+                description={t("shopping.admin.items.form.help.spaces")}
+              >
+                <MultiSelect
+                  options={spaceOptions.map((s) => ({ value: s, label: s }))}
+                  value={form.spaces}
+                  onChange={(spaces) => update({ spaces })}
+                  placeholder={t("shopping.admin.items.form.spacesPlaceholder")}
+                  searchPlaceholder={t("shopping.stages.itemPicker.search")}
+                  emptyMessage={t("shopping.stages.itemPicker.noItemsForSystem")}
+                />
+              </FormField>
+            </div>
             <FormField label={t("shopping.admin.items.form.category")} required>
               <Input
                 value={form.category}
@@ -734,152 +707,94 @@ function ItemDialogContent({
               </Select>
             </FormField>
             <FormField
-              label={t("shopping.admin.items.form.spaces")}
-              description={t("shopping.admin.items.form.help.spaces")}
+              label={t("shopping.admin.items.form.replacementCue")}
+              required
+              className="md:col-span-2"
             >
               <Textarea
-                value={("spaces" in form ? form.spaces : []).join(", ")}
-                onChange={(e) => update({ spaces: parseArray(e.target.value) })}
-                placeholder={t("shopping.admin.items.form.spacesPlaceholder")}
-                maxLength={ITEM_LIMITS.spacesPerItem * ITEM_LIMITS.spacesCount}
+                value={form.replacementCue}
+                onChange={(e) => update({ replacementCue: e.target.value })}
+                placeholder={t("shopping.admin.items.form.cuePlaceholder")}
+                maxLength={ITEM_LIMITS.replacementCue}
                 rows={3}
               />
             </FormField>
 
-            {isOwned ? (
-              <FormField label={t("shopping.admin.items.form.status")} required>
-                <Select
-                  value={"status" in form ? form.status : ""}
-                  onValueChange={(value) => update({ status: value as ShoppingOwnedStatus })}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("shopping.admin.items.form.statusPlaceholder")}>
-                      {"status" in form && form.status
-                        ? ownedStatusDisplayName(form.status, t)
-                        : null}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SHOPPING_OWNED_STATUS_OPTIONS.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {ownedStatusDisplayName(status, t)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            ) : null}
-
             <FormField
-              label={t("shopping.admin.items.form.stages")}
-              description={t("shopping.admin.items.form.help.stages")}
-              className="md:col-span-2"
+              label={t("shopping.admin.items.form.keywords")}
+              description={t("shopping.admin.items.form.help.keywords")}
             >
-              <StageMultiSelectField
-                value={normalizeStageValues("stages" in form ? form.stages : [])}
-                onChange={(stages) => update({ stages })}
-                t={t}
+              <Textarea
+                value={form.keywords.join(", ")}
+                onChange={(e) => update({ keywords: parseArray(e.target.value) })}
+                placeholder={t("shopping.admin.items.form.keywordsPlaceholder")}
+                maxLength={ITEM_LIMITS.keywordsPerItem * ITEM_LIMITS.keywordsCount}
+                rows={3}
               />
             </FormField>
 
-            {isOwned ? (
-              <>
-                <FormField
-                  label={t("shopping.admin.items.form.replacementCue")}
-                  required
-                  className="md:col-span-2"
-                >
-                  <Textarea
-                    value={"replacementCue" in form ? form.replacementCue : ""}
-                    onChange={(e) => update({ replacementCue: e.target.value })}
-                    placeholder={t("shopping.admin.items.form.cuePlaceholder")}
-                    maxLength={ITEM_LIMITS.replacementCue}
-                    rows={3}
-                  />
-                </FormField>
-              </>
-            ) : (
-              <>
-                {/* 注:tags FormField 已删除 — 物品的标签由 system/spaces/stages 在显示层渲染 */}
-                <FormField
-                  label={t("shopping.admin.items.form.keywords")}
-                  description={t("shopping.admin.items.form.help.keywords")}
-                >
-                  <Textarea
-                    value={("keywords" in form ? form.keywords : []).join(", ")}
-                    onChange={(e) => update({ keywords: parseArray(e.target.value) })}
-                    placeholder={t("shopping.admin.items.form.keywordsPlaceholder")}
-                    maxLength={ITEM_LIMITS.keywordsPerItem * ITEM_LIMITS.keywordsCount}
-                    rows={3}
-                  />
-                </FormField>
-                <FormField
-                  label={t("shopping.admin.items.form.reason")}
-                  required
-                  className="md:col-span-2"
-                >
-                  <Textarea
-                    value={"reason" in form ? form.reason : ""}
-                    onChange={(e) => update({ reason: e.target.value })}
-                    placeholder={t("shopping.admin.items.form.reasonPlaceholder")}
-                    maxLength={ITEM_LIMITS.reason}
-                    rows={4}
-                  />
-                </FormField>
-                <FormField
-                  label={t("shopping.admin.items.form.targetLifestyle")}
-                  required
-                  className="md:col-span-2"
-                >
-                  <Textarea
-                    value={"targetLifestyle" in form ? form.targetLifestyle : ""}
-                    onChange={(e) => update({ targetLifestyle: e.target.value })}
-                    placeholder={t("shopping.admin.items.form.lifestylePlaceholder")}
-                    maxLength={ITEM_LIMITS.targetLifestyle}
-                    rows={3}
-                  />
-                </FormField>
-                <FormField label={t("shopping.admin.items.form.currentPrice")}>
-                  <Input
-                    type="number"
-                    value={"currentPrice" in form ? (form.currentPrice ?? "") : ""}
-                    onChange={(e) =>
-                      update({ currentPrice: e.target.value ? Number(e.target.value) : null })
-                    }
-                    placeholder={t("shopping.admin.items.form.pricePlaceholder")}
-                    min={0}
-                    max={ITEM_LIMITS.price}
-                    step={0.01}
-                  />
-                </FormField>
-                <FormField label={t("shopping.admin.items.form.buyBelowPrice")}>
-                  <Input
-                    type="number"
-                    value={"buyBelowPrice" in form ? (form.buyBelowPrice ?? "") : ""}
-                    onChange={(e) =>
-                      update({ buyBelowPrice: e.target.value ? Number(e.target.value) : null })
-                    }
-                    placeholder={t("shopping.admin.items.form.pricePlaceholder")}
-                    min={0}
-                    max={ITEM_LIMITS.price}
-                    step={0.01}
-                  />
-                </FormField>
-                <FormField label={t("shopping.admin.items.form.overpayPrice")}>
-                  <Input
-                    type="number"
-                    value={"overpayPrice" in form ? (form.overpayPrice ?? "") : ""}
-                    onChange={(e) =>
-                      update({ overpayPrice: e.target.value ? Number(e.target.value) : null })
-                    }
-                    placeholder={t("shopping.admin.items.form.pricePlaceholder")}
-                    min={0}
-                    max={ITEM_LIMITS.price}
-                    step={0.01}
-                  />
-                </FormField>
-              </>
-            )}
+            <div className="grid grid-cols-2 gap-4 md:col-span-2">
+              <FormField label={t("shopping.admin.items.form.reason")} required>
+                <Textarea
+                  value={form.reason}
+                  onChange={(e) => update({ reason: e.target.value })}
+                  placeholder={t("shopping.admin.items.form.reasonPlaceholder")}
+                  maxLength={ITEM_LIMITS.reason}
+                  rows={3}
+                />
+              </FormField>
+              <FormField label={t("shopping.admin.items.form.targetLifestyle")} required>
+                <Textarea
+                  value={form.targetLifestyle}
+                  onChange={(e) => update({ targetLifestyle: e.target.value })}
+                  placeholder={t("shopping.admin.items.form.lifestylePlaceholder")}
+                  maxLength={ITEM_LIMITS.targetLifestyle}
+                  rows={3}
+                />
+              </FormField>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 md:col-span-2">
+              <FormField label={t("shopping.admin.items.form.currentPrice")}>
+                <Input
+                  type="number"
+                  value={form.currentPrice ?? ""}
+                  onChange={(e) =>
+                    update({ currentPrice: e.target.value ? Number(e.target.value) : null })
+                  }
+                  placeholder={t("shopping.admin.items.form.pricePlaceholder")}
+                  min={0}
+                  max={ITEM_LIMITS.price}
+                  step={0.01}
+                />
+              </FormField>
+              <FormField label={t("shopping.admin.items.form.buyBelowPrice")}>
+                <Input
+                  type="number"
+                  value={form.buyBelowPrice ?? ""}
+                  onChange={(e) =>
+                    update({ buyBelowPrice: e.target.value ? Number(e.target.value) : null })
+                  }
+                  placeholder={t("shopping.admin.items.form.pricePlaceholder")}
+                  min={0}
+                  max={ITEM_LIMITS.price}
+                  step={0.01}
+                />
+              </FormField>
+              <FormField label={t("shopping.admin.items.form.overpayPrice")}>
+                <Input
+                  type="number"
+                  value={form.overpayPrice ?? ""}
+                  onChange={(e) =>
+                    update({ overpayPrice: e.target.value ? Number(e.target.value) : null })
+                  }
+                  placeholder={t("shopping.admin.items.form.pricePlaceholder")}
+                  min={0}
+                  max={ITEM_LIMITS.price}
+                  step={0.01}
+                />
+              </FormField>
+            </div>
 
             <FormField label={t("shopping.admin.items.form.note")} className="md:col-span-2">
               <Textarea
@@ -913,12 +828,7 @@ function ItemDialogContent({
           </Button>
           <Button
             onClick={() => void handleSave()}
-            disabled={
-              saving ||
-              !form.name ||
-              !form.system ||
-              (!isOwned && !("laneId" in form && form.laneId))
-            }
+            disabled={saving || !form.name || !form.system || !form.laneId}
           >
             {t("shopping.admin.items.save")}
           </Button>

@@ -276,11 +276,12 @@ export function ShoppingStagesTab({
   itemsById: Map<string, { id: string; name: string }>
   onSelectStage: (stageId: string) => void
   onEditStage?: (checklist: ShoppingStageChecklist) => void
-  onAddNew?: () => void
+  onAddNew?: (stage: string) => void
   onReorder?: (orderedIds: string[]) => void
 }) {
   const { t } = useTranslation()
   const selectedChecklist = checklists.find((c) => c.id === selectedStageId) ?? null
+  const newStage = selectedChecklist?.stage ?? checklists[0]?.stage ?? ""
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -304,7 +305,7 @@ export function ShoppingStagesTab({
 
   const gridContent = (
     <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
-      {isManagementMode && onAddNew ? <AddCard onClick={onAddNew} /> : null}
+      {isManagementMode && onAddNew ? <AddCard onClick={() => onAddNew(newStage)} /> : null}
       {checklists.length > 0 ? (
         checklists.map((checklist) =>
           isManagementMode ? (

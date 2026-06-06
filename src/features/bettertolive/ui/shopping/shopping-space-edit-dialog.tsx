@@ -328,13 +328,53 @@ function SpaceDialogContent({
   }
 
   async function handleDelete() {
-    if (form.isNew || !form.id) return
+    if (form.isNew) return
     if (!window.confirm(t("shopping.spaces.confirmDelete"))) return
 
     try {
       setSaving(true)
       setError(null)
-      await deletePageContent(form.id)
+
+      const spaceName = form.originalName ?? form.name
+      const tasks: Promise<unknown>[] = []
+
+      // 从所有物品中移除该空间名
+      for (const item of allItems.owned) {
+        const nextSpaces = removeSpaceValue(item.spaces, spaceName)
+        if (nextSpaces.length !== item.spaces.length) {
+          tasks.push(
+            updateOwnedItem({
+              ...item,
+              depreciation: item.depreciation ?? null,
+              spaces: nextSpaces,
+            }),
+          )
+        }
+      }
+      for (const item of allItems.plan) {
+        const nextSpaces = removeSpaceValue(item.spaces, spaceName)
+        if (nextSpaces.length !== item.spaces.length) {
+          tasks.push(
+            updatePlanItem({
+              ...item,
+              laneId: item.laneId,
+              depreciation: item.depreciation ?? null,
+              currentPrice: item.currentPrice ?? null,
+              buyBelowPrice: item.buyBelowPrice ?? null,
+              overpayPrice: item.overpayPrice ?? null,
+              spaces: nextSpaces,
+            }),
+          )
+        }
+      }
+
+      // 删除空间定义(如果存在)
+      if (form.id) {
+        tasks.push(deletePageContent(form.id))
+      }
+
+      await Promise.all(tasks)
+
       onClose()
       onSaved()
     } catch (e) {
@@ -390,7 +430,7 @@ function SpaceDialogContent({
       </div>
 
       <DialogFooter className="flex items-center justify-between">
-        {!form.isNew && form.id ? (
+        {!form.isNew ? (
           <Button
             variant="ghost"
             size="icon-sm"

@@ -13,13 +13,7 @@ import {
 import { SortableContext, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Tabs as InlineTabs,
-  TabsContent as InlineTabsContent,
-  TabsList as InlineTabsList,
-  TabsTrigger as InlineTabsTrigger,
-  TabsContent,
-} from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
 import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
 import {
@@ -43,9 +37,6 @@ const SYSTEM_STATUS_STYLES = {
   pending:
     "border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
 }
-
-const SHOPPING_SEGMENT_TRIGGER_CLASSNAME =
-  "h-8 rounded-md border border-transparent bg-transparent px-3 text-xs text-[color:var(--text-muted)] shadow-none transition-colors data-active:border-[color:var(--muted-surface-border)] data-active:bg-[color:var(--surface-bg)] data-active:text-[color:var(--text-primary)] data-active:shadow-none"
 
 function SystemDetailItemRow({
   item,
@@ -168,17 +159,17 @@ function SystemDetailPanel({
           </div>
         </div>
 
-        <InlineTabs defaultValue={defaultItemTab} className="mt-5">
-          <InlineTabsList className="grid h-auto w-full grid-cols-2 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
-            <InlineTabsTrigger value="owned" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+        <Tabs defaultValue={defaultItemTab} className="mt-5">
+          <TabsList className="w-full">
+            <TabsTrigger value="owned" className="text-xs">
               {t("shopping.systems.ownedLabel")} ({system.owned.length})
-            </InlineTabsTrigger>
-            <InlineTabsTrigger value="planned" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+            </TabsTrigger>
+            <TabsTrigger value="planned" className="text-xs">
               {t("shopping.systems.pendingLabel")} ({system.planned.length})
-            </InlineTabsTrigger>
-          </InlineTabsList>
+            </TabsTrigger>
+          </TabsList>
 
-          <InlineTabsContent value="owned" className="mt-4">
+          <TabsContent value="owned" className="mt-4">
             {system.owned.length > 0 ? (
               <div className="space-y-3">
                 {system.owned.map((item) => (
@@ -196,9 +187,9 @@ function SystemDetailPanel({
                 {t("shopping.systems.noOwnedItems")}
               </p>
             )}
-          </InlineTabsContent>
+          </TabsContent>
 
-          <InlineTabsContent value="planned" className="mt-4">
+          <TabsContent value="planned" className="mt-4">
             {system.planned.length > 0 ? (
               <div className="space-y-3">
                 {system.planned.map((item) => (
@@ -216,8 +207,8 @@ function SystemDetailPanel({
                 {t("shopping.systems.noPendingItems")}
               </p>
             )}
-          </InlineTabsContent>
-        </InlineTabs>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

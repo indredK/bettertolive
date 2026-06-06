@@ -1,9 +1,10 @@
-import { Pencil, X } from "lucide-react"
+import { Pencil, Search, X } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { TabsContent } from "@/components/ui/tabs"
 import type { ShoppingModuleData } from "@/features/bettertolive/types"
 import type {
@@ -323,6 +324,7 @@ export function ShoppingPlanningTab({
   )
   // 注:filterNecessity 已删除 — 物品不再有 necessity 字段
   const [filterLifecycle, setFilterLifecycle] = useState<ShoppingLifecycle | "all">("all")
+  const [searchQuery, setSearchQuery] = useState("")
   const systemOptions = useMemo(
     () =>
       Array.from(
@@ -335,24 +337,30 @@ export function ShoppingPlanningTab({
   )
 
   const filteredItems = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
     return planItems.filter((item) => {
       if (filterDepreciation !== "all" && item.depreciation !== filterDepreciation) return false
       if (filterSystem !== ALL_SYSTEM_FILTER && item.system !== filterSystem) return false
       if (filterLifecycle !== "all" && item.lifecycle !== filterLifecycle) return false
+      if (query && !item.name.toLowerCase().includes(query)) return false
       return true
     })
-  }, [planItems, filterDepreciation, filterSystem, filterLifecycle])
+  }, [planItems, filterDepreciation, filterSystem, filterLifecycle, searchQuery])
 
   const selectedItem = planItems.find((item) => item.id === selectedItemId) ?? null
 
   const hasActiveFilters =
-    filterDepreciation !== "all" || filterSystem !== ALL_SYSTEM_FILTER || filterLifecycle !== "all"
+    filterDepreciation !== "all" ||
+    filterSystem !== ALL_SYSTEM_FILTER ||
+    filterLifecycle !== "all" ||
+    searchQuery !== ""
 
   const clearFilters = () => {
     setFilterDepreciation("all")
     setFilterSystem(ALL_SYSTEM_FILTER)
     // 注:filterNecessity 已删除
     setFilterLifecycle("all")
+    setSearchQuery("")
   }
 
   return (
@@ -390,6 +398,17 @@ export function ShoppingPlanningTab({
             </div>
 
             <div className="mt-3 space-y-3">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-[color:var(--text-muted)]" />
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t("shopping.planning.searchPlaceholder")}
+                  className="h-8 pl-8 text-[13px]"
+                />
+              </div>
+
               {/* Depreciation */}
               <div>
                 <div className="mb-1.5 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase">

@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { MultiSelect } from "@/components/ui/multi-select"
 import {
   Select,
   SelectContent,
@@ -39,11 +39,9 @@ import type { ShoppingSystem } from "@/features/bettertolive/types"
 import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import {
   SHOPPING_STAGE_OPTIONS,
-  stageDisplayName,
   systemDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
-import { cn } from "@/lib/utils"
 
 // 阶段编辑对话框现在需要全量物品池(按系统过滤后作为各档位 picker 的候选)— 见方案 §5
 export type StageDialogAllItems = {
@@ -188,12 +186,13 @@ function createEmptySection(preferredSystem = ""): ShoppingStageChecklistSection
 function buildForm(
   checklist: ShoppingStageChecklist | null,
   systemOptions: string[],
+  preferredStage: string,
 ): StageFormState {
   if (!checklist) {
     return {
       isNew: true,
       title: "",
-      stage: "",
+      stage: preferredStage,
       description: "",
       focus: "",
       sections: [createEmptySection(systemOptions[0] ?? "")],
@@ -223,18 +222,20 @@ export function ShoppingStageEditDialog({
   editing,
   systemOptions,
   allItems,
+  preferredStage,
   onClose,
   onSaved,
 }: {
-  editing: { isNew: boolean; checklist: ShoppingStageChecklist | null } | null
+  editing: { isNew: boolean; checklist: ShoppingStageChecklist | null; stage: string } | null
   systemOptions: string[]
   allItems: StageDialogAllItems
+  preferredStage: string
   onClose: () => void
   onSaved: () => void
 }) {
   if (!editing) return null
 
-  const initialForm = buildForm(editing.checklist, systemOptions)
+  const initialForm = buildForm(editing.checklist, systemOptions, preferredStage)
   const dialogKey = editing.checklist?.id ?? "new-stage"
 
   return (
@@ -443,26 +444,6 @@ function StageDialogContent({
               />
             </FormField>
 
-            <FormField label={t("shopping.stages.form.stage")} required>
-              <Select
-                value={form.stage || undefined}
-                onValueChange={(value) => update({ stage: value ?? "" })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder={t("shopping.stages.form.stagePlaceholder")}>
-                    {form.stage ? stageDisplayName(form.stage as ShoppingStage, t) : undefined}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {SHOPPING_STAGE_OPTIONS.map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {stageDisplayName(stage, t)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-
             <FormField label={t("shopping.stages.form.description")} className="md:col-span-2">
               <Textarea
                 value={form.description}
@@ -553,21 +534,32 @@ function StageDialogContent({
                             ["essentialItemIds", t("shopping.stages.table.essentials")],
                             ["upgradeItemIds", t("shopping.stages.table.upgrades")],
                           ] as const
-                        ).map(([key, label]) => (
-                          <StageItemPickerColumn
-                            key={key}
-                            label={label}
-                            candidates={candidatesForSystem}
-                            value={section[key]}
-                            onChange={(nextIds) =>
-                              updateSection(sectionIndex, (current) => ({
-                                ...current,
-                                [key]: nextIds,
-                              }))
-                            }
-                            noItemsHint={t("shopping.stages.itemPicker.noItemsForSystem")}
-                          />
-                        ))}
+                        ).map(([key, label]) => {
+                          const candidateOptions = candidatesForSystem.map((item) => ({
+                            value: item.id,
+                            label: item.name,
+                          }))
+                          return (
+                            <div key={key} className="space-y-2">
+                              <div className="text-xs font-medium text-[color:var(--text-secondary)]">
+                                {label}
+                              </div>
+                              <MultiSelect
+                                options={candidateOptions}
+                                value={section[key]}
+                                onChange={(nextIds) =>
+                                  updateSection(sectionIndex, (current) => ({
+                                    ...current,
+                                    [key]: nextIds,
+                                  }))
+                                }
+                                placeholder={t("shopping.stages.itemPicker.placeholder")}
+                                searchPlaceholder={t("shopping.stages.itemPicker.search")}
+                                emptyMessage={t("shopping.stages.itemPicker.noItemsForSystem")}
+                              />
+                            </div>
+                          )
+                        })}
                       </div>
                     </div>
                   )
@@ -601,61 +593,5 @@ function StageDialogContent({
         </div>
       </DialogFooter>
     </DialogContent>
-  )
-}
-
-// 单档物品 picker — checkbox grid 样式,复用 StageMultiSelectField 的设计语言(见方案 §5)
-function StageItemPickerColumn({
-  label,
-  candidates,
-  value,
-  onChange,
-  noItemsHint,
-}: {
-  label: string
-  candidates: Array<{ id: string; name: string }>
-  value: string[]
-  onChange: (nextIds: string[]) => void
-  noItemsHint: string
-}) {
-  const valueSet = new Set(value)
-  return (
-    <div className="space-y-2">
-      <div className="text-xs font-medium text-[color:var(--text-secondary)]">{label}</div>
-      <div className="space-y-1">
-        {candidates.length === 0 ? (
-          <p className="text-[11px] leading-5 text-[color:var(--text-muted)]">{noItemsHint}</p>
-        ) : (
-          candidates.map((item) => {
-            const checked = valueSet.has(item.id)
-            return (
-              <Label
-                key={item.id}
-                className={cn(
-                  "flex min-h-9 cursor-pointer items-start rounded-md border px-2 py-1.5 text-[12px] leading-5 transition-colors",
-                  checked
-                    ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/35 text-[color:var(--text-primary)]"
-                    : "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)] hover:bg-[color:var(--muted-surface-bg)]",
-                )}
-              >
-                <input
-                  type="checkbox"
-                  checked={checked}
-                  onChange={(event) => {
-                    if (event.target.checked) {
-                      onChange([...value, item.id])
-                    } else {
-                      onChange(value.filter((id) => id !== item.id))
-                    }
-                  }}
-                  className="mt-0.5 size-3.5 rounded border-[color:var(--surface-border)]"
-                />
-                <span className="ml-2 truncate">{item.name}</span>
-              </Label>
-            )
-          })
-        )}
-      </div>
-    </div>
   )
 }

@@ -18,7 +18,6 @@ import type {
   RelationshipsModuleData,
   ShoppingModuleData,
   ShoppingOwnedStatus,
-  ShoppingStage,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
@@ -31,7 +30,6 @@ export type ShoppingOwnedItemForm = {
   system: string
   category: string
   spaces: string[]
-  stages: ShoppingStage[]
   // 注:已删除 necessity — 该信息由阶段模板的档位承载
   lifecycle: string
   depreciation?: string | null
@@ -39,6 +37,13 @@ export type ShoppingOwnedItemForm = {
   status: ShoppingOwnedStatus
   replacementCue: string
   note: string
+  laneId?: string
+  reason?: string
+  targetLifestyle?: string
+  currentPrice?: number | null
+  buyBelowPrice?: number | null
+  overpayPrice?: number | null
+  keywords?: string[]
 }
 
 export type ShoppingPlanItemForm = {
@@ -48,7 +53,6 @@ export type ShoppingPlanItemForm = {
   system: string
   category: string
   spaces: string[]
-  stages: ShoppingStage[]
   // 注:已删除 necessity 与 tags — 物品的"标签"在显示层由 system/spaces/stages 渲染
   lifecycle: string
   depreciation?: string | null
@@ -59,6 +63,9 @@ export type ShoppingPlanItemForm = {
   overpayPrice: number | null
   note: string
   keywords: string[]
+  quantity?: number
+  status?: ShoppingOwnedStatus
+  replacementCue?: string
 }
 
 export type ShoppingPageContentForm = {

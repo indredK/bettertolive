@@ -35,9 +35,6 @@ import {
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
-const SHOPPING_SEGMENT_TRIGGER_CLASSNAME =
-  "h-8 rounded-md border border-transparent bg-transparent px-3 text-xs text-[color:var(--text-muted)] shadow-none transition-colors data-active:border-[color:var(--muted-surface-border)] data-active:bg-[color:var(--surface-bg)] data-active:text-[color:var(--text-primary)] data-active:shadow-none"
-
 function SpotlightCarousel({ spotlights }: { spotlights: ShoppingSpotlight[] }) {
   const { t } = useTranslation()
   const [selectedIndex, setSelectedIndex] = useState(0)
@@ -242,14 +239,14 @@ export function ShoppingOverviewTab({
             </div>
 
             <Tabs defaultValue="classification" className="mt-5 min-h-0 gap-4">
-              <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
-                <TabsTrigger value="classification" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+              <TabsList className="w-full">
+                <TabsTrigger value="classification" className="text-xs">
                   {t("shopping.overview.dimensions")}
                 </TabsTrigger>
-                <TabsTrigger value="collections" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+                <TabsTrigger value="collections" className="text-xs">
                   {t("shopping.overview.lifestyle")}
                 </TabsTrigger>
-                <TabsTrigger value="boundary" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+                <TabsTrigger value="boundary" className="text-xs">
                   {t("shopping.overview.boundary")}
                 </TabsTrigger>
               </TabsList>
@@ -362,14 +359,14 @@ export function ShoppingOverviewTab({
             defaultValue="fast-depreciation"
             className="mt-5 min-h-0 flex-1 gap-4 overflow-hidden"
           >
-            <TabsList className="grid h-auto w-full grid-cols-3 items-center gap-1 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-1">
-              <TabsTrigger value="fast-depreciation" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+            <TabsList className="w-full">
+              <TabsTrigger value="fast-depreciation" className="text-xs">
                 {t("shopping.overview.highDepreciation")}
               </TabsTrigger>
-              <TabsTrigger value="buy-slowly" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+              <TabsTrigger value="buy-slowly" className="text-xs">
                 {t("shopping.overview.buySlowly")}
               </TabsTrigger>
-              <TabsTrigger value="overlooked" className={SHOPPING_SEGMENT_TRIGGER_CLASSNAME}>
+              <TabsTrigger value="overlooked" className="text-xs">
                 {t("shopping.overview.essentials")}
               </TabsTrigger>
             </TabsList>
