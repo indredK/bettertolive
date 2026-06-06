@@ -24,21 +24,21 @@ export function SortableShoppingCard({ id, children, disabled }: SortableShoppin
     <div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className={cn(
-        "relative select-none",
-        !disabled && "cursor-grab active:cursor-grabbing",
-        isDragging && "z-10",
-      )}
+      className={cn("relative w-full min-w-0 flex-1 select-none", isDragging && "z-10")}
     >
       {/* Visual drag indicator — three tiny dots on the left edge */}
       {!disabled ? (
-        <div className="pointer-events-none absolute top-1/2 left-1 z-10 flex shrink-0 -translate-y-1/2 flex-col items-center gap-[1.5px] py-0.5">
+        <button
+          type="button"
+          aria-label="拖动排序"
+          {...attributes}
+          {...listeners}
+          className="focus-visible:ring-primary absolute top-1/2 left-1 z-10 flex -translate-y-1/2 cursor-grab flex-col items-center gap-[1.5px] rounded-sm px-1 py-2 outline-none focus-visible:ring-2 active:cursor-grabbing"
+        >
           <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
           <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
           <div className="size-[2px] rounded-full bg-[color:var(--text-muted)]" />
-        </div>
+        </button>
       ) : null}
       <div className={cn(isDragging && "opacity-40")}>{children}</div>
     </div>

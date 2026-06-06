@@ -56,40 +56,38 @@ export type ShoppingSpotlight = {
   attention: string[]
 }
 
-export enum ShoppingNeedLevel {
-  MinimalConfig = "MinimalConfig",
-  Necessary = "Necessary",
-  Comfortable = "Comfortable",
-  HappinessBoost = "HappinessBoost",
+// ===== 标签字典(全局) =====
+
+// 系统标签 ID(从原 enum 改为字符串,允许用户自定义)
+export type ShoppingSystem = string
+
+export type ShoppingSystemDefinition = {
+  id: ShoppingSystem
+  name: string
+  summary: string
+  keyQuestion: string
+  secondaryGroups: string[]
 }
 
-export const ShoppingSystem = {
-  Sleep: "Sleep",
-  Diet: "Diet",
-  Cleaning: "Cleaning",
-  Storage: "Storage",
-  Lighting: "Lighting",
-  Environment: "Environment",
-  PowerNetwork: "PowerNetwork",
-  WorkStudy: "WorkStudy",
-  EmergencyHealth: "EmergencyHealth",
-  PersonalCare: "PersonalCare",
-  Clothing: "Clothing",
-  Furniture: "Furniture",
-  Transportation: "Transportation",
-  Entertainment: "Entertainment",
-  Pets: "Pets",
-} as const
+export type ShoppingSpaceDefinition = {
+  id: string
+  name: string
+  note?: string
+}
 
-export type ShoppingSystem = (typeof ShoppingSystem)[keyof typeof ShoppingSystem] | (string & {})
+// ===== 物品属性枚举 =====
 
-export enum ShoppingStage {
-  MovingMinimal = "MovingMinimal",
-  Renting = "Renting",
-  LongTermLiving = "LongTermLiving",
-  OwnHome = "OwnHome",
-  SelfBuilt = "SelfBuilt",
-  Basement = "Basement",
+// 物品状态:已有 / 待购
+export enum ShoppingStatus {
+  Owned = "Owned",
+  Wanted = "Wanted",
+}
+
+// 采购泳道:仅 status=Wanted 时有意义
+export enum ShoppingLane {
+  Now = "Now", // 立即买
+  Wait = "Wait", // 等好价
+  Hold = "Hold", // 先不买
 }
 
 export enum ShoppingLifecycle {
@@ -107,7 +105,8 @@ export enum ShoppingDepreciation {
   NoDepreciation = "NoDepreciation",
 }
 
-export enum ShoppingOwnedStatus {
+// 已有物品的健康状态(原 ShoppingOwnedStatus 改名,避免与 ShoppingStatus 冲突)
+export enum ShoppingHealthStatus {
   StableUse = "StableUse",
   ConsiderUpgrade = "ConsiderUpgrade",
   NeedRestock = "NeedRestock",
@@ -115,85 +114,61 @@ export enum ShoppingOwnedStatus {
   NeedComplete = "NeedComplete",
 }
 
-export type ShoppingSystemDefinition = {
-  id: ShoppingSystem
-  summary: string
-  keyQuestion: string
-  secondaryGroups: string[]
+// ===== 物品(统一,跨 Tab 共享) =====
+
+export type ShoppingItemChildChannelPrice = {
+  id: string
+  channel: string
+  entryPrice?: number
+  sweetSpotPrice?: number
+  overpayPrice?: number
 }
 
-export type ShoppingSpaceDefinition = {
+// 物品子级(具体型号/品牌)
+export type ShoppingItemChild = {
   id: string
   name: string
-}
-
-export type ShoppingItemBase = {
-  system: ShoppingSystem
-  category: string
-  spaces: string[]
-  stages: ShoppingStage[]
-  // 注:necessity 字段已迁移到阶段模板的档位(最低/基础/升级),物品本身不再持有
-  lifecycle: ShoppingLifecycle
+  status?: ShoppingStatus
+  lifecycle?: ShoppingLifecycle
   depreciation?: ShoppingDepreciation
+  channelPrices?: ShoppingItemChildChannelPrice[]
 }
 
-export type ShoppingOwnedItem = ShoppingItemBase & {
+export type ShoppingItem = {
   id: string
   name: string
-  quantity: number
-  status: ShoppingOwnedStatus
-  replacementCue: string
+  children: ShoppingItemChild[]
+
+  // 分组标签(必填多选)
+  systemTags: ShoppingSystem[]
+  spaceTags: string[] // 引用 ShoppingSpaceDefinition.id
+
+  // 通用备注
   note: string
 }
 
-export type ShoppingPlanItem = ShoppingItemBase & {
-  id: string
-  name: string
-  reason: string
-  targetLifestyle: string
-  currentPrice: number
-  buyBelowPrice: number
-  overpayPrice: number
-  note: string
-  // 注:tags 字段已删除 — 物品的标签由 system/spaces/stages 三字段在显示层渲染
-  keywords: string[]
+// ===== 阶段模板 =====
+
+export type ShoppingStageItem = {
+  itemId: string // 引用 ShoppingItem
+  tiers: {
+    low: string[] // ShoppingItemChild.id 数组
+    base: string[]
+    up: string[]
+  }
 }
 
-export type ShoppingPurchaseLane = {
+export type ShoppingStageTemplate = {
   id: string
-  title: string
-  subtitle: string
-  items: ShoppingPlanItem[]
-}
-
-export type ShoppingStageChecklistSection = {
-  system: ShoppingSystem
-  // 注:各档位现在存物品 ID 数组(指向 owned 或 plan item),不再是手写文本
-  minimumItemIds: string[]
-  essentialItemIds: string[]
-  upgradeItemIds: string[]
-}
-
-export type ShoppingStageChecklist = {
-  id: string
-  stage: ShoppingStage
-  title: string
+  name: string // 原 title
   description: string
   focus: string
-  sections: ShoppingStageChecklistSection[]
+  systemDimensionIds: string[]
+  spaceDimensionIds: string[]
+  items: ShoppingStageItem[] // 扁平,视图层 group-by
 }
 
-export type ShoppingPriceReference = {
-  id: string
-  system: ShoppingSystem
-  category: string
-  lifecycle: ShoppingLifecycle
-  depreciation?: ShoppingDepreciation
-  entryPrice: number
-  sweetSpotPrice: number
-  overpayPrice: number
-  note: string
-}
+// ===== 文档辅助(保留,展示用) =====
 
 export type ShoppingBoundaryEntry = {
   id: string
@@ -756,10 +731,8 @@ export type ShoppingModuleData = {
   systemDefinitions: ShoppingSystemDefinition[]
   spaceDefinitions: ShoppingSpaceDefinition[]
   spotlights: ShoppingSpotlight[]
-  ownedItems: ShoppingOwnedItem[]
-  purchaseLanes: ShoppingPurchaseLane[]
-  stageChecklists: ShoppingStageChecklist[]
-  priceReferences: ShoppingPriceReference[]
+  items: ShoppingItem[]
+  stageTemplates: ShoppingStageTemplate[]
   boundaryEntries: ShoppingBoundaryEntry[]
   lifestyleCollections: ShoppingLifestyleCollection[]
 }

@@ -1,567 +1,216 @@
-import { AlertTriangle, House, Package2, ShoppingBasket, Sparkles } from "lucide-react"
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
+  ShoppingItem,
   ShoppingModuleData,
-  ShoppingOwnedItem,
-  ShoppingStageChecklist,
-  ShoppingSystem,
+  ShoppingStageTemplate,
+  ShoppingSystemDefinition,
+  ShoppingSpaceDefinition,
 } from "@/features/bettertolive/types"
-import { ShoppingDepreciation, ShoppingLifecycle } from "@/features/bettertolive/types"
 import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
-import {
-  FAST_DEPRECIATION,
-  type ShoppingLifecycleGroups,
-} from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import {
-  type EditingItem,
-  ShoppingItemEditDialog,
-} from "@/features/bettertolive/ui/shopping/shopping-item-edit-dialog"
-import { ShoppingStageEditDialog } from "@/features/bettertolive/ui/shopping/shopping-stage-edit-dialog"
-import { ShoppingSpaceEditDialog } from "@/features/bettertolive/ui/shopping/shopping-space-edit-dialog"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
-import { ShoppingSystemEditDialog } from "@/features/bettertolive/ui/shopping/shopping-system-edit-dialog"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
 import {
-  type ShoppingPlanWithLane,
-  type ShoppingSystemOverview,
-  type SpaceOverview,
-} from "@/features/bettertolive/ui/shopping/shopping-types"
+  ShoppingItemEditDialog,
+  type EditingItem,
+} from "@/features/bettertolive/ui/shopping/shopping-item-edit-dialog"
 import {
-  createSpaceDefinition,
-  reorderShoppingPageContents,
-  reorderSystemDefinitions,
-} from "@/features/bettertolive/api/shopping-crud-api"
-import { cn } from "@/lib/utils"
+  ShoppingStageEditDialog,
+  type EditingStage,
+} from "@/features/bettertolive/ui/shopping/shopping-stage-edit-dialog"
+import { ShoppingSpaceEditDialog } from "@/features/bettertolive/ui/shopping/shopping-space-edit-dialog"
+import { ShoppingSystemEditDialog } from "@/features/bettertolive/ui/shopping/shopping-system-edit-dialog"
 
 export function ShoppingPage({
   shopping,
   searchQuery,
-  isWideLayout = false,
-  isStackedLayout = false,
-  isManagementMode = false,
+  isControlMode = false,
   onRefresh,
 }: {
   shopping: ShoppingModuleData
   searchQuery: string
   isWideLayout?: boolean
   isStackedLayout?: boolean
-  isManagementMode?: boolean
+  isControlMode?: boolean
   onRefresh?: () => void
 }) {
   const { t } = useTranslation()
-  const isFixedLayout = !isStackedLayout
-  const [selectedSystemId, setSelectedSystemId] = useState<string | null>(null)
-  const [selectedSpaceName, setSelectedSpaceName] = useState<string | null>(null)
-  const [selectedStageId, setSelectedStageId] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState("overview")
   const [editingItem, setEditingItem] = useState<EditingItem | null>(null)
-  const [editingStage, setEditingStage] = useState<{
-    isNew: boolean
-    checklist: ShoppingStageChecklist | null
-    stage: string
-  } | null>(null)
+  const [editingStage, setEditingStage] = useState<EditingStage | null>(null)
   const [editingSystem, setEditingSystem] = useState<{
     isNew: boolean
-    system: ShoppingSystemOverview | null
+    system: ShoppingSystemDefinition | null
   } | null>(null)
   const [editingSpace, setEditingSpace] = useState<{
     isNew: boolean
-    space: SpaceOverview | null
+    space: ShoppingSpaceDefinition | null
   } | null>(null)
-  const [spacesOrder, setSpacesOrder] = useState<string[] | null>(null)
 
-  // ---- Reorder handlers ----
-
-  const handleReorderSystems = async (orderedIds: string[]) => {
-    try {
-      await reorderSystemDefinitions(orderedIds)
-      toast.success(t("shopping.toast.reorderSuccess"))
-      onRefresh?.()
-    } catch {
-      toast.error(t("shopping.toast.reorderFailed"))
-    }
-  }
-
-  const handleReorderSpaces = async (orderedNames: string[]) => {
-    setSpacesOrder(orderedNames)
-    try {
-      const definitionIdsByName = new Map<string, string>(
-        shopping.spaceDefinitions.map((definition) => [definition.name, definition.id]),
-      )
-      const orderedIds: string[] = []
-
-      for (const name of orderedNames) {
-        let definitionId = definitionIdsByName.get(name)
-        if (!definitionId) {
-          const created = await createSpaceDefinition({ name })
-          definitionId = created.id
-          definitionIdsByName.set(name, definitionId)
-        }
-        if (!definitionId) {
-          throw new Error(`Missing space definition id for ${name}`)
-        }
-        orderedIds.push(definitionId)
-      }
-
-      await reorderShoppingPageContents(orderedIds)
-      toast.success(t("shopping.toast.reorderSuccess"))
-      onRefresh?.()
-    } catch {
-      toast.error(t("shopping.toast.reorderFailed"))
-    }
-  }
-
-  const handleReorderStages = async (orderedIds: string[]) => {
-    try {
-      await reorderShoppingPageContents(orderedIds)
-      toast.success(t("shopping.toast.reorderSuccess"))
-      onRefresh?.()
-    } catch {
-      toast.error(t("shopping.toast.reorderFailed"))
-    }
-  }
-
-  const handleSaved = () => {
-    setEditingItem(null)
+  const refresh = () => {
     onRefresh?.()
   }
 
-  const handleStageSaved = () => {
-    setEditingStage(null)
-    onRefresh?.()
+  const handleEditItem = (item: ShoppingItem | null) => {
+    setEditingItem({ isNew: item === null, item })
   }
 
-  const handleSystemSaved = () => {
-    setEditingSystem(null)
-    onRefresh?.()
-  }
-
-  const handleSpaceSaved = () => {
-    setEditingSpace(null)
-    onRefresh?.()
-  }
-
-  const startEditStage = (checklist: ShoppingStageChecklist) => {
-    setEditingStage({ isNew: false, checklist, stage: checklist.stage })
-  }
-
-  const startAddStage = (stage: string) => {
-    setEditingStage({ isNew: true, checklist: null, stage })
-  }
-
-  const startEditSystem = (system: ShoppingSystemOverview) => {
-    setEditingSystem({ isNew: false, system })
-  }
-
-  const startAddSystem = () => {
-    setEditingSystem({ isNew: true, system: null })
-  }
-
-  const startEditSpace = (space: SpaceOverview) => {
-    setEditingSpace({ isNew: false, space })
-  }
-
-  const startAddSpace = () => {
-    setEditingSpace({ isNew: true, space: null })
-  }
-
-  const startEditOwned = (item: ShoppingOwnedItem) => {
-    setEditingItem({ type: "owned", item, isNew: false })
-  }
-
-  const startEditPlan = (item: ShoppingPlanWithLane) => {
-    setEditingItem({ type: "plan", item, isNew: false })
-  }
-
-  const startAddPlan = () => {
-    const firstLane = shopping.purchaseLanes[0]
-    const firstSystemId = shopping.systemDefinitions[0]?.id ?? ""
-    const newPlanItem: ShoppingPlanWithLane = {
-      id: `new-${Date.now()}`,
-      name: "",
-      system: firstSystemId,
-      category: "",
-      spaces: [],
-      stages: [],
-      // 注:necessity 与 tags 字段已删除
-      lifecycle: ShoppingLifecycle.Durable,
-      reason: "",
-      targetLifestyle: "",
-      currentPrice: 0,
-      buyBelowPrice: 0,
-      overpayPrice: 0,
-      note: "",
-      keywords: [],
-      laneId: firstLane?.id ?? "",
-      laneTitle: firstLane?.title ?? "",
-    }
-    setEditingItem({ type: "plan", item: newPlanItem, isNew: true })
-  }
-
-  const lanes = useMemo(
-    () =>
-      shopping.purchaseLanes.map((lane) => ({
-        id: lane.id,
-        title: lane.title,
-      })),
-    [shopping.purchaseLanes],
-  )
-
-  const planItems = useMemo(
-    () =>
-      shopping.purchaseLanes.flatMap((lane) =>
-        lane.items.map((item) => ({
-          ...item,
-          laneId: lane.id,
-          laneTitle: lane.title,
-        })),
-      ),
-    [shopping.purchaseLanes],
-  )
-
-  const activeSystems = useMemo(
-    () =>
-      shopping.systemDefinitions.map((definition) => {
-        const owned = shopping.ownedItems.filter((item) => item.system === definition.id)
-        const planned = planItems.filter((item) => item.system === definition.id)
-        const spaces = Array.from(
-          new Set([
-            ...owned.flatMap((item) => item.spaces),
-            ...planned.flatMap((item) => item.spaces),
-          ]),
-        )
-        // 注:原本按 necessity ∈ PRIORITY_LEVELS 计算紧急数;字段删除后,改为该系统下规划中的物品总数作为关注度指标
-        const urgentCount = planned.length
-
-        return {
-          ...definition,
-          owned,
-          planned,
-          spaces,
-          urgentCount,
-          isActive: owned.length + planned.length > 0,
-        }
-      }),
-    [shopping.systemDefinitions, shopping.ownedItems, planItems],
-  )
-
-  // 快折旧警示:原本规则是"高折旧 + 幸福加成"。necessity 删除后改为"高折旧 + 情绪型物品"(lifecycle === Emotional)作为近似启发式
-  const fastDepreciationWarnings = useMemo(
-    () =>
-      planItems.filter(
-        (item) =>
-          item.depreciation &&
-          FAST_DEPRECIATION.has(item.depreciation) &&
-          item.lifecycle === ShoppingLifecycle.Emotional,
-      ),
-    [planItems],
-  )
-
-  // 值得慢慢买:原本排除"幸福加成"。necessity 删除后改为排除情绪型物品
-  const worthBuyingSlowly = useMemo(
-    () =>
-      planItems.filter(
-        (item) =>
-          item.depreciation === ShoppingDepreciation.Slow &&
-          item.lifecycle !== ShoppingLifecycle.Emotional,
-      ),
-    [planItems],
-  )
-
-  const lifecycleGroups = useMemo((): ShoppingLifecycleGroups => {
-    const groups: ShoppingLifecycleGroups = {
-      [ShoppingLifecycle.Consumable]: { owned: [], planned: [] },
-      [ShoppingLifecycle.Durable]: { owned: [], planned: [] },
-      [ShoppingLifecycle.Tool]: { owned: [], planned: [] },
-      [ShoppingLifecycle.Emotional]: { owned: [], planned: [] },
-    }
-
-    shopping.ownedItems.forEach((item) => {
-      groups[item.lifecycle].owned.push(item)
+  const filterByQuery = <T extends { name?: string; title?: string }>(items: T[]): T[] => {
+    if (!searchQuery.trim()) return items
+    const q = searchQuery.toLowerCase()
+    return items.filter((it) => {
+      const text = `${it.name ?? ""} ${it.title ?? ""}`.toLowerCase()
+      return text.includes(q)
     })
-    planItems.forEach((item) => {
-      groups[item.lifecycle].planned.push(item)
-    })
+  }
 
-    return groups
-  }, [shopping.ownedItems, planItems])
-
-  const spaces = useMemo((): SpaceOverview[] => {
-    const spaceMap = new Map<
-      string,
-      {
-        definitionId: string | null
-        name: string
-        owned: ShoppingOwnedItem[]
-        planned: ShoppingPlanWithLane[]
-        systems: Set<ShoppingSystem>
-      }
-    >()
-
-    shopping.spaceDefinitions.forEach((definition) => {
-      spaceMap.set(definition.name, {
-        definitionId: definition.id,
-        name: definition.name,
-        owned: [],
-        planned: [],
-        systems: new Set<ShoppingSystem>(),
-      })
-    })
-
-    shopping.ownedItems.forEach((item) => {
-      item.spaces.forEach((space) => {
-        const current = spaceMap.get(space) ?? {
-          definitionId: null,
-          name: space,
-          owned: [],
-          planned: [],
-          systems: new Set<ShoppingSystem>(),
-        }
-        current.owned.push(item)
-        current.systems.add(item.system)
-        spaceMap.set(space, current)
-      })
-    })
-
-    planItems.forEach((item) => {
-      item.spaces.forEach((space) => {
-        const current = spaceMap.get(space) ?? {
-          definitionId: null,
-          name: space,
-          owned: [],
-          planned: [],
-          systems: new Set<ShoppingSystem>(),
-        }
-        current.planned.push(item)
-        current.systems.add(item.system)
-        spaceMap.set(space, current)
-      })
-    })
-
-    const definitionOrder = new Map(
-      shopping.spaceDefinitions.map((definition, index) => [definition.id, index]),
-    )
-
-    return Array.from(spaceMap.values()).sort((left, right) => {
-      const leftOrder =
-        left.definitionId === null
-          ? Number.POSITIVE_INFINITY
-          : (definitionOrder.get(left.definitionId) ?? Number.POSITIVE_INFINITY)
-      const rightOrder =
-        right.definitionId === null
-          ? Number.POSITIVE_INFINITY
-          : (definitionOrder.get(right.definitionId) ?? Number.POSITIVE_INFINITY)
-
-      if (leftOrder !== rightOrder) return leftOrder - rightOrder
-
-      const countDiff =
-        right.owned.length + right.planned.length - (left.owned.length + left.planned.length)
-      if (countDiff !== 0) return countDiff
-
-      return left.name.localeCompare(right.name, "zh-Hans-CN")
-    })
-  }, [shopping.spaceDefinitions, shopping.ownedItems, planItems])
-
-  const orderedSpaces = useMemo(() => {
-    if (!spacesOrder) return spaces
-    const orderMap = new Map(spacesOrder.map((name, i) => [name, i]))
-    return [...spaces].sort((a, b) => {
-      const ai = orderMap.get(a.name) ?? Infinity
-      const bi = orderMap.get(b.name) ?? Infinity
-      return ai - bi
-    })
-  }, [spaces, spacesOrder])
-
-  // 物品 ID → 名字 的解析表 — 阶段模板的 section 各档位现在存物品 ID,详情页需要 resolve 出名字
-  const itemsById = useMemo(() => {
-    const map = new Map<string, { id: string; name: string }>()
-    for (const item of shopping.ownedItems) {
-      map.set(item.id, { id: item.id, name: item.name })
-    }
-    for (const item of planItems) {
-      map.set(item.id, { id: item.id, name: item.name })
-    }
-    return map
-  }, [shopping.ownedItems, planItems])
-
-  const overlookedCollection = useMemo(
-    () =>
-      shopping.lifestyleCollections.find((collection) => collection.id === "collection-overlooked"),
-    [shopping.lifestyleCollections],
-  )
-
-  const featuredCollections = useMemo(
-    () =>
-      shopping.lifestyleCollections.filter(
-        (collection) => collection.id !== "collection-overlooked",
-      ),
-    [shopping.lifestyleCollections],
-  )
-
-  // Derive displayed selection — fall back to first item when nothing is selected or selection is stale
-  const displaySystemId = selectedSystemId ?? activeSystems[0]?.id ?? null
-  const displaySpaceName = selectedSpaceName ?? spaces[0]?.name ?? null
-  const displayStageId = selectedStageId ?? shopping.stageChecklists[0]?.id ?? null
+  const items = filterByQuery(shopping.items)
 
   return (
-    <div
-      className={cn(
-        "space-y-5",
-        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
-      )}
-    >
+    <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden">
       <PageIntro
-        eyebrow={t("shopping.page.eyebrow")}
-        title={t("shopping.page.title")}
-        description={t("shopping.page.description")}
+        eyebrow={t("shopping.pageEyebrow", "Shopping")}
+        title={t("shopping.pageTitle", "购物")}
+        description={t("shopping.pageDescription", "物件库 + 物件系统 + 空间场景 + 阶段适用")}
         searchQuery={searchQuery}
       />
 
       <Tabs
-        defaultValue="overview"
-        className={cn(
-          "gap-4",
-          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
-          isWideLayout && "gap-3",
-        )}
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="min-h-0 flex-1 overflow-hidden"
       >
-        <TabsList
-          variant="line"
-          className={cn(
-            "flex w-full flex-wrap items-center gap-1 rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-1",
-            isFixedLayout && "shrink-0",
-            isWideLayout && "gap-0.5 p-0.5",
-          )}
-        >
-          <TabsTrigger
-            value="overview"
-            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
-          >
-            <AlertTriangle />
-            {t("shopping.tabs.overview")}
-          </TabsTrigger>
-          <TabsTrigger value="systems" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
-            <Package2 />
-            {t("shopping.tabs.systems")}
-          </TabsTrigger>
-          <TabsTrigger value="spaces" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
-            <House />
-            {t("shopping.tabs.spaces")}
-          </TabsTrigger>
-          <TabsTrigger value="stages" className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}>
-            <Sparkles />
-            {t("shopping.tabs.stages")}
-          </TabsTrigger>
-          <TabsTrigger
-            value="planning"
-            className={cn("px-3", isWideLayout && "px-2.5 text-[13px]")}
-          >
-            <ShoppingBasket />
-            {t("shopping.tabs.planning")}
-          </TabsTrigger>
+        <TabsList className="shrink-0">
+          <TabsTrigger value="overview">{t("shopping.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="planning">{t("shopping.tabs.planning", "物件库")}</TabsTrigger>
+          <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
+          <TabsTrigger value="spaces">{t("shopping.tabs.spaces", "空间场景")}</TabsTrigger>
+          <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
         </TabsList>
 
-        <ShoppingOverviewTab
-          shopping={shopping}
-          lifecycleGroups={lifecycleGroups}
-          fastDepreciationWarnings={fastDepreciationWarnings}
-          worthBuyingSlowly={worthBuyingSlowly}
-          featuredCollections={featuredCollections}
-          overlookedCollection={overlookedCollection}
-          isWideLayout={isWideLayout}
-          isFixedLayout={isFixedLayout}
-          isManagementMode={isManagementMode}
-          onEditPlan={isManagementMode ? startEditPlan : undefined}
-        />
+        <TabsContent value="overview" className="min-h-0">
+          <ShoppingOverviewTab shopping={shopping} items={items} />
+        </TabsContent>
 
-        <ShoppingSystemsTab
-          systems={activeSystems}
-          selectedSystemId={displaySystemId}
-          isFixedLayout={isFixedLayout}
-          isManagementMode={isManagementMode}
-          onSelectSystem={setSelectedSystemId}
-          onAddNew={isManagementMode ? startAddSystem : undefined}
-          onEditSystem={isManagementMode ? startEditSystem : undefined}
-          onEditOwned={isManagementMode ? startEditOwned : undefined}
-          onEditPlan={isManagementMode ? startEditPlan : undefined}
-          onReorder={isManagementMode ? handleReorderSystems : undefined}
-        />
+        <TabsContent value="planning" className="h-full min-h-0 overflow-hidden">
+          <ShoppingPlanningTab
+            shopping={shopping}
+            items={items}
+            isControlMode={isControlMode}
+            onEditItem={handleEditItem}
+            onDeleted={refresh}
+          />
+        </TabsContent>
 
-        <ShoppingSpacesTab
-          spaces={orderedSpaces}
-          selectedSpaceName={displaySpaceName}
-          isFixedLayout={isFixedLayout}
-          isManagementMode={isManagementMode}
-          onSelectSpace={setSelectedSpaceName}
-          onAddNew={isManagementMode ? startAddSpace : undefined}
-          onEditSpace={isManagementMode ? startEditSpace : undefined}
-          onEditOwned={isManagementMode ? startEditOwned : undefined}
-          onEditPlan={isManagementMode ? startEditPlan : undefined}
-          onReorder={isManagementMode ? handleReorderSpaces : undefined}
-        />
+        <TabsContent value="systems" className="h-full min-h-0 overflow-hidden">
+          <ShoppingSystemsTab
+            shopping={shopping}
+            items={items}
+            isControlMode={isControlMode}
+            onEditItem={handleEditItem}
+            onEditSystem={(system) => setEditingSystem({ isNew: system === null, system })}
+            onDeleted={refresh}
+          />
+        </TabsContent>
 
-        <ShoppingStagesTab
-          checklists={shopping.stageChecklists}
-          selectedStageId={displayStageId}
-          isFixedLayout={isFixedLayout}
-          isManagementMode={isManagementMode}
-          itemsById={itemsById}
-          onSelectStage={setSelectedStageId}
-          onEditStage={isManagementMode ? startEditStage : undefined}
-          onAddNew={isManagementMode ? startAddStage : undefined}
-          onReorder={isManagementMode ? handleReorderStages : undefined}
-        />
+        <TabsContent value="spaces" className="h-full min-h-0 overflow-hidden">
+          <ShoppingSpacesTab
+            shopping={shopping}
+            items={items}
+            isControlMode={isControlMode}
+            onEditItem={handleEditItem}
+            onEditSpace={(space) => setEditingSpace({ isNew: space === null, space })}
+            onDeleted={refresh}
+          />
+        </TabsContent>
 
-        <ShoppingPlanningTab
-          shopping={shopping}
-          planItems={planItems}
-          isWideLayout={isWideLayout}
-          isFixedLayout={isFixedLayout}
-          isManagementMode={isManagementMode}
-          onEditPlan={isManagementMode ? startEditPlan : undefined}
-          onAddNew={isManagementMode ? startAddPlan : undefined}
-        />
+        <TabsContent value="stages" className="h-full min-h-0 overflow-hidden">
+          <ShoppingStagesTab
+            shopping={shopping}
+            stageTemplates={shopping.stageTemplates}
+            searchQuery={searchQuery}
+            isControlMode={isControlMode}
+            onEditStage={(stage: ShoppingStageTemplate | null) =>
+              setEditingStage({ isNew: stage === null, stage })
+            }
+            onDeleted={refresh}
+          />
+        </TabsContent>
+      </Tabs>
 
+      {editingItem && (
         <ShoppingItemEditDialog
           editing={editingItem}
-          lanes={lanes}
-          systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
-          spaceOptions={spaces.map((s) => s.name)}
+          shopping={shopping}
           onClose={() => setEditingItem(null)}
-          onSaved={handleSaved}
+          onSaved={() => {
+            setEditingItem(null)
+            refresh()
+            toast.success(t("shopping.toast.saved", "已保存"))
+          }}
+          onDeleted={() => {
+            setEditingItem(null)
+            refresh()
+          }}
         />
+      )}
 
+      {editingStage && (
         <ShoppingStageEditDialog
           editing={editingStage}
-          systemOptions={shopping.systemDefinitions.map((definition) => definition.id)}
-          allItems={{ owned: shopping.ownedItems, plan: planItems }}
-          preferredStage={editingStage?.stage ?? ""}
+          shopping={shopping}
           onClose={() => setEditingStage(null)}
-          onSaved={handleStageSaved}
+          onSaved={() => {
+            setEditingStage(null)
+            refresh()
+            toast.success(t("shopping.toast.saved", "已保存"))
+          }}
+          onDeleted={() => {
+            setEditingStage(null)
+            refresh()
+          }}
         />
+      )}
 
+      {editingSystem && (
         <ShoppingSystemEditDialog
           editing={editingSystem}
-          existingSystemIds={shopping.systemDefinitions.map((definition) => definition.id)}
-          allItems={{ owned: shopping.ownedItems, plan: planItems }}
+          shopping={shopping}
           onClose={() => setEditingSystem(null)}
-          onSaved={handleSystemSaved}
+          onSaved={() => {
+            setEditingSystem(null)
+            refresh()
+            toast.success(t("shopping.toast.saved", "已保存"))
+          }}
+          onDeleted={() => {
+            setEditingSystem(null)
+            refresh()
+          }}
         />
+      )}
 
+      {editingSpace && (
         <ShoppingSpaceEditDialog
           editing={editingSpace}
-          existingSpaceNames={spaces.map((space) => space.name)}
-          allItems={{ owned: shopping.ownedItems, plan: planItems }}
+          shopping={shopping}
           onClose={() => setEditingSpace(null)}
-          onSaved={handleSpaceSaved}
+          onSaved={() => {
+            setEditingSpace(null)
+            refresh()
+            toast.success(t("shopping.toast.saved", "已保存"))
+          }}
+          onDeleted={() => {
+            setEditingSpace(null)
+            refresh()
+          }}
         />
-      </Tabs>
+      )}
     </div>
   )
 }

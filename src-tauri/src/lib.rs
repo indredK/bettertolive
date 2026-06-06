@@ -1,12 +1,15 @@
 mod shopping;
 
 use shopping::commands::{
-    create_owned_item, create_plan_item, create_shopping_page_content, create_system_definition,
-    delete_owned_item, delete_plan_item, delete_shopping_page_content, delete_system_definition,
-    get_shopping, get_workspace_snapshot, list_owned_items, list_plan_items,
-    list_shopping_page_contents, reorder_shopping_page_contents, reorder_system_definitions,
-    update_owned_item, update_plan_item, update_shopping_page_content, update_system_definition,
-    AppState,
+    assign_space_definition_items, assign_system_definition_items, create_shopping_item,
+    create_shopping_page_content, create_shopping_space_definition, create_shopping_stage_template,
+    create_system_definition, delete_shopping_item, delete_shopping_page_content,
+    delete_shopping_space_definition, delete_shopping_stage_template, delete_system_definition,
+    get_shopping, get_workspace_snapshot, list_shopping_items, list_shopping_page_contents,
+    list_shopping_space_definitions, list_shopping_stage_templates, reorder_shopping_page_contents,
+    reorder_space_definitions, reorder_stage_templates, reorder_system_definitions,
+    update_shopping_item, update_shopping_page_content, update_shopping_space_definition,
+    update_shopping_stage_template, update_system_definition, AppState,
 };
 use specta_typescript::Typescript;
 use std::sync::Mutex;
@@ -23,14 +26,20 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
         greet,
         get_shopping,
-        list_owned_items,
-        create_owned_item,
-        update_owned_item,
-        delete_owned_item,
-        list_plan_items,
-        create_plan_item,
-        update_plan_item,
-        delete_plan_item,
+        list_shopping_items,
+        create_shopping_item,
+        update_shopping_item,
+        delete_shopping_item,
+        list_shopping_stage_templates,
+        create_shopping_stage_template,
+        update_shopping_stage_template,
+        delete_shopping_stage_template,
+        reorder_stage_templates,
+        list_shopping_space_definitions,
+        create_shopping_space_definition,
+        update_shopping_space_definition,
+        delete_shopping_space_definition,
+        reorder_space_definitions,
         list_shopping_page_contents,
         create_shopping_page_content,
         update_shopping_page_content,
@@ -39,6 +48,8 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         update_system_definition,
         delete_system_definition,
         reorder_system_definitions,
+        assign_system_definition_items,
+        assign_space_definition_items,
         reorder_shopping_page_contents
     ])
 }
@@ -60,7 +71,6 @@ pub fn run() {
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            // Resolve the app data directory for the database
             let app_data_dir = app
                 .path()
                 .app_data_dir()
@@ -83,14 +93,20 @@ pub fn run() {
             greet,
             get_shopping,
             get_workspace_snapshot,
-            list_owned_items,
-            create_owned_item,
-            update_owned_item,
-            delete_owned_item,
-            list_plan_items,
-            create_plan_item,
-            update_plan_item,
-            delete_plan_item,
+            list_shopping_items,
+            create_shopping_item,
+            update_shopping_item,
+            delete_shopping_item,
+            list_shopping_stage_templates,
+            create_shopping_stage_template,
+            update_shopping_stage_template,
+            delete_shopping_stage_template,
+            reorder_stage_templates,
+            list_shopping_space_definitions,
+            create_shopping_space_definition,
+            update_shopping_space_definition,
+            delete_shopping_space_definition,
+            reorder_space_definitions,
             list_shopping_page_contents,
             create_shopping_page_content,
             update_shopping_page_content,
@@ -99,6 +115,8 @@ pub fn run() {
             update_system_definition,
             delete_system_definition,
             reorder_system_definitions,
+            assign_system_definition_items,
+            assign_space_definition_items,
             reorder_shopping_page_contents
         ])
         .run(tauri::generate_context!())

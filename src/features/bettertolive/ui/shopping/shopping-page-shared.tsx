@@ -1,585 +1,209 @@
-import { type LucideIcon, Pencil, Plus } from "lucide-react"
 import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
-
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type {
-  ShoppingBoundaryEntry,
-  ShoppingLifecycle,
-  ShoppingOwnedItem,
+  ShoppingItem,
+  ShoppingSpaceDefinition,
+  ShoppingSystemDefinition,
 } from "@/features/bettertolive/types"
-import type { ShoppingSystem } from "@/features/bettertolive/types"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
 import {
-  DEPRECIATION_STYLES,
-  getLifecycleCopy,
-  LIFECYCLE_STYLES,
   SPACE_CHIP_STYLE,
-  STAGE_CHIP_STYLE,
+  STATUS_STYLES,
   SYSTEM_CHIP_STYLE,
-  depreciationDisplayName,
-  formatPrice,
-  getPriceSignal,
-  laneDisplayName,
-  lifecycleDisplayName,
-  stageDisplayName,
-  systemDisplayName,
+  itemPrimaryStatus,
+  statusDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
-export function ClassificationBadge({ label, className }: { label: string; className: string }) {
-  return (
-    <Badge variant="outline" className={className}>
-      {label}
-    </Badge>
-  )
-}
+export const SHOPPING_DIALOG_CONTENT_CLASS = "border border-foreground/10 bg-background shadow-lg"
 
-export function FormField({
-  label,
-  description,
-  required,
-  className,
-  children,
-}: {
-  label: string
-  description?: string
-  required?: boolean
-  className?: string
-  children: ReactNode
-}) {
-  return (
-    <label className={cn("space-y-1.5", className)}>
-      <span className="text-xs font-medium text-[color:var(--text-secondary)]">
-        {label}
-        {required ? <span className="ml-0.5 text-red-400">*</span> : null}
-      </span>
-      {children}
-      {description ? (
-        <span className="block text-[11px] leading-5 text-[color:var(--text-muted)]">
-          {description}
-        </span>
-      ) : null}
-    </label>
-  )
-}
+export const SHOPPING_DIALOG_HEADER_CLASS =
+  "sticky top-0 z-10 -mx-4 -mt-4 border-b border-foreground/10 bg-background/95 px-4 pt-4 pb-3 pr-12 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
 
-export function SystemChip({ system }: { system: ShoppingSystem }) {
-  const { t } = useTranslation()
-  return (
-    <Badge
-      variant="outline"
-      className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-    >
-      {systemDisplayName(system, t)}
-    </Badge>
-  )
-}
+export const SHOPPING_DIALOG_SECTION_CLASS =
+  "space-y-3 rounded-xl border border-foreground/10 bg-card/70 p-4"
 
-export function SystemSummaryChip({ label }: { label: string }) {
-  return (
-    <Badge
-      variant="outline"
-      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-    >
-      {label}
-    </Badge>
-  )
-}
+export const SHOPPING_DIALOG_PANEL_CLASS =
+  "rounded-lg border border-foreground/10 bg-background/85 p-4"
 
-// 物品的"标签"由 system / spaces / stages 三字段组合而成,按三行不同颜色显示。
-// — 第 1 行:系统(蓝)— 第 2 行:空间(绿)— 第 3 行:阶段(紫)。
-// 空的行自动隐藏。compact 模式下行间距更紧。
-export function ItemMetadataChips({
+export const SHOPPING_DIALOG_FIELD_CLASS = "w-full border-foreground/15 bg-background shadow-sm"
+
+export const SHOPPING_DIALOG_FOOTER_CLASS =
+  "sticky bottom-0 z-10 gap-2 border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
+
+/**
+ * 物品卡片(各 Tab 复用)。
+ * 展示物品的核心信息:名称、状态、标签、子级、价格、备注。
+ */
+export function ItemCard({
   item,
-  compact = false,
+  systemDefinitions,
+  spaceDefinitions,
+  onEdit,
 }: {
-  item: ShoppingOwnedItem | ShoppingPlanWithLane
-  compact?: boolean
+  item: ShoppingItem
+  systemDefinitions: ShoppingSystemDefinition[]
+  spaceDefinitions: ShoppingSpaceDefinition[]
+  onEdit?: () => void
 }) {
   const { t } = useTranslation()
-  const systemLabel = item.system ? systemDisplayName(item.system, t) : ""
-  const rows: Array<{ key: "system" | "space" | "stage"; chips: string[]; className: string }> = [
-    {
-      key: "system",
-      chips: systemLabel ? [systemLabel] : [],
-      className: SYSTEM_CHIP_STYLE,
-    },
-    {
-      key: "space",
-      chips: item.spaces,
-      className: SPACE_CHIP_STYLE,
-    },
-    {
-      key: "stage",
-      chips: item.stages.map((stage) => stageDisplayName(stage, t)),
-      className: STAGE_CHIP_STYLE,
-    },
-  ]
-  const visibleRows = rows.filter((row) => row.chips.length > 0)
-  if (visibleRows.length === 0) return null
+  const status = itemPrimaryStatus(item)
+
+  const systemNames = item.systemTags
+    .map((id) => systemDefinitions.find((s) => s.id === id)?.name ?? id)
+    .filter(Boolean)
+  const spaceNames = item.spaceTags
+    .map((id) => spaceDefinitions.find((s) => s.id === id)?.name ?? id)
+    .filter(Boolean)
+
   return (
-    <div className={cn("flex flex-col", compact ? "gap-0.5" : "gap-1")}>
-      {visibleRows.map((row) => (
-        <div key={row.key} className="flex flex-wrap items-center gap-1">
-          {row.chips.map((chip, index) => (
-            <Badge
-              key={`${row.key}-${chip}-${index}`}
-              variant="outline"
-              className={cn("h-5 px-1.5 text-[10px] font-normal", row.className)}
-            >
-              {chip}
-            </Badge>
-          ))}
+    <div
+      className="bg-card flex cursor-pointer flex-col gap-2 rounded-md border p-3 hover:shadow-sm"
+      role={onEdit ? "button" : undefined}
+      onClick={onEdit}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-medium">{item.name}</div>
+        <Badge variant="outline" className={STATUS_STYLES[status]}>
+          {statusDisplayName(status, t)}
+        </Badge>
+      </div>
+
+      {item.children.length > 0 && (
+        <div className="text-muted-foreground text-xs">
+          {item.children.map((c) => c.name).join(" / ")}
         </div>
+      )}
+
+      <div className="flex flex-wrap gap-1">
+        {systemNames.map((n) => (
+          <Badge key={`sys-${n}`} variant="outline" className={SYSTEM_CHIP_STYLE}>
+            {n}
+          </Badge>
+        ))}
+        {spaceNames.map((n) => (
+          <Badge key={`spc-${n}`} variant="outline" className={SPACE_CHIP_STYLE}>
+            {n}
+          </Badge>
+        ))}
+      </div>
+
+      {item.note && <div className="text-muted-foreground text-xs">{item.note}</div>}
+    </div>
+  )
+}
+
+/** 简易名字标签栏 */
+export function NameTagBar({ names, className }: { names: string[]; className?: string }) {
+  return (
+    <div className={cn("flex flex-wrap gap-1 text-xs", className)}>
+      {names.map((n) => (
+        <span
+          key={n}
+          className="border-border bg-muted text-muted-foreground rounded-md border px-2 py-0.5"
+        >
+          {n}
+        </span>
       ))}
     </div>
   )
 }
 
-export function ShoppingPriceRow({
-  label,
-  value,
-  compact = false,
-}: {
-  label: string
-  value: string
-  compact?: boolean
-}) {
-  return (
-    <div
-      className={cn(
-        "flex items-center justify-between gap-3 border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0",
-        compact && "py-1.5",
-      )}
-    >
-      <span className={cn("text-xs text-[color:var(--text-muted)]", compact && "text-[11px]")}>
-        {label}
-      </span>
-      <span
-        className={cn(
-          "text-sm font-medium text-[color:var(--text-primary)]",
-          compact && "text-[13px]",
-        )}
-      >
-        {value}
-      </span>
-    </div>
-  )
-}
-
-export function ChecklistBlock({ title, items }: { title: string; items: string[] }) {
-  const { t } = useTranslation()
-  return (
-    <div>
-      <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-        {title}
-      </div>
-      {items.length > 0 ? (
-        <ul className="mt-3 space-y-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-          {items.map((item) => (
-            <li
-              key={item}
-              className="border-t border-[color:var(--muted-surface-border)] py-2 first:border-t-0 first:pt-0 last:pb-0"
-            >
-              {item}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-          {t("shopping.shared.noItemsInLayer")}
-        </p>
-      )}
-    </div>
-  )
-}
-
-export function CompactItemRow({
-  item,
-  sourceLabel,
-  compact = false,
-  onEditOwned,
-  onEditPlan,
-}: {
-  item: ShoppingOwnedItem | ShoppingPlanWithLane
-  sourceLabel: string
-  compact?: boolean
-  onEditOwned?: (item: ShoppingOwnedItem) => void
-  onEditPlan?: (item: ShoppingPlanWithLane) => void
-}) {
-  const { t } = useTranslation()
-  const isPlanItem = "currentPrice" in item
-
-  return (
-    <div
-      className={cn(
-        "rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3",
-        compact && "px-3 py-2.5",
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3
-              className={cn(
-                "text-sm font-medium text-[color:var(--text-primary)]",
-                compact && "text-[13px]",
-              )}
-            >
-              {item.name}
-            </h3>
-            {/* 物品物理属性 chip:lifecycle、depreciation;来源标签 — 与归属无关,所以与三色 chip 分开 */}
-            <ClassificationBadge
-              label={lifecycleDisplayName(item.lifecycle, t)}
-              className={LIFECYCLE_STYLES[item.lifecycle]}
-            />
-            {item.depreciation ? (
-              <ClassificationBadge
-                label={depreciationDisplayName(item.depreciation, t)}
-                className={DEPRECIATION_STYLES[item.depreciation]}
-              />
-            ) : null}
-            <Badge
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-            >
-              {sourceLabel}
-            </Badge>
-          </div>
-
-          {/* 归属标签:系统/空间/阶段 — 三行不同颜色 */}
-          <div className="mt-2">
-            <ItemMetadataChips item={item} compact={compact} />
-          </div>
-
-          <div
-            className={cn(
-              "mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]",
-              compact && "text-[11px]",
-            )}
-          >
-            <span>{item.category}</span>
-          </div>
-
-          <p
-            className={cn(
-              "mt-2 text-sm leading-6 text-[color:var(--text-secondary)]",
-              compact && "text-[13px] leading-5",
-            )}
-          >
-            {isPlanItem ? item.reason : item.replacementCue}
-          </p>
-          <p
-            className={cn(
-              "mt-1 text-sm leading-6 text-[color:var(--text-muted)]",
-              compact && "text-[13px] leading-5",
-            )}
-          >
-            {item.note}
-          </p>
-        </div>
-
-        {onEditOwned || onEditPlan ? (
-          <Button
-            size="icon-sm"
-            variant="ghost"
-            className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-            onClick={(e) => {
-              e.stopPropagation()
-              if (isPlanItem && onEditPlan) {
-                onEditPlan(item)
-              } else if (!isPlanItem && onEditOwned) {
-                onEditOwned(item)
-              }
-            }}
-          >
-            <Pencil className="size-3.5" />
-          </Button>
-        ) : null}
-      </div>
-    </div>
-  )
-}
-
-export function InlineSectionHeader({
-  icon: Icon,
-  title,
-  description,
-  compact = false,
-}: {
-  icon: LucideIcon
-  title: string
-  description: string
-  compact?: boolean
-}) {
-  return (
-    <div className="flex items-start justify-between gap-4">
-      <div className="min-w-0 flex-1">
-        <div className="flex min-w-0 items-center gap-2 text-[color:var(--text-primary)]">
-          <Icon className="size-4 shrink-0" />
-          <div className="flex min-w-0 items-baseline gap-2">
-            <h4
-              className={cn(
-                "shrink-0 text-base font-semibold tracking-tight",
-                compact && "text-sm",
-              )}
-            >
-              {title}
-            </h4>
-            <p
-              className={cn(
-                "min-w-0 truncate text-xs leading-5 text-[color:var(--text-muted)]",
-                compact && "text-[11px]",
-              )}
-              title={description}
-            >
-              {description}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-export function BoundaryTable({
-  entries,
+export function ShoppingTabViewport({
+  children,
   className,
 }: {
-  entries: ShoppingBoundaryEntry[]
+  children: ReactNode
   className?: string
 }) {
-  const { t } = useTranslation()
-  return (
-    <div
-      className={cn(
-        "mt-5 min-h-0 flex-1 overflow-auto rounded-lg border border-[color:var(--muted-surface-border)]",
-        className,
-      )}
-    >
-      <Table className="min-w-[720px]">
-        <TableHeader>
-          <TableRow className="border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)]">
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
-              {t("shopping.shared.boundaryTable.item")}
-            </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
-              {t("shopping.shared.boundaryTable.ownership")}
-            </TableHead>
-            <TableHead className="sticky top-0 z-10 bg-[color:var(--surface-bg)]">
-              {t("shopping.shared.boundaryTable.reason")}
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {entries.map((entry) => (
-            <TableRow key={entry.id} className="border-[color:var(--muted-surface-border)]">
-              <TableCell className="font-medium text-[color:var(--text-primary)]">
-                {entry.item}
-              </TableCell>
-              <TableCell className="text-[color:var(--text-secondary)]">
-                <SystemChip system={entry.system} />
-              </TableCell>
-              <TableCell className="max-w-[420px] whitespace-normal text-[color:var(--text-secondary)]">
-                <span className="block text-sm leading-6">{entry.reason}</span>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  )
+  return <div className={cn("flex h-full min-h-0 flex-col gap-4", className)}>{children}</div>
 }
 
-export function LifecycleLane({
-  lifecycle,
-  ownedCount,
-  plannedCount,
-  highlights,
+export function ShoppingTabBody({
+  children,
+  className,
 }: {
-  lifecycle: ShoppingLifecycle
-  ownedCount: number
-  plannedCount: number
-  highlights: string[]
+  children: ReactNode
+  className?: string
 }) {
-  const { t } = useTranslation()
-  const lifecycleCopy = getLifecycleCopy(t)
   return (
-    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <ClassificationBadge
-          label={lifecycleDisplayName(lifecycle, t)}
-          className={LIFECYCLE_STYLES[lifecycle]}
-        />
-        <span className="text-sm font-medium text-[color:var(--text-primary)]">
-          {lifecycleCopy[lifecycle].title}
-        </span>
-      </div>
-      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
-        {lifecycleCopy[lifecycle].detail}
-      </p>
-      <div className="mt-3 text-xs text-[color:var(--text-muted)]">
-        {t("shopping.overview.ownedAndPlanned", { owned: ownedCount, planned: plannedCount })}
-      </div>
-      {highlights.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {highlights.map((item) => (
-            <Badge
-              key={item}
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-            >
-              {item}
-            </Badge>
-          ))}
-        </div>
-      ) : (
-        <p className="mt-3 text-sm text-[color:var(--text-muted)]">
-          {t("shopping.overview.noItemsUnderFilter")}
-        </p>
-      )}
+    <div className={cn("flex min-h-0 flex-1 flex-col gap-3 lg:flex-row", className)}>
+      {children}
     </div>
   )
 }
 
-export function PurchaseDecisionCard({
-  item,
-  compact = false,
+export function ShoppingSidebarPane({
+  children,
+  className,
+  contentClassName,
 }: {
-  item: ShoppingPlanWithLane
-  compact?: boolean
+  children: ReactNode
+  className?: string
+  contentClassName?: string
 }) {
-  const { t } = useTranslation()
-  const signal = getPriceSignal(item, t)
-
   return (
-    <div
-      className={cn(
-        "border-t border-[color:var(--muted-surface-border)] pt-5 first:border-t-0 first:pt-0",
-        compact && "pt-4",
-      )}
-    >
-      <div className="flex flex-wrap items-center gap-2">
-        <h3
-          className={cn(
-            "text-base font-medium text-[color:var(--text-primary)]",
-            compact && "text-sm",
-          )}
-        >
-          {item.name}
-        </h3>
-        {/* 物品物理属性 chip + 价格信号 — 与归属解耦 */}
-        <ClassificationBadge
-          label={lifecycleDisplayName(item.lifecycle, t)}
-          className={LIFECYCLE_STYLES[item.lifecycle]}
-        />
-        {item.depreciation ? (
-          <ClassificationBadge
-            label={depreciationDisplayName(item.depreciation, t)}
-            className={DEPRECIATION_STYLES[item.depreciation]}
-          />
-        ) : null}
-        <ClassificationBadge label={signal.label} className={signal.className} />
-      </div>
-
-      {/* 归属标签 — 三行不同颜色 */}
-      <div className="mt-2">
-        <ItemMetadataChips item={item} compact={compact} />
-      </div>
-
-      <div className="mt-2 flex flex-wrap gap-2 text-xs text-[color:var(--text-muted)]">
-        <span>{item.category}</span>
-      </div>
-
-      <p
-        className={cn(
-          "mt-3 text-sm leading-6 text-[color:var(--text-secondary)]",
-          compact && "mt-2 text-[13px] leading-5",
-        )}
-      >
-        {item.reason}
-      </p>
-      <p
-        className={cn(
-          "mt-2 text-sm leading-6 text-[color:var(--text-muted)]",
-          compact && "text-[13px] leading-5",
-        )}
-      >
-        {item.note}
-      </p>
-
-      <div
-        className={cn(
-          "mt-4 grid gap-4 min-[960px]:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]",
-          compact && "mt-3 gap-3",
-        )}
-      >
-        <div className="space-y-2">
-          <ShoppingPriceRow
-            compact={compact}
-            label={t("shopping.planning.currentPrice")}
-            value={formatPrice(item.currentPrice)}
-          />
-          <ShoppingPriceRow
-            compact={compact}
-            label={t("shopping.planning.buyBelowPrice")}
-            value={`<= ${formatPrice(item.buyBelowPrice)}`}
-          />
-          <ShoppingPriceRow
-            compact={compact}
-            label={t("shopping.planning.overpayPrice")}
-            value={`>= ${formatPrice(item.overpayPrice)}`}
-          />
-        </div>
-
-        <div>
-          <div className="text-xs tracking-[0.18em] text-[color:var(--text-muted)] uppercase">
-            {t("shopping.shared.relatedReminders")}
-          </div>
-          <div className={cn("mt-3 flex flex-wrap gap-2", compact && "mt-2 gap-1.5")}>
-            <Badge
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-            >
-              {laneDisplayName(item.laneId, item.laneTitle, t)}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-            >
-              {item.targetLifestyle}
-            </Badge>
-            {/* 注:item.tags 已废弃 — 物品的"标签"由上方的 ItemMetadataChips 三行 chip 呈现 */}
-          </div>
-        </div>
-      </div>
-    </div>
+    <Card className={cn("min-h-0 lg:w-72 lg:shrink-0", className)}>
+      <CardContent className={cn("flex min-h-0 flex-col overflow-y-auto p-3", contentClassName)}>
+        {children}
+      </CardContent>
+    </Card>
   )
 }
 
-export function AddCard({ onClick, className }: { onClick: () => void; className?: string }) {
-  const { t } = useTranslation()
+export function ShoppingDetailPane({
+  children,
+  className,
+}: {
+  children: ReactNode
+  className?: string
+}) {
+  return <div className={cn("min-h-0 flex-1", className)}>{children}</div>
+}
+
+export function ShoppingEmptyDetailCard({ message }: { message: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex w-full flex-col items-center justify-center gap-1.5 rounded-xl border-2 border-dashed border-[color:var(--chip-border)] px-3 py-4 text-[color:var(--text-muted)] transition-all duration-200 hover:border-[color:var(--tone-present-border)] hover:text-[color:var(--text-primary)]",
-        className,
-      )}
-    >
-      <Plus className="size-5" />
-      <span className="text-xs">{t("shopping.cardGrid.addNew")}</span>
-    </button>
+    <Card className="flex h-full items-center justify-center p-8">
+      <p className="text-muted-foreground text-sm">{message}</p>
+    </Card>
+  )
+}
+
+export function ShoppingStatusColumnCard({
+  title,
+  count,
+  emptyMessage,
+  children,
+  className,
+  contentClassName,
+}: {
+  title: string
+  count: number
+  emptyMessage: string
+  children?: ReactNode
+  className?: string
+  contentClassName?: string
+}) {
+  return (
+    <Card className={cn("flex min-h-0 flex-col overflow-hidden", className)}>
+      <CardHeader className="shrink-0 pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle className="text-sm font-medium">{title}</CardTitle>
+          <Badge variant="outline" className="text-muted-foreground text-[10px]">
+            {count}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className={cn("min-h-0 flex-1 space-y-3 overflow-y-auto", contentClassName)}>
+        {count > 0 ? (
+          children
+        ) : (
+          <div className="text-muted-foreground rounded-lg border border-dashed px-4 py-6 text-center text-xs">
+            {emptyMessage}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

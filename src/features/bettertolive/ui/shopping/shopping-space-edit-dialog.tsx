@@ -1,457 +1,195 @@
-import { Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { z } from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import type { ShoppingModuleData, ShoppingSpaceDefinition } from "@/features/bettertolive/types"
 import {
+  assignSpaceDefinitionItems,
   createSpaceDefinition,
-  deletePageContent,
-  updateOwnedItem,
-  updatePlanItem,
+  deleteSpaceDefinition,
   updateSpaceDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import type { ShoppingOwnedItem } from "@/features/bettertolive/types"
-import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import { ShoppingItemShuttle } from "@/features/bettertolive/ui/shopping/shopping-item-shuttle"
-import type {
-  ShoppingPlanWithLane,
-  SpaceOverview,
-} from "@/features/bettertolive/ui/shopping/shopping-types"
-
-type EditingState = {
-  isNew: boolean
-  space: SpaceOverview | null
-}
-
-// 空间编辑对话框接受全量物品池作为穿梭框候选 — 见方案 §4
-export type SpaceDialogAllItems = {
-  owned: ShoppingOwnedItem[]
-  plan: ShoppingPlanWithLane[]
-}
-
-type FormState = {
-  isNew: boolean
-  id?: string
-  originalName?: string
-  name: string
-  selectedItemIds: string[]
-}
-
-const SPACE_LIMITS = {
-  name: 40,
-} as const
-
-const schema = z.object({
-  name: z.string().trim().min(1).max(SPACE_LIMITS.name),
-})
-
-function renameSpaceValue(spaces: string[], oldName: string, newName: string) {
-  return Array.from(new Set(spaces.map((space) => (space === oldName ? newName : space))))
-}
-
-function addSpaceValue(spaces: string[], name: string) {
-  return Array.from(new Set([...spaces, name]))
-}
-
-function removeSpaceValue(spaces: string[], name: string) {
-  return spaces.filter((space) => space !== name)
-}
-
-function buildForm(editing: EditingState, allItems: SpaceDialogAllItems): FormState {
-  if (editing.isNew || !editing.space) {
-    return {
-      isNew: true,
-      name: "",
-      selectedItemIds: [],
-    }
-  }
-
-  const name = editing.space.name
-  // 初始选中:任何 spaces 里包含本空间名的物品
-  const selectedIds = [
-    ...allItems.owned.filter((item) => item.spaces.includes(name)).map((item) => item.id),
-    ...allItems.plan.filter((item) => item.spaces.includes(name)).map((item) => item.id),
-  ]
-
-  return {
-    isNew: false,
-    id: editing.space.definitionId ?? undefined,
-    originalName: name,
-    name,
-    selectedItemIds: selectedIds,
-  }
-}
+import {
+  SHOPPING_DIALOG_CONTENT_CLASS,
+  SHOPPING_DIALOG_FIELD_CLASS,
+  SHOPPING_DIALOG_FOOTER_CLASS,
+  SHOPPING_DIALOG_HEADER_CLASS,
+  SHOPPING_DIALOG_SECTION_CLASS,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import { cn } from "@/lib/utils"
 
 export function ShoppingSpaceEditDialog({
   editing,
-  existingSpaceNames,
-  allItems,
+  shopping,
   onClose,
   onSaved,
+  onDeleted,
 }: {
-  editing: EditingState | null
-  existingSpaceNames: string[]
-  allItems: SpaceDialogAllItems
+  editing: { isNew: boolean; space: ShoppingSpaceDefinition | null }
+  shopping: ShoppingModuleData
   onClose: () => void
   onSaved: () => void
-}) {
-  if (!editing) return null
-
-  const initialForm = buildForm(editing, allItems)
-  const dialogKey = editing.isNew
-    ? "new-space"
-    : (editing.space?.definitionId ?? editing.space?.name)
-
-  return (
-    <Dialog
-      open
-      key={dialogKey}
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-    >
-      <SpaceDialogContent
-        initialForm={initialForm}
-        existingSpaceNames={existingSpaceNames}
-        allItems={allItems}
-        onClose={onClose}
-        onSaved={onSaved}
-      />
-    </Dialog>
-  )
-}
-
-function SpaceDialogContent({
-  initialForm,
-  existingSpaceNames,
-  allItems,
-  onClose,
-  onSaved,
-}: {
-  initialForm: FormState
-  existingSpaceNames: string[]
-  allItems: SpaceDialogAllItems
-  onClose: () => void
-  onSaved: () => void
+  onDeleted?: () => void
 }) {
   const { t } = useTranslation()
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [form, setForm] = useState<FormState>(initialForm)
-
-  // 穿梭框候选 — 把 owned + plan 拍扁,提示当前所属空间
-  const shuttleCandidates = useMemo(
-    () => [
-      ...allItems.owned.map((item) => ({
-        id: item.id,
-        name: item.name,
-        hint: item.spaces.length > 0 ? item.spaces.join(" / ") : undefined,
-      })),
-      ...allItems.plan.map((item) => ({
-        id: item.id,
-        name: item.name,
-        hint: item.spaces.length > 0 ? item.spaces.join(" / ") : undefined,
-      })),
-    ],
-    [allItems],
+  const [name, setName] = useState(editing.space?.name ?? "")
+  const [note, setNote] = useState(editing.space?.note ?? "")
+  const [selectedItemIds, setSelectedItemIds] = useState<string[]>(() =>
+    editing.space
+      ? shopping.items
+          .filter((item) => item.spaceTags.includes(editing.space?.id ?? ""))
+          .map((item) => item.id)
+      : [],
   )
 
-  const initialSelectedSet = useMemo(
-    () => new Set(initialForm.selectedItemIds),
-    [initialForm.selectedItemIds],
-  )
+  const validSelectedItemIds = useMemo(() => {
+    const itemIdSet = new Set(shopping.items.map((item) => item.id))
+    return selectedItemIds.filter((itemId) => itemIdSet.has(itemId))
+  }, [selectedItemIds, shopping.items])
 
-  async function handleSave() {
+  const handleSubmit = async () => {
+    const normalizedName = name.trim()
+    if (!normalizedName) {
+      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      return
+    }
+
     try {
-      setSaving(true)
-      setError(null)
-
-      const parsed = schema.safeParse({ name: form.name })
-      if (!parsed.success) {
-        setError(t("shopping.validation.invalidForm"))
-        return
+      if (editing.isNew) {
+        const space = await createSpaceDefinition({ name: normalizedName, note: note.trim() })
+        await assignSpaceDefinitionItems(space.id, validSelectedItemIds)
+      } else if (editing.space) {
+        const space = await updateSpaceDefinition({
+          id: editing.space.id,
+          name: normalizedName,
+          note: note.trim(),
+        })
+        await assignSpaceDefinitionItems(space.id, validSelectedItemIds)
       }
-
-      const nextName = parsed.data.name.trim()
-      const normalizedCurrentName = form.originalName?.trim().toLocaleLowerCase()
-      const hasDuplicate = existingSpaceNames.some((name) => {
-        const normalizedName = name.trim().toLocaleLowerCase()
-        return (
-          normalizedName === nextName.toLocaleLowerCase() &&
-          normalizedName !== normalizedCurrentName
-        )
-      })
-
-      if (hasDuplicate) {
-        setError(t("shopping.validation.duplicateName"))
-        return
-      }
-
-      if (form.isNew) {
-        await createSpaceDefinition({ name: nextName })
-
-        // 新建空间也可以直接挑物品 — 给它们加上 spaces:[nextName]
-        const ownedIds = new Set(allItems.owned.map((item) => item.id))
-        const planIds = new Set(allItems.plan.map((item) => item.id))
-        const tasks: Promise<unknown>[] = []
-        for (const id of form.selectedItemIds) {
-          if (ownedIds.has(id)) {
-            const item = allItems.owned.find((row) => row.id === id)!
-            tasks.push(
-              updateOwnedItem({
-                ...item,
-                depreciation: item.depreciation ?? null,
-                spaces: addSpaceValue(item.spaces, nextName),
-              }),
-            )
-          } else if (planIds.has(id)) {
-            const item = allItems.plan.find((row) => row.id === id)!
-            tasks.push(
-              updatePlanItem({
-                ...item,
-                laneId: item.laneId,
-                depreciation: item.depreciation ?? null,
-                currentPrice: item.currentPrice ?? null,
-                buyBelowPrice: item.buyBelowPrice ?? null,
-                overpayPrice: item.overpayPrice ?? null,
-                spaces: addSpaceValue(item.spaces, nextName),
-              }),
-            )
-          }
-        }
-        await Promise.all(tasks)
-
-        onClose()
-        onSaved()
-        return
-      }
-
-      if (!form.originalName) {
-        setError(t("shopping.validation.invalidForm"))
-        return
-      }
-
-      // 1. 写空间定义本身(可能改名)
-      if (form.id) {
-        await updateSpaceDefinition({ id: form.id, name: nextName })
-      } else {
-        await createSpaceDefinition({ name: nextName })
-      }
-
-      // 2. 计算物品归属变化(基于 nextName,因为旧名将被改成新名)
-      const nextSelected = new Set(form.selectedItemIds)
-      const wasRenamed = nextName !== form.originalName
-
-      const ownedById = new Map(allItems.owned.map((item) => [item.id, item]))
-      const planById = new Map(allItems.plan.map((item) => [item.id, item]))
-      const allIds = new Set([...ownedById.keys(), ...planById.keys()])
-
-      const tasks: Promise<unknown>[] = []
-      for (const id of allIds) {
-        const ownedItem = ownedById.get(id)
-        const planItem = planById.get(id)
-        const wasIn = initialSelectedSet.has(id)
-        const isIn = nextSelected.has(id)
-
-        if (ownedItem) {
-          let nextSpaces = ownedItem.spaces
-          if (wasRenamed) {
-            // 物品之前在该空间下,要把空间名改成新的
-            nextSpaces = renameSpaceValue(nextSpaces, form.originalName, nextName)
-          }
-          if (isIn && !wasIn) {
-            nextSpaces = addSpaceValue(nextSpaces, nextName)
-          } else if (!isIn && wasIn) {
-            // 取消选中 — 移除该空间名(也包括 rename 前的旧名,以防万一)
-            nextSpaces = removeSpaceValue(nextSpaces, nextName)
-            if (wasRenamed) {
-              nextSpaces = removeSpaceValue(nextSpaces, form.originalName)
-            }
-          }
-          if (nextSpaces !== ownedItem.spaces) {
-            tasks.push(
-              updateOwnedItem({
-                ...ownedItem,
-                depreciation: ownedItem.depreciation ?? null,
-                spaces: nextSpaces,
-              }),
-            )
-          }
-        } else if (planItem) {
-          let nextSpaces = planItem.spaces
-          if (wasRenamed) {
-            nextSpaces = renameSpaceValue(nextSpaces, form.originalName, nextName)
-          }
-          if (isIn && !wasIn) {
-            nextSpaces = addSpaceValue(nextSpaces, nextName)
-          } else if (!isIn && wasIn) {
-            nextSpaces = removeSpaceValue(nextSpaces, nextName)
-            if (wasRenamed) {
-              nextSpaces = removeSpaceValue(nextSpaces, form.originalName)
-            }
-          }
-          if (nextSpaces !== planItem.spaces) {
-            tasks.push(
-              updatePlanItem({
-                ...planItem,
-                laneId: planItem.laneId,
-                depreciation: planItem.depreciation ?? null,
-                currentPrice: planItem.currentPrice ?? null,
-                buyBelowPrice: planItem.buyBelowPrice ?? null,
-                overpayPrice: planItem.overpayPrice ?? null,
-                spaces: nextSpaces,
-              }),
-            )
-          }
-        }
-      }
-
-      await Promise.all(tasks)
-
-      onClose()
       onSaved()
     } catch (e) {
-      setError(String(e))
-    } finally {
-      setSaving(false)
+      toast.error(String(e))
     }
   }
 
-  async function handleDelete() {
-    if (form.isNew) return
-    if (!window.confirm(t("shopping.spaces.confirmDelete"))) return
+  const handleDelete = () => {
+    if (!editing.space) return
 
-    try {
-      setSaving(true)
-      setError(null)
+    const scheduled = confirmUndoableDelete({
+      confirmMessage: t("shopping.confirm.deleteSpace", `确定删除 ${editing.space.name} 吗？`),
+      pendingMessage: t("shopping.toast.deletePendingSpace", {
+        name: editing.space.name,
+        defaultValue: `已加入删除队列：${editing.space.name}，5 秒内可撤销`,
+      }),
+      successMessage: t("shopping.toast.deleteSuccessSpace", {
+        name: editing.space.name,
+        defaultValue: `已删除空间：${editing.space.name}`,
+      }),
+      failureMessage: t("shopping.toast.deleteFailedSpace", "删除空间失败"),
+      undoLabel: t("shopping.undo", "撤销"),
+      undoneMessage: t("shopping.toast.deleteUndoneSpace", {
+        name: editing.space.name,
+        defaultValue: `已撤销删除：${editing.space.name}`,
+      }),
+      onDelete: () => deleteSpaceDefinition(editing.space!.id),
+      onDeleted,
+    })
 
-      const spaceName = form.originalName ?? form.name
-      const tasks: Promise<unknown>[] = []
-
-      // 从所有物品中移除该空间名
-      for (const item of allItems.owned) {
-        const nextSpaces = removeSpaceValue(item.spaces, spaceName)
-        if (nextSpaces.length !== item.spaces.length) {
-          tasks.push(
-            updateOwnedItem({
-              ...item,
-              depreciation: item.depreciation ?? null,
-              spaces: nextSpaces,
-            }),
-          )
-        }
-      }
-      for (const item of allItems.plan) {
-        const nextSpaces = removeSpaceValue(item.spaces, spaceName)
-        if (nextSpaces.length !== item.spaces.length) {
-          tasks.push(
-            updatePlanItem({
-              ...item,
-              laneId: item.laneId,
-              depreciation: item.depreciation ?? null,
-              currentPrice: item.currentPrice ?? null,
-              buyBelowPrice: item.buyBelowPrice ?? null,
-              overpayPrice: item.overpayPrice ?? null,
-              spaces: nextSpaces,
-            }),
-          )
-        }
-      }
-
-      // 删除空间定义(如果存在)
-      if (form.id) {
-        tasks.push(deletePageContent(form.id))
-      }
-
-      await Promise.all(tasks)
-
+    if (scheduled) {
       onClose()
-      onSaved()
-    } catch (e) {
-      setError(String(e))
-    } finally {
-      setSaving(false)
     }
   }
 
   return (
-    <DialogContent className="flex max-h-[min(90vh,800px)] flex-col sm:max-w-3xl">
-      <DialogHeader>
-        <DialogTitle>
-          {form.isNew
-            ? t("shopping.spaces.newTitle")
-            : t("shopping.spaces.editTitle", { title: form.originalName ?? form.name })}
-        </DialogTitle>
-        <DialogDescription>
-          {form.isNew ? t("shopping.spaces.newDescription") : t("shopping.spaces.editDescription")}
-        </DialogDescription>
-      </DialogHeader>
-
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-        <div className="space-y-4">
-          {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50/90 px-4 py-3 text-sm text-red-800">
-              {error}
-            </div>
-          ) : null}
-
-          <FormField label={t("shopping.spaces.form.name")} required>
-            <Input
-              value={form.name}
-              onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-              maxLength={SPACE_LIMITS.name}
-            />
-          </FormField>
-
-          {/* 穿梭框 — 选择属于本空间的物品。set + remove 策略:勾选 = 把空间名加到物品的 spaces 数组;取消 = 从 spaces 移除 */}
-          <FormField
-            label={t("shopping.spaces.form.assignItems")}
-            description={t("shopping.spaces.form.assignItemsHelp")}
-          >
-            <ShoppingItemShuttle
-              candidates={shuttleCandidates}
-              selectedIds={form.selectedItemIds}
-              onChange={(nextIds) => setForm((prev) => ({ ...prev, selectedItemIds: nextIds }))}
-              leftTitle={t("shopping.shuttle.candidates")}
-              rightTitle={t("shopping.shuttle.selected")}
-            />
-          </FormField>
-        </div>
-      </div>
-
-      <DialogFooter className="flex items-center justify-between">
-        {!form.isNew ? (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="text-red-500 hover:bg-red-50 hover:text-red-700"
-            onClick={() => void handleDelete()}
-            disabled={saving}
-          >
-            <Trash2 />
-          </Button>
-        ) : (
-          <span />
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className={cn(
+          "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
+          SHOPPING_DIALOG_CONTENT_CLASS,
         )}
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onClose}>
-            {t("shopping.spaces.form.cancel")}
-          </Button>
-          <Button onClick={() => void handleSave()} disabled={saving}>
-            {t("shopping.spaces.form.save")}
-          </Button>
+      >
+        <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
+          <DialogTitle>
+            {editing.isNew
+              ? t("shopping.space.create", "新增空间")
+              : t("shopping.space.edit", "编辑空间")}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+          <div
+            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+          >
+            <div className="shrink-0 text-sm font-medium">
+              {t("shopping.spaces.form.basicInfo", "基本信息")}
+            </div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+              <div className="space-y-1.5">
+                <Label>{t("shopping.spaces.form.name", "名称")}</Label>
+                <Input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className={SHOPPING_DIALOG_FIELD_CLASS}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("shopping.spaces.form.note", "备注")}</Label>
+                <Textarea
+                  value={note}
+                  onChange={(event) => setNote(event.target.value)}
+                  rows={4}
+                  placeholder={t(
+                    "shopping.spaces.form.notePlaceholder",
+                    "描述这个空间的特点、用途等",
+                  )}
+                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+          >
+            <div className="shrink-0 text-sm font-medium">
+              {t("shopping.spaces.form.assignItems", "本空间下的物品")}
+            </div>
+            <div className="mt-2 min-h-0 flex-1 overflow-hidden">
+              <ShoppingItemShuttle
+                items={shopping.items}
+                selectedIds={validSelectedItemIds}
+                onChange={setSelectedItemIds}
+                scope="space"
+              />
+            </div>
+          </div>
         </div>
-      </DialogFooter>
-    </DialogContent>
+
+        <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
+          {!editing.isNew && (
+            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+              {t("shopping.delete", "删除")}
+            </Button>
+          )}
+          <Button variant="outline" onClick={onClose}>
+            {t("shopping.cancel", "取消")}
+          </Button>
+          <Button onClick={handleSubmit}>{t("shopping.save", "保存")}</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

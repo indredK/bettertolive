@@ -1,30 +1,16 @@
 import type {
-  ShoppingOwnedItem,
-  ShoppingPlanItem,
-  ShoppingSystem,
+  ShoppingItem,
+  ShoppingSpaceDefinition,
   ShoppingSystemDefinition,
-} from "@/features/bettertolive/types"
+} from "@/features/bettertolive/models/workspace"
 
-/** Plan item with its parent purchase lane metadata. */
-export type ShoppingPlanWithLane = ShoppingPlanItem & {
-  laneId: string
-  laneTitle: string
-}
-
-/** Aggregated system overview with owned and planned items. */
+/** 系统聚合视图(按 systemTags group-by 后的结果) */
 export type ShoppingSystemOverview = ShoppingSystemDefinition & {
-  owned: ShoppingOwnedItem[]
-  planned: ShoppingPlanWithLane[]
-  spaces: string[]
-  urgentCount: number
+  items: ShoppingItem[]
   isActive: boolean
 }
 
-/** Aggregated space with owned and planned items. */
-export type SpaceOverview = {
-  definitionId: string | null
-  name: string
-  owned: ShoppingOwnedItem[]
-  planned: ShoppingPlanWithLane[]
-  systems: Set<ShoppingSystem>
+/** 空间聚合视图(按 spaceTags group-by 后的结果) */
+export type SpaceOverview = ShoppingSpaceDefinition & {
+  items: ShoppingItem[]
 }

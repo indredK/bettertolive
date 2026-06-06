@@ -4,10 +4,8 @@ export const emptyShoppingModuleData = {
   systemDefinitions: [],
   spaceDefinitions: [],
   spotlights: [],
-  ownedItems: [],
-  purchaseLanes: [],
-  stageChecklists: [],
-  priceReferences: [],
+  items: [],
+  stageTemplates: [],
   boundaryEntries: [],
   lifestyleCollections: [],
 } satisfies ShoppingModuleData

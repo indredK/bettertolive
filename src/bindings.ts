@@ -5,16 +5,21 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 /** Commands */
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
-	/**  Returns the full shopping module content aggregated from relational tables. */
 	getShopping: () => typedError<ShoppingModuleDto_Serialize, string>(__TAURI_INVOKE("get_shopping")),
-	listOwnedItems: () => typedError<OwnedItemRow[], string>(__TAURI_INVOKE("list_owned_items")),
-	createOwnedItem: (form: OwnedItemFormDto) => typedError<ShoppingOwnedItemDto_Serialize, string>(__TAURI_INVOKE("create_owned_item", { form })),
-	updateOwnedItem: (form: OwnedItemFormDto) => typedError<ShoppingOwnedItemDto_Serialize, string>(__TAURI_INVOKE("update_owned_item", { form })),
-	deleteOwnedItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_owned_item", { id })),
-	listPlanItems: () => typedError<PlanItemRow[], string>(__TAURI_INVOKE("list_plan_items")),
-	createPlanItem: (form: PlanItemFormDto) => typedError<ShoppingPlanItemDto_Serialize, string>(__TAURI_INVOKE("create_plan_item", { form })),
-	updatePlanItem: (form: PlanItemFormDto) => typedError<ShoppingPlanItemDto_Serialize, string>(__TAURI_INVOKE("update_plan_item", { form })),
-	deletePlanItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_plan_item", { id })),
+	listShoppingItems: () => typedError<ShoppingItemDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_items")),
+	createShoppingItem: (form: ItemFormDto) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("create_shopping_item", { form })),
+	updateShoppingItem: (form: ItemFormDto) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("update_shopping_item", { form })),
+	deleteShoppingItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_item", { id })),
+	listShoppingStageTemplates: () => typedError<ShoppingStageTemplateDto[], string>(__TAURI_INVOKE("list_shopping_stage_templates")),
+	createShoppingStageTemplate: (form: StageTemplateFormDto) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("create_shopping_stage_template", { form })),
+	updateShoppingStageTemplate: (form: StageTemplateFormDto) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("update_shopping_stage_template", { form })),
+	deleteShoppingStageTemplate: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_stage_template", { id })),
+	reorderStageTemplates: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_stage_templates", { orderedIds })),
+	listShoppingSpaceDefinitions: () => typedError<ShoppingSpaceDefinitionDto[], string>(__TAURI_INVOKE("list_shopping_space_definitions")),
+	createShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("create_shopping_space_definition", { form })),
+	updateShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("update_shopping_space_definition", { form })),
+	deleteShoppingSpaceDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_space_definition", { id })),
+	reorderSpaceDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_space_definitions", { orderedIds })),
 	listShoppingPageContents: (contentType: string | null) => typedError<PageContentRow[], string>(__TAURI_INVOKE("list_shopping_page_contents", { contentType })),
 	createShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("create_shopping_page_content", { form })),
 	updateShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
@@ -23,41 +28,36 @@ export const commands = {
 	updateSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("update_system_definition", { form })),
 	deleteSystemDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_system_definition", { id })),
 	reorderSystemDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_system_definitions", { orderedIds })),
+	assignSystemDefinitionItems: (systemId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_system_definition_items", { systemId, itemIds })),
+	assignSpaceDefinitionItems: (spaceId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_space_definition_items", { spaceId, itemIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 };
 
 /* Types */
-export type OwnedItemFormDto = {
+export type ItemChildChannelFormDto = {
 	id?: string | null,
-	name: string,
-	system: string,
-	category: string,
-	spaces: string[],
-	stages: string[],
-	lifecycle: string,
-	depreciation: string | null,
-	quantity: number,
-	status: string,
-	replacementCue: string,
-	note: string,
+	channel: string,
+	entryPrice?: number | null,
+	sweetSpotPrice?: number | null,
+	overpayPrice?: number | null,
 };
 
-export type OwnedItemRow = {
-	id: string,
+export type ItemChildFormDto = {
+	id?: string | null,
 	name: string,
-	system_id: string,
-	category: string,
-	necessity: string,
-	lifecycle: string,
-	depreciation: string | null,
-	quantity: number,
-	status: string,
-	replacement_cue: string,
-	note: string,
-	sort_order: number,
-	is_archived: boolean,
-	created_at: string,
-	updated_at: string,
+	status?: string | null,
+	lifecycle?: string | null,
+	depreciation?: string | null,
+	channelPrices?: ItemChildChannelFormDto[],
+};
+
+export type ItemFormDto = {
+	id?: string | null,
+	name: string,
+	children: ItemChildFormDto[],
+	systemTags: string[],
+	spaceTags: string[],
+	note?: string,
 };
 
 export type PageContentFormDto = {
@@ -86,46 +86,6 @@ export type PageContentRow = {
 	updated_at: string,
 };
 
-export type PlanItemFormDto = {
-	id?: string | null,
-	laneId: string,
-	name: string,
-	system: string,
-	category: string,
-	spaces: string[],
-	stages: string[],
-	lifecycle: string,
-	depreciation: string | null,
-	reason: string,
-	targetLifestyle: string,
-	currentPrice: number | null,
-	buyBelowPrice: number | null,
-	overpayPrice: number | null,
-	note: string,
-	keywords: string[],
-};
-
-export type PlanItemRow = {
-	id: string,
-	lane_id: string,
-	name: string,
-	system_id: string,
-	category: string,
-	necessity: string,
-	lifecycle: string,
-	depreciation: string | null,
-	reason: string,
-	target_lifestyle: string,
-	current_price: number | null,
-	buy_below_price: number | null,
-	overpay_price: number | null,
-	note: string,
-	sort_order: number,
-	is_archived: boolean,
-	created_at: string,
-	updated_at: string,
-};
-
 export type ShoppingBoundaryEntryDto = {
 	id: string,
 	item: string,
@@ -133,24 +93,62 @@ export type ShoppingBoundaryEntryDto = {
 	reason: string,
 };
 
-export type ShoppingItemBaseDto = ShoppingItemBaseDto_Serialize | ShoppingItemBaseDto_Deserialize;
+export type ShoppingItemChildChannelDto = ShoppingItemChildChannelDto_Serialize | ShoppingItemChildChannelDto_Deserialize;
 
-export type ShoppingItemBaseDto_Deserialize = {
-	system: string,
-	category: string,
-	spaces: string[],
-	stages: string[],
-	lifecycle: string,
-	depreciation: string | null,
+export type ShoppingItemChildChannelDto_Deserialize = {
+	id: string,
+	channel: string,
+	entryPrice: number | null,
+	sweetSpotPrice: number | null,
+	overpayPrice: number | null,
 };
 
-export type ShoppingItemBaseDto_Serialize = {
-	system: string,
-	category: string,
-	spaces: string[],
-	stages: string[],
-	lifecycle: string,
+export type ShoppingItemChildChannelDto_Serialize = {
+	id: string,
+	channel: string,
+	entryPrice?: number | null,
+	sweetSpotPrice?: number | null,
+	overpayPrice?: number | null,
+};
+
+export type ShoppingItemChildDto = ShoppingItemChildDto_Serialize | ShoppingItemChildDto_Deserialize;
+
+export type ShoppingItemChildDto_Deserialize = {
+	id: string,
+	name: string,
+	status: string | null,
+	lifecycle: string | null,
+	depreciation: string | null,
+	channelPrices?: ShoppingItemChildChannelDto_Deserialize[],
+};
+
+export type ShoppingItemChildDto_Serialize = {
+	id: string,
+	name: string,
+	status?: string | null,
+	lifecycle?: string | null,
 	depreciation?: string | null,
+	channelPrices: ShoppingItemChildChannelDto_Serialize[],
+};
+
+export type ShoppingItemDto = ShoppingItemDto_Serialize | ShoppingItemDto_Deserialize;
+
+export type ShoppingItemDto_Deserialize = {
+	id: string,
+	name: string,
+	children: ShoppingItemChildDto_Deserialize[],
+	systemTags: string[],
+	spaceTags: string[],
+	note: string,
+};
+
+export type ShoppingItemDto_Serialize = {
+	id: string,
+	name: string,
+	children: ShoppingItemChildDto_Serialize[],
+	systemTags: string[],
+	spaceTags: string[],
+	note: string,
 };
 
 export type ShoppingLifestyleCollectionDto = {
@@ -166,10 +164,8 @@ export type ShoppingModuleDto_Deserialize = {
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
-	ownedItems: ShoppingOwnedItemDto_Deserialize[],
-	purchaseLanes: ShoppingPurchaseLaneDto_Deserialize[],
-	stageChecklists: ShoppingStageChecklistDto[],
-	priceReferences: ShoppingPriceReferenceDto_Deserialize[],
+	items: ShoppingItemDto_Deserialize[],
+	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
 };
@@ -178,105 +174,16 @@ export type ShoppingModuleDto_Serialize = {
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
-	ownedItems: ShoppingOwnedItemDto_Serialize[],
-	purchaseLanes: ShoppingPurchaseLaneDto_Serialize[],
-	stageChecklists: ShoppingStageChecklistDto[],
-	priceReferences: ShoppingPriceReferenceDto_Serialize[],
+	items: ShoppingItemDto_Serialize[],
+	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
-};
-
-export type ShoppingOwnedItemDto = ShoppingOwnedItemDto_Serialize | ShoppingOwnedItemDto_Deserialize;
-
-export type ShoppingOwnedItemDto_Deserialize = {
-	id: string,
-	name: string,
-	quantity: number,
-	status: string,
-	replacementCue: string,
-	note: string,
-} & ShoppingItemBaseDto_Deserialize;
-
-export type ShoppingOwnedItemDto_Serialize = {
-	id: string,
-	name: string,
-	quantity: number,
-	status: string,
-	replacementCue: string,
-	note: string,
-} & ShoppingItemBaseDto_Serialize;
-
-export type ShoppingPlanItemDto = ShoppingPlanItemDto_Serialize | ShoppingPlanItemDto_Deserialize;
-
-export type ShoppingPlanItemDto_Deserialize = {
-	id: string,
-	name: string,
-	reason: string,
-	targetLifestyle: string,
-	currentPrice: number | null,
-	buyBelowPrice: number | null,
-	overpayPrice: number | null,
-	note: string,
-	keywords: string[],
-} & ShoppingItemBaseDto_Deserialize;
-
-export type ShoppingPlanItemDto_Serialize = {
-	id: string,
-	name: string,
-	reason: string,
-	targetLifestyle: string,
-	currentPrice: number | null,
-	buyBelowPrice: number | null,
-	overpayPrice: number | null,
-	note: string,
-	keywords: string[],
-} & ShoppingItemBaseDto_Serialize;
-
-export type ShoppingPriceReferenceDto = ShoppingPriceReferenceDto_Serialize | ShoppingPriceReferenceDto_Deserialize;
-
-export type ShoppingPriceReferenceDto_Deserialize = {
-	id: string,
-	system: string,
-	category: string,
-	lifecycle: string,
-	depreciation: string | null,
-	entryPrice: number | null,
-	sweetSpotPrice: number | null,
-	overpayPrice: number | null,
-	note: string,
-};
-
-export type ShoppingPriceReferenceDto_Serialize = {
-	id: string,
-	system: string,
-	category: string,
-	lifecycle: string,
-	depreciation?: string | null,
-	entryPrice: number | null,
-	sweetSpotPrice: number | null,
-	overpayPrice: number | null,
-	note: string,
-};
-
-export type ShoppingPurchaseLaneDto = ShoppingPurchaseLaneDto_Serialize | ShoppingPurchaseLaneDto_Deserialize;
-
-export type ShoppingPurchaseLaneDto_Deserialize = {
-	id: string,
-	title: string,
-	subtitle: string,
-	items: ShoppingPlanItemDto_Deserialize[],
-};
-
-export type ShoppingPurchaseLaneDto_Serialize = {
-	id: string,
-	title: string,
-	subtitle: string,
-	items: ShoppingPlanItemDto_Serialize[],
 };
 
 export type ShoppingSpaceDefinitionDto = {
 	id: string,
 	name: string,
+	note?: string,
 };
 
 export type ShoppingSpotlightDto = {
@@ -288,31 +195,65 @@ export type ShoppingSpotlightDto = {
 	attention: string[],
 };
 
-export type ShoppingStageChecklistDto = {
-	id: string,
-	stage: string,
-	title: string,
-	description: string,
-	focus: string,
-	sections: ShoppingStageChecklistSectionDto[],
+export type ShoppingStageItemDto = {
+	itemId: string,
+	tiers: ShoppingStageItemTiersDto,
 };
 
-export type ShoppingStageChecklistSectionDto = {
-	system: string,
-	minimumItemIds?: string[],
-	essentialItemIds?: string[],
-	upgradeItemIds?: string[],
+export type ShoppingStageItemTiersDto = {
+	low: string[],
+	base: string[],
+	up: string[],
+};
+
+export type ShoppingStageTemplateDto = {
+	id: string,
+	name: string,
+	description: string,
+	focus: string,
+	systemDimensionIds: string[],
+	spaceDimensionIds: string[],
+	items: ShoppingStageItemDto[],
 };
 
 export type ShoppingSystemDefinitionDto = {
 	id: string,
+	name: string,
 	summary: string,
 	keyQuestion: string,
 	secondaryGroups: string[],
 };
 
+export type SpaceDefinitionFormDto = {
+	id?: string | null,
+	name: string,
+	note?: string,
+};
+
+export type StageItemFormDto = {
+	itemId: string,
+	tiers: StageItemTiersFormDto,
+};
+
+export type StageItemTiersFormDto = {
+	low: string[],
+	base: string[],
+	up: string[],
+};
+
+export type StageTemplateFormDto = {
+	id?: string | null,
+	name: string,
+	description?: string,
+	focus?: string,
+	systemDimensionIds?: string[],
+	spaceDimensionIds?: string[],
+	items: StageItemFormDto[],
+};
+
 export type SystemDefinitionFormDto = {
 	id: string,
+	name: string,
 	summary: string,
 	keyQuestion: string,
 	secondaryGroups: string[],

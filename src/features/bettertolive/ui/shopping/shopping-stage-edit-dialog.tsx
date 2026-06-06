@@ -1,597 +1,462 @@
 import { Plus, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
-import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
-import { z } from "zod"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { MultiSelect } from "@/components/ui/multi-select"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select"
 import { Textarea } from "@/components/ui/textarea"
-import type { ShoppingPageContentForm } from "@/features/bettertolive/api/bettertolive-api"
-import {
-  createPageContent,
-  deletePageContent,
-  updatePageContent,
-} from "@/features/bettertolive/api/shopping-crud-api"
 import type {
-  ShoppingOwnedItem,
-  ShoppingStageChecklist,
-  ShoppingStageChecklistSection,
-  ShoppingStage,
+  ShoppingItem,
+  ShoppingModuleData,
+  ShoppingStageItem,
+  ShoppingStageTemplate,
 } from "@/features/bettertolive/types"
-import type { ShoppingSystem } from "@/features/bettertolive/types"
-import { FormField } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import type { ShoppingStageTemplateForm } from "@/features/bettertolive/api/bettertolive-api"
 import {
-  SHOPPING_STAGE_OPTIONS,
-  systemDisplayName,
-} from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import type { ShoppingPlanWithLane } from "@/features/bettertolive/ui/shopping/shopping-types"
+  createStageTemplate,
+  deleteStageTemplate,
+  updateStageTemplate,
+} from "@/features/bettertolive/api/shopping-crud-api"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { ShoppingItemShuttle } from "@/features/bettertolive/ui/shopping/shopping-item-shuttle"
+import {
+  SHOPPING_DIALOG_CONTENT_CLASS,
+  SHOPPING_DIALOG_FIELD_CLASS,
+  SHOPPING_DIALOG_FOOTER_CLASS,
+  SHOPPING_DIALOG_HEADER_CLASS,
+  SHOPPING_DIALOG_PANEL_CLASS,
+  SHOPPING_DIALOG_SECTION_CLASS,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import { cn } from "@/lib/utils"
 
-// 阶段编辑对话框现在需要全量物品池(按系统过滤后作为各档位 picker 的候选)— 见方案 §5
-export type StageDialogAllItems = {
-  owned: ShoppingOwnedItem[]
-  plan: ShoppingPlanWithLane[]
-}
+export type EditingStage = { isNew: boolean; stage: ShoppingStageTemplate | null }
 
-type StageFormState = {
-  isNew: boolean
-  id?: string
-  title: string
-  stage: string
-  description: string
-  focus: string
-  sections: ShoppingStageChecklistSection[]
-}
-
-const STAGE_LIMITS = {
-  title: 80,
-  description: 240,
-  focus: 240,
-  sections: 16,
-  itemsPerGroup: 24,
-  // 注:itemLength 已删除 — 各档位现在存物品 ID 不是手写文本
-} as const
-
-function cleanFieldLabel(label: string) {
-  return label.replace(/\s*\([^)]*\)$/, "")
-}
-
-function requiredMessage(t: TFunction, field: string) {
-  return t("shopping.validation.required", { field })
-}
-
-function maxLengthMessage(t: TFunction, field: string, count: number) {
-  return t("shopping.validation.maxLength", { field, count })
-}
-
-function invalidOptionMessage(t: TFunction, field: string) {
-  return t("shopping.validation.invalidOption", { field })
-}
-
-function buildStageSchema(t: TFunction, systemOptions: string[]) {
-  const fields = {
-    title: cleanFieldLabel(t("shopping.stages.form.title")),
-    stage: cleanFieldLabel(t("shopping.stages.form.stage")),
-    description: cleanFieldLabel(t("shopping.stages.form.description")),
-    focus: cleanFieldLabel(t("shopping.stages.form.focus")),
-    sections: cleanFieldLabel(t("shopping.stages.form.sections")),
-  }
-
-  const itemIdsArraySchema = (label: string) =>
-    z.array(z.string().trim().min(1)).max(
-      STAGE_LIMITS.itemsPerGroup,
-      t("shopping.validation.maxItems", {
-        field: label,
-        count: STAGE_LIMITS.itemsPerGroup,
-      }),
-    )
-
-  return z.object({
-    title: z
-      .string()
-      .trim()
-      .min(1, requiredMessage(t, fields.title))
-      .max(STAGE_LIMITS.title, maxLengthMessage(t, fields.title, STAGE_LIMITS.title)),
-    stage: z
-      .string()
-      .min(1, requiredMessage(t, fields.stage))
-      .refine(
-        (value): value is ShoppingStage => SHOPPING_STAGE_OPTIONS.includes(value as ShoppingStage),
-        { message: invalidOptionMessage(t, fields.stage) },
-      ),
-    description: z
-      .string()
-      .trim()
-      .max(
-        STAGE_LIMITS.description,
-        maxLengthMessage(t, fields.description, STAGE_LIMITS.description),
-      ),
-    focus: z
-      .string()
-      .trim()
-      .max(STAGE_LIMITS.focus, maxLengthMessage(t, fields.focus, STAGE_LIMITS.focus)),
-    sections: z
-      .array(
-        z.object({
-          system: z
-            .string()
-            .min(1, requiredMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))))
-            .refine((value): value is ShoppingSystem => systemOptions.includes(value), {
-              message: invalidOptionMessage(t, cleanFieldLabel(t("shopping.stages.table.system"))),
-            }),
-          minimumItemIds: itemIdsArraySchema(t("shopping.stages.table.minimum")),
-          essentialItemIds: itemIdsArraySchema(t("shopping.stages.table.essentials")),
-          upgradeItemIds: itemIdsArraySchema(t("shopping.stages.table.upgrades")),
-        }),
-      )
-      .min(1, requiredMessage(t, fields.sections))
-      .max(
-        STAGE_LIMITS.sections,
-        t("shopping.validation.maxItems", { field: fields.sections, count: STAGE_LIMITS.sections }),
-      )
-      .superRefine((sections, ctx) => {
-        const usedSystems = new Set<string>()
-        sections.forEach((section, index) => {
-          if (usedSystems.has(section.system)) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [index, "system"],
-              message: t("shopping.validation.duplicateSystem"),
-            })
-          }
-          usedSystems.add(section.system)
-
-          if (
-            section.minimumItemIds.length +
-              section.essentialItemIds.length +
-              section.upgradeItemIds.length ===
-            0
-          ) {
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              path: [index],
-              message: t("shopping.validation.emptySection"),
-            })
-          }
-        })
-      }),
-  })
-}
-
-function createEmptySection(preferredSystem = ""): ShoppingStageChecklistSection {
-  return {
-    system: preferredSystem,
-    minimumItemIds: [],
-    essentialItemIds: [],
-    upgradeItemIds: [],
-  }
-}
-
-function buildForm(
-  checklist: ShoppingStageChecklist | null,
-  systemOptions: string[],
-  preferredStage: string,
-): StageFormState {
-  if (!checklist) {
-    return {
-      isNew: true,
-      title: "",
-      stage: preferredStage,
-      description: "",
-      focus: "",
-      sections: [createEmptySection(systemOptions[0] ?? "")],
-    }
-  }
-  return {
-    isNew: false,
-    id: checklist.id,
-    title: checklist.title,
-    stage: checklist.stage,
-    description: checklist.description,
-    focus: checklist.focus,
-    sections:
-      checklist.sections.length > 0
-        ? checklist.sections.map((section) => ({
-            system: section.system,
-            // 字段缺失或老数据 → 默认为空数组
-            minimumItemIds: [...(section.minimumItemIds ?? [])],
-            essentialItemIds: [...(section.essentialItemIds ?? [])],
-            upgradeItemIds: [...(section.upgradeItemIds ?? [])],
-          }))
-        : [createEmptySection(systemOptions[0] ?? "")],
-  }
-}
+type StageEditorDraft = Omit<ShoppingStageTemplateForm, "id">
+type Tier = keyof ShoppingStageItem["tiers"]
 
 export function ShoppingStageEditDialog({
   editing,
-  systemOptions,
-  allItems,
-  preferredStage,
+  shopping,
   onClose,
   onSaved,
+  onDeleted,
 }: {
-  editing: { isNew: boolean; checklist: ShoppingStageChecklist | null; stage: string } | null
-  systemOptions: string[]
-  allItems: StageDialogAllItems
-  preferredStage: string
+  editing: EditingStage
+  shopping: ShoppingModuleData
   onClose: () => void
   onSaved: () => void
+  onDeleted?: () => void
 }) {
-  if (!editing) return null
+  const { t } = useTranslation()
+  const seed = editing.stage
 
-  const initialForm = buildForm(editing.checklist, systemOptions, preferredStage)
-  const dialogKey = editing.checklist?.id ?? "new-stage"
+  const itemMap = useMemo(
+    () => new Map(shopping.items.map((item) => [item.id, item])),
+    [shopping.items],
+  )
+
+  const [draft, setDraft] = useState<StageEditorDraft>(() => createInitialDraft(seed, itemMap))
+
+  const handleDraftChange = (updater: (current: StageEditorDraft) => StageEditorDraft) => {
+    setDraft((current) => normalizeStageDraft(updater(current), itemMap))
+  }
+
+  const selectedItemIds = useMemo(() => draft.items.map((si) => si.itemId), [draft.items])
+
+  const syncItemsFromIds = (newIds: string[]) => {
+    handleDraftChange((current) => {
+      const currentIdSet = new Set(current.items.map((si) => si.itemId))
+      const newIdSet = new Set(newIds)
+
+      // Remove items not in new list
+      const items = current.items.filter((si) => newIdSet.has(si.itemId))
+
+      // Add new items with default tiers
+      for (const id of newIds) {
+        if (!currentIdSet.has(id)) {
+          items.push({ itemId: id, tiers: { low: [], base: [], up: [] } })
+        }
+      }
+
+      return { ...current, items }
+    })
+  }
+
+  const removeStageItem = (itemId: string) => {
+    handleDraftChange((current) => ({
+      ...current,
+      items: current.items.filter((stageItem) => stageItem.itemId !== itemId),
+    }))
+  }
+
+  const updateTier = (itemId: string, tier: Tier, value: string[]) => {
+    handleDraftChange((current) => ({
+      ...current,
+      items: current.items.map((stageItem) =>
+        stageItem.itemId === itemId
+          ? { ...stageItem, tiers: { ...stageItem.tiers, [tier]: value } }
+          : stageItem,
+      ),
+    }))
+  }
+
+  const handleSubmit = async () => {
+    if (!draft.name.trim()) {
+      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      return
+    }
+
+    const autoSystemDimensionIds = Array.from(
+      new Set(
+        draft.items
+          .map((stageItem) => itemMap.get(stageItem.itemId))
+          .filter(Boolean)
+          .flatMap((item) => item!.systemTags),
+      ),
+    )
+
+    const autoSpaceDimensionIds = Array.from(
+      new Set(
+        draft.items
+          .map((stageItem) => itemMap.get(stageItem.itemId))
+          .filter(Boolean)
+          .flatMap((item) => item!.spaceTags),
+      ),
+    )
+
+    const form: ShoppingStageTemplateForm = {
+      id: seed?.id,
+      name: draft.name.trim(),
+      description: draft.description.trim(),
+      focus: draft.focus.trim(),
+      systemDimensionIds: autoSystemDimensionIds,
+      spaceDimensionIds: autoSpaceDimensionIds,
+      items: draft.items,
+    }
+
+    try {
+      if (editing.isNew) {
+        await createStageTemplate(form)
+      } else {
+        await updateStageTemplate(form)
+      }
+      onSaved()
+    } catch (e) {
+      toast.error(String(e))
+    }
+  }
+
+  const handleDelete = () => {
+    if (!seed) return
+
+    const scheduled = confirmUndoableDelete({
+      confirmMessage: t("shopping.confirm.deleteStage", `确定删除 ${seed.name} 吗？`),
+      pendingMessage: t("shopping.toast.deletePendingStage", {
+        name: seed.name,
+        defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,
+      }),
+      successMessage: t("shopping.toast.deleteSuccessStage", {
+        name: seed.name,
+        defaultValue: `已删除阶段：${seed.name}`,
+      }),
+      failureMessage: t("shopping.toast.deleteFailedStage", "删除阶段失败"),
+      undoLabel: t("shopping.undo", "撤销"),
+      undoneMessage: t("shopping.toast.deleteUndoneStage", {
+        name: seed.name,
+        defaultValue: `已撤销删除：${seed.name}`,
+      }),
+      onDelete: () => deleteStageTemplate(seed.id),
+      onDeleted,
+    })
+
+    if (scheduled) {
+      onClose()
+    }
+  }
 
   return (
-    <Dialog
-      open
-      key={dialogKey}
-      onOpenChange={(open) => {
-        if (!open) onClose()
-      }}
-    >
-      <StageDialogContent
-        initialForm={initialForm}
-        systemOptions={systemOptions}
-        allItems={allItems}
-        onClose={onClose}
-        onSaved={onSaved}
-      />
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        className={cn(
+          "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
+          SHOPPING_DIALOG_CONTENT_CLASS,
+        )}
+      >
+        <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
+          <DialogTitle>
+            {editing.isNew
+              ? t("shopping.stage.create", "新增阶段")
+              : t("shopping.stage.edit", "编辑阶段")}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+          <div
+            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+          >
+            <div className="shrink-0">
+              <div className="text-sm font-medium">{t("shopping.stage.basicInfo", "基本属性")}</div>
+            </div>
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+              <div className="space-y-1.5">
+                <Label>{t("shopping.stage.name", "名称")} *</Label>
+                <Input
+                  value={draft.name}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, name: event.target.value }))
+                  }
+                  className={SHOPPING_DIALOG_FIELD_CLASS}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("shopping.stage.description", "描述")}</Label>
+                <Textarea
+                  value={draft.description}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      description: event.target.value,
+                    }))
+                  }
+                  rows={4}
+                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>{t("shopping.stage.focus", "重点")}</Label>
+                <Textarea
+                  value={draft.focus}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, focus: event.target.value }))
+                  }
+                  rows={5}
+                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+          >
+            <div className="flex shrink-0 items-center justify-between gap-3">
+              <div className="text-sm font-medium">{t("shopping.stage.items", "阶段物品")}</div>
+            </div>
+
+            <ShoppingItemShuttle
+              items={shopping.items}
+              selectedIds={selectedItemIds}
+              onChange={syncItemsFromIds}
+              scope="stage"
+              className="shrink-0"
+            />
+
+            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+              {draft.items.length === 0 ? (
+                <EmptyStageHint
+                  title={t("shopping.stage.emptyDimensions", "先添加物品")}
+                  description={t(
+                    "shopping.stage.emptyShuttleHint",
+                    "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
+                  )}
+                />
+              ) : (
+                <div className="grid gap-3 pt-4 xl:grid-cols-2">
+                  {draft.items.map((stageItem) => {
+                    const item = itemMap.get(stageItem.itemId)
+                    if (!item) return null
+                    return (
+                      <StageItemEditorCard
+                        key={stageItem.itemId}
+                        item={item}
+                        stageItem={stageItem}
+                        onRemoveItem={() => removeStageItem(stageItem.itemId)}
+                        onUpdateTier={updateTier}
+                      />
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
+          {!editing.isNew && (
+            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+              {t("shopping.delete", "删除")}
+            </Button>
+          )}
+          <Button variant="outline" onClick={onClose}>
+            {t("shopping.cancel", "取消")}
+          </Button>
+          <Button onClick={handleSubmit}>{t("shopping.save", "保存")}</Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   )
 }
 
-function StageDialogContent({
-  initialForm,
-  systemOptions,
-  allItems,
-  onClose,
-  onSaved,
+function StageItemEditorCard({
+  item,
+  stageItem,
+  onRemoveItem,
+  onUpdateTier,
 }: {
-  initialForm: StageFormState
-  systemOptions: string[]
-  allItems: StageDialogAllItems
-  onClose: () => void
-  onSaved: () => void
+  item: ShoppingItem
+  stageItem: ShoppingStageItem
+  onRemoveItem: () => void
+  onUpdateTier: (itemId: string, tier: Tier, value: string[]) => void
 }) {
   const { t } = useTranslation()
-  const [form, setForm] = useState<StageFormState>(initialForm)
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  // 把全量物品按系统聚合,方便每个 section 拿 picker 候选
-  const itemsBySystem = useMemo(() => {
-    const map = new Map<string, Array<{ id: string; name: string }>>()
-    for (const item of allItems.owned) {
-      const list = map.get(item.system) ?? []
-      list.push({ id: item.id, name: item.name })
-      map.set(item.system, list)
-    }
-    for (const item of allItems.plan) {
-      const list = map.get(item.system) ?? []
-      list.push({ id: item.id, name: item.name })
-      map.set(item.system, list)
-    }
-    return map
-  }, [allItems])
-
-  const update = (partial: Partial<StageFormState>) => {
-    setForm((prev) => ({ ...prev, ...partial }))
-  }
-
-  const updateSection = (
-    sectionIndex: number,
-    updater: (section: ShoppingStageChecklistSection) => ShoppingStageChecklistSection,
-  ) => {
-    setForm((prev) => ({
-      ...prev,
-      sections: prev.sections.map((section, index) =>
-        index === sectionIndex ? updater(section) : section,
-      ),
-    }))
-  }
-
-  const addSection = () => {
-    const usedSystems = new Set(form.sections.map((section) => section.system))
-    const nextSystem =
-      systemOptions.find((system) => !usedSystems.has(system)) ?? systemOptions[0] ?? ""
-
-    setForm((prev) => ({
-      ...prev,
-      sections:
-        prev.sections.length >= STAGE_LIMITS.sections
-          ? prev.sections
-          : [...prev.sections, createEmptySection(nextSystem)],
-    }))
-  }
-
-  const removeSection = (sectionIndex: number) => {
-    setForm((prev) => ({
-      ...prev,
-      sections:
-        prev.sections.length <= 1
-          ? [createEmptySection(systemOptions[0] ?? "")]
-          : prev.sections.filter((_, index) => index !== sectionIndex),
-    }))
-  }
-
-  // 切换 section 的系统时,清空三档 ID 数组(旧系统的 ID 不再有效)
-  const changeSectionSystem = (sectionIndex: number, nextSystem: string) => {
-    updateSection(sectionIndex, (section) => {
-      const hasAny =
-        section.minimumItemIds.length +
-          section.essentialItemIds.length +
-          section.upgradeItemIds.length >
-        0
-      if (hasAny) {
-        if (!window.confirm(t("shopping.stages.form.confirmSystemReset"))) {
-          return section
-        }
-      }
-      return {
-        system: nextSystem,
-        minimumItemIds: [],
-        essentialItemIds: [],
-        upgradeItemIds: [],
-      }
-    })
-  }
-
-  async function handleSave() {
-    try {
-      setSaving(true)
-      setError(null)
-
-      const parsed = buildStageSchema(t, systemOptions).safeParse(form)
-      if (!parsed.success) {
-        setError(parsed.error.issues[0]?.message ?? t("shopping.validation.invalidForm"))
-        return
-      }
-
-      const apiForm: ShoppingPageContentForm = {
-        id: form.isNew ? undefined : form.id,
-        contentType: "stage_checklist",
-        title: parsed.data.title || null,
-        stage: parsed.data.stage || null,
-        system: null,
-        summary: parsed.data.description || null,
-        reason: parsed.data.focus || null,
-        body: JSON.stringify({
-          description: parsed.data.description,
-          focus: parsed.data.focus,
-          // 新 shape:各档位存物品 ID 数组
-          sections: parsed.data.sections.map((section) => ({
-            system: section.system,
-            minimumItemIds: section.minimumItemIds,
-            essentialItemIds: section.essentialItemIds,
-            upgradeItemIds: section.upgradeItemIds,
-          })),
-        }),
-      }
-
-      if (form.isNew) {
-        await createPageContent(apiForm)
-      } else {
-        await updatePageContent({ ...apiForm, id: form.id! })
-      }
-
-      onClose()
-      onSaved()
-    } catch (e) {
-      setError(String(e))
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  async function handleDelete() {
-    if (!form.id || form.isNew) return
-    if (!window.confirm(t("shopping.stages.confirmDelete"))) return
-    try {
-      setError(null)
-      await deletePageContent(form.id)
-      onClose()
-      onSaved()
-    } catch (e) {
-      setError(String(e))
-    }
-  }
+  const childOptions = useMemo<MultiSelectOption[]>(
+    () =>
+      item.children.map((child) => ({
+        value: child.id,
+        label: child.name,
+      })),
+    [item.children],
+  )
 
   return (
-    <DialogContent className="flex max-h-[min(90vh,900px)] flex-col sm:max-w-3xl">
-      <DialogHeader>
-        <DialogTitle>
-          {form.isNew
-            ? t("shopping.stages.newTitle")
-            : t("shopping.stages.editTitle", { title: form.title })}
-        </DialogTitle>
-        <DialogDescription>
-          {form.isNew ? t("shopping.stages.newDescription") : t("shopping.stages.editDescription")}
-        </DialogDescription>
-      </DialogHeader>
-
-      <div className="min-h-0 overflow-y-auto pr-1">
-        <div className="space-y-4">
-          {error ? (
-            <div className="rounded-lg border border-red-200 bg-red-50/90 px-4 py-3 text-sm text-red-800">
-              {error}
+    <div className={cn(SHOPPING_DIALOG_PANEL_CLASS, "space-y-4 p-4")}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-medium">{item.name}</div>
+          {item.children.length > 0 ? (
+            <div className="text-muted-foreground mt-1 text-xs">
+              {item.children.map((child) => child.name).join(" / ")}
             </div>
-          ) : null}
-
-          <div className="grid items-start gap-4 md:grid-cols-2">
-            <FormField label={t("shopping.stages.form.title")} required>
-              <Input
-                value={form.title}
-                onChange={(e) => update({ title: e.target.value })}
-                placeholder={t("shopping.stages.form.titlePlaceholder")}
-                maxLength={STAGE_LIMITS.title}
-              />
-            </FormField>
-
-            <FormField label={t("shopping.stages.form.description")} className="md:col-span-2">
-              <Textarea
-                value={form.description}
-                onChange={(e) => update({ description: e.target.value })}
-                placeholder={t("shopping.stages.form.descriptionPlaceholder")}
-                maxLength={STAGE_LIMITS.description}
-                rows={3}
-              />
-            </FormField>
-
-            <FormField label={t("shopping.stages.form.focus")} className="md:col-span-2">
-              <Textarea
-                value={form.focus}
-                onChange={(e) => update({ focus: e.target.value })}
-                placeholder={t("shopping.stages.form.focusPlaceholder")}
-                maxLength={STAGE_LIMITS.focus}
-                rows={3}
-              />
-            </FormField>
-
-            <div className="space-y-3 md:col-span-2">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs font-medium text-[color:var(--text-secondary)]">
-                    {t("shopping.stages.form.sections")}
-                  </div>
-                  <div className="text-[11px] leading-5 text-[color:var(--text-muted)]">
-                    {t("shopping.stages.form.sectionsHelp")}
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addSection}
-                  disabled={form.sections.length >= STAGE_LIMITS.sections}
-                >
-                  <Plus />
-                  {t("shopping.stages.form.addSection")}
-                </Button>
-              </div>
-
-              <div className="space-y-3">
-                {form.sections.map((section, sectionIndex) => {
-                  const candidatesForSystem = itemsBySystem.get(section.system) ?? []
-                  return (
-                    <div
-                      key={`${section.system}-${sectionIndex}`}
-                      className="rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)] p-4"
-                    >
-                      <div className="mb-4 flex items-center justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 text-xs font-medium text-[color:var(--text-secondary)]">
-                            {t("shopping.stages.table.system")}
-                          </div>
-                          <Select
-                            value={section.system}
-                            onValueChange={(value) =>
-                              changeSectionSystem(sectionIndex, value ?? "")
-                            }
-                          >
-                            <SelectTrigger className="w-full">
-                              <SelectValue>{systemDisplayName(section.system, t)}</SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {systemOptions.map((system) => (
-                                <SelectItem key={system} value={system}>
-                                  {systemDisplayName(system, t)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon-sm"
-                          className="mt-5 text-red-500 hover:bg-red-50 hover:text-red-700"
-                          onClick={() => removeSection(sectionIndex)}
-                        >
-                          <Trash2 />
-                        </Button>
-                      </div>
-
-                      {/* 三档 picker:从该系统下的物品中多选 */}
-                      <div className="grid gap-4 md:grid-cols-3">
-                        {(
-                          [
-                            ["minimumItemIds", t("shopping.stages.table.minimum")],
-                            ["essentialItemIds", t("shopping.stages.table.essentials")],
-                            ["upgradeItemIds", t("shopping.stages.table.upgrades")],
-                          ] as const
-                        ).map(([key, label]) => {
-                          const candidateOptions = candidatesForSystem.map((item) => ({
-                            value: item.id,
-                            label: item.name,
-                          }))
-                          return (
-                            <div key={key} className="space-y-2">
-                              <div className="text-xs font-medium text-[color:var(--text-secondary)]">
-                                {label}
-                              </div>
-                              <MultiSelect
-                                options={candidateOptions}
-                                value={section[key]}
-                                onChange={(nextIds) =>
-                                  updateSection(sectionIndex, (current) => ({
-                                    ...current,
-                                    [key]: nextIds,
-                                  }))
-                                }
-                                placeholder={t("shopping.stages.itemPicker.placeholder")}
-                                searchPlaceholder={t("shopping.stages.itemPicker.search")}
-                                emptyMessage={t("shopping.stages.itemPicker.noItemsForSystem")}
-                              />
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
+          ) : (
+            <div className="text-muted-foreground mt-1 text-xs">
+              {t("shopping.stage.noChildren", "该物品暂无子级")}
             </div>
-          </div>
+          )}
         </div>
+        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemoveItem}>
+          <Trash2 className="h-4 w-4" />
+        </Button>
       </div>
 
-      <DialogFooter className="flex items-center justify-between">
-        {!form.isNew ? (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="text-red-500 hover:bg-red-50 hover:text-red-700"
-            onClick={() => void handleDelete()}
-          >
-            <Trash2 />
-          </Button>
-        ) : (
-          <span />
-        )}
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={onClose}>
-            {t("shopping.stages.form.cancel")}
-          </Button>
-          <Button onClick={() => void handleSave()} disabled={saving || !form.title || !form.stage}>
-            {t("shopping.stages.form.save")}
-          </Button>
-        </div>
-      </DialogFooter>
-    </DialogContent>
+      <div className="grid gap-3">
+        {(
+          [
+            ["low", t("shopping.stages.tier.low", "最低")],
+            ["base", t("shopping.stages.tier.base", "基础")],
+            ["up", t("shopping.stages.tier.up", "升级")],
+          ] as Array<[Tier, string]>
+        ).map(([tier, label]) => (
+          <div key={tier} className="space-y-1.5">
+            <Label>{label}</Label>
+            <MultiSelect
+              options={childOptions}
+              value={stageItem.tiers[tier]}
+              onChange={(value) => onUpdateTier(item.id, tier, value)}
+              placeholder={
+                item.children.length > 0
+                  ? t("shopping.stage.selectTierChildren", "选择子级")
+                  : t("shopping.stage.noChildren", "该物品暂无子级")
+              }
+              searchPlaceholder={t("shopping.search", "搜索...")}
+              emptyMessage={t("shopping.stage.noMatchingChildren", "没有匹配的子级")}
+              disabled={childOptions.length === 0}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
   )
+}
+
+function EmptyStageHint({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="border-foreground/15 bg-muted/15 rounded-xl border border-dashed px-5 py-10 text-center">
+      <Plus className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+      <div className="text-sm font-medium">{title}</div>
+      <div className="text-muted-foreground mt-1 text-xs leading-5">{description}</div>
+    </div>
+  )
+}
+
+function createInitialDraft(
+  seed: ShoppingStageTemplate | null,
+  itemMap: Map<string, ShoppingItem>,
+): StageEditorDraft {
+  if (!seed) {
+    return {
+      name: "",
+      description: "",
+      focus: "",
+      systemDimensionIds: [],
+      spaceDimensionIds: [],
+      items: [],
+    }
+  }
+
+  return normalizeStageDraft(
+    {
+      name: seed.name,
+      description: seed.description ?? "",
+      focus: seed.focus ?? "",
+      systemDimensionIds: [],
+      spaceDimensionIds: [],
+      items: seed.items.map((stageItem) => ({
+        itemId: stageItem.itemId,
+        tiers: {
+          low: [...stageItem.tiers.low],
+          base: [...stageItem.tiers.base],
+          up: [...stageItem.tiers.up],
+        },
+      })),
+    },
+    itemMap,
+  )
+}
+
+function normalizeStageDraft(
+  draft: StageEditorDraft,
+  itemMap: Map<string, ShoppingItem>,
+): StageEditorDraft {
+  const seenItemIds = new Set<string>()
+
+  const items = draft.items
+    .filter((stageItem) => {
+      if (seenItemIds.has(stageItem.itemId)) return false
+      seenItemIds.add(stageItem.itemId)
+      return true
+    })
+    .map((stageItem) => {
+      const item = itemMap.get(stageItem.itemId)
+      if (!item) return null
+      const validChildIds = new Set(item.children.map((child) => child.id))
+      const normalizeTierIds = (tierIds: string[]) =>
+        Array.from(new Set(tierIds.filter((childId) => validChildIds.has(childId))))
+      return {
+        itemId: stageItem.itemId,
+        tiers: {
+          low: normalizeTierIds(stageItem.tiers.low),
+          base: normalizeTierIds(stageItem.tiers.base),
+          up: normalizeTierIds(stageItem.tiers.up),
+        },
+      }
+    })
+    .filter((stageItem): stageItem is ShoppingStageItem => Boolean(stageItem))
+
+  return {
+    ...draft,
+    systemDimensionIds: [],
+    spaceDimensionIds: [],
+    items,
+  }
 }

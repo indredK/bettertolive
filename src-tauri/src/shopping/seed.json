@@ -2,93 +2,1249 @@
   "systemDefinitions": [
     {
       "id": "Sleep",
-      "summary": "睡眠不是一件单品，而是一整套恢复力基础设施。",
-      "keyQuestion": "我睡得着、睡得好吗？",
+      "name": "睡眠系统",
+      "summary": "睡眠不是一件单品,而是一整套恢复力基础设施。",
+      "keyQuestion": "我睡得着、睡得好吗?",
       "secondaryGroups": ["骨架", "寝具", "温控", "环境", "睡眠辅助"]
     },
     {
       "id": "Diet",
+      "name": "饮食系统",
       "summary": "饮食系统决定了家里能不能稳定地做饭、吃饭和储存食物。",
-      "keyQuestion": "我能舒服地做和吃三餐吗？",
+      "keyQuestion": "我能舒服地做和吃三餐吗?",
       "secondaryGroups": ["烹饪工具", "餐具", "储存", "食材消耗", "家具"]
     },
     {
       "id": "Cleaning",
+      "name": "清洁系统",
       "summary": "清洁系统决定家能不能持续回到可住、可放松的状态。",
-      "keyQuestion": "家在变干净还是变脏？",
+      "keyQuestion": "家在变干净还是变脏?",
       "secondaryGroups": ["日常打扫", "洗衣", "厨卫深度清洁", "垃圾处理", "消毒杀菌"]
     },
     {
       "id": "Storage",
-      "summary": "收纳不是把东西塞进去，而是让它们有家、有顺手路径。",
-      "keyQuestion": "找东西会不会卡住？",
+      "name": "收纳系统",
+      "summary": "收纳不是把东西塞进去,而是让它们有家、有顺手路径。",
+      "keyQuestion": "找东西会不会卡住?",
       "secondaryGroups": ["大件容器", "小件容器", "挂收纳", "标签与索引"]
     },
     {
       "id": "Lighting",
+      "name": "照明系统",
       "summary": "照明系统影响清醒、专注、休息和夜晚收尾的节奏。",
-      "keyQuestion": "白天、夜晚、睡前的光都对吗？",
+      "keyQuestion": "白天、夜晚、睡前的光都对吗?",
       "secondaryGroups": ["主照明", "任务照明", "睡前照明", "夜间照明"]
     },
     {
       "id": "Environment",
-      "summary": "温度、湿度、空气和噪音，是生活舒适度最难忽略的底层变量。",
-      "keyQuestion": "家里待着舒服吗？",
+      "name": "环境系统",
+      "summary": "温度、湿度、空气和噪音,是生活舒适度最难忽略的底层变量。",
+      "keyQuestion": "家里待着舒服吗?",
       "secondaryGroups": ["温度", "湿度", "空气", "噪音"]
     },
     {
       "id": "PowerNetwork",
-      "summary": "电和网络一旦不稳，工作、休息和应急都会一起受影响。",
-      "keyQuestion": "用电用网会卡吗？",
+      "name": "电力网络",
+      "summary": "电和网络一旦不稳,工作、休息和应急都会一起受影响。",
+      "keyQuestion": "用电用网会卡吗?",
       "secondaryGroups": ["供电", "充电", "网络", "理线"]
     },
     {
       "id": "WorkStudy",
+      "name": "工作学习",
       "summary": "工作学习系统决定你能不能把注意力稳稳放在输出上。",
-      "keyQuestion": "我能坐住吗？",
+      "keyQuestion": "我能坐住吗?",
       "secondaryGroups": ["桌椅与支撑", "显示与输入", "文具与纸面", "辅助"]
     },
     {
       "id": "EmergencyHealth",
-      "summary": "平时最容易忘，但真出事时最能决定慌不慌的系统。",
-      "keyQuestion": "突发情况能不能先撑过去？",
+      "name": "应急健康",
+      "summary": "平时最容易忘,但真出事时最能决定慌不慌的系统。",
+      "keyQuestion": "突发情况能不能先撑过去?",
       "secondaryGroups": ["常备药与护理", "文件与备份", "工具与应急", "停电备用"]
     },
     {
       "id": "PersonalCare",
-      "summary": "身体被照顾着，很多生活摩擦就不会无限放大。",
-      "keyQuestion": "身体有没有被稳定地照顾着？",
+      "name": "个人护理",
+      "summary": "身体被照顾着,很多生活摩擦就不会无限放大。",
+      "keyQuestion": "身体有没有被稳定地照顾着?",
       "secondaryGroups": ["洗护", "护肤化妆", "口腔", "形象修整"]
     },
     {
       "id": "Clothing",
+      "name": "穿着系统",
       "summary": "穿着系统让你一年四季都能体面、舒服地出门或留在家里。",
-      "keyQuestion": "下楼、见人、出差都有合适衣物吗？",
+      "keyQuestion": "下楼、见人、出差都有合适衣物吗?",
       "secondaryGroups": ["基础件", "日常衣", "外套", "鞋", "配饰", "特殊场合"]
     },
     {
       "id": "Furniture",
-      "summary": "它不只是在填满空间，而是在塑造你愿不愿意待在家里。",
-      "keyQuestion": "这个空间有没有让我想坐下来的理由？",
+      "name": "家具陈设",
+      "summary": "它不只是在填满空间,而是在塑造你愿不愿意待在家里。",
+      "keyQuestion": "这个空间有没有让我想坐下来的理由?",
       "secondaryGroups": ["大件家具", "软装", "装饰物", "改善型小件"]
     },
     {
       "id": "Transportation",
-      "summary": "出行系统让人和东西能平稳地离开家，又完整地回来。",
-      "keyQuestion": "出门这件事顺不顺手？",
+      "name": "出行系统",
+      "summary": "出行系统让人和东西能平稳地离开家,又完整地回来。",
+      "keyQuestion": "出门这件事顺不顺手?",
       "secondaryGroups": ["代步", "承载", "应对天气", "户外"]
     },
     {
       "id": "Entertainment",
-      "summary": "兴趣和沉浸感不该只靠冲动消费，而要看它能否真的被生活容纳。",
-      "keyQuestion": "我真的会反复使用它吗？",
+      "name": "娱乐爱好",
+      "summary": "兴趣和沉浸感不该只靠冲动消费,而要看它能否真的被生活容纳。",
+      "keyQuestion": "我真的会反复使用它吗?",
       "secondaryGroups": ["阅读", "影音", "运动器材", "乐器与艺术", "收藏与情感"]
     },
     {
       "id": "Pets",
-      "summary": "宠物系统让它们在家过得舒服，也让你的生活不会被意外状况打断。",
-      "keyQuestion": "它的吃、睡、玩、看病都安排好了吗？",
+      "name": "宠物系统",
+      "summary": "宠物系统让它们在家过得舒服,也让你的生活不会被意外状况打断。",
+      "keyQuestion": "它的吃、睡、玩、看病都安排好了吗?",
       "secondaryGroups": ["饮食", "生活空间", "外出与随行", "健康护理", "清洁与排泄", "娱乐与训练"]
+    }
+  ],
+  "spaceDefinitions": [
+    { "id": "space-bedroom", "name": "卧室", "note": "睡眠与恢复的核心区域" },
+    { "id": "space-livingroom", "name": "客厅", "note": "起居、社交与放松的日常中心" },
+    { "id": "space-kitchen", "name": "厨房", "note": "烹饪、饮食与食材存储" },
+    { "id": "space-bathroom", "name": "卫生间", "note": "洗护、清洁与个人护理" },
+    { "id": "space-study", "name": "书房", "note": "工作、学习与专注输出" },
+    { "id": "space-entryway", "name": "玄关", "note": "进出、换鞋与日常出行准备" },
+    { "id": "space-balcony", "name": "阳台", "note": "晾晒、通风与室外过渡" },
+    { "id": "space-storage", "name": "储物间", "note": "收纳、囤货与长期存放" }
+  ],
+  "items": [
+    {
+      "id": "item-mattress",
+      "name": "床垫",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "睡眠系统的骨架,值得一次买好的。",
+      "children": [
+        { "id": "child-mattress-spring", "name": "弹簧床垫" },
+        { "id": "child-mattress-memory", "name": "记忆棉床垫" },
+        { "id": "child-mattress-latex", "name": "乳胶床垫" },
+        { "id": "child-mattress-hybrid", "name": "混合型床垫" }
+      ],
+      "systemTags": ["Sleep"],
+      "spaceTags": ["space-bedroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 1500,
+      "sweetSpotPrice": 3500,
+      "overpayPrice": 8000,
+      "quantity": 1,
+      "healthStatus": "ConsiderUpgrade"
+    },
+    {
+      "id": "item-blackout-curtain",
+      "name": "遮光帘",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "睡眠质量的隐形支柱。",
+      "children": [
+        { "id": "child-curtain-velcro", "name": "魔术贴遮光帘" },
+        { "id": "child-curtain-rod", "name": "罗马杆款" },
+        { "id": "child-curtain-smart", "name": "电动智能款" }
+      ],
+      "systemTags": ["Sleep"],
+      "spaceTags": ["space-bedroom"],
+      "channels": ["拼多多"],
+      "entryPrice": 80,
+      "sweetSpotPrice": 250,
+      "overpayPrice": 800,
+      "quantity": 2,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-desk-lamp",
+      "name": "书桌台灯",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "护眼显色比花哨造型更重要。",
+      "children": [
+        { "id": "child-lamp-basic", "name": "国 A 级护眼灯" },
+        { "id": "child-lamp-pro", "name": "高显色专业款" },
+        { "id": "child-lamp-smart", "name": "智能调光款" }
+      ],
+      "systemTags": ["Lighting", "WorkStudy"],
+      "spaceTags": ["space-study"],
+      "channels": ["京东", "小米官方"],
+      "entryPrice": 150,
+      "sweetSpotPrice": 400,
+      "overpayPrice": 1500,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-pot",
+      "name": "锅具",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "一把汤锅 + 一把炒锅就够覆盖大部分场景。",
+      "children": [
+        { "id": "child-pot-stainless", "name": "不锈钢汤锅" },
+        { "id": "child-pot-iron", "name": "铸铁锅" },
+        { "id": "child-pot-wok", "name": "炒锅" },
+        { "id": "child-pot-nonstick", "name": "不粘锅" }
+      ],
+      "systemTags": ["Diet"],
+      "spaceTags": ["space-kitchen"],
+      "channels": ["山姆", "京东"],
+      "entryPrice": 100,
+      "sweetSpotPrice": 350,
+      "overpayPrice": 1200,
+      "quantity": 2,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-laundry-liquid",
+      "name": "洗衣液",
+      "status": "Owned",
+      "lifecycle": "Consumable",
+      "note": "记得每月底看一次库存。",
+      "children": [
+        { "id": "child-laundry-baimao", "name": "白猫" },
+        { "id": "child-laundry-omo", "name": "奥妙" },
+        { "id": "child-laundry-import", "name": "进口品牌" }
+      ],
+      "systemTags": ["Cleaning"],
+      "spaceTags": ["space-bathroom", "space-balcony"],
+      "channels": ["京东", "山姆"],
+      "entryPrice": 15,
+      "sweetSpotPrice": 35,
+      "overpayPrice": 80,
+      "quantity": 3,
+      "healthStatus": "NeedRestock"
+    },
+    {
+      "id": "item-detergent",
+      "name": "洗洁精",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Consumable",
+      "note": "厨房与卫生间常备,目前快用完。",
+      "children": [
+        { "id": "child-detergent-baimao", "name": "白猫" },
+        { "id": "child-detergent-libai", "name": "立白" },
+        { "id": "child-detergent-chaoneng", "name": "超能" },
+        { "id": "child-detergent-import", "name": "进口" }
+      ],
+      "systemTags": ["Cleaning"],
+      "spaceTags": ["space-kitchen", "space-bathroom"],
+      "channels": ["京东", "山姆"],
+      "entryPrice": 10,
+      "sweetSpotPrice": 18,
+      "overpayPrice": 35,
+      "reason": "目前快用完",
+      "currentPrice": 22,
+      "buyBelowPrice": 18
+    },
+    {
+      "id": "item-trash-bag",
+      "name": "垃圾袋",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Consumable",
+      "note": "和洗洁精一起补,顺手买大包装。",
+      "children": [
+        { "id": "child-trash-small", "name": "小号 (15L)" },
+        { "id": "child-trash-medium", "name": "中号 (30L)" },
+        { "id": "child-trash-large", "name": "大号 (50L)" }
+      ],
+      "systemTags": ["Cleaning"],
+      "spaceTags": ["space-kitchen", "space-bathroom"],
+      "channels": ["京东", "拼多多"],
+      "entryPrice": 8,
+      "sweetSpotPrice": 18,
+      "overpayPrice": 40,
+      "reason": "和洗洁精一起补",
+      "currentPrice": 20
+    },
+    {
+      "id": "item-storage-box",
+      "name": "透明收纳盒",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "看见就能拿到,比关在柜子里更顺手。",
+      "children": [
+        { "id": "child-storage-pp", "name": "PP 塑料款" },
+        { "id": "child-storage-stackable", "name": "可堆叠款" },
+        { "id": "child-storage-handled", "name": "带提手款" }
+      ],
+      "systemTags": ["Storage"],
+      "spaceTags": ["space-study", "space-storage"],
+      "channels": ["拼多多", "宜家"],
+      "entryPrice": 25,
+      "sweetSpotPrice": 60,
+      "overpayPrice": 150,
+      "quantity": 8,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-router",
+      "name": "路由器",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "全屋网络的骨架。",
+      "children": [
+        { "id": "child-router-gigabit", "name": "千兆双频" },
+        { "id": "child-router-wifi6", "name": "WiFi 6" },
+        { "id": "child-router-mesh", "name": "Mesh 套装" },
+        { "id": "child-router-enterprise", "name": "企业级" }
+      ],
+      "systemTags": ["PowerNetwork"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["京东", "拼多多", "小米官方"],
+      "entryPrice": 150,
+      "sweetSpotPrice": 350,
+      "overpayPrice": 1200,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-power-strip",
+      "name": "插线板",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "玄关充电与吸尘器共用一个集中位。",
+      "children": [
+        { "id": "child-power-basic", "name": "国标基础款" },
+        { "id": "child-power-usb", "name": "带 USB 快充款" },
+        { "id": "child-power-smart", "name": "智能定时款" }
+      ],
+      "systemTags": ["PowerNetwork"],
+      "spaceTags": ["space-entryway"],
+      "channels": ["京东", "小米官方"],
+      "entryPrice": 30,
+      "sweetSpotPrice": 80,
+      "overpayPrice": 250,
+      "reason": "玄关缺一个集中充电位",
+      "currentPrice": 90,
+      "buyBelowPrice": 80
+    },
+    {
+      "id": "item-basic-tools",
+      "name": "基础工具包",
+      "status": "Owned",
+      "lifecycle": "Tool",
+      "depreciation": "NoDepreciation",
+      "note": "卷尺、螺丝刀、胶带、剪刀、手电,缺一个就会卡住。",
+      "children": [
+        { "id": "child-tools-driver", "name": "螺丝刀套装" },
+        { "id": "child-tools-tape", "name": "卷尺" },
+        { "id": "child-tools-scissors", "name": "强力剪刀" },
+        { "id": "child-tools-flashlight", "name": "应急手电" }
+      ],
+      "systemTags": ["EmergencyHealth"],
+      "spaceTags": ["space-entryway"],
+      "channels": ["京东", "小米官方"],
+      "entryPrice": 80,
+      "sweetSpotPrice": 200,
+      "overpayPrice": 600,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-medicine-drawer",
+      "name": "常备药",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Consumable",
+      "note": "感冒药、肠胃药、创可贴、退烧药,每半年看一次有效期。",
+      "children": [
+        { "id": "child-med-cold", "name": "感冒药" },
+        { "id": "child-med-stomach", "name": "肠胃药" },
+        { "id": "child-med-bandaid", "name": "创可贴" },
+        { "id": "child-med-fever", "name": "退烧药" }
+      ],
+      "systemTags": ["EmergencyHealth"],
+      "spaceTags": ["space-bathroom"],
+      "channels": ["药店", "京东健康"],
+      "entryPrice": 50,
+      "sweetSpotPrice": 120,
+      "overpayPrice": 300,
+      "reason": "上次盘点发现部分快过期",
+      "currentPrice": 150
+    },
+    {
+      "id": "item-electric-toothbrush",
+      "name": "电动牙刷",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Fast",
+      "note": "刷头是消耗品,主体可以用几年。",
+      "children": [
+        { "id": "child-toothbrush-entry", "name": "入门款" },
+        { "id": "child-toothbrush-mid", "name": "中端款" },
+        { "id": "child-toothbrush-pro", "name": "专业款" }
+      ],
+      "systemTags": ["PersonalCare"],
+      "spaceTags": ["space-bathroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 150,
+      "sweetSpotPrice": 350,
+      "overpayPrice": 1500,
+      "quantity": 2,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-slippers",
+      "name": "家居拖鞋",
+      "status": "Owned",
+      "lifecycle": "Consumable",
+      "note": "夏冬各一双,每半年换。",
+      "children": [
+        { "id": "child-slippers-summer", "name": "夏季款" },
+        { "id": "child-slippers-winter", "name": "冬季款" },
+        { "id": "child-slippers-guest", "name": "待客款" }
+      ],
+      "systemTags": ["Clothing"],
+      "spaceTags": ["space-bedroom", "space-entryway"],
+      "channels": ["拼多多", "无印良品"],
+      "entryPrice": 30,
+      "sweetSpotPrice": 80,
+      "overpayPrice": 200,
+      "quantity": 4,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-commute-backpack",
+      "name": "通勤背包",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "通勤包属于出行系统,不是穿搭配饰。",
+      "children": [
+        { "id": "child-backpack-basic", "name": "基础通勤款" },
+        { "id": "child-backpack-laptop", "name": "笔电专用款" },
+        { "id": "child-backpack-business", "name": "商务款" }
+      ],
+      "systemTags": ["Transportation"],
+      "spaceTags": ["space-entryway"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 200,
+      "sweetSpotPrice": 500,
+      "overpayPrice": 1800,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-laptop-stand",
+      "name": "笔记本支架",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "提升视线高度,颈椎友好。",
+      "children": [
+        { "id": "child-stand-fold", "name": "折叠便携款" },
+        { "id": "child-stand-alu", "name": "全铝款" },
+        { "id": "child-stand-rise", "name": "升降款" }
+      ],
+      "systemTags": ["WorkStudy"],
+      "spaceTags": ["space-study"],
+      "channels": ["京东", "小米官方"],
+      "entryPrice": 50,
+      "sweetSpotPrice": 150,
+      "overpayPrice": 500,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-scent-candle",
+      "name": "低饱和香薰",
+      "status": "Owned",
+      "lifecycle": "Consumable",
+      "note": "氛围用,香味要克制。",
+      "children": [
+        { "id": "child-candle-soywax", "name": "大豆蜡蜡烛" },
+        { "id": "child-candle-essential", "name": "精油香薰" },
+        { "id": "child-candle-reed", "name": "无火香薰" }
+      ],
+      "systemTags": ["Furniture"],
+      "spaceTags": ["space-livingroom", "space-bedroom"],
+      "channels": ["天猫", "无印良品"],
+      "entryPrice": 50,
+      "sweetSpotPrice": 150,
+      "overpayPrice": 500,
+      "quantity": 3,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-photo-box",
+      "name": "相册盒",
+      "status": "Owned",
+      "lifecycle": "Emotional",
+      "note": "情感物,不按市场价值衡量。",
+      "children": [
+        { "id": "child-album-cloth", "name": "布艺相册盒" },
+        { "id": "child-album-leather", "name": "皮质相册盒" }
+      ],
+      "systemTags": ["Entertainment"],
+      "spaceTags": ["space-study"],
+      "channels": ["手作"],
+      "quantity": 2,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-cat-bowl",
+      "name": "猫碗",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "陶瓷材质好清洗。",
+      "children": [
+        { "id": "child-bowl-ceramic", "name": "陶瓷碗" },
+        { "id": "child-bowl-steel", "name": "不锈钢碗" },
+        { "id": "child-bowl-elevated", "name": "高架碗" }
+      ],
+      "systemTags": ["Pets"],
+      "spaceTags": ["space-kitchen"],
+      "channels": ["拼多多"],
+      "entryPrice": 30,
+      "sweetSpotPrice": 80,
+      "overpayPrice": 250,
+      "quantity": 2,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-cat-litter-box",
+      "name": "猫砂盆",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "封闭式更好控味。",
+      "children": [
+        { "id": "child-litter-open", "name": "敞开式" },
+        { "id": "child-litter-hood", "name": "封闭式" },
+        { "id": "child-litter-smart", "name": "智能自清洁" }
+      ],
+      "systemTags": ["Pets"],
+      "spaceTags": ["space-bathroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 80,
+      "sweetSpotPrice": 250,
+      "overpayPrice": 3000,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-cat-carrier",
+      "name": "航空箱",
+      "status": "Owned",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "看医生、出门必备。",
+      "children": [
+        { "id": "child-carrier-basic", "name": "基础硬壳款" },
+        { "id": "child-carrier-soft", "name": "软包款" },
+        { "id": "child-carrier-backpack", "name": "太空舱背包款" }
+      ],
+      "systemTags": ["Pets", "Transportation"],
+      "spaceTags": ["space-entryway"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 80,
+      "sweetSpotPrice": 200,
+      "overpayPrice": 800,
+      "quantity": 1,
+      "healthStatus": "StableUse"
+    },
+    {
+      "id": "item-cat-food",
+      "name": "猫粮",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Consumable",
+      "note": "看一下库存,准备囤一个月量。",
+      "children": [
+        { "id": "child-food-dry", "name": "干粮" },
+        { "id": "child-food-wet", "name": "湿粮包" },
+        { "id": "child-food-freeze", "name": "冻干" }
+      ],
+      "systemTags": ["Pets"],
+      "spaceTags": ["space-kitchen"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 100,
+      "sweetSpotPrice": 300,
+      "overpayPrice": 800,
+      "reason": "库存只剩两周",
+      "currentPrice": 350,
+      "buyBelowPrice": 300
+    },
+    {
+      "id": "item-cat-litter",
+      "name": "猫砂",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Consumable",
+      "note": "豆腐砂混合膨润土用,味道与结团都更好。",
+      "children": [
+        { "id": "child-sand-bentonite", "name": "膨润土砂" },
+        { "id": "child-sand-tofu", "name": "豆腐砂" },
+        { "id": "child-sand-mixed", "name": "混合砂" }
+      ],
+      "systemTags": ["Pets"],
+      "spaceTags": ["space-bathroom"],
+      "channels": ["京东", "拼多多"],
+      "entryPrice": 30,
+      "sweetSpotPrice": 80,
+      "overpayPrice": 200,
+      "reason": "和猫粮一起囤",
+      "currentPrice": 95
+    },
+    {
+      "id": "item-dehumidifier",
+      "name": "除湿机",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "梅雨季前补齐,先看 8L 入门款。",
+      "children": [
+        { "id": "child-dehu-small", "name": "8L 入门款" },
+        { "id": "child-dehu-mid", "name": "12L 主流款" },
+        { "id": "child-dehu-pro", "name": "20L 专业款" }
+      ],
+      "systemTags": ["Environment"],
+      "spaceTags": ["space-bedroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 500,
+      "sweetSpotPrice": 1200,
+      "overpayPrice": 3500,
+      "reason": "梅雨季前到位",
+      "currentPrice": 1350,
+      "buyBelowPrice": 1200
+    },
+    {
+      "id": "item-bedside-lamp",
+      "name": "床边灯",
+      "status": "Wanted",
+      "lane": "Now",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "暖光、可调亮度,睡前不刺眼。",
+      "children": [
+        { "id": "child-bedlamp-warm", "name": "暖光固定款" },
+        { "id": "child-bedlamp-dim", "name": "可调亮度款" },
+        { "id": "child-bedlamp-smart", "name": "智能感应款" }
+      ],
+      "systemTags": ["Lighting", "Sleep"],
+      "spaceTags": ["space-bedroom"],
+      "channels": ["京东", "无印良品"],
+      "entryPrice": 100,
+      "sweetSpotPrice": 280,
+      "overpayPrice": 800,
+      "reason": "睡前氛围一直缺",
+      "currentPrice": 300,
+      "buyBelowPrice": 280
+    },
+    {
+      "id": "item-ergo-chair",
+      "name": "人体工学椅",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "实测半年再下手,等 618 或双 11 大促。",
+      "children": [
+        { "id": "child-chair-entry", "name": "入门款" },
+        { "id": "child-chair-mid", "name": "中端款" },
+        { "id": "child-chair-flagship", "name": "旗舰款" }
+      ],
+      "systemTags": ["WorkStudy"],
+      "spaceTags": ["space-study"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 800,
+      "sweetSpotPrice": 2500,
+      "overpayPrice": 6000,
+      "reason": "目前椅子用三年了腰开始酸",
+      "currentPrice": 3000,
+      "buyBelowPrice": 2500
+    },
+    {
+      "id": "item-monitor",
+      "name": "便携显示器",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Fast",
+      "note": "新机折旧快,等成熟款落价。",
+      "children": [
+        { "id": "child-monitor-15", "name": "15.6 寸便携" },
+        { "id": "child-monitor-16", "name": "16 寸 2K" },
+        { "id": "child-monitor-oled", "name": "OLED 旗舰" }
+      ],
+      "systemTags": ["WorkStudy"],
+      "spaceTags": ["space-study"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 600,
+      "sweetSpotPrice": 1500,
+      "overpayPrice": 4000,
+      "reason": "笔电外接显示器,出差也能用",
+      "currentPrice": 1800,
+      "buyBelowPrice": 1500
+    },
+    {
+      "id": "item-vacuum",
+      "name": "吸尘器",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "等 4 字头大促价。",
+      "children": [
+        { "id": "child-vacuum-corded", "name": "有线款" },
+        { "id": "child-vacuum-cordless", "name": "无线款" },
+        { "id": "child-vacuum-robot", "name": "扫地机器人" }
+      ],
+      "systemTags": ["Cleaning"],
+      "spaceTags": ["space-livingroom", "space-bedroom"],
+      "channels": ["京东", "小米官方"],
+      "entryPrice": 300,
+      "sweetSpotPrice": 900,
+      "overpayPrice": 3500,
+      "reason": "猫毛地毯一直清不干净",
+      "currentPrice": 1100,
+      "buyBelowPrice": 900
+    },
+    {
+      "id": "item-mattress-upgrade",
+      "name": "床垫升级",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "现床垫还能用半年,等大促窗口。",
+      "children": [
+        { "id": "child-newbed-latex", "name": "全乳胶旗舰款" },
+        { "id": "child-newbed-hybrid", "name": "弹簧+乳胶混合" }
+      ],
+      "systemTags": ["Sleep"],
+      "spaceTags": ["space-bedroom"],
+      "channels": ["京东"],
+      "entryPrice": 3000,
+      "sweetSpotPrice": 6500,
+      "overpayPrice": 15000,
+      "reason": "现床垫塌陷已影响睡眠",
+      "currentPrice": 7200,
+      "buyBelowPrice": 6500
+    },
+    {
+      "id": "item-folding-dining-table",
+      "name": "折叠餐桌",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "小户型方案,平时折起。",
+      "children": [
+        { "id": "child-dtable-wall", "name": "壁挂折叠" },
+        { "id": "child-dtable-stand", "name": "落地折叠" }
+      ],
+      "systemTags": ["Diet"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["拼多多", "宜家"],
+      "entryPrice": 200,
+      "sweetSpotPrice": 600,
+      "overpayPrice": 1500,
+      "reason": "目前饭都在沙发吃",
+      "currentPrice": 750,
+      "buyBelowPrice": 600
+    },
+    {
+      "id": "item-cat-tree",
+      "name": "猫爬架",
+      "status": "Wanted",
+      "lane": "Wait",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "等中型款大促。",
+      "children": [
+        { "id": "child-tree-small", "name": "小型款" },
+        { "id": "child-tree-medium", "name": "中型款" },
+        { "id": "child-tree-floor2ceiling", "name": "顶天立地款" }
+      ],
+      "systemTags": ["Pets"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 200,
+      "sweetSpotPrice": 600,
+      "overpayPrice": 2000,
+      "reason": "猫已经把沙发抓花了",
+      "currentPrice": 750,
+      "buyBelowPrice": 600
+    },
+    {
+      "id": "item-projector",
+      "name": "投影仪",
+      "status": "Wanted",
+      "lane": "Hold",
+      "lifecycle": "Durable",
+      "depreciation": "VeryFast",
+      "note": "高折旧 + 幸福感物品,先按住。",
+      "children": [
+        { "id": "child-proj-led", "name": "LED 入门款" },
+        { "id": "child-proj-laser", "name": "激光主流款" },
+        { "id": "child-proj-4k", "name": "4K 旗舰款" }
+      ],
+      "systemTags": ["Entertainment"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 800,
+      "sweetSpotPrice": 2500,
+      "overpayPrice": 8000,
+      "reason": "暂时电视够用",
+      "currentPrice": 3500
+    },
+    {
+      "id": "item-coffee-machine",
+      "name": "半自动咖啡机",
+      "status": "Wanted",
+      "lane": "Hold",
+      "lifecycle": "Durable",
+      "depreciation": "Medium",
+      "note": "现阶段挂耳已经够喝,等更稳定生活节奏再说。",
+      "children": [
+        { "id": "child-coffee-entry", "name": "入门款" },
+        { "id": "child-coffee-mid", "name": "进阶款" },
+        { "id": "child-coffee-pro", "name": "专业款" }
+      ],
+      "systemTags": ["Diet"],
+      "spaceTags": ["space-kitchen"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 500,
+      "sweetSpotPrice": 1500,
+      "overpayPrice": 6000,
+      "reason": "挂耳够喝,先不上设备",
+      "currentPrice": 2200
+    },
+    {
+      "id": "item-treadmill",
+      "name": "折叠跑步机",
+      "status": "Wanted",
+      "lane": "Hold",
+      "lifecycle": "Durable",
+      "depreciation": "Fast",
+      "note": "占地大、易吃灰,先约公园跑。",
+      "children": [
+        { "id": "child-tread-walk", "name": "走步机" },
+        { "id": "child-tread-fold", "name": "折叠跑步机" }
+      ],
+      "systemTags": ["Entertainment"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["京东", "天猫"],
+      "entryPrice": 800,
+      "sweetSpotPrice": 2000,
+      "overpayPrice": 6000,
+      "reason": "习惯没养成不买大件",
+      "currentPrice": 2400
+    },
+    {
+      "id": "item-side-table",
+      "name": "复古边几",
+      "status": "Wanted",
+      "lane": "Hold",
+      "lifecycle": "Durable",
+      "depreciation": "Slow",
+      "note": "纯陈设需求,先按住。",
+      "children": [
+        { "id": "child-side-mid", "name": "中古款" },
+        { "id": "child-side-new", "name": "新中式款" }
+      ],
+      "systemTags": ["Furniture"],
+      "spaceTags": ["space-livingroom"],
+      "channels": ["二手平台", "天猫"],
+      "entryPrice": 400,
+      "sweetSpotPrice": 1200,
+      "overpayPrice": 5000,
+      "reason": "客厅还没定位",
+      "currentPrice": 1500
+    }
+  ],
+  "stageTemplates": [
+    {
+      "id": "stage-moving-minimum",
+      "name": "搬家最低配",
+      "description": "目标不是把家一次布满,而是保证第一晚到前三天能顺利生活。",
+      "focus": "优先保障睡、洗、充电、出门和应急的连续性。",
+      "items": [
+        {
+          "itemId": "item-mattress",
+          "tiers": {
+            "low": ["child-mattress-spring"],
+            "base": ["child-mattress-memory"],
+            "up": ["child-mattress-latex", "child-mattress-hybrid"]
+          }
+        },
+        {
+          "itemId": "item-blackout-curtain",
+          "tiers": {
+            "low": ["child-curtain-velcro"],
+            "base": ["child-curtain-rod"],
+            "up": ["child-curtain-smart"]
+          }
+        },
+        {
+          "itemId": "item-laundry-liquid",
+          "tiers": {
+            "low": ["child-laundry-baimao"],
+            "base": ["child-laundry-omo"],
+            "up": ["child-laundry-import"]
+          }
+        },
+        {
+          "itemId": "item-power-strip",
+          "tiers": {
+            "low": ["child-power-basic"],
+            "base": ["child-power-usb"],
+            "up": ["child-power-smart"]
+          }
+        },
+        {
+          "itemId": "item-basic-tools",
+          "tiers": {
+            "low": ["child-tools-driver", "child-tools-tape"],
+            "base": ["child-tools-driver", "child-tools-tape", "child-tools-scissors"],
+            "up": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ]
+          }
+        },
+        {
+          "itemId": "item-medicine-drawer",
+          "tiers": {
+            "low": ["child-med-cold", "child-med-bandaid"],
+            "base": ["child-med-cold", "child-med-stomach", "child-med-bandaid"],
+            "up": ["child-med-cold", "child-med-stomach", "child-med-bandaid", "child-med-fever"]
+          }
+        },
+        {
+          "itemId": "item-slippers",
+          "tiers": {
+            "low": ["child-slippers-summer"],
+            "base": ["child-slippers-summer", "child-slippers-winter"],
+            "up": ["child-slippers-summer", "child-slippers-winter", "child-slippers-guest"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stage-renting",
+      "name": "租房需要什么",
+      "description": "租房阶段最重要的是用低成本把不舒服的地方修正到可住。",
+      "focus": "优先选择可移动、可复用、搬走不心疼的方案。",
+      "items": [
+        {
+          "itemId": "item-mattress",
+          "tiers": {
+            "low": ["child-mattress-spring"],
+            "base": ["child-mattress-memory"],
+            "up": ["child-mattress-latex"]
+          }
+        },
+        {
+          "itemId": "item-blackout-curtain",
+          "tiers": {
+            "low": ["child-curtain-velcro"],
+            "base": ["child-curtain-rod"],
+            "up": ["child-curtain-smart"]
+          }
+        },
+        {
+          "itemId": "item-desk-lamp",
+          "tiers": {
+            "low": ["child-lamp-basic"],
+            "base": ["child-lamp-pro"],
+            "up": ["child-lamp-smart"]
+          }
+        },
+        {
+          "itemId": "item-bedside-lamp",
+          "tiers": {
+            "low": ["child-bedlamp-warm"],
+            "base": ["child-bedlamp-dim"],
+            "up": ["child-bedlamp-smart"]
+          }
+        },
+        {
+          "itemId": "item-detergent",
+          "tiers": {
+            "low": ["child-detergent-baimao"],
+            "base": ["child-detergent-libai"],
+            "up": ["child-detergent-chaoneng", "child-detergent-import"]
+          }
+        },
+        {
+          "itemId": "item-trash-bag",
+          "tiers": {
+            "low": ["child-trash-medium"],
+            "base": ["child-trash-medium", "child-trash-large"],
+            "up": ["child-trash-small", "child-trash-medium", "child-trash-large"]
+          }
+        },
+        {
+          "itemId": "item-storage-box",
+          "tiers": {
+            "low": ["child-storage-pp"],
+            "base": ["child-storage-stackable"],
+            "up": ["child-storage-stackable", "child-storage-handled"]
+          }
+        },
+        {
+          "itemId": "item-dehumidifier",
+          "tiers": {
+            "low": ["child-dehu-small"],
+            "base": ["child-dehu-mid"],
+            "up": ["child-dehu-pro"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stage-long-term",
+      "name": "长期居住",
+      "description": "当住所不再只是落脚点,系统感会比单个好物更重要。",
+      "focus": "把睡眠、饮食、工作学习、清洁和应急一起看成可长期运转的组合。",
+      "items": [
+        {
+          "itemId": "item-mattress",
+          "tiers": {
+            "low": ["child-mattress-memory"],
+            "base": ["child-mattress-latex"],
+            "up": ["child-mattress-hybrid"]
+          }
+        },
+        {
+          "itemId": "item-pot",
+          "tiers": {
+            "low": ["child-pot-stainless"],
+            "base": ["child-pot-stainless", "child-pot-wok"],
+            "up": ["child-pot-iron", "child-pot-wok", "child-pot-nonstick"]
+          }
+        },
+        {
+          "itemId": "item-laptop-stand",
+          "tiers": {
+            "low": ["child-stand-fold"],
+            "base": ["child-stand-alu"],
+            "up": ["child-stand-rise"]
+          }
+        },
+        {
+          "itemId": "item-ergo-chair",
+          "tiers": {
+            "low": ["child-chair-entry"],
+            "base": ["child-chair-mid"],
+            "up": ["child-chair-flagship"]
+          }
+        },
+        {
+          "itemId": "item-vacuum",
+          "tiers": {
+            "low": ["child-vacuum-corded"],
+            "base": ["child-vacuum-cordless"],
+            "up": ["child-vacuum-robot"]
+          }
+        },
+        {
+          "itemId": "item-router",
+          "tiers": {
+            "low": ["child-router-gigabit"],
+            "base": ["child-router-wifi6"],
+            "up": ["child-router-mesh", "child-router-enterprise"]
+          }
+        },
+        {
+          "itemId": "item-medicine-drawer",
+          "tiers": {
+            "low": ["child-med-cold", "child-med-stomach", "child-med-bandaid"],
+            "base": ["child-med-cold", "child-med-stomach", "child-med-bandaid", "child-med-fever"],
+            "up": ["child-med-cold", "child-med-stomach", "child-med-bandaid", "child-med-fever"]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stage-owned-home",
+      "name": "自有住房",
+      "description": "自有住房会把视角从「先住下」拉到「怎么降低长期维护成本」。",
+      "focus": "更值得买耐用、可维修、能长期陪伴的东西。",
+      "items": [
+        {
+          "itemId": "item-dehumidifier",
+          "tiers": {
+            "low": ["child-dehu-mid"],
+            "base": ["child-dehu-pro"],
+            "up": ["child-dehu-pro"]
+          }
+        },
+        {
+          "itemId": "item-storage-box",
+          "tiers": {
+            "low": ["child-storage-stackable"],
+            "base": ["child-storage-stackable", "child-storage-handled"],
+            "up": ["child-storage-stackable", "child-storage-handled"]
+          }
+        },
+        {
+          "itemId": "item-ergo-chair",
+          "tiers": {
+            "low": ["child-chair-mid"],
+            "base": ["child-chair-flagship"],
+            "up": ["child-chair-flagship"]
+          }
+        },
+        {
+          "itemId": "item-folding-dining-table",
+          "tiers": {
+            "low": ["child-dtable-wall"],
+            "base": ["child-dtable-stand"],
+            "up": ["child-dtable-stand"]
+          }
+        },
+        {
+          "itemId": "item-scent-candle",
+          "tiers": {
+            "low": ["child-candle-reed"],
+            "base": ["child-candle-soywax"],
+            "up": ["child-candle-essential"]
+          }
+        },
+        {
+          "itemId": "item-basic-tools",
+          "tiers": {
+            "low": ["child-tools-driver", "child-tools-scissors"],
+            "base": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ],
+            "up": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stage-self-built-home",
+      "name": "自建房",
+      "description": "这时要看的不只是买什么,而是整套居住系统如何运转和维护。",
+      "focus": "物品要和水、电、排风、维护路径一起规划。",
+      "items": [
+        {
+          "itemId": "item-router",
+          "tiers": {
+            "low": ["child-router-wifi6"],
+            "base": ["child-router-mesh"],
+            "up": ["child-router-enterprise"]
+          }
+        },
+        {
+          "itemId": "item-power-strip",
+          "tiers": {
+            "low": ["child-power-usb"],
+            "base": ["child-power-smart"],
+            "up": ["child-power-smart"]
+          }
+        },
+        {
+          "itemId": "item-dehumidifier",
+          "tiers": {
+            "low": ["child-dehu-mid"],
+            "base": ["child-dehu-pro"],
+            "up": ["child-dehu-pro"]
+          }
+        },
+        {
+          "itemId": "item-basic-tools",
+          "tiers": {
+            "low": ["child-tools-driver", "child-tools-tape", "child-tools-flashlight"],
+            "base": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ],
+            "up": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "stage-basement",
+      "name": "地下室",
+      "description": "地下室的核心任务不是装修,而是先管住潮气、排水、通风和电力安全。",
+      "focus": "防潮第一,电路安全第二,储物规划最后跟上。",
+      "items": [
+        {
+          "itemId": "item-dehumidifier",
+          "tiers": {
+            "low": ["child-dehu-mid"],
+            "base": ["child-dehu-pro"],
+            "up": ["child-dehu-pro"]
+          }
+        },
+        {
+          "itemId": "item-power-strip",
+          "tiers": {
+            "low": ["child-power-usb"],
+            "base": ["child-power-smart"],
+            "up": ["child-power-smart"]
+          }
+        },
+        {
+          "itemId": "item-basic-tools",
+          "tiers": {
+            "low": ["child-tools-flashlight"],
+            "base": ["child-tools-driver", "child-tools-tape", "child-tools-flashlight"],
+            "up": [
+              "child-tools-driver",
+              "child-tools-tape",
+              "child-tools-scissors",
+              "child-tools-flashlight"
+            ]
+          }
+        },
+        {
+          "itemId": "item-storage-box",
+          "tiers": {
+            "low": ["child-storage-pp"],
+            "base": ["child-storage-stackable"],
+            "up": ["child-storage-handled"]
+          }
+        },
+        {
+          "itemId": "item-desk-lamp",
+          "tiers": {
+            "low": ["child-lamp-basic"],
+            "base": ["child-lamp-pro"],
+            "up": ["child-lamp-smart"]
+          }
+        }
+      ]
     }
   ],
   "spotlights": [
@@ -97,1055 +1253,44 @@
       "title": "睡眠系统仍然是当前最值得补齐的一组",
       "stage": "LongTermLiving",
       "summary": "床垫、遮光、除湿和睡前照明会一起决定第二天的恢复力。",
-      "reason": "这不是买一件舒服单品，而是把每天都在用的系统先稳住。",
+      "reason": "这不是买一件舒服单品,而是把每天都在用的系统先稳住。",
       "attention": [
         "把床垫、遮光帘、床边灯和除湿机放在同一张桌上看。",
-        "优先补必要项，而不是先追求高折旧的幸福感大件。"
+        "优先补必要项,而不是先追求高折旧的幸福感大件。"
       ]
     },
     {
       "id": "focus-rhythm",
       "title": "补货节奏比一次性买满更重要",
       "stage": "本月补货",
-      "summary": "洗衣液、常备药、垃圾袋这类消耗品如果没节奏，生活崩溃感会突然出现。",
-      "reason": "lifecycle 决定动作，消耗品不是等想起来再补。",
+      "summary": "洗衣液、常备药、垃圾袋这类消耗品如果没节奏,生活崩溃感会突然出现。",
+      "reason": "lifecycle 决定动作,消耗品不是等想起来再补。",
       "attention": [
-        "把消耗品单独看，避免和耐用品混在一个愿望清单里。",
-        "消耗品不谈折旧率，重点是库存和补货窗口。"
+        "把消耗品单独看,避免和耐用品混在一个愿望清单里。",
+        "消耗品不谈折旧率,重点是库存和补货窗口。"
       ]
     },
     {
       "id": "focus-tools",
       "title": "搬家最低配和应急工具还不够完整",
       "stage": "MovingMinimal",
-      "summary": "卷尺、手电、插线板、常备药这些基础件很小，但缺一个就会卡住。",
-      "reason": "工具类和最低配置更适合一次补齐，而不是临场救火。",
+      "summary": "卷尺、手电、插线板、常备药这些基础件很小,但缺一个就会卡住。",
+      "reason": "工具类和最低配置更适合一次补齐,而不是临场救火。",
       "attention": [
         "把工具、应急和第一晚要用到的东西放进同一套最低配视角。",
-        "工具和耐用品可以带折旧率，但别把它们丢进幸福感消费里看。"
+        "工具和耐用品可以带折旧率,但别把它们丢进幸福感消费里看。"
       ]
     },
     {
       "id": "focus-fast-depreciation",
       "title": "高折旧幸福感物品要特别慢一点买",
       "stage": "购买判断",
-      "summary": "投影仪、便携显示器这类东西往往不是最需要，却最容易被想象力放大。",
-      "reason": "depreciation 是单件决策字段，不该主导整个分类，但该提醒你别在情绪最高点下单。",
+      "summary": "投影仪、便携显示器这类东西往往不是最需要,却最容易被想象力放大。",
+      "reason": "depreciation 是单件决策字段,不该主导整个分类,但该提醒你别在情绪最高点下单。",
       "attention": [
-        "先确认使用频率和空间条件，再看品牌和新款。",
-        "幸福感 + 极快折旧 的组合，需要比别的物品多一轮自查。"
+        "先确认使用频率和空间条件,再看品牌和新款。",
+        "幸福感 + 极快折旧 的组合,需要比别的物品多一轮自查。"
       ]
-    }
-  ],
-  "ownedItems": [
-    {
-      "id": "owned-mattress",
-      "name": "现有床垫",
-      "system": "Sleep",
-      "category": "骨架",
-      "spaces": ["卧室"],
-      "stages": ["Renting", "LongTermLiving", "OwnHome"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 1,
-      "status": "考虑升级",
-      "replacementCue": "能睡，但支撑感已经开始影响起床后的身体反馈。",
-      "note": "这件是睡眠系统的底盘，升级时机比品牌故事更重要。"
-    },
-    {
-      "id": "owned-blackout-curtain",
-      "name": "遮光帘",
-      "system": "Sleep",
-      "category": "环境",
-      "spaces": ["卧室"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "遮光够用，之后主要看是否需要升级轨道和贴合度。",
-      "note": "它不是装饰，而是直接改善入睡和醒来的边界感。"
-    },
-    {
-      "id": "owned-desk-lamp",
-      "name": "书桌台灯",
-      "system": "Lighting",
-      "category": "任务照明",
-      "spaces": ["书桌"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "亮度够用，后续更看重色温和夜间收尾的舒适感。",
-      "note": "已经明显减轻了夜里工作的刺眼感，属于有效购入。"
-    },
-    {
-      "id": "owned-pot",
-      "name": "不锈钢汤锅",
-      "system": "Diet",
-      "category": "烹饪工具",
-      "spaces": ["厨房"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "锅体还能打，但配套的小锅和储存容器还没成体系。",
-      "note": "饮食系统现在不是缺一口贵锅，而是缺更顺手的全链路搭配。"
-    },
-    {
-      "id": "owned-laundry-liquid",
-      "name": "洗衣液",
-      "system": "Cleaning",
-      "category": "洗衣",
-      "spaces": ["卫生间", "阳台"],
-      "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Consumable",
-      "quantity": 1,
-      "status": "需要补货",
-      "replacementCue": "剩余不多，最好和垃圾袋、清洁剂一起建立补货节奏。",
-      "note": "这类东西不该靠临时想起，应该放在固定周期里。"
-    },
-    {
-      "id": "owned-storage-box",
-      "name": "透明收纳盒",
-      "system": "Storage",
-      "category": "小件容器",
-      "spaces": ["书桌", "柜体"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Comfortable",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 4,
-      "status": "缺补件",
-      "replacementCue": "盒子本身够用，但标签和同尺寸补件还没跟上。",
-      "note": "现在的问题不是没有收纳，而是还没形成真的省脑力的索引。"
-    },
-    {
-      "id": "owned-router",
-      "name": "双频路由器",
-      "system": "PowerNetwork",
-      "category": "网络",
-      "spaces": ["客厅"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "quantity": 1,
-      "status": "考虑升级",
-      "replacementCue": "近距离够用，但远端房间的稳定性一般。",
-      "note": "如果以后更固定地远程工作，网络稳不稳会放大很多生活摩擦。"
-    },
-    {
-      "id": "owned-basic-tools",
-      "name": "基础工具包",
-      "system": "EmergencyHealth",
-      "category": "工具与应急",
-      "spaces": ["玄关"],
-      "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Tool",
-      "depreciation": "Slow",
-      "quantity": 1,
-      "status": "需要补齐",
-      "replacementCue": "只有螺丝刀和剪刀，卷尺、胶带和手电还缺位。",
-      "note": "工具类不是天天用，但一旦缺，生活会立刻卡住。"
-    },
-    {
-      "id": "owned-medicine-drawer",
-      "name": "常备药抽屉",
-      "system": "EmergencyHealth",
-      "category": "常备药与护理",
-      "spaces": ["卫生间"],
-      "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Consumable",
-      "quantity": 1,
-      "status": "需要补货",
-      "replacementCue": "盒子在，但创可贴、退烧药和肠胃药已经不齐。",
-      "note": "应急不是买个盒子，而是内容完整度和更新节奏。"
-    },
-    {
-      "id": "owned-electric-toothbrush",
-      "name": "电动牙刷",
-      "system": "PersonalCare",
-      "category": "口腔",
-      "spaces": ["卫生间"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Fast",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "主机还能用，重点是刷头补货别断。",
-      "note": "个人护理里很多痛点不是缺主机，而是补充件节奏没接上。"
-    },
-    {
-      "id": "owned-slippers",
-      "name": "家居拖鞋",
-      "system": "Clothing",
-      "category": "基础件",
-      "spaces": ["卧室", "玄关"],
-      "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-      "necessity": "Comfortable",
-      "lifecycle": "Consumable",
-      "quantity": 2,
-      "status": "稳定使用",
-      "replacementCue": "当前够用，之后注意季节替换和清洁频率。",
-      "note": "看起来很小，却会影响待在家里的放松感。"
-    },
-    {
-      "id": "owned-commute-backpack",
-      "name": "通勤背包",
-      "system": "Transportation",
-      "category": "承载",
-      "spaces": ["玄关"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "容量合理，但如果增加外出工作频率会需要更好的分隔。",
-      "note": "出行系统现在最大的价值是顺手，而不是风格升级。"
-    },
-    {
-      "id": "owned-keyboard-stand",
-      "name": "笔记本支架",
-      "system": "WorkStudy",
-      "category": "桌椅与支撑",
-      "spaces": ["书桌"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Comfortable",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "抬高了视线，但还没有把坐姿支持补完整。",
-      "note": "工作学习系统现在更缺的是长期坐住的能力，而不是更多小工具。"
-    },
-    {
-      "id": "owned-scent-candle",
-      "name": "低饱和香薰蜡烛",
-      "system": "Furniture",
-      "category": "装饰物",
-      "spaces": ["客厅", "卧室"],
-      "stages": ["LongTermLiving", "OwnHome"],
-      "necessity": "HappinessBoost",
-      "lifecycle": "Consumable",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "偶尔点燃刚刚好，不需要继续囤太多同类型香味。",
-      "note": "它是气氛件，不该挤占必要项预算。"
-    },
-    {
-      "id": "owned-photo-box",
-      "name": "相册盒",
-      "system": "Entertainment",
-      "category": "收藏与情感",
-      "spaces": ["书柜"],
-      "stages": ["LongTermLiving", "OwnHome"],
-      "necessity": "HappinessBoost",
-      "lifecycle": "Emotional",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "不需要替换，重点是给它留一个不被压坏的位置。",
-      "note": "情感物不靠市场价值存在，它的动作逻辑和别的物品不同。"
-    },
-    {
-      "id": "owned-cat-bowl",
-      "name": "猫碗",
-      "system": "Pets",
-      "category": "饮食",
-      "spaces": ["厨房"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 2,
-      "status": "稳定使用",
-      "replacementCue": "陶瓷材质可以继续用，后续考虑加一个慢食碗。",
-      "note": "日常粮和水分开放，清洁频率决定了猫咪饮水的意愿。"
-    },
-    {
-      "id": "owned-cat-litter-box",
-      "name": "猫砂盆",
-      "system": "Pets",
-      "category": "清洁与排泄",
-      "spaces": ["卫生间"],
-      "stages": ["Renting", "LongTermLiving"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "quantity": 1,
-      "status": "考虑升级",
-      "replacementCue": "开放式够用但落砂严重，后续考虑顶入式或走廊式。",
-      "note": "位置比盆本身重要——放在通风安静的位置比追求封闭设计效果更好。"
-    },
-    {
-      "id": "owned-cat-carrier",
-      "name": "航空箱",
-      "system": "Pets",
-      "category": "外出与随行",
-      "spaces": ["玄关"],
-      "stages": ["Renting", "LongTermLiving", "OwnHome"],
-      "necessity": "Necessary",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "quantity": 1,
-      "status": "稳定使用",
-      "replacementCue": "硬壳够用，之后如果需要更频繁出门可以考虑双开门的。",
-      "note": "平时放玄关当安全感据点，出门直接提走不费心。"
-    }
-  ],
-  "purchaseLanes": [
-    {
-      "id": "buy-now",
-      "title": "立即补齐",
-      "subtitle": "已经在影响生活连续性的缺口，适合按系统和动作节奏尽快补齐。",
-      "items": [
-        {
-          "id": "plan-dehumidifier",
-          "name": "除湿机",
-          "system": "Environment",
-          "category": "湿度",
-          "spaces": ["卧室"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Necessary",
-          "lifecycle": "Durable",
-          "depreciation": "Fast",
-          "reason": "潮湿会同时拖累睡眠、衣物、纸品和电子设备状态。",
-          "targetLifestyle": "安静、干爽、能稳定工作和休息的家。",
-          "currentPrice": 799,
-          "buyBelowPrice": 599,
-          "overpayPrice": 899,
-          "note": "接近梅雨季时，环境系统的优先级会比很多幸福感物品更高。",
-          "tags": ["梅雨季", "环境系统", "高频使用"],
-          "keywords": ["小型除湿机", "家用除湿器", "抽湿机", "梅雨季除湿", "压缩式除湿机"]
-        },
-        {
-          "id": "plan-bedside-lamp",
-          "name": "床边灯",
-          "system": "Lighting",
-          "category": "睡前照明",
-          "spaces": ["卧室"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Medium",
-          "reason": "睡前有一盏柔和的灯，夜晚才能慢慢收住，而不是被顶灯硬切断。",
-          "targetLifestyle": "夜里可以读几页书，再自然地进入休息。",
-          "currentPrice": 129,
-          "buyBelowPrice": 99,
-          "overpayPrice": 169,
-          "note": "这类小件很适合等一次顺手的满减，但不必拖到下个季节。",
-          "tags": ["卧室", "阅读", "幸福感"],
-          "keywords": ["小台灯", "夜灯", "星空灯", "床头灯", "阅读灯", "氛围灯", "触控灯"]
-        },
-        {
-          "id": "plan-medicine-restock",
-          "name": "常备药补货",
-          "system": "EmergencyHealth",
-          "category": "常备药与护理",
-          "spaces": ["卫生间"],
-          "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-          "necessity": "MinimalConfig",
-          "lifecycle": "Consumable",
-          "reason": "真正难受的时候，不该再出门找退烧药和创可贴。",
-          "targetLifestyle": "小意外不会立刻把生活节奏打散。",
-          "currentPrice": 168,
-          "buyBelowPrice": 128,
-          "overpayPrice": 220,
-          "note": "比起盒子本身，更重要的是药品与耗材是否完整。",
-          "tags": ["应急", "基础生活", "补货节奏"],
-          "keywords": ["家庭药箱", "退烧药", "创可贴", "感冒药", "急救包", "肠胃药", "碘伏"]
-        },
-        {
-          "id": "plan-cleaning-restock",
-          "name": "垃圾袋与清洁补货",
-          "system": "Cleaning",
-          "category": "垃圾处理",
-          "spaces": ["厨房", "卫生间"],
-          "stages": ["MovingMinimal", "Renting", "LongTermLiving"],
-          "necessity": "Necessary",
-          "lifecycle": "Consumable",
-          "reason": "清洁系统最容易被忽略的不是工具，而是最基础的耗材突然断档。",
-          "targetLifestyle": "家不会因为几样小耗材见底就迅速变乱。",
-          "currentPrice": 72,
-          "buyBelowPrice": 55,
-          "overpayPrice": 95,
-          "note": "适合和洗衣液、纸巾一起看作同一个补货节奏。",
-          "tags": ["消耗品", "补货", "别拖到用完"],
-          "keywords": ["垃圾袋", "清洁用品", "洗洁精", "百洁布", "厨房清洁", "卫生间清洁"]
-        },
-        {
-          "id": "plan-power-strip",
-          "name": "玄关插线板",
-          "system": "PowerNetwork",
-          "category": "供电",
-          "spaces": ["玄关"],
-          "stages": ["MovingMinimal", "Renting"],
-          "necessity": "MinimalConfig",
-          "lifecycle": "Durable",
-          "depreciation": "Slow",
-          "reason": "入口位置没有稳定供电点，会让充电、照明和小家电使用都变得别扭。",
-          "targetLifestyle": "进门、充电、整理随身物时不需要到处找插口。",
-          "currentPrice": 89,
-          "buyBelowPrice": 69,
-          "overpayPrice": 129,
-          "note": "这类基础件不需要追新，重在孔位顺手和安全。",
-          "tags": ["最低配置", "理线", "一劳永逸"],
-          "keywords": ["排插", "接线板", "USB插线板", "多口插座", "防雷插排"]
-        },
-        {
-          "id": "plan-cat-litter",
-          "name": "猫砂补货",
-          "system": "Pets",
-          "category": "清洁与排泄",
-          "spaces": ["卫生间"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Necessary",
-          "lifecycle": "Consumable",
-          "reason": "猫砂是宠物系统最高频的消耗品，断供会直接影响猫咪健康和居家环境。",
-          "targetLifestyle": "猫砂按月补，不会在需要的时候临时去买。",
-          "currentPrice": 39,
-          "buyBelowPrice": 29,
-          "overpayPrice": 49,
-          "note": "结团型和豆腐砂可以混用，建议和垃圾袋一起纳入月度补货节奏。",
-          "tags": ["宠物", "消耗品", "补货节奏"],
-          "keywords": ["猫砂", "豆腐猫砂", "结团猫砂", "除臭猫砂", "膨润土猫砂", "猫砂"]
-        },
-        {
-          "id": "plan-cat-food",
-          "name": "猫粮储备",
-          "system": "Pets",
-          "category": "饮食",
-          "spaces": ["厨房"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Necessary",
-          "lifecycle": "Consumable",
-          "reason": "干粮储备要保证至少两周余量，避免断粮后临时换粮导致肠胃问题。",
-          "targetLifestyle": "储粮稳定有节奏，不会等到猫碗空了才想起来买。",
-          "currentPrice": 89,
-          "buyBelowPrice": 69,
-          "overpayPrice": 109,
-          "note": "不同品牌不要混喂，建议固定 1-2 个配方，搭配主食罐头换换口味。",
-          "tags": ["宠物", "消耗品", "健康"],
-          "keywords": ["猫粮", "猫主食", "猫罐头", "冻干", "猫零食", "幼猫粮", "成猫粮"]
-        }
-      ]
-    },
-    {
-      "id": "watch-price",
-      "title": "等好价",
-      "subtitle": "已经确认能改善系统完整度，但更值得在清楚规格后等一个合理价格。",
-      "items": [
-        {
-          "id": "plan-chair",
-          "name": "人体工学椅",
-          "system": "WorkStudy",
-          "category": "桌椅与支撑",
-          "spaces": ["书桌"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "Necessary",
-          "lifecycle": "Durable",
-          "depreciation": "Medium",
-          "reason": "长期坐着工作时，身体反馈已经比外观偏好更值得被优先考虑。",
-          "targetLifestyle": "能稳定输出，而不是靠硬扛支撑每一天。",
-          "currentPrice": 1399,
-          "buyBelowPrice": 1199,
-          "overpayPrice": 1799,
-          "note": "先确认腰靠、坐深和扶手调节，再谈颜色和外观。",
-          "tags": ["工作学习", "长期回报", "身体支持"],
-          "keywords": ["办公椅", "电脑椅", "工学椅", "护腰椅", "网布椅", "可躺椅"]
-        },
-        {
-          "id": "plan-mattress-upgrade",
-          "name": "床垫升级",
-          "system": "Sleep",
-          "category": "骨架",
-          "spaces": ["卧室"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "Necessary",
-          "lifecycle": "Durable",
-          "depreciation": "Slow",
-          "reason": "它比很多电子产品都更直接地决定第二天醒来的状态。",
-          "targetLifestyle": "家真的是恢复力发生的地方，而不是勉强睡一晚。",
-          "currentPrice": 2399,
-          "buyBelowPrice": 1899,
-          "overpayPrice": 2999,
-          "note": "如果住所还没有稳定下来，可以先明确体感和尺寸，再等真正合适的时机。",
-          "tags": ["睡眠系统", "高频使用", "值得买好"],
-          "keywords": ["床垫", "乳胶床垫", "记忆棉床垫", "弹簧床垫", "独立袋装弹簧", "护脊床垫"]
-        },
-        {
-          "id": "plan-monitor",
-          "name": "便携显示器",
-          "system": "WorkStudy",
-          "category": "显示与输入",
-          "spaces": ["书桌", "外出"],
-          "stages": ["LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "VeryFast",
-          "reason": "它会提高灵活度，但前提是你真的会把它带出门，而不是只喜欢那种想象。",
-          "targetLifestyle": "可以在不同地点工作，又不牺牲专注度。",
-          "currentPrice": 1599,
-          "buyBelowPrice": 1299,
-          "overpayPrice": 1799,
-          "note": "高折旧电子类更适合慢一点买，先验证使用场景再下单。",
-          "tags": ["电子类", "极快折旧", "先验证习惯"],
-          "keywords": ["外接显示器", "便携屏", "副屏", "移动显示器", "USB-C显示器", "轻薄显示器"]
-        },
-        {
-          "id": "plan-vacuum",
-          "name": "吸尘器",
-          "system": "Cleaning",
-          "category": "日常打扫",
-          "spaces": ["客厅", "卧室"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Fast",
-          "reason": "地面清洁如果长期依赖随手拖，清洁系统很难稳定下来。",
-          "targetLifestyle": "清洁不是一次大扫除，而是日常轻松维持。",
-          "currentPrice": 999,
-          "buyBelowPrice": 799,
-          "overpayPrice": 1299,
-          "note": "比品牌更重要的是重量、续航和你愿不愿意频繁拿出来。",
-          "tags": ["日常打扫", "长期居住", "降低清洁阻力"],
-          "keywords": ["无线吸尘器", "手持吸尘器", "扫地机", "除螨仪", "立式吸尘器", "地毯清洁"]
-        },
-        {
-          "id": "plan-folding-dining-table",
-          "name": "折叠餐桌",
-          "system": "Diet",
-          "category": "家具",
-          "spaces": ["客厅"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Medium",
-          "reason": "吃饭没有稳定位置时，饮食系统总会滑回随便对付。",
-          "targetLifestyle": "在家吃饭不是临时凑合，而是有一个能坐下来的场景。",
-          "currentPrice": 699,
-          "buyBelowPrice": 539,
-          "overpayPrice": 899,
-          "note": "租房阶段更适合看可移动、可折叠和不占体积的方案。",
-          "tags": ["租房", "饮食系统", "先把场景建起来"],
-          "keywords": ["折叠桌", "小餐桌", "伸缩餐桌", "租房餐桌", "多功能桌", "展开式餐桌"]
-        },
-        {
-          "id": "plan-cat-tree",
-          "name": "猫爬架",
-          "system": "Pets",
-          "category": "娱乐与训练",
-          "spaces": ["客厅"],
-          "stages": ["LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Medium",
-          "reason": "垂直空间能让猫更有安全感，但需要先确认客厅布局和猫咪是否真的会用。",
-          "targetLifestyle": "猫有自己爬高和躲藏的位置，人猫互不打扰。",
-          "currentPrice": 329,
-          "buyBelowPrice": 249,
-          "overpayPrice": 429,
-          "note": "高度和稳定性比外观重要，猫爬架不喜欢了还能当猫窝放窗边。",
-          "tags": ["宠物", "改善体验", "空间条件"],
-          "keywords": ["猫爬架", "猫树", "猫抓板", "猫窝", "猫架子", "猫跳台", "猫玩具"]
-        },
-        {
-          "id": "plan-cat-water-fountain",
-          "name": "宠物饮水机",
-          "system": "Pets",
-          "category": "饮食",
-          "spaces": ["厨房"],
-          "stages": ["Renting", "LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Fast",
-          "reason": "流动水比静水更吸引猫咪喝水，对泌尿系统健康有明显帮助。",
-          "targetLifestyle": "猫自己愿意多喝水，不用追着喂或者担心尿路问题。",
-          "currentPrice": 159,
-          "buyBelowPrice": 119,
-          "overpayPrice": 189,
-          "note": "过滤芯是持续耗材，选通用滤芯型号比品牌溢价更值得。",
-          "tags": ["宠物", "健康", "耗材跟进"],
-          "keywords": ["宠物饮水机", "猫咪饮水机", "流动水碗", "猫水机", "静音饮水机", "滤芯饮水机"]
-        }
-      ]
-    },
-    {
-      "id": "hold",
-      "title": "先不买",
-      "subtitle": "现在更像想象、补偿或情绪投射，先让生活基础系统更稳。",
-      "items": [
-        {
-          "id": "plan-projector",
-          "name": "投影仪",
-          "system": "Entertainment",
-          "category": "影音",
-          "spaces": ["客厅"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "HappinessBoost",
-          "lifecycle": "Durable",
-          "depreciation": "VeryFast",
-          "reason": "它对应的是理想中的夜晚氛围，但当前空间条件和使用频率都还不够确定。",
-          "targetLifestyle": "舒展、安静、有自己的小电影院。",
-          "currentPrice": 2499,
-          "buyBelowPrice": 1899,
-          "overpayPrice": 2899,
-          "note": "幸福感 + 极快折旧，是最值得额外冷静的一类组合。",
-          "tags": ["极快折旧", "氛围件", "先确认空间"],
-          "keywords": ["家用投影仪", "迷你投影仪", "便携投影", "卧室投影", "激光投影", "智能投影"]
-        },
-        {
-          "id": "plan-coffee-machine",
-          "name": "半自动咖啡机",
-          "system": "Diet",
-          "category": "烹饪工具",
-          "spaces": ["厨房"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "HappinessBoost",
-          "lifecycle": "Durable",
-          "depreciation": "Fast",
-          "reason": "它可能提升晨间仪式感，但维护成本、学习成本和占地会一起进来。",
-          "targetLifestyle": "慢一点开始一天，但家里仍然整洁轻松。",
-          "currentPrice": 1899,
-          "buyBelowPrice": 1499,
-          "overpayPrice": 2299,
-          "note": "先验证自己是不是愿意长期清洁和维护，而不是只喜欢拥有它的感觉。",
-          "tags": ["仪式感", "维护成本", "厨房占地"],
-          "keywords": ["咖啡机", "意式咖啡机", "胶囊咖啡机", "手冲壶", "全自动咖啡机", "磨豆机"]
-        },
-        {
-          "id": "plan-treadmill",
-          "name": "折叠跑步机",
-          "system": "Entertainment",
-          "category": "运动器材",
-          "spaces": ["客厅"],
-          "stages": ["LongTermLiving"],
-          "necessity": "Comfortable",
-          "lifecycle": "Durable",
-          "depreciation": "Fast",
-          "reason": "它看起来能解决运动问题，但也很容易变成大型晾衣架。",
-          "targetLifestyle": "身体保持活力，但家里不被器械占满。",
-          "currentPrice": 2199,
-          "buyBelowPrice": 1699,
-          "overpayPrice": 2499,
-          "note": "先把步行、瑜伽垫或出门频率稳定下来，再看要不要上大件。",
-          "tags": ["大件", "重复风险", "先验证习惯"],
-          "keywords": ["跑步机", "走步机", "健身器材", "家用跑步机", "折叠健身", "有氧器械"]
-        },
-        {
-          "id": "plan-side-table",
-          "name": "复古边几",
-          "system": "Furniture",
-          "category": "大件家具",
-          "spaces": ["客厅"],
-          "stages": ["LongTermLiving", "OwnHome"],
-          "necessity": "HappinessBoost",
-          "lifecycle": "Durable",
-          "depreciation": "Medium",
-          "reason": "它能让客厅更完整，但当前更紧急的还是坐感、照明和收纳动线。",
-          "targetLifestyle": "客厅有真正愿意坐下来的细节，而不是只有想象图。",
-          "currentPrice": 899,
-          "buyBelowPrice": 699,
-          "overpayPrice": 1099,
-          "note": "空间起居系统没稳定之前，家具陈设更适合作为后续升级。",
-          "tags": ["客厅氛围", "后续升级", "先稳基础系统"],
-          "keywords": ["边几", "茶几", "小桌子", "沙发边几", "角几", "复古家具", "小茶几"]
-        }
-      ]
-    }
-  ],
-  "stageChecklists": [
-    {
-      "id": "stage-moving-minimum",
-      "stage": "MovingMinimal",
-      "title": "搬家最低配",
-      "description": "目标不是把家一次布满，而是保证第一晚到前三天能顺利生活。",
-      "focus": "优先保障睡、洗、充电、出门和应急的连续性。",
-      "sections": [
-        {
-          "system": "Sleep",
-          "minimum": ["床品一套", "可直接铺开的睡眠垫"],
-          "essentials": ["枕头", "薄被或空调被"],
-          "upgrades": ["便携床边灯"]
-        },
-        {
-          "system": "PersonalCare",
-          "minimum": ["洗漱包", "毛巾"],
-          "essentials": ["牙刷牙膏", "基础护肤与沐浴用品"],
-          "upgrades": ["旅行分装收纳"]
-        },
-        {
-          "system": "PowerNetwork",
-          "minimum": ["手机充电器"],
-          "essentials": ["插线板", "备用充电线"],
-          "upgrades": ["理线夹"]
-        },
-        {
-          "system": "EmergencyHealth",
-          "minimum": ["常备药", "创可贴"],
-          "essentials": ["剪刀", "胶带", "手电"],
-          "upgrades": ["应急小药包"]
-        },
-        {
-          "system": "Clothing",
-          "minimum": ["换洗衣物", "室内拖鞋"],
-          "essentials": ["雨具"],
-          "upgrades": ["便携衣架"]
-        }
-      ]
-    },
-    {
-      "id": "stage-renting",
-      "stage": "Renting",
-      "title": "租房需要什么",
-      "description": "租房阶段最重要的是用低成本把不舒服的地方修正到可住。",
-      "focus": "优先选择可移动、可复用、搬走不心疼的方案。",
-      "sections": [
-        {
-          "system": "Sleep",
-          "minimum": ["遮光方案", "基础床品"],
-          "essentials": ["更稳的床垫", "替换床单"],
-          "upgrades": ["白噪音或耳塞"]
-        },
-        {
-          "system": "Lighting",
-          "minimum": ["书桌台灯"],
-          "essentials": ["床边灯"],
-          "upgrades": ["夜灯"]
-        },
-        {
-          "system": "Cleaning",
-          "minimum": ["基础清洁工具", "垃圾袋"],
-          "essentials": ["洗衣液", "厨卫清洁剂"],
-          "upgrades": ["轻量吸尘器"]
-        },
-        {
-          "system": "Storage",
-          "minimum": ["收纳盒", "挂钩"],
-          "essentials": ["抽屉分隔", "标签"],
-          "upgrades": ["小推车"]
-        },
-        {
-          "system": "Environment",
-          "minimum": ["通风与除味方案"],
-          "essentials": ["除湿机"],
-          "upgrades": ["空气净化器"]
-        }
-      ]
-    },
-    {
-      "id": "stage-long-term",
-      "stage": "LongTermLiving",
-      "title": "长期居住",
-      "description": "当住所不再只是落脚点，系统感会比单个好物更重要。",
-      "focus": "把睡眠、饮食、工作学习、清洁和应急一起看成可长期运转的组合。",
-      "sections": [
-        {
-          "system": "Sleep",
-          "minimum": ["稳定睡眠环境"],
-          "essentials": ["更合适的床垫", "遮光与除湿协同"],
-          "upgrades": ["睡前照明", "阅读角小毯"]
-        },
-        {
-          "system": "Diet",
-          "minimum": ["基础锅具与餐具"],
-          "essentials": ["储存容器", "稳定用餐位置"],
-          "upgrades": ["更顺手的小家电"]
-        },
-        {
-          "system": "WorkStudy",
-          "minimum": ["稳定桌面"],
-          "essentials": ["人体工学椅", "显示器支撑"],
-          "upgrades": ["第二屏或移动工作方案"]
-        },
-        {
-          "system": "Cleaning",
-          "minimum": ["洗衣与日常打扫节奏"],
-          "essentials": ["更低阻力的打扫工具"],
-          "upgrades": ["吸尘器"]
-        },
-        {
-          "system": "EmergencyHealth",
-          "minimum": ["常备药完整度"],
-          "essentials": ["工具箱", "证件与保险备份"],
-          "upgrades": ["停电应急灯"]
-        }
-      ]
-    },
-    {
-      "id": "stage-owned-home",
-      "stage": "OwnHome",
-      "title": "自有住房",
-      "description": "自有住房会把视角从“先住下”拉到“怎么降低长期维护成本”。",
-      "focus": "更值得买耐用、可维修、能长期陪伴的东西。",
-      "sections": [
-        {
-          "system": "Environment",
-          "minimum": ["除湿与通风方案"],
-          "essentials": ["更安静稳定的温湿控制"],
-          "upgrades": ["空气质量监测"]
-        },
-        {
-          "system": "Storage",
-          "minimum": ["稳定柜体与分类"],
-          "essentials": ["储物柜体优化", "文件归档区"],
-          "upgrades": ["杂物间分层系统"]
-        },
-        {
-          "system": "EmergencyHealth",
-          "minimum": ["备用灯泡", "卷尺与电笔"],
-          "essentials": ["完整工具箱", "安防检查"],
-          "upgrades": ["备用应急电源"]
-        },
-        {
-          "system": "WorkStudy",
-          "minimum": ["稳定工作位"],
-          "essentials": ["更好的椅子与照明"],
-          "upgrades": ["双工作场景切换"]
-        },
-        {
-          "system": "Furniture",
-          "minimum": ["真正能坐下来的起居位"],
-          "essentials": ["边几、地毯等动线补全"],
-          "upgrades": ["更完整的软装氛围"]
-        }
-      ]
-    },
-    {
-      "id": "stage-self-built-home",
-      "stage": "SelfBuilt",
-      "title": "自建房",
-      "description": "这时要看的不只是买什么，而是整套居住系统如何运转和维护。",
-      "focus": "物品要和水、电、排风、维护路径一起规划。",
-      "sections": [
-        {
-          "system": "PowerNetwork",
-          "minimum": ["总电箱标签", "基础备用网络点"],
-          "essentials": ["路由布局", "关键位置供电"],
-          "upgrades": ["UPS 或备用网络"]
-        },
-        {
-          "system": "Environment",
-          "minimum": ["排风与除湿方案"],
-          "essentials": ["不同空间的温湿控制"],
-          "upgrades": ["监测与自动化联动"]
-        },
-        {
-          "system": "Storage",
-          "minimum": ["储物间分区"],
-          "essentials": ["工具墙与备件区"],
-          "upgrades": ["季节物品轮换系统"]
-        },
-        {
-          "system": "EmergencyHealth",
-          "minimum": ["检修灯", "停电应急箱"],
-          "essentials": ["备用五金", "门锁与监控检查"],
-          "upgrades": ["户外维护区"]
-        }
-      ]
-    },
-    {
-      "id": "stage-basement",
-      "stage": "Basement",
-      "title": "地下室",
-      "description": "地下室的核心任务不是装修，而是先管住潮气、排水、通风和电力安全。",
-      "focus": "防潮第一，电路安全第二，储物规划最后跟上。",
-      "sections": [
-        {
-          "system": "Environment",
-          "minimum": ["工业除湿机", "温湿度计"],
-          "essentials": ["排气扇或通风管道", "墙面防潮涂层"],
-          "upgrades": ["自动排水式除湿系统", "空气质量监测"]
-        },
-        {
-          "system": "PowerNetwork",
-          "minimum": ["漏电保护插座"],
-          "essentials": ["防水接线盒", "备用照明灯"],
-          "upgrades": ["独立回路配电箱", "备用电源接口"]
-        },
-        {
-          "system": "EmergencyHealth",
-          "minimum": ["防水手电", "积水应急泵"],
-          "essentials": ["工具箱", "防水密封材料"],
-          "upgrades": ["雨水倒灌报警器", "备用排水方案"]
-        },
-        {
-          "system": "Storage",
-          "minimum": ["防潮收纳箱", "离地货架"],
-          "essentials": ["分类标签", "工具墙"],
-          "upgrades": ["重型储物架", "温控储物区"]
-        },
-        {
-          "system": "Lighting",
-          "minimum": ["基础顶灯"],
-          "essentials": ["感应夜灯"],
-          "upgrades": ["分区照明"]
-        }
-      ]
-    }
-  ],
-  "priceReferences": [
-    {
-      "id": "price-mattress",
-      "system": "Sleep",
-      "category": "床垫",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "entryPrice": 1299,
-      "sweetSpotPrice": 1999,
-      "overpayPrice": 2899,
-      "note": "如果住所还没稳定，晚一点买对的，比先买贵的更重要。"
-    },
-    {
-      "id": "price-chair",
-      "system": "WorkStudy",
-      "category": "人体工学椅",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "entryPrice": 799,
-      "sweetSpotPrice": 1299,
-      "overpayPrice": 1899,
-      "note": "先看支撑与调节范围，再看材质和品牌故事。"
-    },
-    {
-      "id": "price-lighting",
-      "system": "Lighting",
-      "category": "台灯 / 床边灯",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "entryPrice": 79,
-      "sweetSpotPrice": 149,
-      "overpayPrice": 249,
-      "note": "光线舒服、开关顺手，比堆功能更重要。"
-    },
-    {
-      "id": "price-dehumidifier",
-      "system": "Environment",
-      "category": "除湿机",
-      "lifecycle": "Durable",
-      "depreciation": "Fast",
-      "entryPrice": 499,
-      "sweetSpotPrice": 699,
-      "overpayPrice": 999,
-      "note": "环境系统的回报来自使用频率，不是参数越多越好。"
-    },
-    {
-      "id": "price-storage",
-      "system": "Storage",
-      "category": "收纳系统",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "entryPrice": 39,
-      "sweetSpotPrice": 99,
-      "overpayPrice": 169,
-      "note": "重点在统一尺寸和可扩展，不在单个盒子的高级感。"
-    },
-    {
-      "id": "price-projector",
-      "system": "Entertainment",
-      "category": "投影仪",
-      "lifecycle": "Durable",
-      "depreciation": "VeryFast",
-      "entryPrice": 1499,
-      "sweetSpotPrice": 1999,
-      "overpayPrice": 2899,
-      "note": "高折旧影音设备更适合慢一点买，先确认空间和频率。"
-    },
-    {
-      "id": "price-kitchen-appliance",
-      "system": "Diet",
-      "category": "小厨房电器",
-      "lifecycle": "Durable",
-      "depreciation": "Fast",
-      "entryPrice": 399,
-      "sweetSpotPrice": 699,
-      "overpayPrice": 1099,
-      "note": "高频使用才值得上更好的档位，低频则优先看维护负担。"
-    },
-    {
-      "id": "price-cleaning",
-      "system": "Cleaning",
-      "category": "清洁耗材与基础工具",
-      "lifecycle": "Consumable",
-      "entryPrice": 39,
-      "sweetSpotPrice": 99,
-      "overpayPrice": 169,
-      "note": "清洁系统先保证不断档，再考虑工具升级。"
-    },
-    {
-      "id": "price-power-network",
-      "system": "PowerNetwork",
-      "category": "插线板 / 充电站",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "entryPrice": 59,
-      "sweetSpotPrice": 129,
-      "overpayPrice": 219,
-      "note": "这类基础件重在安全、孔位和用起来顺不顺手。"
-    },
-    {
-      "id": "price-emergency-health",
-      "system": "EmergencyHealth",
-      "category": "常备药箱",
-      "lifecycle": "Consumable",
-      "entryPrice": 99,
-      "sweetSpotPrice": 199,
-      "overpayPrice": 299,
-      "note": "重点是完整度和更新节奏，不是盒子本身。"
-    },
-    {
-      "id": "price-personal-care",
-      "system": "PersonalCare",
-      "category": "基础洗护套装",
-      "lifecycle": "Consumable",
-      "entryPrice": 79,
-      "sweetSpotPrice": 149,
-      "overpayPrice": 249,
-      "note": "个人护理更适合按补货节奏看，而不是一次性囤满。"
-    },
-    {
-      "id": "price-clothing",
-      "system": "Clothing",
-      "category": "日常外套 / 鞋履",
-      "lifecycle": "Durable",
-      "depreciation": "Slow",
-      "entryPrice": 199,
-      "sweetSpotPrice": 499,
-      "overpayPrice": 999,
-      "note": "穿着系统里，合适的版型和耐用度比追新更重要。"
-    },
-    {
-      "id": "price-travel",
-      "system": "Transportation",
-      "category": "通勤包 / 行李箱",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "entryPrice": 299,
-      "sweetSpotPrice": 699,
-      "overpayPrice": 1299,
-      "note": "出行系统看的是承载和频率，不只是外观风格。"
-    },
-    {
-      "id": "price-furniture",
-      "system": "Furniture",
-      "category": "沙发 / 茶几",
-      "lifecycle": "Durable",
-      "depreciation": "Medium",
-      "entryPrice": 699,
-      "sweetSpotPrice": 1499,
-      "overpayPrice": 2999,
-      "note": "家具陈设的价值在于把空间变成愿意待着的地方。"
     }
   ],
   "boundaryEntries": [
@@ -1153,37 +1298,37 @@
       "id": "boundary-bed-frame",
       "item": "床架",
       "system": "Sleep",
-      "reason": "它是睡眠系统的骨架，不是单独拿出来看的普通家具。"
+      "reason": "它是睡眠系统的骨架,不是单独拿出来看的普通家具。"
     },
     {
       "id": "boundary-office-set",
       "item": "办公桌椅",
       "system": "WorkStudy",
-      "reason": "它存在的目的就是工作，不该拆散成普通桌椅看。"
+      "reason": "它存在的目的就是工作,不该拆散成普通桌椅看。"
     },
     {
       "id": "boundary-dining-table",
       "item": "餐桌",
       "system": "Diet",
-      "reason": "吃饭场景的核心位置，归饮食比归家具更有用。"
+      "reason": "吃饭场景的核心位置,归饮食比归家具更有用。"
     },
     {
       "id": "boundary-coffee-table",
       "item": "茶几 / 边几",
       "system": "Furniture",
-      "reason": "它们更多是在撑起客厅起居感，而不是单一功能。"
+      "reason": "它们更多是在撑起客厅起居感,而不是单一功能。"
     },
     {
       "id": "boundary-wardrobe",
       "item": "衣柜",
       "system": "Storage",
-      "reason": "它是装衣服的容器，归收纳比归穿着更准确。"
+      "reason": "它是装衣服的容器,归收纳比归穿着更准确。"
     },
     {
       "id": "boundary-bedside-lamp",
       "item": "床头灯 / 阅读灯",
       "system": "Lighting",
-      "reason": "它服务的是光环境，不需要拆进睡眠本身。"
+      "reason": "它服务的是光环境,不需要拆进睡眠本身。"
     },
     {
       "id": "boundary-blackout-curtain",
@@ -1195,25 +1340,25 @@
       "id": "boundary-decor-curtain",
       "item": "装饰窗帘",
       "system": "Furniture",
-      "reason": "它更偏空间感和氛围，而不是睡眠功能。"
+      "reason": "它更偏空间感和氛围,而不是睡眠功能。"
     },
     {
       "id": "boundary-commute-bag",
       "item": "通勤包",
       "system": "Transportation",
-      "reason": "它的作用是把东西带出门，属于出行系统。"
+      "reason": "它的作用是把东西带出门,属于出行系统。"
     },
     {
       "id": "boundary-fashion-bag",
       "item": "时尚手提包",
       "system": "Clothing",
-      "reason": "它是搭配的一部分，更像穿着系统里的配饰。"
+      "reason": "它是搭配的一部分,更像穿着系统里的配饰。"
     },
     {
       "id": "boundary-treadmill",
       "item": "跑步机 / 哑铃",
       "system": "Entertainment",
-      "reason": "运动是个人活动，归娱乐爱好比单独开新系统更稳。"
+      "reason": "运动是个人活动,归娱乐爱好比单独开新系统更稳。"
     },
     {
       "id": "boundary-camping",
@@ -1225,92 +1370,92 @@
       "id": "boundary-scent-candle",
       "item": "香薰 / 蜡烛",
       "system": "Furniture",
-      "reason": "它们主要在做氛围，而不是承担功能性任务。"
+      "reason": "它们主要在做氛围,而不是承担功能性任务。"
     },
     {
       "id": "boundary-humidifier",
       "item": "加湿器 / 除湿机",
       "system": "Environment",
-      "reason": "它们直接在调节空气状态，不属于装饰类物品。"
+      "reason": "它们直接在调节空气状态,不属于装饰类物品。"
     },
     {
       "id": "boundary-file-cabinet",
       "item": "文件柜",
       "system": "Storage",
-      "reason": "它的用途是装和找文件，核心就是收纳。"
+      "reason": "它的用途是装和找文件,核心就是收纳。"
     },
     {
       "id": "boundary-safe",
       "item": "保险柜",
       "system": "EmergencyHealth",
-      "reason": "它通常存放证件、备用钥匙和应急文件，属于应急系统。"
+      "reason": "它通常存放证件、备用钥匙和应急文件,属于应急系统。"
     },
     {
       "id": "boundary-photo-album",
       "item": "纸质相册",
       "system": "Entertainment",
-      "reason": "它更接近记忆与情感承载，不按纯功能来算。"
+      "reason": "它更接近记忆与情感承载,不按纯功能来算。"
     },
     {
       "id": "boundary-piano",
       "item": "钢琴 / 电子琴",
       "system": "Entertainment",
-      "reason": "它们是兴趣器材，空间占位由 space 去处理。"
+      "reason": "它们是兴趣器材,空间占位由 space 去处理。"
     },
     {
       "id": "boundary-consumables",
       "item": "米油盐",
       "system": "Diet",
-      "reason": "消耗是 lifecycle 的事，不要把它拆成独立系统。"
+      "reason": "消耗是 lifecycle 的事,不要把它拆成独立系统。"
     },
     {
       "id": "boundary-tools",
       "item": "螺丝刀套装",
       "system": "EmergencyHealth",
-      "reason": "如果不单独做居家维修系统，就先并入应急使用。"
+      "reason": "如果不单独做居家维修系统,就先并入应急使用。"
     },
     {
       "id": "boundary-electric-blanket",
       "item": "电热毯",
       "system": "Sleep",
-      "reason": "如果天天用，它就属于睡眠；只有季节性出现时才考虑扩展系统。"
+      "reason": "如果天天用,它就属于睡眠;只有季节性出现时才考虑扩展系统。"
     },
     {
       "id": "boundary-speaker",
       "item": "蓝牙音箱",
       "system": "Furniture",
-      "reason": "放氛围音乐时更像空间的一部分，而不是独立功能系统。"
+      "reason": "放氛围音乐时更像空间的一部分,而不是独立功能系统。"
     },
     {
       "id": "boundary-projector",
       "item": "投影仪",
       "system": "Entertainment",
-      "reason": "它对应的是观影和沉浸体验，和工作显示器不是一回事。"
+      "reason": "它对应的是观影和沉浸体验,和工作显示器不是一回事。"
     },
     {
       "id": "boundary-scale",
       "item": "体重秤 / 血压计",
       "system": "EmergencyHealth",
-      "reason": "它们是健康监测基础件，优先算进应急健康。"
+      "reason": "它们是健康监测基础件,优先算进应急健康。"
     },
     {
       "id": "boundary-dashcam",
       "item": "行车记录仪",
       "system": "Transportation",
-      "reason": "没有单独车辆系统时，先并到出行里看。"
+      "reason": "没有单独车辆系统时,先并到出行里看。"
     },
     {
       "id": "boundary-cosmetics",
       "item": "化妆品 / 美妆工具",
       "system": "PersonalCare",
-      "reason": "它们属于身体维护的一部分，归个人护理最顺手。"
+      "reason": "它们属于身体维护的一部分,归个人护理最顺手。"
     }
   ],
   "lifestyleCollections": [
     {
       "id": "collection-life",
       "title": "我想要的生活里应该有",
-      "description": "不是先买贵东西，而是让家能稳定支持睡眠、工作和吃饭。",
+      "description": "不是先买贵东西,而是让家能稳定支持睡眠、工作和吃饭。",
       "items": [
         "一张真正想坐下来的椅子",
         "稳定的睡眠环境",
@@ -1321,7 +1466,7 @@
     {
       "id": "collection-happiness",
       "title": "增加幸福感的东西",
-      "description": "这类东西不一定最必要，但会决定你愿不愿意留在自己的生活里。",
+      "description": "这类东西不一定最必要,但会决定你愿不愿意留在自己的生活里。",
       "items": ["床边灯", "舒服拖鞋", "一只顺手杯子", "低饱和香氛"]
     },
     {
@@ -1337,8 +1482,8 @@
     },
     {
       "id": "collection-overlooked",
-      "title": "很容易没想到，但应该提醒自己",
-      "description": "很多生活崩溃感不是来自大事，而是这些基础件长期缺位。",
+      "title": "很容易没想到,但应该提醒自己",
+      "description": "很多生活崩溃感不是来自大事,而是这些基础件长期缺位。",
       "items": [
         "常备药与创可贴",
         "备用充电线与插线板",

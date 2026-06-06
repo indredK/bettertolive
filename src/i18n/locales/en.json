@@ -7,10 +7,10 @@
     },
     "tabs": {
       "overview": "Overview",
-      "systems": "System Map",
-      "spaces": "Space Inspection",
-      "stages": "Stage Templates",
-      "planning": "Purchase Decisions",
+      "systems": "Item Systems",
+      "spaces": "Space Scenes",
+      "stages": "Stage Fit",
+      "planning": "Item Library",
       "admin": "Admin"
     },
     "cardGrid": {
@@ -18,8 +18,25 @@
     },
     "toast": {
       "reorderSuccess": "Order updated",
-      "reorderFailed": "Reorder failed, please try again"
+      "reorderFailed": "Reorder failed, please try again",
+      "deletePendingItem": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deletePendingSystem": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deletePendingSpace": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deletePendingStage": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deleteSuccessItem": "Deleted item: {{name}}",
+      "deleteSuccessSystem": "Deleted system: {{name}}",
+      "deleteSuccessSpace": "Deleted space: {{name}}",
+      "deleteSuccessStage": "Deleted stage: {{name}}",
+      "deleteFailedItem": "Failed to delete item",
+      "deleteFailedSystem": "Failed to delete system",
+      "deleteFailedSpace": "Failed to delete space",
+      "deleteFailedStage": "Failed to delete stage",
+      "deleteUndoneItem": "Deletion undone: {{name}}",
+      "deleteUndoneSystem": "Deletion undone: {{name}}",
+      "deleteUndoneSpace": "Deletion undone: {{name}}",
+      "deleteUndoneStage": "Deletion undone: {{name}}"
     },
+    "undo": "Undo",
     "overview": {
       "currentFocus": "What to Focus On Now",
       "currentFocusDesc": "These aren't random thoughts, but reminders emerging from system gaps, action rhythm, and purchase judgment.",
@@ -91,7 +108,8 @@
     "priceSignal": {
       "inBuyZone": "In Buy Zone",
       "overpriced": "Currently Expensive",
-      "watchOnly": "Watch & Wait"
+      "watchOnly": "Watch & Wait",
+      "title": "Price Signal"
     },
     "validation": {
       "required": "Please enter {{field}}",
@@ -160,6 +178,13 @@
         "NeedRestock": "Need Restock",
         "MissingParts": "Missing Parts",
         "NeedComplete": "Need Completion"
+      },
+      "healthStatus": {
+        "StableUse": "In Stable Use",
+        "ConsiderUpgrade": "Consider Upgrade",
+        "NeedRestock": "Need Restock",
+        "MissingParts": "Missing Parts",
+        "NeedComplete": "Need Completion"
       }
     },
     "laneName": {
@@ -196,10 +221,15 @@
         "secondaryGroups": "Secondary Groups",
         "secondaryGroupsHelp": "Separate multiple secondary groups with commas",
         "assignItems": "Items under this system",
-        "assignItemsHelp": "Pick items that belong to this system. Unchecking does not detach from their existing system.",
+        "assignItemsHelp": "Move items belonging to this system to the right, then save",
         "cancel": "Cancel",
-        "save": "Save"
-      }
+        "save": "Save",
+        "autoId": "Auto-generated ID:",
+        "basicInfo": "Basic Info",
+        "name": "Name"
+      },
+      "itemCount": "{{count}} items",
+      "emptySystem": "No items in this system"
     },
     "spaces": {
       "totalItemsAndSystems": "{{total}} items · {{systems}} systems",
@@ -219,9 +249,12 @@
       "form": {
         "name": "Space Name",
         "assignItems": "Items in this space",
-        "assignItemsHelp": "Pick items that belong to this space. Checking adds the space; unchecking removes the space from the item.",
+        "assignItemsHelp": "Move items belonging to this space to the right, then save",
         "cancel": "Cancel",
-        "save": "Save"
+        "save": "Save",
+        "basicInfo": "Basic Info",
+        "note": "Note",
+        "notePlaceholder": "Describe this space, its purpose, etc."
       },
       "table": {
         "itemName": "Item Name",
@@ -230,7 +263,9 @@
         "stage": "Stage",
         "tag": "Tag",
         "owned": "Owned"
-      }
+      },
+      "summary": "{{total}} items · {{systems}} systems",
+      "emptySpace": "No items in this space"
     },
     "stages": {
       "systemCount": "{{count}} systems",
@@ -272,7 +307,7 @@
       "itemPicker": {
         "search": "Search...",
         "placeholder": "None selected (optional)",
-        "noItemsForSystem": "No items under this system yet. Create them on the Purchase Decisions tab.",
+        "noItemsForSystem": "No items under this system yet. Create them on the Item Library tab.",
         "unresolved": "(item deleted or not found)"
       }
     },
@@ -304,7 +339,8 @@
         "entryPrice": "Entry Price",
         "comfortZone": "Comfort Zone",
         "overpay": "Overpay"
-      }
+      },
+      "title": "Item Library"
     },
     "shared": {
       "boundaryTable": {
@@ -371,12 +407,12 @@
           "name": "Name",
           "laneId": "Purchase Strategy",
           "selectLane": "Select purchase strategy",
-          "systemId": "System Map",
+          "systemId": "Item Systems",
           "category": "Category",
           "necessity": "Necessity",
           "lifecycle": "Lifecycle",
           "depreciation": "Depreciation",
-          "spaces": "Space Inspection",
+          "spaces": "Space Scenes",
           "stages": "Stages",
           "quantity": "Quantity",
           "status": "Status",
@@ -467,6 +503,14 @@
           "bodyPlaceholder": "{\"key\": \"value\"}"
         }
       }
+    },
+    "item": {
+      "children": "Children"
+    },
+    "priceRef": {
+      "entry": "Entry",
+      "sweet": "Sweet",
+      "overpay": "Overpay"
     }
   },
   "shell": {

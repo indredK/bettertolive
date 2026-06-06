@@ -1,73 +1,71 @@
 import { invoke } from "@tauri-apps/api/core"
 import type {
-  ShoppingOwnedItemForm,
-  ShoppingOwnedItemRow,
-  ShoppingPlanItemForm,
-  ShoppingPlanItemRow,
+  ShoppingItemForm,
   ShoppingPageContentForm,
   ShoppingPageContentRow,
   ShoppingSpaceDefinitionForm,
+  ShoppingStageTemplateForm,
   ShoppingSystemDefinitionForm,
 } from "@/features/bettertolive/api/bettertolive-api"
-import type { ShoppingModuleData } from "@/features/bettertolive/models/workspace"
+import type {
+  ShoppingItem,
+  ShoppingSpaceDefinition,
+  ShoppingStageTemplate,
+} from "@/features/bettertolive/models/workspace"
 
 function hasTauriRuntime() {
   return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
 }
 
-// ---- Owned Items ----
+// ---- Items(统一物品库,替代旧的 owned/plan 分裂) ----
 
-export async function listOwnedItems(): Promise<ShoppingOwnedItemRow[]> {
+export async function listItems(): Promise<ShoppingItem[]> {
   if (!hasTauriRuntime()) return []
-  return invoke<ShoppingOwnedItemRow[]>("list_owned_items")
+  return invoke<ShoppingItem[]>("list_shopping_items")
 }
 
-export async function createOwnedItem(
-  form: ShoppingOwnedItemForm,
-): Promise<ShoppingModuleData["ownedItems"][number]> {
+export async function createItem(form: ShoppingItemForm): Promise<ShoppingItem> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("create_owned_item", { form })
+  return invoke("create_shopping_item", { form })
 }
 
-export async function updateOwnedItem(
-  form: ShoppingOwnedItemForm,
-): Promise<ShoppingModuleData["ownedItems"][number]> {
+export async function updateItem(form: ShoppingItemForm): Promise<ShoppingItem> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("update_owned_item", { form })
+  return invoke("update_shopping_item", { form })
 }
 
-export async function deleteOwnedItem(id: string): Promise<void> {
+export async function deleteItem(id: string): Promise<void> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("delete_owned_item", { id })
+  return invoke("delete_shopping_item", { id })
 }
 
-// ---- Plan Items ----
+// ---- Stage Templates ----
 
-export async function listPlanItems(): Promise<ShoppingPlanItemRow[]> {
+export async function listStageTemplates(): Promise<ShoppingStageTemplate[]> {
   if (!hasTauriRuntime()) return []
-  return invoke<ShoppingPlanItemRow[]>("list_plan_items")
+  return invoke<ShoppingStageTemplate[]>("list_shopping_stage_templates")
 }
 
-export async function createPlanItem(
-  form: ShoppingPlanItemForm,
-): Promise<ShoppingModuleData["purchaseLanes"][number]["items"][number]> {
+export async function createStageTemplate(
+  form: ShoppingStageTemplateForm,
+): Promise<ShoppingStageTemplate> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("create_plan_item", { form })
+  return invoke("create_shopping_stage_template", { form })
 }
 
-export async function updatePlanItem(
-  form: ShoppingPlanItemForm,
-): Promise<ShoppingModuleData["purchaseLanes"][number]["items"][number]> {
+export async function updateStageTemplate(
+  form: ShoppingStageTemplateForm,
+): Promise<ShoppingStageTemplate> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("update_plan_item", { form })
+  return invoke("update_shopping_stage_template", { form })
 }
 
-export async function deletePlanItem(id: string): Promise<void> {
+export async function deleteStageTemplate(id: string): Promise<void> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return invoke("delete_plan_item", { id })
+  return invoke("delete_shopping_stage_template", { id })
 }
 
-// ---- Page Content ----
+// ---- Page Content(spotlight / boundary / lifestyle 等展示类内容) ----
 
 export async function listPageContents(
   contentType?: string | null,
@@ -102,6 +100,16 @@ export async function reorderSystemDefinitions(orderedIds: string[]): Promise<vo
   return invoke("reorder_system_definitions", { orderedIds })
 }
 
+export async function reorderSpaceDefinitions(orderedIds: string[]): Promise<void> {
+  if (!hasTauriRuntime()) return
+  return invoke("reorder_space_definitions", { orderedIds })
+}
+
+export async function reorderStageTemplates(orderedIds: string[]): Promise<void> {
+  if (!hasTauriRuntime()) return
+  return invoke("reorder_stage_templates", { orderedIds })
+}
+
 export async function reorderShoppingPageContents(orderedIds: string[]): Promise<void> {
   if (!hasTauriRuntime()) return
   return invoke("reorder_shopping_page_contents", { orderedIds })
@@ -124,36 +132,44 @@ export async function deleteSystemDefinition(id: string): Promise<void> {
   return invoke("delete_system_definition", { id })
 }
 
-// ---- Space Definitions ----
+export async function assignSystemDefinitionItems(
+  systemId: string,
+  itemIds: string[],
+): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("assign_system_definition_items", { systemId, itemIds })
+}
+
+// ---- Space Definitions(独立的空间字典管理) ----
+
+export async function listSpaceDefinitions(): Promise<ShoppingSpaceDefinition[]> {
+  if (!hasTauriRuntime()) return []
+  return invoke<ShoppingSpaceDefinition[]>("list_shopping_space_definitions")
+}
 
 export async function createSpaceDefinition(
   form: ShoppingSpaceDefinitionForm,
-): Promise<ShoppingPageContentRow> {
+): Promise<ShoppingSpaceDefinition> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return createPageContent({
-    id: form.id,
-    contentType: "space_definition",
-    title: form.name,
-    stage: null,
-    system: null,
-    summary: null,
-    reason: null,
-    body: "{}",
-  })
+  return invoke("create_shopping_space_definition", { form })
 }
 
 export async function updateSpaceDefinition(
   form: ShoppingSpaceDefinitionForm & { id: string },
-): Promise<ShoppingPageContentRow> {
+): Promise<ShoppingSpaceDefinition> {
   if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
-  return updatePageContent({
-    id: form.id,
-    contentType: "space_definition",
-    title: form.name,
-    stage: null,
-    system: null,
-    summary: null,
-    reason: null,
-    body: "{}",
-  })
+  return invoke("update_shopping_space_definition", { form })
+}
+
+export async function deleteSpaceDefinition(id: string): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("delete_shopping_space_definition", { id })
+}
+
+export async function assignSpaceDefinitionItems(
+  spaceId: string,
+  itemIds: string[],
+): Promise<void> {
+  if (!hasTauriRuntime()) throw new Error("Tauri runtime not available")
+  return invoke("assign_space_definition_items", { spaceId, itemIds })
 }

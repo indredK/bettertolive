@@ -1,46 +1,25 @@
 import { useCallback, useMemo } from "react"
-import i18next from "@/i18n/config"
 
 import type {
   EmotionTriggerGroup,
   ShoppingLifestyleCollection,
-  ShoppingStageChecklist,
+  ShoppingStageTemplate,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
-import { ownedStatusDisplayName } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
-function filterChecklistByQuery(
-  checklist: ShoppingStageChecklist,
+function filterStageTemplateByQuery(
+  stage: ShoppingStageTemplate,
   hasQuery: boolean,
   matchesQuery: (...values: Array<string | number | undefined>) => boolean,
 ) {
   if (!hasQuery) {
-    return checklist
+    return stage
   }
-
-  if (matchesQuery(checklist.stage, checklist.title, checklist.description, checklist.focus)) {
-    return checklist
+  if (matchesQuery(stage.name, stage.description, stage.focus)) {
+    return stage
   }
-
-  const sections = checklist.sections
-    .map((section) => {
-      // 注:旧文本字段(minimum/essentials/upgrades)已改为物品 ID 数组,
-      // 搜索匹配只看 section.system;其下的物品 ID 不参与文本匹配。
-      if (matchesQuery(section.system)) {
-        return section
-      }
-      return null
-    })
-    .filter((section) => section !== null)
-
-  if (sections.length === 0) {
-    return null
-  }
-
-  return {
-    ...checklist,
-    sections,
-  }
+  // 阶段下物品的过滤交给视图层(按 itemId 解出名字时再做)
+  return null
 }
 
 function filterCollectionByQuery(
@@ -141,7 +120,13 @@ export function useWorkspaceViewModel({
     () => ({
       ...workspace.shopping,
       systemDefinitions: workspace.shopping.systemDefinitions.filter((entry) =>
-        matchesQuery(entry.id, entry.summary, entry.keyQuestion, ...entry.secondaryGroups),
+        matchesQuery(
+          entry.id,
+          entry.name,
+          entry.summary,
+          entry.keyQuestion,
+          ...entry.secondaryGroups,
+        ),
       ),
       spaceDefinitions: workspace.shopping.spaceDefinitions.filter((entry) =>
         matchesQuery(entry.name),
@@ -149,67 +134,30 @@ export function useWorkspaceViewModel({
       spotlights: workspace.shopping.spotlights.filter((entry) =>
         matchesQuery(entry.title, entry.stage, entry.summary, entry.reason, ...entry.attention),
       ),
-      ownedItems: workspace.shopping.ownedItems.filter((entry) =>
+      items: workspace.shopping.items.filter((entry) =>
         matchesQuery(
           entry.name,
-          entry.system,
-          entry.category,
-          ...entry.spaces,
-          ...entry.stages,
-          entry.lifecycle,
-          entry.depreciation,
-          entry.status,
-          ownedStatusDisplayName(entry.status, i18next.t.bind(i18next)),
-          entry.replacementCue,
-          entry.note,
-          entry.quantity,
-        ),
-      ),
-      purchaseLanes: workspace.shopping.purchaseLanes.map((lane) => ({
-        ...lane,
-        items: lane.items.filter((entry) =>
-          matchesQuery(
-            lane.title,
-            lane.subtitle,
-            entry.name,
-            entry.system,
-            entry.category,
-            ...entry.stages,
-            ...entry.spaces,
-            // 注:necessity 与 tags 字段已删除
-            entry.lifecycle,
-            entry.depreciation,
-            entry.reason,
-            entry.targetLifestyle,
-            entry.currentPrice,
-            entry.buyBelowPrice,
-            entry.overpayPrice,
-            entry.note,
-            ...entry.keywords,
-          ),
-        ),
-      })),
-      stageChecklists: workspace.shopping.stageChecklists
-        .map((entry) => filterChecklistByQuery(entry, normalizedQuery.length > 0, matchesQuery))
-        .filter((entry) => entry !== null),
-      priceReferences: workspace.shopping.priceReferences.filter((entry) =>
-        matchesQuery(
-          entry.system,
-          entry.category,
-          entry.lifecycle,
-          entry.depreciation,
-          entry.entryPrice,
-          entry.sweetSpotPrice,
-          entry.overpayPrice,
+          ...entry.systemTags,
+          ...entry.spaceTags,
+          ...entry.children.map((c) => c.name),
+          ...entry.children.flatMap((child) => [
+            child.status,
+            child.lifecycle,
+            child.depreciation,
+            ...(child.channelPrices ?? []).map((channelPrice) => channelPrice.channel),
+          ]),
           entry.note,
         ),
       ),
+      stageTemplates: workspace.shopping.stageTemplates
+        .map((entry) => filterStageTemplateByQuery(entry, normalizedQuery.length > 0, matchesQuery))
+        .filter((entry): entry is ShoppingStageTemplate => entry !== null),
       boundaryEntries: workspace.shopping.boundaryEntries.filter((entry) =>
         matchesQuery(entry.item, entry.system, entry.reason),
       ),
       lifestyleCollections: workspace.shopping.lifestyleCollections
         .map((entry) => filterCollectionByQuery(entry, normalizedQuery.length > 0, matchesQuery))
-        .filter((entry) => entry !== null),
+        .filter((entry): entry is ShoppingLifestyleCollection => entry !== null),
     }),
     [matchesQuery, normalizedQuery.length, workspace.shopping],
   )
@@ -620,10 +568,7 @@ export function useWorkspaceViewModel({
   const socioeconomicsEntries = socioeconomicsModule.entries
   const socioeconomicsGaps = socioeconomicsModule.gaps
 
-  const visibleShoppingCount = shoppingModule.purchaseLanes.reduce(
-    (count, column) => count + column.items.length,
-    0,
-  )
+  const visibleShoppingCount = shoppingModule.items.length
 
   const visibleRelationshipCount = relationshipCircles.reduce(
     (count, circle) => count + circle.entries.length,

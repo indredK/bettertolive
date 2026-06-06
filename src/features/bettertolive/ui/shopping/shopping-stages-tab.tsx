@@ -1,380 +1,387 @@
-import { useCallback } from "react"
+import { Pencil, Plus, Trash2 } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
-import {
-  DndContext,
-  PointerSensor,
-  KeyboardSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core"
-import { SortableContext, sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable"
-import { Pencil, Sparkles } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { toast } from "sonner"
+
+import { DndContext, type DragEndEvent } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
+
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type {
+  ShoppingItem,
+  ShoppingModuleData,
+  ShoppingStageItem,
+  ShoppingStageTemplate,
+} from "@/features/bettertolive/types"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { TabsContent } from "@/components/ui/tabs"
-import type { ShoppingStageChecklist } from "@/features/bettertolive/types"
-import { AddCard } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+  deleteStageTemplate,
+  reorderStageTemplates,
+} from "@/features/bettertolive/api/shopping-crud-api"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import {
+  ShoppingDetailPane,
+  ShoppingEmptyDetailCard,
+  ShoppingSidebarPane,
+  ShoppingTabBody,
+  ShoppingTabViewport,
+} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import {
+  buildStageDimensionGroups,
+  type ShoppingStageViewMode,
+} from "@/features/bettertolive/ui/shopping/shopping-stage-utils"
 import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
-import { EmptyState, Surface } from "@/features/bettertolive/ui/shared/shared"
-import {
-  stageDisplayName,
-  systemDisplayName,
-} from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
 
-function StageDetailGroupedTable({
-  checklist,
-  itemsById,
-}: {
-  checklist: ShoppingStageChecklist
-  // 物品 ID → 名字 的解析表。section 各档位现在存的是物品 ID;在这里 resolve 出名字渲染
-  itemsById: Map<string, { id: string; name: string }>
-}) {
-  const { t } = useTranslation()
-  const sectionCount = checklist.sections.length
-  const totalItems = checklist.sections.reduce(
-    (sum, s) =>
-      sum +
-      (s.minimumItemIds?.length ?? 0) +
-      (s.essentialItemIds?.length ?? 0) +
-      (s.upgradeItemIds?.length ?? 0),
-    0,
-  )
-
-  return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]">
-      <div className="shrink-0 border-b border-[color:var(--muted-surface-border)] px-5 py-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <h3 className="text-lg font-semibold text-[color:var(--text-primary)]">
-              {checklist.title}
-            </h3>
-            <p className="mt-1 text-sm leading-6 text-[color:var(--text-secondary)]">
-              {checklist.description}
-            </p>
-          </div>
-          <div className="shrink-0 text-right text-xs text-[color:var(--text-muted)]">
-            <div>{stageDisplayName(checklist.stage, t)}</div>
-            <div className="mt-1">{t("shopping.stages.systemCount", { count: sectionCount })}</div>
-            <div>{t("shopping.stages.itemCount", { count: totalItems })}</div>
-          </div>
-        </div>
-        {checklist.focus ? (
-          <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-            {checklist.focus}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
-        <Table>
-          <TableHeader className="bg-[color:var(--surface-bg)]">
-            <TableRow>
-              <TableHead className="w-44">{t("shopping.stages.table.system")}</TableHead>
-              <TableHead className="w-32">{t("shopping.stages.table.group")}</TableHead>
-              <TableHead>{t("shopping.stages.table.items")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {checklist.sections.flatMap((section) => {
-              const groups = [
-                { label: t("shopping.stages.table.minimum"), ids: section.minimumItemIds ?? [] },
-                {
-                  label: t("shopping.stages.table.essentials"),
-                  ids: section.essentialItemIds ?? [],
-                },
-                { label: t("shopping.stages.table.upgrades"), ids: section.upgradeItemIds ?? [] },
-              ]
-
-              return groups.map((group, index) => (
-                <TableRow key={`${section.system}-${group.label}`} className="hover:bg-transparent">
-                  {index === 0 ? (
-                    <TableCell
-                      rowSpan={groups.length}
-                      className="align-top font-medium text-[color:var(--text-primary)]"
-                    >
-                      {systemDisplayName(section.system, t)}
-                    </TableCell>
-                  ) : null}
-                  <TableCell className="align-top text-[color:var(--text-secondary)]">
-                    {group.label}
-                  </TableCell>
-                  <TableCell className="align-top whitespace-normal">
-                    {group.ids.length > 0 ? (
-                      <ul className="list-disc space-y-1 pl-5 text-sm leading-6 text-[color:var(--text-secondary)]">
-                        {group.ids.map((id) => {
-                          const item = itemsById.get(id)
-                          return (
-                            <li
-                              key={id}
-                              className={
-                                item
-                                  ? undefined
-                                  : "text-[color:var(--text-muted)] italic opacity-60"
-                              }
-                            >
-                              {item?.name ?? t("shopping.stages.itemPicker.unresolved")}
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    ) : (
-                      <span className="text-sm text-[color:var(--text-muted)]">—</span>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-            })}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  )
-}
-
-function StageMapCard({
-  checklist,
-  isSelected,
-  onSelect,
-  isManagementMode,
-  onEdit,
-}: {
-  checklist: ShoppingStageChecklist
-  isSelected: boolean
-  onSelect: (stageId: string) => void
-  isManagementMode?: boolean
-  onEdit?: (checklist: ShoppingStageChecklist) => void
-}) {
-  const { t } = useTranslation()
-  const sectionCount = checklist.sections.length
-  const totalItems = checklist.sections.reduce(
-    (sum, section) =>
-      sum +
-      (section.minimumItemIds?.length ?? 0) +
-      (section.essentialItemIds?.length ?? 0) +
-      (section.upgradeItemIds?.length ?? 0),
-    0,
-  )
-  const systemNames = checklist.sections.map((section) => section.system)
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      className={cn(
-        "relative flex w-full flex-col gap-1.5 overflow-hidden rounded-xl border px-2.5 py-2 text-left transition-all duration-200 outline-none focus-visible:ring-3 focus-visible:ring-[color:var(--tone-present-border)]",
-        totalItems > 0
-          ? "border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]"
-          : "border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]",
-        isSelected &&
-          "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]/40 shadow-[0_4px_16px_rgba(15,23,42,0.06)]",
-      )}
-      onClick={() => onSelect(checklist.id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault()
-          onSelect(checklist.id)
-        }
-      }}
-    >
-      <div className="flex min-w-0 items-start gap-2 pr-6">
-        <div className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[11px] font-medium text-[color:var(--text-primary)]">
-          <Sparkles className="size-3.5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-[13px] font-medium text-[color:var(--text-primary)]">
-            {checklist.title}
-          </div>
-          <div className="truncate text-[11px] text-[color:var(--text-muted)]">
-            {stageDisplayName(checklist.stage, t)}
-          </div>
-        </div>
-      </div>
-
-      <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden")}>
-        <Badge
-          variant="outline"
-          className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-        >
-          {t("shopping.stages.systemCount", { count: sectionCount })}
-        </Badge>
-        <Badge
-          variant="outline"
-          className="h-5 shrink-0 border-[color:var(--tone-value-border)] bg-[color:var(--tone-value-bg)] px-1.5 text-[10px] text-[color:var(--tone-value-ink)]"
-        >
-          {t("shopping.stages.itemCount", { count: totalItems })}
-        </Badge>
-      </div>
-
-      <p className={cn("truncate text-[12px] leading-5 text-[color:var(--text-secondary)]")}>
-        {checklist.focus}
-      </p>
-
-      <div className={cn("flex min-w-0 items-center gap-1.5 overflow-hidden opacity-45")}>
-        {systemNames.slice(0, 3).map((system) => (
-          <Badge
-            key={system}
-            variant="outline"
-            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-          >
-            {systemDisplayName(system, t)}
-          </Badge>
-        ))}
-        {systemNames.length > 3 ? (
-          <Badge
-            variant="outline"
-            className="h-5 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-1.5 text-[10px] text-[color:var(--text-muted)]"
-          >
-            +{systemNames.length - 3}
-          </Badge>
-        ) : null}
-      </div>
-
-      {isManagementMode && onEdit ? (
-        <Button
-          size="icon-sm"
-          variant="ghost"
-          className="absolute top-2 right-2 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
-          onClick={(e) => {
-            e.stopPropagation()
-            onEdit(checklist)
-          }}
-        >
-          <Pencil className="size-3.5" />
-        </Button>
-      ) : null}
-    </div>
-  )
-}
-
 export function ShoppingStagesTab({
-  checklists,
-  selectedStageId,
-  isFixedLayout,
-  isManagementMode,
-  itemsById,
-  onSelectStage,
+  shopping,
+  stageTemplates,
+  searchQuery,
+  isControlMode,
   onEditStage,
-  onAddNew,
-  onReorder,
+  onDeleted,
 }: {
-  checklists: ShoppingStageChecklist[]
-  selectedStageId: string | null
-  isFixedLayout: boolean
-  isManagementMode?: boolean
-  // 物品 ID → 名字 的解析表(在 shopping-page.tsx 由 owned + plan 聚合)
-  itemsById: Map<string, { id: string; name: string }>
-  onSelectStage: (stageId: string) => void
-  onEditStage?: (checklist: ShoppingStageChecklist) => void
-  onAddNew?: (stage: string) => void
-  onReorder?: (orderedIds: string[]) => void
+  shopping: ShoppingModuleData
+  stageTemplates: ShoppingStageTemplate[]
+  searchQuery: string
+  isControlMode: boolean
+  onEditStage: (stage: ShoppingStageTemplate | null) => void
+  onDeleted: () => void
 }) {
   const { t } = useTranslation()
-  const selectedChecklist = checklists.find((c) => c.id === selectedStageId) ?? null
-  const newStage = selectedChecklist?.stage ?? checklists[0]?.stage ?? ""
+  const [rawActiveStageId, setRawActiveStageId] = useState<string | null>(
+    stageTemplates[0]?.id ?? null,
+  )
+  const [viewMode, setViewMode] = useState<ShoppingStageViewMode>("system")
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  const prevIdsRef = useRef<string[]>([])
+  const [orderedIds, setOrderedIds] = useState<string[]>(() =>
+    stageTemplates.map((stage) => stage.id),
   )
 
-  const checklistIds = checklists.map((c) => c.id)
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event
-      if (!over || active.id === over.id) return
+  useEffect(() => {
+    const currentIds = stageTemplates.map((stage) => stage.id)
+    const prevKey = prevIdsRef.current.join(",")
+    const curKey = currentIds.join(",")
+    if (curKey !== prevKey) {
+      setOrderedIds((prev) => {
+        const currentSet = new Set(currentIds)
+        const localSet = new Set(prev)
+        if (currentSet.size !== localSet.size || !currentIds.every((id) => localSet.has(id))) {
+          prevIdsRef.current = currentIds
+          return currentIds
+        }
+        return prev
+      })
+    }
+  }, [stageTemplates])
 
-      const oldIndex = checklistIds.indexOf(active.id as string)
-      const newIndex = checklistIds.indexOf(over.id as string)
-      if (oldIndex === -1 || newIndex === -1) return
-
-      onReorder?.(arrayMove(checklistIds, oldIndex, newIndex))
-    },
-    [checklistIds, onReorder],
+  const orderedStageTemplates = useMemo(
+    () =>
+      orderedIds
+        .map((id) => stageTemplates.find((stage) => stage.id === id))
+        .filter(Boolean) as ShoppingStageTemplate[],
+    [orderedIds, stageTemplates],
   )
 
-  const gridContent = (
-    <div className="grid min-h-0 flex-1 [scrollbar-width:thin] [scrollbar-color:var(--muted-surface-border)_transparent] auto-rows-max grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2 overflow-y-auto pr-1">
-      {isManagementMode && onAddNew ? <AddCard onClick={() => onAddNew(newStage)} /> : null}
-      {checklists.length > 0 ? (
-        checklists.map((checklist) =>
-          isManagementMode ? (
-            <SortableShoppingCard key={checklist.id} id={checklist.id}>
-              <StageMapCard
-                checklist={checklist}
-                isSelected={selectedStageId === checklist.id}
-                onSelect={onSelectStage}
-                isManagementMode={isManagementMode}
-                onEdit={onEditStage}
-              />
-            </SortableShoppingCard>
-          ) : (
-            <StageMapCard
-              key={checklist.id}
-              checklist={checklist}
-              isSelected={selectedStageId === checklist.id}
-              onSelect={onSelectStage}
-            />
-          ),
-        )
-      ) : (
-        <EmptyState message={t("shopping.stages.noTemplates")} />
-      )}
-    </div>
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const visibleStageTemplates = useMemo(() => {
+    if (!normalizedQuery) return orderedStageTemplates
+    return orderedStageTemplates.filter((stage) =>
+      `${stage.name} ${stage.description ?? ""}`.toLowerCase().includes(normalizedQuery),
+    )
+  }, [normalizedQuery, orderedStageTemplates])
+
+  const activeStageId = useMemo(() => {
+    if (visibleStageTemplates.length === 0) return null
+    if (rawActiveStageId && visibleStageTemplates.some((stage) => stage.id === rawActiveStageId)) {
+      return rawActiveStageId
+    }
+    return visibleStageTemplates[0]?.id ?? null
+  }, [visibleStageTemplates, rawActiveStageId])
+
+  const activeStage = useMemo(
+    () => visibleStageTemplates.find((stage) => stage.id === activeStageId) ?? null,
+    [activeStageId, visibleStageTemplates],
   )
+
+  const handleDelete = (id: string, name: string) => {
+    confirmUndoableDelete({
+      confirmMessage: t("shopping.confirm.deleteStage", `确定删除 ${name} 吗？`),
+      pendingMessage: t("shopping.toast.deletePendingStage", {
+        name,
+        defaultValue: `已加入删除队列：${name}，5 秒内可撤销`,
+      }),
+      successMessage: t("shopping.toast.deleteSuccessStage", {
+        name,
+        defaultValue: `已删除阶段：${name}`,
+      }),
+      failureMessage: t("shopping.toast.deleteFailedStage", "删除阶段失败"),
+      undoLabel: t("shopping.undo", "撤销"),
+      undoneMessage: t("shopping.toast.deleteUndoneStage", {
+        name,
+        defaultValue: `已撤销删除：${name}`,
+      }),
+      onDelete: () => deleteStageTemplate(id),
+      onDeleted,
+    })
+  }
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const activeId = String(active.id)
+    const overId = String(over.id)
+    const visibleIds = visibleStageTemplates.map((stage) => stage.id)
+    const visibleSet = new Set(visibleIds)
+    const visibleOldIndex = visibleIds.indexOf(activeId)
+    const visibleNewIndex = visibleIds.indexOf(overId)
+    if (visibleOldIndex === -1 || visibleNewIndex === -1) return
+
+    const visibleOrder = [...visibleIds]
+    visibleOrder.splice(visibleOldIndex, 1)
+    visibleOrder.splice(visibleNewIndex, 0, activeId)
+
+    let nextVisibleIndex = 0
+    const nextOrder = orderedIds.map((id) =>
+      visibleSet.has(id) ? visibleOrder[nextVisibleIndex++] : id,
+    )
+    const previousOrder = [...orderedIds]
+    setOrderedIds(nextOrder)
+
+    try {
+      await reorderStageTemplates(nextOrder)
+      toast.success(t("shopping.stages.reordered", "阶段顺序已更新"))
+      onDeleted()
+    } catch (err) {
+      toast.error(String(err))
+      setOrderedIds(previousOrder)
+    }
+  }
 
   return (
-    <TabsContent
-      value="stages"
-      className={cn("space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
-    >
-      <div
-        className={cn(
-          "grid gap-4",
-          isFixedLayout
-            ? "min-h-0 flex-1 grid-cols-[1fr_2fr]"
-            : "grid-cols-1 lg:grid-cols-[1fr_2fr]",
-          isFixedLayout && "h-full",
-        )}
-      >
-        {/* Left: Stage Cards */}
-        <Surface className={cn("flex min-h-0 flex-col p-3", isFixedLayout && "min-h-0")}>
-          {isManagementMode ? (
-            <DndContext
-              sensors={sensors}
-              collisionDetection={closestCenter}
-              onDragEnd={handleDragEnd}
-            >
-              <SortableContext items={checklistIds}>{gridContent}</SortableContext>
-            </DndContext>
-          ) : (
-            gridContent
-          )}
-        </Surface>
-
-        {/* Right: Detail Panel */}
-        <div className="min-h-0 overflow-hidden">
-          {selectedChecklist ? (
-            <StageDetailGroupedTable checklist={selectedChecklist} itemsById={itemsById} />
-          ) : (
-            <div className="flex h-full items-center justify-center rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)]">
-              <p className="text-sm text-[color:var(--text-muted)]">
-                {t("shopping.stages.selectPrompt")}
-              </p>
-            </div>
-          )}
+    <ShoppingTabViewport>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h3 className="text-lg font-medium">{t("shopping.stages.title", "阶段适用")}</h3>
+          <span
+            className={cn(
+              "rounded-full border px-2 py-0.5 text-[11px]",
+              isControlMode
+                ? "border-primary bg-primary/10 text-primary"
+                : "border-muted-foreground/30 bg-muted text-muted-foreground",
+            )}
+          >
+            {isControlMode
+              ? t("shopping.controlMode.on", "控制模式")
+              : t("shopping.controlMode.off", "浏览模式")}
+          </span>
         </div>
+        {isControlMode && (
+          <Button size="sm" onClick={() => onEditStage(null)}>
+            <Plus className="mr-1 h-4 w-4" />
+            {t("shopping.stages.addStage", "新增阶段")}
+          </Button>
+        )}
       </div>
-    </TabsContent>
+
+      {visibleStageTemplates.length === 0 ? (
+        <div className="bg-card text-muted-foreground rounded-md border p-6 text-center text-sm">
+          {normalizedQuery
+            ? t("shopping.stages.noMatchingStages", "没有匹配的阶段适用")
+            : t("shopping.stages.empty", "还没有阶段适用,点击「新增阶段」开始")}
+        </div>
+      ) : (
+        <ShoppingTabBody>
+          {/* 左侧:阶段列表 */}
+          <ShoppingSidebarPane contentClassName="gap-2">
+            <DndContext onDragEnd={handleDragEnd}>
+              <SortableContext
+                items={visibleStageTemplates.map((stage) => stage.id)}
+                strategy={verticalListSortingStrategy}
+                disabled={!isControlMode}
+              >
+                {visibleStageTemplates.map((stage) => (
+                  <SortableShoppingCard key={stage.id} id={stage.id} disabled={!isControlMode}>
+                    <div
+                      className={cn(
+                        "rounded-lg border transition-all duration-150",
+                        activeStageId === stage.id
+                          ? "border-primary bg-primary/10"
+                          : "border-border bg-card hover:border-primary/50",
+                      )}
+                    >
+                      <div className="flex items-start gap-2 px-3 py-2.5">
+                        <button
+                          type="button"
+                          onClick={() => setRawActiveStageId(stage.id)}
+                          className="focus-visible:ring-primary flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
+                        >
+                          <span className="truncate text-[13px] font-medium">{stage.name}</span>
+                          <span className="text-muted-foreground text-xs">
+                            {stage.items.length} 个物品
+                          </span>
+                        </button>
+                        {isControlMode && (
+                          <Button
+                            size="icon-sm"
+                            variant="ghost"
+                            className="h-6 w-6 shrink-0"
+                            onClick={() => onEditStage(stage)}
+                          >
+                            <Pencil className="size-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </SortableShoppingCard>
+                ))}
+              </SortableContext>
+            </DndContext>
+          </ShoppingSidebarPane>
+
+          {/* 右侧:阶段详情 + 视图切换 */}
+          {activeStage && (
+            <ShoppingDetailPane>
+              <Card className="flex h-full min-h-0 flex-col">
+                <CardHeader className="flex shrink-0 flex-row items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <CardTitle>{activeStage.name}</CardTitle>
+                    {activeStage.description && (
+                      <div className="text-muted-foreground text-xs">{activeStage.description}</div>
+                    )}
+                    {activeStage.focus && (
+                      <div className="text-muted-foreground text-xs">{activeStage.focus}</div>
+                    )}
+                  </div>
+                  {isControlMode && (
+                    <div className="flex shrink-0 items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(activeStage.id, activeStage.name)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </CardHeader>
+                <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                  <Tabs
+                    value={viewMode}
+                    onValueChange={(v) => setViewMode(v as ShoppingStageViewMode)}
+                    className="min-h-0 flex-1 overflow-hidden"
+                  >
+                    <TabsList className="mb-3 shrink-0">
+                      <TabsTrigger value="system">
+                        {t("shopping.stages.systemView", "系统视图")}
+                      </TabsTrigger>
+                      <TabsTrigger value="space">
+                        {t("shopping.stages.spaceView", "空间视图")}
+                      </TabsTrigger>
+                    </TabsList>
+
+                    <div className="min-h-0 flex-1 overflow-y-auto">
+                      <StageItemsView
+                        stage={activeStage}
+                        allItems={shopping.items}
+                        viewMode={viewMode}
+                        shopping={shopping}
+                      />
+                    </div>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </ShoppingDetailPane>
+          )}
+          {!activeStage && (
+            <ShoppingDetailPane>
+              <ShoppingEmptyDetailCard
+                message={t("shopping.stages.selectPrompt", "从左侧选择一个阶段查看详情")}
+              />
+            </ShoppingDetailPane>
+          )}
+        </ShoppingTabBody>
+      )}
+    </ShoppingTabViewport>
+  )
+}
+
+function StageItemsView({
+  stage,
+  allItems,
+  viewMode,
+  shopping,
+}: {
+  stage: ShoppingStageTemplate
+  allItems: ShoppingItem[]
+  viewMode: ShoppingStageViewMode
+  shopping: ShoppingModuleData
+}) {
+  const { t } = useTranslation()
+  const groups = useMemo(() => {
+    return buildStageDimensionGroups(stage, allItems, shopping, viewMode)
+  }, [allItems, shopping, stage, viewMode])
+
+  const hasAnyEntries = groups.some((group) => group.entries.length > 0)
+
+  if (stage.items.length === 0) {
+    return (
+      <div className="text-muted-foreground text-xs">
+        {t("shopping.stages.noItems", "该阶段还没有物品,在「编辑」里添加")}
+      </div>
+    )
+  }
+
+  if (!hasAnyEntries) {
+    return (
+      <div className="text-muted-foreground text-xs">
+        {t("shopping.stages.noVisibleGroups", "当前视角下还没有可展示的维度")}
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      {groups
+        .filter((g) => g.entries.length > 0)
+        .map((g) => (
+          <div key={g.key}>
+            <div className="mb-2 text-sm font-medium">{g.label}</div>
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+              {g.entries.map(({ item, stageItem }) => (
+                <StageItemCard key={item.id} item={item} stageItem={stageItem} />
+              ))}
+            </div>
+          </div>
+        ))}
+    </div>
+  )
+}
+
+function StageItemCard({ item, stageItem }: { item: ShoppingItem; stageItem: ShoppingStageItem }) {
+  const { t } = useTranslation()
+  const renderTier = (label: string, ids: string[]) => {
+    const names = ids
+      .map((id) => item.children.find((c) => c.id === id)?.name ?? id)
+      .filter(Boolean)
+    if (names.length === 0) return null
+    return (
+      <div className="text-muted-foreground text-xs">
+        <span className="font-medium">{label}:</span> {names.join(", ")}
+      </div>
+    )
+  }
+  return (
+    <div className="bg-card rounded-md border p-3">
+      <div className="font-medium">{item.name}</div>
+      <div className="mt-1 space-y-0.5">
+        {renderTier(t("shopping.stages.tier.low", "最低"), stageItem.tiers.low)}
+        {renderTier(t("shopping.stages.tier.base", "基础"), stageItem.tiers.base)}
+        {renderTier(t("shopping.stages.tier.up", "升级"), stageItem.tiers.up)}
+      </div>
+    </div>
   )
 }

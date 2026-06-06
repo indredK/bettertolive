@@ -1,15 +1,14 @@
 use serde::{Deserialize, Serialize};
 use specta::Type;
 
-// ---- Enums (as strings) ----
+// ---- 类型别名(全部为字符串,枚举值在前端定义) ----
 
-// 注:ShoppingNeedLevel 已删除 — 物品的必要程度由阶段模板的档位承载
 pub type ShoppingSystem = String;
-pub type ShoppingStage = String;
 pub type ShoppingLifecycle = String;
 pub type ShoppingDepreciation = String;
+pub type ShoppingStatus = String; // "Owned" | "Wanted"
 
-// ---- DTOs ----
+// ---- 基础展示 DTO(保留) ----
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -26,6 +25,7 @@ pub struct ShoppingSpotlightDto {
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingSystemDefinitionDto {
     pub id: ShoppingSystem,
+    pub name: String,
     pub summary: String,
     pub key_question: String,
     pub secondary_groups: Vec<String>,
@@ -36,98 +36,85 @@ pub struct ShoppingSystemDefinitionDto {
 pub struct ShoppingSpaceDefinitionDto {
     pub id: String,
     pub name: String,
+    #[serde(default)]
+    pub note: String,
+}
+
+// ---- 物品(统一,跨 Tab 共享) ----
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingItemChildChannelDto {
+    pub id: String,
+    pub channel: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entry_price: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sweet_spot_price: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub overpay_price: Option<f64>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct ShoppingItemBaseDto {
-    pub system: ShoppingSystem,
-    pub category: String,
-    pub spaces: Vec<String>,
-    pub stages: Vec<ShoppingStage>,
-    // 注:necessity 字段已迁移到阶段模板的档位,这里通过 #[serde(default)] 容忍旧数据
-    pub lifecycle: ShoppingLifecycle,
+pub struct ShoppingItemChildDto {
+    pub id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<ShoppingStatus>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lifecycle: Option<ShoppingLifecycle>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub depreciation: Option<ShoppingDepreciation>,
+    #[serde(default)]
+    pub channel_prices: Vec<ShoppingItemChildChannelDto>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct ShoppingOwnedItemDto {
-    #[serde(flatten)]
-    pub base: ShoppingItemBaseDto,
+pub struct ShoppingItemDto {
     pub id: String,
     pub name: String,
-    pub quantity: i32,
-    pub status: String,
-    pub replacement_cue: String,
+    pub children: Vec<ShoppingItemChildDto>,
+
+    // 分组标签(必填多选)
+    pub system_tags: Vec<ShoppingSystem>,
+    pub space_tags: Vec<String>,
+
+    // 通用备注
     pub note: String,
 }
 
+// ---- 阶段模板 ----
+
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
-pub struct ShoppingPlanItemDto {
-    #[serde(flatten)]
-    pub base: ShoppingItemBaseDto,
+pub struct ShoppingStageItemTiersDto {
+    pub low: Vec<String>,
+    pub base: Vec<String>,
+    pub up: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingStageItemDto {
+    pub item_id: String,
+    pub tiers: ShoppingStageItemTiersDto,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingStageTemplateDto {
     pub id: String,
     pub name: String,
-    pub reason: String,
-    pub target_lifestyle: String,
-    pub current_price: f64,
-    pub buy_below_price: f64,
-    pub overpay_price: f64,
-    pub note: String,
-    // 注:tags 字段已删除 — 物品的标签由 system/spaces/stages 三字段在显示层渲染
-    pub keywords: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoppingPurchaseLaneDto {
-    pub id: String,
-    pub title: String,
-    pub subtitle: String,
-    pub items: Vec<ShoppingPlanItemDto>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoppingStageChecklistSectionDto {
-    pub system: ShoppingSystem,
-    // 注:各档位现在存物品 ID 数组(指向 owned 或 plan item),不再是手写文本
-    #[serde(default)]
-    pub minimum_item_ids: Vec<String>,
-    #[serde(default)]
-    pub essential_item_ids: Vec<String>,
-    #[serde(default)]
-    pub upgrade_item_ids: Vec<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoppingStageChecklistDto {
-    pub id: String,
-    pub stage: ShoppingStage,
-    pub title: String,
     pub description: String,
     pub focus: String,
-    pub sections: Vec<ShoppingStageChecklistSectionDto>,
+    pub system_dimension_ids: Vec<String>,
+    pub space_dimension_ids: Vec<String>,
+    pub items: Vec<ShoppingStageItemDto>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Type)]
-#[serde(rename_all = "camelCase")]
-pub struct ShoppingPriceReferenceDto {
-    pub id: String,
-    pub system: ShoppingSystem,
-    pub category: String,
-    pub lifecycle: ShoppingLifecycle,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub depreciation: Option<ShoppingDepreciation>,
-    pub entry_price: f64,
-    pub sweet_spot_price: f64,
-    pub overpay_price: f64,
-    pub note: String,
-}
+// ---- 文档辅助(保留) ----
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
@@ -147,16 +134,16 @@ pub struct ShoppingLifestyleCollectionDto {
     pub items: Vec<String>,
 }
 
+// ---- 模块聚合 DTO ----
+
 #[derive(Debug, Clone, Serialize, Deserialize, Type, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingModuleDto {
     pub system_definitions: Vec<ShoppingSystemDefinitionDto>,
     pub space_definitions: Vec<ShoppingSpaceDefinitionDto>,
     pub spotlights: Vec<ShoppingSpotlightDto>,
-    pub owned_items: Vec<ShoppingOwnedItemDto>,
-    pub purchase_lanes: Vec<ShoppingPurchaseLaneDto>,
-    pub stage_checklists: Vec<ShoppingStageChecklistDto>,
-    pub price_references: Vec<ShoppingPriceReferenceDto>,
+    pub items: Vec<ShoppingItemDto>,
+    pub stage_templates: Vec<ShoppingStageTemplateDto>,
     pub boundary_entries: Vec<ShoppingBoundaryEntryDto>,
     pub lifestyle_collections: Vec<ShoppingLifestyleCollectionDto>,
 }

@@ -16,56 +16,70 @@ import type {
   PrinciplesModuleData,
   ReflectionModuleData,
   RelationshipsModuleData,
+  ShoppingItem,
+  ShoppingItemChild,
   ShoppingModuleData,
-  ShoppingOwnedStatus,
+  ShoppingStageTemplate,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
 
 // ---- Shopping CRUD types ----
 
-export type ShoppingOwnedItemForm = {
+// 统一物品的 Form(取代旧的 ShoppingOwnedItemForm 与 ShoppingPlanItemForm)
+// 注: note 和 children.channelPrices 在后端 Rust 侧均为 #[serde(default)],
+// 因此 Specta 生成的类型中它们为 optional。此处保持与后端一致。
+export type ShoppingItemForm = {
   id?: string | null
   name: string
-  system: string
-  category: string
-  spaces: string[]
-  // 注:已删除 necessity — 该信息由阶段模板的档位承载
-  lifecycle: string
-  depreciation?: string | null
-  quantity: number
-  status: ShoppingOwnedStatus
-  replacementCue: string
-  note: string
-  laneId?: string
-  reason?: string
-  targetLifestyle?: string
-  currentPrice?: number | null
-  buyBelowPrice?: number | null
-  overpayPrice?: number | null
-  keywords?: string[]
+  children: ShoppingItemChild[] // 子级清单
+  systemTags: string[] // 必填,≥1
+  spaceTags: string[] // 必填,≥1
+  note?: string
 }
 
-export type ShoppingPlanItemForm = {
-  id?: string | null
-  laneId: string
+// 物品 Row(后端原始 DB 行,扁平字段;子级和多对多关系单独获取)
+export type ShoppingItemRow = {
+  id: string
   name: string
-  system: string
-  category: string
-  spaces: string[]
-  // 注:已删除 necessity 与 tags — 物品的"标签"在显示层由 system/spaces/stages 渲染
+  status: string
+  lane: string | null
   lifecycle: string
-  depreciation?: string | null
-  reason: string
-  targetLifestyle: string
-  currentPrice: number | null
-  buyBelowPrice: number | null
-  overpayPrice: number | null
+  depreciation: string | null
+  entry_price: number | null
+  sweet_spot_price: number | null
+  overpay_price: number | null
   note: string
-  keywords: string[]
-  quantity?: number
-  status?: ShoppingOwnedStatus
-  replacementCue?: string
+  quantity: number | null
+  health_status: string | null
+  replacement_cue: string | null
+  reason: string | null
+  target_lifestyle: string | null
+  current_price: number | null
+  buy_below_price: number | null
+  keywords_json: string | null
+  sort_order: number
+  is_archived: boolean
+  created_at: string
+  updated_at: string
+}
+
+// 阶段模板 Form
+export type ShoppingStageTemplateForm = {
+  id?: string | null
+  name: string
+  description: string
+  focus: string
+  systemDimensionIds: string[]
+  spaceDimensionIds: string[]
+  items: {
+    itemId: string
+    tiers: {
+      low: string[]
+      base: string[]
+      up: string[]
+    }
+  }[]
 }
 
 export type ShoppingPageContentForm = {
@@ -81,6 +95,7 @@ export type ShoppingPageContentForm = {
 
 export type ShoppingSystemDefinitionForm = {
   id: string
+  name: string
   summary: string
   keyQuestion: string
   secondaryGroups: string[]
@@ -89,45 +104,7 @@ export type ShoppingSystemDefinitionForm = {
 export type ShoppingSpaceDefinitionForm = {
   id?: string | null
   name: string
-}
-
-export type ShoppingOwnedItemRow = {
-  id: string
-  name: string
-  system_id: string
-  category: string
-  // 注:DB 列 necessity 仍存在但已停止使用;Rust 端 struct 字段用 #[serde(default)] 容忍
-  lifecycle: string
-  depreciation: string | null
-  quantity: number
-  status: string
-  replacement_cue: string
-  note: string
-  sort_order: number
-  is_archived: boolean
-  created_at: string
-  updated_at: string
-}
-
-export type ShoppingPlanItemRow = {
-  id: string
-  lane_id: string
-  name: string
-  system_id: string
-  category: string
-  // 注:DB 列 necessity/tags 仍存在但已停止使用
-  lifecycle: string
-  depreciation: string | null
-  reason: string
-  target_lifestyle: string
-  current_price: number | null
-  buy_below_price: number | null
-  overpay_price: number | null
-  note: string
-  sort_order: number
-  is_archived: boolean
-  created_at: string
-  updated_at: string
+  note?: string
 }
 
 export type ShoppingPageContentRow = {
@@ -144,6 +121,12 @@ export type ShoppingPageContentRow = {
   created_at: string
   updated_at: string
 }
+
+// 向后兼容(给尚未迁移完的旧 UI 代码用):
+// 待 UI 全部迁移完成后,删除以下别名
+export type ShoppingOwnedItem = ShoppingItem
+export type ShoppingPlanItem = ShoppingItem
+export type { ShoppingItem, ShoppingItemChild, ShoppingStageTemplate }
 
 export type BetterToLiveApi = {
   getOverview: () => Promise<OverviewModuleData>

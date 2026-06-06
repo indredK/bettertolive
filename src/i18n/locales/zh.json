@@ -7,10 +7,10 @@
     },
     "tabs": {
       "overview": "总览",
-      "systems": "系统地图",
-      "spaces": "空间巡检",
-      "stages": "阶段模板",
-      "planning": "采购决策",
+      "systems": "物件系统",
+      "spaces": "空间场景",
+      "stages": "阶段适用",
+      "planning": "物件库",
       "admin": "管理"
     },
     "cardGrid": {
@@ -18,8 +18,25 @@
     },
     "toast": {
       "reorderSuccess": "排序已更新",
-      "reorderFailed": "排序更新失败，请重试"
+      "reorderFailed": "排序更新失败，请重试",
+      "deletePendingItem": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deletePendingSystem": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deletePendingSpace": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deletePendingStage": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deleteSuccessItem": "已删除物件：{{name}}",
+      "deleteSuccessSystem": "已删除系统：{{name}}",
+      "deleteSuccessSpace": "已删除空间：{{name}}",
+      "deleteSuccessStage": "已删除阶段：{{name}}",
+      "deleteFailedItem": "删除物件失败",
+      "deleteFailedSystem": "删除系统失败",
+      "deleteFailedSpace": "删除空间失败",
+      "deleteFailedStage": "删除阶段失败",
+      "deleteUndoneItem": "已撤销删除：{{name}}",
+      "deleteUndoneSystem": "已撤销删除：{{name}}",
+      "deleteUndoneSpace": "已撤销删除：{{name}}",
+      "deleteUndoneStage": "已撤销删除：{{name}}"
     },
+    "undo": "撤销",
     "overview": {
       "currentFocus": "当前该先看什么",
       "currentFocusDesc": "这些不是随机想法，而是从系统缺口、动作节奏和购买判断里冒出来的提醒。",
@@ -31,7 +48,7 @@
       "lifestyle": "生活方式",
       "boundary": "边界约定",
       "actionRhythm": "动作节奏",
-      "actionRhythmDesc": "同样都是\u201c需要\u201d，但下一步完全不同：补货、等好价、一次备齐，还是别乱动。",
+      "actionRhythmDesc": "同样都是“需要”，但下一步完全不同：补货、等好价、一次备齐，还是别乱动。",
       "purchaseAlerts": "购买提醒",
       "purchaseAlertsDesc": "把折旧、慢慢买好和基础补齐放在同一块里看，方便快速切换。",
       "highDepreciation": "高折旧",
@@ -51,7 +68,7 @@
       },
       "space": {
         "answer": "它放在哪？",
-        "detail": "卧室、书桌、厨房、玄关，帮助你按空间巡检。",
+        "detail": "卧室、书桌、厨房、玄关，帮助你按空间场景整理。",
         "cue": "把它放回真实空间里看，你会更容易发现缺件和重复购买。"
       },
       "stage": {
@@ -91,7 +108,8 @@
     "priceSignal": {
       "inBuyZone": "已进可买区间",
       "overpriced": "当前偏贵",
-      "watchOnly": "先观察"
+      "watchOnly": "先观察",
+      "title": "价格信号"
     },
     "validation": {
       "required": "请填写{{field}}",
@@ -105,7 +123,7 @@
       "jsonArray": "{{field}}必须是 JSON 数组",
       "priceOrder": "购入价格不能高于超付价格",
       "invalidForm": "表单内容不符合要求，请检查后再保存",
-      "duplicateSystem": "同一个阶段模板里不能重复选择系统",
+      "duplicateSystem": "同一个阶段适用里不能重复选择系统",
       "emptySection": "每个系统分组至少要填写一项内容",
       "duplicateName": "名称已存在，请换一个"
     },
@@ -160,6 +178,13 @@
         "NeedRestock": "需要补货",
         "MissingParts": "缺补件",
         "NeedComplete": "需要补齐"
+      },
+      "healthStatus": {
+        "StableUse": "稳定使用",
+        "ConsiderUpgrade": "考虑升级",
+        "NeedRestock": "需要补货",
+        "MissingParts": "缺补件",
+        "NeedComplete": "需要补齐"
       }
     },
     "laneName": {
@@ -187,7 +212,7 @@
       "editDescription": "修改系统卡片的分组、摘要和核心问题。",
       "confirmDelete": "确定要删除这个系统卡片吗？",
       "selectPrompt": "选择一个系统查看详情",
-      "noSystemData": "当前筛选下没有系统地图数据。",
+      "noSystemData": "当前筛选下没有物件系统数据。",
       "form": {
         "system": "名称",
         "systemPlaceholder": "例如：睡眠",
@@ -196,10 +221,15 @@
         "secondaryGroups": "二级分组",
         "secondaryGroupsHelp": "使用逗号分隔多个二级分组",
         "assignItems": "本系统下的物品",
-        "assignItemsHelp": "从所有物品中挑出归属本系统的物品；取消选中不会从原系统中移除",
+        "assignItemsHelp": "将属于此系统的物品移至右侧，保存后生效",
         "cancel": "取消",
-        "save": "保存"
-      }
+        "save": "保存",
+        "autoId": "自动生成 ID:",
+        "basicInfo": "基本信息",
+        "name": "名称"
+      },
+      "itemCount": "{{count}} 个物品",
+      "emptySystem": "当前系统下暂无物品"
     },
     "spaces": {
       "totalItemsAndSystems": "共 {{total}} 项 · {{systems}} 个系统",
@@ -219,9 +249,12 @@
       "form": {
         "name": "空间名称",
         "assignItems": "本空间下的物品",
-        "assignItemsHelp": "从所有物品中挑出归属本空间的物品;勾选 = 加入该空间,取消勾选 = 从该空间移除",
+        "assignItemsHelp": "将属于此空间的物品移至右侧，保存后生效",
         "cancel": "取消",
-        "save": "保存"
+        "save": "保存",
+        "basicInfo": "基本信息",
+        "note": "备注",
+        "notePlaceholder": "描述这个空间的特点、用途等"
       },
       "table": {
         "itemName": "物品名称",
@@ -230,13 +263,15 @@
         "stage": "阶段",
         "tag": "标签",
         "owned": "已拥有"
-      }
+      },
+      "summary": "共 {{total}} 项 · {{systems}} 个系统",
+      "emptySpace": "当前空间下暂无物品"
     },
     "stages": {
       "systemCount": "{{count}} 个系统",
       "itemCount": "{{count}} 条物品",
       "selectPrompt": "选择一个阶段查看详情",
-      "noTemplates": "当前筛选下没有阶段模板。",
+      "noTemplates": "当前筛选下没有阶段适用。",
       "table": {
         "system": "系统",
         "minimum": "最低配置",
@@ -246,11 +281,11 @@
         "upgrades": "升级配置"
       },
       "noStageItems": "当前阶段暂时没有这一层。",
-      "confirmDelete": "确定要删除这个阶段模板吗？",
-      "newTitle": "新建阶段模板",
+      "confirmDelete": "确定要删除这个阶段适用吗？",
+      "newTitle": "新建阶段适用",
       "editTitle": "编辑 {{title}}",
-      "newDescription": "填写阶段模板的基本信息，并按系统逐组维护阶段清单。",
-      "editDescription": "修改阶段模板的标题、描述或系统清单结构。",
+      "newDescription": "填写阶段适用的基本信息，并按系统逐组维护阶段清单。",
+      "editDescription": "修改阶段适用的标题、描述或系统清单结构。",
       "form": {
         "title": "标题",
         "titlePlaceholder": "例如:刚搬进来",
@@ -272,7 +307,7 @@
       "itemPicker": {
         "search": "搜索...",
         "placeholder": "未选(可空)",
-        "noItemsForSystem": "该系统下还没有物品,先去采购决策里创建",
+        "noItemsForSystem": "该系统下还没有物品,先去物件库里创建",
         "unresolved": "(物品已删除或不存在)"
       }
     },
@@ -304,7 +339,8 @@
         "entryPrice": "入门价",
         "comfortZone": "舒适区间",
         "overpay": "偏贵"
-      }
+      },
+      "title": "物件库"
     },
     "shared": {
       "boundaryTable": {
@@ -371,12 +407,12 @@
           "name": "名称",
           "laneId": "购买策略",
           "selectLane": "选择购买策略",
-          "systemId": "系统地图",
+          "systemId": "物件系统",
           "category": "分类",
           "necessity": "必要性",
           "lifecycle": "生命周期",
           "depreciation": "折旧程度",
-          "spaces": "空间巡检",
+          "spaces": "空间场景",
           "stages": "适用阶段",
           "quantity": "数量",
           "status": "状态",
@@ -428,7 +464,7 @@
         "count": "{{count}} 条",
         "contentList": "{{type}} 内容列表",
         "contentListDesc": "集中维护当前分类下的标题、摘要与关联字段。",
-        "noContent": "暂无 {{type}} 内容，点击\u201c新增内容\u201d开始添加。",
+        "noContent": "暂无 {{type}} 内容，点击“新增内容”开始添加。",
         "newContentTitle": "新增页面内容",
         "editContentTitle": "编辑内容：{{title}}",
         "saveInstructions": "填写内容信息后点击保存。",
@@ -446,7 +482,7 @@
         },
         "type": {
           "spotlight": "焦点提醒",
-          "stageChecklist": "阶段模板",
+          "stageChecklist": "阶段适用",
           "priceReference": "价格参考",
           "boundaryEntry": "边界约定",
           "lifestyleCollection": "生活方式"
@@ -467,6 +503,14 @@
           "bodyPlaceholder": "{\"key\": \"value\"}"
         }
       }
+    },
+    "item": {
+      "children": "子级"
+    },
+    "priceRef": {
+      "entry": "入门",
+      "sweet": "甜蜜",
+      "overpay": "虚高"
     }
   },
   "shell": {

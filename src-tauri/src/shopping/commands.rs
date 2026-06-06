@@ -1,23 +1,25 @@
+#![allow(clippy::too_many_arguments, clippy::type_complexity)]
+
 use crate::shopping::db::chrono_now;
 use crate::shopping::dto::{
-    ShoppingModuleDto, ShoppingOwnedItemDto, ShoppingPlanItemDto, WorkspaceSnapshotDto,
+    ShoppingItemDto, ShoppingModuleDto, ShoppingSpaceDefinitionDto, ShoppingStageTemplateDto,
+    WorkspaceSnapshotDto,
 };
-use crate::shopping::models::{OwnedItemRow, PageContentRow, PlanItemRow};
+use crate::shopping::models::{ItemChildChannelWriteModel, ItemChildWriteModel, PageContentRow};
 use crate::shopping::repository::ShoppingRepository;
 use rusqlite::params;
 use std::sync::Mutex;
 use tauri::State;
 
-/// Application state holding the SQLite connection.
+/// 应用状态:持有 SQLite 连接。
 pub struct AppState {
     pub db: Mutex<rusqlite::Connection>,
 }
 
 // =====================
-// Read-only aggregation commands
+// 聚合查询
 // =====================
 
-/// Returns the full shopping module content aggregated from relational tables.
 #[tauri::command]
 #[specta::specta]
 pub fn get_shopping(state: State<AppState>) -> Result<ShoppingModuleDto, String> {
@@ -25,7 +27,6 @@ pub fn get_shopping(state: State<AppState>) -> Result<ShoppingModuleDto, String>
     ShoppingRepository::get_shopping_module_aggregated(&conn)
 }
 
-/// Returns the workspace snapshot with all modules.
 #[tauri::command]
 pub fn get_workspace_snapshot(state: State<AppState>) -> Result<WorkspaceSnapshotDto, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
@@ -51,240 +52,279 @@ pub fn get_workspace_snapshot(state: State<AppState>) -> Result<WorkspaceSnapsho
 }
 
 // =====================
-// Owned Item CRUD commands
+// 系统定义 CRUD
 // =====================
 
 #[derive(Debug, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct OwnedItemFormDto {
+pub struct SystemDefinitionFormDto {
+    pub id: String,
+    pub name: String,
+    pub summary: String,
+    pub key_question: String,
+    pub secondary_groups: Vec<String>,
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn create_system_definition(
+    state: State<AppState>,
+    form: SystemDefinitionFormDto,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::create_system_definition(
+        &conn,
+        &form.id,
+        &form.name,
+        &form.summary,
+        &form.key_question,
+        &form.secondary_groups,
+        &now,
+    )
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_system_definition(
+    state: State<AppState>,
+    form: SystemDefinitionFormDto,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::update_system_definition(
+        &conn,
+        &form.id,
+        &form.name,
+        &form.summary,
+        &form.key_question,
+        &form.secondary_groups,
+        &now,
+    )
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn delete_system_definition(state: State<AppState>, id: String) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::delete_system_definition(&conn, &id)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_system_definitions(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::reorder_system_definitions(&conn, &ordered_ids, &now)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn assign_system_definition_items(
+    state: State<AppState>,
+    system_id: String,
+    item_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::replace_system_definition_items(&conn, &system_id, &item_ids)
+}
+
+// =====================
+// 空间定义 CRUD
+// =====================
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct SpaceDefinitionFormDto {
     #[serde(default)]
     pub id: Option<String>,
     pub name: String,
-    pub system: String,
-    pub category: String,
-    pub spaces: Vec<String>,
-    pub stages: Vec<String>,
-    // 注:necessity 字段已删除 — 该信息由阶段模板的档位承载
-    pub lifecycle: String,
-    pub depreciation: Option<String>,
-    pub quantity: i32,
-    pub status: String,
-    #[serde(rename = "replacementCue")]
-    pub replacement_cue: String,
+    #[serde(default)]
     pub note: String,
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn list_owned_items(state: State<AppState>) -> Result<Vec<OwnedItemRow>, String> {
+pub fn list_shopping_space_definitions(
+    state: State<AppState>,
+) -> Result<Vec<ShoppingSpaceDefinitionDto>, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::list_owned_items(&conn)
+    ShoppingRepository::list_space_definitions_dto(&conn)
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn create_owned_item(
+pub fn create_shopping_space_definition(
     state: State<AppState>,
-    form: OwnedItemFormDto,
-) -> Result<ShoppingOwnedItemDto, String> {
+    form: SpaceDefinitionFormDto,
+) -> Result<ShoppingSpaceDefinitionDto, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let now = chrono_now();
-
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::create_owned_item(
-        &conn,
-        &id,
-        &form.name,
-        &form.system,
-        &form.category,
-        &form.lifecycle,
-        form.depreciation.as_deref(),
-        form.quantity,
-        &form.status,
-        &form.replacement_cue,
-        &form.note,
-        &form.spaces,
-        &form.stages,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
-
-    // Return the created item as DTO
-    let item = ShoppingRepository::get_owned_item_by_id(&conn, &id)?
-        .ok_or("Failed to retrieve created item")?;
-
-    let spaces = ShoppingRepository::get_spaces_for_owned_item(&conn, &id)?;
-    let stages = ShoppingRepository::get_stages_for_owned_item(&conn, &id)?;
-
-    Ok(ShoppingOwnedItemDto {
-        base: crate::shopping::dto::ShoppingItemBaseDto {
-            system: item.system_id,
-            category: item.category,
-            spaces,
-            stages,
-            lifecycle: item.lifecycle,
-            depreciation: item.depreciation,
-        },
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        status: item.status,
-        replacement_cue: item.replacement_cue,
-        note: item.note,
-    })
+    ShoppingRepository::create_space_definition(&conn, &id, &form.name, &form.note, &now)
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn update_owned_item(
+pub fn update_shopping_space_definition(
     state: State<AppState>,
-    form: OwnedItemFormDto,
-) -> Result<ShoppingOwnedItemDto, String> {
+    form: SpaceDefinitionFormDto,
+) -> Result<ShoppingSpaceDefinitionDto, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let id = form.id.as_ref().ok_or("id is required for update")?.clone();
+    let id = form.id.ok_or("id is required for update")?;
     let now = chrono_now();
-
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::update_owned_item(
-        &conn,
-        &id,
-        &form.name,
-        &form.system,
-        &form.category,
-        &form.lifecycle,
-        form.depreciation.as_deref(),
-        form.quantity,
-        &form.status,
-        &form.replacement_cue,
-        &form.note,
-        &form.spaces,
-        &form.stages,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
-
-    let item = ShoppingRepository::get_owned_item_by_id(&conn, &id)?
-        .ok_or("Failed to retrieve updated item")?;
-
-    let spaces = ShoppingRepository::get_spaces_for_owned_item(&conn, &id)?;
-    let stages = ShoppingRepository::get_stages_for_owned_item(&conn, &id)?;
-
-    Ok(ShoppingOwnedItemDto {
-        base: crate::shopping::dto::ShoppingItemBaseDto {
-            system: item.system_id,
-            category: item.category,
-            spaces,
-            stages,
-            lifecycle: item.lifecycle,
-            depreciation: item.depreciation,
-        },
-        id: item.id,
-        name: item.name,
-        quantity: item.quantity,
-        status: item.status,
-        replacement_cue: item.replacement_cue,
-        note: item.note,
-    })
+    ShoppingRepository::update_space_definition(&conn, &id, &form.name, &form.note, &now)
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn delete_owned_item(state: State<AppState>, id: String) -> Result<(), String> {
+pub fn delete_shopping_space_definition(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_owned_item(&conn, &id)
+    ShoppingRepository::delete_space_definition(&conn, &id)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_space_definitions(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::reorder_space_definitions(&conn, &ordered_ids, &now)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn assign_space_definition_items(
+    state: State<AppState>,
+    space_id: String,
+    item_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::replace_space_definition_items(&conn, &space_id, &item_ids)
 }
 
 // =====================
-// Plan Item CRUD commands
+// 物品 CRUD(统一,替代旧 owned/plan)
 // =====================
 
 #[derive(Debug, serde::Deserialize, specta::Type)]
 #[serde(rename_all = "camelCase")]
-pub struct PlanItemFormDto {
+pub struct ItemChildChannelFormDto {
     #[serde(default)]
     pub id: Option<String>,
-    #[serde(rename = "laneId")]
-    pub lane_id: String,
+    pub channel: String,
+    #[serde(default)]
+    pub entry_price: Option<f64>,
+    #[serde(default)]
+    pub sweet_spot_price: Option<f64>,
+    #[serde(default)]
+    pub overpay_price: Option<f64>,
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ItemChildFormDto {
+    #[serde(default)]
+    pub id: Option<String>,
     pub name: String,
-    pub system: String,
-    pub category: String,
-    pub spaces: Vec<String>,
-    pub stages: Vec<String>,
-    // 注:necessity 与 tags 字段已删除 — 物品的"标签"在显示层由 system/spaces/stages 渲染
-    pub lifecycle: String,
+    #[serde(default)]
+    pub status: Option<String>,
+    #[serde(default)]
+    pub lifecycle: Option<String>,
+    #[serde(default)]
     pub depreciation: Option<String>,
-    pub reason: String,
-    #[serde(rename = "targetLifestyle")]
-    pub target_lifestyle: String,
-    #[serde(rename = "currentPrice")]
-    pub current_price: f64,
-    #[serde(rename = "buyBelowPrice")]
-    pub buy_below_price: f64,
-    #[serde(rename = "overpayPrice")]
-    pub overpay_price: f64,
+    #[serde(default)]
+    pub channel_prices: Vec<ItemChildChannelFormDto>,
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ItemFormDto {
+    #[serde(default)]
+    pub id: Option<String>,
+    pub name: String,
+    pub children: Vec<ItemChildFormDto>,
+    pub system_tags: Vec<String>,
+    pub space_tags: Vec<String>,
+    #[serde(default)]
     pub note: String,
-    pub keywords: Vec<String>,
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn list_plan_items(state: State<AppState>) -> Result<Vec<PlanItemRow>, String> {
+pub fn list_shopping_items(state: State<AppState>) -> Result<Vec<ShoppingItemDto>, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::list_plan_items(&conn)
+    ShoppingRepository::list_items_dto(&conn)
+}
+
+fn item_form_to_args(form: &ItemFormDto, item_id: &str) -> Vec<ItemChildWriteModel> {
+    form.children
+        .iter()
+        .enumerate()
+        .map(|(i, c)| {
+            let child_id =
+                c.id.clone()
+                    .unwrap_or_else(|| format!("{}_child_{}", item_id, i));
+
+            let channel_prices = c
+                .channel_prices
+                .iter()
+                .enumerate()
+                .map(|(channel_index, channel)| ItemChildChannelWriteModel {
+                    id: channel
+                        .id
+                        .clone()
+                        .unwrap_or_else(|| format!("{}_channel_{}", child_id, channel_index)),
+                    channel: channel.channel.clone(),
+                    entry_price: channel.entry_price,
+                    sweet_spot_price: channel.sweet_spot_price,
+                    overpay_price: channel.overpay_price,
+                })
+                .collect();
+
+            ItemChildWriteModel {
+                id: child_id,
+                name: c.name.clone(),
+                status: c.status.clone(),
+                lifecycle: c.lifecycle.clone(),
+                depreciation: c.depreciation.clone(),
+                channel_prices,
+            }
+        })
+        .collect()
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn create_plan_item(
+pub fn create_shopping_item(
     state: State<AppState>,
-    form: PlanItemFormDto,
-) -> Result<ShoppingPlanItemDto, String> {
+    form: ItemFormDto,
+) -> Result<ShoppingItemDto, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let id = form.id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
+    let id = form
+        .id
+        .clone()
+        .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let now = chrono_now();
+    let children = item_form_to_args(&form, &id);
 
     conn.execute("BEGIN TRANSACTION", params![])
         .map_err(|e| e.to_string())?;
 
-    let result = ShoppingRepository::create_plan_item(
+    let result = ShoppingRepository::upsert_item(
         &conn,
         &id,
-        &form.lane_id,
         &form.name,
-        &form.system,
-        &form.category,
-        &form.lifecycle,
-        form.depreciation.as_deref(),
-        &form.reason,
-        &form.target_lifestyle,
-        form.current_price,
-        form.buy_below_price,
-        form.overpay_price,
         &form.note,
-        &form.spaces,
-        &form.stages,
-        &form.keywords,
+        &children,
+        &form.system_tags,
+        &form.space_tags,
+        false,
         &now,
     );
 
@@ -297,65 +337,32 @@ pub fn create_plan_item(
     conn.execute("COMMIT", params![])
         .map_err(|e| e.to_string())?;
 
-    let item = ShoppingRepository::get_plan_item_by_id(&conn, &id)?
-        .ok_or("Failed to retrieve created item")?;
-
-    let spaces = ShoppingRepository::get_spaces_for_plan_item(&conn, &id)?;
-    let stages = ShoppingRepository::get_stages_for_plan_item(&conn, &id)?;
-    let keywords = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "keyword")?;
-
-    Ok(ShoppingPlanItemDto {
-        base: crate::shopping::dto::ShoppingItemBaseDto {
-            system: item.system_id,
-            category: item.category,
-            spaces,
-            stages,
-            lifecycle: item.lifecycle,
-            depreciation: item.depreciation,
-        },
-        id: item.id,
-        name: item.name,
-        reason: item.reason,
-        target_lifestyle: item.target_lifestyle,
-        current_price: item.current_price,
-        buy_below_price: item.buy_below_price,
-        overpay_price: item.overpay_price,
-        note: item.note,
-        keywords,
-    })
+    ShoppingRepository::get_item_by_id(&conn, &id)?.ok_or("Failed to load created item".to_string())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn update_plan_item(
+pub fn update_shopping_item(
     state: State<AppState>,
-    form: PlanItemFormDto,
-) -> Result<ShoppingPlanItemDto, String> {
+    form: ItemFormDto,
+) -> Result<ShoppingItemDto, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let id = form.id.as_ref().ok_or("id is required for update")?.clone();
+    let id = form.id.clone().ok_or("id is required for update")?;
     let now = chrono_now();
+    let children = item_form_to_args(&form, &id);
 
     conn.execute("BEGIN TRANSACTION", params![])
         .map_err(|e| e.to_string())?;
 
-    let result = ShoppingRepository::update_plan_item(
+    let result = ShoppingRepository::upsert_item(
         &conn,
         &id,
-        &form.lane_id,
         &form.name,
-        &form.system,
-        &form.category,
-        &form.lifecycle,
-        form.depreciation.as_deref(),
-        &form.reason,
-        &form.target_lifestyle,
-        form.current_price,
-        form.buy_below_price,
-        form.overpay_price,
         &form.note,
-        &form.spaces,
-        &form.stages,
-        &form.keywords,
+        &children,
+        &form.system_tags,
+        &form.space_tags,
+        true,
         &now,
     );
 
@@ -368,43 +375,180 @@ pub fn update_plan_item(
     conn.execute("COMMIT", params![])
         .map_err(|e| e.to_string())?;
 
-    let item = ShoppingRepository::get_plan_item_by_id(&conn, &id)?
-        .ok_or("Failed to retrieve updated item")?;
-
-    let spaces = ShoppingRepository::get_spaces_for_plan_item(&conn, &id)?;
-    let stages = ShoppingRepository::get_stages_for_plan_item(&conn, &id)?;
-    let keywords = ShoppingRepository::get_tags_for_plan_item(&conn, &id, "keyword")?;
-
-    Ok(ShoppingPlanItemDto {
-        base: crate::shopping::dto::ShoppingItemBaseDto {
-            system: item.system_id,
-            category: item.category,
-            spaces,
-            stages,
-            lifecycle: item.lifecycle,
-            depreciation: item.depreciation,
-        },
-        id: item.id,
-        name: item.name,
-        reason: item.reason,
-        target_lifestyle: item.target_lifestyle,
-        current_price: item.current_price,
-        buy_below_price: item.buy_below_price,
-        overpay_price: item.overpay_price,
-        note: item.note,
-        keywords,
-    })
+    ShoppingRepository::get_item_by_id(&conn, &id)?.ok_or("Failed to load updated item".to_string())
 }
 
 #[tauri::command]
 #[specta::specta]
-pub fn delete_plan_item(state: State<AppState>, id: String) -> Result<(), String> {
+pub fn delete_shopping_item(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_plan_item(&conn, &id)
+    ShoppingRepository::delete_item(&conn, &id)
 }
 
 // =====================
-// Page Content CRUD commands
+// 阶段模板 CRUD
+// =====================
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StageItemTiersFormDto {
+    pub low: Vec<String>,
+    pub base: Vec<String>,
+    pub up: Vec<String>,
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StageItemFormDto {
+    pub item_id: String,
+    pub tiers: StageItemTiersFormDto,
+}
+
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct StageTemplateFormDto {
+    #[serde(default)]
+    pub id: Option<String>,
+    pub name: String,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub focus: String,
+    #[serde(default)]
+    pub system_dimension_ids: Vec<String>,
+    #[serde(default)]
+    pub space_dimension_ids: Vec<String>,
+    pub items: Vec<StageItemFormDto>,
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn list_shopping_stage_templates(
+    state: State<AppState>,
+) -> Result<Vec<ShoppingStageTemplateDto>, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::list_stage_templates_dto(&conn)
+}
+
+fn stage_form_to_args(
+    form: &StageTemplateFormDto,
+) -> Vec<(String, Vec<String>, Vec<String>, Vec<String>)> {
+    form.items
+        .iter()
+        .map(|si| {
+            (
+                si.item_id.clone(),
+                si.tiers.low.clone(),
+                si.tiers.base.clone(),
+                si.tiers.up.clone(),
+            )
+        })
+        .collect()
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn create_shopping_stage_template(
+    state: State<AppState>,
+    form: StageTemplateFormDto,
+) -> Result<ShoppingStageTemplateDto, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let id = form
+        .id
+        .clone()
+        .unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
+    let now = chrono_now();
+    let items = stage_form_to_args(&form);
+
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::upsert_stage_template(
+        &conn,
+        &id,
+        &form.name,
+        &form.description,
+        &form.focus,
+        &form.system_dimension_ids,
+        &form.space_dimension_ids,
+        &items,
+        false,
+        &now,
+    );
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map_err(|e| e.to_string())?;
+
+    ShoppingRepository::get_stage_template_by_id(&conn, &id)?
+        .ok_or("Failed to load created stage template".to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_shopping_stage_template(
+    state: State<AppState>,
+    form: StageTemplateFormDto,
+) -> Result<ShoppingStageTemplateDto, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let id = form.id.clone().ok_or("id is required for update")?;
+    let now = chrono_now();
+    let items = stage_form_to_args(&form);
+
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::upsert_stage_template(
+        &conn,
+        &id,
+        &form.name,
+        &form.description,
+        &form.focus,
+        &form.system_dimension_ids,
+        &form.space_dimension_ids,
+        &items,
+        true,
+        &now,
+    );
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map_err(|e| e.to_string())?;
+
+    ShoppingRepository::get_stage_template_by_id(&conn, &id)?
+        .ok_or("Failed to load updated stage template".to_string())
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn delete_shopping_stage_template(state: State<AppState>, id: String) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::delete_stage_template(&conn, &id)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_stage_templates(
+    state: State<AppState>,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    ShoppingRepository::reorder_stage_templates(&conn, &ordered_ids, &now)
+}
+
+// =====================
+// 页面内容 CRUD(spotlight/boundary/lifestyle)
 // =====================
 
 #[derive(Debug, serde::Deserialize, specta::Type)]
@@ -412,7 +556,6 @@ pub fn delete_plan_item(state: State<AppState>, id: String) -> Result<(), String
 pub struct PageContentFormDto {
     #[serde(default)]
     pub id: Option<String>,
-    #[serde(rename = "contentType")]
     pub content_type: String,
     pub title: Option<String>,
     pub stage: Option<String>,
@@ -491,73 +634,6 @@ pub fn update_shopping_page_content(
 pub fn delete_shopping_page_content(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     ShoppingRepository::delete_page_content(&conn, &id)
-}
-
-#[derive(Debug, serde::Deserialize, specta::Type)]
-#[serde(rename_all = "camelCase")]
-pub struct SystemDefinitionFormDto {
-    pub id: String,
-    pub summary: String,
-    pub key_question: String,
-    pub secondary_groups: Vec<String>,
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn create_system_definition(
-    state: State<AppState>,
-    form: SystemDefinitionFormDto,
-) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let now = chrono_now();
-    ShoppingRepository::create_system_definition(
-        &conn,
-        &form.id,
-        &form.summary,
-        &form.key_question,
-        &form.secondary_groups,
-        &now,
-    )
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn update_system_definition(
-    state: State<AppState>,
-    form: SystemDefinitionFormDto,
-) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let now = chrono_now();
-    ShoppingRepository::update_system_definition(
-        &conn,
-        &form.id,
-        &form.summary,
-        &form.key_question,
-        &form.secondary_groups,
-        &now,
-    )
-}
-
-#[tauri::command]
-#[specta::specta]
-pub fn delete_system_definition(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_system_definition(&conn, &id)
-}
-
-// =====================
-// Reorder commands
-// =====================
-
-#[tauri::command]
-#[specta::specta]
-pub fn reorder_system_definitions(
-    state: State<AppState>,
-    ordered_ids: Vec<String>,
-) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    let now = chrono_now();
-    ShoppingRepository::reorder_system_definitions(&conn, &ordered_ids, &now)
 }
 
 #[tauri::command]

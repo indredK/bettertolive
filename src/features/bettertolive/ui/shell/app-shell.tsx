@@ -413,7 +413,7 @@ export function BetterToLiveAppShell() {
             searchQuery={searchQuery}
             isWideLayout={isWideLayout}
             isStackedLayout={isStackedLayout}
-            isManagementMode={isShoppingManagementMode}
+            isControlMode={isShoppingManagementMode}
             onRefresh={() => workspaceQuery.refetch()}
           />
         )
