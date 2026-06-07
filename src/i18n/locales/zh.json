@@ -669,6 +669,568 @@
       "shuttleDescription": "将属于此阶段的物品移至右侧，保存后生效"
     }
   },
+  "nutrition": {
+    "page": {
+      "eyebrow": "饮食",
+      "title": "个人饮食工作台",
+      "description": "食谱库 + 食品分类 + 营养成分表 + 每日计划 + 进食记录"
+    },
+    "tabs": {
+      "overview": "总览",
+      "dailyPlan": "每日计划",
+      "recipes": "食谱库",
+      "foods": "食品分类",
+      "nutrients": "营养成分表",
+      "logs": "进食记录"
+    },
+    "status": {
+      "planned": "已计划",
+      "prepared": "已备好",
+      "eaten": "已吃",
+      "skipped": "跳过",
+      "replaced": "已替换"
+    },
+    "units": {
+      "serving": "份",
+      "minutes": "min"
+    },
+    "enum": {
+      "unit": {
+        "g": "g",
+        "ml": "ml",
+        "个": "个",
+        "份": "份"
+      },
+      "storage": {
+        "常温": "常温",
+        "冷藏": "冷藏",
+        "冷冻": "冷冻",
+        "即食": "即食"
+      },
+      "lifecycle": {
+        "新鲜短期": "新鲜短期",
+        "常备": "常备",
+        "干货": "干货",
+        "调味": "调味",
+        "饮品": "饮品"
+      },
+      "source": {
+        "手动": "手动",
+        "包装": "包装",
+        "食物成分表": "食物成分表",
+        "外部导入": "外部导入"
+      },
+      "confidence": {
+        "高": "高",
+        "中": "中",
+        "低": "低"
+      },
+      "mealRole": {
+        "早餐": "早餐",
+        "午餐": "午餐",
+        "晚餐": "晚餐",
+        "加餐": "加餐",
+        "夜宵": "夜宵",
+        "节庆餐": "节庆餐",
+        "饮品": "饮品"
+      },
+      "difficulty": {
+        "简单": "简单",
+        "中等": "中等",
+        "麻烦": "麻烦"
+      },
+      "repeatability": {
+        "常做": "常做",
+        "偶尔": "偶尔",
+        "只想记录": "只想记录"
+      },
+      "foodCategoryDimension": {
+        "食物大类": "食物大类",
+        "食材形态": "食材形态",
+        "储存方式": "储存方式",
+        "使用频率": "使用频率",
+        "饮食立场": "饮食立场"
+      },
+      "dietaryIntentMode": {
+        "维持": "维持",
+        "稍微注意": "稍微注意",
+        "在调整具体问题": "在调整具体问题",
+        "阶段性需求": "阶段性需求"
+      },
+      "hardConstraintType": {
+        "过敏": "过敏",
+        "宗教/文化": "宗教/文化",
+        "医学限制": "医学限制"
+      },
+      "softStanceType": {
+        "饮食方式": "饮食方式",
+        "进食节律": "进食节律",
+        "临时关注": "临时关注"
+      },
+      "scene": {
+        "在家做": "在家做",
+        "外卖": "外卖",
+        "堂食": "堂食",
+        "路边/便利店": "路边/便利店",
+        "应酬/聚餐": "应酬/聚餐",
+        "旅行": "旅行",
+        "加餐零食": "加餐零食"
+      },
+      "trigger": {
+        "准时按点": "准时按点",
+        "真饿了": "真饿了",
+        "社交场合": "社交场合",
+        "情绪驱动": "情绪驱动",
+        "习惯反射": "习惯反射",
+        "不想浪费": "不想浪费",
+        "看到就想吃": "看到就想吃"
+      },
+      "valueDensity": {
+        "高": "高",
+        "中": "中",
+        "低": "低",
+        "不划算": "不划算"
+      },
+      "bodyFeedback": {
+        "满足舒服": "满足舒服",
+        "普通": "普通",
+        "偏重偏胀": "偏重偏胀",
+        "不适": "不适",
+        "想再吃": "想再吃"
+      },
+      "foodMemoryType": {
+        "家庭味道": "家庭味道",
+        "地方味道": "地方味道",
+        "关系味道": "关系味道",
+        "人生节点味道": "人生节点味道",
+        "已经吃不到的": "已经吃不到的"
+      },
+      "foodMemoryAvailability": {
+        "仍能吃到": "仍能吃到",
+        "偶尔能吃到": "偶尔能吃到",
+        "已经吃不到": "已经吃不到",
+        "自己尝试复刻": "自己尝试复刻"
+      },
+      "foodMemoryEmotionalLoad": {
+        "很重": "很重",
+        "中等": "中等",
+        "轻微": "轻微",
+        "平静": "平静"
+      }
+    },
+    "common": {
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中",
+      "optional": "可选"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "overview": {
+      "eyebrow": "今日饮食总览",
+      "heroTitle": "今天不是要完美，而是要能被照顾到",
+      "heroDescription": "把食谱、食品、营养和真实进食收敛到一页里，先看今天怎么吃、缺什么、下一步能做什么。",
+      "todaySlots": "今日餐次",
+      "todaySlotsHint": "含早餐、午餐、晚餐和饮品",
+      "arrangedSlots": "已安排",
+      "arrangedSlotsHint": "空餐次不制造压力，只提示预案",
+      "foods": "食品",
+      "foodsHint": "食品库是营养与食谱的底层",
+      "recipes": "食谱",
+      "recipesHint": "只放真的会做或想复刻的",
+      "todayPlate": "今日餐盘",
+      "todayPlateDesc": "把计划按餐次排成能执行的一天。",
+      "emptySlot": "还没安排，允许留白",
+      "nutritionPulse": "营养脉冲",
+      "nutritionPulseDesc": "轻量估算，不把缺失数据算成 0。",
+      "planCompletion": "计划度",
+      "completionCopy": "今天已经有了预案，剩下的是让它足够好执行。",
+      "profile": "饮食意图",
+      "profileDesc": "先看边界和当前目标，再安排今天能执行的吃法。",
+      "intentWindow": "{{start}} 至 {{end}}",
+      "intentOpenEnded": "持续中",
+      "hardConstraints": "硬约束",
+      "softStances": "软立场",
+      "noConstraints": "暂无硬约束",
+      "noStances": "暂无软立场",
+      "actions": "可执行建议",
+      "review": "近期校准",
+      "missingNutrition": "{{count}} 项营养数据待补",
+      "energySummary": "今日估算 {{kcal}} kcal · 蛋白 {{protein}} g"
+    },
+    "profileEdit": {
+      "title": "编辑饮食档案",
+      "description": "饮食档案记录当前阶段目标、不能碰的边界，以及会影响每日计划的温和立场。",
+      "intentMode": "当前意图",
+      "windowStart": "开始日期",
+      "windowEnd": "结束日期",
+      "intentNote": "意图说明",
+      "intentNotePlaceholder": "例如：先观察外卖、咖啡因和睡眠之间的关系。",
+      "hardConstraints": "硬约束",
+      "constraintsDescription": "硬约束用于记录过敏、医学限制或宗教文化边界，后续计划与建议应优先避开。",
+      "emptyConstraints": "暂无硬约束",
+      "addConstraint": "新增硬约束",
+      "constraintLabelPlaceholder": "例如：晚间减少咖啡因",
+      "constraintNotePlaceholder": "这个边界为什么重要？",
+      "softStances": "软立场",
+      "stancesDescription": "软立场不是禁止项，而是当前阶段希望计划多照顾一点的方向。",
+      "emptyStances": "暂无软立场",
+      "addStance": "新增软立场",
+      "stanceLabelPlaceholder": "例如：补蔬果",
+      "stanceNotePlaceholder": "希望它怎样影响计划？",
+      "saved": "饮食档案已保存",
+      "saveFailed": "饮食档案保存失败",
+      "validation": {
+        "labelRequired": "请补全约束或立场名称"
+      }
+    },
+    "dailyPlan": {
+      "title": "每日计划",
+      "week": "一周计划",
+      "selectedDate": "当前日期",
+      "planNote": "计划是预案，不是打卡压力",
+      "emptyPlan": "暂无每日计划。",
+      "emptySlot": "这一餐先留白",
+      "generateLog": "生成进食记录",
+      "logGeneratedAction": "已生成记录",
+      "logGenerated": "已从计划生成进食记录",
+      "logGenerateFailed": "进食记录生成失败",
+      "noNote": "暂无当日备注",
+      "nutritionSummary": "营养摘要",
+      "gaps": "今日缺口",
+      "emptySlots": "留白餐次",
+      "emptySlotsHint": "可以继续留白，也可以补一个低门槛预案",
+      "pendingNutrition": "待补营养",
+      "pendingNutritionHint": "缺失数据不会被当成 0",
+      "replacementSuggestions": "可替换建议",
+      "replacementHint": "从未安排且营养数据更完整的食谱里挑选。",
+      "missingShort": "待补 {{count}}",
+      "noReplacement": "暂无可替换食谱，可以先补充食谱或完善营养数据。",
+      "missingNutrition": "{{count}} 个条目营养数据待补，未按 0 计算。"
+    },
+    "dailyPlanEdit": {
+      "createTitle": "新增每日计划",
+      "editTitle": "编辑每日计划",
+      "editAction": "编辑",
+      "description": "每日计划可以引用食谱、食品或临时文本；空餐次允许保留，表示先留白。",
+      "date": "日期",
+      "note": "整日备注",
+      "notePlaceholder": "今天的饮食预案或提醒",
+      "slots": "餐次",
+      "slotsHint": "每个餐次可以为空，也可以组合多个计划条目。",
+      "addSlot": "添加餐次",
+      "mealRole": "餐次",
+      "status": "状态",
+      "slotNote": "餐次备注",
+      "addEntry": "添加条目",
+      "entryType": "类型",
+      "recipe": "食谱",
+      "selectRecipe": "选择食谱",
+      "missingRecipe": "已关联的食谱不存在",
+      "servings": "份数",
+      "food": "食品",
+      "selectFood": "选择食品",
+      "missingFood": "已关联的食品不存在",
+      "amount": "用量",
+      "unit": "单位",
+      "textTitle": "文本条目",
+      "textTitlePlaceholder": "例如：临时外食",
+      "entryNote": "备注",
+      "delete": "删除",
+      "deleteBlocked": "该计划已有 {{count}} 条进食记录关联，暂不能删除。",
+      "saved": "每日计划已保存",
+      "deleted": "每日计划已删除",
+      "saveFailed": "每日计划保存失败",
+      "deleteFailed": "每日计划删除失败",
+      "entryTypes": {
+        "recipe": "食谱",
+        "food": "食品",
+        "text": "文本"
+      },
+      "validation": {
+        "dateRequired": "请填写日期",
+        "slotRequired": "请至少保留一个餐次",
+        "entryInvalid": "请补全计划条目"
+      }
+    },
+    "recipes": {
+      "title": "食谱库",
+      "search": "搜索食谱、标签或餐次",
+      "empty": "没有匹配的食谱。",
+      "personalLibrary": "个人食谱库",
+      "totalTime": "总时间",
+      "servings": "份数",
+      "missing": "待补",
+      "missingHint": "营养缺口",
+      "foodMemory": "关联食物记忆",
+      "recentFeedback": "最近进食反馈",
+      "recentFeedbackNoNote": "这次记录没有额外备注。",
+      "noRecentFeedback": "还没有实际进食反馈，之后从计划生成记录或手动补记后会出现在这里。",
+      "tagFilter": "标签筛选",
+      "allTags": "全部标签",
+      "ingredients": "食材",
+      "steps": "步骤"
+    },
+    "recipeFilters": {
+      "all": "全部",
+      "breakfast": "早餐",
+      "lunch": "午餐",
+      "dinner": "晚餐",
+      "snack": "加餐",
+      "frequent": "常做",
+      "easy": "简单",
+      "missingNutrition": "待补营养",
+      "linkedMemory": "关联记忆",
+      "hasFeedback": "有反馈",
+      "全部": "全部",
+      "早餐": "早餐",
+      "午餐": "午餐",
+      "晚餐": "晚餐",
+      "加餐": "加餐",
+      "常做": "常做",
+      "简单": "简单",
+      "待补营养": "待补营养",
+      "关联记忆": "关联记忆",
+      "有反馈": "有反馈"
+    },
+    "recipeEdit": {
+      "createTitle": "新增食谱",
+      "editTitle": "编辑食谱",
+      "editAction": "编辑",
+      "description": "食谱引用食品库食材，营养成分会从食材自动派生。",
+      "name": "食谱名",
+      "namePlaceholder": "例如：番茄鸡蛋面",
+      "summary": "简介",
+      "summaryPlaceholder": "这道食谱适合什么场景？",
+      "servings": "份数",
+      "mealRoles": "适用餐次",
+      "mealRolesPlaceholder": "选择餐次",
+      "mealRolesSearch": "搜索餐次",
+      "mealRolesEmpty": "没有匹配餐次",
+      "linkedFoodMemory": "关联食物记忆",
+      "noFoodMemory": "不关联食物记忆",
+      "missingFoodMemory": "已关联的食物记忆不存在",
+      "tags": "标签",
+      "tagsPlaceholder": "用逗号分隔",
+      "prepMinutes": "准备分钟",
+      "cookMinutes": "烹饪分钟",
+      "difficulty": "难度",
+      "repeatability": "复用频率",
+      "ingredients": "食材",
+      "ingredientsHint": "食材来自食品库，后续营养会按用量派生。",
+      "addIngredient": "添加食材",
+      "food": "食品",
+      "selectFood": "选择食品",
+      "missingFood": "已关联的食品不存在",
+      "amount": "用量",
+      "unit": "单位",
+      "ingredientNote": "备注",
+      "steps": "步骤",
+      "stepsPlaceholder": "每行一个步骤",
+      "delete": "删除",
+      "deleteBlocked": "该食谱已被 {{count}} 个计划或记录引用，暂不能删除。",
+      "saved": "食谱已保存",
+      "deleted": "食谱已删除",
+      "saveFailed": "食谱保存失败",
+      "deleteFailed": "食谱删除失败",
+      "validation": {
+        "nameRequired": "请填写食谱名",
+        "mealRoleRequired": "请至少选择一个适用餐次",
+        "ingredientsRequired": "请至少添加一个有效食材",
+        "stepsRequired": "请至少填写一个步骤"
+      }
+    },
+    "foods": {
+      "title": "食品分类",
+      "search": "搜索食品、分类或储存方式",
+      "allFoods": "全部食品",
+      "allFoodsDesc": "跨分类查看和搜索整个食品库。",
+      "empty": "没有匹配的食品。",
+      "baseLibrary": "食品基础库",
+      "noNote": "暂无备注，后续可补充储存、使用和限制信息。",
+      "unit": "默认单位",
+      "storage": "储存",
+      "lifecycle": "周期",
+      "nutrition": "营养",
+      "hasProfile": "已录入",
+      "missingProfile": "待补",
+      "dietaryTags": "饮食标签",
+      "noDietaryTags": "暂无饮食标签或过敏原。",
+      "nutrientProfile": "营养档案",
+      "profileMissingCopy": "这项食品仍可进入食谱和计划，但营养表会显示待补。"
+    },
+    "categoryEdit": {
+      "createTitle": "新增食品分类",
+      "editTitle": "编辑食品分类",
+      "description": "食品分类用于组织食品库视角，会影响食品列表、筛选和营养表阅读路径。",
+      "name": "分类名",
+      "namePlaceholder": "例如：常备蛋白",
+      "dimension": "分类维度",
+      "sortOrder": "排序",
+      "descriptionLabel": "说明",
+      "descriptionPlaceholder": "这个分类帮助你怎样选择食品？",
+      "delete": "删除",
+      "deleteBlocked": "该分类已被 {{count}} 个食品引用，暂不能删除。",
+      "saved": "食品分类已保存",
+      "deleted": "食品分类已删除",
+      "saveFailed": "食品分类保存失败",
+      "deleteFailed": "食品分类删除失败",
+      "validation": {
+        "nameRequired": "请填写分类名"
+      }
+    },
+    "foodEdit": {
+      "createTitle": "新增食品",
+      "editTitle": "编辑食品",
+      "editAction": "编辑",
+      "description": "食品是饮食模块的基础数据源，会被食谱、每日计划和营养成分表复用。",
+      "name": "食品名",
+      "namePlaceholder": "例如：鸡蛋、番茄、杂粮饭",
+      "defaultUnit": "默认单位",
+      "categories": "食品分类",
+      "categoriesPlaceholder": "选择分类",
+      "categoriesSearch": "搜索分类",
+      "categoriesEmpty": "没有匹配分类",
+      "storage": "储存方式",
+      "lifecycle": "使用周期",
+      "dietaryTags": "饮食标签",
+      "allergenTags": "过敏原",
+      "tagsPlaceholder": "用逗号分隔",
+      "note": "备注",
+      "notePlaceholder": "储存、使用场景或限制说明",
+      "nutritionSection": "营养档案",
+      "nutritionDescription": "按每 100g / 100ml 维护。留空时不会按 0 计算，而是在营养表显示待补。",
+      "source": "来源",
+      "confidence": "可信度",
+      "delete": "删除",
+      "deleteBlocked": "该食品已被 {{count}} 个食谱、计划或记录引用，暂不能删除。",
+      "saved": "食品已保存",
+      "deleted": "食品已删除",
+      "saveFailed": "食品保存失败",
+      "deleteFailed": "食品删除失败",
+      "validation": {
+        "nameRequired": "请填写食品名",
+        "categoryRequired": "请至少选择一个分类"
+      }
+    },
+    "nutrients": {
+      "title": "营养成分表",
+      "search": "搜索食品、食谱或日期",
+      "categoryFilter": "分类筛选",
+      "allCategories": "全部分类",
+      "missingOnly": "只看待补",
+      "missingOnlyActive": "仅看待补",
+      "resultCount": "{{count}} 条",
+      "item": "条目",
+      "basis": "粒度",
+      "missing": "待补",
+      "pending": "待补",
+      "perServing": "每份",
+      "dailyTotal": "每日合计",
+      "empty": "没有匹配的营养条目",
+      "emptyHint": "可以清空搜索、切换分类，或关闭只看待补筛选。",
+      "rowClickHint": "点击查看详细营养",
+      "drawerTitle": "{{name}} 的营养详情",
+      "drawerDescription": "先用现有营养字段和稳定模拟分数搭建详情视图，后续可接入真实目标值。",
+      "simulatedBadge": "含模拟雷达",
+      "chartTitle": "六维营养轮廓",
+      "chartHint": "类似游戏战力表：越靠外代表该维度越突出，缺失字段会临时模拟。",
+      "knownFields": "已知字段",
+      "scoreLabel": "轮廓均值",
+      "detailTitle": "详细营养表",
+      "energyKcal": "能量",
+      "proteinG": "蛋白质",
+      "fatG": "脂肪",
+      "carbG": "碳水",
+      "fiberG": "膳食纤维",
+      "sugarG": "糖",
+      "sodiumMg": "钠",
+      "modes": {
+        "foods": "食品",
+        "recipes": "食谱",
+        "plans": "每日合计"
+      },
+      "dimensions": {
+        "energy": "能量",
+        "protein": "蛋白",
+        "carbs": "碳水",
+        "fats": "脂肪",
+        "fiber": "纤维",
+        "lightness": "轻负担"
+      }
+    },
+    "logs": {
+      "title": "进食记录",
+      "description": "记录真实发生的进食，用来校准计划。",
+      "search": "搜索进食、场景、反馈或食物记忆",
+      "empty": "没有匹配的进食记录。",
+      "review": "回顾线索",
+      "boundary": "这里保留观察线索：为什么吃、吃完怎样、计划为什么偏离。它服务计划校准，不用来评判。",
+      "changeReason": "偏差原因",
+      "changeReasonWithValue": "偏差原因：{{reason}}",
+      "valueDensity": "价值密度",
+      "filters": {
+        "all": "全部",
+        "linkedPlan": "关联计划",
+        "linkedMemory": "关联记忆",
+        "changed": "有偏差",
+        "needsCare": "需要照顾"
+      }
+    },
+    "logEdit": {
+      "createTitle": "新增进食记录",
+      "editTitle": "编辑进食记录",
+      "description": "进食记录用于回看真实发生了什么，也可以关联某个计划餐次。",
+      "dateTime": "进食时间",
+      "plannedSlot": "关联计划餐次",
+      "noPlannedSlot": "不关联计划",
+      "missingPlannedSlot": "已关联的计划餐次不存在",
+      "relatedFoodMemory": "关联食物记忆",
+      "noFoodMemory": "不关联食物记忆",
+      "missingFoodMemory": "已关联的食物记忆不存在",
+      "scene": "场景",
+      "trigger": "触发",
+      "valueDensity": "价值密度",
+      "bodyFeedback": "身体反馈",
+      "entries": "进食条目",
+      "entriesHint": "可以记录食谱、单个食品，或无法结构化的临时文本。",
+      "addEntry": "添加条目",
+      "entryType": "类型",
+      "recipe": "食谱",
+      "selectRecipe": "选择食谱",
+      "missingRecipe": "已关联的食谱不存在",
+      "servings": "份数",
+      "food": "食品",
+      "selectFood": "选择食品",
+      "missingFood": "已关联的食品不存在",
+      "amount": "用量",
+      "unit": "单位",
+      "textTitle": "文本条目",
+      "textTitlePlaceholder": "例如：一份外卖套餐",
+      "entryNote": "备注",
+      "changeReason": "偏差原因",
+      "changeReasonPlaceholder": "如果和计划不同，发生了什么？",
+      "note": "备注",
+      "notePlaceholder": "身体感受、情绪、环境或后续调整",
+      "delete": "删除",
+      "saved": "进食记录已保存",
+      "deleted": "进食记录已删除",
+      "saveFailed": "进食记录保存失败",
+      "deleteFailed": "进食记录删除失败",
+      "entryTypes": {
+        "recipe": "食谱",
+        "food": "食品",
+        "text": "文本"
+      },
+      "validation": {
+        "dateTimeRequired": "请填写进食时间",
+        "entryRequired": "请至少添加一个进食条目",
+        "entryInvalid": "请补全进食条目"
+      }
+    }
+  },
   "shell": {
     "brandSubtitle": "个人的人生工作台",
     "tagline": "本地优先 / 自我认知系统",
@@ -735,7 +1297,7 @@
         },
         "nutrition": {
           "label": "饮食",
-          "hint": "吃在生活里的位置"
+          "hint": "食谱、食品和每日计划"
         },
         "emotion": {
           "label": "情绪情感",
@@ -883,16 +1445,16 @@
         "heading": "饮食说明",
         "lines": {
           "record": {
-            "label": "记录",
-            "text": "按场景、构成、触发记录每一顿，再补一段身体反馈。"
+            "label": "安排",
+            "text": "用食谱、食品和每日计划先搭出今天怎么吃。"
           },
           "fit": {
             "label": "适合",
-            "text": "适合发现自己吃得乱、吃完不舒服或想看饮食结构时。"
+            "text": "适合整理常吃食物、复用食谱、查看轻量营养和计划偏差时。"
           },
           "purpose": {
             "label": "目的",
-            "text": "不算卡路里，而是把吃和生活、关系、心情连起来。"
+            "text": "把饮食从零散选择变成可回看的生活系统。"
           }
         }
       },

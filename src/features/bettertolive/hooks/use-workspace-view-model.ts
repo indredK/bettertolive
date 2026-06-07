@@ -458,7 +458,111 @@ export function useWorkspaceViewModel({
   const nutritionModule = useMemo(
     () => ({
       ...workspace.nutrition,
-      meals: workspace.nutrition.meals.filter((entry) =>
+      foodCategories: (workspace.nutrition.foodCategories ?? []).filter((entry) =>
+        matchesQuery(entry.id, entry.name, entry.dimension, entry.description, entry.sortOrder),
+      ),
+      foods: (workspace.nutrition.foods ?? []).filter((entry) =>
+        matchesQuery(
+          entry.id,
+          entry.name,
+          ...entry.categoryIds,
+          entry.defaultUnit,
+          entry.storage,
+          entry.lifecycle,
+          ...entry.allergenTags,
+          ...entry.dietaryTags,
+          entry.nutrientProfileId,
+          entry.note,
+        ),
+      ),
+      nutrientProfiles: (workspace.nutrition.nutrientProfiles ?? []).filter((entry) =>
+        matchesQuery(
+          entry.id,
+          entry.foodId,
+          entry.basisAmount,
+          entry.basisUnit,
+          entry.energyKcal,
+          entry.proteinG,
+          entry.fatG,
+          entry.carbG,
+          entry.fiberG,
+          entry.sugarG,
+          entry.sodiumMg,
+          entry.source,
+          entry.confidence,
+        ),
+      ),
+      recipes: (workspace.nutrition.recipes ?? []).filter((entry) =>
+        matchesQuery(
+          entry.id,
+          entry.name,
+          entry.summary,
+          entry.servings,
+          ...entry.mealRoles,
+          ...entry.ingredients.flatMap((ingredient) => [
+            ingredient.foodId,
+            ingredient.amount,
+            ingredient.unit,
+            ingredient.note,
+          ]),
+          ...entry.steps,
+          entry.prepMinutes,
+          entry.cookMinutes,
+          entry.difficulty,
+          entry.repeatability,
+          ...entry.tags,
+          entry.linkedFoodMemoryId,
+        ),
+      ),
+      dailyPlans: (workspace.nutrition.dailyPlans ?? []).filter((entry) =>
+        matchesQuery(
+          entry.id,
+          entry.date,
+          entry.note,
+          ...entry.slots.flatMap((slot) => [
+            slot.id,
+            slot.structure,
+            slot.status,
+            slot.note,
+            ...slot.entries.flatMap((slotEntry) =>
+              slotEntry.type === "recipe"
+                ? [slotEntry.type, slotEntry.recipeId, slotEntry.servings]
+                : slotEntry.type === "food"
+                  ? [slotEntry.type, slotEntry.foodId, slotEntry.amount, slotEntry.unit]
+                  : [slotEntry.type, slotEntry.title, slotEntry.note],
+            ),
+          ]),
+        ),
+      ),
+      mealLogs: (workspace.nutrition.mealLogs ?? []).filter((entry) => {
+        const relatedFoodMemory = (workspace.nutrition.foodMemories ?? []).find(
+          (memory) => memory.id === entry.relatedFoodMemoryId,
+        )
+
+        return matchesQuery(
+          entry.id,
+          entry.dateTime,
+          entry.plannedSlotId,
+          entry.relatedFoodMemoryId,
+          relatedFoodMemory?.name,
+          relatedFoodMemory?.type,
+          relatedFoodMemory?.story,
+          entry.scene,
+          entry.trigger,
+          entry.valueDensity,
+          entry.bodyFeedback,
+          entry.changeReason,
+          entry.note,
+          ...entry.entries.flatMap((logEntry) =>
+            logEntry.type === "recipe"
+              ? [logEntry.type, logEntry.recipeId, logEntry.servings]
+              : logEntry.type === "food"
+                ? [logEntry.type, logEntry.foodId, logEntry.amount, logEntry.unit]
+                : [logEntry.type, logEntry.title, logEntry.note],
+          ),
+        )
+      }),
+      meals: (workspace.nutrition.meals ?? []).filter((entry) =>
         matchesQuery(
           entry.date,
           entry.title,
@@ -481,13 +585,13 @@ export function useWorkspaceViewModel({
       ),
       weeklyReview: {
         ...workspace.nutrition.weeklyReview,
-        highlights: workspace.nutrition.weeklyReview.highlights.filter((entry) =>
+        highlights: (workspace.nutrition.weeklyReview?.highlights ?? []).filter((entry) =>
           matchesQuery(entry.title, entry.summary, ...entry.evidence),
         ),
-        missingSignals: workspace.nutrition.weeklyReview.missingSignals.filter((entry) =>
+        missingSignals: (workspace.nutrition.weeklyReview?.missingSignals ?? []).filter((entry) =>
           matchesQuery(entry),
         ),
-        crossViews: workspace.nutrition.weeklyReview.crossViews
+        crossViews: (workspace.nutrition.weeklyReview?.crossViews ?? [])
           .map((entry) => {
             if (matchesQuery(entry.title, entry.summary)) {
               return entry
@@ -508,7 +612,7 @@ export function useWorkspaceViewModel({
           })
           .filter((entry) => entry !== null),
       },
-      foodMemories: workspace.nutrition.foodMemories.filter((entry) =>
+      foodMemories: (workspace.nutrition.foodMemories ?? []).filter((entry) =>
         matchesQuery(
           entry.name,
           entry.type,

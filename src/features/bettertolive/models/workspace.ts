@@ -931,8 +931,112 @@ export type NutritionWeeklyReview = {
   crossViews: NutritionCrossView[]
 }
 
+export type FoodCategoryDimension = "食物大类" | "食材形态" | "储存方式" | "使用频率" | "饮食立场"
+
+export type FoodCategoryDefinition = {
+  id: string
+  name: string
+  dimension: FoodCategoryDimension
+  description?: string
+  sortOrder: number
+}
+
+export type NutritionBasisUnit = "g" | "ml"
+
+export type FoodNutrientProfile = {
+  id: string
+  foodId: string
+  basisAmount: number
+  basisUnit: NutritionBasisUnit
+  energyKcal?: number
+  proteinG?: number
+  fatG?: number
+  carbG?: number
+  fiberG?: number
+  sugarG?: number
+  sodiumMg?: number
+  source: "手动" | "包装" | "食物成分表" | "外部导入"
+  confidence: "高" | "中" | "低"
+}
+
+export type FoodItem = {
+  id: string
+  name: string
+  categoryIds: string[]
+  defaultUnit: "g" | "ml" | "个" | "份"
+  storage?: "常温" | "冷藏" | "冷冻" | "即食"
+  lifecycle?: "新鲜短期" | "常备" | "干货" | "调味" | "饮品"
+  allergenTags: string[]
+  dietaryTags: string[]
+  nutrientProfileId?: string
+  note?: string
+}
+
+export type RecipeIngredient = {
+  foodId: string
+  amount: number
+  unit: "g" | "ml" | "个" | "份"
+  note?: string
+}
+
+export type Recipe = {
+  id: string
+  name: string
+  summary?: string
+  servings: number
+  mealRoles: MealStructure[]
+  ingredients: RecipeIngredient[]
+  steps: string[]
+  prepMinutes?: number
+  cookMinutes?: number
+  difficulty: "简单" | "中等" | "麻烦"
+  repeatability: "常做" | "偶尔" | "只想记录"
+  tags: string[]
+  linkedFoodMemoryId?: string
+}
+
+export type DailyPlanEntry =
+  | { type: "recipe"; recipeId: string; servings: number }
+  | { type: "food"; foodId: string; amount: number; unit: string }
+  | { type: "text"; title: string; note?: string }
+
+export type DailyMealSlot = {
+  id: string
+  structure: MealStructure
+  entries: DailyPlanEntry[]
+  status: "planned" | "prepared" | "eaten" | "skipped" | "replaced"
+  note?: string
+}
+
+export type DailyPlan = {
+  id: string
+  date: string
+  slots: DailyMealSlot[]
+  note?: string
+}
+
+export type MealLog = {
+  id: string
+  dateTime: string
+  plannedSlotId?: string
+  entries: DailyPlanEntry[]
+  scene?: MealScene
+  trigger?: MealTrigger
+  valueDensity?: ValueDensity
+  bodyFeedback?: BodyFeedback
+  relatedFoodMemoryId?: string
+  changeReason?: string
+  note?: string
+}
+
 export type NutritionModuleData = {
   profile: DietaryProfile
+  foodCategories: FoodCategoryDefinition[]
+  foods: FoodItem[]
+  nutrientProfiles: FoodNutrientProfile[]
+  recipes: Recipe[]
+  dailyPlans: DailyPlan[]
+  mealLogs: MealLog[]
   meals: NutritionMealEntry[]
   weeklyReview: NutritionWeeklyReview
   foodMemories: NutritionFoodMemory[]

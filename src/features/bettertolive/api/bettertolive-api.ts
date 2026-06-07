@@ -135,6 +135,7 @@ export type BetterToLiveApi = {
   getFinance: () => Promise<FinanceModuleData>
   getShopping: () => Promise<ShoppingModuleData>
   getNutrition: () => Promise<NutritionModuleData>
+  saveNutrition: (nutrition: NutritionModuleData) => Promise<void>
   getEmotion: () => Promise<EmotionWorkspaceModuleData>
   getBeliefs: () => Promise<BeliefsModuleData>
   getPrinciples: () => Promise<PrinciplesModuleData>

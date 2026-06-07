@@ -45,6 +45,22 @@ async function getShoppingFromRust() {
   }
 }
 
+async function getNutritionFromRust() {
+  if (!hasTauriRuntime()) {
+    return cloneData(workspaceSnapshotMockData.nutrition)
+  }
+
+  return await invoke<NutritionModuleData>("get_nutrition")
+}
+
+async function saveNutritionToRust(nutrition: NutritionModuleData) {
+  if (!hasTauriRuntime()) {
+    return
+  }
+
+  await invoke("save_nutrition", { nutrition })
+}
+
 export function createLiveBetterToLiveApi(): BetterToLiveApi {
   return {
     // ---- Tauri commands (Rust backend) ----
@@ -52,11 +68,15 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     getShopping: () => getShoppingFromRust(),
 
     async getWorkspaceSnapshot() {
-      const shopping = await getShoppingFromRust()
+      const [shopping, nutrition] = await Promise.all([
+        getShoppingFromRust(),
+        getNutritionFromRust(),
+      ])
 
       return {
         ...cloneData(workspaceSnapshotMockData),
         shopping,
+        nutrition,
       } satisfies WorkspaceSnapshot
     },
 
@@ -66,7 +86,8 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     getReflection: () => requestJson<ReflectionModuleData>(BETTERTOLIVE_API_ENDPOINTS.reflection),
     getEvents: () => requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
     getFinance: () => requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
-    getNutrition: () => requestJson<NutritionModuleData>(BETTERTOLIVE_API_ENDPOINTS.nutrition),
+    getNutrition: () => getNutritionFromRust(),
+    saveNutrition: (nutrition) => saveNutritionToRust(nutrition),
     getEmotion: () => requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
     getBeliefs: () => requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
     getPrinciples: () => requestJson<PrinciplesModuleData>(BETTERTOLIVE_API_ENDPOINTS.principles),

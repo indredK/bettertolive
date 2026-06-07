@@ -1,0 +1,681 @@
+import { Plus, Trash2 } from "lucide-react"
+import type { FormEvent, ReactNode } from "react"
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+
+import { Button } from "@/components/ui/button"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { useSaveNutritionMutation } from "@/features/bettertolive/queries/use-save-nutrition-mutation"
+import type {
+  MealStructure,
+  NutritionModuleData,
+  Recipe,
+  RecipeIngredient,
+} from "@/features/bettertolive/types"
+import {
+  NUTRITION_DIALOG_CONTENT_CLASS,
+  NUTRITION_DIALOG_FIELD_CLASS,
+  NUTRITION_DIALOG_FOOTER_CLASS,
+  NUTRITION_DIALOG_HEADER_CLASS,
+  NUTRITION_DIALOG_SECTION_CLASS,
+} from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
+import { cn } from "@/lib/utils"
+
+export type EditingRecipe = {
+  isNew: boolean
+  recipe: Recipe | null
+}
+
+type RecipeIngredientForm = {
+  foodId: string
+  amount: string
+  unit: RecipeIngredient["unit"]
+  note: string
+}
+
+type RecipeFormState = {
+  name: string
+  summary: string
+  servings: string
+  mealRoles: MealStructure[]
+  linkedFoodMemoryId: string
+  ingredients: RecipeIngredientForm[]
+  stepsText: string
+  prepMinutes: string
+  cookMinutes: string
+  difficulty: Recipe["difficulty"]
+  repeatability: Recipe["repeatability"]
+  tagsText: string
+}
+
+const MEAL_ROLE_OPTIONS: MealStructure[] = [
+  "早餐",
+  "午餐",
+  "晚餐",
+  "加餐",
+  "夜宵",
+  "节庆餐",
+  "饮品",
+]
+const INGREDIENT_UNIT_OPTIONS: RecipeIngredient["unit"][] = ["g", "ml", "个", "份"]
+const DIFFICULTY_OPTIONS: Recipe["difficulty"][] = ["简单", "中等", "麻烦"]
+const REPEATABILITY_OPTIONS: Recipe["repeatability"][] = ["常做", "偶尔", "只想记录"]
+const NONE_VALUE = "__none__"
+
+function normalizeSelectValue(value: string | null) {
+  return value === null || value === NONE_VALUE ? "" : value
+}
+
+export function NutritionRecipeEditDialog({
+  editing,
+  nutrition,
+  onClose,
+}: {
+  editing: EditingRecipe
+  nutrition: NutritionModuleData
+  onClose: () => void
+}) {
+  const { t } = useTranslation()
+  const saveNutritionMutation = useSaveNutritionMutation()
+  const [form, setForm] = useState<RecipeFormState>(() =>
+    createInitialForm(editing.recipe, nutrition.foods[0]?.id ?? ""),
+  )
+  const foodOptions = useMemo(
+    () => nutrition.foods.map((food) => ({ value: food.id, label: food.name })),
+    [nutrition.foods],
+  )
+  const foodMemoryOptions = useMemo(
+    () =>
+      (nutrition.foodMemories ?? []).map((memory) => ({
+        value: memory.id,
+        label: `${memory.name} · ${t(`nutrition.enum.foodMemoryType.${memory.type}`, memory.type)}`,
+      })),
+    [nutrition.foodMemories, t],
+  )
+  const mealRoleOptions = useMemo<MultiSelectOption[]>(
+    () =>
+      MEAL_ROLE_OPTIONS.map((role) => ({
+        value: role,
+        label: t(`nutrition.enum.mealRole.${role}`, role),
+      })),
+    [t],
+  )
+  const linkedFoodMemoryOptions = [...foodMemoryOptions]
+
+  if (
+    form.linkedFoodMemoryId &&
+    !linkedFoodMemoryOptions.some((option) => option.value === form.linkedFoodMemoryId)
+  ) {
+    linkedFoodMemoryOptions.push({
+      value: form.linkedFoodMemoryId,
+      label: t("nutrition.recipeEdit.missingFoodMemory", "已关联的食物记忆不存在"),
+    })
+  }
+  const referencedByPlans = editing.recipe
+    ? nutrition.dailyPlans.filter((plan) =>
+        plan.slots.some((slot) =>
+          slot.entries.some(
+            (entry) => entry.type === "recipe" && entry.recipeId === editing.recipe?.id,
+          ),
+        ),
+      )
+    : []
+  const referencedByLogs = editing.recipe
+    ? nutrition.mealLogs.filter((log) =>
+        log.entries.some(
+          (entry) => entry.type === "recipe" && entry.recipeId === editing.recipe?.id,
+        ),
+      )
+    : []
+  const referenceCount = referencedByPlans.length + referencedByLogs.length
+
+  const updateForm = (patch: Partial<RecipeFormState>) => {
+    setForm((current) => ({ ...current, ...patch }))
+  }
+
+  const updateIngredient = (index: number, patch: Partial<RecipeIngredientForm>) => {
+    setForm((current) => ({
+      ...current,
+      ingredients: current.ingredients.map((ingredient, ingredientIndex) =>
+        ingredientIndex === index ? { ...ingredient, ...patch } : ingredient,
+      ),
+    }))
+  }
+
+  const addIngredient = () => {
+    setForm((current) => ({
+      ...current,
+      ingredients: [...current.ingredients, createEmptyIngredient(nutrition.foods[0]?.id ?? "")],
+    }))
+  }
+
+  const removeIngredient = (index: number) => {
+    setForm((current) => ({
+      ...current,
+      ingredients: current.ingredients.filter((_, ingredientIndex) => ingredientIndex !== index),
+    }))
+  }
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault()
+
+    if (!form.name.trim()) {
+      toast.error(t("nutrition.recipeEdit.validation.nameRequired", "请填写食谱名"))
+      return
+    }
+
+    if (form.mealRoles.length === 0) {
+      toast.error(t("nutrition.recipeEdit.validation.mealRoleRequired", "请至少选择一个适用餐次"))
+      return
+    }
+
+    const nextIngredients = form.ingredients
+      .map((ingredient) => ({
+        foodId: ingredient.foodId,
+        amount: Number(ingredient.amount),
+        unit: ingredient.unit,
+        note: ingredient.note.trim() || undefined,
+      }))
+      .filter(
+        (ingredient) =>
+          ingredient.foodId && Number.isFinite(ingredient.amount) && ingredient.amount > 0,
+      )
+
+    if (nextIngredients.length === 0) {
+      toast.error(
+        t("nutrition.recipeEdit.validation.ingredientsRequired", "请至少添加一个有效食材"),
+      )
+      return
+    }
+
+    const steps = form.stepsText
+      .split("\n")
+      .map((step) => step.trim())
+      .filter(Boolean)
+
+    if (steps.length === 0) {
+      toast.error(t("nutrition.recipeEdit.validation.stepsRequired", "请至少填写一个步骤"))
+      return
+    }
+
+    const nextRecipeId = editing.recipe?.id ?? createId("recipe")
+    const nextRecipe: Recipe = {
+      id: nextRecipeId,
+      name: form.name.trim(),
+      summary: form.summary.trim() || undefined,
+      servings: parsePositiveNumber(form.servings, 1),
+      mealRoles: form.mealRoles,
+      ingredients: nextIngredients,
+      steps,
+      prepMinutes: parseOptionalPositiveNumber(form.prepMinutes),
+      cookMinutes: parseOptionalPositiveNumber(form.cookMinutes),
+      difficulty: form.difficulty,
+      repeatability: form.repeatability,
+      tags: splitTags(form.tagsText),
+      ...(form.linkedFoodMemoryId ? { linkedFoodMemoryId: form.linkedFoodMemoryId } : {}),
+    }
+    const nextRecipes = editing.isNew
+      ? [...nutrition.recipes, nextRecipe]
+      : nutrition.recipes.map((recipe) => (recipe.id === nextRecipe.id ? nextRecipe : recipe))
+
+    try {
+      await saveNutritionMutation.mutateAsync({
+        ...nutrition,
+        recipes: nextRecipes,
+      })
+      toast.success(t("nutrition.recipeEdit.saved", "食谱已保存"))
+      onClose()
+    } catch {
+      toast.error(t("nutrition.recipeEdit.saveFailed", "食谱保存失败"))
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!editing.recipe || referenceCount > 0) {
+      return
+    }
+
+    try {
+      await saveNutritionMutation.mutateAsync({
+        ...nutrition,
+        recipes: nutrition.recipes.filter((recipe) => recipe.id !== editing.recipe?.id),
+      })
+      toast.success(t("nutrition.recipeEdit.deleted", "食谱已删除"))
+      onClose()
+    } catch {
+      toast.error(t("nutrition.recipeEdit.deleteFailed", "食谱删除失败"))
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
+      <DialogContent
+        className={cn(
+          NUTRITION_DIALOG_CONTENT_CLASS,
+          "flex max-h-[min(780px,calc(100dvh-2rem))] max-w-5xl flex-col overflow-hidden",
+        )}
+      >
+        <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
+          <DialogTitle>
+            {editing.isNew
+              ? t("nutrition.recipeEdit.createTitle", "新增食谱")
+              : t("nutrition.recipeEdit.editTitle", "编辑食谱")}
+          </DialogTitle>
+          <DialogDescription>
+            {t(
+              "nutrition.recipeEdit.description",
+              "食谱引用食品库食材，营养成分会从食材自动派生。",
+            )}
+          </DialogDescription>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
+            <section className={NUTRITION_DIALOG_SECTION_CLASS}>
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_160px]">
+                <Field label={t("nutrition.recipeEdit.name", "食谱名")}>
+                  <Input
+                    value={form.name}
+                    onChange={(event) => updateForm({ name: event.target.value })}
+                    className={NUTRITION_DIALOG_FIELD_CLASS}
+                    placeholder={t("nutrition.recipeEdit.namePlaceholder", "例如：番茄鸡蛋面")}
+                  />
+                </Field>
+                <NumberField
+                  label={t("nutrition.recipeEdit.servings", "份数")}
+                  value={form.servings}
+                  onChange={(servings) => updateForm({ servings })}
+                />
+              </div>
+
+              <Field label={t("nutrition.recipeEdit.summary", "简介")}>
+                <Textarea
+                  value={form.summary}
+                  onChange={(event) => updateForm({ summary: event.target.value })}
+                  className={cn(NUTRITION_DIALOG_FIELD_CLASS, "min-h-16")}
+                  placeholder={t(
+                    "nutrition.recipeEdit.summaryPlaceholder",
+                    "这道食谱适合什么场景？",
+                  )}
+                />
+              </Field>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label={t("nutrition.recipeEdit.mealRoles", "适用餐次")}>
+                  <MultiSelect
+                    options={mealRoleOptions}
+                    value={form.mealRoles}
+                    onChange={(mealRoles) =>
+                      updateForm({ mealRoles: mealRoles as MealStructure[] })
+                    }
+                    placeholder={t("nutrition.recipeEdit.mealRolesPlaceholder", "选择餐次")}
+                    searchPlaceholder={t("nutrition.recipeEdit.mealRolesSearch", "搜索餐次")}
+                    emptyMessage={t("nutrition.recipeEdit.mealRolesEmpty", "没有匹配餐次")}
+                  />
+                </Field>
+
+                <Field label={t("nutrition.recipeEdit.tags", "标签")}>
+                  <Input
+                    value={form.tagsText}
+                    onChange={(event) => updateForm({ tagsText: event.target.value })}
+                    className={NUTRITION_DIALOG_FIELD_CLASS}
+                    placeholder={t("nutrition.recipeEdit.tagsPlaceholder", "用逗号分隔")}
+                  />
+                </Field>
+              </div>
+
+              {linkedFoodMemoryOptions.length > 0 ? (
+                <Field label={t("nutrition.recipeEdit.linkedFoodMemory", "关联食物记忆")}>
+                  <Select
+                    value={form.linkedFoodMemoryId || NONE_VALUE}
+                    onValueChange={(linkedFoodMemoryId) =>
+                      updateForm({
+                        linkedFoodMemoryId: normalizeSelectValue(linkedFoodMemoryId),
+                      })
+                    }
+                  >
+                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE_VALUE}>
+                        {t("nutrition.recipeEdit.noFoodMemory", "不关联食物记忆")}
+                      </SelectItem>
+                      {linkedFoodMemoryOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              ) : null}
+
+              <div className="grid gap-4 md:grid-cols-4">
+                <NumberField
+                  label={t("nutrition.recipeEdit.prepMinutes", "准备分钟")}
+                  value={form.prepMinutes}
+                  onChange={(prepMinutes) => updateForm({ prepMinutes })}
+                />
+                <NumberField
+                  label={t("nutrition.recipeEdit.cookMinutes", "烹饪分钟")}
+                  value={form.cookMinutes}
+                  onChange={(cookMinutes) => updateForm({ cookMinutes })}
+                />
+                <Field label={t("nutrition.recipeEdit.difficulty", "难度")}>
+                  <Select
+                    value={form.difficulty}
+                    onValueChange={(difficulty) =>
+                      updateForm({
+                        difficulty: (normalizeSelectValue(difficulty) ||
+                          form.difficulty) as Recipe["difficulty"],
+                      })
+                    }
+                  >
+                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DIFFICULTY_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {t(`nutrition.enum.difficulty.${option}`, option)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label={t("nutrition.recipeEdit.repeatability", "复用频率")}>
+                  <Select
+                    value={form.repeatability}
+                    onValueChange={(repeatability) =>
+                      updateForm({
+                        repeatability: (normalizeSelectValue(repeatability) ||
+                          form.repeatability) as Recipe["repeatability"],
+                      })
+                    }
+                  >
+                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {REPEATABILITY_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {t(`nutrition.enum.repeatability.${option}`, option)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+            </section>
+
+            <section className={NUTRITION_DIALOG_SECTION_CLASS}>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold">
+                    {t("nutrition.recipeEdit.ingredients", "食材")}
+                  </h3>
+                  <p className="text-muted-foreground mt-1 text-xs leading-5">
+                    {t(
+                      "nutrition.recipeEdit.ingredientsHint",
+                      "食材来自食品库，后续营养会按用量派生。",
+                    )}
+                  </p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addIngredient}>
+                  <Plus className="size-3.5" />
+                  {t("nutrition.recipeEdit.addIngredient", "添加食材")}
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {form.ingredients.map((ingredient, index) => (
+                  <div
+                    key={`${index}-${ingredient.foodId}`}
+                    className="border-foreground/10 bg-background/70 grid gap-3 rounded-xl border p-3 lg:grid-cols-[minmax(180px,1fr)_120px_100px_minmax(160px,0.8fr)_auto]"
+                  >
+                    <Field label={t("nutrition.recipeEdit.food", "食品")}>
+                      <Select
+                        value={ingredient.foodId || NONE_VALUE}
+                        onValueChange={(foodId) =>
+                          updateIngredient(index, { foodId: normalizeSelectValue(foodId) })
+                        }
+                      >
+                        <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={NONE_VALUE}>
+                            {t("nutrition.recipeEdit.selectFood", "选择食品")}
+                          </SelectItem>
+                          {ingredient.foodId &&
+                          !foodOptions.some((option) => option.value === ingredient.foodId) ? (
+                            <SelectItem value={ingredient.foodId}>
+                              {t("nutrition.recipeEdit.missingFood", "已关联的食品不存在")}
+                            </SelectItem>
+                          ) : null}
+                          {foodOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <NumberField
+                      label={t("nutrition.recipeEdit.amount", "用量")}
+                      value={ingredient.amount}
+                      onChange={(amount) => updateIngredient(index, { amount })}
+                    />
+                    <Field label={t("nutrition.recipeEdit.unit", "单位")}>
+                      <Select
+                        value={ingredient.unit}
+                        onValueChange={(unit) =>
+                          updateIngredient(index, {
+                            unit: (normalizeSelectValue(unit) ||
+                              ingredient.unit) as RecipeIngredient["unit"],
+                          })
+                        }
+                      >
+                        <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {INGREDIENT_UNIT_OPTIONS.map((option) => (
+                            <SelectItem key={option} value={option}>
+                              {t(`nutrition.enum.unit.${option}`, option)}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                    <Field label={t("nutrition.recipeEdit.ingredientNote", "备注")}>
+                      <Input
+                        value={ingredient.note}
+                        onChange={(event) => updateIngredient(index, { note: event.target.value })}
+                        className={NUTRITION_DIALOG_FIELD_CLASS}
+                      />
+                    </Field>
+                    <div className="flex items-end">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => removeIngredient(index)}
+                        disabled={form.ingredients.length <= 1}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className={NUTRITION_DIALOG_SECTION_CLASS}>
+              <Field label={t("nutrition.recipeEdit.steps", "步骤")}>
+                <Textarea
+                  value={form.stepsText}
+                  onChange={(event) => updateForm({ stepsText: event.target.value })}
+                  className={cn(NUTRITION_DIALOG_FIELD_CLASS, "min-h-36")}
+                  placeholder={t("nutrition.recipeEdit.stepsPlaceholder", "每行一个步骤")}
+                />
+              </Field>
+            </section>
+
+            {!editing.isNew && referenceCount > 0 ? (
+              <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed px-4 py-3 text-xs leading-5">
+                {t(
+                  "nutrition.recipeEdit.deleteBlocked",
+                  "该食谱已被 {{count}} 个计划或记录引用，暂不能删除。",
+                  { count: referenceCount },
+                )}
+              </div>
+            ) : null}
+          </div>
+
+          <DialogFooter className={NUTRITION_DIALOG_FOOTER_CLASS}>
+            {!editing.isNew ? (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={referenceCount > 0 || saveNutritionMutation.isPending}
+                className="mr-auto"
+              >
+                <Trash2 className="size-4" />
+                {t("nutrition.recipeEdit.delete", "删除")}
+              </Button>
+            ) : null}
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t("nutrition.common.cancel", "取消")}
+            </Button>
+            <Button type="submit" disabled={saveNutritionMutation.isPending}>
+              {saveNutritionMutation.isPending
+                ? t("nutrition.common.saving", "保存中")
+                : t("nutrition.common.save", "保存")}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function createInitialForm(recipe: Recipe | null, defaultFoodId: string): RecipeFormState {
+  const ingredients =
+    recipe?.ingredients.map((ingredient) => ({
+      foodId: ingredient.foodId,
+      amount: String(ingredient.amount),
+      unit: ingredient.unit,
+      note: ingredient.note ?? "",
+    })) ?? []
+
+  return {
+    name: recipe?.name ?? "",
+    summary: recipe?.summary ?? "",
+    servings: String(recipe?.servings ?? 1),
+    mealRoles: recipe?.mealRoles ?? ["午餐"],
+    linkedFoodMemoryId: recipe?.linkedFoodMemoryId ?? "",
+    ingredients: ingredients.length > 0 ? ingredients : [createEmptyIngredient(defaultFoodId)],
+    stepsText: (recipe?.steps ?? []).join("\n"),
+    prepMinutes: stringifyNumber(recipe?.prepMinutes),
+    cookMinutes: stringifyNumber(recipe?.cookMinutes),
+    difficulty: recipe?.difficulty ?? "简单",
+    repeatability: recipe?.repeatability ?? "偶尔",
+    tagsText: (recipe?.tags ?? []).join(", "),
+  }
+}
+
+function createEmptyIngredient(defaultFoodId: string): RecipeIngredientForm {
+  return {
+    foodId: defaultFoodId,
+    amount: "",
+    unit: "g",
+    note: "",
+  }
+}
+
+function splitTags(value: string) {
+  return value
+    .split(/[,，]/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+}
+
+function parseOptionalPositiveNumber(value: string) {
+  if (!value.trim()) {
+    return undefined
+  }
+
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined
+}
+
+function parsePositiveNumber(value: string, fallback: number) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
+}
+
+function stringifyNumber(value: number | undefined) {
+  return typeof value === "number" ? String(value) : ""
+}
+
+function createId(prefix: string) {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `${prefix}-${crypto.randomUUID()}`
+  }
+
+  return `${prefix}-${Date.now()}`
+}
+
+function Field({ children, label }: { children: ReactNode; label: string }) {
+  return (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      {children}
+    </div>
+  )
+}
+
+function NumberField({
+  label,
+  onChange,
+  value,
+}: {
+  label: string
+  onChange: (value: string) => void
+  value: string
+}) {
+  return (
+    <Field label={label}>
+      <Input
+        type="number"
+        min={0}
+        step="0.1"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={NUTRITION_DIALOG_FIELD_CLASS}
+      />
+    </Field>
+  )
+}

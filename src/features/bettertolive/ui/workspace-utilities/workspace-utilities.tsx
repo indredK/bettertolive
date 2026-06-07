@@ -6,7 +6,8 @@ import {
   useRef,
   useState,
 } from "react"
-import { BellRing, Music4, Palette, Wrench } from "lucide-react"
+import { BellRing, Globe, Music4, Palette, Wrench } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import type {
   WorkspaceNotification,
@@ -14,6 +15,7 @@ import type {
 } from "@/features/bettertolive/config/notifications"
 import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
+import { useLocaleStore } from "@/features/bettertolive/stores/locale-store"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
 import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"
@@ -82,6 +84,7 @@ export function WorkspaceUtilities({
   onToggleMusic: () => void | Promise<void>
   onNudgeVolume: (delta: number) => void
 }) {
+  const { t } = useTranslation()
   const [openPanel, setOpenPanel] = useState<UtilityPanel>(null)
   const [panelStyle, setPanelStyle] = useState<CSSProperties | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -91,6 +94,8 @@ export function WorkspaceUtilities({
   const musicTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   const currentTheme = themes.find((item) => item.id === themeId) ?? themes[0]
+  const locale = useLocaleStore((state) => state.locale)
+  const toggleLocale = useLocaleStore((state) => state.toggleLocale)
   const isShoppingManagementMode = useWorkspaceUiStore((state) => state.isShoppingManagementMode)
   const toggleShoppingManagementMode = useWorkspaceUiStore(
     (state) => state.toggleShoppingManagementMode,
@@ -238,6 +243,19 @@ export function WorkspaceUtilities({
           onClick={() => setOpenPanel((current) => (current === "music" ? null : "music"))}
         >
           <Music4 className="size-4" />
+        </UtilityIconButton>
+
+        <UtilityIconButton
+          isActive={false}
+          label={
+            locale === "zh"
+              ? t("shell.language.switchToEnglish")
+              : t("shell.language.switchToChinese")
+          }
+          testId="language-toggle"
+          onClick={toggleLocale}
+        >
+          <Globe className="size-4" />
         </UtilityIconButton>
 
         <UtilityIconButton

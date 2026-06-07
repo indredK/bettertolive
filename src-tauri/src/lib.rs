@@ -1,5 +1,7 @@
+mod nutrition;
 mod shopping;
 
+use nutrition::commands::{get_nutrition, save_nutrition, NutritionState};
 use shopping::commands::{
     assign_space_definition_items, assign_system_definition_items, create_shopping_item,
     create_shopping_page_content, create_shopping_space_definition, create_shopping_stage_template,
@@ -86,11 +88,16 @@ pub fn run() {
             app.manage(AppState {
                 db: Mutex::new(conn),
             });
+            app.manage(NutritionState {
+                data_path: app_data_dir.join("nutrition.json"),
+            });
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             greet,
+            get_nutrition,
+            save_nutrition,
             get_shopping,
             get_workspace_snapshot,
             list_shopping_items,

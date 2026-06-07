@@ -58,7 +58,6 @@ import { RelationshipsPage } from "@/features/bettertolive/ui/relationships/rela
 import { ShoppingPage } from "@/features/bettertolive/ui/shopping/shopping-page"
 import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page"
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
-import { LanguageToggle } from "@/features/bettertolive/ui/shell/language-toggle"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
   getSidebarBrandIconOffset,
@@ -422,6 +421,7 @@ export function BetterToLiveAppShell() {
           <NutritionPage
             nutrition={viewModel.nutritionModule}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -624,7 +624,6 @@ export function BetterToLiveAppShell() {
                           >
                             <PanelLeftClose className="size-4" />
                           </button>
-                          <LanguageToggle />
                         </div>
                       </m.div>
                     )}
@@ -701,7 +700,6 @@ export function BetterToLiveAppShell() {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <LanguageToggle />
                     <Badge
                       variant="outline"
                       className="shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"

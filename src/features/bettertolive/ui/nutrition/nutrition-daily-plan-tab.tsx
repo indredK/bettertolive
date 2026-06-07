@@ -1,0 +1,595 @@
+import { CalendarRange, CircleCheck, ClipboardCheck, Pencil, Plus, Utensils } from "lucide-react"
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { useSaveNutritionMutation } from "@/features/bettertolive/queries/use-save-nutrition-mutation"
+import type {
+  DailyMealSlot,
+  DailyPlan,
+  DailyPlanEntry,
+  MealLog,
+  MealStructure,
+  NutritionModuleData,
+  Recipe,
+} from "@/features/bettertolive/types"
+import {
+  NutritionDailyPlanEditDialog,
+  type EditingDailyPlan,
+} from "@/features/bettertolive/ui/nutrition/nutrition-daily-plan-edit-dialog"
+import {
+  NUTRIENT_KEYS,
+  NUTRIENT_UNITS,
+  buildNutritionLookups,
+  calculateDailyPlanNutrition,
+  calculateRecipeNutrition,
+  findDailyPlanForDate,
+  formatEntryTitle,
+  formatNutrientValue,
+} from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
+import {
+  NUTRITION_DETAIL_CARD_CLASS,
+  NutritionControlModeBadge,
+  NutritionDetailPane,
+  NutritionMetricCard,
+  NutritionSelectableCard,
+  NutritionSidebarPane,
+  NutritionTabBody,
+  NutritionTabViewport,
+} from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
+import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
+import { cn } from "@/lib/utils"
+
+export function NutritionDailyPlanTab({
+  isControlMode = false,
+  nutrition,
+}: {
+  isControlMode?: boolean
+  nutrition: NutritionModuleData
+}) {
+  const { t } = useTranslation()
+  const [activePlanId, setActivePlanId] = useState(
+    () => findDailyPlanForDate(nutrition.dailyPlans)?.id ?? "",
+  )
+  const [editingPlan, setEditingPlan] = useState<EditingDailyPlan | null>(null)
+  const saveNutritionMutation = useSaveNutritionMutation()
+  const activePlan =
+    nutrition.dailyPlans.find((plan) => plan.id === activePlanId) ??
+    findDailyPlanForDate(nutrition.dailyPlans)
+  const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
+  const generatedLogBySlotId = useMemo(
+    () =>
+      new Map<string, MealLog>(
+        nutrition.mealLogs.flatMap(
+          (log): Array<[string, MealLog]> => (log.plannedSlotId ? [[log.plannedSlotId, log]] : []),
+        ),
+      ),
+    [nutrition.mealLogs],
+  )
+
+  const handleGenerateMealLog = async (plan: DailyPlan, slot: DailyMealSlot) => {
+    if (!isControlMode || slot.entries.length === 0 || generatedLogBySlotId.has(slot.id)) {
+      return
+    }
+
+    const nextLog: MealLog = {
+      id: createId("meal-log"),
+      dateTime: toOffsetDateTime(defaultSlotDateTime(plan.date, slot.structure)),
+      plannedSlotId: slot.id,
+      entries: slot.entries.map(clonePlanEntry),
+      trigger: "准时按点",
+      ...(slot.note ? { note: slot.note } : {}),
+    }
+    const eatenStatus: DailyMealSlot["status"] = "eaten"
+    const nextDailyPlans: DailyPlan[] = nutrition.dailyPlans.map(
+      (currentPlan): DailyPlan =>
+        currentPlan.id === plan.id
+          ? {
+              ...currentPlan,
+              slots: currentPlan.slots.map(
+                (currentSlot): DailyMealSlot =>
+                  currentSlot.id === slot.id
+                    ? { ...currentSlot, status: eatenStatus }
+                    : currentSlot,
+              ),
+            }
+          : currentPlan,
+    )
+
+    try {
+      await saveNutritionMutation.mutateAsync({
+        ...nutrition,
+        dailyPlans: nextDailyPlans,
+        mealLogs: [nextLog, ...nutrition.mealLogs],
+      })
+      toast.success(t("nutrition.dailyPlan.logGenerated", "已从计划生成进食记录"))
+    } catch {
+      toast.error(t("nutrition.dailyPlan.logGenerateFailed", "进食记录生成失败"))
+    }
+  }
+
+  if (!activePlan) {
+    return (
+      <NutritionTabViewport>
+        <Card
+          className={cn(
+            NUTRITION_DETAIL_CARD_CLASS,
+            "flex min-h-[320px] items-center justify-center",
+          )}
+        >
+          <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-muted-foreground text-sm">
+              {t("nutrition.dailyPlan.emptyPlan", "暂无每日计划。")}
+            </p>
+            {isControlMode ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditingPlan({ isNew: true, plan: null })}
+              >
+                <Plus className="size-4" />
+                {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
+              </Button>
+            ) : null}
+          </CardContent>
+        </Card>
+        {isControlMode && editingPlan ? (
+          <NutritionDailyPlanEditDialog
+            editing={editingPlan}
+            nutrition={nutrition}
+            onClose={() => setEditingPlan(null)}
+          />
+        ) : null}
+      </NutritionTabViewport>
+    )
+  }
+
+  return (
+    <NutritionTabViewport>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
+          <h3 className="text-lg font-medium">{t("nutrition.dailyPlan.title", "每日计划")}</h3>
+          <NutritionControlModeBadge isControlMode={isControlMode} />
+        </div>
+      </div>
+      <NutritionTabBody>
+        <NutritionSidebarPane>
+          <div className="mb-3 flex items-center justify-between gap-2 px-1">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <CalendarRange className="size-4" />
+              {t("nutrition.dailyPlan.week", "一周计划")}
+            </div>
+            {isControlMode ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                onClick={() => setEditingPlan({ isNew: true, plan: null })}
+                aria-label={t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
+              >
+                <Plus className="size-3.5" />
+              </Button>
+            ) : null}
+          </div>
+          <div className="space-y-2">
+            {nutrition.dailyPlans.map((plan) => (
+              <PlanListCard
+                key={plan.id}
+                isActive={plan.id === activePlan.id}
+                onClick={() => setActivePlanId(plan.id)}
+                plan={plan}
+              />
+            ))}
+          </div>
+        </NutritionSidebarPane>
+
+        <NutritionDetailPane>
+          <div className="grid h-full min-h-0 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(280px,0.42fr)]">
+            <Card
+              className={cn(NUTRITION_DETAIL_CARD_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <CardContent className="flex min-h-0 flex-1 flex-col p-4">
+                <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="text-muted-foreground text-xs">
+                      {t("nutrition.dailyPlan.selectedDate", "当前日期")}
+                    </div>
+                    <h3 className="mt-1 text-lg font-semibold tracking-tight">{activePlan.date}</h3>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant="outline"
+                      className="border-foreground/10 bg-muted text-muted-foreground"
+                    >
+                      {t("nutrition.dailyPlan.planNote", "计划是预案，不是打卡压力")}
+                    </Badge>
+                    {isControlMode ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
+                      >
+                        <Pencil className="size-3.5" />
+                        {t("nutrition.dailyPlanEdit.editAction", "编辑")}
+                      </Button>
+                    ) : null}
+                  </div>
+                </div>
+
+                <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 md:grid-cols-2 2xl:grid-cols-3">
+                  {activePlan.slots.map((slot) => (
+                    <div
+                      key={slot.id}
+                      className="border-foreground/10 bg-background/70 flex min-h-[190px] flex-col rounded-2xl border p-4"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 font-medium">
+                          <Utensils className="size-4" />
+                          {translateNutritionEnum(t, "mealRole", slot.structure)}
+                        </div>
+                        <Badge
+                          variant="outline"
+                          className="border-foreground/10 bg-muted text-muted-foreground"
+                        >
+                          {t(`nutrition.status.${slot.status}`, slot.status)}
+                        </Badge>
+                      </div>
+                      {isControlMode ? (
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
+                          <Button
+                            type="button"
+                            variant={generatedLogBySlotId.has(slot.id) ? "secondary" : "outline"}
+                            size="sm"
+                            disabled={
+                              slot.entries.length === 0 ||
+                              generatedLogBySlotId.has(slot.id) ||
+                              saveNutritionMutation.isPending
+                            }
+                            onClick={() => handleGenerateMealLog(activePlan, slot)}
+                          >
+                            <ClipboardCheck className="size-3.5" />
+                            {generatedLogBySlotId.has(slot.id)
+                              ? t("nutrition.dailyPlan.logGeneratedAction", "已生成记录")
+                              : t("nutrition.dailyPlan.generateLog", "生成进食记录")}
+                          </Button>
+                        </div>
+                      ) : null}
+
+                      <div className="mt-4 min-h-0 flex-1 space-y-2">
+                        {slot.entries.length > 0 ? (
+                          slot.entries.map((entry, index) => (
+                            <div
+                              key={`${slot.id}-${index}`}
+                              className="border-foreground/10 bg-muted/20 rounded-xl border px-3 py-2 text-sm"
+                            >
+                              {formatEntryTitle({
+                                entry,
+                                foodById: lookups.foodById,
+                                recipeById: lookups.recipeById,
+                                servingLabel: t("nutrition.units.serving", "份"),
+                                unitLabel: (unit) => translateNutritionEnum(t, "unit", unit),
+                              })}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="border-foreground/15 text-muted-foreground rounded-xl border border-dashed px-3 py-6 text-center text-sm">
+                            {t("nutrition.dailyPlan.emptySlot", "这一餐先留白")}
+                          </div>
+                        )}
+                      </div>
+
+                      {slot.note ? (
+                        <p className="text-muted-foreground mt-3 text-xs leading-5">{slot.note}</p>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <DailyNutritionPanel plan={activePlan} nutrition={nutrition} />
+          </div>
+        </NutritionDetailPane>
+      </NutritionTabBody>
+
+      {isControlMode && editingPlan ? (
+        <NutritionDailyPlanEditDialog
+          key={editingPlan.plan?.id ?? "new-daily-plan"}
+          editing={editingPlan}
+          nutrition={nutrition}
+          onClose={() => setEditingPlan(null)}
+        />
+      ) : null}
+    </NutritionTabViewport>
+  )
+}
+
+function clonePlanEntry(entry: DailyPlanEntry): DailyPlanEntry {
+  if (entry.type === "recipe") {
+    return { type: "recipe", recipeId: entry.recipeId, servings: entry.servings }
+  }
+
+  if (entry.type === "food") {
+    return { type: "food", foodId: entry.foodId, amount: entry.amount, unit: entry.unit }
+  }
+
+  return { type: "text", title: entry.title, note: entry.note }
+}
+
+function defaultSlotDateTime(date: string, structure: MealStructure) {
+  const fallbackTimeByRole: Record<MealStructure, string> = {
+    早餐: "08:00",
+    午餐: "12:30",
+    晚餐: "18:30",
+    加餐: "15:30",
+    夜宵: "22:00",
+    节庆餐: "18:30",
+    饮品: "10:00",
+  }
+
+  return `${date}T${fallbackTimeByRole[structure]}`
+}
+
+function toOffsetDateTime(value: string) {
+  const date = new Date(value)
+
+  if (Number.isNaN(date.getTime())) {
+    return value
+  }
+
+  const offsetMinutes = -date.getTimezoneOffset()
+  const sign = offsetMinutes >= 0 ? "+" : "-"
+  const absoluteOffset = Math.abs(offsetMinutes)
+  const hours = String(Math.floor(absoluteOffset / 60)).padStart(2, "0")
+  const minutes = String(absoluteOffset % 60).padStart(2, "0")
+
+  return `${value.length === 16 ? `${value}:00` : value}${sign}${hours}:${minutes}`
+}
+
+function createId(prefix: string) {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `${prefix}-${crypto.randomUUID()}`
+  }
+
+  return `${prefix}-${Date.now()}`
+}
+
+function PlanListCard({
+  isActive,
+  onClick,
+  plan,
+}: {
+  isActive: boolean
+  onClick: () => void
+  plan: DailyPlan
+}) {
+  const { t } = useTranslation()
+  const plannedCount = plan.slots.filter((slot) => slot.entries.length > 0).length
+
+  return (
+    <NutritionSelectableCard isActive={isActive} onClick={onClick}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-medium">{plan.date}</div>
+        <Badge
+          variant="outline"
+          className={cn(
+            "text-[10px]",
+            isActive
+              ? "border-ring/50 bg-accent text-accent-foreground"
+              : "border-foreground/10 bg-muted text-muted-foreground",
+          )}
+        >
+          {plannedCount}/{plan.slots.length}
+        </Badge>
+      </div>
+      <p className="text-muted-foreground mt-2 line-clamp-2 text-xs leading-5">
+        {plan.note || t("nutrition.dailyPlan.noNote", "暂无当日备注")}
+      </p>
+    </NutritionSelectableCard>
+  )
+}
+
+function DailyNutritionPanel({
+  nutrition,
+  plan,
+}: {
+  nutrition: NutritionModuleData
+  plan: DailyPlan
+}) {
+  const { t } = useTranslation()
+  const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
+  const totals = calculateDailyPlanNutrition({
+    foodById: lookups.foodById,
+    plan,
+    profileByFoodId: lookups.profileByFoodId,
+    recipeById: lookups.recipeById,
+  })
+  const emptySlotCount = plan.slots.filter((slot) => slot.entries.length === 0).length
+  const replacementRecipes = buildReplacementSuggestions({
+    foodById: lookups.foodById,
+    plan,
+    profileByFoodId: lookups.profileByFoodId,
+    recipes: nutrition.recipes,
+  })
+
+  return (
+    <Card className={cn(NUTRITION_DETAIL_CARD_CLASS, "flex min-h-0 flex-col overflow-hidden")}>
+      <CardContent className="flex min-h-0 flex-1 flex-col p-4">
+        <div className="flex shrink-0 items-center gap-2">
+          <CircleCheck className="size-4" />
+          <h3 className="text-sm font-semibold">
+            {t("nutrition.dailyPlan.nutritionSummary", "营养摘要")}
+          </h3>
+        </div>
+
+        <div className="mt-4 grid shrink-0 grid-cols-2 gap-2 xl:grid-cols-1 2xl:grid-cols-2">
+          <NutritionMetricCard
+            label={t("nutrition.nutrients.energyKcal", "能量")}
+            value={formatNutrientValue(totals.energyKcal)}
+            detail="kcal"
+          />
+          <NutritionMetricCard
+            label={t("nutrition.nutrients.proteinG", "蛋白质")}
+            value={formatNutrientValue(totals.proteinG, 1)}
+            detail="g"
+          />
+        </div>
+
+        <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <section className="border-foreground/10 bg-background/70 rounded-2xl border p-3">
+            <h4 className="text-sm font-semibold">{t("nutrition.dailyPlan.gaps", "今日缺口")}</h4>
+            <div className="mt-3 grid gap-2">
+              <GapLine
+                label={t("nutrition.dailyPlan.emptySlots", "留白餐次")}
+                value={emptySlotCount}
+                detail={t(
+                  "nutrition.dailyPlan.emptySlotsHint",
+                  "可以继续留白，也可以补一个低门槛预案",
+                )}
+              />
+              <GapLine
+                label={t("nutrition.dailyPlan.pendingNutrition", "待补营养")}
+                value={totals.missingCount}
+                detail={t("nutrition.dailyPlan.pendingNutritionHint", "缺失数据不会被当成 0")}
+              />
+            </div>
+          </section>
+
+          {NUTRIENT_KEYS.map((key) => (
+            <div
+              key={key}
+              className="border-foreground/10 bg-background/70 flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-sm"
+            >
+              <span className="text-muted-foreground">{t(`nutrition.nutrients.${key}`, key)}</span>
+              <span className="font-medium">
+                {formatNutrientValue(
+                  totals[key],
+                  key === "energyKcal" || key === "sodiumMg" ? 0 : 1,
+                )}
+                <span className="text-muted-foreground ml-1 text-xs">{NUTRIENT_UNITS[key]}</span>
+              </span>
+            </div>
+          ))}
+          {totals.missingCount > 0 ? (
+            <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed px-3 py-3 text-xs leading-5">
+              {t(
+                "nutrition.dailyPlan.missingNutrition",
+                "{{count}} 个条目营养数据待补，未按 0 计算。",
+                {
+                  count: totals.missingCount,
+                },
+              )}
+            </div>
+          ) : null}
+          <section className="border-foreground/10 bg-background/70 rounded-2xl border p-3">
+            <h4 className="text-sm font-semibold">
+              {t("nutrition.dailyPlan.replacementSuggestions", "可替换建议")}
+            </h4>
+            <p className="text-muted-foreground mt-1 text-xs leading-5">
+              {t("nutrition.dailyPlan.replacementHint", "从未安排且营养数据更完整的食谱里挑选。")}
+            </p>
+            <div className="mt-3 space-y-2">
+              {replacementRecipes.length > 0 ? (
+                replacementRecipes.map((entry) => (
+                  <div
+                    key={entry.recipe.id}
+                    className="border-foreground/10 bg-muted/20 rounded-xl border px-3 py-2"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium">{entry.recipe.name}</div>
+                        <div className="text-muted-foreground mt-1 line-clamp-1 text-xs">
+                          {entry.recipe.mealRoles
+                            .map((role) => translateNutritionEnum(t, "mealRole", role))
+                            .join(" / ")}
+                        </div>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="border-foreground/10 bg-background/70 text-[10px]"
+                      >
+                        {formatNutrientValue(entry.totals.energyKcal)}
+                        <span className="ml-1">kcal</span>
+                      </Badge>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {entry.recipe.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="border-foreground/10 bg-background/70 text-[10px]"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {entry.totals.missingCount > 0 ? (
+                        <Badge
+                          variant="outline"
+                          className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
+                        >
+                          {t("nutrition.dailyPlan.missingShort", "待补 {{count}}", {
+                            count: entry.totals.missingCount,
+                          })}
+                        </Badge>
+                      ) : null}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="border-foreground/15 text-muted-foreground rounded-xl border border-dashed px-3 py-4 text-center text-xs leading-5">
+                  {t(
+                    "nutrition.dailyPlan.noReplacement",
+                    "暂无可替换食谱，可以先补充食谱或完善营养数据。",
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function GapLine({ detail, label, value }: { detail: string; label: string; value: number }) {
+  return (
+    <div className="border-foreground/10 bg-muted/20 rounded-xl border px-3 py-2">
+      <div className="flex items-center justify-between gap-3 text-sm">
+        <span className="text-muted-foreground">{label}</span>
+        <span className="font-semibold">{value}</span>
+      </div>
+      <p className="text-muted-foreground mt-1 text-xs leading-5">{detail}</p>
+    </div>
+  )
+}
+
+function buildReplacementSuggestions({
+  foodById,
+  plan,
+  profileByFoodId,
+  recipes,
+}: {
+  foodById: ReturnType<typeof buildNutritionLookups>["foodById"]
+  plan: DailyPlan
+  profileByFoodId: ReturnType<typeof buildNutritionLookups>["profileByFoodId"]
+  recipes: Recipe[]
+}) {
+  const plannedRecipeIds = new Set(
+    plan.slots.flatMap((slot) =>
+      slot.entries.flatMap((entry) => (entry.type === "recipe" ? [entry.recipeId] : [])),
+    ),
+  )
+
+  return recipes
+    .filter((recipe) => recipe.repeatability !== "只想记录" && !plannedRecipeIds.has(recipe.id))
+    .map((recipe) => ({
+      recipe,
+      totals: calculateRecipeNutrition({ foodById, profileByFoodId, recipe }),
+    }))
+    .sort((a, b) => a.totals.missingCount - b.totals.missingCount)
+    .slice(0, 3)
+}

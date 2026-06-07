@@ -1,9 +1,15 @@
 import type { BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
+import type { NutritionModuleData } from "@/features/bettertolive/types"
 
 const MOCK_API_LATENCY_MS = 80
+let nutritionMockData: NutritionModuleData = cloneMockData(workspaceSnapshotMockData.nutrition)
 
 function cloneMockData<T>(data: T): T {
+  if (typeof data === "undefined") {
+    return data
+  }
+
   return JSON.parse(JSON.stringify(data)) as T
 }
 
@@ -20,7 +26,11 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getEvents: () => withMockLatency(workspaceSnapshotMockData.events),
     getFinance: () => withMockLatency(workspaceSnapshotMockData.finance),
     getShopping: () => withMockLatency(workspaceSnapshotMockData.shopping),
-    getNutrition: () => withMockLatency(workspaceSnapshotMockData.nutrition),
+    getNutrition: () => withMockLatency(nutritionMockData),
+    saveNutrition: (nutrition) => {
+      nutritionMockData = cloneMockData(nutrition)
+      return withMockLatency(undefined)
+    },
     getEmotion: () => withMockLatency(workspaceSnapshotMockData.emotion),
     getBeliefs: () => withMockLatency(workspaceSnapshotMockData.beliefs),
     getPrinciples: () => withMockLatency(workspaceSnapshotMockData.principles),
@@ -35,6 +45,10 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getLegacy: () => withMockLatency(workspaceSnapshotMockData.legacy),
     getSocioeconomics: () => withMockLatency(workspaceSnapshotMockData.socioeconomics),
     getFuture: () => withMockLatency(workspaceSnapshotMockData.future),
-    getWorkspaceSnapshot: () => withMockLatency(workspaceSnapshotMockData),
+    getWorkspaceSnapshot: () =>
+      withMockLatency({
+        ...workspaceSnapshotMockData,
+        nutrition: nutritionMockData,
+      }),
   }
 }
