@@ -111,7 +111,10 @@ export function ShoppingSystemEditDialog({
 
     const displayName = editing.system.name || editing.system.id
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSystem", `确定删除 ${displayName} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteSystem", {
+        name: displayName,
+        defaultValue: `确定删除 ${displayName} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingSystem", {
         name: displayName,
         defaultValue: `已加入删除队列：${displayName}，5 秒内可撤销`,
@@ -200,7 +203,10 @@ export function ShoppingSystemEditDialog({
                   value={secondaryGroups}
                   onChange={(event) => setSecondaryGroups(event.target.value)}
                   rows={4}
-                  placeholder="日常打扫, 洗衣, ..."
+                  placeholder={t(
+                    "shopping.systems.form.secondaryGroupsPlaceholder",
+                    "日常打扫, 洗衣, ...",
+                  )}
                   className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
                 />
               </div>

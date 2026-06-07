@@ -89,7 +89,10 @@ export function ShoppingSpaceEditDialog({
     if (!editing.space) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSpace", `确定删除 ${editing.space.name} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteSpace", {
+        name: editing.space.name,
+        defaultValue: `确定删除 ${editing.space.name} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingSpace", {
         name: editing.space.name,
         defaultValue: `已加入删除队列：${editing.space.name}，5 秒内可撤销`,

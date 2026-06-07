@@ -34,7 +34,8 @@
       "deleteUndoneItem": "已撤销删除：{{name}}",
       "deleteUndoneSystem": "已撤销删除：{{name}}",
       "deleteUndoneSpace": "已撤销删除：{{name}}",
-      "deleteUndoneStage": "已撤销删除：{{name}}"
+      "deleteUndoneStage": "已撤销删除：{{name}}",
+      "saved": "已保存"
     },
     "undo": "撤销",
     "overview": {
@@ -45,7 +46,7 @@
       "switchToNth": "切换到第 {{n}} 条提醒",
       "noSpotlights": "当前筛选下没有需要注意的系统提醒。",
       "dimensions": "五维分类",
-      "lifestyle": "生活方式",
+      "lifestyle": "生活方式集合",
       "boundary": "边界约定",
       "actionRhythm": "动作节奏",
       "actionRhythmDesc": "同样都是“需要”，但下一步完全不同：补货、等好价、一次备齐，还是别乱动。",
@@ -58,7 +59,36 @@
       "noItemsUnderFilter": "当前筛选下还没有条目。",
       "noHighDepreciationWarnings": "当前筛选下没有需要额外冷静的高折旧幸福感物品。",
       "noSlowDepreciationSuggestions": "当前筛选下没有慢折旧的长期件建议。",
-      "noEssentialsReminder": "当前筛选下没有基础提醒。"
+      "noEssentialsReminder": "当前筛选下没有基础提醒。",
+      "itemsTotal": "物品",
+      "totalChildren": "子级",
+      "totalStages": "阶段",
+      "totalSystems": "系统",
+      "itemsWanted": "待购",
+      "stagePulse": "阶段脉冲",
+      "stagePulseDescription": "最能代表当前生活阶段的配置重心。",
+      "systemPulse": "系统热点",
+      "systemPulseDescription": "哪些物件系统正在形成真正的支撑面。",
+      "spacePulse": "空间锚点",
+      "spacePulseDescription": "空间场景能暴露出你真正高频使用和维护的生活区域。",
+      "eyebrow": "生活系统总览",
+      "heroTitle": "把购物看成生活结构，而不是待买清单",
+      "heroDescription": "总览把物品、阶段、系统与空间收敛到一页里，帮助你判断现在需要补齐什么、哪些地方已经过密，以及当前生活方式正在被什么支撑。",
+      "curationTitle": "当下策展",
+      "curatedSubtitle": "把正在支撑生活的物件、焦点与集合放在同一视野里。",
+      "focusFallback": "当前焦点",
+      "focusReasonFallback": "还没有焦点提示时，这里会成为购物策略与注意事项的主叙事位。",
+      "lifestyleFallback": "把一组共同服务于某种生活方式的物品归拢起来，能快速看出你真正重视的使用场景。",
+      "structureTitle": "结构密度",
+      "structureSubtitle": "物品不是越多越好，关键是它们是否形成清晰层次。",
+      "portfolioSplit": "拥有 / 待购",
+      "portfolioSplitHint": "先看结构倾向，再看数量",
+      "structureChartTitle": "结构层级",
+      "structureChartHint": "看数量，也看组织成本",
+      "boundaries": "边界清单",
+      "spotlights": "焦点提示",
+      "moreAttentionItems": "+{{count}} 条注意事项",
+      "moreRelatedItems": "+{{count}} 个相关项目"
     },
     "dimensions": {
       "system": {
@@ -106,9 +136,9 @@
       }
     },
     "priceSignal": {
-      "inBuyZone": "已进可买区间",
-      "overpriced": "当前偏贵",
-      "watchOnly": "先观察",
+      "inBuyZone": "在买点",
+      "overpriced": "偏贵",
+      "watchOnly": "观望",
       "title": "价格信号"
     },
     "validation": {
@@ -185,6 +215,15 @@
         "NeedRestock": "需要补货",
         "MissingParts": "缺补件",
         "NeedComplete": "需要补齐"
+      },
+      "status": {
+        "Owned": "已有",
+        "Wanted": "待购"
+      },
+      "lane": {
+        "Now": "立即买",
+        "Wait": "等好价",
+        "Hold": "先不买"
       }
     },
     "laneName": {
@@ -226,10 +265,17 @@
         "save": "保存",
         "autoId": "自动生成 ID:",
         "basicInfo": "基本信息",
-        "name": "名称"
+        "name": "名称",
+        "secondaryGroupsPlaceholder": "日常打扫, 洗衣, ..."
       },
       "itemCount": "{{count}} 个物品",
-      "emptySystem": "当前系统下暂无物品"
+      "emptySystem": "当前系统下暂无物品",
+      "title": "物件系统",
+      "addSystem": "新增系统",
+      "emptyHint": "还没有系统定义,点击「新增系统」开始",
+      "reordered": "系统顺序已更新",
+      "ownedInlineCount": "{{count}} 已有",
+      "wantedInlineCount": "{{count}} 待购"
     },
     "spaces": {
       "totalItemsAndSystems": "共 {{total}} 项 · {{systems}} 个系统",
@@ -265,7 +311,13 @@
         "owned": "已拥有"
       },
       "summary": "共 {{total}} 项 · {{systems}} 个系统",
-      "emptySpace": "当前空间下暂无物品"
+      "emptySpace": "当前空间下暂无物品",
+      "title": "空间场景",
+      "addSpace": "新增空间",
+      "emptyHint": "还没有空间定义,点击「新增空间」开始",
+      "reordered": "空间顺序已更新",
+      "ownedInlineCount": "{{count}} 已有",
+      "wantedInlineCount": "{{count}} 待购"
     },
     "stages": {
       "systemCount": "{{count}} 个系统",
@@ -309,6 +361,21 @@
         "placeholder": "未选(可空)",
         "noItemsForSystem": "该系统下还没有物品,先去物件库里创建",
         "unresolved": "(物品已删除或不存在)"
+      },
+      "title": "阶段适用",
+      "addStage": "新增阶段",
+      "empty": "还没有阶段适用,点击「新增阶段」开始",
+      "noMatchingStages": "没有匹配的阶段适用",
+      "noItems": "该阶段还没有物品,在「编辑」里添加",
+      "noVisibleGroups": "当前视角下还没有可展示的维度",
+      "reordered": "阶段顺序已更新",
+      "systemView": "系统视图",
+      "spaceView": "空间视图",
+      "itemInlineCount": "{{count}} 个物品",
+      "tier": {
+        "low": "最低",
+        "base": "基础",
+        "up": "升级"
       }
     },
     "planning": {
@@ -320,9 +387,9 @@
       "lifecycle": "生命周期",
       "all": "全部",
       "itemCount": "{{count}} 个物件",
-      "searchPlaceholder": "搜索物件...",
-      "selectPrompt": "选择一个物件查看采购详情",
-      "noMatchingItems": "当前筛选条件下没有匹配的物件。",
+      "searchPlaceholder": "搜索物品 / 子级 / 渠道",
+      "selectPrompt": "从左侧选择一个物品查看详情",
+      "noMatchingItems": "无匹配物品",
       "decisionReason": "决策理由",
       "priceReference": "价格参考",
       "systemInfo": "系统信息",
@@ -340,7 +407,9 @@
         "comfortZone": "舒适区间",
         "overpay": "偏贵"
       },
-      "title": "物件库"
+      "title": "物件库",
+      "addItem": "新增物品",
+      "filteredItemCount": "{{count}} / {{total}} 个物品"
     },
     "shared": {
       "boundaryTable": {
@@ -505,12 +574,99 @@
       }
     },
     "item": {
-      "children": "子级"
+      "children": "子级",
+      "create": "新增物品",
+      "edit": "编辑物品",
+      "basicAttributes": "基础属性",
+      "name": "名称",
+      "systemTags": "系统标签",
+      "spaceTags": "空间标签",
+      "note": "备注",
+      "childSettings": "子级设置",
+      "addChild": "添加子级",
+      "noChildren": "暂未添加子级",
+      "childCount": "{{count}} 个子级",
+      "childLabel": "子级 {{index}}",
+      "childName": "子级名称",
+      "status": "状态",
+      "lifecycle": "生命周期",
+      "depreciation": "折旧",
+      "depPlaceholder": "可选",
+      "childChannels": "渠道价格参考",
+      "addChannel": "添加渠道",
+      "noChildChannels": "暂未添加渠道价格",
+      "channelName": "渠道",
+      "defaultChannels": {
+        "jd": "京东",
+        "taobao": "淘宝",
+        "pinduoduo": "拼多多",
+        "douyin": "抖音"
+      }
     },
     "priceRef": {
-      "entry": "入门",
-      "sweet": "甜蜜",
-      "overpay": "虚高"
+      "entry": "入门价",
+      "sweet": "甜蜜价",
+      "overpay": "虚高价"
+    },
+    "pageEyebrow": "Shopping",
+    "pageTitle": "购物",
+    "pageDescription": "物件库 + 物件系统 + 空间场景 + 阶段适用",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "note": "备注",
+    "search": "搜索...",
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "error": {
+      "idNameRequired": "缺少系统 ID",
+      "itemRequired": "请填写名称,并至少各选一个系统和空间",
+      "nameRequired": "请填写名称"
+    },
+    "confirm": {
+      "deleteItem": "确定删除 {{name}} 吗？",
+      "deleteSystem": "确定删除 {{name}} 吗？",
+      "deleteSpace": "确定删除 {{name}} 吗？",
+      "deleteStage": "确定删除 {{name}} 吗？"
+    },
+    "filter": {
+      "all": "全部",
+      "allSpaces": "全部空间",
+      "allSystems": "全部系统",
+      "clearAll": "清空",
+      "more": "筛选",
+      "noSpace": "未分配空间",
+      "noSystem": "未分配系统",
+      "space": "空间",
+      "system": "系统"
+    },
+    "sortable": {
+      "dragHandle": "拖动排序"
+    },
+    "system": {
+      "create": "新增系统",
+      "edit": "编辑系统"
+    },
+    "space": {
+      "create": "新增空间",
+      "edit": "编辑空间"
+    },
+    "stage": {
+      "create": "新增阶段",
+      "edit": "编辑阶段",
+      "basicInfo": "基本属性",
+      "name": "名称",
+      "description": "描述",
+      "focus": "重点",
+      "items": "阶段物品",
+      "emptyDimensions": "先添加物品",
+      "emptyShuttleHint": "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
+      "noChildren": "该物品暂无子级",
+      "noMatchingChildren": "没有匹配的子级",
+      "selectTierChildren": "选择子级",
+      "shuttleDescription": "将属于此阶段的物品移至右侧，保存后生效"
     }
   },
   "shell": {

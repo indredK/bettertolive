@@ -184,6 +184,34 @@ export type ShoppingLifestyleCollection = {
   items: string[]
 }
 
+export type ShoppingOverviewStagePulse = {
+  id: string
+  name: string
+  itemCount: number
+}
+
+export type ShoppingOverviewDimensionPulse = {
+  id: string
+  name: string
+  itemCount: number
+}
+
+export type ShoppingOverview = {
+  totalItems: number
+  ownedItems: number
+  wantedItems: number
+  totalSystems: number
+  totalSpaces: number
+  totalStages: number
+  totalChildren: number
+  totalSpotlights: number
+  totalBoundaryEntries: number
+  totalLifestyleCollections: number
+  topStagePulses: ShoppingOverviewStagePulse[]
+  topSystemPulses: ShoppingOverviewDimensionPulse[]
+  topSpacePulses: ShoppingOverviewDimensionPulse[]
+}
+
 export type RecentRecordKind = "反思" | "记事" | "支出" | "收入" | "蓝图" | "情绪" | "记忆" | "托付"
 
 export type RecentRecord = {
@@ -728,6 +756,7 @@ export type FinanceModuleData = {
 }
 
 export type ShoppingModuleData = {
+  overview: ShoppingOverview
   systemDefinitions: ShoppingSystemDefinition[]
   spaceDefinitions: ShoppingSpaceDefinition[]
   spotlights: ShoppingSpotlight[]

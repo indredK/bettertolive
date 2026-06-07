@@ -34,7 +34,8 @@
       "deleteUndoneItem": "Deletion undone: {{name}}",
       "deleteUndoneSystem": "Deletion undone: {{name}}",
       "deleteUndoneSpace": "Deletion undone: {{name}}",
-      "deleteUndoneStage": "Deletion undone: {{name}}"
+      "deleteUndoneStage": "Deletion undone: {{name}}",
+      "saved": "Saved"
     },
     "undo": "Undo",
     "overview": {
@@ -45,7 +46,7 @@
       "switchToNth": "Switch to reminder {{n}}",
       "noSpotlights": "No system reminders to highlight under current filters.",
       "dimensions": "5 Dimensions",
-      "lifestyle": "Lifestyle",
+      "lifestyle": "Lifestyle Collection",
       "boundary": "Boundaries",
       "actionRhythm": "Action Rhythm",
       "actionRhythmDesc": "Every need has a different next step: restock, wait for a deal, buy once, or leave it alone.",
@@ -58,7 +59,36 @@
       "noItemsUnderFilter": "No items under current filter.",
       "noHighDepreciationWarnings": "No high-depreciation happiness items that need extra caution under current filters.",
       "noSlowDepreciationSuggestions": "No slow-depreciation long-term item suggestions under current filters.",
-      "noEssentialsReminder": "No essentials reminder under current filter."
+      "noEssentialsReminder": "No essentials reminder under current filter.",
+      "itemsTotal": "Items",
+      "totalChildren": "Children",
+      "totalStages": "Stages",
+      "totalSystems": "Systems",
+      "itemsWanted": "Wanted",
+      "stagePulse": "Stage Pulse",
+      "stagePulseDescription": "The configuration focus that best represents your current life stage.",
+      "systemPulse": "System Hotspots",
+      "systemPulseDescription": "Which item systems are forming real support surfaces.",
+      "spacePulse": "Space Anchors",
+      "spacePulseDescription": "Space scenes reveal the areas you use and maintain most frequently.",
+      "eyebrow": "Life System Overview",
+      "heroTitle": "Treat shopping as life structure, not a to-buy list",
+      "heroDescription": "The overview brings items, stages, systems, and spaces into one page so you can judge what needs filling, where density is too high, and what supports your current lifestyle.",
+      "curationTitle": "Current Curation",
+      "curatedSubtitle": "Put supporting items, spotlights, and collections in the same field of view.",
+      "focusFallback": "Current Focus",
+      "focusReasonFallback": "When there are no spotlight hints, this becomes the main narrative area for shopping strategy and attention points.",
+      "lifestyleFallback": "Grouping items that serve one lifestyle makes your real usage scenes visible faster.",
+      "structureTitle": "Structure Density",
+      "structureSubtitle": "More items is not always better. The key is whether they form clear layers.",
+      "portfolioSplit": "Owned / Wanted",
+      "portfolioSplitHint": "Read structure first, then quantity",
+      "structureChartTitle": "Structure Layers",
+      "structureChartHint": "See quantity and organization cost together",
+      "boundaries": "Boundary List",
+      "spotlights": "Spotlights",
+      "moreAttentionItems": "+{{count}} attention items",
+      "moreRelatedItems": "+{{count}} related items"
     },
     "dimensions": {
       "system": {
@@ -106,9 +136,9 @@
       }
     },
     "priceSignal": {
-      "inBuyZone": "In Buy Zone",
-      "overpriced": "Currently Expensive",
-      "watchOnly": "Watch & Wait",
+      "inBuyZone": "In buy zone",
+      "overpriced": "Overpriced",
+      "watchOnly": "Watch only",
       "title": "Price Signal"
     },
     "validation": {
@@ -185,6 +215,15 @@
         "NeedRestock": "Need Restock",
         "MissingParts": "Missing Parts",
         "NeedComplete": "Need Completion"
+      },
+      "status": {
+        "Owned": "Owned",
+        "Wanted": "Wanted"
+      },
+      "lane": {
+        "Now": "Buy now",
+        "Wait": "Wait for deal",
+        "Hold": "Hold off"
       }
     },
     "laneName": {
@@ -226,10 +265,17 @@
         "save": "Save",
         "autoId": "Auto-generated ID:",
         "basicInfo": "Basic Info",
-        "name": "Name"
+        "name": "Name",
+        "secondaryGroupsPlaceholder": "Daily cleaning, laundry, ..."
       },
       "itemCount": "{{count}} items",
-      "emptySystem": "No items in this system"
+      "emptySystem": "No items in this system",
+      "title": "Item Systems",
+      "addSystem": "Add System",
+      "emptyHint": "No system definitions yet. Click “Add System” to start.",
+      "reordered": "System order updated",
+      "ownedInlineCount": "{{count}} owned",
+      "wantedInlineCount": "{{count}} wanted"
     },
     "spaces": {
       "totalItemsAndSystems": "{{total}} items · {{systems}} systems",
@@ -265,7 +311,13 @@
         "owned": "Owned"
       },
       "summary": "{{total}} items · {{systems}} systems",
-      "emptySpace": "No items in this space"
+      "emptySpace": "No items in this space",
+      "title": "Space Scenes",
+      "addSpace": "Add Space",
+      "emptyHint": "No space definitions yet. Click “Add Space” to start.",
+      "reordered": "Space order updated",
+      "ownedInlineCount": "{{count}} owned",
+      "wantedInlineCount": "{{count}} wanted"
     },
     "stages": {
       "systemCount": "{{count}} systems",
@@ -309,6 +361,21 @@
         "placeholder": "None selected (optional)",
         "noItemsForSystem": "No items under this system yet. Create them on the Item Library tab.",
         "unresolved": "(item deleted or not found)"
+      },
+      "title": "Stage Fit",
+      "addStage": "Add Stage",
+      "empty": "No stage templates yet. Click “Add Stage” to start.",
+      "noMatchingStages": "No matching stage templates",
+      "noItems": "This stage has no items yet. Add them in Edit.",
+      "noVisibleGroups": "No dimensions to show in the current view",
+      "reordered": "Stage order updated",
+      "systemView": "System View",
+      "spaceView": "Space View",
+      "itemInlineCount": "{{count}} items",
+      "tier": {
+        "low": "Minimum",
+        "base": "Base",
+        "up": "Upgrade"
       }
     },
     "planning": {
@@ -320,9 +387,9 @@
       "lifecycle": "Lifecycle",
       "all": "All",
       "itemCount": "{{count}} items",
-      "searchPlaceholder": "Search items...",
-      "selectPrompt": "Select an item to view purchase details",
-      "noMatchingItems": "No matching items under current filters.",
+      "searchPlaceholder": "Search items / children / channels",
+      "selectPrompt": "Select an item on the left to view details",
+      "noMatchingItems": "No matching items",
       "decisionReason": "Decision Rationale",
       "priceReference": "Price Reference",
       "systemInfo": "System Info",
@@ -340,7 +407,9 @@
         "comfortZone": "Comfort Zone",
         "overpay": "Overpay"
       },
-      "title": "Item Library"
+      "title": "Item Library",
+      "addItem": "Add Item",
+      "filteredItemCount": "{{count}} / {{total}} items"
     },
     "shared": {
       "boundaryTable": {
@@ -505,12 +574,99 @@
       }
     },
     "item": {
-      "children": "Children"
+      "children": "Children",
+      "create": "Add Item",
+      "edit": "Edit Item",
+      "basicAttributes": "Basic Attributes",
+      "name": "Name",
+      "systemTags": "System tags",
+      "spaceTags": "Space tags",
+      "note": "Note",
+      "childSettings": "Child Settings",
+      "addChild": "Add Child",
+      "noChildren": "No children yet",
+      "childCount": "{{count}} children",
+      "childLabel": "Child {{index}}",
+      "childName": "Child name",
+      "status": "Status",
+      "lifecycle": "Lifecycle",
+      "depreciation": "Depreciation",
+      "depPlaceholder": "Optional",
+      "childChannels": "Channel price references",
+      "addChannel": "Add Channel",
+      "noChildChannels": "No channel prices yet",
+      "channelName": "Channel",
+      "defaultChannels": {
+        "jd": "JD",
+        "taobao": "Taobao",
+        "pinduoduo": "Pinduoduo",
+        "douyin": "Douyin"
+      }
     },
     "priceRef": {
-      "entry": "Entry",
-      "sweet": "Sweet",
+      "entry": "Entry price",
+      "sweet": "Sweet spot",
       "overpay": "Overpay"
+    },
+    "pageEyebrow": "Shopping",
+    "pageTitle": "Shopping",
+    "pageDescription": "Item Library + Item Systems + Space Scenes + Stage Fit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "note": "Note",
+    "search": "Search...",
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "error": {
+      "idNameRequired": "Missing system ID",
+      "itemRequired": "Enter a name and select at least one system and one space",
+      "nameRequired": "Enter a name"
+    },
+    "confirm": {
+      "deleteItem": "Delete {{name}}?",
+      "deleteSystem": "Delete {{name}}?",
+      "deleteSpace": "Delete {{name}}?",
+      "deleteStage": "Delete {{name}}?"
+    },
+    "filter": {
+      "all": "All",
+      "allSpaces": "All spaces",
+      "allSystems": "All systems",
+      "clearAll": "Clear all",
+      "more": "Filters",
+      "noSpace": "No space",
+      "noSystem": "No system",
+      "space": "Space",
+      "system": "System"
+    },
+    "sortable": {
+      "dragHandle": "Drag to reorder"
+    },
+    "system": {
+      "create": "Add System",
+      "edit": "Edit System"
+    },
+    "space": {
+      "create": "Add Space",
+      "edit": "Edit Space"
+    },
+    "stage": {
+      "create": "Add Stage",
+      "edit": "Edit Stage",
+      "basicInfo": "Basic Info",
+      "name": "Name",
+      "description": "Description",
+      "focus": "Focus",
+      "items": "Stage Items",
+      "emptyDimensions": "Add items first",
+      "emptyShuttleHint": "Use the transfer box above to add stage items, then configure child tiers for each item.",
+      "noChildren": "This item has no children",
+      "noMatchingChildren": "No matching children",
+      "selectTierChildren": "Select children",
+      "shuttleDescription": "Move items belonging to this stage to the right, then save"
     }
   },
   "shell": {

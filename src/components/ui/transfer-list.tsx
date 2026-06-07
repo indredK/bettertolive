@@ -27,6 +27,8 @@ export type TransferListLabels = {
   removeAll: string
 }
 
+type TransferListItemLayout = "default" | "compact"
+
 export function TransferList({
   items,
   selectedIds,
@@ -34,6 +36,7 @@ export function TransferList({
   labels,
   description,
   className,
+  itemLayout = "default",
 }: {
   items: TransferListItem[]
   selectedIds: string[]
@@ -41,6 +44,7 @@ export function TransferList({
   labels: TransferListLabels
   description?: ReactNode
   className?: string
+  itemLayout?: TransferListItemLayout
 }) {
   const [availableSearch, setAvailableSearch] = useState("")
   const [selectedSearch, setSelectedSearch] = useState("")
@@ -132,6 +136,7 @@ export function TransferList({
           items={filteredAvailableItems}
           emptyMessage={labels.emptyAvailable}
           searchPlaceholder={labels.searchPlaceholder}
+          itemLayout={itemLayout}
         />
 
         <div className="flex flex-row items-center justify-center gap-2 xl:flex-col">
@@ -198,6 +203,7 @@ export function TransferList({
           items={filteredSelectedItems}
           emptyMessage={labels.emptySelected}
           searchPlaceholder={labels.searchPlaceholder}
+          itemLayout={itemLayout}
         />
       </div>
     </div>
@@ -215,6 +221,7 @@ function TransferListPanel({
   items,
   emptyMessage,
   searchPlaceholder,
+  itemLayout,
 }: {
   title: string
   count: number
@@ -226,6 +233,7 @@ function TransferListPanel({
   items: TransferListItem[]
   emptyMessage: string
   searchPlaceholder: string
+  itemLayout: TransferListItemLayout
 }) {
   const hasSearch = searchValue.trim().length > 0
 
@@ -261,7 +269,8 @@ function TransferListPanel({
               <label
                 key={item.id}
                 className={cn(
-                  "border-foreground/10 flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors",
+                  "border-foreground/10 flex cursor-pointer items-start rounded-lg border transition-colors",
+                  itemLayout === "compact" ? "gap-2 p-2.5" : "gap-3 p-3",
                   checkedIds.has(item.id)
                     ? "bg-muted/45 ring-foreground/10 ring-1"
                     : "bg-background/85 hover:bg-muted/35",
@@ -270,16 +279,34 @@ function TransferListPanel({
                 <Checkbox
                   checked={checkedIds.has(item.id)}
                   onCheckedChange={() => onToggleChecked(item.id)}
-                  className="mt-0.5 shrink-0"
+                  className={cn("shrink-0", itemLayout === "compact" ? "mt-0.5" : "mt-0.5")}
                 />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium">{item.title}</div>
-                  {item.description ? (
-                    <div className="text-muted-foreground mt-1 text-xs">{item.description}</div>
-                  ) : null}
-                  {item.meta ? (
-                    <div className="mt-2 flex flex-wrap gap-1.5">{item.meta}</div>
-                  ) : null}
+                  {itemLayout === "compact" ? (
+                    <>
+                      <div className="flex min-w-0 items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1 truncate text-sm leading-5 font-medium">
+                          {item.title}
+                        </div>
+                        {item.meta ? <div className="shrink-0">{item.meta}</div> : null}
+                      </div>
+                      {item.description ? (
+                        <div className="text-muted-foreground mt-0.5 line-clamp-2 text-xs leading-5">
+                          {item.description}
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <>
+                      <div className="truncate text-sm font-medium">{item.title}</div>
+                      {item.description ? (
+                        <div className="text-muted-foreground mt-1 text-xs">{item.description}</div>
+                      ) : null}
+                      {item.meta ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5">{item.meta}</div>
+                      ) : null}
+                    </>
+                  )}
                 </div>
               </label>
             ))}

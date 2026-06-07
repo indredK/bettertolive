@@ -161,6 +161,7 @@ export type ShoppingLifestyleCollectionDto = {
 export type ShoppingModuleDto = ShoppingModuleDto_Serialize | ShoppingModuleDto_Deserialize;
 
 export type ShoppingModuleDto_Deserialize = {
+	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
@@ -171,6 +172,7 @@ export type ShoppingModuleDto_Deserialize = {
 };
 
 export type ShoppingModuleDto_Serialize = {
+	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
 	spotlights: ShoppingSpotlightDto[],
@@ -178,6 +180,34 @@ export type ShoppingModuleDto_Serialize = {
 	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
+};
+
+export type ShoppingOverviewDimensionPulseDto = {
+	id: string,
+	name: string,
+	itemCount: number,
+};
+
+export type ShoppingOverviewDto = {
+	totalItems: number,
+	ownedItems: number,
+	wantedItems: number,
+	totalSystems: number,
+	totalSpaces: number,
+	totalStages: number,
+	totalChildren: number,
+	totalSpotlights: number,
+	totalBoundaryEntries: number,
+	totalLifestyleCollections: number,
+	topStagePulses: ShoppingOverviewStagePulseDto[],
+	topSystemPulses: ShoppingOverviewDimensionPulseDto[],
+	topSpacePulses: ShoppingOverviewDimensionPulseDto[],
+};
+
+export type ShoppingOverviewStagePulseDto = {
+	id: string,
+	name: string,
+	itemCount: number,
 };
 
 export type ShoppingSpaceDefinitionDto = {

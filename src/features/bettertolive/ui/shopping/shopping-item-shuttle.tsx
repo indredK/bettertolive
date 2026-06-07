@@ -49,7 +49,10 @@ export function ShoppingItemShuttle({
             ]),
           ].join(" "),
           meta: (
-            <Badge variant="outline" className={STATUS_STYLES[status]}>
+            <Badge
+              variant="outline"
+              className={`h-4.5 px-1.5 text-[10px] leading-none ${STATUS_STYLES[status]}`}
+            >
               {statusDisplayName(status, t)}
             </Badge>
           ),
@@ -64,6 +67,7 @@ export function ShoppingItemShuttle({
       selectedIds={selectedIds}
       onChange={onChange}
       className={className}
+      itemLayout={scope === "stage" ? "compact" : "default"}
       description={
         scope === "system"
           ? t("shopping.systems.form.assignItemsHelp", "将属于此系统的物品移至右侧，保存后生效")

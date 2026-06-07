@@ -53,7 +53,6 @@ import { cn } from "@/lib/utils"
 
 export type EditingItem = { isNew: boolean; item: ShoppingItem | null }
 
-const DEFAULT_CHILD_CHANNELS = ["京东", "淘宝", "拼多多", "抖音"] as const
 const NONE_SELECT_VALUE = "__none__"
 
 export function ShoppingItemEditDialog({
@@ -71,6 +70,15 @@ export function ShoppingItemEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.item
+  const defaultChildChannels = useMemo(
+    () => [
+      t("shopping.item.defaultChannels.jd", "京东"),
+      t("shopping.item.defaultChannels.taobao", "淘宝"),
+      t("shopping.item.defaultChannels.pinduoduo", "拼多多"),
+      t("shopping.item.defaultChannels.douyin", "抖音"),
+    ],
+    [t],
+  )
 
   const [name, setName] = useState(seed?.name ?? "")
   const [children, setChildren] = useState<ShoppingItemChild[]>(() =>
@@ -108,6 +116,7 @@ export function ShoppingItemEditDialog({
       ...current,
       createDefaultChildDraft({
         index: current.length,
+        defaultChannels: defaultChildChannels,
       }),
     ])
   }
@@ -180,7 +189,10 @@ export function ShoppingItemEditDialog({
     if (!seed) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteItem", `确定删除 ${seed.name} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteItem", {
+        name: seed.name,
+        defaultValue: `确定删除 ${seed.name} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingItem", {
         name: seed.name,
         defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,
@@ -596,14 +608,20 @@ function normalizeChildDraft(
   }
 }
 
-function createDefaultChildDraft({ index }: { index: number }): ShoppingItemChild {
+function createDefaultChildDraft({
+  index,
+  defaultChannels,
+}: {
+  index: number
+  defaultChannels: string[]
+}): ShoppingItemChild {
   return {
     id: createLocalId("child", index),
     name: "",
     status: ShoppingStatus.Owned,
     lifecycle: ShoppingLifecycle.Durable,
     depreciation: undefined,
-    channelPrices: DEFAULT_CHILD_CHANNELS.map((channel, channelIndex) =>
+    channelPrices: defaultChannels.map((channel, channelIndex) =>
       createChannelPriceDraft(channel, channelIndex),
     ),
   }

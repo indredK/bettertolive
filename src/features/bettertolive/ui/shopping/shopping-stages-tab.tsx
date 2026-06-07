@@ -21,6 +21,12 @@ import {
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
+  SHOPPING_CONTROL_BADGE_CLASS,
+  SHOPPING_DETAIL_CARD_CLASS,
+  SHOPPING_IDLE_BADGE_CLASS,
+  SHOPPING_MUTED_PANEL_CLASS,
+  SHOPPING_SELECTABLE_CARD_CLASS,
+  SHOPPING_SELECTED_CARD_CLASS,
   ShoppingDetailPane,
   ShoppingEmptyDetailCard,
   ShoppingSidebarPane,
@@ -108,7 +114,10 @@ export function ShoppingStagesTab({
 
   const handleDelete = (id: string, name: string) => {
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteStage", `确定删除 ${name} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteStage", {
+        name,
+        defaultValue: `确定删除 ${name} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingStage", {
         name,
         defaultValue: `已加入删除队列：${name}，5 秒内可撤销`,
@@ -163,15 +172,13 @@ export function ShoppingStagesTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <h3 className="text-lg font-medium">{t("shopping.stages.title", "阶段适用")}</h3>
           <span
             className={cn(
               "rounded-full border px-2 py-0.5 text-[11px]",
-              isControlMode
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-muted-foreground/30 bg-muted text-muted-foreground",
+              isControlMode ? SHOPPING_CONTROL_BADGE_CLASS : SHOPPING_IDLE_BADGE_CLASS,
             )}
           >
             {isControlMode
@@ -188,7 +195,12 @@ export function ShoppingStagesTab({
       </div>
 
       {visibleStageTemplates.length === 0 ? (
-        <div className="bg-card text-muted-foreground rounded-md border p-6 text-center text-sm">
+        <div
+          className={cn(
+            SHOPPING_MUTED_PANEL_CLASS,
+            "text-muted-foreground rounded-xl border p-6 text-center text-sm",
+          )}
+        >
           {normalizedQuery
             ? t("shopping.stages.noMatchingStages", "没有匹配的阶段适用")
             : t("shopping.stages.empty", "还没有阶段适用,点击「新增阶段」开始")}
@@ -207,21 +219,22 @@ export function ShoppingStagesTab({
                   <SortableShoppingCard key={stage.id} id={stage.id} disabled={!isControlMode}>
                     <div
                       className={cn(
-                        "rounded-lg border transition-all duration-150",
-                        activeStageId === stage.id
-                          ? "border-primary bg-primary/10"
-                          : "border-border bg-card hover:border-primary/50",
+                        SHOPPING_SELECTABLE_CARD_CLASS,
+                        activeStageId === stage.id && SHOPPING_SELECTED_CARD_CLASS,
                       )}
                     >
-                      <div className="flex items-start gap-2 px-3 py-2.5">
+                      <div className="flex items-start gap-2 py-2.5 pr-3 pl-8">
                         <button
                           type="button"
                           onClick={() => setRawActiveStageId(stage.id)}
-                          className="focus-visible:ring-primary flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
+                          className="focus-visible:ring-ring flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
                         >
                           <span className="truncate text-[13px] font-medium">{stage.name}</span>
                           <span className="text-muted-foreground text-xs">
-                            {stage.items.length} 个物品
+                            {t("shopping.stages.itemInlineCount", {
+                              count: stage.items.length,
+                              defaultValue: "{{count}} 个物品",
+                            })}
                           </span>
                         </button>
                         {isControlMode && (
@@ -245,7 +258,7 @@ export function ShoppingStagesTab({
           {/* 右侧:阶段详情 + 视图切换 */}
           {activeStage && (
             <ShoppingDetailPane>
-              <Card className="flex h-full min-h-0 flex-col">
+              <Card className={cn(SHOPPING_DETAIL_CARD_CLASS, "flex h-full min-h-0 flex-col")}>
                 <CardHeader className="flex shrink-0 flex-row items-center justify-between gap-3">
                   <div className="min-w-0">
                     <CardTitle>{activeStage.name}</CardTitle>
@@ -375,7 +388,7 @@ function StageItemCard({ item, stageItem }: { item: ShoppingItem; stageItem: Sho
     )
   }
   return (
-    <div className="bg-card rounded-md border p-3">
+    <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, "p-3")}>
       <div className="font-medium">{item.name}</div>
       <div className="mt-1 space-y-0.5">
         {renderTier(t("shopping.stages.tier.low", "最低"), stageItem.tiers.low)}

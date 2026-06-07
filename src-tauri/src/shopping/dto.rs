@@ -134,11 +134,46 @@ pub struct ShoppingLifestyleCollectionDto {
     pub items: Vec<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingOverviewStagePulseDto {
+    pub id: String,
+    pub name: String,
+    pub item_count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingOverviewDimensionPulseDto {
+    pub id: String,
+    pub name: String,
+    pub item_count: i32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingOverviewDto {
+    pub total_items: i32,
+    pub owned_items: i32,
+    pub wanted_items: i32,
+    pub total_systems: i32,
+    pub total_spaces: i32,
+    pub total_stages: i32,
+    pub total_children: i32,
+    pub total_spotlights: i32,
+    pub total_boundary_entries: i32,
+    pub total_lifestyle_collections: i32,
+    pub top_stage_pulses: Vec<ShoppingOverviewStagePulseDto>,
+    pub top_system_pulses: Vec<ShoppingOverviewDimensionPulseDto>,
+    pub top_space_pulses: Vec<ShoppingOverviewDimensionPulseDto>,
+}
+
 // ---- 模块聚合 DTO ----
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type, Default)]
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingModuleDto {
+    pub overview: ShoppingOverviewDto,
     pub system_definitions: Vec<ShoppingSystemDefinitionDto>,
     pub space_definitions: Vec<ShoppingSpaceDefinitionDto>,
     pub spotlights: Vec<ShoppingSpotlightDto>,

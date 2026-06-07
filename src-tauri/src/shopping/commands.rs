@@ -107,7 +107,20 @@ pub fn update_system_definition(
 #[specta::specta]
 pub fn delete_system_definition(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_system_definition(&conn, &id)
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::delete_system_definition(&conn, &id);
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -183,7 +196,20 @@ pub fn update_shopping_space_definition(
 #[specta::specta]
 pub fn delete_shopping_space_definition(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_space_definition(&conn, &id)
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::delete_space_definition(&conn, &id);
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -382,7 +408,20 @@ pub fn update_shopping_item(
 #[specta::specta]
 pub fn delete_shopping_item(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_item(&conn, &id)
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::delete_item(&conn, &id);
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 // =====================
@@ -533,7 +572,20 @@ pub fn update_shopping_stage_template(
 #[specta::specta]
 pub fn delete_shopping_stage_template(state: State<AppState>, id: String) -> Result<(), String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_stage_template(&conn, &id)
+    conn.execute("BEGIN TRANSACTION", params![])
+        .map_err(|e| e.to_string())?;
+
+    let result = ShoppingRepository::delete_stage_template(&conn, &id);
+
+    if let Err(err) = result {
+        conn.execute("ROLLBACK", params![])
+            .map_err(|e| e.to_string())?;
+        return Err(err);
+    }
+
+    conn.execute("COMMIT", params![])
+        .map(|_| ())
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]

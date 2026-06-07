@@ -23,6 +23,12 @@ import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopp
 import { itemHasStatus } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   ItemCard,
+  SHOPPING_CONTROL_BADGE_CLASS,
+  SHOPPING_DETAIL_CARD_CLASS,
+  SHOPPING_IDLE_BADGE_CLASS,
+  SHOPPING_MUTED_PANEL_CLASS,
+  SHOPPING_SELECTABLE_CARD_CLASS,
+  SHOPPING_SELECTED_CARD_CLASS,
   ShoppingDetailPane,
   ShoppingEmptyDetailCard,
   ShoppingSidebarPane,
@@ -49,28 +55,32 @@ function SystemMapCard({
   onSelect: (id: string) => void
   onEditSystem: (system: ShoppingSystemDefinition) => void
 }) {
+  const { t } = useTranslation()
   const owned = items.filter((i) => itemHasStatus(i, ShoppingStatus.Owned))
   const wanted = items.filter((i) => itemHasStatus(i, ShoppingStatus.Wanted))
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border transition-all duration-150",
-        isSelected
-          ? "border-primary bg-primary/10"
-          : "border-border bg-card hover:border-primary/50",
-      )}
-    >
-      <div className="flex items-start gap-2 px-3 py-2.5">
+    <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, isSelected && SHOPPING_SELECTED_CARD_CLASS)}>
+      <div className="flex items-start gap-2 py-2.5 pr-3 pl-8">
         <button
           type="button"
           onClick={() => onSelect(system.id)}
-          className="focus-visible:ring-primary flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
         >
           <span className="truncate text-[13px] font-medium">{system.name || system.id}</span>
           <div className="text-muted-foreground flex gap-1.5 text-[11px]">
-            <span>{owned.length} 已有</span>
-            <span>{wanted.length} 待购</span>
+            <span>
+              {t("shopping.systems.ownedInlineCount", {
+                count: owned.length,
+                defaultValue: "{{count}} 已有",
+              })}
+            </span>
+            <span>
+              {t("shopping.systems.wantedInlineCount", {
+                count: wanted.length,
+                defaultValue: "{{count}} 待购",
+              })}
+            </span>
           </div>
           {system.summary && (
             <div className="text-muted-foreground truncate text-[11px]">{system.summary}</div>
@@ -109,7 +119,7 @@ function SystemDetailPanel({
   const { t } = useTranslation()
 
   return (
-    <Card className="flex h-full min-h-0 flex-col">
+    <Card className={cn(SHOPPING_DETAIL_CARD_CLASS, "flex h-full min-h-0 flex-col")}>
       <CardHeader className="flex shrink-0 flex-row items-center justify-between gap-3">
         <div className="min-w-0">
           <CardTitle>{system.name || system.id}</CardTitle>
@@ -155,7 +165,7 @@ function SystemDetailPanel({
             ))}
           </div>
         ) : (
-          <div className="text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
+          <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
             {t("shopping.systems.emptySystem", "当前系统下暂无物品")}
           </div>
         )}
@@ -214,8 +224,11 @@ export function ShoppingSystemsTab({
   }, [orderedIds, shopping.systemDefinitions])
 
   const selectedSystem = useMemo(
-    () => shopping.systemDefinitions.find((s) => s.id === selectedSystemId) ?? null,
-    [shopping.systemDefinitions, selectedSystemId],
+    () =>
+      orderedDefinitions.find((system) => system.id === selectedSystemId) ??
+      orderedDefinitions[0] ??
+      null,
+    [orderedDefinitions, selectedSystemId],
   )
 
   const systemItems = useMemo(
@@ -250,7 +263,10 @@ export function ShoppingSystemsTab({
   const handleDeleteSystem = (system: ShoppingSystemDefinition) => {
     const displayName = system.name || system.id
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSystem", `确定删除 ${displayName} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteSystem", {
+        name: displayName,
+        defaultValue: `确定删除 ${displayName} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingSystem", {
         name: displayName,
         defaultValue: `已加入删除队列：${displayName}，5 秒内可撤销`,
@@ -275,15 +291,13 @@ export function ShoppingSystemsTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <h3 className="text-lg font-medium">{t("shopping.systems.title", "物件系统")}</h3>
           <span
             className={cn(
               "rounded-full border px-2 py-0.5 text-[11px]",
-              isControlMode
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-muted-foreground/30 bg-muted text-muted-foreground",
+              isControlMode ? SHOPPING_CONTROL_BADGE_CLASS : SHOPPING_IDLE_BADGE_CLASS,
             )}
           >
             {isControlMode
@@ -300,7 +314,12 @@ export function ShoppingSystemsTab({
       </div>
 
       {orderedDefinitions.length === 0 ? (
-        <div className="bg-card text-muted-foreground rounded-md border p-6 text-center text-sm">
+        <div
+          className={cn(
+            SHOPPING_MUTED_PANEL_CLASS,
+            "text-muted-foreground rounded-xl border p-6 text-center text-sm",
+          )}
+        >
           {t("shopping.systems.emptyHint", "还没有系统定义,点击「新增系统」开始")}
         </div>
       ) : (
@@ -321,7 +340,7 @@ export function ShoppingSystemsTab({
                         <SystemMapCard
                           system={sys}
                           items={sysItems}
-                          isSelected={selectedSystemId === sys.id}
+                          isSelected={selectedSystem?.id === sys.id}
                           isControlMode={isControlMode}
                           onSelect={setSelectedSystemId}
                           onEditSystem={onEditSystem}

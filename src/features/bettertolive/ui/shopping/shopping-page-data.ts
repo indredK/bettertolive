@@ -12,46 +12,34 @@ import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
 
 // ===== 显示用的样式 =====
 
-export const SYSTEM_CHIP_STYLE =
-  "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-200"
-export const SPACE_CHIP_STYLE =
-  "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200"
-export const CHANNEL_CHIP_STYLE =
-  "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200"
+export const SYSTEM_CHIP_STYLE = "border-foreground/10 bg-accent text-accent-foreground"
+export const SPACE_CHIP_STYLE = "border-foreground/10 bg-secondary text-secondary-foreground"
+export const CHANNEL_CHIP_STYLE = "border-foreground/10 bg-muted text-muted-foreground"
 
 export const LIFECYCLE_STYLES: Record<ShoppingLifecycle, string> = {
-  [ShoppingLifecycle.Consumable]:
-    "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-800/60 dark:bg-sky-950/40 dark:text-sky-200",
-  [ShoppingLifecycle.Durable]:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200",
-  [ShoppingLifecycle.Tool]:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200",
-  [ShoppingLifecycle.Emotional]:
-    "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-700 dark:border-fuchsia-800/60 dark:bg-fuchsia-950/40 dark:text-fuchsia-200",
+  [ShoppingLifecycle.Consumable]: "border-foreground/10 bg-muted text-muted-foreground",
+  [ShoppingLifecycle.Durable]: "border-foreground/10 bg-accent text-accent-foreground",
+  [ShoppingLifecycle.Tool]: "border-foreground/10 bg-secondary text-secondary-foreground",
+  [ShoppingLifecycle.Emotional]: "border-foreground/10 bg-card text-card-foreground",
 }
 
 export const DEPRECIATION_STYLES: Record<ShoppingDepreciation, string> = {
-  [ShoppingDepreciation.VeryFast]:
-    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-800/60 dark:bg-rose-950/40 dark:text-rose-200",
-  [ShoppingDepreciation.Fast]:
-    "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-800/60 dark:bg-orange-950/40 dark:text-orange-200",
-  [ShoppingDepreciation.Medium]:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200",
-  [ShoppingDepreciation.Slow]:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200",
-  [ShoppingDepreciation.NoDepreciation]:
-    "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-800/60 dark:bg-violet-950/40 dark:text-violet-200",
+  [ShoppingDepreciation.VeryFast]: "border-foreground/10 bg-muted text-muted-foreground",
+  [ShoppingDepreciation.Fast]: "border-foreground/10 bg-muted text-muted-foreground",
+  [ShoppingDepreciation.Medium]: "border-foreground/10 bg-secondary text-secondary-foreground",
+  [ShoppingDepreciation.Slow]: "border-foreground/10 bg-accent text-accent-foreground",
+  [ShoppingDepreciation.NoDepreciation]: "border-foreground/10 bg-card text-card-foreground",
 }
 
 export const STATUS_STYLES: Record<ShoppingStatus, string> = {
-  [ShoppingStatus.Owned]: "border-emerald-300 bg-emerald-50 text-emerald-700",
-  [ShoppingStatus.Wanted]: "border-amber-300 bg-amber-50 text-amber-700",
+  [ShoppingStatus.Owned]: "border-foreground/10 bg-accent text-accent-foreground",
+  [ShoppingStatus.Wanted]: "border-foreground/10 bg-secondary text-secondary-foreground",
 }
 
 export const LANE_STYLES: Record<ShoppingLane, string> = {
-  [ShoppingLane.Now]: "border-rose-300 bg-rose-50 text-rose-700",
-  [ShoppingLane.Wait]: "border-sky-300 bg-sky-50 text-sky-700",
-  [ShoppingLane.Hold]: "border-zinc-300 bg-zinc-50 text-zinc-700",
+  [ShoppingLane.Now]: "border-foreground/10 bg-accent text-accent-foreground",
+  [ShoppingLane.Wait]: "border-foreground/10 bg-accent text-accent-foreground",
+  [ShoppingLane.Hold]: "border-foreground/10 bg-muted text-muted-foreground",
 }
 
 // ===== 枚举选项 =====
@@ -172,17 +160,17 @@ export function getPriceSignal(
   if (item.currentPrice <= item.buyBelowPrice) {
     return {
       label: t("shopping.priceSignal.inBuyZone", "在买点"),
-      className: "border-emerald-300 bg-emerald-50 text-emerald-700",
+      className: "border-foreground/10 bg-accent text-accent-foreground",
     }
   }
   if (item.overpayPrice != null && item.currentPrice >= item.overpayPrice) {
     return {
       label: t("shopping.priceSignal.overpriced", "偏贵"),
-      className: "border-rose-300 bg-rose-50 text-rose-700",
+      className: "border-foreground/10 bg-secondary text-secondary-foreground",
     }
   }
   return {
     label: t("shopping.priceSignal.watchOnly", "观望"),
-    className: "border-sky-300 bg-sky-50 text-sky-700",
+    className: "border-foreground/10 bg-muted text-muted-foreground",
   }
 }

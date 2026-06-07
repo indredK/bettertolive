@@ -86,7 +86,7 @@ export function ShoppingPage({
         onValueChange={setActiveTab}
         className="min-h-0 flex-1 overflow-hidden"
       >
-        <TabsList className="shrink-0">
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
           <TabsTrigger value="overview">{t("shopping.tabs.overview", "总览")}</TabsTrigger>
           <TabsTrigger value="planning">{t("shopping.tabs.planning", "物件库")}</TabsTrigger>
           <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
@@ -94,8 +94,8 @@ export function ShoppingPage({
           <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="min-h-0">
-          <ShoppingOverviewTab shopping={shopping} items={items} />
+        <TabsContent value="overview" className="h-full min-h-0 overflow-hidden">
+          <ShoppingOverviewTab shopping={shopping} />
         </TabsContent>
 
         <TabsContent value="planning" className="h-full min-h-0 overflow-hidden">
@@ -146,6 +146,7 @@ export function ShoppingPage({
 
       {editingItem && (
         <ShoppingItemEditDialog
+          key={editingItem.item?.id ?? "new-item"}
           editing={editingItem}
           shopping={shopping}
           onClose={() => setEditingItem(null)}
@@ -163,6 +164,7 @@ export function ShoppingPage({
 
       {editingStage && (
         <ShoppingStageEditDialog
+          key={editingStage.stage?.id ?? "new-stage"}
           editing={editingStage}
           shopping={shopping}
           onClose={() => setEditingStage(null)}
@@ -180,6 +182,7 @@ export function ShoppingPage({
 
       {editingSystem && (
         <ShoppingSystemEditDialog
+          key={editingSystem.system?.id ?? "new-system"}
           editing={editingSystem}
           shopping={shopping}
           onClose={() => setEditingSystem(null)}
@@ -197,6 +200,7 @@ export function ShoppingPage({
 
       {editingSpace && (
         <ShoppingSpaceEditDialog
+          key={editingSpace.space?.id ?? "new-space"}
           editing={editingSpace}
           shopping={shopping}
           onClose={() => setEditingSpace(null)}

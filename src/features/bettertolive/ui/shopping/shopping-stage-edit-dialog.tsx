@@ -160,7 +160,10 @@ export function ShoppingStageEditDialog({
     if (!seed) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteStage", `确定删除 ${seed.name} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteStage", {
+        name: seed.name,
+        defaultValue: `确定删除 ${seed.name} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingStage", {
         name: seed.name,
         defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,

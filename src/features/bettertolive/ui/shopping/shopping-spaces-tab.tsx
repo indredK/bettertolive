@@ -22,6 +22,12 @@ import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopp
 import { itemHasStatus } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   ItemCard,
+  SHOPPING_CONTROL_BADGE_CLASS,
+  SHOPPING_DETAIL_CARD_CLASS,
+  SHOPPING_IDLE_BADGE_CLASS,
+  SHOPPING_MUTED_PANEL_CLASS,
+  SHOPPING_SELECTABLE_CARD_CLASS,
+  SHOPPING_SELECTED_CARD_CLASS,
   ShoppingDetailPane,
   ShoppingEmptyDetailCard,
   ShoppingSidebarPane,
@@ -48,31 +54,35 @@ function SpaceMapCard({
   onSelect: (id: string) => void
   onEditSpace: (space: ShoppingSpaceDefinition) => void
 }) {
+  const { t } = useTranslation()
   const owned = items.filter((i) => itemHasStatus(i, ShoppingStatus.Owned))
   const wanted = items.filter((i) => itemHasStatus(i, ShoppingStatus.Wanted))
 
   return (
-    <div
-      className={cn(
-        "rounded-lg border transition-all duration-150",
-        isSelected
-          ? "border-primary bg-primary/10"
-          : "border-border bg-card hover:border-primary/50",
-      )}
-    >
-      <div className="flex items-start gap-2 px-3 py-2.5">
+    <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, isSelected && SHOPPING_SELECTED_CARD_CLASS)}>
+      <div className="flex items-start gap-2 py-2.5 pr-3 pl-8">
         <button
           type="button"
           onClick={() => onSelect(space.id)}
-          className="focus-visible:ring-primary flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
+          className="focus-visible:ring-ring flex min-w-0 flex-1 appearance-none flex-col gap-1 border-0 bg-transparent p-0 text-left outline-none focus-visible:ring-2"
         >
           <div className="flex min-w-0 items-center gap-1.5">
             <House className="text-muted-foreground size-3.5 shrink-0" />
             <span className="truncate text-[13px] font-medium">{space.name}</span>
           </div>
           <div className="text-muted-foreground flex gap-1.5 text-[11px]">
-            <span>{owned.length} 已有</span>
-            <span>{wanted.length} 待购</span>
+            <span>
+              {t("shopping.spaces.ownedInlineCount", {
+                count: owned.length,
+                defaultValue: "{{count}} 已有",
+              })}
+            </span>
+            <span>
+              {t("shopping.spaces.wantedInlineCount", {
+                count: wanted.length,
+                defaultValue: "{{count}} 待购",
+              })}
+            </span>
           </div>
         </button>
         {isControlMode && (
@@ -110,7 +120,7 @@ function SpaceDetailPanel({
   const systemIds = useMemo(() => [...new Set(items.map((i) => i.systemTags).flat())], [items])
 
   return (
-    <Card className="flex h-full min-h-0 flex-col">
+    <Card className={cn(SHOPPING_DETAIL_CARD_CLASS, "flex h-full min-h-0 flex-col")}>
       <CardHeader className="flex shrink-0 flex-row items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -143,7 +153,7 @@ function SpaceDetailPanel({
             ))}
           </div>
         ) : (
-          <div className="text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
+          <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
             {t("shopping.spaces.emptySpace", "当前空间下暂无物品")}
           </div>
         )}
@@ -201,8 +211,11 @@ export function ShoppingSpacesTab({
   }, [orderedIds, shopping.spaceDefinitions])
 
   const selectedSpace = useMemo(
-    () => shopping.spaceDefinitions.find((s) => s.id === selectedSpaceId) ?? null,
-    [shopping.spaceDefinitions, selectedSpaceId],
+    () =>
+      orderedDefinitions.find((space) => space.id === selectedSpaceId) ??
+      orderedDefinitions[0] ??
+      null,
+    [orderedDefinitions, selectedSpaceId],
   )
 
   const spaceItems = useMemo(
@@ -236,7 +249,10 @@ export function ShoppingSpacesTab({
 
   const handleDeleteSpace = (space: ShoppingSpaceDefinition) => {
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSpace", `确定删除 ${space.name} 吗？`),
+      confirmMessage: t("shopping.confirm.deleteSpace", {
+        name: space.name,
+        defaultValue: `确定删除 ${space.name} 吗？`,
+      }),
       pendingMessage: t("shopping.toast.deletePendingSpace", {
         name: space.name,
         defaultValue: `已加入删除队列：${space.name}，5 秒内可撤销`,
@@ -261,15 +277,13 @@ export function ShoppingSpacesTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap items-center gap-3">
           <h3 className="text-lg font-medium">{t("shopping.spaces.title", "空间场景")}</h3>
           <span
             className={cn(
               "rounded-full border px-2 py-0.5 text-[11px]",
-              isControlMode
-                ? "border-primary bg-primary/10 text-primary"
-                : "border-muted-foreground/30 bg-muted text-muted-foreground",
+              isControlMode ? SHOPPING_CONTROL_BADGE_CLASS : SHOPPING_IDLE_BADGE_CLASS,
             )}
           >
             {isControlMode
@@ -286,7 +300,12 @@ export function ShoppingSpacesTab({
       </div>
 
       {orderedDefinitions.length === 0 ? (
-        <div className="bg-card text-muted-foreground rounded-md border p-6 text-center text-sm">
+        <div
+          className={cn(
+            SHOPPING_MUTED_PANEL_CLASS,
+            "text-muted-foreground rounded-xl border p-6 text-center text-sm",
+          )}
+        >
           {t("shopping.spaces.emptyHint", "还没有空间定义,点击「新增空间」开始")}
         </div>
       ) : (
@@ -307,7 +326,7 @@ export function ShoppingSpacesTab({
                         <SpaceMapCard
                           space={sp}
                           items={spItems}
-                          isSelected={selectedSpaceId === sp.id}
+                          isSelected={selectedSpace?.id === sp.id}
                           isControlMode={isControlMode}
                           onSelect={setSelectedSpaceId}
                           onEditSpace={onEditSpace}
