@@ -60,7 +60,6 @@ import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/so
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
-  getSidebarBrandIconOffset,
   getSidebarHeaderTransition,
   getSidebarNoteContentTransition,
   getSidebarPadding,
@@ -325,8 +324,14 @@ export function BetterToLiveAppShell() {
       : isSidebarCollapsed
   const sidebarWidth = getSidebarWidth(effectiveSidebarCollapsed)
   const sidebarPadding = getSidebarPadding(effectiveSidebarCollapsed)
-  const sidebarTransitionStyle = getSidebarTransitionStyle(prefersReducedMotion)
-  const sidebarHeaderTransition = getSidebarHeaderTransition(prefersReducedMotion)
+  const sidebarTransitionStyle = getSidebarTransitionStyle(
+    prefersReducedMotion,
+    effectiveSidebarCollapsed,
+  )
+  const sidebarHeaderTransition = getSidebarHeaderTransition(
+    prefersReducedMotion,
+    effectiveSidebarCollapsed,
+  )
   const sidebarNoteContentTransition = getSidebarNoteContentTransition(prefersReducedMotion)
   const currentViewLabel = t(`shell.views.${activeView}`)
   const currentLocale = i18n.resolvedLanguage ?? i18n.language
@@ -553,41 +558,43 @@ export function BetterToLiveAppShell() {
                 className="flex items-start"
               >
                 <div className="flex min-w-0 flex-1 items-start gap-2">
-                  <m.button
-                    initial={false}
-                    animate={{
-                      x: getSidebarBrandIconOffset(effectiveSidebarCollapsed),
-                    }}
-                    transition={sidebarHeaderTransition}
-                    type="button"
-                    data-testid={
-                      effectiveSidebarCollapsed && isSidebarInteractive
-                        ? "sidebar-brand-toggle"
-                        : undefined
-                    }
-                    onClick={
-                      effectiveSidebarCollapsed && isSidebarInteractive
-                        ? handleSidebarCollapseToggle
-                        : undefined
-                    }
-                    aria-label={
-                      effectiveSidebarCollapsed && isSidebarInteractive
-                        ? t("shell.expandSidebar")
-                        : undefined
-                    }
-                    aria-hidden={effectiveSidebarCollapsed ? undefined : true}
-                    tabIndex={effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1}
-                    className={cn(
-                      "flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)] transition-opacity",
-                      effectiveSidebarCollapsed
-                        ? isSidebarInteractive
-                          ? "cursor-pointer hover:opacity-90"
-                          : "pointer-events-none cursor-default"
-                        : "pointer-events-none cursor-default",
-                    )}
-                  >
-                    <Sparkles className="size-4" />
-                  </m.button>
+                  <div className="flex w-14 shrink-0 justify-center">
+                    <m.button
+                      initial={false}
+                      animate={{
+                        x: 0,
+                      }}
+                      transition={sidebarHeaderTransition}
+                      type="button"
+                      data-testid={
+                        effectiveSidebarCollapsed && isSidebarInteractive
+                          ? "sidebar-brand-toggle"
+                          : undefined
+                      }
+                      onClick={
+                        effectiveSidebarCollapsed && isSidebarInteractive
+                          ? handleSidebarCollapseToggle
+                          : undefined
+                      }
+                      aria-label={
+                        effectiveSidebarCollapsed && isSidebarInteractive
+                          ? t("shell.expandSidebar")
+                          : undefined
+                      }
+                      aria-hidden={effectiveSidebarCollapsed ? undefined : true}
+                      tabIndex={effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1}
+                      className={cn(
+                        "flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)] transition-opacity",
+                        effectiveSidebarCollapsed
+                          ? isSidebarInteractive
+                            ? "cursor-pointer hover:opacity-90"
+                            : "pointer-events-none cursor-default"
+                          : "pointer-events-none cursor-default",
+                      )}
+                    >
+                      <Sparkles className="size-4" />
+                    </m.button>
+                  </div>
                   <AnimatePresence initial={false}>
                     {effectiveSidebarCollapsed ? null : (
                       <m.div

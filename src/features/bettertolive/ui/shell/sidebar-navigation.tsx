@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react"
-import { AnimatePresence, m, useReducedMotion, type Transition, type Variants } from "motion/react"
+import { m, useReducedMotion, type Transition } from "motion/react"
 
 import type { AppView } from "@/features/bettertolive/types"
 import { cn } from "@/lib/utils"
@@ -8,122 +8,18 @@ import { cn } from "@/lib/utils"
 const PREVIEW_LIMIT = 4
 const VISIBILITY_OFFSET = 12
 
-// ---------------------------------------------------------------------------
-// 组件级 motion 配置(刻意不放进公共 app-motion.ts,与组件耦合在一起)
-//
-// 展开→缩起:
-//   1. 展开 panel 整体向左滑出 + 渐隐,里面的标题/按钮反向 stagger 退场
-//   2. AnimatePresence mode="wait" 等老 panel 完全离场
-//   3. collapsed panel 从右轻微滑入 + 渐显,图标依次淡入浮现
-// 缩起→展开: 完全反向
-// ---------------------------------------------------------------------------
-
 const SIDEBAR_NAV_EASE = [0.22, 1, 0.36, 1] as const
 
-const PANEL_BASE_TRANSITION: Transition = {
-  duration: 0.42,
-  ease: SIDEBAR_NAV_EASE,
-}
+function getNavCopyTransition(isCollapsed: boolean, reduceMotion: boolean): Transition {
+  if (reduceMotion) {
+    return { duration: 0.1 }
+  }
 
-const EXPANDED_PANEL_VARIANTS: Variants = {
-  initial: { opacity: 0, x: -36 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      ...PANEL_BASE_TRANSITION,
-      staggerChildren: 0.04,
-      delayChildren: 0.06,
-    },
-  },
-  exit: {
-    opacity: 0,
-    x: -48,
-    transition: {
-      ...PANEL_BASE_TRANSITION,
-      duration: 0.34,
-      staggerChildren: 0.012,
-      staggerDirection: -1,
-    },
-  },
-}
-
-const COLLAPSED_PANEL_VARIANTS: Variants = {
-  initial: { opacity: 0, x: 24 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      ...PANEL_BASE_TRANSITION,
-      staggerChildren: 0.045,
-      delayChildren: 0.08,
-    },
-  },
-  exit: {
-    opacity: 0,
-    x: 24,
-    transition: {
-      ...PANEL_BASE_TRANSITION,
-      duration: 0.3,
-      staggerChildren: 0.014,
-      staggerDirection: -1,
-    },
-  },
-}
-
-const GROUP_VARIANTS: Variants = {
-  initial: { opacity: 0, x: -5 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.36,
-      ease: SIDEBAR_NAV_EASE,
-      staggerChildren: 0.028,
-    },
-  },
-  exit: {
-    opacity: 0,
-    x: -4,
-    transition: {
-      duration: 0.22,
-      ease: SIDEBAR_NAV_EASE,
-      staggerChildren: 0.01,
-      staggerDirection: -1,
-    },
-  },
-}
-
-const ITEM_VARIANTS: Variants = {
-  initial: { opacity: 0, y: 6, scale: 0.97 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.34, ease: SIDEBAR_NAV_EASE },
-  },
-  exit: {
-    opacity: 0,
-    y: -3,
-    scale: 0.98,
-    transition: { duration: 0.2, ease: SIDEBAR_NAV_EASE },
-  },
-}
-
-// 用户开启 prefers-reduced-motion 时,只做温和的 opacity 切换
-const REDUCED_PANEL_VARIANTS: Variants = {
-  initial: { opacity: 0 },
-  animate: {
-    opacity: 1,
-    transition: { duration: 0.18, staggerChildren: 0 },
-  },
-  exit: { opacity: 0, transition: { duration: 0.14 } },
-}
-
-const REDUCED_ITEM_VARIANTS: Variants = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1, transition: { duration: 0.14 } },
-  exit: { opacity: 0, transition: { duration: 0.1 } },
+  return {
+    duration: isCollapsed ? 0.16 : 0.2,
+    delay: isCollapsed ? 0 : 0.28,
+    ease: SIDEBAR_NAV_EASE,
+  }
 }
 
 export type SidebarNavigationItem = {
@@ -249,7 +145,7 @@ export function SidebarNavigation({
   onSelectView: (view: AppView) => void
   sections: SidebarNavigationSection[]
 }) {
-  const scrollViewportRef = useRef<HTMLDivElement | null>(null)
+  const scrollViewportRef = useRef<HTMLElement | null>(null)
   const itemRefs = useRef<Partial<Record<AppView, HTMLButtonElement | null>>>({})
   const animationFrameRef = useRef<number | null>(null)
   const flattenedItems = useMemo(() => sections.flatMap((section) => section.items), [sections])
@@ -258,10 +154,6 @@ export function SidebarNavigation({
     lastVisibleIndex: Math.max(0, flattenedItems.length - 1),
   }))
   const reduceMotion = useReducedMotion()
-  const expandedPanelVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : EXPANDED_PANEL_VARIANTS
-  const collapsedPanelVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : COLLAPSED_PANEL_VARIANTS
-  const groupVariants = reduceMotion ? REDUCED_PANEL_VARIANTS : GROUP_VARIANTS
-  const itemVariants = reduceMotion ? REDUCED_ITEM_VARIANTS : ITEM_VARIANTS
 
   const measureVisibleRange = useCallback(() => {
     const container = scrollViewportRef.current
@@ -432,73 +324,29 @@ export function SidebarNavigation({
   const bottomPreviewItems = hiddenAfter.slice(0, PREVIEW_LIMIT)
   const topStrength = hiddenBefore.length / Math.max(1, flattenedItems.length)
   const bottomStrength = hiddenAfter.length / Math.max(1, flattenedItems.length)
+  const copyTransition = getNavCopyTransition(isCollapsed, reduceMotion ?? false)
+  const itemGridColumns = isCollapsed ? "32px 0px 0px" : "32px minmax(0, 1fr) 10px"
+  const itemColumnGap = isCollapsed ? "0px" : "0.625rem"
+  const navGap = isCollapsed ? "0.375rem" : "0.875rem"
+  const sectionGap = isCollapsed ? "0px" : "0.375rem"
+  const itemListGap = isCollapsed ? "0.375rem" : "0.375rem"
+  const itemPaddingInline = "0.625rem"
 
   return (
-    <AnimatePresence initial={false} mode="wait">
-      {isCollapsed ? (
-        <m.section
-          key="collapsed"
-          layout
-          variants={collapsedPanelVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-2 py-2"
-        >
-          <m.nav
-            ref={scrollViewportRef}
-            data-testid="sidebar-nav-scroll"
-            variants={groupVariants}
-            className="hide-scrollbar grid min-h-0 flex-1 content-start justify-items-center gap-2.5 overflow-y-auto overscroll-contain py-1"
-          >
-            {flattenedItems.map((item) => {
-              const Icon = item.icon
-              const isActive = item.view === activeView
-
-              return (
-                <m.button
-                  key={item.view}
-                  ref={(node) => {
-                    itemRefs.current[item.view] = node
-                  }}
-                  type="button"
-                  variants={itemVariants}
-                  data-testid={`nav-${item.view}`}
-                  onClick={() => onSelectView(item.view)}
-                  aria-current={isActive ? "page" : undefined}
-                  aria-label={`导航 ${item.label}`}
-                  title={item.label}
-                  className={cn(
-                    "flex size-11 items-center justify-center rounded-xl border transition-colors",
-                    isActive
-                      ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)] text-[color:var(--nav-active-icon-ink)]"
-                      : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] text-[color:var(--text-muted)] hover:bg-[color:var(--surface-bg)] hover:text-[color:var(--text-primary)]",
-                  )}
-                  style={
-                    isActive
-                      ? {
-                          boxShadow: "var(--surface-shadow)",
-                          backgroundColor: "var(--nav-active-icon-bg)",
-                        }
-                      : undefined
-                  }
-                >
-                  <Icon className="size-4.5" />
-                </m.button>
-              )
-            })}
-          </m.nav>
-        </m.section>
-      ) : (
-        <m.section
-          key="expanded"
-          layout
-          variants={expandedPanelVariants}
-          initial="initial"
-          animate="animate"
-          exit="exit"
-          className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-2.5 py-2"
-        >
+    <m.section
+      layout
+      className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-0 py-2"
+    >
+      <m.div
+        animate={{
+          height: isCollapsed ? 0 : "auto",
+          opacity: isCollapsed ? 0 : 1,
+        }}
+        transition={copyTransition}
+        className="overflow-hidden"
+        aria-hidden={isCollapsed}
+      >
+        <div className={cn(isCollapsed ? "pointer-events-none" : "")}>
           <SidebarPreviewBand
             activeView={activeView}
             direction="top"
@@ -507,75 +355,124 @@ export function SidebarNavigation({
             onSelectView={onSelectView}
             strength={topStrength}
           />
+        </div>
+      </m.div>
 
-          <m.nav
-            ref={scrollViewportRef}
-            data-testid="sidebar-nav-scroll"
-            variants={groupVariants}
-            className="hide-scrollbar grid min-h-0 flex-1 content-start gap-2.5 overflow-y-auto overscroll-contain py-2 pr-0.5"
+      <m.nav
+        ref={scrollViewportRef}
+        data-testid="sidebar-nav-scroll"
+        animate={{ rowGap: navGap }}
+        transition={copyTransition}
+        className="hide-scrollbar grid min-h-0 flex-1 content-start overflow-y-auto overscroll-contain py-2"
+      >
+        {sections.map((section) => (
+          <m.div
+            key={section.title}
+            animate={{ rowGap: sectionGap }}
+            transition={copyTransition}
+            className="grid"
           >
-            {sections.map((section) => (
-              <m.div
-                key={section.title}
-                variants={groupVariants}
-                className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-1"
-              >
-                <m.div
-                  variants={itemVariants}
-                  className="col-span-full mb-0.5 px-1 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase"
-                >
-                  {section.title}
-                </m.div>
-                {section.items.map((item) => {
-                  const Icon = item.icon
-                  const isActive = item.view === activeView
+            <m.div
+              animate={{
+                height: isCollapsed ? 0 : 16,
+                marginBottom: isCollapsed ? 0 : 2,
+                opacity: isCollapsed ? 0 : 1,
+                x: isCollapsed ? -4 : 0,
+              }}
+              transition={copyTransition}
+              aria-hidden={isCollapsed}
+              className="col-span-full overflow-hidden px-1 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase"
+            >
+              {section.title}
+            </m.div>
+            <m.div animate={{ rowGap: itemListGap }} transition={copyTransition} className="grid">
+              {section.items.map((item) => {
+                const Icon = item.icon
+                const isActive = item.view === activeView
 
-                  return (
-                    <m.button
-                      key={item.view}
-                      ref={(node) => {
-                        itemRefs.current[item.view] = node
-                      }}
-                      type="button"
-                      variants={itemVariants}
-                      data-testid={`nav-${item.view}`}
-                      onClick={() => onSelectView(item.view)}
-                      aria-current={isActive ? "page" : undefined}
-                      aria-label={`导航 ${item.label}`}
+                return (
+                  <m.button
+                    key={item.view}
+                    ref={(node) => {
+                      itemRefs.current[item.view] = node
+                    }}
+                    type="button"
+                    data-testid={`nav-${item.view}`}
+                    onClick={() => onSelectView(item.view)}
+                    aria-current={isActive ? "page" : undefined}
+                    aria-label={`导航 ${item.label}`}
+                    title={isCollapsed ? item.label : undefined}
+                    animate={{
+                      columnGap: itemColumnGap,
+                      gridTemplateColumns: itemGridColumns,
+                      paddingLeft: itemPaddingInline,
+                      paddingRight: itemPaddingInline,
+                    }}
+                    transition={copyTransition}
+                    className={cn(
+                      "grid h-[56px] items-center gap-2.5 overflow-hidden rounded-lg border text-left transition-colors",
+                      "w-full",
+                      isActive
+                        ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
+                        : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
+                    )}
+                    style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
+                  >
+                    <div
                       className={cn(
-                        "grid h-[56px] grid-cols-[auto_1fr_auto] items-center gap-2.5 rounded-lg border px-3 text-left transition-colors",
+                        "flex size-8 items-center justify-center rounded-lg border",
                         isActive
-                          ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
-                          : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
+                          ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
+                          : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
                       )}
-                      style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
                     >
-                      <div
-                        className={cn(
-                          "flex size-8 items-center justify-center rounded-lg border",
-                          isActive
-                            ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
-                            : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
-                        )}
-                      >
-                        <Icon className="size-4" />
+                      <Icon className="size-4" />
+                    </div>
+                    <m.div
+                      animate={{
+                        opacity: isCollapsed ? 0 : 1,
+                        x: isCollapsed ? -6 : 0,
+                      }}
+                      transition={copyTransition}
+                      aria-hidden={isCollapsed}
+                      className="min-w-0 overflow-hidden"
+                    >
+                      <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+                        {item.label}
                       </div>
-                      <div className="min-w-0">
-                        <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-                          {item.label}
-                        </div>
-                        <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
-                          {item.hint}
-                        </div>
+                      <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
+                        {item.hint}
                       </div>
-                      <span className="text-[color:var(--text-muted)]">&rsaquo;</span>
-                    </m.button>
-                  )
-                })}
-              </m.div>
-            ))}
-          </m.nav>
+                    </m.div>
+                    <m.span
+                      animate={{
+                        opacity: isCollapsed ? 0 : 1,
+                        x: isCollapsed ? -4 : 0,
+                      }}
+                      transition={copyTransition}
+                      aria-hidden={isCollapsed}
+                      className="overflow-hidden text-[color:var(--text-muted)]"
+                    >
+                      &rsaquo;
+                    </m.span>
+                  </m.button>
+                )
+              })}
+            </m.div>
+          </m.div>
+        ))}
+      </m.nav>
 
+      <m.div
+        animate={{
+          height: isCollapsed ? 0 : "auto",
+          opacity: isCollapsed ? 0 : 1,
+        }}
+        transition={copyTransition}
+        className="overflow-hidden"
+        aria-hidden={isCollapsed}
+      >
+        <div className={cn(isCollapsed ? "pointer-events-none" : "")}>
           <SidebarPreviewBand
             activeView={activeView}
             direction="bottom"
@@ -584,9 +481,9 @@ export function SidebarNavigation({
             onSelectView={onSelectView}
             strength={bottomStrength}
           />
-        </m.section>
-      )}
-    </AnimatePresence>
+        </div>
+      </m.div>
+    </m.section>
   )
 }
 
