@@ -3,7 +3,7 @@ import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
 } from "@/features/bettertolive/config/notifications"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
+import { useTranslation } from "react-i18next"
 
 export function NotificationCenterPanel({
   notifications,
@@ -22,6 +22,7 @@ export function NotificationCenterPanel({
   onOpenNotificationDetail: (id: string) => void
   onRequestClose: () => void
 }) {
+  const { t } = useTranslation()
   const activeNotificationCount = notifications.length
   const hasNotifications = notificationFeed.length > 0
 
@@ -32,13 +33,15 @@ export function NotificationCenterPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">通知中心</div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+            {t("shell.notificationCenter.title")}
+          </div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-            顶部消息和右下通知都会汇总到这里，适合回看和继续处理。
+            {t("shell.notificationCenter.description")}
           </p>
         </div>
         <span className="rounded-full border border-[color:var(--chip-border)] bg-white/80 px-2 py-1 text-[11px] leading-none text-[color:var(--text-muted)]">
-          {activeNotificationCount} 条正在显示
+          {t("shell.notificationCenter.activeCount", { count: activeNotificationCount })}
         </span>
       </div>
 
@@ -66,12 +69,12 @@ export function NotificationCenterPanel({
                         </div>
                         {notification.readAt === null ? (
                           <span className="rounded-full border border-sky-200 bg-sky-50 px-2 py-0.5 text-[11px] leading-none text-sky-700">
-                            未读
+                            {t("shell.notificationCenter.unread")}
                           </span>
                         ) : null}
                         {notification.persistent ? (
                           <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] leading-none text-amber-700">
-                            常驻
+                            {t("shell.notifications.persistent")}
                           </span>
                         ) : null}
                       </div>
@@ -79,7 +82,9 @@ export function NotificationCenterPanel({
                         {notification.message}
                       </p>
                       <div className="mt-2 text-[11px] text-[color:var(--text-muted)]">
-                        {notification.channel === "message" ? "顶部消息" : "右下通知"}
+                        {notification.channel === "message"
+                          ? t("shell.notifications.messageChannel")
+                          : t("shell.notifications.notificationChannel")}
                       </div>
                     </div>
                   </div>
@@ -94,7 +99,9 @@ export function NotificationCenterPanel({
                         onRequestClose()
                       }}
                     >
-                      前往{getWorkspaceViewLabel(notification.targetView)}
+                      {t("shell.notifications.goTo", {
+                        view: t(`shell.views.${notification.targetView}`),
+                      })}
                     </button>
                   ) : null}
                   {isActive ? (
@@ -103,7 +110,7 @@ export function NotificationCenterPanel({
                       className="text-[11px] text-[color:var(--text-muted)]"
                       onClick={() => onDismissNotification(notification.id)}
                     >
-                      关闭
+                      {t("shell.notifications.close")}
                     </button>
                   ) : null}
                 </div>
@@ -112,13 +119,15 @@ export function NotificationCenterPanel({
           })
         ) : (
           <div className="rounded-xl border border-dashed border-[color:var(--chip-border)] bg-white/60 px-4 py-5 text-sm text-[color:var(--text-muted)]">
-            暂时还没有通知。后面可以继续接保存结果、提醒和跨页面待处理事项。
+            {t("shell.notificationCenter.empty")}
           </div>
         )}
       </div>
 
       <div className="mt-4 rounded-xl border border-[color:var(--chip-border)] bg-white/65 px-3 py-3">
-        <div className="text-xs font-medium text-[color:var(--text-muted)]">反馈测试</div>
+        <div className="text-xs font-medium text-[color:var(--text-muted)]">
+          {t("shell.notificationCenter.demo.title")}
+        </div>
         <div className="mt-2 flex flex-wrap gap-2">
           <Button
             size="sm"
@@ -128,20 +137,20 @@ export function NotificationCenterPanel({
             onClick={() =>
               onNotify({
                 channel: "message",
-                title: "顶部消息已触发",
-                message: "默认 3 秒后自动消失，适合保存成功这类轻反馈。",
+                title: t("shell.notificationCenter.demo.message.title"),
+                message: t("shell.notificationCenter.demo.message.message"),
                 tone: "success",
-                source: "顶部消息组件",
-                detail: "顶部消息更适合短暂确认和轻量结果反馈，不应该承载太重的阅读压力。",
+                source: t("shell.notificationCenter.demo.message.source"),
+                detail: t("shell.notificationCenter.demo.message.detail"),
                 detailLines: [
-                  "默认时长：3000ms",
-                  "适合保存成功、完成确认、轻提醒",
-                  "信息应短，动作应少",
+                  t("shell.notificationCenter.demo.message.lineDuration"),
+                  t("shell.notificationCenter.demo.message.lineUse"),
+                  t("shell.notificationCenter.demo.message.lineShape"),
                 ],
               })
             }
           >
-            顶部消息 3s
+            {t("shell.notificationCenter.demo.message.button")}
           </Button>
           <Button
             size="sm"
@@ -151,20 +160,20 @@ export function NotificationCenterPanel({
             onClick={() =>
               onNotify({
                 channel: "notification",
-                title: "右下通知已触发",
-                message: "默认 5 秒停留，适合更完整的信息提示。",
+                title: t("shell.notificationCenter.demo.notification.title"),
+                message: t("shell.notificationCenter.demo.notification.message"),
                 tone: "info",
-                source: "右下通知组件",
-                detail: "右下通知更适合带上下文的提醒、建议和可操作的信息，也更适合多条堆叠。",
+                source: t("shell.notificationCenter.demo.notification.source"),
+                detail: t("shell.notificationCenter.demo.notification.detail"),
                 detailLines: [
-                  "默认时长：5000ms",
-                  "适合任务完成、提醒、建议等场景",
-                  "可继续扩展优先级、来源和分类",
+                  t("shell.notificationCenter.demo.notification.lineDuration"),
+                  t("shell.notificationCenter.demo.notification.lineUse"),
+                  t("shell.notificationCenter.demo.notification.lineShape"),
                 ],
               })
             }
           >
-            右下通知 5s
+            {t("shell.notificationCenter.demo.notification.button")}
           </Button>
           <Button
             size="sm"
@@ -174,23 +183,23 @@ export function NotificationCenterPanel({
             onClick={() =>
               onNotify({
                 channel: "notification",
-                title: "人生脉络待补充",
-                message: "这条通知会常驻，直到你处理或手动关闭。",
+                title: t("shell.notificationCenter.demo.persistent.title"),
+                message: t("shell.notificationCenter.demo.persistent.message"),
                 tone: "warning",
                 persistent: true,
                 targetView: "journey",
-                actionLabel: "前往成长记忆",
-                source: "扩展通知示例",
-                detail: "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
+                actionLabel: t("shell.notificationCenter.demo.persistent.action"),
+                source: t("shell.notificationCenter.demo.persistent.source"),
+                detail: t("shell.notificationCenter.demo.persistent.detail"),
                 detailLines: [
-                  "不会自动消失",
-                  "支持前往指定页面",
-                  "支持后续扩展成任务、待办或消息中心入口",
+                  t("shell.notificationCenter.demo.persistent.lineDuration"),
+                  t("shell.notificationCenter.demo.persistent.lineTarget"),
+                  t("shell.notificationCenter.demo.persistent.lineShape"),
                 ],
               })
             }
           >
-            常驻通知
+            {t("shell.notificationCenter.demo.persistent.button")}
           </Button>
         </div>
       </div>

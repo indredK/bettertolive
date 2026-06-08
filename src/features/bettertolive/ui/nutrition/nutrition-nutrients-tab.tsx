@@ -494,7 +494,11 @@ function NutrientDetailDrawer({
                   </div>
                 </div>
                 <div className="mt-4 h-[280px] min-h-0">
-                  <ResponsiveContainer width="100%" height="100%">
+                  <ResponsiveContainer
+                    width="100%"
+                    height="100%"
+                    initialDimension={{ width: 520, height: 280 }}
+                  >
                     <RadarChart data={radarData} outerRadius="78%">
                       <PolarGrid stroke="var(--color-border)" />
                       <PolarAngleAxis

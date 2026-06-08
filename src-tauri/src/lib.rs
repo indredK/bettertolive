@@ -1,7 +1,36 @@
+mod beliefs;
+mod emotion;
+mod events;
+mod finance;
+mod future;
+mod growth;
+mod legacy;
+mod memory;
 mod nutrition;
+mod overview;
+mod principles;
+mod reflection;
+mod relationships;
 mod shopping;
+mod socioeconomics;
 
+use beliefs::commands::{
+    create_belief_entry, delete_belief_entry, get_beliefs, update_belief_entry, BeliefsState,
+};
+use emotion::commands::{get_emotion, save_emotion, EmotionState};
+use events::commands::{get_events, save_events, EventsState};
+use finance::commands::{get_finance, save_finance, FinanceState};
+use future::commands::{get_future, save_future, FutureState};
+use growth::commands::{get_growth, save_growth, GrowthState};
+use legacy::commands::{
+    create_legacy_item, delete_legacy_item, get_legacy, list_legacy_items, update_legacy_item,
+};
+use memory::commands::{get_memory, save_memory, MemoryState};
 use nutrition::commands::{get_nutrition, save_nutrition, NutritionState};
+use overview::commands::{get_overview, OverviewState};
+use principles::commands::{get_principles, save_principles, PrinciplesState};
+use reflection::commands::{get_reflection, save_reflection, ReflectionState};
+use relationships::commands::{get_relationships, save_relationships, RelationshipsState};
 use shopping::commands::{
     assign_space_definition_items, assign_system_definition_items, create_shopping_item,
     create_shopping_page_content, create_shopping_space_definition, create_shopping_stage_template,
@@ -13,6 +42,7 @@ use shopping::commands::{
     update_shopping_item, update_shopping_page_content, update_shopping_space_definition,
     update_shopping_stage_template, update_system_definition, AppState,
 };
+use socioeconomics::commands::{get_socioeconomics, save_socioeconomics, SocioeconomicsState};
 use specta_typescript::Typescript;
 use std::sync::Mutex;
 use tauri::Manager;
@@ -27,6 +57,15 @@ fn greet(name: &str) -> String {
 fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
     tauri_specta::Builder::<tauri::Wry>::new().commands(tauri_specta::collect_commands![
         greet,
+        get_beliefs,
+        create_belief_entry,
+        update_belief_entry,
+        delete_belief_entry,
+        get_legacy,
+        list_legacy_items,
+        create_legacy_item,
+        update_legacy_item,
+        delete_legacy_item,
         get_shopping,
         list_shopping_items,
         create_shopping_item,
@@ -91,13 +130,79 @@ pub fn run() {
             app.manage(NutritionState {
                 data_path: app_data_dir.join("nutrition.json"),
             });
+            app.manage(BeliefsState {
+                data_path: app_data_dir.join("beliefs.json"),
+            });
+            app.manage(EmotionState {
+                data_path: app_data_dir.join("emotion.json"),
+            });
+            app.manage(EventsState {
+                data_path: app_data_dir.join("events.json"),
+            });
+            app.manage(FinanceState {
+                data_path: app_data_dir.join("finance.json"),
+            });
+            app.manage(OverviewState {
+                data_path: app_data_dir.join("overview.json"),
+            });
+            app.manage(ReflectionState {
+                data_path: app_data_dir.join("reflection.json"),
+            });
+            app.manage(GrowthState {
+                data_path: app_data_dir.join("growth.json"),
+            });
+            app.manage(MemoryState {
+                data_path: app_data_dir.join("memory.json"),
+            });
+            app.manage(PrinciplesState {
+                data_path: app_data_dir.join("principles.json"),
+            });
+            app.manage(RelationshipsState {
+                data_path: app_data_dir.join("relationships.json"),
+            });
+            app.manage(SocioeconomicsState {
+                data_path: app_data_dir.join("socioeconomics.json"),
+            });
+            app.manage(FutureState {
+                data_path: app_data_dir.join("future.json"),
+            });
 
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             greet,
+            get_overview,
+            get_reflection,
+            save_reflection,
+            get_emotion,
+            save_emotion,
+            get_events,
+            save_events,
+            get_finance,
+            save_finance,
+            get_growth,
+            save_growth,
+            get_memory,
+            save_memory,
+            get_legacy,
+            list_legacy_items,
+            create_legacy_item,
+            update_legacy_item,
+            delete_legacy_item,
             get_nutrition,
             save_nutrition,
+            get_beliefs,
+            create_belief_entry,
+            update_belief_entry,
+            delete_belief_entry,
+            get_principles,
+            save_principles,
+            get_relationships,
+            save_relationships,
+            get_socioeconomics,
+            save_socioeconomics,
+            get_future,
+            save_future,
             get_shopping,
             get_workspace_snapshot,
             list_shopping_items,

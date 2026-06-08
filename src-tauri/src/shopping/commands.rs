@@ -7,6 +7,22 @@ use crate::shopping::dto::{
 };
 use crate::shopping::models::{ItemChildChannelWriteModel, ItemChildWriteModel, PageContentRow};
 use crate::shopping::repository::ShoppingRepository;
+use crate::{beliefs::commands::BeliefsState, beliefs::dto::BeliefsModuleDto};
+use crate::{
+    emotion::commands::{get_emotion, EmotionState},
+    events::commands::{get_events, EventsState},
+    finance::commands::{get_finance, FinanceState},
+    future::commands::{get_future, FutureState},
+    growth::commands::{get_growth, GrowthState},
+    memory::commands::{get_memory, MemoryState},
+    nutrition::commands::{get_nutrition, NutritionState},
+    overview::commands::{get_overview, OverviewState},
+    principles::commands::{get_principles, PrinciplesState},
+    reflection::commands::{get_reflection, ReflectionState},
+    relationships::commands::{get_relationships, RelationshipsState},
+    socioeconomics::commands::{get_socioeconomics, SocioeconomicsState},
+};
+use crate::{legacy::dto::LegacyModuleDto, legacy::repository::LegacyRepository};
 use rusqlite::params;
 use std::sync::Mutex;
 use tauri::State;
@@ -28,26 +44,57 @@ pub fn get_shopping(state: State<AppState>) -> Result<ShoppingModuleDto, String>
 }
 
 #[tauri::command]
-pub fn get_workspace_snapshot(state: State<AppState>) -> Result<WorkspaceSnapshotDto, String> {
+pub fn get_workspace_snapshot(
+    state: State<AppState>,
+    beliefs_state: State<BeliefsState>,
+    emotion_state: State<EmotionState>,
+    events_state: State<EventsState>,
+    finance_state: State<FinanceState>,
+    future_state: State<FutureState>,
+    growth_state: State<GrowthState>,
+    memory_state: State<MemoryState>,
+    nutrition_state: State<NutritionState>,
+    overview_state: State<OverviewState>,
+    principles_state: State<PrinciplesState>,
+    reflection_state: State<ReflectionState>,
+    relationships_state: State<RelationshipsState>,
+    socioeconomics_state: State<SocioeconomicsState>,
+) -> Result<WorkspaceSnapshotDto, String> {
+    let overview = get_overview(overview_state)?;
+    let reflection = get_reflection(reflection_state)?;
+    let events = get_events(events_state)?;
+    let finance = get_finance(finance_state)?;
+    let nutrition = get_nutrition(nutrition_state)?;
+    let emotion = get_emotion(emotion_state)?;
+    let beliefs = crate::beliefs::commands::get_beliefs(beliefs_state)?;
+    let principles = get_principles(principles_state)?;
+    let relationships = get_relationships(relationships_state)?;
+    let growth = get_growth(growth_state)?;
+    let memory = get_memory(memory_state)?;
+    let socioeconomics = get_socioeconomics(socioeconomics_state)?;
+    let future = get_future(future_state)?;
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let shopping = ShoppingRepository::get_shopping_module_aggregated(&conn)?;
+    let legacy = LegacyRepository::get_legacy_module(&conn)?;
 
     Ok(WorkspaceSnapshotDto {
-        overview: None,
-        reflection: None,
-        events: None,
-        finance: None,
+        overview: Some(overview),
+        reflection: Some(reflection),
+        events: Some(events),
+        finance: Some(finance),
         shopping,
-        nutrition: None,
-        emotion: None,
-        beliefs: None,
-        principles: None,
-        relationships: None,
-        growth: None,
-        memory: None,
-        legacy: None,
-        socioeconomics: None,
-        future: None,
+        nutrition: Some(nutrition),
+        emotion: Some(emotion),
+        beliefs: Some(
+            serde_json::to_value::<BeliefsModuleDto>(beliefs).map_err(|e| e.to_string())?,
+        ),
+        principles: Some(principles),
+        relationships: Some(relationships),
+        growth: Some(growth),
+        memory: Some(memory),
+        legacy: Some(serde_json::to_value::<LegacyModuleDto>(legacy).map_err(|e| e.to_string())?),
+        socioeconomics: Some(socioeconomics),
+        future: Some(future),
     })
 }
 

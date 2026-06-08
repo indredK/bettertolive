@@ -1,4 +1,5 @@
 import { Check } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import { cn } from "@/lib/utils"
@@ -14,6 +15,9 @@ export function ThemeUtilityPanel({
   themes: WorkspaceTheme[]
   onSelectTheme: (themeId: WorkspaceThemeId) => void
 }) {
+  const { t } = useTranslation()
+  const currentThemeLabel = t(`shell.themes.options.${currentTheme.id}.label`, currentTheme.label)
+
   return (
     <div
       data-testid="utility-panel-themes"
@@ -21,9 +25,11 @@ export function ThemeUtilityPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">主题切换</div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+            {t("shell.themes.title")}
+          </div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-            主题是一种工作氛围，不是昼夜模式。当前是 {currentTheme.label}。
+            {t("shell.themes.description", { theme: currentThemeLabel })}
           </p>
         </div>
         <div className="flex items-center gap-1 rounded-full border border-[color:var(--chip-border)] bg-white/80 px-2 py-1">
@@ -57,15 +63,15 @@ export function ThemeUtilityPanel({
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-                    {item.label}
+                    {t(`shell.themes.options.${item.id}.label`, item.label)}
                     {isActive ? (
                       <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] leading-none text-emerald-700">
-                        当前
+                        {t("shell.themes.current")}
                       </span>
                     ) : null}
                   </div>
                   <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                    {item.description}
+                    {t(`shell.themes.options.${item.id}.description`, item.description)}
                   </p>
                 </div>
                 {isActive ? (

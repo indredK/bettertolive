@@ -5,7 +5,35 @@
 
 - `design.md` 已收纳 原则模块 的产品定位、分类维度、页面职责和边界。
 - `development.md` 已收纳当前能从设计文档中提取的开发约定。
-- 当前没有独立的历史进度记录；实现开始后在本文件维护阶段状态、已完成事项和遗留问题。
+- 原则模块已进入第一阶段实现：页面展示、控制模式编辑、轻量后端持久化、mock/seed 数据和 i18n 已落地。
+
+## 已完成
+
+- 数据模型已按设计文档落地 `PrincipleDomain` / `PrincipleType` / `PrincipleStrength` / `PrincipleSource` / `PrincipleStatus` / `PrincipleCost`，并在 `PrincipleEntry` 上保留 `revisionHistory`、`relations` 和 `decisionPrompts`。
+- live API 已接入原则模块后端数据：`get_principles` / `save_principles` 使用 app data 下的 `principles.json` 做第一阶段持久化，首次无用户数据时读取模块 `seed.json`。
+- mock API 已补齐会话级 `savePrinciples` 闭环，保存后 `getPrinciples` 与 `getWorkspaceSnapshot` 都会读取最新原则数据。
+- `PrinciplesPage` 已支持浏览 / 控制模式；控制模式下可新增、编辑、删除原则，保存后刷新 workspace snapshot。
+- 原则页展示数据和编辑源数据已拆开：搜索状态下仍使用完整后端 snapshot 保存，避免只持久化当前筛选结果。
+- 原则编辑弹窗已覆盖标题、原则表达、说明、5 个分类维度、cost、边界、保护对象、触发校准和标签；编辑内容、强度、状态时会自动追加修订记录。
+- 页面统计遵守设计边界：5 个分类维度用于分布统计，`cost` 只作为单条原则评估属性在详情 / 信号区 / cost 标注区显示，不进入主筛选器。
+- 页面固定布局和堆叠布局都已保留一页式响应式展示：上方分类与控制条，中部原则清单、边界、决策校准，下方/侧边展示支撑冲突和高优先级信号。
+- 中英文 i18n 已补齐原则页、编辑弹窗、枚举显示、关系类型、修订摘要、空态和控制模式文案。
+- 原则页已接入现有全局主题变量体系，页面、卡片、徽标、弹窗和固定布局状态均使用 `theme-presets.ts` 暴露的 surface / tone / chip 变量。
+- mock 数据和 Tauri seed 已扩展到 10 条原则，覆盖 6 个领域、3 种类型、3 级强度、4 种来源、4 种状态、4 级代价，并包含支撑 / 冲突关系与修订记录。
+
+## 进行中
+
+- 暂无。本阶段以原则条目的整模块保存和页面控制模式为完成边界。
+
+## 待处理
+
+- 关系、决策校准问题、边界清单目前随原则条目同步和展示；后续如需要，可继续拆出独立编辑入口。
+- 后端当前采用 JSON 文件持久化；后续如需要更强查询、排序、关系维护，可迁移到 SQLite schema 与细粒度 CRUD commands。
+- 原则与观念、反思、关系模块的跨模块引用暂未接入。
+
+## 暂不处理
+
+- 本阶段不做浏览器验收、不启动本地服务、不运行测试或 lint。
 
 ## 后续维护格式
 

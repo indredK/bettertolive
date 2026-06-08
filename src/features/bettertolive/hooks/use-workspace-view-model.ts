@@ -103,7 +103,18 @@ export function useWorkspaceViewModel({
   const events = useMemo(
     () =>
       workspace.events.entries.filter((entry) =>
-        matchesQuery(entry.date, entry.title, entry.excerpt, entry.theme),
+        matchesQuery(
+          entry.date,
+          entry.title,
+          entry.excerpt,
+          entry.theme,
+          entry.type,
+          entry.createdAt,
+          entry.occurredAt,
+          entry.content,
+          entry.status,
+          ...(entry.tags ?? []),
+        ),
       ),
     [matchesQuery, workspace.events.entries],
   )
@@ -111,7 +122,19 @@ export function useWorkspaceViewModel({
   const transactions = useMemo(
     () =>
       workspace.finance.entries.filter((entry) =>
-        matchesQuery(entry.date, entry.label, entry.category, entry.note, entry.amount),
+        matchesQuery(
+          entry.date,
+          entry.label,
+          entry.category,
+          entry.note,
+          entry.amount,
+          entry.account,
+          entry.lifeSystem,
+          entry.necessity,
+          entry.reviewStatus,
+          entry.linkedModule,
+          ...(entry.tags ?? []),
+        ),
       ),
     [matchesQuery, workspace.finance.entries],
   )
@@ -428,9 +451,14 @@ export function useWorkspaceViewModel({
           entry.status,
           entry.emotionalLoad,
           entry.summary,
+          entry.content,
           entry.contentPreview,
           entry.isLocked ? "锁定" : "可修改",
+          entry.requiresSecondConfirm ? "二次确认" : "",
+          entry.excludeFromAi ? "不参与AI" : "",
+          entry.createdAt,
           entry.updatedAt,
+          entry.finalizedAt,
           entry.reviewCue,
           ...entry.tags,
         ),

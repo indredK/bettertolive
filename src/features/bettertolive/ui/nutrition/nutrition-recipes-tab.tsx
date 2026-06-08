@@ -57,13 +57,16 @@ type RecipeFilter = (typeof RECIPE_FILTERS)[number]
 type RecipeFilterId = RecipeFilter["id"]
 
 export function NutritionRecipesTab({
+  editableNutrition,
   isControlMode = false,
   nutrition,
 }: {
+  editableNutrition?: NutritionModuleData
   isControlMode?: boolean
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
+  const sourceNutrition = editableNutrition ?? nutrition
   const [activeRecipeId, setActiveRecipeId] = useState(nutrition.recipes[0]?.id ?? "")
   const [editingRecipe, setEditingRecipe] = useState<EditingRecipe | null>(null)
   const [query, setQuery] = useState("")
@@ -219,7 +222,7 @@ export function NutritionRecipesTab({
         <NutritionRecipeEditDialog
           key={editingRecipe.recipe?.id ?? "new-recipe"}
           editing={editingRecipe}
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setEditingRecipe(null)}
         />
       ) : null}

@@ -29,6 +29,12 @@ export type ReflectionDraftExample = {
 
 export type EventEntry = {
   id: string
+  type?: "event"
+  createdAt?: string
+  occurredAt?: string
+  content?: string
+  tags?: string[]
+  status?: "active" | "archived"
   date: string
   title: string
   excerpt: string
@@ -45,6 +51,44 @@ export type TransactionEntry = {
   amount: number
   direction: TransactionDirection
   note: string
+  account?: string
+  lifeSystem?: FinanceLifeSystem
+  necessity?: FinanceNecessity
+  reviewStatus?: FinanceReviewStatus
+  linkedModule?: FinanceLinkedModule
+  tags?: string[]
+}
+
+export type FinanceLifeSystem =
+  | "基本生活"
+  | "身体健康"
+  | "关系社交"
+  | "成长学习"
+  | "居住环境"
+  | "自由安全"
+  | "娱乐恢复"
+
+export type FinanceNecessity = "生存必需" | "稳定维护" | "体验改善" | "长期投资" | "冲动/待复盘"
+
+export type FinanceReviewStatus = "已确认" | "待复盘" | "可优化" | "值得保留"
+
+export type FinanceLinkedModule = "手动录入" | "购物" | "饮食" | "记事" | "反思" | "未来"
+
+export type FinanceMonthlyTarget = {
+  id: string
+  month: string
+  incomeTarget?: number
+  expenseLimit?: number
+  savingTarget?: number
+  note?: string
+}
+
+export type FinanceCategoryRule = {
+  id: string
+  category: string
+  monthlyLimit?: number
+  intent: string
+  reviewPrompt?: string
 }
 
 export type ShoppingSpotlight = {
@@ -717,9 +761,35 @@ export type LegacyItem = {
   status: LegacyStatus
   emotionalLoad?: EmotionalLoad
   summary: string
+  content: string
   contentPreview: string
   isLocked: boolean
+  requiresSecondConfirm: boolean
+  excludeFromAi: boolean
+  createdAt: string
   updatedAt: string
+  finalizedAt?: string
+  reviewCue: string
+  tags: string[]
+}
+
+export type LegacyItemForm = {
+  id?: string | null
+  title: string
+  category: LegacyCategory
+  recipient: LegacyRecipient
+  recipientName?: string
+  relatedRelationshipId?: string
+  urgency: LegacyUrgency
+  visibility: LegacyVisibility
+  deliveryCondition?: string
+  status: LegacyStatus
+  emotionalLoad?: EmotionalLoad
+  summary: string
+  content: string
+  isLocked: boolean
+  requiresSecondConfirm: boolean
+  excludeFromAi: boolean
   reviewCue: string
   tags: string[]
 }
@@ -753,6 +823,9 @@ export type EventsModuleData = {
 
 export type FinanceModuleData = {
   entries: TransactionEntry[]
+  monthlyTargets: FinanceMonthlyTarget[]
+  categoryRules: FinanceCategoryRule[]
+  reviewPrompts: string[]
 }
 
 export type ShoppingModuleData = {

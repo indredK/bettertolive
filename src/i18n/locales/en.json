@@ -669,6 +669,432 @@
       "shuttleDescription": "Move items belonging to this stage to the right, then save"
     }
   },
+  "beliefs": {
+    "page": {
+      "eyebrow": "Beliefs",
+      "title": "Belief Map",
+      "description": "Classify beliefs with 4 dimensions, read impact distribution, and keep psychology as an optional lens."
+    },
+    "classification": {
+      "title": "4-D Belief Classification",
+      "description": "Group, filter, and map cognition by 4 dimensions; impact stays on each belief, not in the main filters.",
+      "domain": {
+        "title": "Domain",
+        "description": "Which part of life this belief acts on."
+      },
+      "layer": {
+        "title": "Layer",
+        "description": "Where it sits in cognition."
+      },
+      "stability": {
+        "title": "Stability",
+        "description": "Whether it is still changing."
+      },
+      "source": {
+        "title": "Source",
+        "description": "Where it grew from."
+      }
+    },
+    "filter": {
+      "title": "4-D Filters",
+      "all": "All",
+      "count": "{{count}} items"
+    },
+    "impact": {
+      "title": "Impact Direction",
+      "description": "Impact is not a fifth classification dimension; it belongs to each belief."
+    },
+    "tabs": {
+      "entries": "Belief List",
+      "cards": "Three-Layer Frame",
+      "relations": "Relations"
+    },
+    "entries": {
+      "title": "Belief List",
+      "description": "Details always show impact and the optional psychology lens."
+    },
+    "questions": {
+      "title": "Recurring Questions",
+      "description": "Keep the questions you repeatedly ask yourself."
+    },
+    "relations": {
+      "title": "Relations",
+      "description": "Beliefs can be similar, opposed, or derived from each other."
+    },
+    "cards": {
+      "title": "Three-Layer Frame",
+      "description": "A summary frame for worldview, life view, and values."
+    },
+    "signals": {
+      "conflict": "In Tension",
+      "changing": "Changing"
+    },
+    "attachment": {
+      "title": "Attachment Note"
+    },
+    "psych": {
+      "title": "Psychology Lens (Optional)"
+    },
+    "field": {
+      "title": "Title",
+      "statement": "Belief Statement",
+      "description": "Description",
+      "source": "Source",
+      "impact": "Impact",
+      "secondaryDomains": "Secondary Domains",
+      "cbtLayer": "CBT Layer",
+      "cognitiveDistortions": "Cognitive Distortions",
+      "defenseMechanism": "Defense Mechanism",
+      "attachmentNote": "Attachment Note",
+      "tags": "Tags"
+    },
+    "form": {
+      "basic": "Basic Content",
+      "classification": "Classification and Lens",
+      "optional": "Optional",
+      "tagsPlaceholder": "Separate with commas"
+    },
+    "actions": {
+      "create": "Add Belief",
+      "edit": "Edit",
+      "editEntry": "Edit Belief",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "toast": {
+      "saved": "Saved",
+      "deletePending": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deleteSuccess": "Deleted belief: {{name}}",
+      "deleteFailed": "Failed to delete belief",
+      "deleteUndone": "Deletion undone: {{name}}"
+    },
+    "confirm": {
+      "deleteEntry": "Delete {{name}}?"
+    },
+    "undo": "Undo",
+    "error": {
+      "required": "Enter a title and belief statement"
+    },
+    "revision": {
+      "autoSummary": "Updated this belief in management mode."
+    },
+    "empty": {
+      "questions": "No questions under the current filter.",
+      "entries": "No beliefs under the current filter.",
+      "relations": "No belief relations under the current filter.",
+      "cards": "No three-layer frame under the current filter.",
+      "conflicts": "No conflicting beliefs under the current filter.",
+      "changing": "No changing beliefs under the current filter.",
+      "distribution": "No distribution data yet."
+    },
+    "enums": {
+      "domain": {
+        "关系": "Relationships",
+        "工作": "Work",
+        "金钱": "Money",
+        "自我": "Self",
+        "社会": "Society",
+        "时间": "Time",
+        "意义": "Meaning"
+      },
+      "layer": {
+        "世界观": "Worldview",
+        "人生观": "Life View",
+        "价值观": "Values"
+      },
+      "stability": {
+        "稳定": "Stable",
+        "正在松动": "Loosening",
+        "正在形成": "Forming",
+        "已放弃": "Abandoned"
+      },
+      "source": {
+        "亲身经历": "Lived Experience",
+        "家庭继承": "Family Inheritance",
+        "社会环境": "Social Environment",
+        "主动反思": "Active Reflection",
+        "创伤反应": "Trauma Response"
+      },
+      "impact": {
+        "支撑性": "Supportive",
+        "限制性": "Limiting",
+        "中性": "Neutral",
+        "冲突中": "In Conflict"
+      },
+      "cbtLayer": {
+        "自动思维": "Automatic Thought",
+        "中间信念": "Intermediate Belief",
+        "核心信念": "Core Belief"
+      },
+      "cognitiveDistortion": {
+        "全有或全无": "All-or-Nothing",
+        "过度概括": "Overgeneralization",
+        "灾难化": "Catastrophizing",
+        "读心术": "Mind Reading",
+        "应该陈述": "Should Statements",
+        "个人化": "Personalization",
+        "情绪推理": "Emotional Reasoning",
+        "贴标签": "Labeling"
+      },
+      "defenseMechanism": {
+        "否认": "Denial",
+        "投射": "Projection",
+        "合理化": "Rationalization",
+        "理智化": "Intellectualization",
+        "反向形成": "Reaction Formation",
+        "升华": "Sublimation"
+      },
+      "relationType": {
+        "相似": "Similar",
+        "冲突": "Conflict",
+        "派生": "Derived"
+      },
+      "revisionField": {
+        "内容": "Content",
+        "稳定性": "Stability",
+        "影响": "Impact"
+      }
+    }
+  },
+  "relationships": {
+    "page": {
+      "eyebrow": "Relationships",
+      "title": "Relationship States and Unfinished Words",
+      "description": "Use five classification dimensions to see your relationship world, and unfinished weight to hold what has not been said yet.",
+      "currentFilter": "Current filter: {{query}}",
+      "relationshipCount": "Relationships",
+      "noteCount": "Notes"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "directory": "Directory",
+      "unsent": "Unsent Words",
+      "patterns": "Patterns"
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "actions": {
+      "addRelationship": "Add Relationship",
+      "addNote": "Add Note"
+    },
+    "common": {
+      "add": "Add",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving",
+      "undo": "Undo"
+    },
+    "overview": {
+      "classificationHeading": "Five-Dimension Relationship Map",
+      "classificationDescription": "These dimensions group and observe the relationship world; unfinished weight stays in details and unsent words.",
+      "typeTitle": "Type",
+      "typeDescription": "What is the core bond here?",
+      "depthTitle": "Depth",
+      "depthDescription": "How open can I be in this relationship?",
+      "stageTitle": "Stage",
+      "stageDescription": "Where is this relationship moving now?",
+      "impactTitle": "Impact",
+      "impactDescription": "Is it nourishing, draining, neutral, or mixed?",
+      "interactionTitle": "Interaction",
+      "interactionDescription": "How often do we connect?",
+      "unfinishedHeading": "Unfinished Weight",
+      "unfinishedDescription": "Unfinished weight evaluates a single relationship and does not belong in the main filters.",
+      "nourishing": "Nourishing",
+      "nourishingDetail": "Relationships that restore or strengthen you",
+      "draining": "Draining",
+      "drainingDetail": "Relationships that need boundaries or fresh judgment",
+      "repairing": "Tense / Repairing",
+      "repairingDetail": "Relationships most worth gently checking now",
+      "heavy": "Heavy",
+      "heavyDetail": "Unfinished words to write down or process first"
+    },
+    "directory": {
+      "title": "Relationship Directory"
+    },
+    "filter": {
+      "all": "All",
+      "clear": "Clear filters",
+      "type": "Type",
+      "depth": "Depth",
+      "stage": "Stage",
+      "impact": "Impact",
+      "interaction": "Interaction"
+    },
+    "unsent": {
+      "title": "Unsent Words",
+      "relatedRelationship": "Related relationship: {{name}}"
+    },
+    "patterns": {
+      "title": "Cross-Relationship Patterns",
+      "kicker": "Relationship Pattern"
+    },
+    "labels": {
+      "depth": "Depth",
+      "stage": "Stage",
+      "interaction": "Interaction",
+      "impact": "Impact",
+      "currentState": "Current",
+      "boundary": "Boundary",
+      "unspoken": "Unspoken",
+      "positiveImpact": "Positive Impact",
+      "ongoingShadow": "Ongoing Shadow",
+      "events": "Key Events",
+      "history": "Change History",
+      "relatedNotes": "Related Unsent Words"
+    },
+    "empty": {
+      "distribution": "No distribution data yet.",
+      "events": "No key events yet.",
+      "history": "No depth or stage changes yet.",
+      "relatedNotes": "No related notes yet.",
+      "directory": "No relationships under current filters.",
+      "selectRelationship": "Select a relationship from the left.",
+      "selectNote": "Select a note from the left.",
+      "selectPattern": "Select a pattern from the left."
+    },
+    "edit": {
+      "createRelationship": "Add Relationship",
+      "editRelationship": "Edit Relationship",
+      "relationshipDescription": "The five dimensions classify the relationship world; unfinished weight follows single relationships and unsent words.",
+      "createNote": "Add Unsent Words",
+      "editNote": "Edit Unsent Words",
+      "noteDescription": "Write to an existing relationship, an independent target, or your future self.",
+      "createPattern": "Add Pattern",
+      "editPattern": "Edit Pattern",
+      "patternDescription": "Review repeated roles and paths across relationships.",
+      "name": "Name",
+      "role": "Role",
+      "circle": "Circle",
+      "type": "Type",
+      "depth": "Depth",
+      "stage": "Stage",
+      "impact": "Impact",
+      "interaction": "Interaction",
+      "unfinishedWeight": "Unfinished Weight",
+      "influence": "Relationship Profile",
+      "currentState": "Current State",
+      "emotionalTone": "Emotional Tone",
+      "unspokenLine": "Unspoken Line",
+      "positiveImpact": "Positive Impact",
+      "ongoingShadow": "Ongoing Shadow",
+      "boundaryStatus": "Boundary State",
+      "emotionCues": "Emotion Tags",
+      "tags": "Tags",
+      "events": "Key Interaction Events",
+      "history": "Depth / Stage History",
+      "date": "Date",
+      "eventTitle": "Event Title",
+      "eventSummary": "Event Summary",
+      "from": "From",
+      "toValue": "To",
+      "historyNote": "Change Note",
+      "targetType": "Target Type",
+      "relatedRelationship": "Related Relationship",
+      "noRelationship": "No relation",
+      "to": "To",
+      "theme": "Theme",
+      "excerpt": "Content",
+      "title": "Title",
+      "summary": "Summary",
+      "cues": "Cues",
+      "saved": "Relationship saved",
+      "noteSaved": "Unsent words saved",
+      "patternSaved": "Pattern saved",
+      "saveFailed": "Save failed",
+      "validation": {
+        "relationshipRequired": "Enter a name and role",
+        "noteRequired": "Enter target, theme, and content",
+        "patternRequired": "Enter title and summary"
+      }
+    },
+    "confirm": {
+      "deleteRelationship": "Delete {{name}}?",
+      "deleteNote": "Delete these unsent words?",
+      "deletePattern": "Delete this relationship pattern?"
+    },
+    "toast": {
+      "deleteRelationshipPending": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+      "deleteRelationshipSuccess": "Deleted relationship: {{name}}",
+      "deleteRelationshipFailed": "Failed to delete relationship",
+      "deleteRelationshipUndone": "Deletion undone: {{name}}",
+      "deleteNotePending": "Queued for deletion. Undo is available for 5 seconds.",
+      "deleteNoteSuccess": "Deleted unsent words",
+      "deleteNoteFailed": "Failed to delete unsent words",
+      "deleteNoteUndone": "Deletion undone",
+      "deletePatternPending": "Queued for deletion. Undo is available for 5 seconds.",
+      "deletePatternSuccess": "Deleted relationship pattern",
+      "deletePatternFailed": "Failed to delete relationship pattern",
+      "deletePatternUndone": "Deletion undone"
+    },
+    "enumNames": {
+      "type": {
+        "家人": "Family",
+        "伴侣": "Partner",
+        "朋友": "Friend",
+        "同事": "Colleague",
+        "过去重要的人": "Important Past Person",
+        "导师/榜样": "Mentor / Model"
+      },
+      "depth": {
+        "亲密": "Intimate",
+        "亲近": "Close",
+        "熟人": "Acquaintance",
+        "疏远": "Distant",
+        "断联": "No Contact"
+      },
+      "stage": {
+        "建立中": "Building",
+        "稳定": "Stable",
+        "紧张": "Tense",
+        "修复中": "Repairing",
+        "已结束": "Ended",
+        "等待中": "Waiting"
+      },
+      "impact": {
+        "滋养": "Nourishing",
+        "消耗": "Draining",
+        "中性": "Neutral",
+        "混合": "Mixed"
+      },
+      "interaction": {
+        "每天": "Daily",
+        "每周": "Weekly",
+        "每月": "Monthly",
+        "每年": "Yearly",
+        "几乎不": "Rarely",
+        "已无联系": "No Contact"
+      },
+      "unfinishedWeight": {
+        "很重": "Heavy",
+        "中等": "Medium",
+        "轻微": "Light",
+        "无": "None"
+      },
+      "eventKind": {
+        "认识": "Met",
+        "重要谈话": "Important Talk",
+        "冲突": "Conflict",
+        "和好": "Repaired",
+        "疏远": "Drifted",
+        "断联": "No Contact",
+        "重逢": "Reunion"
+      },
+      "changeField": {
+        "depth": "Depth",
+        "stage": "Stage"
+      },
+      "targetType": {
+        "关系条目": "Relationship",
+        "独立对象": "Independent Target",
+        "未来的自己": "Future Self"
+      }
+    }
+  },
   "nutrition": {
     "page": {
       "eyebrow": "Nutrition",
@@ -1231,6 +1657,1411 @@
       }
     }
   },
+  "overview": {
+    "page": {
+      "eyebrow": "Overview",
+      "title": "See the whole picture before choosing where to begin"
+    },
+    "sections": {
+      "recent": {
+        "title": "Recent Records",
+        "description": "Start by seeing yourself through recent events and recent words."
+      },
+      "logic": {
+        "title": "Page Logic",
+        "description": "Make the reason for this workspace structure clear first."
+      },
+      "pulse": {
+        "title": "Today’s Observations",
+        "description": "Give yourself an honest enough starting point."
+      },
+      "quick": {
+        "title": "Quick Entry",
+        "description": "Start with action, then decide whether to open it further."
+      }
+    },
+    "logic": {
+      "record": {
+        "title": "Recording Workbench",
+        "detail": "Reflection, events, finance, and living items capture how you are actually living right now."
+      },
+      "inner": {
+        "title": "Inner State",
+        "detail": "The emotions page carries recent psychological waves, triggers, and recovery methods that work for you."
+      },
+      "selfMap": {
+        "title": "Self Map",
+        "detail": "Beliefs, principles, relationships, growth, and memories explain why you have become this version of yourself."
+      },
+      "legacyFuture": {
+        "title": "Legacy and Future",
+        "detail": "Legacy organizes important words and entrusted matters, while the future blueprint brings ideal self and stage paths forward."
+      }
+    },
+    "quickActions": {
+      "reflection": {
+        "label": "Write a reflection",
+        "description": "Put down the thoughts and feelings of this moment first."
+      },
+      "events": {
+        "label": "Record an event",
+        "description": "Add a timeline fragment and keep a recent life detail."
+      },
+      "finance": {
+        "label": "Record spending",
+        "description": "Make real choices and lifestyle evidence visible."
+      },
+      "emotion": {
+        "label": "View emotion waves",
+        "description": "See recent inner weather and triggers together."
+      },
+      "future": {
+        "label": "Clarify future direction",
+        "description": "Make ideal self and lifestyle clearer."
+      },
+      "beliefs": {
+        "label": "Open belief map",
+        "description": "See how your worldview and values currently look."
+      },
+      "relationships": {
+        "label": "Review relationships",
+        "description": "Put important people, patterns, and unsaid words in one place."
+      },
+      "journey": {
+        "label": "Review growth memories",
+        "description": "Reconnect life stages, memory nodes, places, and objects."
+      },
+      "legacy": {
+        "label": "Organize entrusted words",
+        "description": "Place words, concerns, and instructions for the future."
+      }
+    },
+    "currentFocus": {
+      "title": "Current Focus",
+      "description": "Bring the new modules onto the same desk first, so they can be viewed, switched, and grounded in basic data."
+    },
+    "empty": {
+      "recent": "No recent records match the current filter."
+    }
+  },
+  "reflection": {
+    "page": {
+      "eyebrow": "Reflection",
+      "title": "Write down this moment first",
+      "description": "The expression does not need to be complete. Honest is better than polished. This is the most natural place to start."
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "sections": {
+      "draft": {
+        "title": "Writing Start",
+        "description": "Keep a concrete example nearby. Saved reflections live in the record list on the right."
+      },
+      "recent": {
+        "title": "Recent Reflections",
+        "description": "Review what you have written recently, then decide how to organize it later."
+      }
+    },
+    "actions": {
+      "create": "New Reflection",
+      "edit": "Edit Reflection",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "fields": {
+      "date": "Time",
+      "title": "Title",
+      "excerpt": "Reflection",
+      "tags": "Tags"
+    },
+    "placeholders": {
+      "date": "For example: 2026-06-08 21:10",
+      "title": "For example: what I really want to keep today",
+      "excerpt": "What happened today? What did I notice? What should future review remember?",
+      "tags": "Separate with commas, for example: rhythm, work"
+    },
+    "empty": {
+      "records": "No reflections match the current filter."
+    },
+    "edit": {
+      "createTitle": "New Reflection",
+      "editTitle": "Edit Reflection",
+      "description": "Keep the time, title, short body, and a few tags."
+    },
+    "validation": {
+      "required": "Enter the time, title, and reflection"
+    },
+    "confirm": {
+      "delete": "Delete \"{{title}}\"?"
+    },
+    "toast": {
+      "saved": "Saved",
+      "saveFailed": "Failed to save",
+      "deleted": "Deleted",
+      "deleteFailed": "Failed to delete"
+    }
+  },
+  "events": {
+    "page": {
+      "eyebrow": "Events",
+      "title": "Reconnect life fragments to the timeline",
+      "description": "Capture events, experiences, fragments, and thoughts so later review can recover what actually happened."
+    },
+    "actions": {
+      "create": "New Event",
+      "edit": "Edit Event",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "search": {
+      "active": "Current filter: {{query}}"
+    },
+    "timeline": {
+      "title": "Timeline",
+      "description": "Review recent fragments by when they happened."
+    },
+    "capture": {
+      "title": "Quick Capture",
+      "description": "Keep the time, title, and short note first.",
+      "latest": "Latest"
+    },
+    "themes": {
+      "title": "Recent Themes",
+      "description": "Repeated themes make the shape of daily life easier to see."
+    },
+    "metrics": {
+      "events": "Events",
+      "days": "Dates"
+    },
+    "empty": {
+      "latest": "No event records yet.",
+      "timeline": "No events match the current filter.",
+      "themes": "No themes match the current filter."
+    },
+    "edit": {
+      "createTitle": "New Event",
+      "editTitle": "Edit Event",
+      "description": "Events keep only the necessary signals: time, title, short note, and theme."
+    },
+    "fields": {
+      "date": "Occurred / Recorded",
+      "title": "Title",
+      "excerpt": "Short Note",
+      "theme": "Theme",
+      "tags": "Tags"
+    },
+    "placeholders": {
+      "date": "For example: 2026-06-08 21:10",
+      "title": "For example: talked with a friend about future cities",
+      "excerpt": "What happened? Which detail would be useful to review later?",
+      "theme": "For example: Lifestyle",
+      "tags": "Separate with commas, for example: city, future"
+    },
+    "defaults": {
+      "theme": "Daily Life"
+    },
+    "validation": {
+      "required": "Enter a time, title, and short note"
+    },
+    "confirm": {
+      "delete": "Delete \"{{title}}\"?"
+    },
+    "toast": {
+      "saved": "Saved",
+      "saveFailed": "Failed to save",
+      "deleted": "Deleted",
+      "deleteFailed": "Failed to delete"
+    }
+  },
+  "finance": {
+    "page": {
+      "eyebrow": "Finance",
+      "title": "Turn resource flow into evidence",
+      "description": "Look at income, expenses, categories, and review status together to see what kind of life your money is shaping."
+    },
+    "actions": {
+      "addEntry": "Add Entry",
+      "editEntry": "Edit entry",
+      "deleteEntry": "Delete entry"
+    },
+    "summary": {
+      "income": "Monthly Income",
+      "expense": "Monthly Expense",
+      "net": "Monthly Balance",
+      "weeklyExpense": "Last 7 Days",
+      "dailyAverage": "Daily avg {{value}}"
+    },
+    "sections": {
+      "entriesTitle": "Recent Entries",
+      "entriesDescription": "Income and expenses stay on the same real-life timeline.",
+      "distributionTitle": "Categories and life systems",
+      "distributionDescription": "See where money goes first, then what part of life it supports.",
+      "reviewTitle": "Targets and review",
+      "reviewDescription": "Targets are not pressure. They give money a direction."
+    },
+    "target": {
+      "empty": "There is no target for the current month yet.",
+      "expenseLimit": "Expense limit",
+      "savingTarget": "Saving target"
+    },
+    "empty": {
+      "entries": "No finance entries under the current filter.",
+      "distribution": "No distribution data under the current filter.",
+      "reviewEntries": "There are no priority entries to review right now."
+    },
+    "toast": {
+      "saved": "Entry saved",
+      "saveFailed": "Save failed",
+      "deleted": "Entry deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "confirm": {
+      "deleteEntry": "Delete \"{{title}}\"?"
+    },
+    "edit": {
+      "createTitle": "Create Entry",
+      "editTitle": "Edit Entry",
+      "description": "Capture the amount, and also the life context behind it.",
+      "tagsPlaceholder": "One tag per line",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving",
+      "validation": {
+        "required": "Please fill in date, title, category, and a valid amount",
+        "amountPositive": "Amount must be greater than 0"
+      },
+      "fields": {
+        "date": "Date",
+        "direction": "Direction",
+        "label": "Label",
+        "amount": "Amount",
+        "category": "Category",
+        "account": "Account",
+        "lifeSystem": "Life system",
+        "necessity": "Necessity",
+        "reviewStatus": "Review status",
+        "linkedModule": "Linked module",
+        "note": "Note",
+        "tags": "Tags"
+      }
+    },
+    "enum": {
+      "direction": {
+        "expense": "Expense",
+        "income": "Income"
+      },
+      "category": {
+        "餐饮": "Food",
+        "居住": "Housing",
+        "交通": "Transport",
+        "购物": "Shopping",
+        "学习成长": "Learning",
+        "健康": "Health",
+        "社交": "Social",
+        "娱乐": "Entertainment",
+        "收入": "Income",
+        "储蓄": "Savings",
+        "其他": "Other"
+      },
+      "lifeSystem": {
+        "基本生活": "Basic living",
+        "身体健康": "Physical health",
+        "关系社交": "Relationships",
+        "成长学习": "Growth and learning",
+        "居住环境": "Living environment",
+        "自由安全": "Freedom and safety",
+        "娱乐恢复": "Play and recovery"
+      },
+      "necessity": {
+        "生存必需": "Essential",
+        "稳定维护": "Stability maintenance",
+        "体验改善": "Experience upgrade",
+        "长期投资": "Long-term investment",
+        "冲动/待复盘": "Impulse / review later"
+      },
+      "reviewStatus": {
+        "已确认": "Confirmed",
+        "待复盘": "Needs review",
+        "可优化": "Can optimize",
+        "值得保留": "Worth keeping"
+      },
+      "linkedModule": {
+        "手动录入": "Manual entry",
+        "购物": "Shopping",
+        "饮食": "Nutrition",
+        "记事": "Events",
+        "反思": "Reflection",
+        "未来": "Future"
+      }
+    }
+  },
+  "journey": {
+    "page": {
+      "eyebrow": "Growth Memory",
+      "title": "Classify the past, then see how it still shapes the present",
+      "description": "Five dimensions organize, filter, and review memory. Formative power stays attached to individual memories and growth nodes instead of becoming a primary filter."
+    },
+    "hero": {
+      "memories": "Memories",
+      "growthNodes": "Growth Nodes",
+      "anchors": "Anchors"
+    },
+    "actions": {
+      "addMemory": "Add Memory",
+      "addGrowth": "Add Growth",
+      "addAnchor": "Add Anchor",
+      "addPrompt": "Add Prompt",
+      "addThread": "Add Signal",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving"
+    },
+    "filters": {
+      "title": "5-D Filters",
+      "type": "Type",
+      "era": "Era",
+      "emotionalWeight": "Emotional Weight",
+      "processing": "Processing",
+      "privacy": "Privacy",
+      "allTypes": "All Types",
+      "allEras": "All Eras",
+      "allEmotionalWeights": "All Weights",
+      "allProcessing": "All Statuses",
+      "allPrivacy": "All Privacy Levels",
+      "optionWithCount": "{{label}} · {{count}}",
+      "resultCount": "{{count}} / {{total}} memories",
+      "reset": "Reset"
+    },
+    "classification": {
+      "type": {
+        "title": "Type",
+        "description": "Start with the form this memory is carried by."
+      },
+      "era": {
+        "title": "Era",
+        "description": "Eras can be multi-select. Primary era is only for timeline placement."
+      },
+      "emotionalWeight": {
+        "title": "Emotional Weight",
+        "description": "How heavy does it feel to touch now?"
+      },
+      "processing": {
+        "title": "Processing",
+        "description": "Not every part of the past needs to be fully processed."
+      },
+      "privacy": {
+        "title": "Privacy",
+        "description": "Sensitive memories need clear boundaries before review."
+      }
+    },
+    "sections": {
+      "classification": {
+        "title": "5-D Overview",
+        "description": "These dimensions belong in filtering and grouping. Formative power stays on the timeline and in detail."
+      },
+      "eraSuggestions": {
+        "title": "Default Era Hints"
+      },
+      "formativePower": {
+        "title": "Formative Power",
+        "description": "Formative power explains depth of influence and is not a primary filter."
+      },
+      "timeline": {
+        "title": "Memory Timeline",
+        "description": "Review memories by primary era while always keeping formative power visible."
+      },
+      "growth": {
+        "title": "Growth Nodes",
+        "description": "When multiple memories point in the same direction of change, they form a growth node."
+      },
+      "anchors": {
+        "title": "Sensory Anchors",
+        "description": "Many memories do not start with events. They begin with places, objects, or photos."
+      },
+      "reviewPrompts": {
+        "title": "Review Prompts",
+        "description": "These prompts help you approach the past gradually instead of forcing a full retelling."
+      },
+      "threads": {
+        "title": "Influences Still Active Now",
+        "description": "Signals surfacing from growth nodes that are worth cross-checking with beliefs, principles, and relationships.",
+        "compactTitle": "Still Active"
+      }
+    },
+    "tabs": {
+      "timeline": "Memory Timeline",
+      "growth": "Growth Nodes",
+      "signals": "Anchors & Signals"
+    },
+    "memory": {
+      "formativePowerBadge": "Formative Power · {{value}}",
+      "unrated": "Unrated",
+      "needsConfirm": "Needs Confirm",
+      "impactPrefix": "Lasting impact: {{value}}",
+      "emotionalWeight": "Emotional Weight",
+      "processing": "Processing",
+      "privacy": "Privacy",
+      "formativePower": "Formative Power",
+      "sensoryCuePrefix": "Sensory cue: {{value}}",
+      "sourcePrefix": "Source: {{value}}"
+    },
+    "growth": {
+      "before": "Before",
+      "after": "After",
+      "beforeInline": "Before: {{value}}",
+      "afterInline": "After: {{value}}",
+      "triggerInline": "Trigger: {{value}}",
+      "keyEventPrefix": "Key turning point: {{value}}",
+      "beforeMemories": "Before memories",
+      "afterMemories": "After memories",
+      "triggerMemory": "Trigger memory"
+    },
+    "control": {
+      "title": "Structure Review",
+      "description": "Control mode can maintain memories, growth nodes, anchors, prompts, and active signals while also spotting missing fields and broken links.",
+      "metrics": {
+        "memories": "Memories",
+        "growthNodes": "Growth Nodes",
+        "secondConfirm": "Need Second Confirm",
+        "missingLinks": "Missing Links"
+      },
+      "missingPowerTitle": "Memories missing formative power",
+      "missingLinksTitle": "Memory IDs referenced by growth nodes but not found in the current dataset"
+    },
+    "management": {
+      "memories": "Memory Maintenance",
+      "growthNodes": "Growth Node Maintenance",
+      "anchors": "Anchor Maintenance",
+      "prompts": "Review Prompt Maintenance",
+      "threads": "Active Signal Maintenance"
+    },
+    "fields": {
+      "title": "Title",
+      "type": "Type",
+      "emotionalWeight": "Emotional Weight",
+      "processing": "Processing",
+      "privacy": "Privacy",
+      "primaryEra": "Primary Era",
+      "formativePower": "Formative Power",
+      "eras": "Era Tags",
+      "summary": "Summary",
+      "impact": "Lasting Impact",
+      "sensoryCue": "Sensory Cue",
+      "sourceModules": "Source Modules",
+      "tags": "Tags",
+      "domain": "Domain",
+      "stability": "Stability",
+      "before": "Before",
+      "after": "After",
+      "keyEvent": "Key Turning Point",
+      "triggerMemory": "Trigger Memory",
+      "beforeMemoryIds": "Before Memory IDs",
+      "afterMemoryIds": "After Memory IDs",
+      "evidence": "Evidence",
+      "label": "Name",
+      "note": "Note",
+      "linkedMemoryIds": "Linked Memory IDs",
+      "prompt": "Review Prompt",
+      "thread": "Active Signal"
+    },
+    "edit": {
+      "none": "None",
+      "listHint": "One per line, or separate with commas.",
+      "sourceModulesHint": "Only recognized source module names are saved.",
+      "memoryIdsHint": "One ID per line, or separate with commas; invalid IDs are ignored.",
+      "memoryIdReference": "Available Memory IDs",
+      "memoryCreateTitle": "Add Memory",
+      "memoryEditTitle": "Edit Memory",
+      "memoryDescription": "Maintain a memory's classification, summary, impact, and review signals.",
+      "growthCreateTitle": "Add Growth Node",
+      "growthEditTitle": "Edit Growth Node",
+      "growthDescription": "Use memory IDs to connect before, after, and trigger memories.",
+      "anchorCreateTitle": "Add Anchor",
+      "anchorEditTitle": "Edit Anchor",
+      "anchorDescription": "Connect places, objects, people, or photos with memories.",
+      "promptCreateTitle": "Add Review Prompt",
+      "promptEditTitle": "Edit Review Prompt",
+      "promptDescription": "Record a question that can be revisited slowly.",
+      "threadCreateTitle": "Add Active Signal",
+      "threadEditTitle": "Edit Active Signal",
+      "threadDescription": "Record an influence that is still active and worth reviewing across modules.",
+      "validation": {
+        "memoryRequired": "Enter a title, primary era, summary, and impact",
+        "growthRequired": "Enter title, before/after states, key event, and a valid trigger memory",
+        "anchorRequired": "Enter the anchor name and note",
+        "textRequired": "Enter content"
+      }
+    },
+    "toast": {
+      "saved": "Saved",
+      "saveFailed": "Save failed",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "confirm": {
+      "deleteMemory": "Delete this memory?",
+      "deleteGrowth": "Delete this growth node?",
+      "deleteAnchor": "Delete this memory anchor?",
+      "deletePrompt": "Delete this review prompt?",
+      "deleteThread": "Delete this active signal?"
+    },
+    "enum": {
+      "memoryType": {
+        "事件": "Event",
+        "地点": "Place",
+        "物件": "Object",
+        "人物": "Person",
+        "照片": "Photo",
+        "领悟": "Realization"
+      },
+      "emotionalWeight": {
+        "轻": "Light",
+        "中性": "Neutral",
+        "重": "Heavy",
+        "很重": "Very Heavy"
+      },
+      "processing": {
+        "已整理": "Organized",
+        "正在理解": "Making Sense",
+        "暂不触碰": "Not Touching Yet",
+        "决定不再细究": "Decided Not to Reopen",
+        "开放问题": "Open Question",
+        "想留给某人": "For Someone",
+        "记不清的裂缝": "Unclear Crack"
+      },
+      "privacy": {
+        "仅自己": "Only Me",
+        "需二次确认": "Needs Second Confirm",
+        "指定的人": "Specified People",
+        "未来可公开": "Future Public",
+        "离世后可看": "After Death"
+      },
+      "formativePower": {
+        "极深": "Extremely Deep",
+        "较深": "Deep",
+        "中等": "Moderate",
+        "轻微": "Slight",
+        "无": "None"
+      },
+      "sourceModule": {
+        "手动录入": "Manual Entry",
+        "反思": "Reflection",
+        "记事": "Events",
+        "记账": "Finance",
+        "关系": "Relationships",
+        "情绪": "Emotion",
+        "原则": "Principles",
+        "未来": "Future",
+        "生命整理": "Legacy"
+      },
+      "growthDomain": {
+        "关系": "Relationships",
+        "自我": "Self",
+        "工作": "Work",
+        "情绪能力": "Emotional Capacity",
+        "生活方式": "Lifestyle"
+      },
+      "growthStability": {
+        "偶尔还会退回去": "Still Slips Back Sometimes",
+        "基本稳定": "Mostly Stable",
+        "已经完全内化": "Fully Internalized"
+      }
+    },
+    "compact": {
+      "anchorTitle": "{{type}} · {{label}}",
+      "relatedMemoryCount": "{{note}} · {{count}} related memories"
+    },
+    "remaining": {
+      "memories": "{{count}} more memories not expanded",
+      "growth": "{{count}} more growth nodes not expanded"
+    },
+    "empty": {
+      "memories": "No memories match the current filters.",
+      "growthNodes": "No growth nodes match the current filters.",
+      "anchors": "No memory anchors match the current filters.",
+      "reviewPrompts": "No review prompts match the current filters.",
+      "threads": "No active influence signals match the current filters.",
+      "signals": "No supporting signals match the current filters.",
+      "noData": "No growth-memory data yet.",
+      "distribution": "No distribution data yet.",
+      "none": "None"
+    }
+  },
+  "socioeconomics": {
+    "page": {
+      "eyebrow": "Socioeconomics",
+      "title": "Map how the external economy works",
+      "description": "Classify knowledge with four tags, read relevance as decision distance, and use the heatmap to spot blind spots."
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "actions": {
+      "addEntry": "Add Entry",
+      "addGap": "Add Gap",
+      "addPrompt": "Add Prompt",
+      "editEntry": "Edit Entry",
+      "editGap": "Edit Gap",
+      "editPrompt": "Edit Prompt",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save"
+    },
+    "classification": {
+      "title": "4-Dimensional Cognition Map",
+      "description": "Classify by four dimensions; relevance stays attached to each item instead of becoming a main filter.",
+      "domain": {
+        "title": "Domain",
+        "description": "Which part of economic operation this belongs to."
+      },
+      "layer": {
+        "title": "Layer",
+        "description": "Micro, meso, and macro perspectives."
+      },
+      "confidence": {
+        "title": "Confidence",
+        "description": "From recognizing the term to having your own framework."
+      },
+      "source": {
+        "title": "Source",
+        "description": "Where this understanding came from."
+      }
+    },
+    "relevance": {
+      "title": "Decision Distance",
+      "description": "Relevance is not a main filter; it shows whether this knowledge is useful for current decisions."
+    },
+    "heatmap": {
+      "title": "Domain × Confidence",
+      "description": "Darker color means stronger understanding.",
+      "stackedDescription": "See where a domain is genuinely understood and where it is only familiar as a term."
+    },
+    "tabs": {
+      "entries": "Knowledge List",
+      "gaps": "Knowledge Gaps",
+      "prompts": "Review Prompts"
+    },
+    "entries": {
+      "title": "Knowledge List",
+      "description": "Each item always shows confidence and decision distance."
+    },
+    "gaps": {
+      "title": "Knowledge Gaps",
+      "description": "Name the areas that are still only familiar or not yet framed."
+    },
+    "prompts": {
+      "title": "Review Prompts",
+      "description": "Use these as a monthly check-in for the cognition map."
+    },
+    "review": {
+      "title": "Priority Repairs",
+      "description": "Short decision distance plus shallow confidence is the first place to study."
+    },
+    "empty": {
+      "entries": "No knowledge entries match the current filters.",
+      "gaps": "No knowledge gaps match the current filters.",
+      "prompts": "No review prompts match the current filters.",
+      "review": "No priority study items match the current filters.",
+      "distribution": "No distribution data yet."
+    },
+    "fields": {
+      "title": "Title",
+      "domain": "Domain",
+      "layer": "Layer",
+      "confidence": "Confidence",
+      "source": "Source",
+      "relevance": "Decision Distance",
+      "summary": "Summary",
+      "understandingNote": "Understanding Note",
+      "relatedConcepts": "Related Concepts",
+      "tags": "Tags",
+      "confidenceHistory": "Confidence Revision History",
+      "gapSummary": "Gap",
+      "nextStep": "Next Step",
+      "prompt": "Review Prompt"
+    },
+    "edit": {
+      "entryCreateTitle": "Add Knowledge Entry",
+      "entryEditTitle": "Edit Knowledge Entry",
+      "entryDescription": "Each entry needs domain, layer, confidence, source, and decision distance.",
+      "gapCreateTitle": "Add Knowledge Gap",
+      "gapEditTitle": "Edit Knowledge Gap",
+      "promptCreateTitle": "Add Review Prompt",
+      "promptEditTitle": "Edit Review Prompt",
+      "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | Finished a reading set",
+      "validation": {
+        "entryRequired": "Please enter a title and summary",
+        "history": "Revision history must use: date | old level -> new level | trigger",
+        "gapRequired": "Please enter the gap and next step",
+        "promptRequired": "Please enter a review prompt"
+      }
+    },
+    "toast": {
+      "saved": "Saved",
+      "saveFailed": "Save failed",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "confirm": {
+      "deleteEntry": "Delete \"{{title}}\"?",
+      "deleteGap": "Delete this gap?",
+      "deletePrompt": "Delete this review prompt?"
+    },
+    "enum": {
+      "domain": {
+        "货币与物价": "Money & Prices",
+        "个人财务": "Personal Finance",
+        "劳动力市场": "Labor Market",
+        "产业与公司": "Industries & Companies",
+        "财政与政策": "Fiscal Policy",
+        "金融市场": "Financial Markets",
+        "全球与宏观": "Global & Macro"
+      },
+      "layer": {
+        "微观": "Micro",
+        "中观": "Meso",
+        "宏观": "Macro"
+      },
+      "confidence": {
+        "听过名词": "Recognize the term",
+        "知道大致逻辑": "Know the basic logic",
+        "能预判常见情境": "Can anticipate common cases",
+        "有自己的判断框架": "Has a personal framework"
+      },
+      "source": {
+        "系统学习": "Systematic Study",
+        "新闻媒体": "News Media",
+        "亲身经历": "Lived Experience",
+        "他人叙述": "Others' Stories",
+        "专业讨论": "Professional Discussion"
+      },
+      "relevance": {
+        "直接影响当前决策": "Directly affects current decisions",
+        "影响中期规划": "Affects mid-term planning",
+        "影响长期方向": "Affects long-term direction",
+        "纯认知储备": "Cognitive reserve"
+      }
+    }
+  },
+  "emotion": {
+    "page": {
+      "eyebrow": "Emotions",
+      "title": "Read the recent inner weather",
+      "description": "See emotional waves, triggers, and recovery methods in one place."
+    },
+    "tabs": {
+      "overview": "Overview",
+      "today": "Today",
+      "timeline": "Timeline",
+      "triggers": "Triggers",
+      "toolbox": "Recovery Toolkit"
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "addCheckIn": "Add Entry",
+      "addTrendPoint": "Add Trend Point",
+      "addSegment": "Add Segment",
+      "addLoop": "Add Loop",
+      "addTrigger": "Add Trigger",
+      "addLifestyleLink": "Add Link",
+      "addEnvironmentCue": "Add Environment",
+      "addRelationshipCue": "Add Relationship",
+      "addTool": "Add Tool",
+      "addRecoveryNote": "Add Recovery Note",
+      "editCheckIn": "Edit Emotion Entry",
+      "editSegment": "Edit Segment",
+      "editLoop": "Edit Loop",
+      "editTrigger": "Edit Trigger",
+      "editLifestyleLink": "Edit Link",
+      "editEnvironmentCue": "Edit Environment",
+      "editRelationshipCue": "Edit Relationship",
+      "editTool": "Edit Tool",
+      "editMinimalSteps": "Edit Minimal Steps",
+      "editIneffectiveActions": "Edit Warnings",
+      "editRecoveryNote": "Edit Recovery Note"
+    },
+    "overview": {
+      "title": "Emotion Overview",
+      "averageScore": "Average Intensity",
+      "bestWindow": "Best Window",
+      "worstWindow": "Hardest Window",
+      "window": "Window",
+      "topTags": "Frequent Emotion Tags",
+      "conclusion": "One-line Summary"
+    },
+    "today": {
+      "title": "Today’s Emotion Entry",
+      "description": "Intensity, body signals, and immediate impulses.",
+      "longDescription": "Turn vague emotion into a sample you can revisit.",
+      "recent": "Recent Entries",
+      "promptTitle": "Entry Path",
+      "promptDescription": "Intensity, tags, triggers, and needs all feed later pattern observation.",
+      "prompt": {
+        "feeling": "Name the feeling first",
+        "feelingBody": "It does not need to be exact; pick the closest word.",
+        "body": "Then check the body",
+        "bodyBody": "Shoulders, chest, appetite, and sleepiness often know before language does.",
+        "need": "Finally name the need",
+        "needBody": "Not to fix it immediately, but to know what would feel safer now."
+      }
+    },
+    "timeline": {
+      "title": "Emotion Timeline",
+      "description": "Read peaks, dips, and recovery periods through time.",
+      "chartTitle": "7-day Intensity",
+      "chartHint": "0–10, higher means tighter",
+      "segments": "Period Summary",
+      "loopTitle": "Recurring Loops",
+      "loopDescription": "See rhythms that are not random."
+    },
+    "triggers": {
+      "title": "Triggers",
+      "description": "Connect emotion with concrete life events.",
+      "lifestyle": "Lifestyle Links",
+      "lifestyleDesc": "Sleep, food, movement, and screen time.",
+      "environment": "Environment Cues",
+      "environmentDesc": "Contexts that tend to worsen state.",
+      "relationships": "Relationship Cues",
+      "relationshipsDesc": "Relationships that tend to create more fluctuation."
+    },
+    "toolbox": {
+      "title": "Soothing & Recovery Toolkit",
+      "description": "When things are hard, stabilize first and analyze later.",
+      "minimalSteps": "If things are already bad, only do these three",
+      "ineffective": "Actions that make things worse",
+      "ineffectiveDesc": "Avoid these paths when your state is low.",
+      "recoveryNotes": "What has held me before",
+      "recoveryNotesDesc": "Past effective recovery experiences can be used again."
+    },
+    "common": {
+      "intensity": "Intensity",
+      "bodySignal": "Body Signal",
+      "triggerEvent": "Trigger Event",
+      "impulse": "Impulse",
+      "needRightNow": "Need Right Now",
+      "bodyPrefix": "Body",
+      "impulsePrefix": "Want to ",
+      "recent": "Recent",
+      "when": "Best when",
+      "effect": "Effect"
+    },
+    "empty": {
+      "checkIns": "No emotion entries yet.",
+      "today": "No entry for today yet.",
+      "trend": "No emotion samples to chart yet.",
+      "timelineSegments": "No period summaries yet.",
+      "loopPatterns": "No recurring loop has been identified yet.",
+      "triggers": "No triggers under the current filter.",
+      "lifestyleLinks": "No lifestyle links yet.",
+      "environmentCues": "No environment cues yet.",
+      "relationshipCues": "No relationship cues yet.",
+      "tools": "No recovery tools under the current filter.",
+      "minimalRecoverySteps": "No minimal recovery steps yet.",
+      "ineffectiveActions": "No ineffective action warnings yet.",
+      "recoveryNotes": "No recovery notes yet."
+    },
+    "toast": {
+      "saved": "Emotion data saved",
+      "deleted": "Emotion data deleted"
+    },
+    "editor": {
+      "description": "This content is saved to backend emotion data instead of temporary page mock data.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "none": "None",
+      "confirmDelete": "Delete this emotion data?",
+      "validation": {
+        "required": "Fill in the required fields"
+      },
+      "overview": {
+        "title": "Edit Emotion Overview",
+        "description": "Maintain the recent window, intensity, and one-line summary.",
+        "tagsPlaceholder": "Anxiety,4"
+      },
+      "textList": {
+        "minimalRecoverySteps": "Edit Minimal Recovery Steps",
+        "ineffectiveActions": "Edit Ineffective Action Warnings",
+        "description": "One item per line; saved back to the backend."
+      },
+      "placeholders": {
+        "list": "One per line, or separate with commas"
+      },
+      "fields": {
+        "date": "Time",
+        "state": "Overall State",
+        "summary": "What is happening now",
+        "intensity": "Intensity",
+        "impulse": "Impulse",
+        "bodySignal": "Body Signal",
+        "emotionTags": "Emotion Tags",
+        "tags": "Context Tags",
+        "triggerEvent": "Trigger Event",
+        "needRightNow": "Need Right Now",
+        "label": "Label",
+        "score": "Intensity Score",
+        "primaryState": "Primary State",
+        "note": "Note",
+        "title": "Title",
+        "category": "Category",
+        "cues": "Cues",
+        "recentExamples": "Recent Examples",
+        "kind": "Type",
+        "description": "Description",
+        "when": "Best When",
+        "contactScript": "Words to Say",
+        "range": "Time Range",
+        "trend": "Trend",
+        "frequency": "Frequency",
+        "factor": "Factor",
+        "direction": "Direction",
+        "observation": "Observation",
+        "context": "Context",
+        "who": "Person / Relationship",
+        "pattern": "Pattern",
+        "what": "What Happened",
+        "effect": "Effect",
+        "windowLabel": "Observation Window",
+        "averageScore": "Average Intensity",
+        "bestWindow": "Better Window",
+        "worstWindow": "Harder Window",
+        "topEmotionTags": "Frequent Emotion Tags",
+        "conclusion": "One-line Summary"
+      },
+      "checkIn": {
+        "createTitle": "Add Emotion Entry",
+        "editTitle": "Edit Emotion Entry"
+      },
+      "trendPoint": {
+        "createTitle": "Add Trend Point",
+        "editTitle": "Edit Trend Point"
+      },
+      "trigger": {
+        "createTitle": "Add Trigger",
+        "editTitle": "Edit Trigger"
+      },
+      "tool": {
+        "createTitle": "Add Recovery Tool",
+        "editTitle": "Edit Recovery Tool"
+      },
+      "timelineSegment": {
+        "createTitle": "Add Period Segment",
+        "editTitle": "Edit Period Segment"
+      },
+      "loopPattern": {
+        "createTitle": "Add Loop Pattern",
+        "editTitle": "Edit Loop Pattern"
+      },
+      "lifestyleLink": {
+        "createTitle": "Add Lifestyle Link",
+        "editTitle": "Edit Lifestyle Link"
+      },
+      "environmentCue": {
+        "createTitle": "Add Environment Cue",
+        "editTitle": "Edit Environment Cue"
+      },
+      "relationshipCue": {
+        "createTitle": "Add Relationship Cue",
+        "editTitle": "Edit Relationship Cue"
+      },
+      "recoveryNote": {
+        "createTitle": "Add Recovery Note",
+        "editTitle": "Edit Recovery Note"
+      }
+    },
+    "enum": {
+      "state": {
+        "平静": "Calm",
+        "回稳": "Stabilizing",
+        "低压焦虑": "Low-grade Anxiety",
+        "易怒": "Irritable",
+        "麻木": "Numb",
+        "空": "Empty",
+        "委屈": "Hurt",
+        "难过": "Sad",
+        "高压后空掉": "Empty After Pressure",
+        "松弛": "Relaxed",
+        "期待": "Hopeful"
+      },
+      "emotionTag": {
+        "难过": "Sad",
+        "焦虑": "Anxious",
+        "空": "Empty",
+        "平静": "Calm",
+        "委屈": "Hurt",
+        "愤怒": "Angry",
+        "松弛": "Relaxed",
+        "期待": "Hopeful",
+        "羞愧": "Ashamed",
+        "恐惧": "Afraid",
+        "孤独": "Lonely",
+        "兴奋": "Excited"
+      },
+      "impulse": {
+        "逃避": "Avoid",
+        "倾诉": "Talk",
+        "睡觉": "Sleep",
+        "吃东西": "Eat",
+        "出门": "Go Out",
+        "沉默": "Stay Silent",
+        "运动": "Move",
+        "刷手机": "Scroll"
+      },
+      "triggerCategory": {
+        "工作": "Work",
+        "家庭": "Family",
+        "亲密关系": "Intimate Relationship",
+        "金钱": "Money",
+        "睡眠": "Sleep",
+        "社交": "Social",
+        "自我否定": "Self-negation",
+        "环境": "Environment"
+      },
+      "toolKind": {
+        "有效": "Effective",
+        "无效": "Ineffective",
+        "极简三步": "Minimal Three Steps",
+        "可联系": "Contact"
+      },
+      "segmentTrend": {
+        "持续恶化": "Worsening",
+        "逐渐恢复": "Recovering",
+        "起伏波动": "Fluctuating",
+        "平稳": "Stable"
+      },
+      "lifestyleFactor": {
+        "睡眠": "Sleep",
+        "饮食": "Food",
+        "运动": "Movement",
+        "经期": "Cycle",
+        "饮酒": "Alcohol",
+        "屏幕时长": "Screen Time",
+        "通勤": "Commute",
+        "独处": "Solitude"
+      },
+      "linkDirection": {
+        "正相关": "Positive",
+        "负相关": "Negative",
+        "混合": "Mixed"
+      }
+    }
+  },
+  "future": {
+    "page": {
+      "eyebrow": "Future Blueprint",
+      "title": "Name the person you want to become",
+      "description": "The future here is not a prediction. It is the direction you choose to write down: ideal self, ideal life, values, and stage paths."
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode"
+    },
+    "searching": "Current filter: {{query}}",
+    "refresh": "Refresh",
+    "addMilestone": "Add Path",
+    "addExperiment": "Add Experiment",
+    "sections": {
+      "definition": {
+        "title": "Ideal Definition",
+        "description": "Clarify the direction first, then make the path concrete."
+      },
+      "milestones": {
+        "title": "Stage Paths",
+        "description": "Break the future into ways to move closer, not a final answer."
+      },
+      "experiments": {
+        "title": "Current Experiments",
+        "description": "No need to arrive all at once. Let daily life become a little more like you."
+      }
+    },
+    "metrics": {
+      "values": "Values",
+      "valuesDetail": "Values are not slogans. They are ongoing filters.",
+      "milestones": "Stage Paths",
+      "milestonesDetail": "Turn distant direction into nearby steps.",
+      "experiments": "Experiments",
+      "experimentsDetail": "Let small changes appear in real life first."
+    },
+    "definition": {
+      "identity": "Ideal Self",
+      "lifestyle": "Ideal Life",
+      "values": "Important Values",
+      "valuesDesc": "These words decide where your time and money go."
+    },
+    "edit": {
+      "blueprint": "Edit Blueprint",
+      "blueprintTitle": "Edit Future Blueprint",
+      "blueprintDescription": "Save the core definition here: who you want to become, the life you want, and the values that matter.",
+      "identity": "Ideal Self",
+      "identityPlaceholder": "Write the self-state you want to move closer to.",
+      "lifestyle": "Ideal Life",
+      "lifestylePlaceholder": "Write about space, work rhythm, relationships, and recovery.",
+      "values": "Important Values",
+      "valuesHint": "One per line. Commas also work.",
+      "milestoneCreateTitle": "Add Stage Path",
+      "milestoneEditTitle": "Edit Stage Path",
+      "milestoneDescription": "Turn distant direction into a path you can approach.",
+      "horizon": "Horizon",
+      "horizonPlaceholder": "For example: next 3 months",
+      "summary": "Stage Summary",
+      "steps": "Ways to Move Closer",
+      "stepsHint": "One step per line.",
+      "experimentCreateTitle": "Add Current Experiment",
+      "experimentEditTitle": "Edit Current Experiment",
+      "experimentDescription": "Experiments do not need to be grand. They only need to move life closer to the blueprint.",
+      "experiment": "Experiment",
+      "clickToEdit": "Click to edit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "delete": "Delete",
+      "validation": {
+        "blueprintRequired": "Please fill in ideal self and ideal life",
+        "milestoneRequired": "Please fill in horizon, summary, and at least one step",
+        "experimentRequired": "Please fill in the experiment"
+      }
+    },
+    "toast": {
+      "saved": "Saved",
+      "saveFailed": "Save failed",
+      "deleted": "Deleted",
+      "deleteFailed": "Delete failed"
+    },
+    "confirm": {
+      "deleteMilestone": "Delete \"{{horizon}}\"?",
+      "deleteExperiment": "Delete this experiment?"
+    },
+    "empty": {
+      "values": "No value keywords yet.",
+      "milestones": "No future paths match the current filter.",
+      "experiments": "No experiments match the current filter."
+    }
+  },
+  "legacy": {
+    "pageEyebrow": "Life Organizing",
+    "pageTitle": "Place the important words before they become urgent",
+    "pageDescription": "The item library is the only editing source; overview, delivery map, relationship expression, and trust boundaries are derived views.",
+    "tabs": {
+      "overview": "Overview",
+      "items": "Item Library",
+      "deliveryMap": "Delivery Map",
+      "relationshipExpression": "Relationship Expression",
+      "trustBoundaries": "Trust Boundaries"
+    },
+    "actions": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "unlock": "Unlock to edit",
+      "revealContent": "Open content"
+    },
+    "undo": "Undo",
+    "toast": {
+      "saved": "Saved",
+      "deletePendingItem": "Queued for deletion: {{title}}. You can undo within 5 seconds.",
+      "deleteSuccessItem": "Deleted life organizing item: {{title}}",
+      "deleteFailedItem": "Failed to delete life organizing item",
+      "deleteUndoneItem": "Deletion undone: {{title}}"
+    },
+    "confirm": {
+      "deleteItem": "Delete {{title}}?"
+    },
+    "fields": {
+      "title": "Title",
+      "summary": "Summary",
+      "content": "Content",
+      "tags": "Tags",
+      "reviewCue": "Review cue",
+      "category": "Category",
+      "recipient": "Recipient",
+      "recipientName": "Named recipient",
+      "relatedRelationshipId": "Relationship reference",
+      "urgency": "Urgency",
+      "visibility": "Visibility",
+      "deliveryCondition": "Delivery condition",
+      "status": "Status",
+      "emotionalLoad": "Emotional load",
+      "isLocked": "Lock item",
+      "requiresSecondConfirm": "Second confirmation before opening",
+      "excludeFromAi": "Exclude from AI summaries",
+      "updatedAt": "Updated",
+      "createdAt": "Created",
+      "finalizedAt": "Finalized",
+      "aiBoundary": "AI boundary"
+    },
+    "labels": {
+      "locked": "Locked",
+      "aiExcluded": "Excluded from AI",
+      "aiAllowed": "Available for organizing",
+      "unrated": "Unrated",
+      "notFinalized": "Not finalized",
+      "unlinked": "Unlinked"
+    },
+    "filters": {
+      "all": "All",
+      "signal": "Protection signal",
+      "missingDelivery": "Missing delivery condition",
+      "locked": "Locked",
+      "aiExcluded": "AI excluded",
+      "secondConfirm": "Second confirm",
+      "clear": "Clear filters"
+    },
+    "warnings": {
+      "missingDelivery": "Delivery condition missing",
+      "missingRecipient": "Named recipient missing",
+      "criticalDraft": "Critical information unfinished",
+      "finalUnlocked": "Final version not locked"
+    },
+    "metrics": {
+      "total": "Items",
+      "totalDesc": "The item library is the only data source.",
+      "criticalDraft": "Critical unfinished",
+      "criticalDraftDesc": "Check what is still draft or continuously updated.",
+      "missingDelivery": "Delivery gaps",
+      "missingDeliveryDesc": "Future or conditional visibility needs a trigger description.",
+      "finalLocked": "Final or locked",
+      "finalLockedDesc": "Locked content needs deliberate confirmation before edits.",
+      "heavyLoad": "Heavy emotional load",
+      "heavyLoadDesc": "Best opened when there is enough steadiness.",
+      "aiExcluded": "AI excluded",
+      "aiExcludedDesc": "These items stay out of cross-module insight.",
+      "secondConfirm": "Second confirmation",
+      "secondConfirmDesc": "A gentle pause remains before opening."
+    },
+    "overview": {
+      "title": "Life Organizing Overview",
+      "description": "See coverage, gaps, and boundaries without turning heavy content into pressure.",
+      "coverage": "Category Coverage",
+      "coverageDesc": "Check whether the work is overly concentrated in one category.",
+      "boundaryTitle": "Boundaries to confirm",
+      "boundaryDesc": "Only counts and cues are shown here; private content is not auto-summarized.",
+      "recent": "Recently Updated",
+      "recentDesc": "Only summaries and boundaries are shown, not full content.",
+      "emotionalLoad": "Emotional Load",
+      "emotionalLoadDesc": "Emotional load is not a main category; it is an opening cue per item.",
+      "reviewPrompts": "Review Prompts",
+      "reviewPromptsDesc": "Organize slowly without turning this into completion pressure.",
+      "missingDeliveryCopy": "These can remain drafts, but final versions need clear trigger and verification wording."
+    },
+    "items": {
+      "title": "Item Library",
+      "search": "Search title, content, or tags",
+      "selectPrompt": "Select an item to view details.",
+      "warningTitle": "Boundaries to confirm",
+      "secondConfirmCopy": "This item requires a second confirmation, so only its summary is shown first."
+    },
+    "edit": {
+      "createTitle": "Add Life Organizing Item",
+      "editTitle": "Edit Life Organizing Item",
+      "lockedCopy": "This item is locked. Unlock it before editing.",
+      "contentSection": "Content",
+      "classifySection": "Classification and Protection",
+      "tagsPlaceholder": "Separate with commas"
+    },
+    "validation": {
+      "required": "Please fill in title, summary, and content",
+      "criticalFinalDelivery": "Critical final items need a delivery condition"
+    },
+    "deliveryMap": {
+      "title": "Delivery Map",
+      "description": "Check who sees what by recipient and visibility.",
+      "itemCount": "{{count}} items",
+      "groupDescription": "V1 records delivery intent and manual confirmation conditions only. It does not promise automatic delivery.",
+      "sectionCount": "{{count}} items",
+      "checklistTitle": "Delivery Checks",
+      "checklistDesc": "These checks come from item fields and do not create separate data."
+    },
+    "relationship": {
+      "title": "Relationship Expression",
+      "description": "Focus on words for someone and unfinished concerns tied to relationships.",
+      "now": "Words that can be said now",
+      "nowDesc": "These may move into the relationship module later, but nothing is pushed automatically.",
+      "future": "Words for future or after death",
+      "futureDesc": "Keep delivery intent, recipient, and condition beside the text.",
+      "private": "Private unfinished concerns",
+      "privateDesc": "These should not be pushed automatically or enter AI summaries by default.",
+      "unlinked": "Unlinked relationship items",
+      "unlinkedDesc": "You can decide later whether to reference a relationship record.",
+      "nowHintTitle": "Current expression cue",
+      "nowHint": "visibility=now is only a cue that expression is possible; it is not a nudge or automatic copy."
+    },
+    "boundaries": {
+      "title": "Trust Boundaries",
+      "description": "Make system boundaries explicit and gather item-level protection rules in one view.",
+      "rules": "Trust Boundary Notes",
+      "rulesDesc": "These notes come from backend configuration and are maintained separately from item rules.",
+      "aiExcludedItems": "Items excluded from AI",
+      "secondConfirmItems": "Items requiring second confirmation",
+      "lockedItems": "Final or locked items",
+      "missingDeliveryItems": "Items missing delivery conditions",
+      "itemCount": "{{count}} items",
+      "legalTitle": "Legal Boundary",
+      "legalCopy": "Life Organizing has no legal will effect and does not replace insurance, asset, medical, or legal document management."
+    },
+    "empty": {
+      "items": "No life organizing items yet.",
+      "filteredItems": "No life organizing items match the current filters.",
+      "prompts": "No review prompts yet.",
+      "bucket": "No matching content.",
+      "boundaries": "No boundary notes yet."
+    },
+    "enum": {
+      "category": {
+        "重要交代": "Important handoff",
+        "留给某人的话": "Words for someone",
+        "人生回顾": "Life review",
+        "未完成的事": "Unfinished matters",
+        "纪念偏好": "Memorial preferences"
+      },
+      "recipient": {
+        "特定的人": "Specific person",
+        "家人": "Family",
+        "朋友": "Friends",
+        "公开": "Public",
+        "仅自己": "Only me"
+      },
+      "urgency": {
+        "关键信息": "Critical information",
+        "重要": "Important",
+        "锦上添花": "Nice to have",
+        "可选": "Optional"
+      },
+      "visibility": {
+        "现在": "Now",
+        "某个时间后": "After a time",
+        "我离世后": "After my death",
+        "条件触发": "Condition-triggered",
+        "永不交付": "Never deliver"
+      },
+      "status": {
+        "草稿": "Draft",
+        "基本完成": "Mostly complete",
+        "已完成": "Complete",
+        "会持续更新": "Continuously updated",
+        "最终版": "Final"
+      },
+      "emotionalLoad": {
+        "很重": "Very heavy",
+        "中等": "Medium",
+        "轻微": "Light",
+        "平静": "Calm"
+      }
+    }
+  },
   "shell": {
     "brandSubtitle": "Personal Life Workbench",
     "tagline": "Local-first / Self-knowledge system",
@@ -1239,6 +3070,9 @@
     "collapseSidebar": "Collapse menu column",
     "searchPlaceholder": "Search records, beliefs, relationships, or growth clues",
     "searchAria": "Search records and page content",
+    "search": {
+      "activeFilter": "Current filter: {{query}}"
+    },
     "quickRecord": "Quick Record",
     "apiErrorFallback": "API request failed, page has fallen back to local mock data.",
     "apiErrorRetry": "Retry",
@@ -1247,6 +3081,115 @@
       "switchToChinese": "切换到中文",
       "englishTitle": "English",
       "chineseTitle": "中文"
+    },
+    "utilities": {
+      "theme": "Theme",
+      "notifications": "Notifications",
+      "music": "Music",
+      "managementMode": "Management Mode"
+    },
+    "themes": {
+      "title": "Theme",
+      "description": "A theme is a work atmosphere, not a day/night mode. Current theme: {{theme}}.",
+      "current": "Current",
+      "options": {
+        "morning": {
+          "label": "Morning",
+          "description": "A calm blue-gray base for organizing and reviewing."
+        },
+        "linen": {
+          "label": "Paper",
+          "description": "A warmer paper and clay palette for a slower workbench."
+        },
+        "tide": {
+          "label": "Tide",
+          "description": "A lighter, cooler palette for stepping back and seeing the structure."
+        }
+      }
+    },
+    "music": {
+      "title": "Music",
+      "description": "Part of the persistent utility area. It offers light company without taking over the page.",
+      "playing": "Playing",
+      "paused": "Paused",
+      "volume": "Volume {{volume}}",
+      "unsupported": "Realtime audio is not supported in this environment. The UI can stay and later be replaced with a real player.",
+      "volumeNudge": "Volume Nudge",
+      "volumeHint": "Keep the utility area light so it does not cover the main page.",
+      "presets": {
+        "morning": {
+          "label": "Morning",
+          "description": "A brighter, lighter melody for organizing thoughts."
+        },
+        "rain": {
+          "label": "Rain",
+          "description": "A slower, lower pattern for staying with the work longer."
+        },
+        "night": {
+          "label": "Night Reading",
+          "description": "A more distant tone for calm evening work."
+        }
+      }
+    },
+    "notifications": {
+      "messageChannel": "Top Message",
+      "notificationChannel": "Bottom Notification",
+      "messageTimed": "Top Message {{seconds}}s",
+      "notificationTimed": "Bottom Notification {{seconds}}s",
+      "persistent": "Persistent",
+      "view": "View",
+      "viewDetails": "View Details",
+      "messageDetail": "Message Detail",
+      "notificationDetail": "Notification Detail",
+      "source": "Source: {{source}}",
+      "defaultSource": "In-app notification",
+      "display": "Display: {{channel}}",
+      "duration": "Duration: {{duration}}",
+      "durationMs": "{{duration}}ms",
+      "close": "Close",
+      "goTo": "Go to {{view}}",
+      "defaultAction": "Open"
+    },
+    "notificationCenter": {
+      "title": "Notification Center",
+      "description": "Top messages and bottom notifications are collected here for review and follow-up.",
+      "activeCount": "{{count}} showing",
+      "unread": "Unread",
+      "empty": "No notifications yet. Save results, reminders, and cross-page follow-ups can be wired here later.",
+      "demo": {
+        "title": "Feedback Test",
+        "message": {
+          "button": "Top Message 3s",
+          "title": "Top message triggered",
+          "message": "It disappears after 3 seconds by default and suits lightweight feedback like save success.",
+          "source": "Top message component",
+          "detail": "Top messages work best for brief confirmations and lightweight result feedback, not heavy reading.",
+          "lineDuration": "Default duration: 3000ms",
+          "lineUse": "Best for save success, completion confirmations, and light reminders",
+          "lineShape": "Keep the message short and actions minimal"
+        },
+        "notification": {
+          "button": "Bottom Notification 5s",
+          "title": "Bottom notification triggered",
+          "message": "It stays for 5 seconds by default and suits fuller information prompts.",
+          "source": "Bottom notification component",
+          "detail": "Bottom notifications fit contextual reminders, suggestions, and actionable information, especially when stacked.",
+          "lineDuration": "Default duration: 5000ms",
+          "lineUse": "Best for task completion, reminders, and suggestions",
+          "lineShape": "Priority, source, and category can be extended later"
+        },
+        "persistent": {
+          "button": "Persistent Notification",
+          "title": "Life timeline needs more context",
+          "message": "This notification stays until you handle or close it.",
+          "action": "Open Growth Memory",
+          "source": "Extended notification demo",
+          "detail": "Persistent notifications suit items that truly need attention, such as missing content, confirmations, or cross-page reminders.",
+          "lineDuration": "Does not disappear automatically",
+          "lineTarget": "Can navigate to a specific page",
+          "lineShape": "Can later become a task, todo, or message-center entry"
+        }
+      }
     },
     "views": {
       "overview": "Overview",
@@ -1265,6 +3208,8 @@
       "future": "Future Blueprint"
     },
     "nav": {
+      "ariaLabel": "Page Navigation",
+      "itemAria": "Navigate to {{label}}",
       "groups": {
         "workbench": "Workbench",
         "records": "Records",
@@ -1331,6 +3276,194 @@
           "label": "Future",
           "hint": "Ideal self and life direction"
         }
+      }
+    },
+    "rhythm": {
+      "capture": {
+        "title": "Capture First",
+        "body": "Capture first, then organize, then understand why you think and live this way."
+      },
+      "review": {
+        "title": "Review Gently",
+        "body": "Do not rush to a conclusion. First look at recent emotions, choices, and rhythm."
+      },
+      "future": {
+        "title": "Leave Room for Future",
+        "body": "Make the ideal life more concrete, and direction can slowly become action."
+      }
+    },
+    "rhythmPopup": {
+      "eyebrow": "Today's Rhythm",
+      "title": "Slow down and look at today first",
+      "switchToNth": "Switch to rhythm slide {{n}}"
+    },
+    "sidebarCarousel": {
+      "switchToNth": "Switch to note {{n}}"
+    }
+  },
+  "principles": {
+    "page": {
+      "eyebrow": "Principles",
+      "title": "Organize principles, boundaries, and bottom lines into a decision system",
+      "description": "This page does more than list principles: it shows what each one protects, where it came from, how firm it is, and what it costs to keep."
+    },
+    "controlMode": {
+      "on": "Control Mode",
+      "off": "Browse Mode",
+      "summary": "{{count}} principles · {{relations}} relations",
+      "add": "Add Principle"
+    },
+    "tabs": {
+      "entries": "Principles",
+      "prompts": "Decision Calibration",
+      "relations": "Support / Conflict"
+    },
+    "classification": {
+      "domain": {
+        "title": "Domain",
+        "description": "Which part of life it mainly protects."
+      },
+      "type": {
+        "title": "Type",
+        "description": "Whether it is a bottom line, boundary, or standard."
+      },
+      "strength": {
+        "title": "Strength",
+        "description": "How non-negotiable it is."
+      },
+      "source": {
+        "title": "Source",
+        "description": "Where it came from."
+      },
+      "status": {
+        "title": "Status",
+        "description": "Whether it is still active."
+      }
+    },
+    "sections": {
+      "classification": {
+        "title": "5-Dimension Classification",
+        "description": "These dimensions organize and review the decision system; cost stays in details and calibration."
+      },
+      "entries": {
+        "title": "Principle List",
+        "description": "Cost is always visible in details, so the real price of each principle stays in view."
+      },
+      "boundaries": {
+        "title": "Where I No Longer Yield",
+        "description": "Bottom lines are not performance; they mark what cannot keep being crossed."
+      },
+      "prompts": {
+        "title": "Decision Calibration",
+        "description": "For a concrete choice, pull up the related principles first, then check strength and cost."
+      },
+      "relations": {
+        "title": "Support And Conflict",
+        "description": "Principles are not isolated dots; they can support each other or pull in different directions."
+      }
+    },
+    "cost": {
+      "title": "Cost Annotation",
+      "description": "Cost is an evaluation attribute for a single principle. It shows what you need to prepare to keep it, and stays out of the main filters."
+    },
+    "meta": {
+      "source": "Source",
+      "cost": "Cost",
+      "protectedValue": "Protected Value",
+      "decisionCue": "Calibration Cue",
+      "boundary": "Boundary"
+    },
+    "empty": {
+      "entries": "No principles match the current filter.",
+      "boundaries": "No bottom lines match the current filter.",
+      "prompts": "No decision prompts match the current filter.",
+      "relations": "No principle relations match the current filter.",
+      "priority": "No high-priority principles match the current filter.",
+      "evolving": "No changing principles match the current filter.",
+      "distribution": "No distribution data yet."
+    },
+    "edit": {
+      "createTitle": "Add Principle",
+      "editTitle": "Edit Principle",
+      "description": "The 5 classification dimensions organize the decision system; cost evaluates the price of keeping one principle.",
+      "title": "Title",
+      "titlePlaceholder": "Example: Avoid important decisions late at night",
+      "cost": "Cost",
+      "statement": "Statement",
+      "statementPlaceholder": "Write the principle as one action-guiding sentence.",
+      "descriptionLabel": "Description",
+      "domain": "Domain",
+      "type": "Type",
+      "strength": "Strength",
+      "source": "Source",
+      "status": "Status",
+      "boundary": "Boundary",
+      "protectedValue": "Protected Value",
+      "decisionCue": "Calibration Cue",
+      "tags": "Tags",
+      "tagsPlaceholder": "Separate with commas",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving",
+      "confirmDelete": "Delete this principle?",
+      "saved": "Principle saved",
+      "saveFailed": "Failed to save principle",
+      "deleted": "Principle deleted",
+      "deleteFailed": "Failed to delete principle",
+      "validation": {
+        "required": "Please fill in title, statement, and boundary"
+      },
+      "revision": {
+        "summary": "Updated {{fields}}.",
+        "separator": ", "
+      }
+    },
+    "enumNames": {
+      "domain": {
+        "关系": "Relationships",
+        "工作": "Work",
+        "金钱": "Money",
+        "健康": "Health",
+        "时间": "Time",
+        "诚信": "Integrity"
+      },
+      "type": {
+        "边界": "Boundary",
+        "标准": "Standard",
+        "底线": "Bottom Line"
+      },
+      "strength": {
+        "不可退让": "Non-negotiable",
+        "强烈偏好": "Strong Preference",
+        "参考指引": "Reference Guide"
+      },
+      "source": {
+        "受伤后确立": "After Being Hurt",
+        "观察他人": "Observed In Others",
+        "主动推导": "Deliberately Derived",
+        "家庭继承": "Family Inheritance"
+      },
+      "status": {
+        "生效中": "Active",
+        "正在测试": "Testing",
+        "已修订": "Revised",
+        "已放弃": "Abandoned"
+      },
+      "cost": {
+        "高代价": "High Cost",
+        "中等代价": "Medium Cost",
+        "低代价": "Low Cost",
+        "零代价": "No Cost"
+      },
+      "relation": {
+        "支撑": "Supports",
+        "冲突": "Conflicts"
+      },
+      "revisionField": {
+        "内容": "content",
+        "强度": "strength",
+        "状态": "status"
       }
     }
   }

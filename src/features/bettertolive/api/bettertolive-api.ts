@@ -2,6 +2,7 @@ import { resolveBetterToLiveApiMode } from "@/features/bettertolive/api/config"
 import { createLiveBetterToLiveApi } from "@/features/bettertolive/api/live/live-bettertolive-api"
 import { createMockBetterToLiveApi } from "@/features/bettertolive/api/mock/mock-bettertolive-api"
 import type {
+  BeliefEntry,
   BeliefsModuleData,
   EmotionWorkspaceModuleData,
   EventsModuleData,
@@ -9,6 +10,8 @@ import type {
   FutureModuleData,
   GrowthModuleData,
   JourneyModuleData,
+  LegacyItem,
+  LegacyItemForm,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
   NutritionModuleData,
@@ -122,6 +125,10 @@ export type ShoppingPageContentRow = {
   updated_at: string
 }
 
+export type BeliefEntryForm = Omit<BeliefEntry, "id"> & {
+  id?: string | null
+}
+
 // 向后兼容(给尚未迁移完的旧 UI 代码用):
 // 待 UI 全部迁移完成后,删除以下别名
 export type ShoppingOwnedItem = ShoppingItem
@@ -131,21 +138,38 @@ export type { ShoppingItem, ShoppingItemChild, ShoppingStageTemplate }
 export type BetterToLiveApi = {
   getOverview: () => Promise<OverviewModuleData>
   getReflection: () => Promise<ReflectionModuleData>
+  saveReflection: (reflection: ReflectionModuleData) => Promise<void>
   getEvents: () => Promise<EventsModuleData>
+  saveEvents: (events: EventsModuleData) => Promise<void>
   getFinance: () => Promise<FinanceModuleData>
+  saveFinance: (finance: FinanceModuleData) => Promise<void>
   getShopping: () => Promise<ShoppingModuleData>
   getNutrition: () => Promise<NutritionModuleData>
   saveNutrition: (nutrition: NutritionModuleData) => Promise<void>
   getEmotion: () => Promise<EmotionWorkspaceModuleData>
+  saveEmotion: (emotion: EmotionWorkspaceModuleData) => Promise<void>
   getBeliefs: () => Promise<BeliefsModuleData>
+  createBeliefEntry: (form: BeliefEntryForm) => Promise<BeliefEntry>
+  updateBeliefEntry: (form: BeliefEntryForm) => Promise<BeliefEntry>
+  deleteBeliefEntry: (id: string) => Promise<void>
   getPrinciples: () => Promise<PrinciplesModuleData>
+  savePrinciples: (principles: PrinciplesModuleData) => Promise<void>
   getRelationships: () => Promise<RelationshipsModuleData>
+  saveRelationships: (relationships: RelationshipsModuleData) => Promise<void>
   getGrowth: () => Promise<GrowthModuleData>
+  saveGrowth: (growth: GrowthModuleData) => Promise<void>
   getMemory: () => Promise<MemoryWorkspaceModuleData>
+  saveMemory: (memory: MemoryWorkspaceModuleData) => Promise<void>
   getJourney: () => Promise<JourneyModuleData>
   getLegacy: () => Promise<LegacyWorkspaceModuleData>
+  listLegacyItems: () => Promise<LegacyItem[]>
+  createLegacyItem: (form: LegacyItemForm) => Promise<LegacyItem>
+  updateLegacyItem: (form: LegacyItemForm) => Promise<LegacyItem>
+  deleteLegacyItem: (id: string) => Promise<void>
   getSocioeconomics: () => Promise<SocioeconomicsModuleData>
+  saveSocioeconomics: (socioeconomics: SocioeconomicsModuleData) => Promise<void>
   getFuture: () => Promise<FutureModuleData>
+  saveFuture: (future: FutureModuleData) => Promise<void>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>
 }
 

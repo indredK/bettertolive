@@ -28,9 +28,9 @@ export function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "请选择",
-  searchPlaceholder = "搜索...",
-  emptyMessage = "无匹配选项",
+  placeholder = "Select options",
+  searchPlaceholder = "Search...",
+  emptyMessage = "No matching options",
   maxItems,
   disabled = false,
   className,
@@ -46,8 +46,8 @@ export function MultiSelect({
     return options.filter((opt) => opt.label.toLowerCase().includes(lower))
   }, [options, search])
 
-  const selectedLabels = React.useMemo(
-    () => options.filter((opt) => valueSet.has(opt.value)).map((opt) => opt.label),
+  const selectedOptions = React.useMemo(
+    () => options.filter((opt) => valueSet.has(opt.value)),
     [options, valueSet],
   )
 
@@ -96,22 +96,21 @@ export function MultiSelect({
         )}
       >
         <div className="flex min-w-0 flex-1 flex-wrap gap-1">
-          {selectedLabels.length === 0 ? (
+          {selectedOptions.length === 0 ? (
             <span className="text-[color:var(--text-muted)]">{placeholder}</span>
           ) : (
-            selectedLabels.map((label) => {
-              const optValue = options.find((o) => o.label === label)?.value ?? ""
+            selectedOptions.map((option) => {
               return (
                 <span
-                  key={optValue}
+                  key={option.value}
                   className="inline-flex items-center gap-0.5 rounded-md border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 py-0.5 text-[11px] leading-4 text-[color:var(--text-secondary)]"
                 >
-                  <span className="max-w-[120px] truncate">{label}</span>
+                  <span className="max-w-[120px] truncate">{option.label}</span>
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation()
-                      removeOption(optValue)
+                      removeOption(option.value)
                     }}
                     className="ml-0.5 inline-flex size-3.5 shrink-0 items-center justify-center rounded-sm text-[color:var(--text-muted)] hover:bg-[color:var(--surface-border)] hover:text-[color:var(--text-primary)]"
                   >

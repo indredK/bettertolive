@@ -16,6 +16,7 @@ pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
 
     // 每个表独立判断是否需要 seed,避免某个表已有数据但其他表为空时跳过 seed
     seed_new_tables(&conn)?;
+    crate::legacy::db::initialize_legacy_schema(&conn)?;
 
     Ok(conn)
 }

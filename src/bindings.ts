@@ -5,6 +5,15 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 /** Commands */
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
+	getBeliefs: () => typedError<BeliefsModuleDto_Serialize, string>(__TAURI_INVOKE("get_beliefs")),
+	createBeliefEntry: (form: BeliefEntryFormDto) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("create_belief_entry", { form })),
+	updateBeliefEntry: (form: BeliefEntryFormDto) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("update_belief_entry", { form })),
+	deleteBeliefEntry: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_belief_entry", { id })),
+	getLegacy: () => typedError<LegacyModuleDto_Serialize, string>(__TAURI_INVOKE("get_legacy")),
+	listLegacyItems: () => typedError<LegacyItemDto_Serialize[], string>(__TAURI_INVOKE("list_legacy_items")),
+	createLegacyItem: (form: LegacyItemFormDto) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("create_legacy_item", { form })),
+	updateLegacyItem: (form: LegacyItemFormDto) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("update_legacy_item", { form })),
+	deleteLegacyItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_legacy_item", { id })),
 	getShopping: () => typedError<ShoppingModuleDto_Serialize, string>(__TAURI_INVOKE("get_shopping")),
 	listShoppingItems: () => typedError<ShoppingItemDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_items")),
 	createShoppingItem: (form: ItemFormDto) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("create_shopping_item", { form })),
@@ -34,6 +43,106 @@ export const commands = {
 };
 
 /* Types */
+export type BeliefCardDto = {
+	id: string,
+	label: string,
+	summary: string,
+	note: string,
+	keywords: string[],
+};
+
+export type BeliefEntryDto = BeliefEntryDto_Serialize | BeliefEntryDto_Deserialize;
+
+export type BeliefEntryDto_Deserialize = {
+	id: string,
+	title: string,
+	statement: string,
+	description: string,
+	domain: string,
+	layer: string,
+	stability: string,
+	source: string,
+	impact: string,
+	secondaryDomains?: string[],
+	cbtLayer: string | null,
+	cognitiveDistortions?: string[],
+	defenseMechanism: string | null,
+	attachmentNote: string | null,
+	revisionHistory?: BeliefRevisionDto[],
+	tags?: string[],
+};
+
+export type BeliefEntryDto_Serialize = {
+	id: string,
+	title: string,
+	statement: string,
+	description: string,
+	domain: string,
+	layer: string,
+	stability: string,
+	source: string,
+	impact: string,
+	secondaryDomains?: string[],
+	cbtLayer?: string | null,
+	cognitiveDistortions?: string[],
+	defenseMechanism?: string | null,
+	attachmentNote?: string | null,
+	revisionHistory: BeliefRevisionDto[],
+	tags: string[],
+};
+
+export type BeliefEntryFormDto = {
+	id?: string | null,
+	title: string,
+	statement: string,
+	description?: string,
+	domain: string,
+	layer: string,
+	stability: string,
+	source: string,
+	impact: string,
+	secondaryDomains?: string[],
+	cbtLayer?: string | null,
+	cognitiveDistortions?: string[],
+	defenseMechanism?: string | null,
+	attachmentNote?: string | null,
+	revisionHistory?: BeliefRevisionDto[],
+	tags?: string[],
+};
+
+export type BeliefRelationDto = {
+	id: string,
+	type: string,
+	fromId: string,
+	toId: string,
+	note: string,
+};
+
+export type BeliefRevisionDto = {
+	id: string,
+	date: string,
+	summary: string,
+	changedFields: string[],
+};
+
+export type BeliefsModuleDto = BeliefsModuleDto_Serialize | BeliefsModuleDto_Deserialize;
+
+export type BeliefsModuleDto_Deserialize = {
+	cards: BeliefCardDto[],
+	questions: string[],
+	entries: BeliefEntryDto_Deserialize[],
+	relations: BeliefRelationDto[],
+	attachmentReflection: string,
+};
+
+export type BeliefsModuleDto_Serialize = {
+	cards: BeliefCardDto[],
+	questions: string[],
+	entries: BeliefEntryDto_Serialize[],
+	relations: BeliefRelationDto[],
+	attachmentReflection: string,
+};
+
 export type ItemChildChannelFormDto = {
 	id?: string | null,
 	channel: string,
@@ -58,6 +167,99 @@ export type ItemFormDto = {
 	systemTags: string[],
 	spaceTags: string[],
 	note?: string,
+};
+
+export type LegacyItemDto = LegacyItemDto_Serialize | LegacyItemDto_Deserialize;
+
+export type LegacyItemDto_Deserialize = {
+	id: string,
+	title: string,
+	category: string,
+	recipient: string,
+	recipientName: string | null,
+	relatedRelationshipId: string | null,
+	urgency: string,
+	visibility: string,
+	deliveryCondition: string | null,
+	status: string,
+	emotionalLoad: string | null,
+	summary: string,
+	content: string,
+	contentPreview: string,
+	isLocked: boolean,
+	requiresSecondConfirm: boolean,
+	excludeFromAi: boolean,
+	createdAt: string,
+	updatedAt: string,
+	finalizedAt: string | null,
+	reviewCue: string,
+	tags?: string[],
+};
+
+export type LegacyItemDto_Serialize = {
+	id: string,
+	title: string,
+	category: string,
+	recipient: string,
+	recipientName?: string | null,
+	relatedRelationshipId?: string | null,
+	urgency: string,
+	visibility: string,
+	deliveryCondition?: string | null,
+	status: string,
+	emotionalLoad?: string | null,
+	summary: string,
+	content: string,
+	contentPreview: string,
+	isLocked: boolean,
+	requiresSecondConfirm: boolean,
+	excludeFromAi: boolean,
+	createdAt: string,
+	updatedAt: string,
+	finalizedAt?: string | null,
+	reviewCue: string,
+	tags: string[],
+};
+
+export type LegacyItemFormDto = {
+	id?: string | null,
+	title: string,
+	category: string,
+	recipient: string,
+	recipientName?: string | null,
+	relatedRelationshipId?: string | null,
+	urgency: string,
+	visibility: string,
+	deliveryCondition?: string | null,
+	status: string,
+	emotionalLoad?: string | null,
+	summary: string,
+	content: string,
+	isLocked?: boolean,
+	requiresSecondConfirm?: boolean,
+	excludeFromAi?: boolean,
+	reviewCue?: string,
+	tags?: string[],
+};
+
+export type LegacyModuleDto = LegacyModuleDto_Serialize | LegacyModuleDto_Deserialize;
+
+export type LegacyModuleDto_Deserialize = {
+	items?: LegacyItemDto_Deserialize[],
+	trustBoundaries?: LegacyTrustBoundaryDto[],
+	reviewPrompts?: string[],
+};
+
+export type LegacyModuleDto_Serialize = {
+	items: LegacyItemDto_Serialize[],
+	trustBoundaries: LegacyTrustBoundaryDto[],
+	reviewPrompts: string[],
+};
+
+export type LegacyTrustBoundaryDto = {
+	id: string,
+	title: string,
+	detail: string,
 };
 
 export type PageContentFormDto = {

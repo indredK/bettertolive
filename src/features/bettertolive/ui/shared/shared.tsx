@@ -1,4 +1,5 @@
 import { type ComponentProps } from "react"
+import { useTranslation } from "react-i18next"
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -34,6 +35,9 @@ const KIND_BADGE_STYLES: Record<RecentRecord["kind"], string> = {
 }
 
 export function PageIntro({
+  eyebrow,
+  title,
+  description,
   searchQuery,
 }: {
   eyebrow: string
@@ -41,17 +45,29 @@ export function PageIntro({
   description: string
   searchQuery: string
 }) {
-  if (searchQuery.trim().length === 0) {
-    return null
-  }
+  const { t } = useTranslation()
+  const normalizedSearchQuery = searchQuery.trim()
 
   return (
-    <Badge
-      variant="outline"
-      className="w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-    >
-      当前筛选：{searchQuery.trim()}
-    </Badge>
+    <div className="shrink-0">
+      <div className="text-xs tracking-[0.22em] text-[color:var(--text-muted)] uppercase">
+        {eyebrow}
+      </div>
+      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[color:var(--text-primary)] sm:text-3xl">
+        {title}
+      </h2>
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--text-secondary)]">
+        {description}
+      </p>
+      {normalizedSearchQuery ? (
+        <Badge
+          variant="outline"
+          className="mt-3 w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+        >
+          {t("shell.search.activeFilter", { query: normalizedSearchQuery })}
+        </Badge>
+      ) : null}
+    </div>
   )
 }
 

@@ -1,11 +1,8 @@
 import { invoke } from "@tauri-apps/api/core"
 
-import type { BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
-import { BETTERTOLIVE_API_ENDPOINTS } from "@/features/bettertolive/api/endpoints"
-import { emptyShoppingModuleData } from "@/features/bettertolive/api/fallback/empty-shopping-module"
-import { requestJson } from "@/features/bettertolive/api/http-client"
-import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
+import type { BeliefEntryForm, BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import type {
+  BeliefEntry,
   BeliefsModuleData,
   EmotionWorkspaceModuleData,
   EventsModuleData,
@@ -13,6 +10,8 @@ import type {
   FutureModuleData,
   GrowthModuleData,
   JourneyModuleData,
+  LegacyItem,
+  LegacyItemForm,
   LegacyWorkspaceModuleData,
   MemoryWorkspaceModuleData,
   NutritionModuleData,
@@ -25,40 +24,108 @@ import type {
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
 
-function cloneData<T>(data: T): T {
-  return JSON.parse(JSON.stringify(data)) as T
+function getOverviewFromRust() {
+  return invoke<OverviewModuleData>("get_overview")
 }
 
-function hasTauriRuntime() {
-  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
+function getReflectionFromRust() {
+  return invoke<ReflectionModuleData>("get_reflection")
 }
 
-async function getShoppingFromRust() {
-  if (!hasTauriRuntime()) {
-    return cloneData(emptyShoppingModuleData)
-  }
-
-  try {
-    return await invoke<ShoppingModuleData>("get_shopping")
-  } catch {
-    return cloneData(emptyShoppingModuleData)
-  }
+async function saveReflectionToRust(reflection: ReflectionModuleData) {
+  await invoke("save_reflection", { reflection })
 }
 
-async function getNutritionFromRust() {
-  if (!hasTauriRuntime()) {
-    return cloneData(workspaceSnapshotMockData.nutrition)
-  }
+function getShoppingFromRust() {
+  return invoke<ShoppingModuleData>("get_shopping")
+}
 
-  return await invoke<NutritionModuleData>("get_nutrition")
+function getNutritionFromRust() {
+  return invoke<NutritionModuleData>("get_nutrition")
+}
+
+function getEmotionFromRust() {
+  return invoke<EmotionWorkspaceModuleData>("get_emotion")
+}
+
+function getEventsFromRust() {
+  return invoke<EventsModuleData>("get_events")
+}
+
+function getFinanceFromRust() {
+  return invoke<FinanceModuleData>("get_finance")
+}
+
+function getGrowthFromRust() {
+  return invoke<GrowthModuleData>("get_growth")
+}
+
+async function saveGrowthToRust(growth: GrowthModuleData) {
+  await invoke("save_growth", { growth })
+}
+
+function getMemoryFromRust() {
+  return invoke<MemoryWorkspaceModuleData>("get_memory")
+}
+
+async function saveMemoryToRust(memory: MemoryWorkspaceModuleData) {
+  await invoke("save_memory", { memory })
+}
+
+function getFutureFromRust() {
+  return invoke<FutureModuleData>("get_future")
+}
+
+function getBeliefsFromRust() {
+  return invoke<BeliefsModuleData>("get_beliefs")
+}
+
+function getPrinciplesFromRust() {
+  return invoke<PrinciplesModuleData>("get_principles")
+}
+
+function getRelationshipsFromRust() {
+  return invoke<RelationshipsModuleData>("get_relationships")
+}
+
+function getLegacyFromRust() {
+  return invoke<LegacyWorkspaceModuleData>("get_legacy")
+}
+
+function getSocioeconomicsFromRust() {
+  return invoke<SocioeconomicsModuleData>("get_socioeconomics")
 }
 
 async function saveNutritionToRust(nutrition: NutritionModuleData) {
-  if (!hasTauriRuntime()) {
-    return
-  }
-
   await invoke("save_nutrition", { nutrition })
+}
+
+async function saveEmotionToRust(emotion: EmotionWorkspaceModuleData) {
+  await invoke("save_emotion", { emotion })
+}
+
+async function saveEventsToRust(events: EventsModuleData) {
+  await invoke("save_events", { events })
+}
+
+async function saveFinanceToRust(finance: FinanceModuleData) {
+  await invoke("save_finance", { finance })
+}
+
+async function saveFutureToRust(future: FutureModuleData) {
+  await invoke("save_future", { future })
+}
+
+async function savePrinciplesToRust(principles: PrinciplesModuleData) {
+  await invoke("save_principles", { principles })
+}
+
+async function saveRelationshipsToRust(relationships: RelationshipsModuleData) {
+  await invoke("save_relationships", { relationships })
+}
+
+async function saveSocioeconomicsToRust(socioeconomics: SocioeconomicsModuleData) {
+  await invoke("save_socioeconomics", { socioeconomics })
 }
 
 export function createLiveBetterToLiveApi(): BetterToLiveApi {
@@ -67,44 +134,45 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
 
     getShopping: () => getShoppingFromRust(),
 
-    async getWorkspaceSnapshot() {
-      const [shopping, nutrition] = await Promise.all([
-        getShoppingFromRust(),
-        getNutritionFromRust(),
-      ])
+    getWorkspaceSnapshot: () => invoke<WorkspaceSnapshot>("get_workspace_snapshot"),
 
-      return {
-        ...cloneData(workspaceSnapshotMockData),
-        shopping,
-        nutrition,
-      } satisfies WorkspaceSnapshot
-    },
-
-    // ---- HTTP endpoints (not yet migrated to Rust) ----
-
-    getOverview: () => requestJson<OverviewModuleData>(BETTERTOLIVE_API_ENDPOINTS.overview),
-    getReflection: () => requestJson<ReflectionModuleData>(BETTERTOLIVE_API_ENDPOINTS.reflection),
-    getEvents: () => requestJson<EventsModuleData>(BETTERTOLIVE_API_ENDPOINTS.events),
-    getFinance: () => requestJson<FinanceModuleData>(BETTERTOLIVE_API_ENDPOINTS.finance),
+    getOverview: () => getOverviewFromRust(),
+    getReflection: () => getReflectionFromRust(),
+    saveReflection: (reflection) => saveReflectionToRust(reflection),
+    getEvents: () => getEventsFromRust(),
+    saveEvents: (events) => saveEventsToRust(events),
+    getFinance: () => getFinanceFromRust(),
+    saveFinance: (finance) => saveFinanceToRust(finance),
     getNutrition: () => getNutritionFromRust(),
     saveNutrition: (nutrition) => saveNutritionToRust(nutrition),
-    getEmotion: () => requestJson<EmotionWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.emotion),
-    getBeliefs: () => requestJson<BeliefsModuleData>(BETTERTOLIVE_API_ENDPOINTS.beliefs),
-    getPrinciples: () => requestJson<PrinciplesModuleData>(BETTERTOLIVE_API_ENDPOINTS.principles),
-    getRelationships: () =>
-      requestJson<RelationshipsModuleData>(BETTERTOLIVE_API_ENDPOINTS.relationships),
-    getGrowth: () => requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
-    getMemory: () => requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
+    getEmotion: () => getEmotionFromRust(),
+    saveEmotion: (emotion) => saveEmotionToRust(emotion),
+    getBeliefs: () => getBeliefsFromRust(),
+    createBeliefEntry: (form: BeliefEntryForm) =>
+      invoke<BeliefEntry>("create_belief_entry", { form }),
+    updateBeliefEntry: (form: BeliefEntryForm) =>
+      invoke<BeliefEntry>("update_belief_entry", { form }),
+    deleteBeliefEntry: (id: string) => invoke("delete_belief_entry", { id }),
+    getPrinciples: () => getPrinciplesFromRust(),
+    savePrinciples: (principles) => savePrinciplesToRust(principles),
+    getRelationships: () => getRelationshipsFromRust(),
+    saveRelationships: (relationships) => saveRelationshipsToRust(relationships),
+    getGrowth: () => getGrowthFromRust(),
+    saveGrowth: (growth) => saveGrowthToRust(growth),
+    getMemory: () => getMemoryFromRust(),
+    saveMemory: (memory) => saveMemoryToRust(memory),
     async getJourney(): Promise<JourneyModuleData> {
-      const [growth, memory] = await Promise.all([
-        requestJson<GrowthModuleData>(BETTERTOLIVE_API_ENDPOINTS.growth),
-        requestJson<MemoryWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.memory),
-      ])
+      const [growth, memory] = await Promise.all([getGrowthFromRust(), getMemoryFromRust()])
       return { ...growth, ...memory }
     },
-    getLegacy: () => requestJson<LegacyWorkspaceModuleData>(BETTERTOLIVE_API_ENDPOINTS.legacy),
-    getSocioeconomics: () =>
-      requestJson<SocioeconomicsModuleData>(BETTERTOLIVE_API_ENDPOINTS.socioeconomics),
-    getFuture: () => requestJson<FutureModuleData>(BETTERTOLIVE_API_ENDPOINTS.future),
+    getLegacy: () => getLegacyFromRust(),
+    listLegacyItems: () => invoke<LegacyItem[]>("list_legacy_items"),
+    createLegacyItem: (form: LegacyItemForm) => invoke<LegacyItem>("create_legacy_item", { form }),
+    updateLegacyItem: (form: LegacyItemForm) => invoke<LegacyItem>("update_legacy_item", { form }),
+    deleteLegacyItem: (id: string) => invoke("delete_legacy_item", { id }),
+    getSocioeconomics: () => getSocioeconomicsFromRust(),
+    saveSocioeconomics: (socioeconomics) => saveSocioeconomicsToRust(socioeconomics),
+    getFuture: () => getFutureFromRust(),
+    saveFuture: (future) => saveFutureToRust(future),
   }
 }

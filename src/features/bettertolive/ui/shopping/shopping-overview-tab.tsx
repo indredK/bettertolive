@@ -238,7 +238,11 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                         </div>
                       </div>
                       <div className="min-h-0 flex-1">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer
+                          width="100%"
+                          height="100%"
+                          initialDimension={{ width: 180, height: 150 }}
+                        >
                           <RadialBarChart
                             data={[
                               {
@@ -287,7 +291,11 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                         </div>
                       </div>
                       <div className="min-h-0 flex-1">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer
+                          width="100%"
+                          height="100%"
+                          initialDimension={{ width: 260, height: 150 }}
+                        >
                           <BarChart data={densityChartData} barCategoryGap={12}>
                             <XAxis
                               dataKey="name"
@@ -546,7 +554,11 @@ function PulsePanel({
           {chartData.length > 0 ? (
             <div className="grid h-full min-h-0 grid-rows-[minmax(0,1fr)_auto] gap-1.5">
               <div className="min-h-0">
-                <ResponsiveContainer width="100%" height="100%">
+                <ResponsiveContainer
+                  width="100%"
+                  height="100%"
+                  initialDimension={{ width: 260, height: 150 }}
+                >
                   <BarChart
                     data={chartData}
                     layout="vertical"

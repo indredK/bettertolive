@@ -1,4 +1,5 @@
 import { ChevronRight, Minus, Pause, Play, Plus } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
@@ -31,6 +32,13 @@ export function MusicUtilityPanel({
   onToggleMusic: () => void | Promise<void>
   volume: number
 }) {
+  const { t } = useTranslation()
+  const currentPresetLabel = t(`shell.music.presets.${musicPresetId}.label`, musicPresetLabel)
+  const currentMusicDescription = t(
+    `shell.music.presets.${musicPresetId}.description`,
+    musicDescription,
+  )
+
   return (
     <div
       data-testid="utility-panel-music"
@@ -38,9 +46,11 @@ export function MusicUtilityPanel({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="text-sm font-medium text-[color:var(--text-primary)]">音乐控制</div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+            {t("shell.music.title")}
+          </div>
           <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-            常驻工具区的一部分。更像轻量陪伴，不抢页面注意力。
+            {t("shell.music.description")}
           </p>
         </div>
         <Button
@@ -57,20 +67,18 @@ export function MusicUtilityPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {isPlaying ? "正在播放" : "已暂停"}
+              {isPlaying ? t("shell.music.playing") : t("shell.music.paused")}
             </div>
             <p className="mt-1 text-sm text-[color:var(--text-muted)]">
-              {musicPresetLabel} · {musicDescription}
+              {currentPresetLabel} · {currentMusicDescription}
             </p>
           </div>
           <div className="rounded-full border border-[color:var(--chip-border)] bg-white px-2.5 py-1 text-[11px] leading-none text-[color:var(--text-muted)]">
-            音量 {volume}
+            {t("shell.music.volume", { volume })}
           </div>
         </div>
         {!isMusicSupported ? (
-          <p className="mt-3 text-xs leading-5 text-amber-700">
-            当前环境不支持实时音频，界面仍可保留，后续可替换成真实播放器。
-          </p>
+          <p className="mt-3 text-xs leading-5 text-amber-700">{t("shell.music.unsupported")}</p>
         ) : null}
       </div>
 
@@ -90,10 +98,10 @@ export function MusicUtilityPanel({
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                  {preset.label}
+                  {t(`shell.music.presets.${preset.id}.label`, preset.label)}
                 </div>
                 <div className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                  {preset.description}
+                  {t(`shell.music.presets.${preset.id}.description`, preset.description)}
                 </div>
               </div>
               <ChevronRight className="size-4 text-[color:var(--text-muted)]" />
@@ -104,9 +112,11 @@ export function MusicUtilityPanel({
 
       <div className="mt-4 flex items-center justify-between rounded-xl border border-[color:var(--chip-border)] bg-white/65 px-3 py-3">
         <div>
-          <div className="text-xs font-medium text-[color:var(--text-muted)]">音量微调</div>
+          <div className="text-xs font-medium text-[color:var(--text-muted)]">
+            {t("shell.music.volumeNudge")}
+          </div>
           <div className="mt-1 text-sm text-[color:var(--text-primary)]">
-            让功能区保持轻量，不盖住主页面。
+            {t("shell.music.volumeHint")}
           </div>
         </div>
         <div className="flex items-center gap-2">

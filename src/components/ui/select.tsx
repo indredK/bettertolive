@@ -3,11 +3,66 @@
 import * as React from "react"
 import { Select as SelectPrimitive } from "@base-ui/react/select"
 
-import { cn } from "@/lib/utils"
-import { UI_LAYERS } from "@/lib/ui-layers"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
-const Select = SelectPrimitive.Root
+import { UI_LAYERS } from "@/lib/ui-layers"
+import { cn } from "@/lib/utils"
+
+type SelectItemDefinition = {
+  label: React.ReactNode
+  value: unknown
+}
+
+type SelectItemElement = React.ReactElement<SelectPrimitive.Item.Props>
+
+function isSelectItemElement(node: React.ReactNode): node is SelectItemElement {
+  return React.isValidElement(node) && node.type === SelectItem
+}
+
+function collectSelectItems(children: React.ReactNode): SelectItemDefinition[] {
+  const items: SelectItemDefinition[] = []
+
+  React.Children.forEach(children, (child) => {
+    if (!React.isValidElement(child)) return
+
+    if (isSelectItemElement(child)) {
+      items.push({
+        label: child.props.label ?? child.props.children,
+        value: child.props.value ?? null,
+      })
+      return
+    }
+
+    const nestedChildren = (child.props as { children?: React.ReactNode }).children
+    if (nestedChildren) {
+      items.push(...collectSelectItems(nestedChildren))
+    }
+  })
+
+  return items
+}
+
+function Select<Value, Multiple extends boolean | undefined = false>({
+  children,
+  items,
+  ...props
+}: SelectPrimitive.Root.Props<Value, Multiple>) {
+  const collectedItems = React.useMemo(
+    () => (items ? [] : collectSelectItems(children)),
+    [children, items],
+  )
+  const resolvedItems =
+    items ??
+    (collectedItems.length > 0
+      ? (collectedItems as SelectPrimitive.Root.Props<Value, Multiple>["items"])
+      : undefined)
+
+  return (
+    <SelectPrimitive.Root items={resolvedItems} {...props}>
+      {children}
+    </SelectPrimitive.Root>
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (

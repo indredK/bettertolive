@@ -30,13 +30,16 @@ const LOG_FILTERS = ["all", "linkedPlan", "linkedMemory", "changed", "needsCare"
 type LogFilter = (typeof LOG_FILTERS)[number]
 
 export function NutritionLogsTab({
+  editableNutrition,
   isControlMode = false,
   nutrition,
 }: {
+  editableNutrition?: NutritionModuleData
   isControlMode?: boolean
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
+  const sourceNutrition = editableNutrition ?? nutrition
   const [editingLog, setEditingLog] = useState<EditingMealLog | null>(null)
   const [query, setQuery] = useState("")
   const [filter, setFilter] = useState<LogFilter>("all")
@@ -162,7 +165,7 @@ export function NutritionLogsTab({
         <NutritionMealLogEditDialog
           key={editingLog.log?.id ?? "new-meal-log"}
           editing={editingLog}
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setEditingLog(null)}
         />
       ) : null}

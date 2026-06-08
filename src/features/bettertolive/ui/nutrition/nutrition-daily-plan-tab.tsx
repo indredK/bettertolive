@@ -44,13 +44,16 @@ import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nut
 import { cn } from "@/lib/utils"
 
 export function NutritionDailyPlanTab({
+  editableNutrition,
   isControlMode = false,
   nutrition,
 }: {
+  editableNutrition?: NutritionModuleData
   isControlMode?: boolean
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
+  const sourceNutrition = editableNutrition ?? nutrition
   const [activePlanId, setActivePlanId] = useState(
     () => findDailyPlanForDate(nutrition.dailyPlans)?.id ?? "",
   )
@@ -60,18 +63,18 @@ export function NutritionDailyPlanTab({
     nutrition.dailyPlans.find((plan) => plan.id === activePlanId) ??
     findDailyPlanForDate(nutrition.dailyPlans)
   const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
-  const generatedLogBySlotId = useMemo(
+  const generatedSourceLogBySlotId = useMemo(
     () =>
       new Map<string, MealLog>(
-        nutrition.mealLogs.flatMap(
+        sourceNutrition.mealLogs.flatMap(
           (log): Array<[string, MealLog]> => (log.plannedSlotId ? [[log.plannedSlotId, log]] : []),
         ),
       ),
-    [nutrition.mealLogs],
+    [sourceNutrition.mealLogs],
   )
 
   const handleGenerateMealLog = async (plan: DailyPlan, slot: DailyMealSlot) => {
-    if (!isControlMode || slot.entries.length === 0 || generatedLogBySlotId.has(slot.id)) {
+    if (!isControlMode || slot.entries.length === 0 || generatedSourceLogBySlotId.has(slot.id)) {
       return
     }
 
@@ -84,7 +87,7 @@ export function NutritionDailyPlanTab({
       ...(slot.note ? { note: slot.note } : {}),
     }
     const eatenStatus: DailyMealSlot["status"] = "eaten"
-    const nextDailyPlans: DailyPlan[] = nutrition.dailyPlans.map(
+    const nextDailyPlans: DailyPlan[] = sourceNutrition.dailyPlans.map(
       (currentPlan): DailyPlan =>
         currentPlan.id === plan.id
           ? {
@@ -101,9 +104,9 @@ export function NutritionDailyPlanTab({
 
     try {
       await saveNutritionMutation.mutateAsync({
-        ...nutrition,
+        ...sourceNutrition,
         dailyPlans: nextDailyPlans,
-        mealLogs: [nextLog, ...nutrition.mealLogs],
+        mealLogs: [nextLog, ...sourceNutrition.mealLogs],
       })
       toast.success(t("nutrition.dailyPlan.logGenerated", "已从计划生成进食记录"))
     } catch {
@@ -139,7 +142,7 @@ export function NutritionDailyPlanTab({
         {isControlMode && editingPlan ? (
           <NutritionDailyPlanEditDialog
             editing={editingPlan}
-            nutrition={nutrition}
+            nutrition={sourceNutrition}
             onClose={() => setEditingPlan(null)}
           />
         ) : null}
@@ -242,17 +245,19 @@ export function NutritionDailyPlanTab({
                         <div className="mt-3 flex flex-wrap items-center gap-2">
                           <Button
                             type="button"
-                            variant={generatedLogBySlotId.has(slot.id) ? "secondary" : "outline"}
+                            variant={
+                              generatedSourceLogBySlotId.has(slot.id) ? "secondary" : "outline"
+                            }
                             size="sm"
                             disabled={
                               slot.entries.length === 0 ||
-                              generatedLogBySlotId.has(slot.id) ||
+                              generatedSourceLogBySlotId.has(slot.id) ||
                               saveNutritionMutation.isPending
                             }
                             onClick={() => handleGenerateMealLog(activePlan, slot)}
                           >
                             <ClipboardCheck className="size-3.5" />
-                            {generatedLogBySlotId.has(slot.id)
+                            {generatedSourceLogBySlotId.has(slot.id)
                               ? t("nutrition.dailyPlan.logGeneratedAction", "已生成记录")
                               : t("nutrition.dailyPlan.generateLog", "生成进食记录")}
                           </Button>
@@ -300,7 +305,7 @@ export function NutritionDailyPlanTab({
         <NutritionDailyPlanEditDialog
           key={editingPlan.plan?.id ?? "new-daily-plan"}
           editing={editingPlan}
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setEditingPlan(null)}
         />
       ) : null}

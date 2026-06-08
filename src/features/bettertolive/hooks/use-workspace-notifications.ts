@@ -5,6 +5,7 @@ import type {
   WorkspaceNotificationInput,
 } from "@/features/bettertolive/config/notifications"
 import type { AppView } from "@/features/bettertolive/types"
+import i18next from "@/i18n/config"
 
 let notificationCounter = 0
 
@@ -19,7 +20,7 @@ function normalizeNotification(input: WorkspaceNotificationInput): WorkspaceNoti
   return {
     ...input,
     tone: input.tone ?? "info",
-    actionLabel: input.actionLabel ?? "前往查看",
+    actionLabel: input.actionLabel ?? i18next.t("shell.notifications.defaultAction"),
     createdAt: Date.now(),
     durationMs: input.persistent === true ? null : (input.durationMs ?? defaultDuration),
     id: createNotificationId(),

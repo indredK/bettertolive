@@ -15,9 +15,3 @@ export function resolveBetterToLiveApiMode(): BetterToLiveApiMode {
 
   return hasTauriRuntime() ? "live" : DEFAULT_API_MODE
 }
-
-export function resolveBetterToLiveApiBaseUrl() {
-  const baseUrl = String(import.meta.env.VITE_BETTERTOLIVE_API_BASE_URL ?? "").trim()
-
-  return baseUrl ? baseUrl.replace(/\/$/, "") : "/api/bettertolive"
-}

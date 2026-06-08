@@ -8,7 +8,9 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react"
+import type { TFunction } from "i18next"
 import { AnimatePresence, m } from "motion/react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,7 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import type { WorkspaceNotification } from "@/features/bettertolive/config/notifications"
-import { getWorkspaceViewLabel } from "@/features/bettertolive/config/view-labels"
 import {
   APP_FADE_TRANSITION,
   NOTIFICATION_MESSAGE_PRESENCE,
@@ -59,6 +60,28 @@ const NOTIFICATION_TONE_ICONS: Record<NonNullable<WorkspaceNotification["tone"]>
   neutral: Pin,
 }
 
+function getChannelBadgeLabel(t: TFunction, notification: WorkspaceNotification) {
+  if (notification.durationMs === null) {
+    return notification.channel === "message"
+      ? t("shell.notifications.messageChannel")
+      : t("shell.notifications.notificationChannel")
+  }
+
+  const seconds = Math.max(1, Math.round(notification.durationMs / 1000))
+
+  return notification.channel === "message"
+    ? t("shell.notifications.messageTimed", { seconds })
+    : t("shell.notifications.notificationTimed", { seconds })
+}
+
+function getDurationLabel(t: TFunction, notification: WorkspaceNotification) {
+  if (notification.durationMs === null) {
+    return t("shell.notifications.persistent")
+  }
+
+  return t("shell.notifications.durationMs", { duration: notification.durationMs })
+}
+
 export function NotificationLayer({
   notifications,
   selectedNotification,
@@ -74,6 +97,7 @@ export function NotificationLayer({
   onCloseDetail: () => void
   onActivateTarget: (notification: WorkspaceNotification) => void
 }) {
+  const { t } = useTranslation()
   const messageNotifications = notifications.filter((entry) => entry.channel === "message")
   const inboxNotifications = notifications.filter((entry) => entry.channel === "notification")
 
@@ -94,6 +118,7 @@ export function NotificationLayer({
                 onDismiss={onDismiss}
                 onOpenDetail={onOpenDetail}
                 onActivateTarget={onActivateTarget}
+                t={t}
               />
             ))}
           </AnimatePresence>
@@ -115,6 +140,7 @@ export function NotificationLayer({
                 onDismiss={onDismiss}
                 onOpenDetail={onOpenDetail}
                 onActivateTarget={onActivateTarget}
+                t={t}
               />
             ))}
           </AnimatePresence>
@@ -125,6 +151,7 @@ export function NotificationLayer({
         notification={selectedNotification}
         onClose={onCloseDetail}
         onActivateTarget={onActivateTarget}
+        t={t}
       />
     </>
   )
@@ -135,11 +162,13 @@ function MessageCard({
   onDismiss,
   onOpenDetail,
   onActivateTarget,
+  t,
 }: {
   notification: WorkspaceNotification
   onDismiss: (id: string) => void
   onOpenDetail: (id: string) => void
   onActivateTarget: (notification: WorkspaceNotification) => void
+  t: TFunction
 }) {
   const toneStyle = NOTIFICATION_TONE_STYLES[notification.tone ?? "info"]
   const Icon = NOTIFICATION_TONE_ICONS[notification.tone ?? "info"]
@@ -176,11 +205,11 @@ function MessageCard({
                 toneStyle.label,
               )}
             >
-              顶部消息 3s
+              {getChannelBadgeLabel(t, notification)}
             </span>
             {notification.persistent ? (
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] leading-none text-slate-600">
-                常驻
+                {t("shell.notifications.persistent")}
               </span>
             ) : null}
           </div>
@@ -195,7 +224,7 @@ function MessageCard({
             className="h-7 border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50"
             onClick={() => onOpenDetail(notification.id)}
           >
-            查看
+            {t("shell.notifications.view")}
           </Button>
           {notification.targetView ? (
             <Button
@@ -204,12 +233,13 @@ function MessageCard({
               onClick={() => onActivateTarget(notification)}
             >
               <ExternalLink className="size-3.5" />
-              {notification.actionLabel}
+              {notification.actionLabel ?? t("shell.notifications.defaultAction")}
             </Button>
           ) : null}
           <Button
             variant="ghost"
             size="icon-sm"
+            aria-label={t("shell.notifications.close")}
             className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             onClick={() => onDismiss(notification.id)}
           >
@@ -226,11 +256,13 @@ function NotificationCard({
   onDismiss,
   onOpenDetail,
   onActivateTarget,
+  t,
 }: {
   notification: WorkspaceNotification
   onDismiss: (id: string) => void
   onOpenDetail: (id: string) => void
   onActivateTarget: (notification: WorkspaceNotification) => void
+  t: TFunction
 }) {
   const toneStyle = NOTIFICATION_TONE_STYLES[notification.tone ?? "info"]
   const Icon = NOTIFICATION_TONE_ICONS[notification.tone ?? "info"]
@@ -268,11 +300,11 @@ function NotificationCard({
                 toneStyle.label,
               )}
             >
-              右下通知 5s
+              {getChannelBadgeLabel(t, notification)}
             </span>
             {notification.persistent ? (
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] leading-none text-slate-600">
-                常驻
+                {t("shell.notifications.persistent")}
               </span>
             ) : null}
           </div>
@@ -285,7 +317,7 @@ function NotificationCard({
               className="h-7 border-slate-200 bg-white/70 text-slate-700 hover:bg-slate-50"
               onClick={() => onOpenDetail(notification.id)}
             >
-              查看详情
+              {t("shell.notifications.viewDetails")}
             </Button>
             {notification.targetView ? (
               <Button
@@ -294,7 +326,7 @@ function NotificationCard({
                 onClick={() => onActivateTarget(notification)}
               >
                 <ExternalLink className="size-3.5" />
-                {notification.actionLabel}
+                {notification.actionLabel ?? t("shell.notifications.defaultAction")}
               </Button>
             ) : null}
           </div>
@@ -303,6 +335,7 @@ function NotificationCard({
         <Button
           variant="ghost"
           size="icon-sm"
+          aria-label={t("shell.notifications.close")}
           className="shrink-0 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           onClick={() => onDismiss(notification.id)}
         >
@@ -317,10 +350,12 @@ function NotificationDetailDialog({
   notification,
   onClose,
   onActivateTarget,
+  t,
 }: {
   notification: WorkspaceNotification | null
   onClose: () => void
   onActivateTarget: (notification: WorkspaceNotification) => void
+  t: TFunction
 }) {
   return (
     <Dialog open={notification !== null} onOpenChange={(open) => !open && onClose()}>
@@ -329,7 +364,9 @@ function NotificationDetailDialog({
           <DialogHeader className="px-5 pt-5">
             <div className="flex items-center gap-2 text-xs tracking-[0.18em] text-slate-500 uppercase">
               <BellRing className="size-3.5" />
-              {notification.channel === "message" ? "消息详情" : "通知详情"}
+              {notification.channel === "message"
+                ? t("shell.notifications.messageDetail")
+                : t("shell.notifications.notificationDetail")}
             </div>
             <DialogTitle className="text-lg text-slate-900">{notification.title}</DialogTitle>
             <DialogDescription className="leading-6 text-slate-600">
@@ -359,27 +396,36 @@ function NotificationDetailDialog({
 
             <div className="flex flex-wrap gap-2 text-xs text-slate-500">
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-                来源：{notification.source ?? "站内通知"}
+                {t("shell.notifications.source", {
+                  source: notification.source ?? t("shell.notifications.defaultSource"),
+                })}
               </span>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-                展示：
-                {notification.channel === "message" ? "顶部消息" : "右下通知"}
+                {t("shell.notifications.display", {
+                  channel:
+                    notification.channel === "message"
+                      ? t("shell.notifications.messageChannel")
+                      : t("shell.notifications.notificationChannel"),
+                })}
               </span>
               <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1">
-                时效：
-                {notification.persistent ? "常驻" : `${notification.durationMs}ms`}
+                {t("shell.notifications.duration", {
+                  duration: getDurationLabel(t, notification),
+                })}
               </span>
             </div>
           </div>
 
           <DialogFooter className="bg-slate-50/80">
             <Button variant="outline" onClick={onClose}>
-              关闭
+              {t("shell.notifications.close")}
             </Button>
             {notification.targetView ? (
               <Button onClick={() => onActivateTarget(notification)}>
                 <ExternalLink className="size-4" />
-                前往{getWorkspaceViewLabel(notification.targetView)}
+                {t("shell.notifications.goTo", {
+                  view: t(`shell.views.${notification.targetView}`),
+                })}
               </Button>
             ) : null}
           </DialogFooter>

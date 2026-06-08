@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react"
 import { m, useReducedMotion, type Transition } from "motion/react"
+import { useTranslation } from "react-i18next"
 
 import type { AppView } from "@/features/bettertolive/types"
 import { cn } from "@/lib/utils"
@@ -145,6 +146,7 @@ export function SidebarNavigation({
   onSelectView: (view: AppView) => void
   sections: SidebarNavigationSection[]
 }) {
+  const { t } = useTranslation()
   const scrollViewportRef = useRef<HTMLElement | null>(null)
   const itemRefs = useRef<Partial<Record<AppView, HTMLButtonElement | null>>>({})
   const animationFrameRef = useRef<number | null>(null)
@@ -400,7 +402,7 @@ export function SidebarNavigation({
                     data-testid={`nav-${item.view}`}
                     onClick={() => onSelectView(item.view)}
                     aria-current={isActive ? "page" : undefined}
-                    aria-label={`导航 ${item.label}`}
+                    aria-label={t("shell.nav.itemAria", { label: item.label })}
                     title={isCollapsed ? item.label : undefined}
                     animate={{
                       columnGap: itemColumnGap,
@@ -496,6 +498,7 @@ export function StackedNavigation({
   onSelectView: (view: AppView) => void
   sections: SidebarNavigationSection[]
 }) {
+  const { t } = useTranslation()
   const entries = useMemo<StackedNavigationEntry[]>(
     () =>
       sections.flatMap((section) =>
@@ -515,7 +518,7 @@ export function StackedNavigation({
     >
       <div className="mx-auto w-full max-w-[1500px] px-4 py-4">
         <div className="hide-scrollbar -mx-1 overflow-x-auto pb-1">
-          <nav aria-label="页面导航" className="flex w-max min-w-full gap-2 px-1">
+          <nav aria-label={t("shell.nav.ariaLabel")} className="flex w-max min-w-full gap-2 px-1">
             {entries.map((item) => {
               const Icon = item.icon
               const isActive = item.view === activeView
@@ -527,7 +530,7 @@ export function StackedNavigation({
                   data-testid={`nav-${item.view}`}
                   onClick={() => onSelectView(item.view)}
                   aria-current={isActive ? "page" : undefined}
-                  aria-label={`导航 ${item.label}`}
+                  aria-label={t("shell.nav.itemAria", { label: item.label })}
                   className={cn(
                     "flex min-w-[118px] shrink-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition-all",
                     isActive

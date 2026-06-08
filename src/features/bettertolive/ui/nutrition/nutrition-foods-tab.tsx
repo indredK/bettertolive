@@ -42,13 +42,16 @@ import { cn } from "@/lib/utils"
 const ALL_CATEGORY_ID = "all"
 
 export function NutritionFoodsTab({
+  editableNutrition,
   isControlMode = false,
   nutrition,
 }: {
+  editableNutrition?: NutritionModuleData
   isControlMode?: boolean
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
+  const sourceNutrition = editableNutrition ?? nutrition
   const [activeCategoryId, setActiveCategoryId] = useState(ALL_CATEGORY_ID)
   const [activeFoodId, setActiveFoodId] = useState("")
   const [editingCategory, setEditingCategory] = useState<EditingFoodCategory | null>(null)
@@ -247,7 +250,7 @@ export function NutritionFoodsTab({
         <NutritionFoodEditDialog
           key={editingFood.food?.id ?? "new-food"}
           editing={editingFood}
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setEditingFood(null)}
         />
       ) : null}
@@ -255,7 +258,7 @@ export function NutritionFoodsTab({
         <NutritionFoodCategoryEditDialog
           key={editingCategory.category?.id ?? "new-food-category"}
           editing={editingCategory}
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setEditingCategory(null)}
         />
       ) : null}

@@ -1,0 +1,265 @@
+{
+  "entries": [
+    {
+      "id": "principle-1",
+      "title": "不接受长期单向付出的关系",
+      "statement": "如果一段关系长期只靠我维持，我会停下来重新评估。",
+      "description": "亲近不等于无条件承担，真诚也需要对等和界限。",
+      "domain": "关系",
+      "type": "底线",
+      "strength": "不可退让",
+      "source": "受伤后确立",
+      "status": "生效中",
+      "cost": "高代价",
+      "boundary": "不靠持续委屈自己来换取关系稳定。",
+      "protectedValue": "关系里的自尊和对等性",
+      "decisionCue": "当我连续多次主动修复、对方却没有回应时，先暂停投入。",
+      "revisionHistory": [
+        {
+          "id": "revision-1-1",
+          "date": "2026-05-12",
+          "summary": "从“尽量少单向付出”升级为不可退让的底线。",
+          "changedFields": ["强度", "内容"]
+        }
+      ],
+      "tags": ["亲密关系", "对等", "自尊"]
+    },
+    {
+      "id": "principle-2",
+      "title": "不在深夜做重要决定",
+      "statement": "晚上 23 点后出现的重大决定，默认延迟到第二天再处理。",
+      "description": "深夜的判断容易被疲惫、孤独和焦虑放大。",
+      "domain": "时间",
+      "type": "标准",
+      "strength": "强烈偏好",
+      "source": "主动推导",
+      "status": "生效中",
+      "cost": "低代价",
+      "boundary": "不把低能量时的冲动作最终答案。",
+      "protectedValue": "决策质量和第二天的稳定感",
+      "decisionCue": "如果事情不是必须今晚答复，就先写下选项，睡醒再看。",
+      "revisionHistory": [
+        {
+          "id": "revision-2-1",
+          "date": "2026-04-20",
+          "summary": "把时间线从 0 点提前到 23 点。",
+          "changedFields": ["内容"]
+        }
+      ],
+      "tags": ["决策", "睡眠", "延迟反应"]
+    },
+    {
+      "id": "principle-3",
+      "title": "不为了证明自己接受明显透支的安排",
+      "statement": "当一个机会需要持续牺牲睡眠和基本生活，我会先拒绝或重新谈条件。",
+      "description": "长期稳定比短期证明更重要，工作不能持续吃掉身体。",
+      "domain": "工作",
+      "type": "边界",
+      "strength": "不可退让",
+      "source": "观察他人",
+      "status": "正在测试",
+      "cost": "中等代价",
+      "boundary": "不把工作带进每一个夜晚和周末。",
+      "protectedValue": "精力、尊严和可持续节奏",
+      "decisionCue": "如果连续两周需要 22 点后才能收尾，就进入重新协商。",
+      "revisionHistory": [
+        {
+          "id": "revision-3-1",
+          "date": "2026-06-01",
+          "summary": "从工作建议变成正在测试的边界。",
+          "changedFields": ["状态", "强度"]
+        }
+      ],
+      "tags": ["工作节奏", "精力", "可持续"]
+    },
+    {
+      "id": "principle-4",
+      "title": "不为面子花钱",
+      "statement": "消费先服务真实生活，不服务想象中的别人眼光。",
+      "description": "钱应该建立自由度，而不是制造新的焦虑和表演压力。",
+      "domain": "金钱",
+      "type": "标准",
+      "strength": "强烈偏好",
+      "source": "家庭继承",
+      "status": "已修订",
+      "cost": "中等代价",
+      "boundary": "不为了显得体面而购买自己其实不需要的东西。",
+      "protectedValue": "消费自主权和财务安全感",
+      "decisionCue": "如果购买理由里出现“别人会怎么看”，先等 48 小时。",
+      "revisionHistory": [
+        {
+          "id": "revision-4-1",
+          "date": "2026-03-18",
+          "summary": "从“少买贵东西”修订为“不为面子花钱”。",
+          "changedFields": ["内容"]
+        }
+      ],
+      "tags": ["消费", "安全感", "体面"]
+    },
+    {
+      "id": "principle-5",
+      "title": "身体明显抗议时先停下",
+      "statement": "当身体出现连续预警，计划和面子都要往后排。",
+      "description": "健康不是奖励，而是所有选择能继续成立的底盘。",
+      "domain": "健康",
+      "type": "底线",
+      "strength": "不可退让",
+      "source": "受伤后确立",
+      "status": "生效中",
+      "cost": "中等代价",
+      "boundary": "不把连续失眠、胃痛或心悸当成可以忽略的小事。",
+      "protectedValue": "身体安全和长期生活能力",
+      "decisionCue": "连续三天睡眠异常或饭后不适，就停止加码，优先修复。",
+      "revisionHistory": [],
+      "tags": ["睡眠", "身体信号", "修复"]
+    },
+    {
+      "id": "principle-6",
+      "title": "做不到就提前说",
+      "statement": "承诺一旦出现风险，先告诉对方，而不是假装还来得及。",
+      "description": "可信度来自及时诚实，不来自永远完美。",
+      "domain": "诚信",
+      "type": "标准",
+      "strength": "参考指引",
+      "source": "主动推导",
+      "status": "生效中",
+      "cost": "低代价",
+      "boundary": "不靠沉默拖延来维持表面可靠。",
+      "protectedValue": "自我一致感和他人对我的信任",
+      "decisionCue": "如果我已经预感可能延期，就先发出提醒。",
+      "revisionHistory": [],
+      "tags": ["承诺", "可靠", "沟通"]
+    },
+    {
+      "id": "principle-7",
+      "title": "不把休息当成内疚来源",
+      "statement": "休息是维持生活系统的一部分，不是偷懒的证据。",
+      "description": "这条仍在测试，因为旧习惯会把空下来自动翻译成不够努力。",
+      "domain": "时间",
+      "type": "边界",
+      "strength": "强烈偏好",
+      "source": "观察他人",
+      "status": "正在测试",
+      "cost": "高代价",
+      "boundary": "不把每个周末都排满任务和补偿性工作。",
+      "protectedValue": "恢复权和生活余量",
+      "decisionCue": "如果计划表没有任何空白，就先删掉一项。",
+      "revisionHistory": [],
+      "tags": ["休息", "周末", "恢复"]
+    },
+    {
+      "id": "principle-8",
+      "title": "先为六个月后的自己留余量",
+      "statement": "涉及长期财务和时间承诺时，我优先评估半年后的压力而不是当下的兴奋。",
+      "description": "很多看似可行的决定，真正的问题都出在后续维护成本被低估。",
+      "domain": "金钱",
+      "type": "边界",
+      "strength": "强烈偏好",
+      "source": "主动推导",
+      "status": "生效中",
+      "cost": "中等代价",
+      "boundary": "不因为短期热情签下超出稳定现金流的承诺。",
+      "protectedValue": "生活自由度和长期安全感",
+      "decisionCue": "如果这笔承诺要压缩未来半年的弹性，就先降级方案。",
+      "revisionHistory": [],
+      "tags": ["长期主义", "预算", "余量"]
+    },
+    {
+      "id": "principle-9",
+      "title": "不在生气时发决定性消息",
+      "statement": "强烈情绪里想发出的关系消息，先写草稿，至少等 30 分钟再决定。",
+      "description": "情绪可以被看见，但不该替我按下不可撤回的按钮。",
+      "domain": "关系",
+      "type": "标准",
+      "strength": "参考指引",
+      "source": "受伤后确立",
+      "status": "已修订",
+      "cost": "低代价",
+      "boundary": "不让一瞬间的冲动直接定义一段关系。",
+      "protectedValue": "关系中的真实表达和可修复空间",
+      "decisionCue": "如果消息里有“永远、再也、必须”等词，先停一下。",
+      "revisionHistory": [
+        {
+          "id": "revision-9-1",
+          "date": "2026-02-14",
+          "summary": "从不在生气时回复，修订为不发决定性消息。",
+          "changedFields": ["内容"]
+        }
+      ],
+      "tags": ["情绪", "沟通", "修复"]
+    },
+    {
+      "id": "principle-10",
+      "title": "不为显得合群而撒小谎",
+      "statement": "当真实偏好和群体期待不一致时，我可以沉默，但不主动编造认同。",
+      "description": "这条原则曾经太硬，后来允许自己在安全感不足时先保留表达。",
+      "domain": "诚信",
+      "type": "底线",
+      "strength": "参考指引",
+      "source": "家庭继承",
+      "status": "已放弃",
+      "cost": "零代价",
+      "boundary": "不把被喜欢建立在虚假的一致上。",
+      "protectedValue": "自我一致感",
+      "decisionCue": "如果只是为了避免尴尬而想编造理由，就改成简短真实表达。",
+      "revisionHistory": [
+        {
+          "id": "revision-10-1",
+          "date": "2026-01-03",
+          "summary": "已放弃把它当作底线执行，改留作历史参照。",
+          "changedFields": ["状态", "强度"]
+        }
+      ],
+      "tags": ["真实", "合群", "表达"]
+    }
+  ],
+  "boundaries": [
+    "不长期待在让我持续自我怀疑的关系里。",
+    "不把休息当成内疚来源。",
+    "不为了外界评价放弃自己想要的生活结构。",
+    "身体连续预警时，计划优先级必须下降。"
+  ],
+  "relations": [
+    {
+      "id": "principle-relation-1",
+      "type": "支撑",
+      "fromId": "principle-2",
+      "toId": "principle-5",
+      "note": "不在深夜做重要决定，支撑身体预警时先停下。"
+    },
+    {
+      "id": "principle-relation-2",
+      "type": "支撑",
+      "fromId": "principle-6",
+      "toId": "principle-3",
+      "note": "做不到就提前说，帮助工作边界不靠硬扛维持。"
+    },
+    {
+      "id": "principle-relation-3",
+      "type": "冲突",
+      "fromId": "principle-3",
+      "toId": "principle-7",
+      "note": "工作边界正在测试时，休息边界也容易同时被挤压。"
+    },
+    {
+      "id": "principle-relation-4",
+      "type": "支撑",
+      "fromId": "principle-8",
+      "toId": "principle-4",
+      "note": "先为未来留余量，会降低面子消费带来的冲动决定。"
+    },
+    {
+      "id": "principle-relation-5",
+      "type": "冲突",
+      "fromId": "principle-10",
+      "toId": "principle-9",
+      "note": "真实表达和关系修复之间曾经互相拉扯，所以需要允许延迟回应。"
+    }
+  ],
+  "decisionPrompts": [
+    "这件事最先伤到的是哪个领域：关系、工作、金钱、健康、时间，还是诚信？",
+    "这条原则现在是底线、边界，还是只是一个标准？",
+    "如果守住它要付出高代价，我提前准备好了什么支撑？",
+    "这条原则是保护现在的我，还是还在保护一个旧伤口？"
+  ]
+}

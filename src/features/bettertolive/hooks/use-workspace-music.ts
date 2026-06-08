@@ -15,8 +15,8 @@ type MusicPreset = {
 const MUSIC_PRESETS: MusicPreset[] = [
   {
     id: "morning",
-    label: "晨间",
-    description: "轻一点的明亮旋律，适合整理思路。",
+    label: "Morning",
+    description: "A lighter bright melody for organizing thoughts.",
     notes: [523.25, 659.25, 783.99, 659.25],
     intervalMs: 880,
     oscillatorType: "sine",
@@ -24,8 +24,8 @@ const MUSIC_PRESETS: MusicPreset[] = [
   },
   {
     id: "rain",
-    label: "雨幕",
-    description: "更平缓、更低一点，适合长时间停留。",
+    label: "Rain",
+    description: "A smoother, lower pattern for longer sessions.",
     notes: [220, 246.94, 261.63, 246.94],
     intervalMs: 1080,
     oscillatorType: "triangle",
@@ -33,8 +33,8 @@ const MUSIC_PRESETS: MusicPreset[] = [
   },
   {
     id: "night",
-    label: "夜读",
-    description: "更靠后的音色，适合晚上的沉静工作。",
+    label: "Night Reading",
+    description: "A more distant tone for calm evening work.",
     notes: [329.63, 392, 440, 392],
     intervalMs: 960,
     oscillatorType: "sine",

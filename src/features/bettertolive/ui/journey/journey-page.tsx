@@ -1,17 +1,49 @@
-import { BookHeart, Camera, CheckCheck, Route, Shield, Sprout, Waypoints } from "lucide-react"
+import {
+  Archive,
+  BookHeart,
+  Camera,
+  CheckCheck,
+  Database,
+  FileQuestion,
+  Filter,
+  Lock,
+  Pencil,
+  Plus,
+  Route,
+  Shield,
+  Sprout,
+  Waypoints,
+} from "lucide-react"
+import type { TFunction } from "i18next"
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EmotionalWeight,
   FormativePower,
+  GrowthModuleData,
   GrowthNode,
   MemoryAnchor,
   MemoryEntry,
+  MemoryWorkspaceModuleData,
   MemoryType,
   PrivacyLevel,
   ProcessingStatus,
 } from "@/features/bettertolive/types"
+import {
+  JourneyEditDialog,
+  type EditingJourneyItem,
+} from "@/features/bettertolive/ui/journey/journey-edit-dialog"
 import {
   EmptyState,
   PageIntro,
@@ -19,6 +51,8 @@ import {
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
+
+const ALL_FILTER_VALUE = "__all__"
 
 const MEMORY_TYPES = ["事件", "地点", "物件", "人物", "照片", "领悟"] satisfies MemoryType[]
 
@@ -53,9 +87,43 @@ type JourneyViewData = {
   reviewPrompts: string[]
 }
 
+type JourneyFilters = {
+  type: string
+  era: string
+  emotionalWeight: string
+  processing: string
+  privacy: string
+}
+
 type DistributionRow = {
   label: string
   count: number
+}
+
+type JourneyEnumGroup =
+  | "memoryType"
+  | "emotionalWeight"
+  | "processing"
+  | "privacy"
+  | "formativePower"
+  | "sourceModule"
+  | "growthDomain"
+  | "growthStability"
+
+type FilterOption = {
+  value: string
+  label: string
+  count?: number
+}
+
+function createEmptyFilters(): JourneyFilters {
+  return {
+    type: ALL_FILTER_VALUE,
+    era: ALL_FILTER_VALUE,
+    emotionalWeight: ALL_FILTER_VALUE,
+    processing: ALL_FILTER_VALUE,
+    privacy: ALL_FILTER_VALUE,
+  }
 }
 
 function createMemoryLookup(memories: MemoryEntry[]) {
@@ -97,62 +165,260 @@ function createEraDistribution(memories: MemoryEntry[]) {
     .map(([label, count]) => ({ label, count }))
 }
 
+function createFilterOptions(
+  rows: DistributionRow[],
+  allLabel: string,
+  options: {
+    includeZero?: boolean
+    suggestions?: string[]
+  } = {},
+): FilterOption[] {
+  const rowByLabel = new Map(rows.map((row) => [row.label, row.count]))
+  const labels = new Set<string>()
+
+  rows.forEach((row) => {
+    if (options.includeZero || row.count > 0) {
+      labels.add(row.label)
+    }
+  })
+
+  options.suggestions?.forEach((suggestion) => labels.add(suggestion))
+
+  return [
+    { value: ALL_FILTER_VALUE, label: allLabel },
+    ...[...labels].map((label) => ({
+      value: label,
+      label,
+      count: rowByLabel.get(label) ?? 0,
+    })),
+  ]
+}
+
+function hasActiveFilters(filters: JourneyFilters) {
+  return Object.values(filters).some((value) => value !== ALL_FILTER_VALUE)
+}
+
+function applyJourneyFilters(journey: JourneyViewData, filters: JourneyFilters) {
+  const activeFilters = hasActiveFilters(filters)
+  const memories = journey.memories.filter((memory) => {
+    const typeMatches = filters.type === ALL_FILTER_VALUE || memory.type === filters.type
+    const eraMatches = filters.era === ALL_FILTER_VALUE || memory.era.includes(filters.era)
+    const emotionalWeightMatches =
+      filters.emotionalWeight === ALL_FILTER_VALUE ||
+      memory.emotionalWeight === filters.emotionalWeight
+    const processingMatches =
+      filters.processing === ALL_FILTER_VALUE || memory.processing === filters.processing
+    const privacyMatches =
+      filters.privacy === ALL_FILTER_VALUE || memory.privacy === filters.privacy
+
+    return (
+      typeMatches && eraMatches && emotionalWeightMatches && processingMatches && privacyMatches
+    )
+  })
+  const visibleMemoryIds = new Set(memories.map((memory) => memory.id))
+  const growthNodes = activeFilters
+    ? journey.growthNodes.filter((node) =>
+        [...node.beforeMemoryIds, ...node.afterMemoryIds, node.triggerMemoryId].some((memoryId) =>
+          visibleMemoryIds.has(memoryId),
+        ),
+      )
+    : journey.growthNodes
+  const anchors = activeFilters
+    ? journey.anchors.filter((anchor) =>
+        anchor.linkedMemoryIds.some((memoryId) => visibleMemoryIds.has(memoryId)),
+      )
+    : journey.anchors
+
+  return {
+    ...journey,
+    memories,
+    growthNodes,
+    anchors,
+  }
+}
+
 function getLinkedMemories(memoryIds: string[], memoryById: Map<string, MemoryEntry>) {
   return memoryIds
     .map((memoryId) => memoryById.get(memoryId))
     .filter((memory): memory is MemoryEntry => memory !== undefined)
 }
 
+function translateJourneyEnum(t: TFunction, group: JourneyEnumGroup, value: string | undefined) {
+  if (!value) return ""
+
+  return t(`journey.enum.${group}.${value}`, value)
+}
+
+function getFilterEnumGroup(filterId: keyof JourneyFilters): JourneyEnumGroup | null {
+  switch (filterId) {
+    case "type":
+      return "memoryType"
+    case "emotionalWeight":
+      return "emotionalWeight"
+    case "processing":
+      return "processing"
+    case "privacy":
+      return "privacy"
+    case "era":
+      return null
+  }
+}
+
 export function JourneyPage({
   journey,
+  editableGrowth,
+  editableMemory,
   searchQuery,
+  isControlMode = false,
   isStackedLayout = false,
 }: {
   journey: JourneyViewData
+  editableGrowth: GrowthModuleData
+  editableMemory: MemoryWorkspaceModuleData
   searchQuery: string
+  isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
+  const { t } = useTranslation()
+  const [filters, setFilters] = useState<JourneyFilters>(() => createEmptyFilters())
+  const [editingJourneyItem, setEditingJourneyItem] = useState<EditingJourneyItem | null>(null)
   const isFixedLayout = !isStackedLayout
-  const memoryById = createMemoryLookup(journey.memories)
-  const classificationSections = [
-    {
-      title: "内容类型",
-      description: "先看这段记忆以什么形式被记住。",
-      rows: createDistribution(MEMORY_TYPES, journey.memories, (memory) => memory.type),
-    },
-    {
-      title: "人生时期",
-      description: "时期允许多选，主时期只用于时间线标注。",
-      rows: createEraDistribution(journey.memories),
-    },
-    {
-      title: "情感重量",
-      description: "它现在碰起来轻不轻。",
-      rows: createDistribution(
+  const editableJourney = useMemo(
+    () => ({
+      ...editableGrowth,
+      ...editableMemory,
+    }),
+    [editableGrowth, editableMemory],
+  )
+  const editableMemoryById = useMemo(
+    () => createMemoryLookup(editableMemory.memories),
+    [editableMemory.memories],
+  )
+  const unfilteredTypeRows = useMemo(
+    () => createDistribution(MEMORY_TYPES, journey.memories, (memory) => memory.type),
+    [journey.memories],
+  )
+  const unfilteredEraRows = useMemo(
+    () => createEraDistribution(journey.memories),
+    [journey.memories],
+  )
+  const unfilteredEmotionalWeightRows = useMemo(
+    () =>
+      createDistribution(
         EMOTIONAL_WEIGHT_ORDER,
         journey.memories,
         (memory) => memory.emotionalWeight,
       ),
+    [journey.memories],
+  )
+  const unfilteredProcessingRows = useMemo(
+    () =>
+      createDistribution(PROCESSING_STATUS_ORDER, journey.memories, (memory) => memory.processing),
+    [journey.memories],
+  )
+  const unfilteredPrivacyRows = useMemo(
+    () => createDistribution(PRIVACY_LEVEL_ORDER, journey.memories, (memory) => memory.privacy),
+    [journey.memories],
+  )
+  const filteredJourney = useMemo(() => applyJourneyFilters(journey, filters), [filters, journey])
+  const memoryById = useMemo(
+    () => createMemoryLookup(filteredJourney.memories),
+    [filteredJourney.memories],
+  )
+  const classificationSections = useMemo(
+    () => [
+      {
+        enumGroup: "memoryType" as const,
+        title: t("journey.classification.type.title"),
+        description: t("journey.classification.type.description"),
+        rows: createDistribution(MEMORY_TYPES, filteredJourney.memories, (memory) => memory.type),
+      },
+      {
+        enumGroup: null,
+        title: t("journey.classification.era.title"),
+        description: t("journey.classification.era.description"),
+        rows: createEraDistribution(filteredJourney.memories),
+      },
+      {
+        enumGroup: "emotionalWeight" as const,
+        title: t("journey.classification.emotionalWeight.title"),
+        description: t("journey.classification.emotionalWeight.description"),
+        rows: createDistribution(
+          EMOTIONAL_WEIGHT_ORDER,
+          filteredJourney.memories,
+          (memory) => memory.emotionalWeight,
+        ),
+      },
+      {
+        enumGroup: "processing" as const,
+        title: t("journey.classification.processing.title"),
+        description: t("journey.classification.processing.description"),
+        rows: createDistribution(
+          PROCESSING_STATUS_ORDER,
+          filteredJourney.memories,
+          (memory) => memory.processing,
+        ),
+      },
+      {
+        enumGroup: "privacy" as const,
+        title: t("journey.classification.privacy.title"),
+        description: t("journey.classification.privacy.description"),
+        rows: createDistribution(
+          PRIVACY_LEVEL_ORDER,
+          filteredJourney.memories,
+          (memory) => memory.privacy,
+        ),
+      },
+    ],
+    [filteredJourney.memories, t],
+  )
+  const formativePowerRows = FORMATIVE_POWER_ORDER.map((label) => ({
+    label,
+    count: filteredJourney.memories.filter((memory) => memory.formativePower === label).length,
+  })).filter((row) => row.count > 0)
+  const filterGroups = [
+    {
+      id: "type",
+      label: t("journey.filters.type"),
+      options: createFilterOptions(unfilteredTypeRows, t("journey.filters.allTypes"), {
+        includeZero: true,
+      }),
     },
     {
-      title: "整理状态",
-      description: "不是所有过去都需要被整理完。",
-      rows: createDistribution(
-        PROCESSING_STATUS_ORDER,
-        journey.memories,
-        (memory) => memory.processing,
+      id: "era",
+      label: t("journey.filters.era"),
+      options: createFilterOptions(unfilteredEraRows, t("journey.filters.allEras"), {
+        suggestions: journey.eraSuggestions,
+      }),
+    },
+    {
+      id: "emotionalWeight",
+      label: t("journey.filters.emotionalWeight"),
+      options: createFilterOptions(
+        unfilteredEmotionalWeightRows,
+        t("journey.filters.allEmotionalWeights"),
+        { includeZero: true },
       ),
     },
     {
-      title: "隐私级别",
-      description: "敏感记忆先有清晰边界。",
-      rows: createDistribution(PRIVACY_LEVEL_ORDER, journey.memories, (memory) => memory.privacy),
+      id: "processing",
+      label: t("journey.filters.processing"),
+      options: createFilterOptions(unfilteredProcessingRows, t("journey.filters.allProcessing"), {
+        includeZero: true,
+      }),
     },
-  ]
-  const formativePowerRows = FORMATIVE_POWER_ORDER.map((label) => ({
-    label,
-    count: journey.memories.filter((memory) => memory.formativePower === label).length,
-  })).filter((row) => row.count > 0)
+    {
+      id: "privacy",
+      label: t("journey.filters.privacy"),
+      options: createFilterOptions(unfilteredPrivacyRows, t("journey.filters.allPrivacy"), {
+        includeZero: true,
+      }),
+    },
+  ] satisfies Array<{
+    id: keyof JourneyFilters
+    label: string
+    options: FilterOption[]
+  }>
 
   return (
     <div
@@ -162,191 +428,344 @@ export function JourneyPage({
       )}
     >
       <PageIntro
-        eyebrow="成长记忆"
-        title="把记忆分类，再看见成长发生在哪里"
-        description="每条记忆用 5 个分类标签安放，用塑造力标出它如何影响今天的你。成长节点不是单条记忆，而是一组记忆显现出的变化模式。"
+        eyebrow={t("journey.page.eyebrow")}
+        title={t("journey.page.title")}
+        description={t("journey.page.description")}
         searchQuery={searchQuery}
       />
+
+      <JourneyHero journey={journey} />
+
+      <JourneyFilterBar
+        filterGroups={filterGroups}
+        filters={filters}
+        isCompact={isFixedLayout}
+        resultCount={filteredJourney.memories.length}
+        totalCount={journey.memories.length}
+        onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+        onReset={() => setFilters(createEmptyFilters())}
+      />
+
+      {isControlMode ? (
+        <JourneyControlPanel
+          journey={editableJourney}
+          memoryById={editableMemoryById}
+          isCompact={isFixedLayout}
+          onEdit={setEditingJourneyItem}
+        />
+      ) : null}
 
       {isFixedLayout ? (
         <JourneyFixedDashboard
           classificationSections={classificationSections}
           formativePowerRows={formativePowerRows}
-          journey={journey}
+          journey={filteredJourney}
+          memoryById={memoryById}
+          hasActiveFilters={hasActiveFilters(filters)}
+        />
+      ) : (
+        <JourneyStackedView
+          classificationSections={classificationSections}
+          formativePowerRows={formativePowerRows}
+          journey={filteredJourney}
           memoryById={memoryById}
         />
+      )}
+
+      {editingJourneyItem ? (
+        <JourneyEditDialog
+          editing={editingJourneyItem}
+          growth={editableGrowth}
+          memory={editableMemory}
+          onClose={() => setEditingJourneyItem(null)}
+        />
       ) : null}
+    </div>
+  )
+}
 
-      {!isFixedLayout ? (
-        <div className="space-y-4">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Waypoints}
-              title="5 维分类概览"
-              description="这些维度负责组织和过滤人生档案；塑造力留在时间线和条目详情里。"
-            />
+function JourneyHero({ journey }: { journey: JourneyViewData }) {
+  const { t } = useTranslation()
+  const heroStats = [
+    { label: t("journey.hero.memories"), value: journey.memories.length },
+    { label: t("journey.hero.growthNodes"), value: journey.growthNodes.length },
+    { label: t("journey.hero.anchors"), value: journey.anchors.length },
+  ]
 
-            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
-              {classificationSections.map((section) => (
-                <ClassificationPanel
-                  key={section.title}
-                  title={section.title}
-                  description={section.description}
-                  rows={section.rows}
-                  total={journey.memories.length}
-                />
-              ))}
+  return (
+    <Surface className="shrink-0 border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] p-5">
+      <div className="grid gap-2 min-[560px]:grid-cols-3">
+        {heroStats.map((stat) => (
+          <div
+            key={stat.label}
+            className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-3"
+          >
+            <div className="text-[11px] text-[color:var(--text-muted)]">{stat.label}</div>
+            <div className="mt-1 text-lg font-semibold text-[color:var(--text-primary)]">
+              {stat.value}
             </div>
-
-            {journey.eraSuggestions.length > 0 || formativePowerRows.length > 0 ? (
-              <div className="mt-4 grid gap-3 min-[960px]:grid-cols-2">
-                {journey.eraSuggestions.length > 0 ? (
-                  <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      默认时期提示
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {journey.eraSuggestions.map((era) => (
-                        <Badge
-                          key={era}
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                        >
-                          {era}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {formativePowerRows.length > 0 ? (
-                  <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      塑造力标注
-                    </div>
-                    <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                      跟随单条记忆显示，用来解释影响深度，不作为主筛选维度。
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {formativePowerRows.map((row) => (
-                        <Badge
-                          key={row.label}
-                          variant="outline"
-                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                        >
-                          {row.label} · {row.count}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-          </Surface>
-
-          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
-            <Surface className="p-5">
-              <SectionHeading
-                icon={Route}
-                title="记忆时间线"
-                description="时间线按主时期排列，条目里始终显示塑造力，便于看清哪些经历真正改变了你。"
-              />
-
-              <div className="mt-5 space-y-3">
-                {journey.memories.length > 0 ? (
-                  journey.memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
-                ) : (
-                  <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
-                )}
-              </div>
-            </Surface>
-
-            <Surface className="p-5">
-              <SectionHeading
-                icon={Sprout}
-                title="成长节点"
-                description="当多条记忆指向同一个变化方向，它们就组成一个成长节点。"
-              />
-
-              <div className="mt-5 space-y-4">
-                {journey.growthNodes.length > 0 ? (
-                  journey.growthNodes.map((node) => (
-                    <GrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
-                )}
-              </div>
-            </Surface>
           </div>
+        ))}
+      </div>
+    </Surface>
+  )
+}
 
-          <div className="grid gap-4 min-[960px]:grid-cols-2">
-            <Surface className="p-5">
-              <SectionHeading
-                icon={Camera}
-                title="感官锚点"
-                description="很多记忆不是从事件开始，而是被一个地点、一件物品或一张照片唤起来。"
-              />
+function JourneyFilterBar({
+  filterGroups,
+  filters,
+  isCompact,
+  resultCount,
+  totalCount,
+  onChange,
+  onReset,
+}: {
+  filterGroups: Array<{
+    id: keyof JourneyFilters
+    label: string
+    options: FilterOption[]
+  }>
+  filters: JourneyFilters
+  isCompact: boolean
+  resultCount: number
+  totalCount: number
+  onChange: (key: keyof JourneyFilters, value: string) => void
+  onReset: () => void
+}) {
+  const { t } = useTranslation()
+  const hasFilters = hasActiveFilters(filters)
 
-              <div className="mt-5 space-y-3">
-                {journey.anchors.length > 0 ? (
-                  journey.anchors.map((anchor) => (
-                    <AnchorRow key={anchor.id} anchor={anchor} memoryById={memoryById} />
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下还没有记忆锚点。" compact />
-                )}
-              </div>
-            </Surface>
-
-            <Surface className="p-5">
-              <SectionHeading
-                icon={BookHeart}
-                title="回看问题"
-                description="这些问题帮助你看见过去如何继续影响现在，而不是逼自己一次讲完。"
-              />
-
-              <div className="mt-5 space-y-3">
-                {journey.reviewPrompts.length > 0 ? (
-                  journey.reviewPrompts.map((prompt) => (
-                    <div
-                      key={prompt}
-                      className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
-                    >
-                      {prompt}
-                    </div>
-                  ))
-                ) : (
-                  <EmptyState message="当前筛选下没有回看问题。" compact />
-                )}
-              </div>
-            </Surface>
-          </div>
-
-          <Surface className="p-5">
-            <SectionHeading
-              icon={CheckCheck}
-              title="当前还在生效的影响"
-              description="这些线索从成长节点里浮出来，适合和观念、原则、关系页面交叉回看。"
-            />
-
-            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
-              {journey.threads.length > 0 ? (
-                journey.threads.map((thread) => (
-                  <div
-                    key={thread}
-                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
-                  >
-                    {thread}
-                  </div>
-                ))
-              ) : (
-                <EmptyState message="当前筛选下没有可展示的影响线索。" compact />
-              )}
-            </div>
-          </Surface>
+  return (
+    <Surface className={cn("shrink-0 p-3", isCompact && "p-2.5")}>
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2 px-1 text-xs font-medium text-[color:var(--text-primary)]">
+          <Filter className="size-3.5" />
+          {t("journey.filters.title")}
         </div>
-      ) : null}
+        {filterGroups.map((group) => (
+          <label key={group.id} className="min-w-[150px] flex-1">
+            <span className="sr-only">{group.label}</span>
+            <Select
+              value={filters[group.id]}
+              onValueChange={(value) => {
+                if (value !== null) {
+                  onChange(group.id, value)
+                }
+              }}
+            >
+              <SelectTrigger className="h-8 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]">
+                <SelectValue placeholder={group.label} />
+              </SelectTrigger>
+              <SelectContent>
+                {group.options.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    <JourneyFilterOptionLabel
+                      count={option.count}
+                      filterId={group.id}
+                      label={option.label}
+                    />
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
+        ))}
+        <Badge
+          variant="outline"
+          className="h-8 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+        >
+          {t("journey.filters.resultCount", { count: resultCount, total: totalCount })}
+        </Badge>
+        {hasFilters ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            onClick={onReset}
+          >
+            {t("journey.filters.reset")}
+          </Button>
+        ) : null}
+      </div>
+    </Surface>
+  )
+}
+
+function JourneyFilterOptionLabel({
+  count,
+  filterId,
+  label,
+}: {
+  count?: number
+  filterId: keyof JourneyFilters
+  label: string
+}) {
+  const { t } = useTranslation()
+  const enumGroup = getFilterEnumGroup(filterId)
+  const displayLabel = enumGroup ? translateJourneyEnum(t, enumGroup, label) : label
+
+  if (typeof count !== "number") {
+    return <span>{displayLabel}</span>
+  }
+
+  return (
+    <span className="inline-flex min-w-0 items-center gap-2">
+      <span className="truncate">{displayLabel}</span>
+      <span className="shrink-0 text-[color:var(--text-muted)]">{count}</span>
+    </span>
+  )
+}
+
+function JourneyStackedView({
+  classificationSections,
+  formativePowerRows,
+  journey,
+  memoryById,
+}: {
+  classificationSections: Array<{
+    enumGroup: JourneyEnumGroup | null
+    title: string
+    description: string
+    rows: DistributionRow[]
+  }>
+  formativePowerRows: DistributionRow[]
+  journey: JourneyViewData
+  memoryById: Map<string, MemoryEntry>
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-4">
+      <Surface className="p-5">
+        <SectionHeading
+          icon={Waypoints}
+          title={t("journey.sections.classification.title")}
+          description={t("journey.sections.classification.description")}
+        />
+
+        <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+          {classificationSections.map((section) => (
+            <ClassificationPanel
+              key={section.title}
+              title={section.title}
+              description={section.description}
+              enumGroup={section.enumGroup}
+              rows={section.rows}
+              total={journey.memories.length}
+            />
+          ))}
+        </div>
+
+        {journey.eraSuggestions.length > 0 || formativePowerRows.length > 0 ? (
+          <div className="mt-4 grid gap-3 min-[960px]:grid-cols-2">
+            {journey.eraSuggestions.length > 0 ? (
+              <BadgeBlock
+                title={t("journey.sections.eraSuggestions.title")}
+                rows={journey.eraSuggestions.map((era) => ({ label: era, count: 0 }))}
+                showCount={false}
+              />
+            ) : null}
+
+            {formativePowerRows.length > 0 ? (
+              <BadgeBlock
+                title={t("journey.sections.formativePower.title")}
+                description={t("journey.sections.formativePower.description")}
+                enumGroup="formativePower"
+                rows={formativePowerRows}
+              />
+            ) : null}
+          </div>
+        ) : null}
+      </Surface>
+
+      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)]">
+        <Surface className="p-5">
+          <SectionHeading
+            icon={Route}
+            title={t("journey.sections.timeline.title")}
+            description={t("journey.sections.timeline.description")}
+          />
+
+          <div className="mt-5 space-y-3">
+            {journey.memories.length > 0 ? (
+              journey.memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
+            ) : (
+              <EmptyState message={t("journey.empty.memories")} compact />
+            )}
+          </div>
+        </Surface>
+
+        <Surface className="p-5">
+          <SectionHeading
+            icon={Sprout}
+            title={t("journey.sections.growth.title")}
+            description={t("journey.sections.growth.description")}
+          />
+
+          <div className="mt-5 space-y-4">
+            {journey.growthNodes.length > 0 ? (
+              journey.growthNodes.map((node) => (
+                <GrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
+              ))
+            ) : (
+              <EmptyState message={t("journey.empty.growthNodes")} compact />
+            )}
+          </div>
+        </Surface>
+      </div>
+
+      <div className="grid gap-4 min-[960px]:grid-cols-2">
+        <Surface className="p-5">
+          <SectionHeading
+            icon={Camera}
+            title={t("journey.sections.anchors.title")}
+            description={t("journey.sections.anchors.description")}
+          />
+
+          <div className="mt-5 space-y-3">
+            {journey.anchors.length > 0 ? (
+              journey.anchors.map((anchor) => (
+                <AnchorRow key={anchor.id} anchor={anchor} memoryById={memoryById} />
+              ))
+            ) : (
+              <EmptyState message={t("journey.empty.anchors")} compact />
+            )}
+          </div>
+        </Surface>
+
+        <Surface className="p-5">
+          <SectionHeading
+            icon={BookHeart}
+            title={t("journey.sections.reviewPrompts.title")}
+            description={t("journey.sections.reviewPrompts.description")}
+          />
+
+          <div className="mt-5 space-y-3">
+            {journey.reviewPrompts.length > 0 ? (
+              journey.reviewPrompts.map((prompt) => <TextBlock key={prompt} detail={prompt} />)
+            ) : (
+              <EmptyState message={t("journey.empty.reviewPrompts")} compact />
+            )}
+          </div>
+        </Surface>
+      </div>
+
+      <Surface className="p-5">
+        <SectionHeading
+          icon={CheckCheck}
+          title={t("journey.sections.threads.title")}
+          description={t("journey.sections.threads.description")}
+        />
+
+        <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
+          {journey.threads.length > 0 ? (
+            journey.threads.map((thread) => <TextBlock key={thread} detail={thread} />)
+          ) : (
+            <EmptyState message={t("journey.empty.threads")} compact />
+          )}
+        </div>
+      </Surface>
     </div>
   )
 }
@@ -356,8 +775,10 @@ function JourneyFixedDashboard({
   formativePowerRows,
   journey,
   memoryById,
+  hasActiveFilters,
 }: {
   classificationSections: Array<{
+    enumGroup: JourneyEnumGroup | null
     title: string
     description: string
     rows: DistributionRow[]
@@ -365,7 +786,9 @@ function JourneyFixedDashboard({
   formativePowerRows: DistributionRow[]
   journey: JourneyViewData
   memoryById: Map<string, MemoryEntry>
+  hasActiveFilters: boolean
 }) {
+  const { t } = useTranslation()
   const featuredMemories = journey.memories.slice(0, 3)
   const featuredGrowthNodes = journey.growthNodes.slice(0, 2)
   const featuredAnchors = journey.anchors.slice(0, 2)
@@ -382,6 +805,7 @@ function JourneyFixedDashboard({
             {classificationSections.map((section) => (
               <CompactDistributionPanel
                 key={section.title}
+                enumGroup={section.enumGroup}
                 title={section.title}
                 rows={section.rows}
               />
@@ -389,23 +813,17 @@ function JourneyFixedDashboard({
           </div>
 
           <div className="grid gap-2 min-[1240px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-            <CompactBadgeBlock title="塑造力标注" rows={formativePowerRows} />
-            <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
-              <div className="text-xs font-medium text-[color:var(--text-primary)]">
-                默认时期提示
-              </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {journey.eraSuggestions.slice(0, 5).map((era) => (
-                  <Badge
-                    key={era}
-                    variant="outline"
-                    className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                  >
-                    {era}
-                  </Badge>
-                ))}
-              </div>
-            </div>
+            <CompactBadgeBlock
+              enumGroup="formativePower"
+              title={t("journey.sections.formativePower.title")}
+              rows={formativePowerRows}
+            />
+            <BadgeBlock
+              compact
+              title={t("journey.sections.eraSuggestions.title")}
+              rows={journey.eraSuggestions.slice(0, 5).map((era) => ({ label: era, count: 0 }))}
+              showCount={false}
+            />
           </div>
         </div>
       </Surface>
@@ -415,7 +833,10 @@ function JourneyFixedDashboard({
           {featuredMemories.length > 0 ? (
             featuredMemories.map((memory) => <CompactMemoryCard key={memory.id} memory={memory} />)
           ) : (
-            <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+            <EmptyState
+              message={hasActiveFilters ? t("journey.empty.memories") : t("journey.empty.noData")}
+              compact
+            />
           )}
           <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
             {featuredGrowthNodes.map((node) => (
@@ -428,9 +849,9 @@ function JourneyFixedDashboard({
       <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
         <Tabs defaultValue="timeline" className="min-h-0 flex-1">
           <TabsList className="w-full justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
-            <TabsTrigger value="timeline">记忆时间线</TabsTrigger>
-            <TabsTrigger value="growth">成长节点</TabsTrigger>
-            <TabsTrigger value="signals">锚点与影响</TabsTrigger>
+            <TabsTrigger value="timeline">{t("journey.tabs.timeline")}</TabsTrigger>
+            <TabsTrigger value="growth">{t("journey.tabs.growth")}</TabsTrigger>
+            <TabsTrigger value="signals">{t("journey.tabs.signals")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="timeline" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -440,7 +861,7 @@ function JourneyFixedDashboard({
                   <CompactMemoryCard key={memory.id} memory={memory} />
                 ))
               ) : (
-                <EmptyState message="当前筛选下还没有可展示的记忆。" compact />
+                <EmptyState message={t("journey.empty.memories")} compact />
               )}
             </div>
           </TabsContent>
@@ -452,7 +873,7 @@ function JourneyFixedDashboard({
                   <CompactGrowthNodeCard key={node.id} memoryById={memoryById} node={node} />
                 ))
               ) : (
-                <EmptyState message="当前筛选下还没有可展示的成长节点。" compact />
+                <EmptyState message={t("journey.empty.growthNodes")} compact />
               )}
             </div>
           </TabsContent>
@@ -465,21 +886,35 @@ function JourneyFixedDashboard({
                 return (
                   <CompactTextBlock
                     key={anchor.id}
-                    title={`${anchor.type} · ${anchor.label}`}
-                    detail={`${anchor.note} · ${linkedMemories.length} 条相关记忆`}
+                    title={t("journey.compact.anchorTitle", {
+                      type: translateJourneyEnum(t, "memoryType", anchor.type),
+                      label: anchor.label,
+                    })}
+                    detail={t("journey.compact.relatedMemoryCount", {
+                      note: anchor.note,
+                      count: linkedMemories.length,
+                    })}
                   />
                 )
               })}
               {journey.reviewPrompts.map((prompt) => (
-                <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
+                <CompactTextBlock
+                  key={prompt}
+                  title={t("journey.sections.reviewPrompts.title")}
+                  detail={prompt}
+                />
               ))}
               {journey.threads.map((thread) => (
-                <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
+                <CompactTextBlock
+                  key={thread}
+                  title={t("journey.sections.threads.compactTitle")}
+                  detail={thread}
+                />
               ))}
               {journey.anchors.length === 0 &&
               journey.reviewPrompts.length === 0 &&
               journey.threads.length === 0 ? (
-                <EmptyState message="当前筛选下没有辅助线索。" compact />
+                <EmptyState message={t("journey.empty.signals")} compact />
               ) : null}
             </div>
           </TabsContent>
@@ -494,24 +929,40 @@ function JourneyFixedDashboard({
             return (
               <CompactTextBlock
                 key={anchor.id}
-                title={`${anchor.type} · ${anchor.label}`}
-                detail={`${anchor.note} · ${linkedMemories.length} 条相关记忆`}
+                title={t("journey.compact.anchorTitle", {
+                  type: translateJourneyEnum(t, "memoryType", anchor.type),
+                  label: anchor.label,
+                })}
+                detail={t("journey.compact.relatedMemoryCount", {
+                  note: anchor.note,
+                  count: linkedMemories.length,
+                })}
               />
             )
           })}
           <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
             {featuredPrompts.map((prompt) => (
-              <CompactTextBlock key={prompt} title="回看问题" detail={prompt} />
+              <CompactTextBlock
+                key={prompt}
+                title={t("journey.sections.reviewPrompts.title")}
+                detail={prompt}
+              />
             ))}
             {featuredThreads.map((thread) => (
-              <CompactTextBlock key={thread} title="仍在生效" detail={thread} />
+              <CompactTextBlock
+                key={thread}
+                title={t("journey.sections.threads.compactTitle")}
+                detail={thread}
+              />
             ))}
           </div>
           {remainingMemoryCount > 0 ? (
-            <RemainingLine label={`还有 ${remainingMemoryCount} 条记忆未展开`} />
+            <RemainingLine
+              label={t("journey.remaining.memories", { count: remainingMemoryCount })}
+            />
           ) : null}
           {remainingGrowthCount > 0 ? (
-            <RemainingLine label={`还有 ${remainingGrowthCount} 个成长节点未展开`} />
+            <RemainingLine label={t("journey.remaining.growth", { count: remainingGrowthCount })} />
           ) : null}
         </div>
       </Surface>
@@ -519,7 +970,276 @@ function JourneyFixedDashboard({
   )
 }
 
-function CompactDistributionPanel({ title, rows }: { title: string; rows: DistributionRow[] }) {
+function JourneyControlPanel({
+  journey,
+  memoryById,
+  isCompact,
+  onEdit,
+}: {
+  journey: JourneyViewData
+  memoryById: Map<string, MemoryEntry>
+  isCompact: boolean
+  onEdit: (editing: EditingJourneyItem) => void
+}) {
+  const { t } = useTranslation()
+  const memoriesWithoutFormativePower = journey.memories.filter((memory) => !memory.formativePower)
+  const secondConfirmMemories = journey.memories.filter((memory) => memory.privacy === "需二次确认")
+  const unresolvedMemoryIds = new Set<string>()
+
+  journey.growthNodes.forEach((node) => {
+    ;[...node.beforeMemoryIds, ...node.afterMemoryIds, node.triggerMemoryId].forEach((memoryId) => {
+      if (!memoryById.has(memoryId)) {
+        unresolvedMemoryIds.add(memoryId)
+      }
+    })
+  })
+
+  const metrics = [
+    {
+      icon: Database,
+      label: t("journey.control.metrics.memories"),
+      value: journey.memories.length,
+    },
+    {
+      icon: Sprout,
+      label: t("journey.control.metrics.growthNodes"),
+      value: journey.growthNodes.length,
+    },
+    {
+      icon: Lock,
+      label: t("journey.control.metrics.secondConfirm"),
+      value: secondConfirmMemories.length,
+    },
+    {
+      icon: Archive,
+      label: t("journey.control.metrics.missingLinks"),
+      value: unresolvedMemoryIds.size,
+    },
+  ]
+
+  return (
+    <Surface className={cn("shrink-0 p-3", isCompact && "p-2.5")}>
+      <div className="grid gap-3 min-[960px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
+            <Database className="size-4" />
+            {t("journey.control.title")}
+          </div>
+          <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+            {t("journey.control.description")}
+          </p>
+        </div>
+        <div className="grid gap-2 min-[640px]:grid-cols-4">
+          {metrics.map((metric) => (
+            <div
+              key={metric.label}
+              className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2"
+            >
+              <div className="flex items-center gap-1.5 text-[11px] text-[color:var(--text-muted)]">
+                <metric.icon className="size-3.5" />
+                {metric.label}
+              </div>
+              <div className="mt-1 text-base font-semibold text-[color:var(--text-primary)]">
+                {metric.value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onEdit({ kind: "memory", isNew: true, memory: null })}
+        >
+          <Plus className="size-3.5" />
+          {t("journey.actions.addMemory")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onEdit({ kind: "growth", isNew: true, node: null })}
+        >
+          <Plus className="size-3.5" />
+          {t("journey.actions.addGrowth")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onEdit({ kind: "anchor", isNew: true, anchor: null })}
+        >
+          <Plus className="size-3.5" />
+          {t("journey.actions.addAnchor")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onEdit({ kind: "reviewPrompt", isNew: true, index: null, value: "" })}
+        >
+          <Plus className="size-3.5" />
+          {t("journey.actions.addPrompt")}
+        </Button>
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => onEdit({ kind: "thread", isNew: true, index: null, value: "" })}
+        >
+          <Plus className="size-3.5" />
+          {t("journey.actions.addThread")}
+        </Button>
+      </div>
+
+      <div className="mt-3 grid gap-2 min-[960px]:grid-cols-2 min-[1280px]:grid-cols-3">
+        <JourneyManagementList
+          title={t("journey.management.memories")}
+          emptyLabel={t("journey.empty.memories")}
+          rows={journey.memories.map((memory) => ({
+            id: memory.id,
+            title: memory.title,
+            detail: `${translateJourneyEnum(t, "memoryType", memory.type)} · ${memory.primaryEra}`,
+            onEdit: () => onEdit({ kind: "memory", isNew: false, memory }),
+          }))}
+        />
+        <JourneyManagementList
+          title={t("journey.management.growthNodes")}
+          emptyLabel={t("journey.empty.growthNodes")}
+          rows={journey.growthNodes.map((node) => ({
+            id: node.id,
+            title: node.title,
+            detail: `${translateJourneyEnum(t, "growthDomain", node.domain)} · ${translateJourneyEnum(
+              t,
+              "growthStability",
+              node.stability,
+            )}`,
+            onEdit: () => onEdit({ kind: "growth", isNew: false, node }),
+          }))}
+        />
+        <JourneyManagementList
+          title={t("journey.management.anchors")}
+          emptyLabel={t("journey.empty.anchors")}
+          rows={journey.anchors.map((anchor) => ({
+            id: anchor.id,
+            title: anchor.label,
+            detail: `${translateJourneyEnum(t, "memoryType", anchor.type)} · ${anchor.linkedMemoryIds.length}`,
+            onEdit: () => onEdit({ kind: "anchor", isNew: false, anchor }),
+          }))}
+        />
+        <JourneyManagementList
+          title={t("journey.management.prompts")}
+          emptyLabel={t("journey.empty.reviewPrompts")}
+          rows={journey.reviewPrompts.map((prompt, index) => ({
+            id: `prompt-${index}`,
+            title: prompt,
+            onEdit: () => onEdit({ kind: "reviewPrompt", isNew: false, index, value: prompt }),
+          }))}
+        />
+        <JourneyManagementList
+          title={t("journey.management.threads")}
+          emptyLabel={t("journey.empty.threads")}
+          rows={journey.threads.map((thread, index) => ({
+            id: `thread-${index}`,
+            title: thread,
+            onEdit: () => onEdit({ kind: "thread", isNew: false, index, value: thread }),
+          }))}
+        />
+      </div>
+
+      {memoriesWithoutFormativePower.length > 0 || unresolvedMemoryIds.size > 0 ? (
+        <div className="mt-3 grid gap-2 min-[960px]:grid-cols-2">
+          {memoriesWithoutFormativePower.length > 0 ? (
+            <TextBlock
+              title={t("journey.control.missingPowerTitle")}
+              detail={memoriesWithoutFormativePower.map((memory) => memory.title).join(" / ")}
+            />
+          ) : null}
+          {unresolvedMemoryIds.size > 0 ? (
+            <TextBlock
+              title={t("journey.control.missingLinksTitle")}
+              detail={[...unresolvedMemoryIds].join(" / ")}
+            />
+          ) : null}
+        </div>
+      ) : null}
+    </Surface>
+  )
+}
+
+function JourneyManagementList({
+  title,
+  emptyLabel,
+  rows,
+}: {
+  title: string
+  emptyLabel: string
+  rows: Array<{
+    id: string
+    title: string
+    detail?: string
+    onEdit: () => void
+  }>
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
+      <div className="flex items-center gap-2 text-xs font-medium text-[color:var(--text-primary)]">
+        <FileQuestion className="size-3.5" />
+        {title}
+      </div>
+      <div className="mt-2 max-h-44 space-y-1.5 overflow-y-auto pr-1">
+        {rows.length > 0 ? (
+          rows.map((row) => (
+            <div
+              key={row.id}
+              className="flex items-center justify-between gap-2 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-2.5 py-2"
+            >
+              <div className="min-w-0">
+                <div className="truncate text-xs font-medium text-[color:var(--text-primary)]">
+                  {row.title}
+                </div>
+                {row.detail ? (
+                  <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+                    {row.detail}
+                  </div>
+                ) : null}
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-xs"
+                aria-label={t("journey.actions.edit")}
+                onClick={row.onEdit}
+              >
+                <Pencil className="size-3.5" />
+              </Button>
+            </div>
+          ))
+        ) : (
+          <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] px-2.5 py-2 text-xs text-[color:var(--text-muted)]">
+            {emptyLabel}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function CompactDistributionPanel({
+  enumGroup,
+  title,
+  rows,
+}: {
+  enumGroup?: JourneyEnumGroup | null
+  title: string
+  rows: DistributionRow[]
+}) {
+  const { t } = useTranslation()
   const visibleRows = rows.filter((row) => row.count > 0).slice(0, 3)
 
   return (
@@ -533,22 +1253,53 @@ function CompactDistributionPanel({ title, rows }: { title: string; rows: Distri
               variant="outline"
               className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
             >
-              {row.label} · {row.count}
+              {enumGroup ? translateJourneyEnum(t, enumGroup, row.label) : row.label} · {row.count}
             </Badge>
           ))
         ) : (
-          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+          <span className="text-xs text-[color:var(--text-muted)]">{t("journey.empty.none")}</span>
         )}
       </div>
     </div>
   )
 }
 
-function CompactBadgeBlock({ title, rows }: { title: string; rows: DistributionRow[] }) {
+function CompactBadgeBlock({
+  enumGroup,
+  title,
+  rows,
+}: {
+  enumGroup?: JourneyEnumGroup | null
+  title: string
+  rows: DistributionRow[]
+}) {
+  return <BadgeBlock compact enumGroup={enumGroup} title={title} rows={rows} />
+}
+
+function BadgeBlock({
+  enumGroup,
+  title,
+  description,
+  rows,
+  showCount = true,
+  compact = false,
+}: {
+  enumGroup?: JourneyEnumGroup | null
+  title: string
+  description?: string
+  rows: DistributionRow[]
+  showCount?: boolean
+  compact?: boolean
+}) {
+  const { t } = useTranslation()
+
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
       <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
-      <div className="mt-2 flex flex-wrap gap-1.5">
+      {description ? (
+        <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">{description}</p>
+      ) : null}
+      <div className={cn("mt-2 flex flex-wrap gap-1.5", !compact && "mt-3")}>
         {rows.length > 0 ? (
           rows.map((row) => (
             <Badge
@@ -556,11 +1307,18 @@ function CompactBadgeBlock({ title, rows }: { title: string; rows: DistributionR
               variant="outline"
               className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
             >
-              {row.label} · {row.count}
+              {showCount
+                ? t("journey.filters.optionWithCount", {
+                    label: enumGroup ? translateJourneyEnum(t, enumGroup, row.label) : row.label,
+                    count: row.count,
+                  })
+                : enumGroup
+                  ? translateJourneyEnum(t, enumGroup, row.label)
+                  : row.label}
             </Badge>
           ))
         ) : (
-          <span className="text-xs text-[color:var(--text-muted)]">暂无</span>
+          <span className="text-xs text-[color:var(--text-muted)]">{t("journey.empty.none")}</span>
         )}
       </div>
     </div>
@@ -568,6 +1326,8 @@ function CompactBadgeBlock({ title, rows }: { title: string; rows: DistributionR
 }
 
 function CompactMemoryCard({ memory }: { memory: MemoryEntry }) {
+  const { t } = useTranslation()
+
   return (
     <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
       <div className="flex flex-wrap items-center gap-1.5">
@@ -575,7 +1335,7 @@ function CompactMemoryCard({ memory }: { memory: MemoryEntry }) {
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
         >
-          {memory.type}
+          {translateJourneyEnum(t, "memoryType", memory.type)}
         </Badge>
         <Badge
           variant="outline"
@@ -584,7 +1344,11 @@ function CompactMemoryCard({ memory }: { memory: MemoryEntry }) {
           {memory.primaryEra}
         </Badge>
         <Badge className="bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]">
-          塑造力 · {memory.formativePower ?? "未评估"}
+          {t("journey.memory.formativePowerBadge", {
+            value: memory.formativePower
+              ? translateJourneyEnum(t, "formativePower", memory.formativePower)
+              : t("journey.memory.unrated"),
+          })}
         </Badge>
       </div>
       <div className="mt-2 truncate text-sm font-medium text-[color:var(--text-primary)]">
@@ -592,24 +1356,19 @@ function CompactMemoryCard({ memory }: { memory: MemoryEntry }) {
       </div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{memory.summary}</p>
       <div className="mt-2 flex flex-wrap gap-1.5">
-        <Badge
-          variant="outline"
-          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-        >
-          {memory.emotionalWeight}
-        </Badge>
-        <Badge
-          variant="outline"
-          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-        >
-          {memory.processing}
-        </Badge>
-        <Badge
-          variant="outline"
-          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-        >
-          {memory.privacy}
-        </Badge>
+        {[
+          ["emotionalWeight", memory.emotionalWeight],
+          ["processing", memory.processing],
+          ["privacy", memory.privacy],
+        ].map(([group, value]) => (
+          <Badge
+            key={value}
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {translateJourneyEnum(t, group as JourneyEnumGroup, value)}
+          </Badge>
+        ))}
       </div>
     </article>
   )
@@ -622,31 +1381,32 @@ function CompactGrowthNodeCard({
   node: GrowthNode
   memoryById: Map<string, MemoryEntry>
 }) {
+  const { t } = useTranslation()
   const triggerMemory = memoryById.get(node.triggerMemoryId)
 
   return (
     <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
       <div className="flex flex-wrap items-center gap-1.5">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
-          {node.domain}
+          {translateJourneyEnum(t, "growthDomain", node.domain)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
         >
-          {node.stability}
+          {translateJourneyEnum(t, "growthStability", node.stability)}
         </Badge>
       </div>
       <div className="mt-2 truncate text-sm font-medium text-[color:var(--text-primary)]">
         {node.title}
       </div>
       <div className="mt-1 grid gap-2 text-xs leading-5 text-[color:var(--text-secondary)]">
-        <div>前：{node.before}</div>
-        <div>后：{node.after}</div>
+        <div>{t("journey.growth.beforeInline", { value: node.before })}</div>
+        <div>{t("journey.growth.afterInline", { value: node.after })}</div>
       </div>
       {triggerMemory ? (
         <div className="mt-2 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-2.5 py-1 text-xs text-[color:var(--text-muted)]">
-          触发：{triggerMemory.title}
+          {t("journey.growth.triggerInline", { value: triggerMemory.title })}
         </div>
       ) : null}
     </article>
@@ -671,16 +1431,19 @@ function RemainingLine({ label }: { label: string }) {
 }
 
 function ClassificationPanel({
+  enumGroup,
   title,
   description,
   rows,
   total,
 }: {
+  enumGroup: JourneyEnumGroup | null
   title: string
   description: string
   rows: DistributionRow[]
   total: number
 }) {
+  const { t } = useTranslation()
   const visibleRows = rows.filter((row) => row.count > 0)
 
   return (
@@ -698,7 +1461,7 @@ function ClassificationPanel({
               <div key={row.label} className="space-y-1.5">
                 <div className="flex items-center justify-between gap-3 text-xs">
                   <span className="min-w-0 truncate text-[color:var(--text-secondary)]">
-                    {row.label}
+                    {enumGroup ? translateJourneyEnum(t, enumGroup, row.label) : row.label}
                   </span>
                   <span className="shrink-0 text-[color:var(--text-muted)]">{row.count}</span>
                 </div>
@@ -712,7 +1475,9 @@ function ClassificationPanel({
             )
           })
         ) : (
-          <div className="text-xs leading-5 text-[color:var(--text-muted)]">暂无分布数据。</div>
+          <div className="text-xs leading-5 text-[color:var(--text-muted)]">
+            {t("journey.empty.distribution")}
+          </div>
         )}
       </div>
     </div>
@@ -720,7 +1485,10 @@ function ClassificationPanel({
 }
 
 function MemoryCard({ memory }: { memory: MemoryEntry }) {
-  const formativePower = memory.formativePower ?? "未评估"
+  const { t } = useTranslation()
+  const formativePower = memory.formativePower
+    ? translateJourneyEnum(t, "formativePower", memory.formativePower)
+    : t("journey.memory.unrated")
   const needsSecondLook = memory.privacy === "需二次确认"
 
   return (
@@ -730,7 +1498,7 @@ function MemoryCard({ memory }: { memory: MemoryEntry }) {
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
         >
-          {memory.type}
+          {translateJourneyEnum(t, "memoryType", memory.type)}
         </Badge>
         <Badge
           variant="outline"
@@ -740,7 +1508,7 @@ function MemoryCard({ memory }: { memory: MemoryEntry }) {
         </Badge>
         {needsSecondLook ? (
           <Badge className="bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]">
-            需确认
+            {t("journey.memory.needsConfirm")}
           </Badge>
         ) : null}
       </div>
@@ -750,19 +1518,28 @@ function MemoryCard({ memory }: { memory: MemoryEntry }) {
       </h3>
       <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{memory.summary}</p>
       <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-        留下来的影响：{memory.impact}
+        {t("journey.memory.impactPrefix", { value: memory.impact })}
       </p>
 
       <div className="mt-4 grid gap-2 min-[640px]:grid-cols-2">
-        <MemoryMeta label="情感重量" value={memory.emotionalWeight} />
-        <MemoryMeta label="整理状态" value={memory.processing} />
-        <MemoryMeta label="隐私级别" value={memory.privacy} />
-        <MemoryMeta label="塑造力" value={formativePower} accent />
+        <MemoryMeta
+          label={t("journey.memory.emotionalWeight")}
+          value={translateJourneyEnum(t, "emotionalWeight", memory.emotionalWeight)}
+        />
+        <MemoryMeta
+          label={t("journey.memory.processing")}
+          value={translateJourneyEnum(t, "processing", memory.processing)}
+        />
+        <MemoryMeta
+          label={t("journey.memory.privacy")}
+          value={translateJourneyEnum(t, "privacy", memory.privacy)}
+        />
+        <MemoryMeta label={t("journey.memory.formativePower")} value={formativePower} accent />
       </div>
 
       {memory.sensoryCue ? (
         <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2 text-xs leading-5 text-[color:var(--text-muted)]">
-          感官线索：{memory.sensoryCue}
+          {t("journey.memory.sensoryCuePrefix", { value: memory.sensoryCue })}
         </div>
       ) : null}
 
@@ -782,7 +1559,9 @@ function MemoryCard({ memory }: { memory: MemoryEntry }) {
             variant="outline"
             className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
           >
-            来源：{source}
+            {t("journey.memory.sourcePrefix", {
+              value: translateJourneyEnum(t, "sourceModule", source),
+            })}
           </Badge>
         ))}
       </div>
@@ -821,6 +1600,7 @@ function GrowthNodeCard({
   node: GrowthNode
   memoryById: Map<string, MemoryEntry>
 }) {
+  const { t } = useTranslation()
   const beforeMemories = getLinkedMemories(node.beforeMemoryIds, memoryById)
   const afterMemories = getLinkedMemories(node.afterMemoryIds, memoryById)
   const triggerMemory = memoryById.get(node.triggerMemoryId)
@@ -829,30 +1609,32 @@ function GrowthNodeCard({
     <article className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
       <div className="flex flex-wrap items-center gap-2">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
-          {node.domain}
+          {translateJourneyEnum(t, "growthDomain", node.domain)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
         >
-          {node.stability}
+          {translateJourneyEnum(t, "growthStability", node.stability)}
         </Badge>
       </div>
       <h3 className="mt-3 text-base font-medium text-[color:var(--text-primary)]">{node.title}</h3>
 
       <div className="mt-4 grid gap-3 min-[640px]:grid-cols-2">
-        <GrowthState label="变化前" value={node.before} />
-        <GrowthState label="变化后" value={node.after} />
+        <GrowthState label={t("journey.growth.before")} value={node.before} />
+        <GrowthState label={t("journey.growth.after")} value={node.after} />
       </div>
 
       <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-        关键转折：{node.keyEvent}
+        {t("journey.growth.keyEventPrefix", { value: node.keyEvent })}
       </div>
 
       <div className="mt-3 space-y-2">
-        <MemoryLinkGroup title="变化前记忆" memories={beforeMemories} />
-        <MemoryLinkGroup title="变化后记忆" memories={afterMemories} />
-        {triggerMemory ? <MemoryLinkGroup title="触发记忆" memories={[triggerMemory]} /> : null}
+        <MemoryLinkGroup title={t("journey.growth.beforeMemories")} memories={beforeMemories} />
+        <MemoryLinkGroup title={t("journey.growth.afterMemories")} memories={afterMemories} />
+        {triggerMemory ? (
+          <MemoryLinkGroup title={t("journey.growth.triggerMemory")} memories={[triggerMemory]} />
+        ) : null}
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -907,6 +1689,7 @@ function AnchorRow({
   anchor: MemoryAnchor
   memoryById: Map<string, MemoryEntry>
 }) {
+  const { t } = useTranslation()
   const memories = getLinkedMemories(anchor.linkedMemoryIds, memoryById)
 
   return (
@@ -921,7 +1704,7 @@ function AnchorRow({
               variant="outline"
               className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
             >
-              {anchor.type}
+              {translateJourneyEnum(t, "memoryType", anchor.type)}
             </Badge>
             <h3 className="text-sm font-medium text-[color:var(--text-primary)]">{anchor.label}</h3>
           </div>
@@ -941,6 +1724,15 @@ function AnchorRow({
           ) : null}
         </div>
       </div>
+    </div>
+  )
+}
+
+function TextBlock({ title, detail }: { title?: string; detail: string }) {
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]">
+      {title ? <div className="font-medium text-[color:var(--text-primary)]">{title}</div> : null}
+      <div className={cn(title && "mt-1")}>{detail}</div>
     </div>
   )
 }

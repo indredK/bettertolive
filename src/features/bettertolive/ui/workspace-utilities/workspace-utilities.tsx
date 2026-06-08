@@ -207,7 +207,7 @@ export function WorkspaceUtilities({
         <UtilityIconButton
           ref={themeTriggerRef}
           isActive={openPanel === "themes"}
-          label="主题切换"
+          label={t("shell.utilities.theme")}
           popupType="dialog"
           testId="theme-center-trigger"
           onClick={() => setOpenPanel((current) => (current === "themes" ? null : "themes"))}
@@ -222,7 +222,7 @@ export function WorkspaceUtilities({
         <UtilityIconButton
           ref={notificationTriggerRef}
           isActive={openPanel === "notifications"}
-          label="通知中心"
+          label={t("shell.utilities.notifications")}
           badge={unreadCount > 0 ? unreadCount : null}
           popupType="dialog"
           testId="notification-center-trigger"
@@ -236,7 +236,7 @@ export function WorkspaceUtilities({
         <UtilityIconButton
           ref={musicTriggerRef}
           isActive={openPanel === "music"}
-          label="播放音乐"
+          label={t("shell.utilities.music")}
           dot={isPlaying}
           popupType="dialog"
           testId="music-center-trigger"
@@ -260,7 +260,7 @@ export function WorkspaceUtilities({
 
         <UtilityIconButton
           isActive={isShoppingManagementMode}
-          label="管理模式"
+          label={t("shell.utilities.managementMode")}
           testId="management-mode-trigger"
           onClick={toggleShoppingManagementMode}
         >

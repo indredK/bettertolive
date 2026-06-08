@@ -47,14 +47,17 @@ import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nut
 import { cn } from "@/lib/utils"
 
 export function NutritionOverviewTab({
+  editableNutrition,
   isControlMode = false,
   nutrition,
 }: {
+  editableNutrition?: NutritionModuleData
   isControlMode?: boolean
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
   const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const sourceNutrition = editableNutrition ?? nutrition
   const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
   const plan = findDailyPlanForDate(nutrition.dailyPlans)
   const totals = plan
@@ -216,7 +219,11 @@ export function NutritionOverviewTab({
                 <div className="grid h-full min-h-0 grid-rows-[160px_minmax(0,1fr)] gap-3">
                   <div className="grid min-h-0 grid-cols-[140px_minmax(0,1fr)] gap-3">
                     <div className="min-h-0">
-                      <ResponsiveContainer width="100%" height="100%">
+                      <ResponsiveContainer
+                        width="100%"
+                        height="100%"
+                        initialDimension={{ width: 140, height: 160 }}
+                      >
                         <RadialBarChart
                           data={pulseData}
                           cx="50%"
@@ -245,7 +252,11 @@ export function NutritionOverviewTab({
                   </div>
 
                   <div className="min-h-0">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer
+                      width="100%"
+                      height="100%"
+                      initialDimension={{ width: 360, height: 180 }}
+                    >
                       <BarChart
                         data={nutrientBars}
                         layout="vertical"
@@ -431,7 +442,7 @@ export function NutritionOverviewTab({
 
       {isControlMode && isEditingProfile ? (
         <NutritionProfileEditDialog
-          nutrition={nutrition}
+          nutrition={sourceNutrition}
           onClose={() => setIsEditingProfile(false)}
         />
       ) : null}

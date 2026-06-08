@@ -25,13 +25,16 @@
 
 | 文件 | 现状 |
 |---|---|
-| `src/features/bettertolive/ui/legacy/legacy-page.tsx` | 单页展示，包含分类分布、条目卡片、边界说明、回看问题 |
-| `src/features/bettertolive/models/workspace.ts` | 已有 `LegacyItem / LegacyModuleData` 等类型 |
-| `src/features/bettertolive/api/mock/data/legacy/legacy.mock.ts` | mock 数据已经覆盖 5 维分类、情感负荷、交付条件和锁定状态 |
-| `src/features/bettertolive/hooks/use-workspace-view-model.ts` | 已有搜索过滤 legacy 数据 |
-| `src-tauri/src/shopping/commands.rs` | `get_workspace_snapshot` 中 `legacy` 仍为 `None`，生命整理没有真实后端 |
+| `src/features/bettertolive/ui/legacy/legacy-page.tsx` | 顶层 Tab 和编辑弹窗状态壳 |
+| `src/features/bettertolive/ui/legacy/legacy-*.tsx` | 总览、条目库、交付地图、关系表达、边界与信任等拆分视图 |
+| `src/features/bettertolive/models/workspace.ts` | 已更新 `LegacyItem / LegacyItemForm / LegacyModuleData` 等类型 |
+| `src-tauri/src/legacy/*` | 已新增 SQLite schema、seed、repository 和 Tauri commands |
+| `src-tauri/src/legacy/seed.json` | 后端 seed 数据覆盖 5 维分类、情感负荷、交付条件和锁定状态 |
+| `src/features/bettertolive/api/mock/data/workspace-snapshot.mock.ts` | legacy 使用空 fallback，不再维护前端手写样例 |
+| `src/features/bettertolive/hooks/use-workspace-view-model.ts` | 已补充搜索过滤 legacy 新字段 |
+| `src-tauri/src/shopping/commands.rs` | `get_workspace_snapshot` 已可聚合后端 legacy 数据 |
 
-当前页面和数据已经能表达旧设计，但还缺少：
+本轮实现已补齐原先缺口：
 
 - 顶层 Tab 信息架构。
 - 条目新增 / 编辑 / 删除。
@@ -567,9 +570,9 @@ pub fn delete_legacy_item(state: State<AppState>, id: String) -> Result<(), Stri
 - 默认过滤 `is_archived=0`。
 - `content_preview` 从 `content` 截断生成，前端不必自己截。
 
-#### 9. Mock 数据迁移
+#### 9. 数据迁移
 
-`src/features/bettertolive/api/mock/data/legacy/legacy.mock.ts` 需要补字段：
+生命整理不再维护前端手写样例数据。前端 workspace mock 中 legacy 使用空 fallback，真实样例集中在 `src-tauri/src/legacy/seed.json`，并需要包含这些字段：
 
 - `content`
 - `requiresSecondConfirm`
@@ -577,7 +580,7 @@ pub fn delete_legacy_item(state: State<AppState>, id: String) -> Result<(), Stri
 - `createdAt`
 - `finalizedAt`
 
-现有 `contentPreview` 可以保留，用于卡片摘要。
+`contentPreview` 由后端根据 `content` 生成，用于卡片摘要；前端不再维护第二份生命整理样例。
 
 #### 10. 搜索与 View Model
 
@@ -635,13 +638,13 @@ legacy.warnings.legalBoundary
 #### 12. 实施顺序
 
 1. 生成本设计文档与开发文档。
-2. 扩展前端 `LegacyItem` 类型和 mock 数据。
+2. 扩展前端 `LegacyItem` 类型和后端 seed 数据。
 3. 把 `legacy-page.tsx` 拆成 5 个 Tab 文件，保持现有展示能力不丢。
 4. 新增条目库详情和编辑弹窗。
 5. 新增交付地图分组工具和页面。
 6. 新增关系表达页面。
 7. 新增边界与信任页面。
-8. 接入前端 API 方法，mock 先闭环。
+8. 接入前端 API 方法，前端 mock 仅保留空 fallback 和接口形状。
 9. 新增 Rust `legacy` 模块、SQLite 表和 Tauri commands。
 10. live API 接入 Tauri commands。
 11. 静态通读同模块文件，修掉命名、字段和类似遗漏问题。
@@ -654,7 +657,7 @@ legacy.warnings.legalBoundary
 - 开发文档存在，并明确前端拆分、模型、API、后端表和实施顺序。
 - 旧“告别与托付分类建议”不再作为唯一设计文档。
 - 前端页面可以按总览、条目库、交付地图、关系表达、边界与信任拆分。
-- 条目新增 / 编辑 / 删除有明确 API 和后端计划。
+- 条目新增 / 编辑 / 删除有明确 API、Tauri commands 和 SQLite repository。
 - `status=最终版`、`emotionalLoad=很重`、`visibility=我离世后 / 条件触发` 的保护规则清楚。
 - 不运行测试、不启动本地，只做代码和文档静态检查。
 

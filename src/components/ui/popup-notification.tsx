@@ -244,6 +244,7 @@ type PopupHeaderProps = {
   icon?: LucideIcon
   eyebrow?: string
   title: string
+  closeLabel?: string
   onClose?: () => void
   className?: string
 }
@@ -252,6 +253,7 @@ export function PopupNotificationHeader({
   icon: Icon,
   eyebrow,
   title,
+  closeLabel = "Close",
   onClose,
   className,
 }: PopupHeaderProps) {
@@ -283,7 +285,7 @@ export function PopupNotificationHeader({
           size="icon-sm"
           className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
           onClick={onClose}
-          aria-label="关闭通知"
+          aria-label={closeLabel}
         >
           <X className="size-4" />
         </Button>

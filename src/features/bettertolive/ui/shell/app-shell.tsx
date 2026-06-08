@@ -388,25 +388,34 @@ export function BetterToLiveAppShell() {
       case "reflection":
         return (
           <ReflectionPage
+            editableReflectionModule={workspaceQuery.workspaceSnapshot.reflection}
             draftExample={viewModel.reflectionDraftExample}
             reflections={viewModel.reflections}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
       case "events":
         return (
           <EventsPage
+            editableEventsModule={workspaceQuery.workspaceSnapshot.events}
             events={viewModel.events}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
       case "finance":
         return (
           <FinancePage
-            transactions={viewModel.transactions}
+            financeModule={{
+              ...workspaceQuery.workspaceSnapshot.finance,
+              entries: viewModel.transactions,
+            }}
+            editableFinanceModule={workspaceQuery.workspaceSnapshot.finance}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -425,6 +434,7 @@ export function BetterToLiveAppShell() {
         return (
           <NutritionPage
             nutrition={viewModel.nutritionModule}
+            editableNutrition={workspaceQuery.workspaceSnapshot.nutrition}
             searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
@@ -434,7 +444,9 @@ export function BetterToLiveAppShell() {
         return (
           <EmotionPage
             emotionModule={viewModel.emotionModule}
+            editableEmotionModule={workspaceQuery.workspaceSnapshot.emotion}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -443,30 +455,41 @@ export function BetterToLiveAppShell() {
           <BeliefsPage
             beliefsModule={viewModel.beliefsModule}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "principles":
         return (
           <PrinciplesPage
             principlesModule={viewModel.principlesModule}
+            editablePrinciplesModule={workspaceQuery.workspaceSnapshot.principles}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "relationships":
         return (
           <RelationshipsPage
             relationshipsModule={viewModel.relationshipsModule}
+            editableRelationshipsModule={workspaceQuery.workspaceSnapshot.relationships}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
+            isControlMode={isShoppingManagementMode}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "journey":
         return (
           <JourneyPage
             journey={viewModel.journeyData}
+            editableGrowth={workspaceQuery.workspaceSnapshot.growth}
+            editableMemory={workspaceQuery.workspaceSnapshot.memory}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -476,13 +499,17 @@ export function BetterToLiveAppShell() {
             legacy={viewModel.legacyModule}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
+            isControlMode={isShoppingManagementMode}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "socioeconomics":
         return (
           <SocioeconomicsPage
             socioeconomicsModule={viewModel.socioeconomicsModule}
+            sourceSocioeconomicsModule={workspaceQuery.workspaceSnapshot.socioeconomics}
             searchQuery={searchQuery}
+            isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -493,6 +520,8 @@ export function BetterToLiveAppShell() {
             milestones={viewModel.milestones}
             searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
+            isControlMode={isShoppingManagementMode}
+            onRefresh={() => workspaceQuery.refetch()}
           />
         )
       case "overview":

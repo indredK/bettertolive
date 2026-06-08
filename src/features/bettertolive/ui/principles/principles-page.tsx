@@ -1,18 +1,29 @@
-import { Activity, CheckCheck, Scale, Shield, Waypoints } from "lucide-react"
+import { useMemo, useState } from "react"
+import { useTranslation } from "react-i18next"
+import { Activity, CheckCheck, Pencil, Plus, Scale, Shield, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
-  PrincipleCost,
-  PrincipleDomain,
   PrincipleEntry,
   PrincipleRelation,
-  PrincipleSource,
-  PrincipleStatus,
-  PrincipleStrength,
-  PrincipleType,
   PrinciplesModuleData,
 } from "@/features/bettertolive/types"
+import {
+  PrincipleEditDialog,
+  type EditingPrinciple,
+} from "@/features/bettertolive/ui/principles/principle-edit-dialog"
+import {
+  PRINCIPLE_COSTS,
+  PRINCIPLE_DOMAINS,
+  PRINCIPLE_SOURCES,
+  PRINCIPLE_STATUSES,
+  PRINCIPLE_STRENGTHS,
+  PRINCIPLE_TYPES,
+  type PrincipleEnumGroup,
+  translatePrincipleEnum,
+} from "@/features/bettertolive/ui/principles/principles-page-data"
 import {
   EmptyState,
   PageIntro,
@@ -21,33 +32,16 @@ import {
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
-const PRINCIPLE_DOMAINS = [
-  "关系",
-  "工作",
-  "金钱",
-  "健康",
-  "时间",
-  "诚信",
-] satisfies PrincipleDomain[]
-
-const PRINCIPLE_TYPES = ["边界", "标准", "底线"] satisfies PrincipleType[]
-
-const PRINCIPLE_STRENGTHS = ["不可退让", "强烈偏好", "参考指引"] satisfies PrincipleStrength[]
-
-const PRINCIPLE_SOURCES = [
-  "受伤后确立",
-  "观察他人",
-  "主动推导",
-  "家庭继承",
-] satisfies PrincipleSource[]
-
-const PRINCIPLE_STATUSES = ["生效中", "正在测试", "已修订", "已放弃"] satisfies PrincipleStatus[]
-
-const PRINCIPLE_COSTS = ["高代价", "中等代价", "低代价", "零代价"] satisfies PrincipleCost[]
-
 type DistributionRow = {
   label: string
   count: number
+}
+
+type ClassificationSection = {
+  title: string
+  description: string
+  enumGroup: PrincipleEnumGroup
+  rows: DistributionRow[]
 }
 
 function createDistribution<T extends string>(
@@ -73,45 +67,73 @@ function createPrincipleLookup(principles: PrincipleEntry[]) {
 }
 
 export function PrinciplesPage({
+  editablePrinciplesModule,
   principlesModule,
   searchQuery,
+  isControlMode = false,
   isStackedLayout = false,
+  onRefresh,
 }: {
+  editablePrinciplesModule?: PrinciplesModuleData
   principlesModule: PrinciplesModuleData
   searchQuery: string
+  isControlMode?: boolean
   isStackedLayout?: boolean
+  onRefresh?: () => void
 }) {
+  const { t } = useTranslation()
   const isFixedLayout = !isStackedLayout
+  const [editingPrinciple, setEditingPrinciple] = useState<EditingPrinciple | null>(null)
   const principles = principlesModule.entries
-  const principleById = createPrincipleLookup(principles)
-  const classificationSections = [
-    {
-      title: "领域",
-      description: "它最主要保护哪个生活面。",
-      rows: createDistribution(PRINCIPLE_DOMAINS, principles, (principle) => principle.domain),
-    },
-    {
-      title: "类型",
-      description: "它是底线、边界，还是标准。",
-      rows: createDistribution(PRINCIPLE_TYPES, principles, (principle) => principle.type),
-    },
-    {
-      title: "强度",
-      description: "它有多不可退让。",
-      rows: createDistribution(PRINCIPLE_STRENGTHS, principles, (principle) => principle.strength),
-    },
-    {
-      title: "来源",
-      description: "它从哪里长出来。",
-      rows: createDistribution(PRINCIPLE_SOURCES, principles, (principle) => principle.source),
-    },
-    {
-      title: "状态",
-      description: "它现在是否仍在生效。",
-      rows: createDistribution(PRINCIPLE_STATUSES, principles, (principle) => principle.status),
-    },
-  ]
-  const costRows = createDistribution(PRINCIPLE_COSTS, principles, (principle) => principle.cost)
+  const principleById = useMemo(() => createPrincipleLookup(principles), [principles])
+  const saveSourcePrinciplesModule = editablePrinciplesModule ?? principlesModule
+  const classificationSections = useMemo<ClassificationSection[]>(
+    () => [
+      {
+        title: t("principles.classification.domain.title", "领域"),
+        description: t("principles.classification.domain.description", "它最主要保护哪个生活面。"),
+        enumGroup: "domain",
+        rows: createDistribution(PRINCIPLE_DOMAINS, principles, (principle) => principle.domain),
+      },
+      {
+        title: t("principles.classification.type.title", "类型"),
+        description: t("principles.classification.type.description", "它是底线、边界，还是标准。"),
+        enumGroup: "type",
+        rows: createDistribution(PRINCIPLE_TYPES, principles, (principle) => principle.type),
+      },
+      {
+        title: t("principles.classification.strength.title", "强度"),
+        description: t("principles.classification.strength.description", "它有多不可退让。"),
+        enumGroup: "strength",
+        rows: createDistribution(
+          PRINCIPLE_STRENGTHS,
+          principles,
+          (principle) => principle.strength,
+        ),
+      },
+      {
+        title: t("principles.classification.source.title", "来源"),
+        description: t("principles.classification.source.description", "它从哪里长出来。"),
+        enumGroup: "source",
+        rows: createDistribution(PRINCIPLE_SOURCES, principles, (principle) => principle.source),
+      },
+      {
+        title: t("principles.classification.status.title", "状态"),
+        description: t("principles.classification.status.description", "它现在是否仍在生效。"),
+        enumGroup: "status",
+        rows: createDistribution(PRINCIPLE_STATUSES, principles, (principle) => principle.status),
+      },
+    ],
+    [principles, t],
+  )
+  const costRows = useMemo(
+    () => createDistribution(PRINCIPLE_COSTS, principles, (principle) => principle.cost),
+    [principles],
+  )
+  const handleSaved = () => {
+    setEditingPrinciple(null)
+    onRefresh?.()
+  }
 
   return (
     <div
@@ -121,16 +143,28 @@ export function PrinciplesPage({
       )}
     >
       <PageIntro
-        eyebrow="原则"
-        title="把原则、边界和底线整理成决策体系"
-        description="这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。"
+        eyebrow={t("principles.page.eyebrow", "原则")}
+        title={t("principles.page.title", "把原则、边界和底线整理成决策体系")}
+        description={t(
+          "principles.page.description",
+          "这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。",
+        )}
         searchQuery={searchQuery}
+      />
+
+      <PrinciplesControlStrip
+        isControlMode={isControlMode}
+        principlesCount={principles.length}
+        relationsCount={principlesModule.relations.length}
+        onCreate={() => setEditingPrinciple({ isNew: true, principle: null })}
       />
 
       {isFixedLayout ? (
         <PrinciplesFixedDashboard
           classificationSections={classificationSections}
           costRows={costRows}
+          isControlMode={isControlMode}
+          onEditPrinciple={(principle) => setEditingPrinciple({ isNew: false, principle })}
           principleById={principleById}
           principles={principles}
           principlesModule={principlesModule}
@@ -140,14 +174,18 @@ export function PrinciplesPage({
           <Surface className="p-5">
             <SectionHeading
               icon={Waypoints}
-              title="5 维原则分类"
-              description="这些维度负责分组和观察决策体系；cost 留在详情和校准区里。"
+              title={t("principles.sections.classification.title", "5 维原则分类")}
+              description={t(
+                "principles.sections.classification.description",
+                "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。",
+              )}
             />
 
             <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
               {classificationSections.map((section) => (
                 <ClassificationPanel
                   key={section.title}
+                  enumGroup={section.enumGroup}
                   title={section.title}
                   description={section.description}
                   rows={section.rows}
@@ -157,9 +195,14 @@ export function PrinciplesPage({
             </div>
 
             <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-              <div className="text-sm font-medium text-[color:var(--text-primary)]">cost 标注</div>
+              <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                {t("principles.cost.title", "cost 标注")}
+              </div>
               <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。
+                {t(
+                  "principles.cost.description",
+                  "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
+                )}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {costRows
@@ -170,7 +213,7 @@ export function PrinciplesPage({
                       variant="outline"
                       className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
                     >
-                      {row.label} · {row.count}
+                      {translatePrincipleEnum(t, "cost", row.label)} · {row.count}
                     </Badge>
                   ))}
               </div>
@@ -181,17 +224,28 @@ export function PrinciplesPage({
             <Surface className="p-5">
               <SectionHeading
                 icon={Scale}
-                title="原则清单"
-                description="详情里始终显示 cost，让每条原则的真实代价浮上来。"
+                title={t("principles.sections.entries.title", "原则清单")}
+                description={t(
+                  "principles.sections.entries.description",
+                  "详情里始终显示 cost，让每条原则的真实代价浮上来。",
+                )}
               />
 
               <div className="mt-5 space-y-4">
                 {principles.length > 0 ? (
                   principles.map((principle) => (
-                    <PrincipleCard key={principle.id} principle={principle} />
+                    <PrincipleCard
+                      key={principle.id}
+                      isControlMode={isControlMode}
+                      principle={principle}
+                      onEdit={() => setEditingPrinciple({ isNew: false, principle })}
+                    />
                   ))
                 ) : (
-                  <EmptyState message="当前筛选下还没有可展示的原则条目。" compact />
+                  <EmptyState
+                    message={t("principles.empty.entries", "当前筛选下还没有可展示的原则条目。")}
+                    compact
+                  />
                 )}
               </div>
             </Surface>
@@ -200,8 +254,11 @@ export function PrinciplesPage({
               <Surface className="p-5">
                 <SectionHeading
                   icon={Shield}
-                  title="不想再退让的地方"
-                  description="底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。"
+                  title={t("principles.sections.boundaries.title", "不想再退让的地方")}
+                  description={t(
+                    "principles.sections.boundaries.description",
+                    "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。",
+                  )}
                 />
 
                 <div className="mt-5 space-y-3">
@@ -210,7 +267,10 @@ export function PrinciplesPage({
                       <BoundaryCard key={boundary} boundary={boundary} />
                     ))
                   ) : (
-                    <EmptyState message="当前筛选下没有可展示的底线。" compact />
+                    <EmptyState
+                      message={t("principles.empty.boundaries", "当前筛选下没有可展示的底线。")}
+                      compact
+                    />
                   )}
                 </div>
               </Surface>
@@ -218,8 +278,11 @@ export function PrinciplesPage({
               <Surface className="p-5">
                 <SectionHeading
                   icon={Activity}
-                  title="决策校准"
-                  description="面对具体选择时，先调出相关原则，再看强度和代价。"
+                  title={t("principles.sections.prompts.title", "决策校准")}
+                  description={t(
+                    "principles.sections.prompts.description",
+                    "面对具体选择时，先调出相关原则，再看强度和代价。",
+                  )}
                 />
 
                 <div className="mt-5 space-y-3">
@@ -228,7 +291,10 @@ export function PrinciplesPage({
                       <DecisionPromptCard key={prompt} prompt={prompt} />
                     ))
                   ) : (
-                    <EmptyState message="当前筛选下没有决策校准问题。" compact />
+                    <EmptyState
+                      message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+                      compact
+                    />
                   )}
                 </div>
               </Surface>
@@ -238,8 +304,11 @@ export function PrinciplesPage({
           <Surface className="p-5">
             <SectionHeading
               icon={Waypoints}
-              title="支撑与冲突"
-              description="原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。"
+              title={t("principles.sections.relations.title", "支撑与冲突")}
+              description={t(
+                "principles.sections.relations.description",
+                "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
+              )}
             />
 
             <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
@@ -252,12 +321,25 @@ export function PrinciplesPage({
                   />
                 ))
               ) : (
-                <EmptyState message="当前筛选下没有原则关系。" compact />
+                <EmptyState
+                  message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
+                  compact
+                />
               )}
             </div>
           </Surface>
         </div>
       )}
+
+      {editingPrinciple ? (
+        <PrincipleEditDialog
+          key={editingPrinciple.principle?.id ?? "new-principle"}
+          editing={editingPrinciple}
+          principlesModule={saveSourcePrinciplesModule}
+          onClose={() => setEditingPrinciple(null)}
+          onSaved={handleSaved}
+        />
+      ) : null}
     </div>
   )
 }
@@ -265,20 +347,21 @@ export function PrinciplesPage({
 function PrinciplesFixedDashboard({
   classificationSections,
   costRows,
+  isControlMode,
+  onEditPrinciple,
   principleById,
   principles,
   principlesModule,
 }: {
-  classificationSections: Array<{
-    title: string
-    description: string
-    rows: DistributionRow[]
-  }>
+  classificationSections: ClassificationSection[]
   costRows: DistributionRow[]
+  isControlMode: boolean
+  onEditPrinciple: (principle: PrincipleEntry) => void
   principleById: Map<string, PrincipleEntry>
   principles: PrincipleEntry[]
   principlesModule: PrinciplesModuleData
 }) {
+  const { t } = useTranslation()
   const featuredHighPriorityPrinciples = [...principles]
     .sort((first, second) => {
       const firstScore = (first.strength === "不可退让" ? 2 : 0) + (first.cost === "高代价" ? 1 : 0)
@@ -300,6 +383,7 @@ function PrinciplesFixedDashboard({
             {classificationSections.map((section) => (
               <ClassificationPanel
                 key={section.title}
+                enumGroup={section.enumGroup}
                 title={section.title}
                 description={section.description}
                 rows={section.rows}
@@ -309,9 +393,14 @@ function PrinciplesFixedDashboard({
           </div>
 
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-            <div className="text-sm font-medium text-[color:var(--text-primary)]">cost 标注</div>
+            <div className="text-sm font-medium text-[color:var(--text-primary)]">
+              {t("principles.cost.title", "cost 标注")}
+            </div>
             <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。
+              {t(
+                "principles.cost.description",
+                "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
+              )}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {costRows
@@ -322,7 +411,7 @@ function PrinciplesFixedDashboard({
                     variant="outline"
                     className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
                   >
-                    {row.label} · {row.count}
+                    {translatePrincipleEnum(t, "cost", row.label)} · {row.count}
                   </Badge>
                 ))}
             </div>
@@ -337,7 +426,10 @@ function PrinciplesFixedDashboard({
               <BoundaryCard key={boundary} boundary={boundary} compact />
             ))
           ) : (
-            <EmptyState message="当前筛选下没有可展示的底线。" compact />
+            <EmptyState
+              message={t("principles.empty.boundaries", "当前筛选下没有可展示的底线。")}
+              compact
+            />
           )}
         </div>
       </Surface>
@@ -345,19 +437,30 @@ function PrinciplesFixedDashboard({
       <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
         <Tabs defaultValue="entries" className="min-h-0 flex-1">
           <TabsList className="w-full justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
-            <TabsTrigger value="entries">原则清单</TabsTrigger>
-            <TabsTrigger value="prompts">决策校准</TabsTrigger>
-            <TabsTrigger value="relations">支撑冲突</TabsTrigger>
+            <TabsTrigger value="entries">{t("principles.tabs.entries", "原则清单")}</TabsTrigger>
+            <TabsTrigger value="prompts">{t("principles.tabs.prompts", "决策校准")}</TabsTrigger>
+            <TabsTrigger value="relations">
+              {t("principles.tabs.relations", "支撑冲突")}
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
             <div className="space-y-3">
               {principles.length > 0 ? (
                 principles.map((principle) => (
-                  <PrincipleCard key={principle.id} principle={principle} compact />
+                  <PrincipleCard
+                    key={principle.id}
+                    compact
+                    isControlMode={isControlMode}
+                    principle={principle}
+                    onEdit={() => onEditPrinciple(principle)}
+                  />
                 ))
               ) : (
-                <EmptyState message="当前筛选下还没有可展示的原则条目。" compact />
+                <EmptyState
+                  message={t("principles.empty.entries", "当前筛选下还没有可展示的原则条目。")}
+                  compact
+                />
               )}
             </div>
           </TabsContent>
@@ -369,7 +472,10 @@ function PrinciplesFixedDashboard({
                   <DecisionPromptCard key={prompt} prompt={prompt} compact />
                 ))
               ) : (
-                <EmptyState message="当前筛选下没有决策校准问题。" compact />
+                <EmptyState
+                  message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+                  compact
+                />
               )}
             </div>
           </TabsContent>
@@ -386,7 +492,10 @@ function PrinciplesFixedDashboard({
                   />
                 ))
               ) : (
-                <EmptyState message="当前筛选下没有原则关系。" compact />
+                <EmptyState
+                  message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
+                  compact
+                />
               )}
             </div>
           </TabsContent>
@@ -401,7 +510,10 @@ function PrinciplesFixedDashboard({
                 <PrincipleSignalCard key={principle.id} principle={principle} />
               ))
             ) : (
-              <EmptyState message="当前筛选下没有高优先级原则。" compact />
+              <EmptyState
+                message={t("principles.empty.priority", "当前筛选下没有高优先级原则。")}
+                compact
+              />
             )}
           </div>
 
@@ -413,7 +525,10 @@ function PrinciplesFixedDashboard({
                   <PrincipleSignalCard key={principle.id} principle={principle} subtle />
                 ))
             ) : (
-              <EmptyState message="当前筛选下没有正在变化的原则。" compact />
+              <EmptyState
+                message={t("principles.empty.evolving", "当前筛选下没有正在变化的原则。")}
+                compact
+              />
             )}
           </div>
         </div>
@@ -423,16 +538,19 @@ function PrinciplesFixedDashboard({
 }
 
 function ClassificationPanel({
+  enumGroup,
   title,
   description,
   rows,
   total,
 }: {
+  enumGroup: PrincipleEnumGroup
   title: string
   description: string
   rows: DistributionRow[]
   total: number
 }) {
+  const { t } = useTranslation()
   const visibleRows = rows.filter((row) => row.count > 0)
 
   return (
@@ -450,7 +568,7 @@ function ClassificationPanel({
               <div key={row.label} className="space-y-1.5">
                 <div className="flex items-center justify-between gap-3 text-xs">
                   <span className="min-w-0 truncate text-[color:var(--text-secondary)]">
-                    {row.label}
+                    {translatePrincipleEnum(t, enumGroup, row.label)}
                   </span>
                   <span className="shrink-0 text-[color:var(--text-muted)]">{row.count}</span>
                 </div>
@@ -464,20 +582,74 @@ function ClassificationPanel({
             )
           })
         ) : (
-          <div className="text-xs leading-5 text-[color:var(--text-muted)]">暂无分布数据。</div>
+          <div className="text-xs leading-5 text-[color:var(--text-muted)]">
+            {t("principles.empty.distribution", "暂无分布数据。")}
+          </div>
         )}
       </div>
     </div>
   )
 }
 
+function PrinciplesControlStrip({
+  isControlMode,
+  onCreate,
+  principlesCount,
+  relationsCount,
+}: {
+  isControlMode: boolean
+  onCreate: () => void
+  principlesCount: number
+  relationsCount: number
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <Badge
+          variant="outline"
+          className={cn(
+            "border-[color:var(--chip-border)]",
+            isControlMode
+              ? "bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
+              : "bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]",
+          )}
+        >
+          {isControlMode
+            ? t("principles.controlMode.on", "控制模式")
+            : t("principles.controlMode.off", "浏览模式")}
+        </Badge>
+        <span className="text-xs text-[color:var(--text-muted)]">
+          {t("principles.controlMode.summary", {
+            defaultValue: "{{count}} 条原则 · {{relations}} 个关系",
+            count: principlesCount,
+            relations: relationsCount,
+          })}
+        </span>
+      </div>
+      {isControlMode ? (
+        <Button type="button" size="sm" onClick={onCreate}>
+          <Plus className="size-4" />
+          {t("principles.controlMode.add", "新增原则")}
+        </Button>
+      ) : null}
+    </div>
+  )
+}
+
 function PrincipleCard({
+  isControlMode = false,
+  onEdit,
   principle,
   compact = false,
 }: {
+  isControlMode?: boolean
+  onEdit?: () => void
   principle: PrincipleEntry
   compact?: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <article
       className={cn(
@@ -487,26 +659,31 @@ function PrincipleCard({
     >
       <div className="flex flex-wrap items-center gap-2">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
-          {principle.domain}
+          {translatePrincipleEnum(t, "domain", principle.domain)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
         >
-          {principle.type}
+          {translatePrincipleEnum(t, "type", principle.type)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
         >
-          {principle.strength}
+          {translatePrincipleEnum(t, "strength", principle.strength)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
         >
-          {principle.status}
+          {translatePrincipleEnum(t, "status", principle.status)}
         </Badge>
+        {isControlMode && onEdit ? (
+          <Button type="button" size="icon-sm" variant="ghost" className="ml-auto" onClick={onEdit}>
+            <Pencil className="size-3.5" />
+          </Button>
+        ) : null}
       </div>
 
       <h3
@@ -535,14 +712,29 @@ function PrincipleCard({
       </p>
 
       <div className="mt-4 grid gap-2 min-[640px]:grid-cols-2">
-        <PrincipleMeta label="来源" value={principle.source} />
-        <PrincipleMeta label="cost" value={principle.cost} accent />
-        <PrincipleMeta label="保护对象" value={principle.protectedValue} />
-        <PrincipleMeta label="触发校准" value={principle.decisionCue} />
+        <PrincipleMeta
+          label={t("principles.meta.source", "来源")}
+          value={translatePrincipleEnum(t, "source", principle.source)}
+        />
+        <PrincipleMeta
+          label={t("principles.meta.cost", "cost")}
+          value={translatePrincipleEnum(t, "cost", principle.cost)}
+          accent
+        />
+        <PrincipleMeta
+          label={t("principles.meta.protectedValue", "保护对象")}
+          value={principle.protectedValue}
+        />
+        <PrincipleMeta
+          label={t("principles.meta.decisionCue", "触发校准")}
+          value={principle.decisionCue}
+        />
       </div>
 
       <div className="mt-3 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-3 text-sm leading-6 text-[color:var(--text-secondary)]">
-        <span className="font-medium text-[color:var(--text-primary)]">边界：</span>
+        <span className="font-medium text-[color:var(--text-primary)]">
+          {t("principles.meta.boundary", "边界")}：
+        </span>
         {principle.boundary}
       </div>
 
@@ -608,6 +800,7 @@ function RelationCard({
   principleById: Map<string, PrincipleEntry>
   compact?: boolean
 }) {
+  const { t } = useTranslation()
   const fromPrinciple = principleById.get(relation.fromId)
   const toPrinciple = principleById.get(relation.toId)
 
@@ -626,7 +819,7 @@ function RelationCard({
               : "bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]",
           )}
         >
-          {relation.type}
+          {translatePrincipleEnum(t, "relation", relation.type)}
         </Badge>
         <span className={cn("text-sm text-[color:var(--text-muted)]", compact && "text-xs")}>
           {fromPrinciple?.title ?? relation.fromId} → {toPrinciple?.title ?? relation.toId}
@@ -685,6 +878,7 @@ function PrincipleSignalCard({
   principle: PrincipleEntry
   subtle?: boolean
 }) {
+  const { t } = useTranslation()
   return (
     <div
       className={cn(
@@ -696,19 +890,19 @@ function PrincipleSignalCard({
     >
       <div className="flex flex-wrap items-center gap-1.5">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
-          {principle.domain}
+          {translatePrincipleEnum(t, "domain", principle.domain)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
         >
-          {principle.strength}
+          {translatePrincipleEnum(t, "strength", principle.strength)}
         </Badge>
         <Badge
           variant="outline"
           className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
         >
-          {principle.cost}
+          {translatePrincipleEnum(t, "cost", principle.cost)}
         </Badge>
       </div>
       <div className="mt-2 text-sm font-medium text-[color:var(--text-primary)]">

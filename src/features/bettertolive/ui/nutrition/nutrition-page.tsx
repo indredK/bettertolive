@@ -27,11 +27,13 @@ const EMPTY_WEEKLY_REVIEW: NutritionModuleData["weeklyReview"] = {
 }
 
 export function NutritionPage({
+  editableNutrition,
   nutrition,
   searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
+  editableNutrition?: NutritionModuleData
   nutrition: NutritionModuleData
   searchQuery: string
   isControlMode?: boolean
@@ -40,6 +42,7 @@ export function NutritionPage({
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("overview")
   const normalizedNutrition = normalizeNutritionData(nutrition)
+  const normalizedEditableNutrition = normalizeNutritionData(editableNutrition ?? nutrition)
   const controlModeKey = isControlMode ? "control" : "browse"
   const tabContentClassName = cn(
     "min-h-0",
@@ -81,6 +84,7 @@ export function NutritionPage({
           <NutritionOverviewTab
             key={`overview-${controlModeKey}`}
             nutrition={normalizedNutrition}
+            editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
           />
         </TabsContent>
@@ -89,6 +93,7 @@ export function NutritionPage({
           <NutritionDailyPlanTab
             key={`daily-plan-${controlModeKey}`}
             nutrition={normalizedNutrition}
+            editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
           />
         </TabsContent>
@@ -97,6 +102,7 @@ export function NutritionPage({
           <NutritionRecipesTab
             key={`recipes-${controlModeKey}`}
             nutrition={normalizedNutrition}
+            editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
           />
         </TabsContent>
@@ -105,6 +111,7 @@ export function NutritionPage({
           <NutritionFoodsTab
             key={`foods-${controlModeKey}`}
             nutrition={normalizedNutrition}
+            editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
           />
         </TabsContent>
@@ -117,6 +124,7 @@ export function NutritionPage({
           <NutritionLogsTab
             key={`logs-${controlModeKey}`}
             nutrition={normalizedNutrition}
+            editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
           />
         </TabsContent>

@@ -669,6 +669,432 @@
       "shuttleDescription": "将属于此阶段的物品移至右侧，保存后生效"
     }
   },
+  "beliefs": {
+    "page": {
+      "eyebrow": "观念",
+      "title": "观念图谱",
+      "description": "按 4 维分类、查看 impact 分布，并把心理学视角作为可选解读层。"
+    },
+    "classification": {
+      "title": "4 维观念分类",
+      "description": "按 4 维分组、过滤、看认知地图；impact 跟着每条走，不进主筛选器。",
+      "domain": {
+        "title": "领域",
+        "description": "它主要作用于哪个生活面。"
+      },
+      "layer": {
+        "title": "层次",
+        "description": "它在认知的哪一层。"
+      },
+      "stability": {
+        "title": "稳定性",
+        "description": "它现在是否还在变化。"
+      },
+      "source": {
+        "title": "来源",
+        "description": "它从哪里长出来。"
+      }
+    },
+    "filter": {
+      "title": "四维筛选",
+      "all": "全部",
+      "count": "{{count}} 条"
+    },
+    "impact": {
+      "title": "影响方向 (impact)",
+      "description": "影响方向不是第 5 维分类，而是每条观念的内禀属性。"
+    },
+    "tabs": {
+      "entries": "观念清单",
+      "cards": "三层骨架",
+      "relations": "相互关系"
+    },
+    "entries": {
+      "title": "观念清单",
+      "description": "详情里始终显示 impact 与心理学解读。"
+    },
+    "questions": {
+      "title": "反复出现的问题",
+      "description": "把会反复追问自己的问题先收进来。"
+    },
+    "relations": {
+      "title": "相互关系",
+      "description": "观念之间会相似、对立或派生。"
+    },
+    "cards": {
+      "title": "三层骨架",
+      "description": "世界观、人生观和价值观的摘要骨架。"
+    },
+    "signals": {
+      "conflict": "正在张力中",
+      "changing": "正在变化"
+    },
+    "attachment": {
+      "title": "依恋观察"
+    },
+    "psych": {
+      "title": "心理学解读 (可选)"
+    },
+    "field": {
+      "title": "标题",
+      "statement": "观念表述",
+      "description": "说明",
+      "source": "来源",
+      "impact": "影响方向",
+      "secondaryDomains": "次要领域",
+      "cbtLayer": "CBT 层次",
+      "cognitiveDistortions": "认知扭曲",
+      "defenseMechanism": "防御机制",
+      "attachmentNote": "依恋观察",
+      "tags": "标签"
+    },
+    "form": {
+      "basic": "基本内容",
+      "classification": "分类与解读",
+      "optional": "可选",
+      "tagsPlaceholder": "用逗号分隔"
+    },
+    "actions": {
+      "create": "新增观念",
+      "edit": "编辑",
+      "editEntry": "编辑观念",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "toast": {
+      "saved": "已保存",
+      "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deleteSuccess": "已删除观念：{{name}}",
+      "deleteFailed": "删除观念失败",
+      "deleteUndone": "已撤销删除：{{name}}"
+    },
+    "confirm": {
+      "deleteEntry": "确定删除 {{name}} 吗？"
+    },
+    "undo": "撤销",
+    "error": {
+      "required": "请填写标题和观念表述"
+    },
+    "revision": {
+      "autoSummary": "管理模式更新了这条观念。"
+    },
+    "empty": {
+      "questions": "当前筛选下没有可展示的问题。",
+      "entries": "当前筛选下没有可展示的观念条目。",
+      "relations": "当前筛选下没有观念关系。",
+      "cards": "当前筛选下没有三层骨架。",
+      "conflicts": "当前筛选下没有冲突中的观念。",
+      "changing": "当前筛选下没有正在变化的观念。",
+      "distribution": "暂无分布数据。"
+    },
+    "enums": {
+      "domain": {
+        "关系": "关系",
+        "工作": "工作",
+        "金钱": "金钱",
+        "自我": "自我",
+        "社会": "社会",
+        "时间": "时间",
+        "意义": "意义"
+      },
+      "layer": {
+        "世界观": "世界观",
+        "人生观": "人生观",
+        "价值观": "价值观"
+      },
+      "stability": {
+        "稳定": "稳定",
+        "正在松动": "正在松动",
+        "正在形成": "正在形成",
+        "已放弃": "已放弃"
+      },
+      "source": {
+        "亲身经历": "亲身经历",
+        "家庭继承": "家庭继承",
+        "社会环境": "社会环境",
+        "主动反思": "主动反思",
+        "创伤反应": "创伤反应"
+      },
+      "impact": {
+        "支撑性": "支撑性",
+        "限制性": "限制性",
+        "中性": "中性",
+        "冲突中": "冲突中"
+      },
+      "cbtLayer": {
+        "自动思维": "自动思维",
+        "中间信念": "中间信念",
+        "核心信念": "核心信念"
+      },
+      "cognitiveDistortion": {
+        "全有或全无": "全有或全无",
+        "过度概括": "过度概括",
+        "灾难化": "灾难化",
+        "读心术": "读心术",
+        "应该陈述": "应该陈述",
+        "个人化": "个人化",
+        "情绪推理": "情绪推理",
+        "贴标签": "贴标签"
+      },
+      "defenseMechanism": {
+        "否认": "否认",
+        "投射": "投射",
+        "合理化": "合理化",
+        "理智化": "理智化",
+        "反向形成": "反向形成",
+        "升华": "升华"
+      },
+      "relationType": {
+        "相似": "相似",
+        "冲突": "冲突",
+        "派生": "派生"
+      },
+      "revisionField": {
+        "内容": "内容",
+        "稳定性": "稳定性",
+        "影响": "影响"
+      }
+    }
+  },
+  "relationships": {
+    "page": {
+      "eyebrow": "关系深化",
+      "title": "关系状态与未完成表达",
+      "description": "用 5 个分类维度看关系世界，用未完成重量承接那些还没说出口的话。",
+      "currentFilter": "当前筛选：{{query}}",
+      "relationshipCount": "关系",
+      "noteCount": "表达"
+    },
+    "tabs": {
+      "overview": "总览",
+      "directory": "关系档案",
+      "unsent": "想说的话",
+      "patterns": "跨关系模式"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "actions": {
+      "addRelationship": "新增关系",
+      "addNote": "新增表达"
+    },
+    "common": {
+      "add": "添加",
+      "cancel": "取消",
+      "delete": "删除",
+      "edit": "编辑",
+      "save": "保存",
+      "saving": "保存中",
+      "undo": "撤销"
+    },
+    "overview": {
+      "classificationHeading": "5 维关系分类",
+      "classificationDescription": "这些维度负责分组和观察关系世界；未完成重量留在详情和想说的话里。",
+      "typeTitle": "类型",
+      "typeDescription": "这个人的纽带本质是什么。",
+      "depthTitle": "深度",
+      "depthDescription": "我在这段关系里有多敞开。",
+      "stageTitle": "阶段",
+      "stageDescription": "这段关系现在在往哪里走。",
+      "impactTitle": "影响",
+      "impactDescription": "它滋养、消耗，还是混合。",
+      "interactionTitle": "互动频率",
+      "interactionDescription": "多久会联系一次。",
+      "unfinishedHeading": "未完成重量",
+      "unfinishedDescription": "未完成重量是单段关系的评估属性，用来判断还有多少没说完的话，不进入主筛选器。",
+      "nourishing": "滋养",
+      "nourishingDetail": "让人恢复或更有力量的关系",
+      "draining": "消耗",
+      "drainingDetail": "需要边界或重新判断的关系",
+      "repairing": "紧张 / 修复",
+      "repairingDetail": "当前最适合被温和检查的关系",
+      "heavy": "很重",
+      "heavyDetail": "优先写下或处理的未完成表达"
+    },
+    "directory": {
+      "title": "关系档案"
+    },
+    "filter": {
+      "all": "全部",
+      "clear": "清空筛选",
+      "type": "类型",
+      "depth": "深度",
+      "stage": "阶段",
+      "impact": "影响",
+      "interaction": "互动频率"
+    },
+    "unsent": {
+      "title": "想说的话",
+      "relatedRelationship": "关联关系：{{name}}"
+    },
+    "patterns": {
+      "title": "跨关系模式",
+      "kicker": "关系模式"
+    },
+    "labels": {
+      "depth": "深度",
+      "stage": "阶段",
+      "interaction": "互动频率",
+      "impact": "影响",
+      "currentState": "当前",
+      "boundary": "边界",
+      "unspoken": "没说出口",
+      "positiveImpact": "正面影响",
+      "ongoingShadow": "持续阴影",
+      "events": "关键互动事件",
+      "history": "变化历史",
+      "relatedNotes": "相关想说的话"
+    },
+    "empty": {
+      "distribution": "暂无分布数据。",
+      "events": "暂无关键互动事件。",
+      "history": "暂无深度或阶段变化。",
+      "relatedNotes": "暂无关联表达。",
+      "directory": "当前筛选下没有关系。",
+      "selectRelationship": "从左侧选择一段关系。",
+      "selectNote": "从左侧选择一条表达。",
+      "selectPattern": "从左侧选择一个模式。"
+    },
+    "edit": {
+      "createRelationship": "新增关系",
+      "editRelationship": "编辑关系",
+      "relationshipDescription": "5 维用于归类关系世界，未完成重量只跟随单段关系和想说的话。",
+      "createNote": "新增想说的话",
+      "editNote": "编辑想说的话",
+      "noteDescription": "可以写给现有关系、独立对象，或未来的自己。",
+      "createPattern": "新增模式",
+      "editPattern": "编辑模式",
+      "patternDescription": "用于跨关系复盘重复出现的角色和路径。",
+      "name": "姓名",
+      "role": "角色",
+      "circle": "圈层",
+      "type": "类型",
+      "depth": "深度",
+      "stage": "阶段",
+      "impact": "影响",
+      "interaction": "互动",
+      "unfinishedWeight": "未完成重量",
+      "influence": "关系档案",
+      "currentState": "当前状态",
+      "emotionalTone": "情绪线索描述",
+      "unspokenLine": "没说出口",
+      "positiveImpact": "正面影响",
+      "ongoingShadow": "持续阴影",
+      "boundaryStatus": "边界状态",
+      "emotionCues": "情绪标签",
+      "tags": "标签",
+      "events": "关键互动事件",
+      "history": "深度 / 阶段变化历史",
+      "date": "日期",
+      "eventTitle": "事件标题",
+      "eventSummary": "事件摘要",
+      "from": "从",
+      "toValue": "到",
+      "historyNote": "变化说明",
+      "targetType": "目标类型",
+      "relatedRelationship": "关联关系",
+      "noRelationship": "不关联",
+      "to": "对象",
+      "theme": "主题",
+      "excerpt": "内容",
+      "title": "标题",
+      "summary": "摘要",
+      "cues": "线索",
+      "saved": "关系已保存",
+      "noteSaved": "想说的话已保存",
+      "patternSaved": "模式已保存",
+      "saveFailed": "保存失败",
+      "validation": {
+        "relationshipRequired": "请填写姓名和角色",
+        "noteRequired": "请填写对象、主题和内容",
+        "patternRequired": "请填写标题和摘要"
+      }
+    },
+    "confirm": {
+      "deleteRelationship": "确定删除 {{name}} 吗？",
+      "deleteNote": "确定删除这条想说的话吗？",
+      "deletePattern": "确定删除这个关系模式吗？"
+    },
+    "toast": {
+      "deleteRelationshipPending": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deleteRelationshipSuccess": "已删除关系：{{name}}",
+      "deleteRelationshipFailed": "删除关系失败",
+      "deleteRelationshipUndone": "已撤销删除：{{name}}",
+      "deleteNotePending": "已加入删除队列，5 秒内可撤销",
+      "deleteNoteSuccess": "已删除想说的话",
+      "deleteNoteFailed": "删除想说的话失败",
+      "deleteNoteUndone": "已撤销删除",
+      "deletePatternPending": "已加入删除队列，5 秒内可撤销",
+      "deletePatternSuccess": "已删除关系模式",
+      "deletePatternFailed": "删除关系模式失败",
+      "deletePatternUndone": "已撤销删除"
+    },
+    "enumNames": {
+      "type": {
+        "家人": "家人",
+        "伴侣": "伴侣",
+        "朋友": "朋友",
+        "同事": "同事",
+        "过去重要的人": "过去重要的人",
+        "导师/榜样": "导师/榜样"
+      },
+      "depth": {
+        "亲密": "亲密",
+        "亲近": "亲近",
+        "熟人": "熟人",
+        "疏远": "疏远",
+        "断联": "断联"
+      },
+      "stage": {
+        "建立中": "建立中",
+        "稳定": "稳定",
+        "紧张": "紧张",
+        "修复中": "修复中",
+        "已结束": "已结束",
+        "等待中": "等待中"
+      },
+      "impact": {
+        "滋养": "滋养",
+        "消耗": "消耗",
+        "中性": "中性",
+        "混合": "混合"
+      },
+      "interaction": {
+        "每天": "每天",
+        "每周": "每周",
+        "每月": "每月",
+        "每年": "每年",
+        "几乎不": "几乎不",
+        "已无联系": "已无联系"
+      },
+      "unfinishedWeight": {
+        "很重": "很重",
+        "中等": "中等",
+        "轻微": "轻微",
+        "无": "无"
+      },
+      "eventKind": {
+        "认识": "认识",
+        "重要谈话": "重要谈话",
+        "冲突": "冲突",
+        "和好": "和好",
+        "疏远": "疏远",
+        "断联": "断联",
+        "重逢": "重逢"
+      },
+      "changeField": {
+        "depth": "深度",
+        "stage": "阶段"
+      },
+      "targetType": {
+        "关系条目": "关系条目",
+        "独立对象": "独立对象",
+        "未来的自己": "未来的自己"
+      }
+    }
+  },
   "nutrition": {
     "page": {
       "eyebrow": "饮食",
@@ -1231,6 +1657,1411 @@
       }
     }
   },
+  "overview": {
+    "page": {
+      "eyebrow": "总览",
+      "title": "先看全局，再决定从哪里开始"
+    },
+    "sections": {
+      "recent": {
+        "title": "最近记录",
+        "description": "从最近发生的事和最近写下的话里，先看见当下的自己。"
+      },
+      "logic": {
+        "title": "页面逻辑",
+        "description": "先把这个产品为什么有这些页面说清楚。"
+      },
+      "pulse": {
+        "title": "今天的观察",
+        "description": "先给自己一个足够诚实的起点。"
+      },
+      "quick": {
+        "title": "快速进入",
+        "description": "先动手，再决定要不要继续展开。"
+      }
+    },
+    "logic": {
+      "record": {
+        "title": "记录工作台",
+        "detail": "反思、记事、记账、购物，负责承接你现在到底在怎么生活。"
+      },
+      "inner": {
+        "title": "内在状态",
+        "detail": "情绪情感页负责承接最近的心理波动、触发因素，以及对自己有效的恢复方式。"
+      },
+      "selfMap": {
+        "title": "自我图谱",
+        "detail": "观念、原则、关系深化、成长、记忆节点，负责解释你为什么会变成现在这样的人。"
+      },
+      "legacyFuture": {
+        "title": "生命整理与未来",
+        "detail": "生命整理负责安放重要的话和托付，未来蓝图负责把理想自我和阶段路径放到前面。"
+      }
+    },
+    "quickActions": {
+      "reflection": {
+        "label": "写一条反思",
+        "description": "把此刻的想法和感受先放下来。"
+      },
+      "events": {
+        "label": "记一件事",
+        "description": "补一段事件时间线，留住最近生活片段。"
+      },
+      "finance": {
+        "label": "记一笔支出",
+        "description": "让现实选择和生活方式一眼可见。"
+      },
+      "emotion": {
+        "label": "看情绪波动",
+        "description": "把最近的心理天气和触发因素放到同一页里看。"
+      },
+      "future": {
+        "label": "补未来方向",
+        "description": "把理想自我和生活方式说得更清楚。"
+      },
+      "beliefs": {
+        "label": "打开观念图谱",
+        "description": "看看人生观、世界观和价值观现在是什么样子。"
+      },
+      "relationships": {
+        "label": "看关系深化",
+        "description": "把重要人物、关系模式和没说出口的话放到一起。"
+      },
+      "journey": {
+        "label": "回看成长记忆",
+        "description": "把人生阶段、节点和地点物件背后的记忆重新连起来。"
+      },
+      "legacy": {
+        "label": "整理重要托付",
+        "description": "把留给未来的话、牵挂和交代先安放好。"
+      }
+    },
+    "currentFocus": {
+      "title": "当前重点",
+      "description": "先把新增模块都接进同一张桌子上，保证能看、能切换、能带着基础数据一起成立。"
+    },
+    "empty": {
+      "recent": "当前筛选下还没有最近记录。"
+    }
+  },
+  "reflection": {
+    "page": {
+      "eyebrow": "反思",
+      "title": "先把此刻写下来",
+      "description": "表达不需要完整，真实比完整更重要。这里会成为你最自然的输入入口。"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "sections": {
+      "draft": {
+        "title": "写作起点",
+        "description": "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。"
+      },
+      "recent": {
+        "title": "最近反思",
+        "description": "先展示最近写过的内容，再决定之后如何组织回看。"
+      }
+    },
+    "actions": {
+      "create": "新增反思",
+      "edit": "编辑反思",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "fields": {
+      "date": "时间",
+      "title": "标题",
+      "excerpt": "反思内容",
+      "tags": "标签"
+    },
+    "placeholders": {
+      "date": "例如：2026-06-08 21:10",
+      "title": "例如：今天真正想保留的东西",
+      "excerpt": "今天发生了什么？我看见了什么？以后回看时需要记住什么？",
+      "tags": "用逗号分隔，例如：节奏，工作"
+    },
+    "empty": {
+      "records": "当前筛选下还没有反思记录。"
+    },
+    "edit": {
+      "createTitle": "新增反思",
+      "editTitle": "编辑反思",
+      "description": "保留时间、标题、正文摘要和少量标签即可。"
+    },
+    "validation": {
+      "required": "请填写时间、标题和反思内容"
+    },
+    "confirm": {
+      "delete": "确定删除「{{title}}」吗？"
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败"
+    }
+  },
+  "events": {
+    "page": {
+      "eyebrow": "记事",
+      "title": "把生活片段接回时间线",
+      "description": "记录事件、经历、片段和念头，让回看时能知道当时具体发生了什么。"
+    },
+    "actions": {
+      "create": "新增事件",
+      "edit": "编辑事件",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "search": {
+      "active": "当前筛选：{{query}}"
+    },
+    "timeline": {
+      "title": "时间线",
+      "description": "按发生时间回看最近留下的事件片段。"
+    },
+    "capture": {
+      "title": "快速记事",
+      "description": "先留下发生时间、标题和简要说明。",
+      "latest": "最近一条"
+    },
+    "themes": {
+      "title": "最近主题",
+      "description": "重复出现的主题会让生活轨迹更容易被看见。"
+    },
+    "metrics": {
+      "events": "事件",
+      "days": "日期"
+    },
+    "empty": {
+      "latest": "还没有事件记录。",
+      "timeline": "当前筛选下还没有事件记录。",
+      "themes": "当前筛选下没有可展示的主题。"
+    },
+    "edit": {
+      "createTitle": "新增事件",
+      "editTitle": "编辑事件",
+      "description": "记事只保存必要线索：发生时间、标题、简要说明和主题。"
+    },
+    "fields": {
+      "date": "发生 / 记录时间",
+      "title": "标题",
+      "excerpt": "简要说明",
+      "theme": "主题",
+      "tags": "标签"
+    },
+    "placeholders": {
+      "date": "例如：2026-06-08 21:10",
+      "title": "例如：和朋友聊未来城市选择",
+      "excerpt": "这件事发生了什么？当时有什么值得以后回看的细节？",
+      "theme": "例如：生活方式",
+      "tags": "用逗号分隔，例如：城市，未来"
+    },
+    "defaults": {
+      "theme": "日常"
+    },
+    "validation": {
+      "required": "请填写时间、标题和简要说明"
+    },
+    "confirm": {
+      "delete": "确定删除「{{title}}」吗？"
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败"
+    }
+  },
+  "finance": {
+    "page": {
+      "eyebrow": "记账",
+      "title": "让现实资源流向成为证据",
+      "description": "收入、支出、类别和复盘状态一起看，帮助你判断钱正在塑造怎样的生活。"
+    },
+    "actions": {
+      "addEntry": "记一笔",
+      "editEntry": "编辑账目",
+      "deleteEntry": "删除账目"
+    },
+    "summary": {
+      "income": "本月收入",
+      "expense": "本月支出",
+      "net": "本月结余",
+      "weeklyExpense": "近 7 日支出",
+      "dailyAverage": "日均 {{value}}"
+    },
+    "sections": {
+      "entriesTitle": "最近账目",
+      "entriesDescription": "收入和支出都放在同一条现实时间线上。",
+      "distributionTitle": "类别和生活系统",
+      "distributionDescription": "先看钱流向哪里，再看它支撑了什么。",
+      "reviewTitle": "目标和复盘",
+      "reviewDescription": "目标不是压迫，而是给钱一个方向。"
+    },
+    "target": {
+      "empty": "当前月份还没有目标。",
+      "expenseLimit": "支出上限",
+      "savingTarget": "储蓄目标"
+    },
+    "empty": {
+      "entries": "当前筛选下还没有账目记录。",
+      "distribution": "当前筛选下没有可展示的分布。",
+      "reviewEntries": "当前没有需要优先复盘的账目。"
+    },
+    "toast": {
+      "saved": "已保存账目",
+      "saveFailed": "保存失败",
+      "deleted": "已删除账目",
+      "deleteFailed": "删除失败"
+    },
+    "confirm": {
+      "deleteEntry": "确定删除「{{title}}」吗？"
+    },
+    "edit": {
+      "createTitle": "新增账目",
+      "editTitle": "编辑账目",
+      "description": "记录金额，也保留这笔钱背后的生活语境。",
+      "tagsPlaceholder": "每行一个标签",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中",
+      "validation": {
+        "required": "请填写日期、标题、类别和有效金额",
+        "amountPositive": "金额需要大于 0"
+      },
+      "fields": {
+        "date": "日期",
+        "direction": "方向",
+        "label": "标题",
+        "amount": "金额",
+        "category": "类别",
+        "account": "账户",
+        "lifeSystem": "生活系统",
+        "necessity": "必要性",
+        "reviewStatus": "复盘状态",
+        "linkedModule": "关联模块",
+        "note": "说明",
+        "tags": "标签"
+      }
+    },
+    "enum": {
+      "direction": {
+        "expense": "支出",
+        "income": "收入"
+      },
+      "category": {
+        "餐饮": "餐饮",
+        "居住": "居住",
+        "交通": "交通",
+        "购物": "购物",
+        "学习成长": "学习成长",
+        "健康": "健康",
+        "社交": "社交",
+        "娱乐": "娱乐",
+        "收入": "收入",
+        "储蓄": "储蓄",
+        "其他": "其他"
+      },
+      "lifeSystem": {
+        "基本生活": "基本生活",
+        "身体健康": "身体健康",
+        "关系社交": "关系社交",
+        "成长学习": "成长学习",
+        "居住环境": "居住环境",
+        "自由安全": "自由安全",
+        "娱乐恢复": "娱乐恢复"
+      },
+      "necessity": {
+        "生存必需": "生存必需",
+        "稳定维护": "稳定维护",
+        "体验改善": "体验改善",
+        "长期投资": "长期投资",
+        "冲动/待复盘": "冲动/待复盘"
+      },
+      "reviewStatus": {
+        "已确认": "已确认",
+        "待复盘": "待复盘",
+        "可优化": "可优化",
+        "值得保留": "值得保留"
+      },
+      "linkedModule": {
+        "手动录入": "手动录入",
+        "购物": "购物",
+        "饮食": "饮食",
+        "记事": "记事",
+        "反思": "反思",
+        "未来": "未来"
+      }
+    }
+  },
+  "journey": {
+    "page": {
+      "eyebrow": "成长记忆",
+      "title": "把过去分类，再看见它如何继续塑造现在",
+      "description": "5 个分类维度负责归档、过滤和回看；塑造力只跟着单条记忆和成长节点走，不混进主筛选。"
+    },
+    "hero": {
+      "memories": "记忆",
+      "growthNodes": "成长节点",
+      "anchors": "锚点"
+    },
+    "actions": {
+      "addMemory": "新增记忆",
+      "addGrowth": "新增成长",
+      "addAnchor": "新增锚点",
+      "addPrompt": "新增问题",
+      "addThread": "新增线索",
+      "edit": "编辑",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中"
+    },
+    "filters": {
+      "title": "五维过滤",
+      "type": "内容类型",
+      "era": "人生时期",
+      "emotionalWeight": "情感重量",
+      "processing": "整理状态",
+      "privacy": "隐私级别",
+      "allTypes": "全部类型",
+      "allEras": "全部时期",
+      "allEmotionalWeights": "全部重量",
+      "allProcessing": "全部状态",
+      "allPrivacy": "全部隐私",
+      "optionWithCount": "{{label}} · {{count}}",
+      "resultCount": "{{count}} / {{total}} 条记忆",
+      "reset": "清空过滤"
+    },
+    "classification": {
+      "type": {
+        "title": "内容类型",
+        "description": "先看这段记忆以什么形式被记住。"
+      },
+      "era": {
+        "title": "人生时期",
+        "description": "时期支持多选，主时期只负责时间线定位。"
+      },
+      "emotionalWeight": {
+        "title": "情感重量",
+        "description": "它现在碰起来轻不轻。"
+      },
+      "processing": {
+        "title": "整理状态",
+        "description": "不是所有过去都需要被整理完。"
+      },
+      "privacy": {
+        "title": "隐私级别",
+        "description": "敏感记忆要先有边界，再谈回看。"
+      }
+    },
+    "sections": {
+      "classification": {
+        "title": "5 维分类概览",
+        "description": "这些维度进入过滤和分组；塑造力只在时间线与详情里标注。"
+      },
+      "eraSuggestions": {
+        "title": "默认时期提示"
+      },
+      "formativePower": {
+        "title": "塑造力标注",
+        "description": "塑造力解释影响深度，不作为主筛选维度。"
+      },
+      "timeline": {
+        "title": "记忆时间线",
+        "description": "按主时期回看每条记忆，并始终显示塑造力。"
+      },
+      "growth": {
+        "title": "成长节点",
+        "description": "当多条记忆指向同一个变化方向，它们就形成一个成长节点。"
+      },
+      "anchors": {
+        "title": "感官锚点",
+        "description": "很多记忆不是从事件开始，而是被地点、物件或照片唤起来。"
+      },
+      "reviewPrompts": {
+        "title": "回看问题",
+        "description": "这些问题帮助你慢慢靠近过去，而不是逼自己一次讲完。"
+      },
+      "threads": {
+        "title": "当前还在生效的影响",
+        "description": "从成长节点里浮出来的线索，适合和观念、原则、关系页交叉回看。",
+        "compactTitle": "仍在生效"
+      }
+    },
+    "tabs": {
+      "timeline": "记忆时间线",
+      "growth": "成长节点",
+      "signals": "锚点与影响"
+    },
+    "memory": {
+      "formativePowerBadge": "塑造力 · {{value}}",
+      "unrated": "未评估",
+      "needsConfirm": "需确认",
+      "impactPrefix": "留下来的影响：{{value}}",
+      "emotionalWeight": "情感重量",
+      "processing": "整理状态",
+      "privacy": "隐私级别",
+      "formativePower": "塑造力",
+      "sensoryCuePrefix": "感官线索：{{value}}",
+      "sourcePrefix": "来源：{{value}}"
+    },
+    "growth": {
+      "before": "变化前",
+      "after": "变化后",
+      "beforeInline": "前：{{value}}",
+      "afterInline": "后：{{value}}",
+      "triggerInline": "触发：{{value}}",
+      "keyEventPrefix": "关键转折：{{value}}",
+      "beforeMemories": "变化前记忆",
+      "afterMemories": "变化后记忆",
+      "triggerMemory": "触发记忆"
+    },
+    "control": {
+      "title": "结构检查",
+      "description": "管理模式可维护记忆、成长节点、锚点、回看问题和影响线索，也帮助你找出待补字段和缺失关联。",
+      "metrics": {
+        "memories": "记忆",
+        "growthNodes": "成长节点",
+        "secondConfirm": "需二次确认",
+        "missingLinks": "缺失关联"
+      },
+      "missingPowerTitle": "还没评估塑造力的记忆",
+      "missingLinksTitle": "成长节点引用但当前未命中的记忆 ID"
+    },
+    "management": {
+      "memories": "记忆维护",
+      "growthNodes": "成长节点维护",
+      "anchors": "锚点维护",
+      "prompts": "回看问题维护",
+      "threads": "影响线索维护"
+    },
+    "fields": {
+      "title": "标题",
+      "type": "内容类型",
+      "emotionalWeight": "情感重量",
+      "processing": "整理状态",
+      "privacy": "隐私级别",
+      "primaryEra": "主时期",
+      "formativePower": "塑造力",
+      "eras": "时期标签",
+      "summary": "摘要",
+      "impact": "留下的影响",
+      "sensoryCue": "感官线索",
+      "sourceModules": "来源模块",
+      "tags": "标签",
+      "domain": "领域",
+      "stability": "稳固程度",
+      "before": "变化前",
+      "after": "变化后",
+      "keyEvent": "关键转折",
+      "triggerMemory": "触发记忆",
+      "beforeMemoryIds": "变化前记忆 ID",
+      "afterMemoryIds": "变化后记忆 ID",
+      "evidence": "证据",
+      "label": "名称",
+      "note": "说明",
+      "linkedMemoryIds": "关联记忆 ID",
+      "prompt": "回看问题",
+      "thread": "影响线索"
+    },
+    "edit": {
+      "none": "不设置",
+      "listHint": "每行一个，也支持逗号分隔。",
+      "sourceModulesHint": "只会保存当前系统认识的来源名称。",
+      "memoryIdsHint": "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
+      "memoryIdReference": "可用记忆 ID",
+      "memoryCreateTitle": "新增记忆",
+      "memoryEditTitle": "编辑记忆",
+      "memoryDescription": "维护一条记忆的分类、摘要、影响和可回看的线索。",
+      "growthCreateTitle": "新增成长节点",
+      "growthEditTitle": "编辑成长节点",
+      "growthDescription": "用记忆 ID 把变化前、变化后和触发记忆连接起来。",
+      "anchorCreateTitle": "新增锚点",
+      "anchorEditTitle": "编辑锚点",
+      "anchorDescription": "维护地点、物件、人物或照片与记忆之间的连接。",
+      "promptCreateTitle": "新增回看问题",
+      "promptEditTitle": "编辑回看问题",
+      "promptDescription": "记录一个适合慢慢回看的问题。",
+      "threadCreateTitle": "新增影响线索",
+      "threadEditTitle": "编辑影响线索",
+      "threadDescription": "记录当前仍在生效、适合跨模块回看的影响线索。",
+      "validation": {
+        "memoryRequired": "请填写标题、主时期、摘要和影响",
+        "growthRequired": "请填写标题、变化前后、关键事件，并选择有效触发记忆",
+        "anchorRequired": "请填写锚点名称和说明",
+        "textRequired": "请填写内容"
+      }
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败"
+    },
+    "confirm": {
+      "deleteMemory": "确定删除这条记忆吗？",
+      "deleteGrowth": "确定删除这个成长节点吗？",
+      "deleteAnchor": "确定删除这个记忆锚点吗？",
+      "deletePrompt": "确定删除这条回看问题吗？",
+      "deleteThread": "确定删除这条影响线索吗？"
+    },
+    "enum": {
+      "memoryType": {
+        "事件": "事件",
+        "地点": "地点",
+        "物件": "物件",
+        "人物": "人物",
+        "照片": "照片",
+        "领悟": "领悟"
+      },
+      "emotionalWeight": {
+        "轻": "轻",
+        "中性": "中性",
+        "重": "重",
+        "很重": "很重"
+      },
+      "processing": {
+        "已整理": "已整理",
+        "正在理解": "正在理解",
+        "暂不触碰": "暂不触碰",
+        "决定不再细究": "决定不再细究",
+        "开放问题": "开放问题",
+        "想留给某人": "想留给某人",
+        "记不清的裂缝": "记不清的裂缝"
+      },
+      "privacy": {
+        "仅自己": "仅自己",
+        "需二次确认": "需二次确认",
+        "指定的人": "指定的人",
+        "未来可公开": "未来可公开",
+        "离世后可看": "离世后可看"
+      },
+      "formativePower": {
+        "极深": "极深",
+        "较深": "较深",
+        "中等": "中等",
+        "轻微": "轻微",
+        "无": "无"
+      },
+      "sourceModule": {
+        "手动录入": "手动录入",
+        "反思": "反思",
+        "记事": "记事",
+        "记账": "记账",
+        "关系": "关系",
+        "情绪": "情绪",
+        "原则": "原则",
+        "未来": "未来",
+        "生命整理": "生命整理"
+      },
+      "growthDomain": {
+        "关系": "关系",
+        "自我": "自我",
+        "工作": "工作",
+        "情绪能力": "情绪能力",
+        "生活方式": "生活方式"
+      },
+      "growthStability": {
+        "偶尔还会退回去": "偶尔还会退回去",
+        "基本稳定": "基本稳定",
+        "已经完全内化": "已经完全内化"
+      }
+    },
+    "compact": {
+      "anchorTitle": "{{type}} · {{label}}",
+      "relatedMemoryCount": "{{note}} · {{count}} 条相关记忆"
+    },
+    "remaining": {
+      "memories": "还有 {{count}} 条记忆未展开",
+      "growth": "还有 {{count}} 个成长节点未展开"
+    },
+    "empty": {
+      "memories": "当前筛选下还没有可展示的记忆。",
+      "growthNodes": "当前筛选下还没有可展示的成长节点。",
+      "anchors": "当前筛选下还没有记忆锚点。",
+      "reviewPrompts": "当前筛选下没有回看问题。",
+      "threads": "当前筛选下没有可展示的影响线索。",
+      "signals": "当前筛选下没有辅助线索。",
+      "noData": "当前还没有成长记忆数据。",
+      "distribution": "暂无分布数据。",
+      "none": "暂无"
+    }
+  },
+  "socioeconomics": {
+    "page": {
+      "eyebrow": "社会经济",
+      "title": "看清外部经济世界怎么运转",
+      "description": "按 4 维分类、看 relevance 决策距离，再用热力图找认知盲区。"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "actions": {
+      "addEntry": "新增条目",
+      "addGap": "新增缺口",
+      "addPrompt": "新增提问",
+      "editEntry": "编辑条目",
+      "editGap": "编辑缺口",
+      "editPrompt": "编辑提问",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存"
+    },
+    "classification": {
+      "title": "4 维认知分类",
+      "description": "按 4 维归类；relevance 跟着每条走，不进主筛选器。",
+      "domain": {
+        "title": "领域",
+        "description": "属于经济运行的哪一块。"
+      },
+      "layer": {
+        "title": "层次",
+        "description": "微观、中观、宏观三层视角。"
+      },
+      "confidence": {
+        "title": "掌握程度",
+        "description": "从听过名词到有自己的判断框架。"
+      },
+      "source": {
+        "title": "来源",
+        "description": "认知从哪里建立起来。"
+      }
+    },
+    "relevance": {
+      "title": "决策距离",
+      "description": "relevance 不进主筛选器，但是判断这条现在用不用得上的核心评估。"
+    },
+    "heatmap": {
+      "title": "领域 × 掌握程度",
+      "description": "颜色越深，掌握度越高。",
+      "stackedDescription": "一眼看清哪些领域我自以为懂、其实只到名词。"
+    },
+    "tabs": {
+      "entries": "认知清单",
+      "gaps": "认知缺口",
+      "prompts": "复习提问"
+    },
+    "entries": {
+      "title": "认知清单",
+      "description": "每条都显示掌握度和决策距离。"
+    },
+    "gaps": {
+      "title": "认知缺口",
+      "description": "先把哪里只是听过名词、哪里还没形成判断写出来。"
+    },
+    "prompts": {
+      "title": "复习提问",
+      "description": "把它当作每个月对认知地图的一次例行盘点。"
+    },
+    "review": {
+      "title": "该先补的几条",
+      "description": "决策距离近 + 掌握度浅，是优先补课的位置。"
+    },
+    "empty": {
+      "entries": "当前筛选下没有可展示的认知条目。",
+      "gaps": "当前筛选下没有可展示的认知缺口。",
+      "prompts": "当前筛选下没有复习提问。",
+      "review": "当前筛选下没有需要优先补课的条目。",
+      "distribution": "暂无分布数据。"
+    },
+    "fields": {
+      "title": "标题",
+      "domain": "领域",
+      "layer": "层次",
+      "confidence": "掌握程度",
+      "source": "来源",
+      "relevance": "决策距离",
+      "summary": "摘要",
+      "understandingNote": "理解笔记",
+      "relatedConcepts": "相关概念",
+      "tags": "标签",
+      "confidenceHistory": "掌握修订历史",
+      "gapSummary": "缺口",
+      "nextStep": "下一步",
+      "prompt": "复习提问"
+    },
+    "edit": {
+      "entryCreateTitle": "新增认知条目",
+      "entryEditTitle": "编辑认知条目",
+      "entryDescription": "每条认知都需要完整标注领域、层次、掌握程度、来源和决策距离。",
+      "gapCreateTitle": "新增认知缺口",
+      "gapEditTitle": "编辑认知缺口",
+      "promptCreateTitle": "新增复习提问",
+      "promptEditTitle": "编辑复习提问",
+      "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | 看完一组材料",
+      "validation": {
+        "entryRequired": "请填写标题和摘要",
+        "history": "掌握修订历史格式需要是：日期 | 原等级 -> 新等级 | 触发原因",
+        "gapRequired": "请填写缺口和下一步",
+        "promptRequired": "请填写复习提问"
+      }
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败"
+    },
+    "confirm": {
+      "deleteEntry": "确定删除「{{title}}」吗？",
+      "deleteGap": "确定删除这条缺口吗？",
+      "deletePrompt": "确定删除这条复习提问吗？"
+    },
+    "enum": {
+      "domain": {
+        "货币与物价": "货币与物价",
+        "个人财务": "个人财务",
+        "劳动力市场": "劳动力市场",
+        "产业与公司": "产业与公司",
+        "财政与政策": "财政与政策",
+        "金融市场": "金融市场",
+        "全球与宏观": "全球与宏观"
+      },
+      "layer": {
+        "微观": "微观",
+        "中观": "中观",
+        "宏观": "宏观"
+      },
+      "confidence": {
+        "听过名词": "听过名词",
+        "知道大致逻辑": "知道大致逻辑",
+        "能预判常见情境": "能预判常见情境",
+        "有自己的判断框架": "有自己的判断框架"
+      },
+      "source": {
+        "系统学习": "系统学习",
+        "新闻媒体": "新闻媒体",
+        "亲身经历": "亲身经历",
+        "他人叙述": "他人叙述",
+        "专业讨论": "专业讨论"
+      },
+      "relevance": {
+        "直接影响当前决策": "直接影响当前决策",
+        "影响中期规划": "影响中期规划",
+        "影响长期方向": "影响长期方向",
+        "纯认知储备": "纯认知储备"
+      }
+    }
+  },
+  "emotion": {
+    "page": {
+      "eyebrow": "情绪情感",
+      "title": "看见最近的心理天气",
+      "description": "把波动、触发因素和对自己有效的恢复方式放在一起看。"
+    },
+    "tabs": {
+      "overview": "情绪总览",
+      "today": "今日记录",
+      "timeline": "波动时间线",
+      "triggers": "触发关联",
+      "toolbox": "恢复工具箱"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "actions": {
+      "add": "新增",
+      "edit": "编辑",
+      "addCheckIn": "新增记录",
+      "addTrendPoint": "新增趋势点",
+      "addSegment": "新增时间段",
+      "addLoop": "新增循环",
+      "addTrigger": "新增触发",
+      "addLifestyleLink": "新增关联",
+      "addEnvironmentCue": "新增环境",
+      "addRelationshipCue": "新增关系",
+      "addTool": "新增工具",
+      "addRecoveryNote": "新增经验",
+      "editCheckIn": "编辑情绪记录",
+      "editSegment": "编辑时间段",
+      "editLoop": "编辑循环",
+      "editTrigger": "编辑触发",
+      "editLifestyleLink": "编辑关联",
+      "editEnvironmentCue": "编辑环境",
+      "editRelationshipCue": "编辑关系",
+      "editTool": "编辑工具",
+      "editMinimalSteps": "编辑极简步骤",
+      "editIneffectiveActions": "编辑提醒",
+      "editRecoveryNote": "编辑恢复经验"
+    },
+    "overview": {
+      "title": "情绪总览",
+      "averageScore": "平均强度",
+      "bestWindow": "最好的时段",
+      "worstWindow": "最差的时段",
+      "window": "窗口",
+      "topTags": "高频情绪标签",
+      "conclusion": "一句话总结"
+    },
+    "today": {
+      "title": "今天的情绪记录",
+      "description": "此刻的强度、身体感觉和想做的反应。",
+      "longDescription": "把模糊情绪落成可回看的样本。",
+      "recent": "最近几条",
+      "promptTitle": "记录入口",
+      "promptDescription": "强度、标签、触发和需要会一起进入后续模式观察。",
+      "prompt": {
+        "feeling": "先命名感受",
+        "feelingBody": "不用准确，先选最接近的词。",
+        "body": "再看身体",
+        "bodyBody": "肩颈、胸口、胃口、困意常常比语言更早知道。",
+        "need": "最后确认需要",
+        "needBody": "不是立刻解决，而是先知道此刻怎样会更安全。"
+      }
+    },
+    "timeline": {
+      "title": "波动时间线",
+      "description": "按时间看波峰、波谷和恢复区段。",
+      "chartTitle": "7 天情绪强度",
+      "chartHint": "0–10 越高越紧绷",
+      "segments": "时间段总结",
+      "loopTitle": "反复出现的循环",
+      "loopDescription": "看见不是随机出现的节律。"
+    },
+    "triggers": {
+      "title": "触发因素",
+      "description": "把情绪和真实生活事件连起来。",
+      "lifestyle": "生活节律关联",
+      "lifestyleDesc": "睡眠、饮食、运动和屏幕时长。",
+      "environment": "环境提示",
+      "environmentDesc": "容易让状态变坏的场景。",
+      "relationships": "关系提示",
+      "relationshipsDesc": "哪些关系更容易带来波动。"
+    },
+    "toolbox": {
+      "title": "安抚与恢复工具箱",
+      "description": "状态差的时候，先有效，再分析。",
+      "minimalSteps": "如果已经很差，只做这三件事",
+      "ineffective": "反而会更糟的动作",
+      "ineffectiveDesc": "状态差时先避开这些路径。",
+      "recoveryNotes": "曾经把我接住的方式",
+      "recoveryNotesDesc": "过去有效的经验可以再次被调用。"
+    },
+    "common": {
+      "intensity": "强度",
+      "bodySignal": "身体感觉",
+      "triggerEvent": "触发事件",
+      "impulse": "此刻冲动",
+      "needRightNow": "现在最需要",
+      "bodyPrefix": "身体",
+      "impulsePrefix": "想",
+      "recent": "最近",
+      "when": "适用时机",
+      "effect": "效果"
+    },
+    "empty": {
+      "checkIns": "还没有情绪记录。",
+      "today": "今天还没有记录。",
+      "trend": "还没有可绘制的情绪样本。",
+      "timelineSegments": "还没有可总结的时间段。",
+      "loopPatterns": "还没有识别到循环模式。",
+      "triggers": "当前筛选下没有触发因素。",
+      "lifestyleLinks": "还没有生活节律关联。",
+      "environmentCues": "还没有环境提示。",
+      "relationshipCues": "还没有关系提示。",
+      "tools": "当前筛选下没有恢复工具。",
+      "minimalRecoverySteps": "还没有极简恢复步骤。",
+      "ineffectiveActions": "还没有无效动作提醒。",
+      "recoveryNotes": "还没有恢复经验。"
+    },
+    "toast": {
+      "saved": "情绪数据已保存",
+      "deleted": "情绪数据已删除"
+    },
+    "editor": {
+      "description": "这些内容会保存到后端情绪数据，不再依赖页面内的临时模拟内容。",
+      "save": "保存",
+      "cancel": "取消",
+      "delete": "删除",
+      "none": "不设置",
+      "confirmDelete": "确定删除这条情绪数据吗？",
+      "validation": {
+        "required": "请补全必填内容"
+      },
+      "overview": {
+        "title": "编辑情绪总览",
+        "description": "维护最近窗口、强度和一句话总结。",
+        "tagsPlaceholder": "焦虑,4"
+      },
+      "textList": {
+        "minimalRecoverySteps": "编辑极简恢复步骤",
+        "ineffectiveActions": "编辑无效动作提醒",
+        "description": "一行一条，保存后会写回后端。"
+      },
+      "placeholders": {
+        "list": "一行一个，或用逗号分隔"
+      },
+      "fields": {
+        "date": "时间",
+        "state": "总体状态",
+        "summary": "此刻发生了什么",
+        "intensity": "强度",
+        "impulse": "此刻冲动",
+        "bodySignal": "身体感觉",
+        "emotionTags": "情绪标签",
+        "tags": "上下文标签",
+        "triggerEvent": "触发事件",
+        "needRightNow": "现在最需要",
+        "label": "标签",
+        "score": "强度分",
+        "primaryState": "主要状态",
+        "note": "备注",
+        "title": "标题",
+        "category": "分类",
+        "cues": "线索",
+        "recentExamples": "近期例子",
+        "kind": "类型",
+        "description": "说明",
+        "when": "适用时机",
+        "contactScript": "可直接说的话",
+        "range": "时间段",
+        "trend": "趋势",
+        "frequency": "频率",
+        "factor": "因素",
+        "direction": "方向",
+        "observation": "观察",
+        "context": "环境",
+        "who": "对象",
+        "pattern": "模式",
+        "what": "做了什么",
+        "effect": "效果",
+        "windowLabel": "观察窗口",
+        "averageScore": "平均强度",
+        "bestWindow": "较好时段",
+        "worstWindow": "较差时段",
+        "topEmotionTags": "高频情绪标签",
+        "conclusion": "一句话总结"
+      },
+      "checkIn": {
+        "createTitle": "新增情绪记录",
+        "editTitle": "编辑情绪记录"
+      },
+      "trendPoint": {
+        "createTitle": "新增趋势点",
+        "editTitle": "编辑趋势点"
+      },
+      "trigger": {
+        "createTitle": "新增触发因素",
+        "editTitle": "编辑触发因素"
+      },
+      "tool": {
+        "createTitle": "新增恢复工具",
+        "editTitle": "编辑恢复工具"
+      },
+      "timelineSegment": {
+        "createTitle": "新增时间段",
+        "editTitle": "编辑时间段"
+      },
+      "loopPattern": {
+        "createTitle": "新增循环模式",
+        "editTitle": "编辑循环模式"
+      },
+      "lifestyleLink": {
+        "createTitle": "新增生活关联",
+        "editTitle": "编辑生活关联"
+      },
+      "environmentCue": {
+        "createTitle": "新增环境提示",
+        "editTitle": "编辑环境提示"
+      },
+      "relationshipCue": {
+        "createTitle": "新增关系提示",
+        "editTitle": "编辑关系提示"
+      },
+      "recoveryNote": {
+        "createTitle": "新增恢复经验",
+        "editTitle": "编辑恢复经验"
+      }
+    },
+    "enum": {
+      "state": {
+        "平静": "平静",
+        "回稳": "回稳",
+        "低压焦虑": "低压焦虑",
+        "易怒": "易怒",
+        "麻木": "麻木",
+        "空": "空",
+        "委屈": "委屈",
+        "难过": "难过",
+        "高压后空掉": "高压后空掉",
+        "松弛": "松弛",
+        "期待": "期待"
+      },
+      "emotionTag": {
+        "难过": "难过",
+        "焦虑": "焦虑",
+        "空": "空",
+        "平静": "平静",
+        "委屈": "委屈",
+        "愤怒": "愤怒",
+        "松弛": "松弛",
+        "期待": "期待",
+        "羞愧": "羞愧",
+        "恐惧": "恐惧",
+        "孤独": "孤独",
+        "兴奋": "兴奋"
+      },
+      "impulse": {
+        "逃避": "逃避",
+        "倾诉": "倾诉",
+        "睡觉": "睡觉",
+        "吃东西": "吃东西",
+        "出门": "出门",
+        "沉默": "沉默",
+        "运动": "运动",
+        "刷手机": "刷手机"
+      },
+      "triggerCategory": {
+        "工作": "工作",
+        "家庭": "家庭",
+        "亲密关系": "亲密关系",
+        "金钱": "金钱",
+        "睡眠": "睡眠",
+        "社交": "社交",
+        "自我否定": "自我否定",
+        "环境": "环境"
+      },
+      "toolKind": {
+        "有效": "有效",
+        "无效": "无效",
+        "极简三步": "极简三步",
+        "可联系": "可联系"
+      },
+      "segmentTrend": {
+        "持续恶化": "持续恶化",
+        "逐渐恢复": "逐渐恢复",
+        "起伏波动": "起伏波动",
+        "平稳": "平稳"
+      },
+      "lifestyleFactor": {
+        "睡眠": "睡眠",
+        "饮食": "饮食",
+        "运动": "运动",
+        "经期": "经期",
+        "饮酒": "饮酒",
+        "屏幕时长": "屏幕时长",
+        "通勤": "通勤",
+        "独处": "独处"
+      },
+      "linkDirection": {
+        "正相关": "正相关",
+        "负相关": "负相关",
+        "混合": "混合"
+      }
+    }
+  },
+  "future": {
+    "page": {
+      "eyebrow": "未来蓝图",
+      "title": "把想成为的人说清楚",
+      "description": "未来不是系统替你预测的结果，而是你主动写下的方向。这里承接理想自我、理想生活、重要价值和阶段路径。"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "searching": "当前筛选：{{query}}",
+    "refresh": "刷新",
+    "addMilestone": "新增路径",
+    "addExperiment": "新增实验",
+    "sections": {
+      "definition": {
+        "title": "理想定义",
+        "description": "先把方向说清楚，再把路径写具体。"
+      },
+      "milestones": {
+        "title": "阶段路径",
+        "description": "先把未来拆成靠近方式，而不是终局答案。"
+      },
+      "experiments": {
+        "title": "当前实验",
+        "description": "不用一步到位，先让生活里出现一点点更像自己的东西。"
+      }
+    },
+    "metrics": {
+      "values": "重要价值",
+      "valuesDetail": "价值不是口号，是持续筛选。",
+      "milestones": "阶段路径",
+      "milestonesDetail": "把远处的方向拆成近处步骤。",
+      "experiments": "当前实验",
+      "experimentsDetail": "先让生活里出现一点点变化。"
+    },
+    "definition": {
+      "identity": "理想自我",
+      "lifestyle": "理想生活",
+      "values": "重要价值",
+      "valuesDesc": "这些词决定你会把时间和钱投向哪里。"
+    },
+    "edit": {
+      "blueprint": "编辑蓝图",
+      "blueprintTitle": "编辑未来蓝图",
+      "blueprintDescription": "这里只保存核心定义：想成为的人、想过的生活和重要价值。",
+      "identity": "理想自我",
+      "identityPlaceholder": "写下你想更靠近的自我状态。",
+      "lifestyle": "理想生活",
+      "lifestylePlaceholder": "写下生活空间、工作节奏、关系和恢复方式。",
+      "values": "重要价值",
+      "valuesHint": "每行一个，也支持逗号分隔。",
+      "milestoneCreateTitle": "新增阶段路径",
+      "milestoneEditTitle": "编辑阶段路径",
+      "milestoneDescription": "把远处方向拆成可靠近的一段路径。",
+      "horizon": "阶段",
+      "horizonPlaceholder": "例如：未来 3 个月",
+      "summary": "阶段摘要",
+      "steps": "靠近方式",
+      "stepsHint": "每行一步。",
+      "experimentCreateTitle": "新增当前实验",
+      "experimentEditTitle": "编辑当前实验",
+      "experimentDescription": "实验不需要宏大，只要能让生活更靠近蓝图。",
+      "experiment": "实验内容",
+      "clickToEdit": "点击可编辑",
+      "cancel": "取消",
+      "save": "保存",
+      "delete": "删除",
+      "validation": {
+        "blueprintRequired": "请填写理想自我和理想生活",
+        "milestoneRequired": "请填写阶段、摘要和至少一步行动",
+        "experimentRequired": "请填写实验内容"
+      }
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败"
+    },
+    "confirm": {
+      "deleteMilestone": "确定删除「{{horizon}}」吗？",
+      "deleteExperiment": "确定删除这个实验吗？"
+    },
+    "empty": {
+      "values": "当前还没有价值关键词。",
+      "milestones": "当前筛选下没有未来路径。",
+      "experiments": "当前筛选下没有实验内容。"
+    }
+  },
+  "legacy": {
+    "pageEyebrow": "生命整理",
+    "pageTitle": "把重要的话提前安放好",
+    "pageDescription": "条目库是唯一维护入口；总览、交付地图、关系表达和边界与信任都只是同一份内容的不同视角。",
+    "tabs": {
+      "overview": "总览",
+      "items": "条目库",
+      "deliveryMap": "交付地图",
+      "relationshipExpression": "关系表达",
+      "trustBoundaries": "边界与信任"
+    },
+    "actions": {
+      "add": "新增",
+      "edit": "编辑",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存",
+      "unlock": "解锁编辑",
+      "revealContent": "打开正文"
+    },
+    "undo": "撤销",
+    "toast": {
+      "saved": "已保存",
+      "deletePendingItem": "已加入删除队列：{{title}}，5 秒内可撤销",
+      "deleteSuccessItem": "已删除生命整理条目：{{title}}",
+      "deleteFailedItem": "删除生命整理条目失败",
+      "deleteUndoneItem": "已撤销删除：{{title}}"
+    },
+    "confirm": {
+      "deleteItem": "确定删除 {{title}} 吗？"
+    },
+    "fields": {
+      "title": "标题",
+      "summary": "摘要",
+      "content": "正文",
+      "tags": "标签",
+      "reviewCue": "回看提示",
+      "category": "内容类别",
+      "recipient": "接收者",
+      "recipientName": "具体接收者",
+      "relatedRelationshipId": "关系引用",
+      "urgency": "紧急度",
+      "visibility": "可见时机",
+      "deliveryCondition": "交付条件",
+      "status": "完成状态",
+      "emotionalLoad": "情感负荷",
+      "isLocked": "锁定条目",
+      "requiresSecondConfirm": "打开前二次确认",
+      "excludeFromAi": "不参与 AI 汇总",
+      "updatedAt": "更新时间",
+      "createdAt": "创建时间",
+      "finalizedAt": "最终确认",
+      "aiBoundary": "AI 边界"
+    },
+    "labels": {
+      "locked": "已锁定",
+      "aiExcluded": "不参与 AI",
+      "aiAllowed": "可参与整理",
+      "unrated": "待自评",
+      "notFinalized": "未最终确认",
+      "unlinked": "未关联"
+    },
+    "filters": {
+      "all": "全部",
+      "signal": "保护信号",
+      "missingDelivery": "缺交付条件",
+      "locked": "已锁定",
+      "aiExcluded": "排除 AI",
+      "secondConfirm": "二次确认",
+      "clear": "清除筛选"
+    },
+    "warnings": {
+      "missingDelivery": "交付条件待补",
+      "missingRecipient": "特定的人未写清",
+      "criticalDraft": "关键信息未完成",
+      "finalUnlocked": "最终版未锁定"
+    },
+    "metrics": {
+      "total": "条目总数",
+      "totalDesc": "条目库是唯一数据源。",
+      "criticalDraft": "关键信息未完成",
+      "criticalDraftDesc": "优先看是否仍停在草稿或持续更新。",
+      "missingDelivery": "交付条件待补",
+      "missingDeliveryDesc": "未来或条件可见内容需要说明触发方式。",
+      "finalLocked": "最终版或锁定",
+      "finalLockedDesc": "锁定内容修改前需要主动确认。",
+      "heavyLoad": "情感负荷很重",
+      "heavyLoadDesc": "适合在状态稳定时再打开。",
+      "aiExcluded": "排除 AI 汇总",
+      "aiExcludedDesc": "这些条目不会进入跨模块洞察。",
+      "secondConfirm": "需要二次确认",
+      "secondConfirmDesc": "打开前保留一道温和确认。"
+    },
+    "overview": {
+      "title": "生命整理总览",
+      "description": "看覆盖、缺口和边界是否清楚，不把沉重内容做成催促。",
+      "coverage": "分类覆盖",
+      "coverageDesc": "按内容本质看整理是否过度集中在某一类。",
+      "boundaryTitle": "需要确认的边界",
+      "boundaryDesc": "只显示数量和线索，避免把私密内容自动汇总。",
+      "recent": "最近更新",
+      "recentDesc": "这里只展示摘要和边界，不主动展开全文。",
+      "emotionalLoad": "情感负荷分布",
+      "emotionalLoadDesc": "情感负荷不是主分类，只是单份内容的打开提醒。",
+      "reviewPrompts": "回看问题",
+      "reviewPromptsDesc": "慢慢整理，不把它变成完成压力。",
+      "missingDeliveryCopy": "这些内容可以继续保存为草稿，但进入最终版前需要写清触发和验证方式。"
+    },
+    "items": {
+      "title": "条目库",
+      "search": "搜索标题、正文、标签",
+      "selectPrompt": "选择一个条目查看详情。",
+      "warningTitle": "需要确认的边界",
+      "secondConfirmCopy": "这份内容标记为需要二次确认，先只显示摘要。"
+    },
+    "edit": {
+      "createTitle": "新增生命整理条目",
+      "editTitle": "编辑生命整理条目",
+      "lockedCopy": "这份条目已锁定，解锁后才能编辑。",
+      "contentSection": "内容",
+      "classifySection": "分类与保护",
+      "tagsPlaceholder": "用逗号分隔"
+    },
+    "validation": {
+      "required": "请填写标题、摘要和正文",
+      "criticalFinalDelivery": "关键信息进入最终版前需要填写交付条件"
+    },
+    "deliveryMap": {
+      "title": "交付地图",
+      "description": "按接收者和可见时机检查谁会看到什么。",
+      "itemCount": "{{count}} 份内容",
+      "groupDescription": "V1 只记录交付意图和人工确认条件，不承诺自动交付。",
+      "sectionCount": "{{count}} 份内容",
+      "checklistTitle": "交付检查",
+      "checklistDesc": "这些检查来自条目字段，不生成独立数据。"
+    },
+    "relationship": {
+      "title": "关系表达",
+      "description": "聚焦留给某人的话，以及和关系有关的未完成牵挂。",
+      "now": "现在可以说的话",
+      "nowDesc": "这些内容也许适合转入关系模块继续打磨，但这里不自动推动。",
+      "future": "未来或离世后交付的话",
+      "futureDesc": "保留交付意图、对象和条件，避免只剩一段孤立文字。",
+      "private": "仅自己整理的牵挂",
+      "privateDesc": "这些内容不应该被自动推送或默认进入 AI 汇总。",
+      "unlinked": "未关联关系条目",
+      "unlinkedDesc": "后续可以再决定是否引用关系模块对象。",
+      "nowHintTitle": "当下表达提醒",
+      "nowHint": "visibility=现在 的内容只提示可表达窗口，不做催促，也不会自动复制到关系模块。"
+    },
+    "boundaries": {
+      "title": "边界与信任",
+      "description": "说明系统不会偷偷越界，并把条目级保护策略集中到一页里看。",
+      "rules": "信任边界说明",
+      "rulesDesc": "这些说明来自后端配置，可与条目策略分开维护。",
+      "aiExcludedItems": "排除 AI 的条目",
+      "secondConfirmItems": "需要二次确认的条目",
+      "lockedItems": "最终版或锁定条目",
+      "missingDeliveryItems": "缺少交付条件的条目",
+      "itemCount": "{{count}} 份内容",
+      "legalTitle": "法律边界",
+      "legalCopy": "生命整理不具备法律遗嘱效力，也不替代保险、资产、医疗或法律文件管理。"
+    },
+    "empty": {
+      "items": "当前没有生命整理条目。",
+      "filteredItems": "当前筛选下没有生命整理条目。",
+      "prompts": "当前没有回看问题。",
+      "bucket": "当前没有匹配内容。",
+      "boundaries": "当前没有边界说明。"
+    },
+    "enum": {
+      "category": {
+        "重要交代": "重要交代",
+        "留给某人的话": "留给某人的话",
+        "人生回顾": "人生回顾",
+        "未完成的事": "未完成的事",
+        "纪念偏好": "纪念偏好"
+      },
+      "recipient": {
+        "特定的人": "特定的人",
+        "家人": "家人",
+        "朋友": "朋友",
+        "公开": "公开",
+        "仅自己": "仅自己"
+      },
+      "urgency": {
+        "关键信息": "关键信息",
+        "重要": "重要",
+        "锦上添花": "锦上添花",
+        "可选": "可选"
+      },
+      "visibility": {
+        "现在": "现在",
+        "某个时间后": "某个时间后",
+        "我离世后": "我离世后",
+        "条件触发": "条件触发",
+        "永不交付": "永不交付"
+      },
+      "status": {
+        "草稿": "草稿",
+        "基本完成": "基本完成",
+        "已完成": "已完成",
+        "会持续更新": "会持续更新",
+        "最终版": "最终版"
+      },
+      "emotionalLoad": {
+        "很重": "很重",
+        "中等": "中等",
+        "轻微": "轻微",
+        "平静": "平静"
+      }
+    }
+  },
   "shell": {
     "brandSubtitle": "个人的人生工作台",
     "tagline": "本地优先 / 自我认知系统",
@@ -1239,6 +3070,9 @@
     "collapseSidebar": "收起菜单列",
     "searchPlaceholder": "搜索记录、观念、关系或成长线索",
     "searchAria": "搜索记录和页面内容",
+    "search": {
+      "activeFilter": "当前筛选：{{query}}"
+    },
     "quickRecord": "快速记录",
     "apiErrorFallback": "当前接口请求失败，页面已回退到本地 mock 数据。",
     "apiErrorRetry": "重试",
@@ -1247,6 +3081,115 @@
       "switchToChinese": "切换到中文",
       "englishTitle": "English",
       "chineseTitle": "中文"
+    },
+    "utilities": {
+      "theme": "主题切换",
+      "notifications": "通知中心",
+      "music": "播放音乐",
+      "managementMode": "管理模式"
+    },
+    "themes": {
+      "title": "主题切换",
+      "description": "主题是一种工作氛围，不是昼夜模式。当前是 {{theme}}。",
+      "current": "当前",
+      "options": {
+        "morning": {
+          "label": "清晨",
+          "description": "冷静的蓝灰底色，适合整理和回看。"
+        },
+        "linen": {
+          "label": "纸感",
+          "description": "更温暖的纸面和陶土色，更像慢一点的工作台。"
+        },
+        "tide": {
+          "label": "潮汐",
+          "description": "更轻更凉一点，适合拉开距离看整体结构。"
+        }
+      }
+    },
+    "music": {
+      "title": "音乐控制",
+      "description": "常驻工具区的一部分。更像轻量陪伴，不抢页面注意力。",
+      "playing": "正在播放",
+      "paused": "已暂停",
+      "volume": "音量 {{volume}}",
+      "unsupported": "当前环境不支持实时音频，界面仍可保留，后续可替换成真实播放器。",
+      "volumeNudge": "音量微调",
+      "volumeHint": "让功能区保持轻量，不盖住主页面。",
+      "presets": {
+        "morning": {
+          "label": "晨间",
+          "description": "轻一点的明亮旋律，适合整理思路。"
+        },
+        "rain": {
+          "label": "雨幕",
+          "description": "更平缓、更低一点，适合长时间停留。"
+        },
+        "night": {
+          "label": "夜读",
+          "description": "更靠后的音色，适合晚上的沉静工作。"
+        }
+      }
+    },
+    "notifications": {
+      "messageChannel": "顶部消息",
+      "notificationChannel": "右下通知",
+      "messageTimed": "顶部消息 {{seconds}}s",
+      "notificationTimed": "右下通知 {{seconds}}s",
+      "persistent": "常驻",
+      "view": "查看",
+      "viewDetails": "查看详情",
+      "messageDetail": "消息详情",
+      "notificationDetail": "通知详情",
+      "source": "来源：{{source}}",
+      "defaultSource": "站内通知",
+      "display": "展示：{{channel}}",
+      "duration": "时效：{{duration}}",
+      "durationMs": "{{duration}}ms",
+      "close": "关闭",
+      "goTo": "前往{{view}}",
+      "defaultAction": "前往查看"
+    },
+    "notificationCenter": {
+      "title": "通知中心",
+      "description": "顶部消息和右下通知都会汇总到这里，适合回看和继续处理。",
+      "activeCount": "{{count}} 条正在显示",
+      "unread": "未读",
+      "empty": "暂时还没有通知。后面可以继续接保存结果、提醒和跨页面待处理事项。",
+      "demo": {
+        "title": "反馈测试",
+        "message": {
+          "button": "顶部消息 3s",
+          "title": "顶部消息已触发",
+          "message": "默认 3 秒后自动消失，适合保存成功这类轻反馈。",
+          "source": "顶部消息组件",
+          "detail": "顶部消息更适合短暂确认和轻量结果反馈，不应该承载太重的阅读压力。",
+          "lineDuration": "默认时长：3000ms",
+          "lineUse": "适合保存成功、完成确认、轻提醒",
+          "lineShape": "信息应短，动作应少"
+        },
+        "notification": {
+          "button": "右下通知 5s",
+          "title": "右下通知已触发",
+          "message": "默认 5 秒停留，适合更完整的信息提示。",
+          "source": "右下通知组件",
+          "detail": "右下通知更适合带上下文的提醒、建议和可操作的信息，也更适合多条堆叠。",
+          "lineDuration": "默认时长：5000ms",
+          "lineUse": "适合任务完成、提醒、建议等场景",
+          "lineShape": "可继续扩展优先级、来源和分类"
+        },
+        "persistent": {
+          "button": "常驻通知",
+          "title": "人生脉络待补充",
+          "message": "这条通知会常驻，直到你处理或手动关闭。",
+          "action": "前往成长记忆",
+          "source": "扩展通知示例",
+          "detail": "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
+          "lineDuration": "不会自动消失",
+          "lineTarget": "支持前往指定页面",
+          "lineShape": "支持后续扩展成任务、待办或消息中心入口"
+        }
+      }
     },
     "views": {
       "overview": "总览",
@@ -1265,6 +3208,8 @@
       "future": "未来蓝图"
     },
     "nav": {
+      "ariaLabel": "页面导航",
+      "itemAria": "导航 {{label}}",
       "groups": {
         "workbench": "工作台",
         "records": "记录",
@@ -1593,6 +3538,172 @@
             "text": "未来蓝图不是预测，而是你愿意靠近的定义。"
           }
         }
+      }
+    }
+  },
+  "principles": {
+    "page": {
+      "eyebrow": "原则",
+      "title": "把原则、边界和底线整理成决策体系",
+      "description": "这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式",
+      "summary": "{{count}} 条原则 · {{relations}} 个关系",
+      "add": "新增原则"
+    },
+    "tabs": {
+      "entries": "原则清单",
+      "prompts": "决策校准",
+      "relations": "支撑冲突"
+    },
+    "classification": {
+      "domain": {
+        "title": "领域",
+        "description": "它最主要保护哪个生活面。"
+      },
+      "type": {
+        "title": "类型",
+        "description": "它是底线、边界，还是标准。"
+      },
+      "strength": {
+        "title": "强度",
+        "description": "它有多不可退让。"
+      },
+      "source": {
+        "title": "来源",
+        "description": "它从哪里长出来。"
+      },
+      "status": {
+        "title": "状态",
+        "description": "它现在是否仍在生效。"
+      }
+    },
+    "sections": {
+      "classification": {
+        "title": "5 维原则分类",
+        "description": "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。"
+      },
+      "entries": {
+        "title": "原则清单",
+        "description": "详情里始终显示 cost，让每条原则的真实代价浮上来。"
+      },
+      "boundaries": {
+        "title": "不想再退让的地方",
+        "description": "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。"
+      },
+      "prompts": {
+        "title": "决策校准",
+        "description": "面对具体选择时，先调出相关原则，再看强度和代价。"
+      },
+      "relations": {
+        "title": "支撑与冲突",
+        "description": "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。"
+      }
+    },
+    "cost": {
+      "title": "cost 标注",
+      "description": "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。"
+    },
+    "meta": {
+      "source": "来源",
+      "cost": "cost",
+      "protectedValue": "保护对象",
+      "decisionCue": "触发校准",
+      "boundary": "边界"
+    },
+    "empty": {
+      "entries": "当前筛选下还没有可展示的原则条目。",
+      "boundaries": "当前筛选下没有可展示的底线。",
+      "prompts": "当前筛选下没有决策校准问题。",
+      "relations": "当前筛选下没有原则关系。",
+      "priority": "当前筛选下没有高优先级原则。",
+      "evolving": "当前筛选下没有正在变化的原则。",
+      "distribution": "暂无分布数据。"
+    },
+    "edit": {
+      "createTitle": "新增原则",
+      "editTitle": "编辑原则",
+      "description": "5 个分类维度用于组织决策体系，cost 只作为单条原则的代价评估。",
+      "title": "标题",
+      "titlePlaceholder": "例如：不在深夜做重要决定",
+      "cost": "代价",
+      "statement": "原则表达",
+      "statementPlaceholder": "把这条原则写成可以指导行动的一句话。",
+      "descriptionLabel": "说明",
+      "domain": "领域",
+      "type": "类型",
+      "strength": "强度",
+      "source": "来源",
+      "status": "状态",
+      "boundary": "边界",
+      "protectedValue": "保护对象",
+      "decisionCue": "触发校准",
+      "tags": "标签",
+      "tagsPlaceholder": "用逗号分隔",
+      "delete": "删除",
+      "cancel": "取消",
+      "save": "保存",
+      "saving": "保存中",
+      "confirmDelete": "确定删除这条原则吗？",
+      "saved": "原则已保存",
+      "saveFailed": "原则保存失败",
+      "deleted": "原则已删除",
+      "deleteFailed": "原则删除失败",
+      "validation": {
+        "required": "请填写标题、原则表达和边界"
+      },
+      "revision": {
+        "summary": "更新了{{fields}}。",
+        "separator": "、"
+      }
+    },
+    "enumNames": {
+      "domain": {
+        "关系": "关系",
+        "工作": "工作",
+        "金钱": "金钱",
+        "健康": "健康",
+        "时间": "时间",
+        "诚信": "诚信"
+      },
+      "type": {
+        "边界": "边界",
+        "标准": "标准",
+        "底线": "底线"
+      },
+      "strength": {
+        "不可退让": "不可退让",
+        "强烈偏好": "强烈偏好",
+        "参考指引": "参考指引"
+      },
+      "source": {
+        "受伤后确立": "受伤后确立",
+        "观察他人": "观察他人",
+        "主动推导": "主动推导",
+        "家庭继承": "家庭继承"
+      },
+      "status": {
+        "生效中": "生效中",
+        "正在测试": "正在测试",
+        "已修订": "已修订",
+        "已放弃": "已放弃"
+      },
+      "cost": {
+        "高代价": "高代价",
+        "中等代价": "中等代价",
+        "低代价": "低代价",
+        "零代价": "零代价"
+      },
+      "relation": {
+        "支撑": "支撑",
+        "冲突": "冲突"
+      },
+      "revisionField": {
+        "内容": "内容",
+        "强度": "强度",
+        "状态": "状态"
       }
     }
   }
