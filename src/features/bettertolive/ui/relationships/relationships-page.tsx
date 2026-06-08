@@ -1,6 +1,7 @@
 import {
   Activity,
   MessageCircleMore,
+  Network,
   Pencil,
   Plus,
   Trash2,
@@ -24,12 +25,17 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveRelationshipsMutation } from "@/features/bettertolive/queries/use-save-relationships-mutation"
 import type {
+  RelationshipCircle,
   RelationshipMap,
   RelationshipPattern,
   RelationshipPerson,
   RelationshipUnsentNote,
   UnfinishedWeight,
 } from "@/features/bettertolive/types"
+import {
+  CytoscapeGraph,
+  type CytoscapeThemeTokens,
+} from "@/features/bettertolive/ui/shared/cytoscape-graph"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
@@ -44,6 +50,7 @@ import {
   INTERACTION_FREQUENCIES,
   RELATIONSHIP_DEPTHS,
   RELATIONSHIP_IMPACTS,
+  RELATIONSHIP_SELECT_CONTENT_CLASS,
   RELATIONSHIP_STAGES,
   RELATIONSHIP_TYPES,
   UNFINISHED_WEIGHTS,
@@ -71,10 +78,135 @@ const WEIGHT_ORDER = new Map<UnfinishedWeight, number>([
   ["无", 3],
 ])
 
+const RELATIONSHIP_GRAPH_LAYOUT = {
+  animate: false,
+  edgeElasticity: 110,
+  fit: true,
+  gravity: 0.28,
+  idealEdgeLength: 138,
+  name: "cose",
+  nodeRepulsion: 16000,
+  numIter: 950,
+  padding: 56,
+} as const
+
+function createRelationshipsGraphStylesheet(theme: CytoscapeThemeTokens) {
+  return [
+    {
+      selector: "node",
+      style: {
+        "background-color": theme.surfaceBg,
+        "border-color": theme.surfaceBorder,
+        "border-width": 1.3,
+        color: theme.textPrimary,
+        "font-family": "Geist Variable",
+        "font-size": 13,
+        label: "data(label)",
+        "line-height": 1.24,
+        "min-zoomed-font-size": 11,
+        "overlay-opacity": 0,
+        "padding-bottom": 10,
+        "padding-left": 10,
+        "padding-right": 10,
+        "padding-top": 10,
+        "text-halign": "center",
+        "text-max-width": 140,
+        "text-outline-width": 0,
+        "text-valign": "center",
+        "text-wrap": "wrap",
+      },
+    },
+    {
+      selector: "node[kind = 'relationship']",
+      style: {
+        "background-color": theme.mutedSurfaceBg,
+        "border-width": 1.5,
+        height: "mapData(weight, 1, 5, 64, 92)",
+        shape: "round-rectangle",
+        width: "mapData(weight, 1, 5, 124, 166)",
+      },
+    },
+    {
+      selector: "node[kind = 'relationship'][impact = '滋养']",
+      style: {
+        "background-color": theme.tonePresentBg,
+        "border-color": theme.tonePresentBorder,
+      },
+    },
+    {
+      selector: "node[kind = 'relationship'][impact = '消耗']",
+      style: {
+        "background-color": theme.toneFutureBg,
+        "border-color": theme.toneFutureBorder,
+      },
+    },
+    {
+      selector: "node[kind = 'relationship'][impact = '混合']",
+      style: {
+        "background-color": theme.toneValueBg,
+        "border-color": theme.toneValueBorder,
+      },
+    },
+    {
+      selector: "node[kind = 'relationship'][impact = '中性']",
+      style: {
+        "background-color": theme.surfaceBg,
+        "border-color": theme.mutedSurfaceBorder,
+      },
+    },
+    {
+      selector: "node:selected",
+      style: {
+        "border-color": theme.accent,
+        "border-width": 2.7,
+        "shadow-blur": 18,
+        "shadow-color": theme.accent,
+        "shadow-opacity": 0.28,
+        "shadow-offset-x": 0,
+        "shadow-offset-y": 8,
+      },
+    },
+    {
+      selector: "edge",
+      style: {
+        "curve-style": "bezier",
+        "line-color": theme.chipBorder,
+        opacity: 0.72,
+        "overlay-opacity": 0,
+        "target-arrow-color": theme.chipBorder,
+        "target-arrow-shape": "triangle",
+        width: "mapData(weight, 1, 5, 1.8, 3.2)",
+      },
+    },
+    {
+      selector: "edge[linkKind = 'sameCircle']",
+      style: {
+        "line-color": theme.tonePastBorder,
+        "target-arrow-color": theme.tonePastBorder,
+      },
+    },
+    {
+      selector: "edge[linkKind = 'pattern']",
+      style: {
+        "line-color": theme.toneValueBorder,
+        "line-style": "dashed",
+        "target-arrow-color": theme.toneValueBorder,
+      },
+    },
+    {
+      selector: "edge[linkKind = 'mixed']",
+      style: {
+        "line-color": theme.accent,
+        "target-arrow-color": theme.accent,
+        width: "mapData(weight, 1, 6, 2.2, 4.4)",
+      },
+    },
+  ]
+}
+
 export function RelationshipsPage({
   editableRelationshipsModule,
   relationshipsModule,
-  searchQuery,
   isStackedLayout = false,
   isControlMode = false,
   onRefresh,
@@ -271,21 +403,6 @@ export function RelationshipsPage({
         !isStackedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <RelationshipPageHeader
-        searchQuery={searchQuery}
-        isControlMode={isControlMode}
-        totalRelationships={relationships.length}
-        totalNotes={relationshipsModule.unsentNotes.length}
-        onCreateRelationship={() =>
-          setEditingRelationship({
-            isNew: true,
-            circleId: sourceRelationshipsModule.circles[0]?.id ?? "",
-            relationship: null,
-          })
-        }
-        onCreateNote={() => setEditingNote({ isNew: true, note: null })}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
@@ -293,6 +410,7 @@ export function RelationshipsPage({
       >
         <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
           <TabsTrigger value="overview">{t("relationships.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="graph">{t("relationships.tabs.graph", "关系图谱")}</TabsTrigger>
           <TabsTrigger value="directory">
             {t("relationships.tabs.directory", "关系档案")}
           </TabsTrigger>
@@ -307,6 +425,18 @@ export function RelationshipsPage({
             classificationSections={classificationSections}
             relationships={relationships}
             unfinishedRows={unfinishedRows}
+          />
+        </TabsContent>
+
+        <TabsContent value="graph" className={tabContentClassName(isStackedLayout)}>
+          <RelationshipsGraphTab
+            isControlMode={isControlMode}
+            onEditRelationship={(relationship, circleId) =>
+              setEditingRelationship({ isNew: false, circleId, relationship })
+            }
+            relationshipById={relationshipById}
+            relationships={relationships}
+            relationshipsModule={relationshipsModule}
           />
         </TabsContent>
 
@@ -386,104 +516,6 @@ export function RelationshipsPage({
           onSaved={handleDeleted}
         />
       ) : null}
-    </div>
-  )
-}
-
-function RelationshipPageHeader({
-  isControlMode,
-  onCreateNote,
-  onCreateRelationship,
-  searchQuery,
-  totalNotes,
-  totalRelationships,
-}: {
-  isControlMode: boolean
-  onCreateNote: () => void
-  onCreateRelationship: () => void
-  searchQuery: string
-  totalNotes: number
-  totalRelationships: number
-}) {
-  const { t } = useTranslation()
-
-  return (
-    <Surface className="shrink-0 overflow-hidden p-4">
-      <div className="flex flex-col gap-4 min-[900px]:flex-row min-[900px]:items-start min-[900px]:justify-between">
-        <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
-              {t("relationships.page.eyebrow", "关系深化")}
-            </Badge>
-            <Badge
-              variant="outline"
-              className={cn(
-                "border-[color:var(--chip-border)]",
-                isControlMode
-                  ? "bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-                  : "bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]",
-              )}
-            >
-              {isControlMode
-                ? t("relationships.controlMode.on", "控制模式")
-                : t("relationships.controlMode.off", "浏览模式")}
-            </Badge>
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight text-[color:var(--text-primary)]">
-              {t("relationships.page.title", "关系状态与未完成表达")}
-            </h2>
-            <p className="mt-1 max-w-3xl text-sm leading-6 text-[color:var(--text-muted)]">
-              {t(
-                "relationships.page.description",
-                "用 5 个分类维度看关系世界，用未完成重量承接那些还没说出口的话。",
-              )}
-            </p>
-          </div>
-          {searchQuery.trim() ? (
-            <Badge
-              variant="outline"
-              className="w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-            >
-              {t("relationships.page.currentFilter", {
-                query: searchQuery.trim(),
-                defaultValue: `当前筛选：${searchQuery.trim()}`,
-              })}
-            </Badge>
-          ) : null}
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 min-[900px]:w-[360px]">
-          <HeaderMetric
-            label={t("relationships.page.relationshipCount", "关系")}
-            value={totalRelationships}
-          />
-          <HeaderMetric label={t("relationships.page.noteCount", "表达")} value={totalNotes} />
-          {isControlMode ? (
-            <div className="col-span-2 flex flex-wrap justify-end gap-2">
-              <Button size="sm" onClick={onCreateRelationship}>
-                <Plus className="h-4 w-4" />
-                {t("relationships.actions.addRelationship", "新增关系")}
-              </Button>
-              <Button size="sm" variant="outline" onClick={onCreateNote}>
-                <MessageCircleMore className="h-4 w-4" />
-                {t("relationships.actions.addNote", "新增表达")}
-              </Button>
-            </div>
-          ) : null}
-        </div>
-      </div>
-    </Surface>
-  )
-}
-
-function HeaderMetric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 py-2">
-      <div className="text-[11px] text-[color:var(--text-muted)]">{label}</div>
-      <div className="mt-1 text-lg font-semibold text-[color:var(--text-primary)] tabular-nums">
-        {value}
-      </div>
     </div>
   )
 }
@@ -643,6 +675,317 @@ function InsightMetric({ detail, label, value }: { detail: string; label: string
   )
 }
 
+function GraphMetric({ detail, label, value }: { detail: string; label: string; value: number }) {
+  return (
+    <div className="rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="text-[10px] tracking-[0.14em] text-[color:var(--text-muted)] uppercase">
+          {label}
+        </div>
+        <div className="text-lg font-semibold text-[color:var(--text-primary)] tabular-nums">
+          {value}
+        </div>
+      </div>
+      <p className="mt-1 text-[11px] leading-4 text-[color:var(--text-muted)]">{detail}</p>
+    </div>
+  )
+}
+
+type RelationshipGraphNodeMeta = {
+  circle: RelationshipCircle | null
+  connectedRelationships: RelationshipPerson[]
+  kind: "relationship"
+  matchedPatterns: RelationshipPattern[]
+  relatedNotes: RelationshipUnsentNote[]
+  relationship: RelationshipPerson
+}
+
+function RelationshipsGraphTab({
+  isControlMode,
+  onEditRelationship,
+  relationshipById,
+  relationships,
+  relationshipsModule,
+}: {
+  isControlMode: boolean
+  onEditRelationship: (relationship: RelationshipPerson, circleId: string) => void
+  relationshipById: Map<string, RelationshipPerson>
+  relationships: RelationshipPerson[]
+  relationshipsModule: RelationshipMap
+}) {
+  const { t } = useTranslation()
+  const graphModel = useMemo(
+    () => createRelationshipsGraphModel(relationshipsModule, relationshipById),
+    [relationshipById, relationshipsModule],
+  )
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const effectiveSelectedNodeId =
+    selectedNodeId && graphModel.metaByNodeId.has(selectedNodeId) ? selectedNodeId : null
+
+  if (graphModel.nodeCount === 0) {
+    return (
+      <EmptyState
+        message={t("relationships.empty.graph", "当前还没有可展示的关系连接。")}
+        compact
+      />
+    )
+  }
+
+  const selectedNode = effectiveSelectedNodeId
+    ? (graphModel.metaByNodeId.get(effectiveSelectedNodeId) ?? null)
+    : null
+
+  return (
+    <div className="h-full min-h-0 pr-1">
+      <div className="grid min-h-0 gap-4 xl:h-full xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.78fr)]">
+        <div className="flex min-h-0 flex-col gap-3 xl:h-full">
+          <div className="grid gap-3 min-[720px]:grid-cols-4">
+            <GraphMetric
+              detail={t("relationships.graph.metrics.relationshipsDetail", "图谱里只展示人物节点")}
+              label={t("relationships.graph.metrics.relationships", "人物")}
+              value={relationships.length}
+            />
+            <GraphMetric
+              detail={t("relationships.graph.metrics.circlesDetail", "圈层只作为人物分组线索")}
+              label={t("relationships.graph.metrics.circles", "圈层")}
+              value={relationshipsModule.circles.length}
+            />
+            <GraphMetric
+              detail={t("relationships.graph.metrics.notesDetail", "表达只影响人物节点权重")}
+              label={t("relationships.graph.metrics.notes", "表达线索")}
+              value={graphModel.connectedNotesCount}
+            />
+            <GraphMetric
+              detail={t("relationships.graph.metrics.linksDetail", "同圈层或共同模式的人物连接")}
+              label={t("relationships.graph.metrics.links", "连接")}
+              value={graphModel.edgeCount}
+            />
+          </div>
+
+          <CytoscapeGraph
+            canvasClassName="h-full min-h-[520px] xl:min-h-0"
+            className="min-h-0 flex-1"
+            elements={graphModel.elements}
+            exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
+            fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
+            layout={RELATIONSHIP_GRAPH_LAYOUT}
+            legend={
+              <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
+                <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
+                  {translateRelationshipEnum(t, "impact", "滋养")}
+                </Badge>
+                <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
+                  {translateRelationshipEnum(t, "impact", "消耗")}
+                </Badge>
+                <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
+                  {translateRelationshipEnum(t, "impact", "混合")}
+                </Badge>
+                <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
+                  {translateRelationshipEnum(t, "impact", "中性")}
+                </Badge>
+              </div>
+            }
+            legendPosition="bottom-left"
+            selectedNodeId={effectiveSelectedNodeId}
+            stylesheet={createRelationshipsGraphStylesheet}
+            onNodeSelect={setSelectedNodeId}
+          />
+        </div>
+
+        <Surface className="flex min-h-[360px] flex-col overflow-hidden p-4 xl:min-h-0">
+          <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
+            <Network className="size-4" />
+            <h4 className="text-sm font-semibold tracking-tight">
+              {t("relationships.graph.detailTitle", "节点说明")}
+            </h4>
+          </div>
+
+          <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            {selectedNode ? (
+              <RelationshipGraphDetail
+                isControlMode={isControlMode}
+                node={selectedNode}
+                onEditRelationship={onEditRelationship}
+              />
+            ) : (
+              <EmptyState
+                message={t(
+                  "relationships.graph.emptySelection",
+                  "选中一个节点后，这里会显示详细说明。",
+                )}
+                compact
+              />
+            )}
+          </div>
+        </Surface>
+      </div>
+    </div>
+  )
+}
+
+function RelationshipGraphDetail({
+  isControlMode,
+  node,
+  onEditRelationship,
+}: {
+  isControlMode: boolean
+  node: RelationshipGraphNodeMeta
+  onEditRelationship: (relationship: RelationshipPerson, circleId: string) => void
+}) {
+  return (
+    <RelationshipGraphRelationshipDetail
+      circle={node.circle}
+      connectedRelationships={node.connectedRelationships}
+      isControlMode={isControlMode}
+      matchedPatterns={node.matchedPatterns}
+      onEdit={onEditRelationship}
+      relatedNotes={node.relatedNotes}
+      relationship={node.relationship}
+    />
+  )
+}
+
+function RelationshipGraphRelationshipDetail({
+  circle,
+  connectedRelationships,
+  isControlMode,
+  matchedPatterns,
+  onEdit,
+  relatedNotes,
+  relationship,
+}: {
+  circle: RelationshipCircle | null
+  connectedRelationships: RelationshipPerson[]
+  isControlMode: boolean
+  matchedPatterns: RelationshipPattern[]
+  onEdit: (relationship: RelationshipPerson, circleId: string) => void
+  relatedNotes: RelationshipUnsentNote[]
+  relationship: RelationshipPerson
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <Badge className="bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]">
+          {t("relationships.graph.legend.relationship", "关系人物")}
+        </Badge>
+        {circle ? (
+          <Badge
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+          >
+            {circle.title}
+          </Badge>
+        ) : null}
+      </div>
+
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
+            {relationship.name}
+          </h4>
+          <p className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</p>
+        </div>
+        {isControlMode ? (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="shrink-0"
+            onClick={() => onEdit(relationship, circle?.id ?? "")}
+          >
+            <Pencil className="h-4 w-4" />
+            {t("relationships.common.edit", "编辑")}
+          </Button>
+        ) : null}
+      </div>
+
+      <p className="text-sm leading-6 text-[color:var(--text-secondary)]">
+        {relationship.influence}
+      </p>
+
+      <div className="grid gap-3 min-[640px]:grid-cols-2">
+        <RelationshipMeta
+          label={t("relationships.labels.depth", "深度")}
+          value={translateRelationshipEnum(t, "depth", relationship.depth)}
+        />
+        <RelationshipMeta
+          label={t("relationships.labels.stage", "阶段")}
+          value={translateRelationshipEnum(t, "stage", relationship.stage)}
+        />
+        <RelationshipMeta
+          label={t("relationships.labels.interaction", "互动频率")}
+          value={translateRelationshipEnum(t, "interaction", relationship.interaction)}
+        />
+        <RelationshipMeta
+          label={t("relationships.labels.impact", "影响")}
+          value={translateRelationshipEnum(t, "impact", relationship.impact)}
+        />
+      </div>
+
+      <DetailTextBlock
+        title={t("relationships.labels.currentState", "当前")}
+        body={relationship.currentState}
+      />
+      <DetailTextBlock
+        title={t("relationships.labels.unspoken", "没说出口")}
+        body={relationship.unspokenLine}
+      />
+      <div className="grid gap-3">
+        <RelationshipGraphSignalList
+          emptyLabel={t("relationships.graph.signals.noConnectedPeople", "暂无相连人物")}
+          items={connectedRelationships.map((item) => item.name)}
+          title={t("relationships.graph.signals.connectedPeople", "图中相连")}
+        />
+        <RelationshipGraphSignalList
+          emptyLabel={t("relationships.graph.signals.noPatterns", "暂无共同模式")}
+          items={matchedPatterns.map((pattern) => pattern.title)}
+          title={t("relationships.graph.signals.patterns", "匹配模式")}
+        />
+        <RelationshipGraphSignalList
+          emptyLabel={t("relationships.graph.signals.noNotes", "暂无表达线索")}
+          items={relatedNotes.map((note) => note.theme)}
+          title={t("relationships.graph.signals.notes", "表达线索")}
+        />
+      </div>
+      <BadgeRow items={relationship.emotionCues} />
+      <BadgeRow items={relationship.tags} muted />
+    </div>
+  )
+}
+
+function RelationshipGraphSignalList({
+  emptyLabel,
+  items,
+  title,
+}: {
+  emptyLabel: string
+  items: string[]
+  title: string
+}) {
+  return (
+    <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">{title}</div>
+      {items.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {items.slice(0, 6).map((item, index) => (
+            <Badge
+              key={`${item}-${index}`}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {item}
+            </Badge>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-[color:var(--text-muted)]">{emptyLabel}</p>
+      )}
+    </div>
+  )
+}
+
 function RelationshipsDirectoryTab({
   isControlMode,
   onCreate,
@@ -697,7 +1040,7 @@ function RelationshipsDirectoryTab({
 
   return (
     <TwoPaneLayout>
-      <Surface className="flex min-h-0 flex-col overflow-visible p-3 lg:w-80 lg:shrink-0 lg:overflow-hidden">
+      <Surface className="flex min-h-0 flex-col overflow-visible p-3 lg:w-[22rem] lg:shrink-0 lg:overflow-hidden">
         <ListHeader
           icon={Users2}
           title={t("relationships.directory.title", "关系档案")}
@@ -706,7 +1049,7 @@ function RelationshipsDirectoryTab({
           onCreate={onCreate}
         />
         <div className="mt-3 shrink-0 space-y-2">
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
             <DimensionFilterSelect
               label={t("relationships.filter.type", "类型")}
               value={typeFilter}
@@ -735,15 +1078,13 @@ function RelationshipsDirectoryTab({
               group="impact"
               onValueChange={setImpactFilter}
             />
-            <div className="col-span-2">
-              <DimensionFilterSelect
-                label={t("relationships.filter.interaction", "互动频率")}
-                value={interactionFilter}
-                options={INTERACTION_FREQUENCIES}
-                group="interaction"
-                onValueChange={setInteractionFilter}
-              />
-            </div>
+            <DimensionFilterSelect
+              label={t("relationships.filter.interaction", "互动频率")}
+              value={interactionFilter}
+              options={INTERACTION_FREQUENCIES}
+              group="interaction"
+              onValueChange={setInteractionFilter}
+            />
           </div>
           {hasActiveFilters ? (
             <Button
@@ -848,10 +1189,10 @@ function DimensionFilterSelect({
         }
       }}
     >
-      <SelectTrigger className="h-8 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-xs">
+      <SelectTrigger className="h-8 w-full min-w-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-xs text-[color:var(--text-secondary)]">
         <SelectValue placeholder={label} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
         <SelectItem value="all">{t("relationships.filter.all", "全部")}</SelectItem>
         {options.map((option) => (
           <SelectItem key={option} value={option}>
@@ -1391,6 +1732,216 @@ function EmptyDetail({ message }: { message: string }) {
       <p className="text-sm text-[color:var(--text-muted)]">{message}</p>
     </Surface>
   )
+}
+
+function createRelationshipsGraphModel(
+  relationshipsModule: RelationshipMap,
+  relationshipById: Map<string, RelationshipPerson>,
+) {
+  const metaByNodeId = new Map<string, RelationshipGraphNodeMeta>()
+  const connectedIdsByRelationshipId = new Map<string, Set<string>>()
+  const edgeByKey = new Map<
+    string,
+    {
+      linkKind: string
+      source: string
+      target: string
+      weight: number
+    }
+  >()
+  const elements: Array<{ data: Record<string, string | number> }> = []
+  let connectedNotesCount = 0
+
+  const notesByRelationshipId = new Map<string, RelationshipUnsentNote[]>()
+  relationshipsModule.unsentNotes.forEach((note) => {
+    if (!note.relationshipId || !relationshipById.has(note.relationshipId)) {
+      return
+    }
+
+    connectedNotesCount += 1
+    const bucket = notesByRelationshipId.get(note.relationshipId) ?? []
+    bucket.push(note)
+    notesByRelationshipId.set(note.relationshipId, bucket)
+  })
+
+  const patternsByRelationshipId = new Map<string, RelationshipPattern[]>()
+  relationshipsModule.patterns.forEach((pattern) => {
+    const matchedRelationships = inferPatternMatches(pattern, relationshipById)
+
+    matchedRelationships.forEach((relationship) => {
+      const bucket = patternsByRelationshipId.get(relationship.id) ?? []
+      bucket.push(pattern)
+      patternsByRelationshipId.set(relationship.id, bucket)
+    })
+
+    addRelationshipPairEdges(
+      matchedRelationships,
+      {
+        linkKind: "pattern",
+        weight: 1.15,
+      },
+      edgeByKey,
+      connectedIdsByRelationshipId,
+    )
+  })
+
+  relationshipsModule.circles.forEach((circle) => {
+    addRelationshipPairEdges(
+      circle.entries,
+      {
+        linkKind: "sameCircle",
+        weight: Math.max(1, Math.min(2.2, circle.entries.length / 3)),
+      },
+      edgeByKey,
+      connectedIdsByRelationshipId,
+    )
+
+    circle.entries.forEach((relationship) => {
+      const relatedNotes = notesByRelationshipId.get(relationship.id) ?? []
+      const matchedPatterns = patternsByRelationshipId.get(relationship.id) ?? []
+      const relationshipWeight = Math.max(
+        1,
+        1 +
+          relatedNotes.length * 0.8 +
+          matchedPatterns.length * 0.65 +
+          relationship.events.length * 0.35 +
+          relationship.tags.length * 0.2,
+      )
+
+      elements.push({
+        data: {
+          circle: circle.title,
+          id: relationship.id,
+          impact: relationship.impact,
+          kind: "relationship",
+          label: relationship.name,
+          type: relationship.type,
+          weight: relationshipWeight,
+        },
+      })
+      metaByNodeId.set(relationship.id, {
+        circle,
+        connectedRelationships: [],
+        kind: "relationship",
+        matchedPatterns,
+        relatedNotes,
+        relationship,
+      })
+    })
+  })
+
+  edgeByKey.forEach((edge, key) => {
+    elements.push({
+      data: {
+        id: key,
+        linkKind: edge.linkKind,
+        source: edge.source,
+        target: edge.target,
+        weight: edge.weight,
+      },
+    })
+  })
+
+  metaByNodeId.forEach((meta, relationshipId) => {
+    meta.connectedRelationships = [...(connectedIdsByRelationshipId.get(relationshipId) ?? [])]
+      .map((connectedId) => relationshipById.get(connectedId))
+      .filter((relationship): relationship is RelationshipPerson => Boolean(relationship))
+  })
+
+  return {
+    connectedNotesCount,
+    edgeCount: edgeByKey.size,
+    elements,
+    metaByNodeId,
+    nodeCount: metaByNodeId.size,
+  }
+}
+
+function addRelationshipPairEdges(
+  relationships: RelationshipPerson[],
+  edge: {
+    linkKind: string
+    weight: number
+  },
+  edgeByKey: Map<
+    string,
+    {
+      linkKind: string
+      source: string
+      target: string
+      weight: number
+    }
+  >,
+  connectedIdsByRelationshipId: Map<string, Set<string>>,
+) {
+  const uniqueRelationships = [
+    ...new Map(relationships.map((relationship) => [relationship.id, relationship])).values(),
+  ]
+
+  for (let firstIndex = 0; firstIndex < uniqueRelationships.length; firstIndex += 1) {
+    for (
+      let secondIndex = firstIndex + 1;
+      secondIndex < uniqueRelationships.length;
+      secondIndex += 1
+    ) {
+      const first = uniqueRelationships[firstIndex]
+      const second = uniqueRelationships[secondIndex]
+      const [source, target] = [first.id, second.id].sort()
+      const key = `${source}::${target}`
+      const existing = edgeByKey.get(key)
+
+      edgeByKey.set(key, {
+        linkKind: existing && existing.linkKind !== edge.linkKind ? "mixed" : edge.linkKind,
+        source,
+        target,
+        weight: (existing?.weight ?? 0) + edge.weight,
+      })
+
+      addConnectedRelationshipId(connectedIdsByRelationshipId, source, target)
+      addConnectedRelationshipId(connectedIdsByRelationshipId, target, source)
+    }
+  }
+}
+
+function addConnectedRelationshipId(
+  connectedIdsByRelationshipId: Map<string, Set<string>>,
+  relationshipId: string,
+  connectedRelationshipId: string,
+) {
+  const bucket = connectedIdsByRelationshipId.get(relationshipId) ?? new Set<string>()
+  bucket.add(connectedRelationshipId)
+  connectedIdsByRelationshipId.set(relationshipId, bucket)
+}
+
+function inferPatternMatches(
+  pattern: RelationshipPattern,
+  relationshipById: Map<string, RelationshipPerson>,
+) {
+  const patternTerms = normalizeTerms([pattern.title, pattern.summary, ...pattern.cues])
+
+  return [...relationshipById.values()].filter((relationship) => {
+    const relationshipTerms = normalizeTerms([
+      relationship.name,
+      relationship.role,
+      relationship.currentState,
+      relationship.influence,
+      relationship.unspokenLine,
+      relationship.positiveImpact,
+      relationship.ongoingShadow,
+      relationship.boundaryStatus,
+      ...relationship.tags,
+      ...relationship.emotionCues,
+    ])
+
+    return patternTerms.some((term) => relationshipTerms.some((source) => source.includes(term)))
+  })
+}
+
+function normalizeTerms(values: string[]) {
+  return values
+    .flatMap((value) => value.split(/[，,、。\n\s]+/))
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => value.length >= 2)
 }
 
 function getRelationships(relationshipsModule: RelationshipMap) {

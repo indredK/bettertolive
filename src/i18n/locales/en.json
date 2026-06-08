@@ -871,6 +871,7 @@
     },
     "tabs": {
       "overview": "Overview",
+      "graph": "Relationship Graph",
       "directory": "Directory",
       "unsent": "Unsent Words",
       "patterns": "Patterns"
@@ -936,6 +937,37 @@
       "title": "Cross-Relationship Patterns",
       "kicker": "Relationship Pattern"
     },
+    "graph": {
+      "helper": "Circles connect people, people connect unsent words, and patterns add dashed links when their cues match tags or emotional signals.",
+      "editHint": "Switch to Control Mode to edit relationship, unsent-word, and pattern nodes directly from here.",
+      "detailTitle": "Node Details",
+      "detailDescription": "Select different node types to see their place, context, and nearby links in the relationship network.",
+      "emptySelection": "Select a node to see its details here.",
+      "noPatternMatches": "This pattern does not match any relationship nodes yet.",
+      "connectedRelationshipsCount": "Linked to {{count}} relationships",
+      "controls": {
+        "fit": "Fit",
+        "recenter": "Relayout",
+        "fullscreen": "Fullscreen",
+        "exitFullscreen": "Exit Fullscreen"
+      },
+      "legend": {
+        "circle": "Circle",
+        "relationship": "Relationship",
+        "note": "Unsent Words",
+        "pattern": "Pattern"
+      },
+      "metrics": {
+        "circles": "Circles",
+        "circlesDetail": "How many relationship circles are in the current map",
+        "relationships": "Relationships",
+        "relationshipsDetail": "Relationship people currently shown as graph nodes",
+        "notes": "Notes",
+        "notesDetail": "Unsent-word nodes that are linked to relationship records",
+        "links": "Links",
+        "linksDetail": "Connections between circles, people, notes, and patterns"
+      }
+    },
     "labels": {
       "depth": "Depth",
       "stage": "Stage",
@@ -955,6 +987,7 @@
       "events": "No key events yet.",
       "history": "No depth or stage changes yet.",
       "relatedNotes": "No related notes yet.",
+      "graph": "No relationship links to show yet.",
       "directory": "No relationships under current filters.",
       "selectRelationship": "Select a relationship from the left.",
       "selectNote": "Select a note from the left.",
@@ -2554,7 +2587,32 @@
     },
     "graph": {
       "title": "Knowledge Links",
-      "description": "Put economics and sociology on the same relationship map to see how concepts explain one another."
+      "description": "Put economics and sociology on the same relationship map to see how concepts explain one another.",
+      "helper": "Drag nodes to re-read the structure, click a node for details, and click empty space to clear selection.",
+      "detailTitle": "Node Details",
+      "detailDescription": "The card on the right follows the selected node and translates the map position back into readable context.",
+      "emptySelection": "Select a node to see its details here.",
+      "connectedConcepts": "Connected Concepts",
+      "connectedEntries": "Connected Entries",
+      "connectedEntriesCount": "Linked to {{count}} entries",
+      "conceptDescription": "This concept works like a junction, pulling scattered knowledge entries back into one shared map.",
+      "controls": {
+        "fit": "Fit",
+        "recenter": "Relayout"
+      },
+      "legend": {
+        "entry": "Knowledge Entry",
+        "concept": "Concept Node",
+        "hub": "High-Connection Concept"
+      },
+      "metrics": {
+        "entries": "Entries",
+        "entriesDetail": "Knowledge entries that already point to related concepts",
+        "nodes": "Nodes",
+        "nodesDetail": "Knowledge nodes plus concept nodes together",
+        "links": "Links",
+        "linksDetail": "Connections that point from entries to concepts"
+      }
     }
   },
   "emotion": {

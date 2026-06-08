@@ -83,6 +83,8 @@ export const RELATIONSHIP_DIALOG_FIELD_CLASS = "w-full border-foreground/15 bg-b
 export const RELATIONSHIP_DIALOG_FOOTER_CLASS =
   "sticky bottom-0 z-10 gap-2 border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
 
+export const RELATIONSHIP_SELECT_CONTENT_CLASS = "min-w-[14rem] max-w-[min(24rem,calc(100vw-2rem))]"
+
 export type RelationshipEnumGroup =
   | "type"
   | "depth"

@@ -1,5 +1,15 @@
-import { Globe2, Grid3x3, Landmark, Network, NotebookPen, Pencil, Plus } from "lucide-react"
-import { useState } from "react"
+import {
+  ArrowUpRight,
+  Globe2,
+  Grid3x3,
+  Landmark,
+  Network,
+  NotebookPen,
+  Pencil,
+  Plus,
+  Sparkles,
+} from "lucide-react"
+import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +31,10 @@ import {
   SectionHeading,
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
+import {
+  CytoscapeGraph,
+  type CytoscapeThemeTokens,
+} from "@/features/bettertolive/ui/shared/cytoscape-graph"
 import {
   type EditingSocioeconomicsEntry,
   type EditingSocioeconomicsGap,
@@ -167,6 +181,128 @@ function getEntryTopicArea(entry: SocioeconomicsEntry): EconTopicArea | null {
   }
 
   return "经济学基础概念"
+}
+
+const CONCEPT_GRAPH_LAYOUT = {
+  animate: false,
+  edgeElasticity: 96,
+  fit: true,
+  gravity: 0.32,
+  idealEdgeLength: 132,
+  name: "cose",
+  nodeRepulsion: 14000,
+  numIter: 900,
+  padding: 56,
+} as const
+
+function createConceptGraphStylesheet(theme: CytoscapeThemeTokens) {
+  return [
+    {
+      selector: "node",
+      style: {
+        "background-color": theme.surfaceBg,
+        "border-color": theme.surfaceBorder,
+        "border-width": 1.2,
+        color: theme.textPrimary,
+        "font-family": "Geist Variable",
+        "font-size": 12,
+        label: "data(label)",
+        "line-height": 1.2,
+        "overlay-opacity": 0,
+        "padding-left": 10,
+        "padding-right": 10,
+        "padding-top": 10,
+        "padding-bottom": 10,
+        "text-halign": "center",
+        "text-max-width": 124,
+        "text-outline-width": 0,
+        "text-valign": "center",
+        "text-wrap": "wrap",
+      },
+    },
+    {
+      selector: "node[kind = 'entry']",
+      style: {
+        "background-color": theme.mutedSurfaceBg,
+        "border-width": 1.5,
+        height: "mapData(weight, 1, 6, 62, 90)",
+        shape: "round-rectangle",
+        width: "mapData(weight, 1, 6, 112, 152)",
+      },
+    },
+    {
+      selector: "node[kind = 'entry'][discipline = '经济学']",
+      style: {
+        "background-color": theme.tonePastBg,
+        "border-color": theme.tonePastBorder,
+      },
+    },
+    {
+      selector: "node[kind = 'entry'][discipline = '社会学']",
+      style: {
+        "background-color": theme.tonePresentBg,
+        "border-color": theme.tonePresentBorder,
+      },
+    },
+    {
+      selector: "node[kind = 'concept']",
+      style: {
+        "background-color": theme.surfaceBg,
+        "border-color": theme.mutedSurfaceBorder,
+        "border-style": "dashed",
+        color: theme.textSecondary,
+        height: "mapData(weight, 1, 5, 54, 86)",
+        "font-size": 11,
+        shape: "ellipse",
+        width: "mapData(weight, 1, 5, 54, 86)",
+      },
+    },
+    {
+      selector: "node[kind = 'concept'][importance > 2]",
+      style: {
+        "background-color": theme.toneValueBg,
+        "border-color": theme.toneFutureBorder,
+      },
+    },
+    {
+      selector: "node:selected",
+      style: {
+        "border-color": theme.accent,
+        "border-width": 2.6,
+        "shadow-blur": 18,
+        "shadow-color": theme.accent,
+        "shadow-opacity": 0.28,
+        "shadow-offset-x": 0,
+        "shadow-offset-y": 8,
+      },
+    },
+    {
+      selector: "edge",
+      style: {
+        "curve-style": "bezier",
+        "line-color": theme.chipBorder,
+        opacity: 0.68,
+        "overlay-opacity": 0,
+        "target-arrow-color": theme.chipBorder,
+        "target-arrow-shape": "triangle",
+        width: "mapData(weight, 1, 6, 1.6, 2.8)",
+      },
+    },
+    {
+      selector: "edge[discipline = '经济学']",
+      style: {
+        "line-color": theme.tonePastBorder,
+        "target-arrow-color": theme.tonePastBorder,
+      },
+    },
+    {
+      selector: "edge[discipline = '社会学']",
+      style: {
+        "line-color": theme.tonePresentBorder,
+        "target-arrow-color": theme.tonePresentBorder,
+      },
+    },
+  ]
 }
 
 export function SocioeconomicsPage({
@@ -1021,46 +1157,378 @@ function SocioeconomicsEntryList({
 
 function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
   const { t } = useTranslation()
-  const links = entries.flatMap((entry) =>
-    (entry.relatedConcepts ?? []).map((concept) => ({
-      concept,
-      entry,
-    })),
-  )
 
-  if (links.length === 0) {
+  const graphModel = useMemo(() => {
+    const linkedEntries = entries.filter((entry) => (entry.relatedConcepts ?? []).length > 0)
+    const conceptMap = new Map<
+      string,
+      {
+        concept: string
+        entries: SocioeconomicsEntry[]
+      }
+    >()
+
+    const elements = linkedEntries.flatMap((entry) => {
+      const discipline = getEntryDiscipline(entry)
+      const concepts = [
+        ...new Set((entry.relatedConcepts ?? []).map((item) => item.trim()).filter(Boolean)),
+      ]
+      const entryNode = {
+        data: {
+          discipline,
+          id: entry.id,
+          kind: "entry",
+          label: entry.title,
+          weight: Math.max(1, concepts.length),
+        },
+      }
+
+      const edges = concepts.map((concept) => {
+        const conceptId = `concept:${concept}`
+        const bucket = conceptMap.get(conceptId)
+
+        if (bucket) {
+          bucket.entries.push(entry)
+        } else {
+          conceptMap.set(conceptId, {
+            concept,
+            entries: [entry],
+          })
+        }
+
+        return {
+          data: {
+            discipline,
+            id: `${entry.id}::${conceptId}`,
+            source: entry.id,
+            target: conceptId,
+            weight: Math.max(1, concepts.length),
+          },
+        }
+      })
+
+      return [entryNode, ...edges]
+    })
+
+    const conceptNodes = [...conceptMap.entries()].map(([id, bucket]) => ({
+      data: {
+        id,
+        importance: bucket.entries.length,
+        kind: "concept",
+        label: bucket.concept,
+        weight: Math.max(1, bucket.entries.length),
+      },
+    }))
+
+    const nodeMeta = new Map<
+      string,
+      | {
+          entry: SocioeconomicsEntry
+          kind: "entry"
+        }
+      | {
+          concept: string
+          entries: SocioeconomicsEntry[]
+          kind: "concept"
+        }
+    >()
+
+    linkedEntries.forEach((entry) => {
+      nodeMeta.set(entry.id, { entry, kind: "entry" })
+    })
+    conceptMap.forEach((bucket, id) => {
+      nodeMeta.set(id, {
+        concept: bucket.concept,
+        entries: bucket.entries,
+        kind: "concept",
+      })
+    })
+
+    return {
+      edgeCount: elements.length - linkedEntries.length,
+      elements: [...elements, ...conceptNodes],
+      linkedEntries,
+      nodeCount: linkedEntries.length + conceptNodes.length,
+      nodeMeta,
+    }
+  }, [entries])
+
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const effectiveSelectedNodeId =
+    selectedNodeId && graphModel.nodeMeta.has(selectedNodeId) ? selectedNodeId : null
+
+  if (graphModel.edgeCount === 0) {
     return <EmptyState message={t("socioeconomics.empty.graph", "当前还没有概念关联。")} compact />
   }
 
-  return (
-    <div className="grid gap-3 min-[960px]:grid-cols-2">
-      {links.map(({ concept, entry }) => {
-        const topicArea = getEntryTopicArea(entry)
+  const selectedNode = effectiveSelectedNodeId
+    ? (graphModel.nodeMeta.get(effectiveSelectedNodeId) ?? null)
+    : null
 
-        return (
-          <div
-            key={`${entry.id}-${concept}`}
-            className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
+  return (
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.78fr)]">
+      <div className="space-y-3">
+        <div className="grid gap-3 min-[720px]:grid-cols-3">
+          <GraphMetric
+            detail={t("socioeconomics.graph.metrics.entriesDetail", "带有关联概念的知识条目")}
+            label={t("socioeconomics.graph.metrics.entries", "条目")}
+            value={graphModel.linkedEntries.length}
+          />
+          <GraphMetric
+            detail={t("socioeconomics.graph.metrics.nodesDetail", "概念节点和知识节点合计")}
+            label={t("socioeconomics.graph.metrics.nodes", "节点")}
+            value={graphModel.nodeCount}
+          />
+          <GraphMetric
+            detail={t("socioeconomics.graph.metrics.linksDetail", "从条目指向概念的连接")}
+            label={t("socioeconomics.graph.metrics.links", "连接")}
+            value={graphModel.edgeCount}
+          />
+        </div>
+
+        <CytoscapeGraph
+          elements={graphModel.elements}
+          layout={CONCEPT_GRAPH_LAYOUT}
+          legend={
+            <div className="space-y-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className="bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]">
+                  {t("socioeconomics.graph.legend.entry", "知识条目")}
+                </Badge>
+                <Badge className="bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]">
+                  {t("socioeconomics.graph.legend.concept", "概念节点")}
+                </Badge>
+                <Badge className="bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]">
+                  {t("socioeconomics.graph.legend.hub", "高连接概念")}
+                </Badge>
+              </div>
+              <p className="text-xs leading-5 text-[color:var(--text-muted)]">
+                {t(
+                  "socioeconomics.graph.helper",
+                  "缩放或拖动画布重看结构，点击节点查看说明，空白处点击可取消选择。",
+                )}
+              </p>
+            </div>
+          }
+          selectedNodeId={effectiveSelectedNodeId}
+          stylesheet={createConceptGraphStylesheet}
+          onNodeSelect={setSelectedNodeId}
+        />
+      </div>
+
+      <Surface className="flex min-h-[440px] flex-col overflow-hidden p-4">
+        <SectionHeading
+          icon={Sparkles}
+          title={t("socioeconomics.graph.detailTitle", "节点说明")}
+          description={t(
+            "socioeconomics.graph.detailDescription",
+            "右侧卡片会跟着当前选中的节点变化，帮你把图上的位置重新翻译成可读信息。",
+          )}
+          compact
+        />
+
+        <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+          {selectedNode ? (
+            selectedNode.kind === "entry" ? (
+              <EntryGraphDetail entry={selectedNode.entry} />
+            ) : (
+              <ConceptGraphDetail concept={selectedNode.concept} entries={selectedNode.entries} />
+            )
+          ) : (
+            <EmptyState
+              message={t(
+                "socioeconomics.graph.emptySelection",
+                "选中一个节点后，这里会显示详细说明。",
+              )}
+              compact
+            />
+          )}
+        </div>
+      </Surface>
+    </div>
+  )
+}
+
+function GraphMetric({ detail, label, value }: { detail: string; label: string; value: number }) {
+  return (
+    <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+      <div className="text-[11px] tracking-[0.16em] text-[color:var(--text-muted)] uppercase">
+        {label}
+      </div>
+      <div className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)] tabular-nums">
+        {value}
+      </div>
+      <p className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">{detail}</p>
+    </div>
+  )
+}
+
+function EntryGraphDetail({ entry }: { entry: SocioeconomicsEntry }) {
+  const { t } = useTranslation()
+  const discipline = getEntryDiscipline(entry)
+  const topicArea = getEntryTopicArea(entry)
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <Badge className="bg-[color:var(--tone-past-bg)] text-[color:var(--tone-past-ink)]">
+          {translateSocioeconomicsEnum(t, "discipline", discipline)}
+        </Badge>
+        {topicArea ? (
+          <Badge
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
           >
-            <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-              <Network className="size-4" />
-              {entry.title}
-            </div>
-            <div className="mt-2 flex items-center gap-2 text-xs text-[color:var(--text-muted)]">
-              <span>
-                {topicArea
-                  ? translateSocioeconomicsEnum(t, "topicArea", topicArea)
-                  : translateSocioeconomicsEnum(t, "discipline", getEntryDiscipline(entry))}
-              </span>
-              <span>{"->"}</span>
-              <span className="font-medium text-[color:var(--text-secondary)]">{concept}</span>
-            </div>
-            <p className="mt-2 line-clamp-2 text-xs leading-5 text-[color:var(--text-muted)]">
-              {entry.summary}
-            </p>
+            {translateSocioeconomicsEnum(t, "topicArea", topicArea)}
+          </Badge>
+        ) : null}
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+        >
+          {translateSocioeconomicsEnum(t, "domain", entry.domain)}
+        </Badge>
+      </div>
+
+      <div>
+        <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{entry.title}</h4>
+        <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{entry.summary}</p>
+      </div>
+
+      {entry.understandingNote ? (
+        <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+          <div className="text-xs font-medium text-[color:var(--text-primary)]">
+            {t("socioeconomics.fields.understandingNote", "理解笔记")}
           </div>
-        )
-      })}
+          <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+            {entry.understandingNote}
+          </p>
+        </div>
+      ) : null}
+
+      <div className="grid gap-3 min-[640px]:grid-cols-2">
+        <SocioeconomicsMeta
+          label={t("socioeconomics.fields.relevance", "决策距离")}
+          value={translateSocioeconomicsEnum(t, "relevance", entry.relevance)}
+          accent
+        />
+        <SocioeconomicsMeta
+          label={t("socioeconomics.fields.confidence", "掌握程度")}
+          value={translateSocioeconomicsEnum(t, "confidence", entry.confidence)}
+        />
+      </div>
+
+      {(entry.relatedConcepts ?? []).length > 0 ? (
+        <div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+            {t("socioeconomics.graph.connectedConcepts", "连接到的概念")}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {entry.relatedConcepts?.map((concept) => (
+              <Badge
+                key={concept}
+                variant="outline"
+                className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+              >
+                {concept}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {entry.sourceRefs && entry.sourceRefs.length > 0 ? (
+        <div>
+          <div className="text-sm font-medium text-[color:var(--text-primary)]">
+            {t("socioeconomics.fields.sourceRefs", "权威来源")}
+          </div>
+          <div className="mt-3 space-y-2">
+            {entry.sourceRefs.map((source) => (
+              <a
+                key={source.id}
+                href={source.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm text-[color:var(--text-secondary)] transition hover:border-[color:var(--surface-border)] hover:text-[color:var(--text-primary)]"
+              >
+                <span className="min-w-0 truncate">{source.label}</span>
+                <ArrowUpRight className="size-4 shrink-0" />
+              </a>
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function ConceptGraphDetail({
+  concept,
+  entries,
+}: {
+  concept: string
+  entries: SocioeconomicsEntry[]
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <Badge className="bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]">
+          {t("socioeconomics.graph.legend.concept", "概念节点")}
+        </Badge>
+        <Badge
+          variant="outline"
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+        >
+          {t("socioeconomics.graph.connectedEntriesCount", {
+            count: entries.length,
+            defaultValue: `连接 ${entries.length} 个条目`,
+          })}
+        </Badge>
+      </div>
+
+      <div>
+        <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{concept}</h4>
+        <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
+          {t(
+            "socioeconomics.graph.conceptDescription",
+            "这个概念像一个交汇点，把原本分散的知识条目重新拢到同一张图里。",
+          )}
+        </p>
+      </div>
+
+      <div>
+        <div className="text-sm font-medium text-[color:var(--text-primary)]">
+          {t("socioeconomics.graph.connectedEntries", "连接到的条目")}
+        </div>
+        <div className="mt-3 space-y-3">
+          {entries.map((entry) => (
+            <div
+              key={entry.id}
+              className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                >
+                  {translateSocioeconomicsEnum(t, "discipline", getEntryDiscipline(entry))}
+                </Badge>
+                <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
+                  {translateSocioeconomicsEnum(t, "domain", entry.domain)}
+                </Badge>
+              </div>
+              <div className="mt-3 text-sm font-medium text-[color:var(--text-primary)]">
+                {entry.title}
+              </div>
+              <p className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
+                {entry.summary}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

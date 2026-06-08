@@ -48,6 +48,7 @@ import {
   RELATIONSHIP_DIALOG_FOOTER_CLASS,
   RELATIONSHIP_DIALOG_HEADER_CLASS,
   RELATIONSHIP_DIALOG_SECTION_CLASS,
+  RELATIONSHIP_SELECT_CONTENT_CLASS,
   RELATIONSHIP_EVENT_KINDS,
   RELATIONSHIP_IMPACTS,
   RELATIONSHIP_STAGES,
@@ -171,7 +172,7 @@ export function RelationshipEditDialog({
       <DialogContent
         className={cn(
           RELATIONSHIP_DIALOG_CONTENT_CLASS,
-          "flex max-h-[min(820px,calc(100dvh-2rem))] max-w-6xl flex-col overflow-hidden",
+          "flex max-h-[min(820px,calc(100dvh-2rem))] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
         )}
       >
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
@@ -191,7 +192,7 @@ export function RelationshipEditDialog({
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
-              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px]">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_220px]">
                 <Field label={t("relationships.edit.name", "姓名")}>
                   <Input
                     value={form.name}
@@ -218,7 +219,7 @@ export function RelationshipEditDialog({
                     <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
                       {relationshipsModule.circles.map((circle) => (
                         <SelectItem key={circle.id} value={circle.id}>
                           {circle.title}
@@ -229,7 +230,7 @@ export function RelationshipEditDialog({
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <EnumSelect
                   label={t("relationships.edit.type", "类型")}
                   value={form.type}
@@ -514,7 +515,7 @@ export function UnsentNoteEditDialog({
       <DialogContent
         className={cn(
           RELATIONSHIP_DIALOG_CONTENT_CLASS,
-          "flex max-h-[min(620px,calc(100dvh-2rem))] max-w-3xl flex-col overflow-hidden",
+          "flex max-h-[min(620px,calc(100dvh-2rem))] flex-col overflow-hidden sm:max-w-[min(960px,calc(100vw-3rem))]",
         )}
       >
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
@@ -531,7 +532,7 @@ export function UnsentNoteEditDialog({
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <EnumSelect
                   label={t("relationships.edit.targetType", "目标类型")}
                   value={form.targetType}
@@ -569,7 +570,7 @@ export function UnsentNoteEditDialog({
                     <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
                       <SelectItem value={NONE_RELATIONSHIP_ID}>
                         {t("relationships.edit.noRelationship", "不关联")}
                       </SelectItem>
@@ -681,7 +682,12 @@ export function RelationshipPatternEditDialog({
 
   return (
     <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
-      <DialogContent className={cn(RELATIONSHIP_DIALOG_CONTENT_CLASS, "max-w-2xl")}>
+      <DialogContent
+        className={cn(
+          RELATIONSHIP_DIALOG_CONTENT_CLASS,
+          "flex max-h-[min(640px,calc(100dvh-2rem))] flex-col overflow-hidden sm:max-w-[min(920px,calc(100vw-3rem))]",
+        )}
+      >
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
@@ -693,30 +699,32 @@ export function RelationshipPatternEditDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
-            <Field label={t("relationships.edit.title", "标题")}>
-              <Input
-                value={form.title}
-                onChange={(event) => updateForm({ title: event.target.value })}
-                className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-              />
-            </Field>
-            <Field label={t("relationships.edit.summary", "摘要")}>
-              <Textarea
-                value={form.summary}
-                onChange={(event) => updateForm({ summary: event.target.value })}
-                className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-28")}
-              />
-            </Field>
-            <Field label={t("relationships.edit.cues", "线索")}>
-              <Input
-                value={form.cuesText}
-                onChange={(event) => updateForm({ cuesText: event.target.value })}
-                className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-              />
-            </Field>
-          </section>
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 overflow-y-auto px-1 py-1 pr-2">
+            <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
+              <Field label={t("relationships.edit.title", "标题")}>
+                <Input
+                  value={form.title}
+                  onChange={(event) => updateForm({ title: event.target.value })}
+                  className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+                />
+              </Field>
+              <Field label={t("relationships.edit.summary", "摘要")}>
+                <Textarea
+                  value={form.summary}
+                  onChange={(event) => updateForm({ summary: event.target.value })}
+                  className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-28")}
+                />
+              </Field>
+              <Field label={t("relationships.edit.cues", "线索")}>
+                <Input
+                  value={form.cuesText}
+                  onChange={(event) => updateForm({ cuesText: event.target.value })}
+                  className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+                />
+              </Field>
+            </section>
+          </div>
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
@@ -771,7 +779,7 @@ function EnumSelect({
         <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {translateRelationshipEnum(t, group, option)}
@@ -810,7 +818,7 @@ function EventEditor({
 
   return (
     <div className="border-foreground/10 bg-background/80 rounded-lg border p-3">
-      <div className="grid gap-3 md:grid-cols-[140px_160px_minmax(0,1fr)_auto]">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[140px_160px_minmax(0,1fr)_auto]">
         <Input
           value={event.date}
           onChange={(inputEvent) => onChange({ ...event, date: inputEvent.target.value })}
@@ -828,7 +836,7 @@ function EventEditor({
           <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
             {RELATIONSHIP_EVENT_KINDS.map((kind) => (
               <SelectItem key={kind} value={kind}>
                 {translateRelationshipEnum(t, "eventKind", kind)}
@@ -869,7 +877,7 @@ function HistoryEditor({
 
   return (
     <div className="border-foreground/10 bg-background/80 rounded-lg border p-3">
-      <div className="grid gap-3 md:grid-cols-[140px_120px_minmax(0,1fr)_minmax(0,1fr)_auto]">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-[140px_120px_minmax(0,1fr)_minmax(0,1fr)_auto]">
         <Input
           value={history.date}
           onChange={(event) => onChange({ ...history, date: event.target.value })}
@@ -887,7 +895,7 @@ function HistoryEditor({
           <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
             {RELATIONSHIP_CHANGE_FIELDS.map((field) => (
               <SelectItem key={field} value={field}>
                 {translateRelationshipEnum(t, "changeField", field)}

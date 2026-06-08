@@ -871,6 +871,7 @@
     },
     "tabs": {
       "overview": "总览",
+      "graph": "关系图谱",
       "directory": "关系档案",
       "unsent": "想说的话",
       "patterns": "跨关系模式"
@@ -936,6 +937,37 @@
       "title": "跨关系模式",
       "kicker": "关系模式"
     },
+    "graph": {
+      "helper": "圈层连接人物，人物连接表达，模式会根据线索和标签与相关关系形成虚线连接。",
+      "editHint": "切换到控制模式后，这里的关系人物、想说的话和模式节点都可以直接编辑。",
+      "detailTitle": "节点说明",
+      "detailDescription": "选中不同类型的节点后，这里会显示它在关系网络里的位置、上下文和相关连接。",
+      "emptySelection": "选中一个节点后，这里会显示详细说明。",
+      "noPatternMatches": "这个模式暂时还没有匹配到关系节点。",
+      "connectedRelationshipsCount": "连接 {{count}} 段关系",
+      "controls": {
+        "fit": "铺满",
+        "recenter": "重排",
+        "fullscreen": "全屏",
+        "exitFullscreen": "退出全屏"
+      },
+      "legend": {
+        "circle": "圈层",
+        "relationship": "关系人物",
+        "note": "想说的话",
+        "pattern": "模式"
+      },
+      "metrics": {
+        "circles": "圈层",
+        "circlesDetail": "当前关系圈层的总数",
+        "relationships": "关系",
+        "relationshipsDetail": "进入图谱的人物关系节点",
+        "notes": "表达",
+        "notesDetail": "与关系记录相连的表达节点",
+        "links": "连接",
+        "linksDetail": "圈层、人物、表达和模式之间的连接"
+      }
+    },
     "labels": {
       "depth": "深度",
       "stage": "阶段",
@@ -955,6 +987,7 @@
       "events": "暂无关键互动事件。",
       "history": "暂无深度或阶段变化。",
       "relatedNotes": "暂无关联表达。",
+      "graph": "当前还没有可展示的关系连接。",
       "directory": "当前筛选下没有关系。",
       "selectRelationship": "从左侧选择一段关系。",
       "selectNote": "从左侧选择一条表达。",
@@ -2554,7 +2587,32 @@
     },
     "graph": {
       "title": "知识关联",
-      "description": "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。"
+      "description": "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。",
+      "helper": "拖拽节点重看结构，点击节点查看说明，空白处点击可取消选择。",
+      "detailTitle": "节点说明",
+      "detailDescription": "右侧卡片会跟着当前选中的节点变化，帮你把图上的位置重新翻译成可读信息。",
+      "emptySelection": "选中一个节点后，这里会显示详细说明。",
+      "connectedConcepts": "连接到的概念",
+      "connectedEntries": "连接到的条目",
+      "connectedEntriesCount": "连接 {{count}} 个条目",
+      "conceptDescription": "这个概念像一个交汇点，把原本分散的知识条目重新拢到同一张图里。",
+      "controls": {
+        "fit": "铺满",
+        "recenter": "重排"
+      },
+      "legend": {
+        "entry": "知识条目",
+        "concept": "概念节点",
+        "hub": "高连接概念"
+      },
+      "metrics": {
+        "entries": "条目",
+        "entriesDetail": "带有关联概念的知识条目",
+        "nodes": "节点",
+        "nodesDetail": "概念节点和知识节点合计",
+        "links": "连接",
+        "linksDetail": "从条目指向概念的连接"
+      }
     }
   },
   "emotion": {
