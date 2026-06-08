@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   PrincipleEntry,
+  PrinciplePerspective,
   PrincipleRelation,
   PrinciplesModuleData,
 } from "@/features/bettertolive/types"
@@ -56,7 +57,10 @@ function createDistribution<T extends string>(
     counts.set(value, (counts.get(value) ?? 0) + 1)
   })
 
-  return order.map((label) => ({
+  const orderedLabels = new Set<T>(order)
+  principles.forEach((principle) => orderedLabels.add(getValue(principle)))
+
+  return [...orderedLabels].map((label) => ({
     label,
     count: counts.get(label) ?? 0,
   }))
@@ -64,6 +68,18 @@ function createDistribution<T extends string>(
 
 function createPrincipleLookup(principles: PrincipleEntry[]) {
   return new Map(principles.map((principle) => [principle.id, principle]))
+}
+
+function getPrinciplePerspective(principle: PrincipleEntry): PrinciplePerspective {
+  if (principle.perspective) {
+    return principle.perspective
+  }
+
+  if (principle.source === "观察他人" || principle.source === "家庭继承") {
+    return "他人原则"
+  }
+
+  return "个人原则"
 }
 
 export function PrinciplesPage({
@@ -83,9 +99,18 @@ export function PrinciplesPage({
 }) {
   const { t } = useTranslation()
   const isFixedLayout = !isStackedLayout
+  const [activeTab, setActiveTab] = useState("overview")
   const [editingPrinciple, setEditingPrinciple] = useState<EditingPrinciple | null>(null)
   const principles = principlesModule.entries
   const principleById = useMemo(() => createPrincipleLookup(principles), [principles])
+  const personalPrinciples = useMemo(
+    () => principles.filter((principle) => getPrinciplePerspective(principle) === "个人原则"),
+    [principles],
+  )
+  const otherPrinciples = useMemo(
+    () => principles.filter((principle) => getPrinciplePerspective(principle) === "他人原则"),
+    [principles],
+  )
   const saveSourcePrinciplesModule = editablePrinciplesModule ?? principlesModule
   const classificationSections = useMemo<ClassificationSection[]>(
     () => [
@@ -159,177 +184,248 @@ export function PrinciplesPage({
         onCreate={() => setEditingPrinciple({ isNew: true, principle: null })}
       />
 
-      {isFixedLayout ? (
-        <PrinciplesFixedDashboard
-          classificationSections={classificationSections}
-          costRows={costRows}
-          isControlMode={isControlMode}
-          onEditPrinciple={(principle) => setEditingPrinciple({ isNew: false, principle })}
-          principleById={principleById}
-          principles={principles}
-          principlesModule={principlesModule}
-        />
-      ) : (
-        <div className="space-y-4">
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Waypoints}
-              title={t("principles.sections.classification.title", "5 维原则分类")}
-              description={t(
-                "principles.sections.classification.description",
-                "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。",
-              )}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className={cn("min-h-0 flex-1", isFixedLayout && "overflow-hidden")}
+      >
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="overview">{t("principles.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="personal">{t("principles.tabs.personal", "个人原则")}</TabsTrigger>
+          <TabsTrigger value="others">{t("principles.tabs.others", "他人原则")}</TabsTrigger>
+          <TabsTrigger value="practice">
+            {t("principles.tabs.practiceWorkbench", "校准实践")}
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent
+          value="overview"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          {isFixedLayout ? (
+            <PrinciplesFixedDashboard
+              classificationSections={classificationSections}
+              costRows={costRows}
+              isControlMode={isControlMode}
+              onEditPrinciple={(principle) => setEditingPrinciple({ isNew: false, principle })}
+              principleById={principleById}
+              principles={principles}
+              principlesModule={principlesModule}
             />
-
-            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
-              {classificationSections.map((section) => (
-                <ClassificationPanel
-                  key={section.title}
-                  enumGroup={section.enumGroup}
-                  title={section.title}
-                  description={section.description}
-                  rows={section.rows}
-                  total={principles.length}
-                />
-              ))}
-            </div>
-
-            <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
-              <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                {t("principles.cost.title", "cost 标注")}
-              </div>
-              <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                {t(
-                  "principles.cost.description",
-                  "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
-                )}
-              </p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {costRows
-                  .filter((row) => row.count > 0)
-                  .map((row) => (
-                    <Badge
-                      key={row.label}
-                      variant="outline"
-                      className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-                    >
-                      {translatePrincipleEnum(t, "cost", row.label)} · {row.count}
-                    </Badge>
-                  ))}
-              </div>
-            </div>
-          </Surface>
-
-          <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
-            <Surface className="p-5">
-              <SectionHeading
-                icon={Scale}
-                title={t("principles.sections.entries.title", "原则清单")}
-                description={t(
-                  "principles.sections.entries.description",
-                  "详情里始终显示 cost，让每条原则的真实代价浮上来。",
-                )}
-              />
-
-              <div className="mt-5 space-y-4">
-                {principles.length > 0 ? (
-                  principles.map((principle) => (
-                    <PrincipleCard
-                      key={principle.id}
-                      isControlMode={isControlMode}
-                      principle={principle}
-                      onEdit={() => setEditingPrinciple({ isNew: false, principle })}
-                    />
-                  ))
-                ) : (
-                  <EmptyState
-                    message={t("principles.empty.entries", "当前筛选下还没有可展示的原则条目。")}
-                    compact
-                  />
-                )}
-              </div>
-            </Surface>
-
+          ) : (
             <div className="space-y-4">
               <Surface className="p-5">
                 <SectionHeading
-                  icon={Shield}
-                  title={t("principles.sections.boundaries.title", "不想再退让的地方")}
+                  icon={Waypoints}
+                  title={t("principles.sections.classification.title", "5 维原则分类")}
                   description={t(
-                    "principles.sections.boundaries.description",
-                    "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。",
+                    "principles.sections.classification.description",
+                    "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。",
                   )}
                 />
 
-                <div className="mt-5 space-y-3">
-                  {principlesModule.boundaries.length > 0 ? (
-                    principlesModule.boundaries.map((boundary) => (
-                      <BoundaryCard key={boundary} boundary={boundary} />
-                    ))
-                  ) : (
-                    <EmptyState
-                      message={t("principles.empty.boundaries", "当前筛选下没有可展示的底线。")}
-                      compact
+                <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
+                  {classificationSections.map((section) => (
+                    <ClassificationPanel
+                      key={section.title}
+                      enumGroup={section.enumGroup}
+                      title={section.title}
+                      description={section.description}
+                      rows={section.rows}
+                      total={principles.length}
                     />
-                  )}
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
+                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                    {t("principles.cost.title", "cost 标注")}
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                    {t(
+                      "principles.cost.description",
+                      "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
+                    )}
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {costRows
+                      .filter((row) => row.count > 0)
+                      .map((row) => (
+                        <Badge
+                          key={row.label}
+                          variant="outline"
+                          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+                        >
+                          {translatePrincipleEnum(t, "cost", row.label)} · {row.count}
+                        </Badge>
+                      ))}
+                  </div>
                 </div>
               </Surface>
+
+              <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.14fr)_minmax(0,0.86fr)]">
+                <Surface className="p-5">
+                  <SectionHeading
+                    icon={Scale}
+                    title={t("principles.sections.entries.title", "原则清单")}
+                    description={t(
+                      "principles.sections.entries.description",
+                      "详情里始终显示 cost，让每条原则的真实代价浮上来。",
+                    )}
+                  />
+
+                  <div className="mt-5 space-y-4">
+                    {principles.length > 0 ? (
+                      principles.map((principle) => (
+                        <PrincipleCard
+                          key={principle.id}
+                          isControlMode={isControlMode}
+                          principle={principle}
+                          onEdit={() => setEditingPrinciple({ isNew: false, principle })}
+                        />
+                      ))
+                    ) : (
+                      <EmptyState
+                        message={t(
+                          "principles.empty.entries",
+                          "当前筛选下还没有可展示的原则条目。",
+                        )}
+                        compact
+                      />
+                    )}
+                  </div>
+                </Surface>
+
+                <div className="space-y-4">
+                  <Surface className="p-5">
+                    <SectionHeading
+                      icon={Shield}
+                      title={t("principles.sections.boundaries.title", "不想再退让的地方")}
+                      description={t(
+                        "principles.sections.boundaries.description",
+                        "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。",
+                      )}
+                    />
+
+                    <div className="mt-5 space-y-3">
+                      {principlesModule.boundaries.length > 0 ? (
+                        principlesModule.boundaries.map((boundary) => (
+                          <BoundaryCard key={boundary} boundary={boundary} />
+                        ))
+                      ) : (
+                        <EmptyState
+                          message={t("principles.empty.boundaries", "当前筛选下没有可展示的底线。")}
+                          compact
+                        />
+                      )}
+                    </div>
+                  </Surface>
+
+                  <Surface className="p-5">
+                    <SectionHeading
+                      icon={Activity}
+                      title={t("principles.sections.prompts.title", "决策校准")}
+                      description={t(
+                        "principles.sections.prompts.description",
+                        "面对具体选择时，先调出相关原则，再看强度和代价。",
+                      )}
+                    />
+
+                    <div className="mt-5 space-y-3">
+                      {principlesModule.decisionPrompts.length > 0 ? (
+                        principlesModule.decisionPrompts.map((prompt) => (
+                          <DecisionPromptCard key={prompt} prompt={prompt} />
+                        ))
+                      ) : (
+                        <EmptyState
+                          message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+                          compact
+                        />
+                      )}
+                    </div>
+                  </Surface>
+                </div>
+              </div>
 
               <Surface className="p-5">
                 <SectionHeading
-                  icon={Activity}
-                  title={t("principles.sections.prompts.title", "决策校准")}
+                  icon={Waypoints}
+                  title={t("principles.sections.relations.title", "支撑与冲突")}
                   description={t(
-                    "principles.sections.prompts.description",
-                    "面对具体选择时，先调出相关原则，再看强度和代价。",
+                    "principles.sections.relations.description",
+                    "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
                   )}
                 />
 
-                <div className="mt-5 space-y-3">
-                  {principlesModule.decisionPrompts.length > 0 ? (
-                    principlesModule.decisionPrompts.map((prompt) => (
-                      <DecisionPromptCard key={prompt} prompt={prompt} />
+                <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
+                  {principlesModule.relations.length > 0 ? (
+                    principlesModule.relations.map((relation) => (
+                      <RelationCard
+                        key={relation.id}
+                        principleById={principleById}
+                        relation={relation}
+                      />
                     ))
                   ) : (
                     <EmptyState
-                      message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+                      message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
                       compact
                     />
                   )}
                 </div>
               </Surface>
             </div>
-          </div>
+          )}
+        </TabsContent>
 
-          <Surface className="p-5">
-            <SectionHeading
-              icon={Waypoints}
-              title={t("principles.sections.relations.title", "支撑与冲突")}
-              description={t(
-                "principles.sections.relations.description",
-                "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
-              )}
-            />
+        <TabsContent
+          value="personal"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          <PrinciplesPerspectiveTab
+            title={t("principles.personal.title", "个人原则")}
+            description={t(
+              "principles.personal.description",
+              "把自己主动推导、受伤后确认、已经决定长期持有的原则放在一起看。",
+            )}
+            emptyMessage={t("principles.empty.personal", "当前筛选下没有个人原则。")}
+            isFixedLayout={isFixedLayout}
+            isControlMode={isControlMode}
+            onEditPrinciple={(principle) => setEditingPrinciple({ isNew: false, principle })}
+            principles={personalPrinciples}
+          />
+        </TabsContent>
 
-            <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
-              {principlesModule.relations.length > 0 ? (
-                principlesModule.relations.map((relation) => (
-                  <RelationCard
-                    key={relation.id}
-                    principleById={principleById}
-                    relation={relation}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
-                  compact
-                />
-              )}
-            </div>
-          </Surface>
-        </div>
-      )}
+        <TabsContent
+          value="others"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          <PrinciplesPerspectiveTab
+            title={t("principles.others.title", "他人原则")}
+            description={t(
+              "principles.others.description",
+              "把观察他人、家庭继承或暂时借来使用的原则单独放出来，方便分辨什么真正属于自己。",
+            )}
+            emptyMessage={t("principles.empty.others", "当前筛选下没有他人原则。")}
+            isFixedLayout={isFixedLayout}
+            isControlMode={isControlMode}
+            onEditPrinciple={(principle) => setEditingPrinciple({ isNew: false, principle })}
+            principles={otherPrinciples}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="practice"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          <PrinciplesPracticeWorkbench
+            isFixedLayout={isFixedLayout}
+            principleById={principleById}
+            principles={principles}
+            principlesModule={principlesModule}
+          />
+        </TabsContent>
+      </Tabs>
 
       {editingPrinciple ? (
         <PrincipleEditDialog
@@ -340,6 +436,337 @@ export function PrinciplesPage({
           onSaved={handleSaved}
         />
       ) : null}
+    </div>
+  )
+}
+
+function PrinciplesPerspectiveTab({
+  title,
+  description,
+  emptyMessage,
+  isFixedLayout,
+  isControlMode,
+  onEditPrinciple,
+  principles,
+}: {
+  title: string
+  description: string
+  emptyMessage: string
+  isFixedLayout: boolean
+  isControlMode: boolean
+  onEditPrinciple: (principle: PrincipleEntry) => void
+  principles: PrincipleEntry[]
+}) {
+  const { t } = useTranslation()
+  const sourceRows = createDistribution(
+    PRINCIPLE_SOURCES,
+    principles,
+    (principle) => principle.source,
+  )
+  const statusRows = createDistribution(
+    PRINCIPLE_STATUSES,
+    principles,
+    (principle) => principle.status,
+  )
+  const featuredPrinciples = [...principles]
+    .sort((first, second) => {
+      const firstScore = (first.strength === "不可退让" ? 2 : 0) + (first.cost === "高代价" ? 1 : 0)
+      const secondScore =
+        (second.strength === "不可退让" ? 2 : 0) + (second.cost === "高代价" ? 1 : 0)
+
+      return secondScore - firstScore
+    })
+    .slice(0, 4)
+
+  if (isFixedLayout) {
+    return (
+      <div className="grid h-full min-h-0 grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] gap-3 overflow-hidden">
+        <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+          <SectionHeading icon={Scale} title={title} description={description} compact />
+          <div className="mt-4 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+            {principles.length > 0 ? (
+              principles.map((principle) => (
+                <PrincipleCard
+                  key={principle.id}
+                  compact
+                  isControlMode={isControlMode}
+                  principle={principle}
+                  onEdit={() => onEditPrinciple(principle)}
+                />
+              ))
+            ) : (
+              <EmptyState message={emptyMessage} compact />
+            )}
+          </div>
+        </Surface>
+
+        <div className="flex min-h-0 flex-col gap-3">
+          <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+            <SectionHeading
+              icon={CheckCheck}
+              title={t("principles.perspective.summaryTitle", "来源与状态")}
+              description={t(
+                "principles.perspective.summaryDescription",
+                "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
+              )}
+              compact
+            />
+            <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+              <ClassificationPanel
+                enumGroup="source"
+                title={t("principles.classification.source.title", "来源")}
+                description={t("principles.classification.source.description", "它从哪里长出来。")}
+                rows={sourceRows}
+                total={principles.length}
+              />
+              <ClassificationPanel
+                enumGroup="status"
+                title={t("principles.classification.status.title", "状态")}
+                description={t(
+                  "principles.classification.status.description",
+                  "它现在是否仍在生效。",
+                )}
+                rows={statusRows}
+                total={principles.length}
+              />
+            </div>
+          </Surface>
+
+          <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+            <SectionHeading
+              icon={Activity}
+              title={t("principles.perspective.signalTitle", "先校准的几条")}
+              description={t(
+                "principles.perspective.signalDescription",
+                "优先看不可退让或代价高的原则，确认它们是不是还真属于你。",
+              )}
+              compact
+            />
+            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+              {featuredPrinciples.length > 0 ? (
+                featuredPrinciples.map((principle) => (
+                  <PrincipleSignalCard key={principle.id} principle={principle} />
+                ))
+              ) : (
+                <EmptyState message={emptyMessage} compact />
+              )}
+            </div>
+          </Surface>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <Surface className="p-5">
+        <SectionHeading icon={Scale} title={title} description={description} />
+        <div className="mt-5 space-y-4">
+          {principles.length > 0 ? (
+            principles.map((principle) => (
+              <PrincipleCard
+                key={principle.id}
+                isControlMode={isControlMode}
+                principle={principle}
+                onEdit={() => onEditPrinciple(principle)}
+              />
+            ))
+          ) : (
+            <EmptyState message={emptyMessage} compact />
+          )}
+        </div>
+      </Surface>
+
+      <div className="grid gap-4 min-[1100px]:grid-cols-2">
+        <Surface className="p-5">
+          <ClassificationPanel
+            enumGroup="source"
+            title={t("principles.classification.source.title", "来源")}
+            description={t("principles.classification.source.description", "它从哪里长出来。")}
+            rows={sourceRows}
+            total={principles.length}
+          />
+        </Surface>
+        <Surface className="p-5">
+          <ClassificationPanel
+            enumGroup="status"
+            title={t("principles.classification.status.title", "状态")}
+            description={t("principles.classification.status.description", "它现在是否仍在生效。")}
+            rows={statusRows}
+            total={principles.length}
+          />
+        </Surface>
+      </div>
+    </div>
+  )
+}
+
+function PrinciplesPracticeWorkbench({
+  isFixedLayout,
+  principleById,
+  principles,
+  principlesModule,
+}: {
+  isFixedLayout: boolean
+  principleById: Map<string, PrincipleEntry>
+  principles: PrincipleEntry[]
+  principlesModule: PrinciplesModuleData
+}) {
+  const { t } = useTranslation()
+  const featuredHighPriorityPrinciples = [...principles]
+    .sort((first, second) => {
+      const firstScore = (first.strength === "不可退让" ? 2 : 0) + (first.cost === "高代价" ? 1 : 0)
+      const secondScore =
+        (second.strength === "不可退让" ? 2 : 0) + (second.cost === "高代价" ? 1 : 0)
+
+      return secondScore - firstScore
+    })
+    .slice(0, 4)
+  const evolvingPrinciples = principles.filter(
+    (principle) => principle.status === "正在测试" || principle.status === "已修订",
+  )
+
+  if (isFixedLayout) {
+    return (
+      <div className="grid h-full min-h-0 grid-cols-[minmax(0,0.96fr)_minmax(0,1.04fr)_minmax(320px,0.82fr)] gap-3 overflow-hidden">
+        <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+          <SectionHeading
+            icon={Activity}
+            title={t("principles.sections.prompts.title", "决策校准")}
+            description={t(
+              "principles.sections.prompts.description",
+              "面对具体选择时，先调出相关原则，再看强度和代价。",
+            )}
+            compact
+          />
+          <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            {principlesModule.decisionPrompts.length > 0 ? (
+              principlesModule.decisionPrompts.map((prompt) => (
+                <DecisionPromptCard key={prompt} prompt={prompt} compact />
+              ))
+            ) : (
+              <EmptyState
+                message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+                compact
+              />
+            )}
+          </div>
+        </Surface>
+
+        <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+          <SectionHeading
+            icon={Waypoints}
+            title={t("principles.sections.relations.title", "支撑与冲突")}
+            description={t(
+              "principles.sections.relations.description",
+              "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
+            )}
+            compact
+          />
+          <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+            {principlesModule.relations.length > 0 ? (
+              principlesModule.relations.map((relation) => (
+                <RelationCard
+                  key={relation.id}
+                  compact
+                  principleById={principleById}
+                  relation={relation}
+                />
+              ))
+            ) : (
+              <EmptyState
+                message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
+                compact
+              />
+            )}
+          </div>
+        </Surface>
+
+        <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+            <div className="space-y-2">
+              <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                {t("principles.practice.priority", "高代价优先校准")}
+              </div>
+              {featuredHighPriorityPrinciples.length > 0 ? (
+                featuredHighPriorityPrinciples.map((principle) => (
+                  <PrincipleSignalCard key={principle.id} principle={principle} />
+                ))
+              ) : (
+                <EmptyState
+                  message={t("principles.empty.priority", "当前筛选下没有高优先级原则。")}
+                  compact
+                />
+              )}
+            </div>
+            <div className="space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+              <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                {t("principles.practice.evolving", "正在测试或修订")}
+              </div>
+              {evolvingPrinciples.length > 0 ? (
+                evolvingPrinciples.map((principle) => (
+                  <PrincipleSignalCard key={principle.id} principle={principle} subtle />
+                ))
+              ) : (
+                <EmptyState
+                  message={t("principles.empty.evolving", "当前筛选下没有正在变化的原则。")}
+                  compact
+                />
+              )}
+            </div>
+          </div>
+        </Surface>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <Surface className="p-5">
+        <SectionHeading
+          icon={Activity}
+          title={t("principles.sections.prompts.title", "决策校准")}
+          description={t(
+            "principles.sections.prompts.description",
+            "面对具体选择时，先调出相关原则，再看强度和代价。",
+          )}
+        />
+        <div className="mt-5 space-y-3">
+          {principlesModule.decisionPrompts.length > 0 ? (
+            principlesModule.decisionPrompts.map((prompt) => (
+              <DecisionPromptCard key={prompt} prompt={prompt} />
+            ))
+          ) : (
+            <EmptyState
+              message={t("principles.empty.prompts", "当前筛选下没有决策校准问题。")}
+              compact
+            />
+          )}
+        </div>
+      </Surface>
+
+      <Surface className="p-5">
+        <SectionHeading
+          icon={Waypoints}
+          title={t("principles.sections.relations.title", "支撑与冲突")}
+          description={t(
+            "principles.sections.relations.description",
+            "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
+          )}
+        />
+        <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
+          {principlesModule.relations.length > 0 ? (
+            principlesModule.relations.map((relation) => (
+              <RelationCard key={relation.id} principleById={principleById} relation={relation} />
+            ))
+          ) : (
+            <EmptyState
+              message={t("principles.empty.relations", "当前筛选下没有原则关系。")}
+              compact
+            />
+          )}
+        </div>
+      </Surface>
     </div>
   )
 }
@@ -442,6 +869,7 @@ function PrinciplesFixedDashboard({
             <TabsTrigger value="relations">
               {t("principles.tabs.relations", "支撑冲突")}
             </TabsTrigger>
+            <TabsTrigger value="practice">{t("principles.tabs.practice", "实践回路")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -497,6 +925,41 @@ function PrinciplesFixedDashboard({
                   compact
                 />
               )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="practice" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="grid gap-3 min-[960px]:grid-cols-2">
+              <div className="space-y-2">
+                <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                  {t("principles.practice.priority", "高代价优先校准")}
+                </div>
+                {featuredHighPriorityPrinciples.length > 0 ? (
+                  featuredHighPriorityPrinciples.map((principle) => (
+                    <PrincipleSignalCard key={principle.id} principle={principle} />
+                  ))
+                ) : (
+                  <EmptyState
+                    message={t("principles.empty.priority", "当前筛选下没有高优先级原则。")}
+                    compact
+                  />
+                )}
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                  {t("principles.practice.evolving", "正在测试或修订")}
+                </div>
+                {evolvingPrinciples.length > 0 ? (
+                  evolvingPrinciples.map((principle) => (
+                    <PrincipleSignalCard key={principle.id} principle={principle} subtle />
+                  ))
+                ) : (
+                  <EmptyState
+                    message={t("principles.empty.evolving", "当前筛选下没有正在变化的原则。")}
+                    compact
+                  />
+                )}
+              </div>
             </div>
           </TabsContent>
         </Tabs>

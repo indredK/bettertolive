@@ -356,7 +356,9 @@ export type BeliefProfile = {
   attachmentReflection: string
 }
 
-export type PrincipleDomain = "关系" | "工作" | "金钱" | "健康" | "时间" | "诚信"
+export type PrincipleDomain = string
+
+export type PrinciplePerspective = "个人原则" | "他人原则"
 
 export type PrincipleType = "边界" | "标准" | "底线"
 
@@ -390,6 +392,7 @@ export type PrincipleEntry = {
   title: string
   statement: string
   description: string
+  perspective?: PrinciplePerspective
   domain: PrincipleDomain
   type: PrincipleType
   strength: PrincipleStrength
@@ -1115,14 +1118,7 @@ export type NutritionModuleData = {
   foodMemories: NutritionFoodMemory[]
 }
 
-export type EconDomain =
-  | "货币与物价"
-  | "个人财务"
-  | "劳动力市场"
-  | "产业与公司"
-  | "财政与政策"
-  | "金融市场"
-  | "全球与宏观"
+export type EconDomain = string
 
 export type EconLayer = "微观" | "中观" | "宏观"
 
@@ -1132,6 +1128,16 @@ export type EconSource = "系统学习" | "新闻媒体" | "亲身经历" | "他
 
 export type EconRelevance = "直接影响当前决策" | "影响中期规划" | "影响长期方向" | "纯认知储备"
 
+export type SocioeconomicsDiscipline = "经济学" | "社会学"
+
+export type EconTopicArea =
+  | "经济学基础概念"
+  | "微观经济学"
+  | "宏观经济学"
+  | "著名经济学家"
+  | "经济原理与模型"
+  | "经济政策"
+
 export type EconConfidenceRevision = {
   id: string
   date: string
@@ -1140,9 +1146,17 @@ export type EconConfidenceRevision = {
   trigger: string
 }
 
+export type SocioeconomicsSourceRef = {
+  id: string
+  label: string
+  url: string
+}
+
 export type SocioeconomicsEntry = {
   id: string
   title: string
+  discipline?: SocioeconomicsDiscipline
+  topicArea?: EconTopicArea
   domain: EconDomain
   layer: EconLayer
   confidence: EconConfidence
@@ -1151,6 +1165,7 @@ export type SocioeconomicsEntry = {
   summary: string
   understandingNote?: string
   relatedConcepts?: string[]
+  sourceRefs?: SocioeconomicsSourceRef[]
   confidenceHistory?: EconConfidenceRevision[]
   tags?: string[]
 }

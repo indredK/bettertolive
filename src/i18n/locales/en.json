@@ -707,7 +707,8 @@
     "tabs": {
       "entries": "Belief List",
       "cards": "Three-Layer Frame",
-      "relations": "Relations"
+      "relations": "Relations",
+      "blindspots": "Blind Spots"
     },
     "entries": {
       "title": "Belief List",
@@ -727,7 +728,8 @@
     },
     "signals": {
       "conflict": "In Tension",
-      "changing": "Changing"
+      "changing": "Changing",
+      "limiting": "Possibly limiting beliefs"
     },
     "attachment": {
       "title": "Attachment Note"
@@ -786,7 +788,8 @@
       "cards": "No three-layer frame under the current filter.",
       "conflicts": "No conflicting beliefs under the current filter.",
       "changing": "No changing beliefs under the current filter.",
-      "distribution": "No distribution data yet."
+      "distribution": "No distribution data yet.",
+      "limiting": "No limiting beliefs under the current filter."
     },
     "enums": {
       "domain": {
@@ -1762,6 +1765,16 @@
       "recent": {
         "title": "Recent Reflections",
         "description": "Review what you have written recently, then decide how to organize it later."
+      },
+      "themes": {
+        "title": "Theme Threads",
+        "description": "View tags and months together to see which topics keep returning.",
+        "tags": "Frequent Tags",
+        "months": "Month Distribution"
+      },
+      "writingPrompts": {
+        "title": "Review Questions",
+        "description": "You do not need complete answers before writing; use questions to return attention to yourself."
       }
     },
     "actions": {
@@ -1784,7 +1797,9 @@
       "tags": "Separate with commas, for example: rhythm, work"
     },
     "empty": {
-      "records": "No reflections match the current filter."
+      "records": "No reflections match the current filter.",
+      "tags": "No tags under the current filter.",
+      "months": "No month distribution under the current filter."
     },
     "edit": {
       "createTitle": "New Reflection",
@@ -1802,6 +1817,17 @@
       "saveFailed": "Failed to save",
       "deleted": "Deleted",
       "deleteFailed": "Failed to delete"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "records": "Record Library",
+      "themes": "Theme Threads",
+      "writing": "Writing Scaffold"
+    },
+    "prompts": {
+      "keep": "What judgment from this moment do I want to keep long term?",
+      "pattern": "Has this appeared in recent reflections more than once?",
+      "next": "If I only make one small adjustment, what comes next?"
     }
   },
   "events": {
@@ -1840,7 +1866,8 @@
     "empty": {
       "latest": "No event records yet.",
       "timeline": "No events match the current filter.",
-      "themes": "No themes match the current filter."
+      "themes": "No themes match the current filter.",
+      "review": "No theme cues to review yet."
     },
     "edit": {
       "createTitle": "New Event",
@@ -1875,6 +1902,17 @@
       "saveFailed": "Failed to save",
       "deleted": "Deleted",
       "deleteFailed": "Failed to delete"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "timeline": "Event Flow",
+      "themes": "Tag View",
+      "review": "Review Cues"
+    },
+    "review": {
+      "title": "Review Cues",
+      "description": "Turn recurring themes into questions for the next review.",
+      "themeLine": "{{theme}} has appeared {{count}} times; review the life pattern behind it."
     }
   },
   "finance": {
@@ -1911,7 +1949,8 @@
     "empty": {
       "entries": "No finance entries under the current filter.",
       "distribution": "No distribution data under the current filter.",
-      "reviewEntries": "There are no priority entries to review right now."
+      "reviewEntries": "There are no priority entries to review right now.",
+      "rules": "No budget rules yet."
     },
     "toast": {
       "saved": "Entry saved",
@@ -1998,6 +2037,16 @@
         "反思": "Reflection",
         "未来": "Future"
       }
+    },
+    "tabs": {
+      "overview": "Overview",
+      "entries": "Entries",
+      "rules": "Budget Rules",
+      "review": "Review Cues"
+    },
+    "rules": {
+      "title": "Budget Rules",
+      "description": "Calibrate each category’s intent and limit in one place."
     }
   },
   "journey": {
@@ -2098,7 +2147,8 @@
     "tabs": {
       "timeline": "Memory Timeline",
       "growth": "Growth Nodes",
-      "signals": "Anchors & Signals"
+      "signals": "Anchors & Signals",
+      "library": "Memory Library"
     },
     "memory": {
       "formativePowerBadge": "Formative Power · {{value}}",
@@ -2292,13 +2342,16 @@
       "noData": "No growth-memory data yet.",
       "distribution": "No distribution data yet.",
       "none": "None"
+    },
+    "library": {
+      "memoryDetail": "{{era}} · {{type}} · {{privacy}}"
     }
   },
   "socioeconomics": {
     "page": {
       "eyebrow": "Socioeconomics",
       "title": "Map how the external economy works",
-      "description": "Classify knowledge with four tags, read relevance as decision distance, and use the heatmap to spot blind spots."
+      "description": "Classify knowledge with five dimensions, read relevance as decision distance, and use the heatmap to spot blind spots."
     },
     "controlMode": {
       "on": "Control Mode",
@@ -2316,8 +2369,8 @@
       "save": "Save"
     },
     "classification": {
-      "title": "4-Dimensional Cognition Map",
-      "description": "Classify by four dimensions; relevance stays attached to each item instead of becoming a main filter.",
+      "title": "5-Dimensional Cognition Map",
+      "description": "Classify by five dimensions; relevance stays attached to each item instead of becoming a main filter.",
       "domain": {
         "title": "Domain",
         "description": "Which part of economic operation this belongs to."
@@ -2333,6 +2386,10 @@
       "source": {
         "title": "Source",
         "description": "Where this understanding came from."
+      },
+      "discipline": {
+        "title": "Discipline",
+        "description": "Separate economics from sociology before drilling into details."
       }
     },
     "relevance": {
@@ -2345,9 +2402,16 @@
       "stackedDescription": "See where a domain is genuinely understood and where it is only familiar as a term."
     },
     "tabs": {
+      "all": "All",
       "entries": "Knowledge List",
+      "graph": "Concept Graph",
       "gaps": "Knowledge Gaps",
-      "prompts": "Review Prompts"
+      "prompts": "Review Prompts",
+      "relevance": "Decision Distance",
+      "overview": "Overview",
+      "economics": "Economics",
+      "sociology": "Sociology",
+      "study": "Study Queue"
     },
     "entries": {
       "title": "Knowledge List",
@@ -2367,13 +2431,18 @@
     },
     "empty": {
       "entries": "No knowledge entries match the current filters.",
+      "topicArea": "No entries match {{topic}} under the current filters.",
+      "graph": "No concept links yet.",
       "gaps": "No knowledge gaps match the current filters.",
       "prompts": "No review prompts match the current filters.",
       "review": "No priority study items match the current filters.",
-      "distribution": "No distribution data yet."
+      "distribution": "No distribution data yet.",
+      "economics": "No economics entries match the current filters.",
+      "sociology": "No sociology entries match the current filters."
     },
     "fields": {
       "title": "Title",
+      "topicArea": "Topic Area",
       "domain": "Domain",
       "layer": "Layer",
       "confidence": "Confidence",
@@ -2382,11 +2451,13 @@
       "summary": "Summary",
       "understandingNote": "Understanding Note",
       "relatedConcepts": "Related Concepts",
+      "sourceRefs": "Authoritative Sources",
       "tags": "Tags",
       "confidenceHistory": "Confidence Revision History",
       "gapSummary": "Gap",
       "nextStep": "Next Step",
-      "prompt": "Review Prompt"
+      "prompt": "Review Prompt",
+      "discipline": "Discipline"
     },
     "edit": {
       "entryCreateTitle": "Add Knowledge Entry",
@@ -2397,9 +2468,11 @@
       "promptCreateTitle": "Add Review Prompt",
       "promptEditTitle": "Edit Review Prompt",
       "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | Finished a reading set",
+      "sourceRefsPlaceholder": "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
       "validation": {
         "entryRequired": "Please enter a title and summary",
         "history": "Revision history must use: date | old level -> new level | trigger",
+        "sourceRefs": "Source format must be: source label | https://example.com",
         "gapRequired": "Please enter the gap and next step",
         "promptRequired": "Please enter a review prompt"
       }
@@ -2423,7 +2496,12 @@
         "产业与公司": "Industries & Companies",
         "财政与政策": "Fiscal Policy",
         "金融市场": "Financial Markets",
-        "全球与宏观": "Global & Macro"
+        "全球与宏观": "Global & Macro",
+        "社会结构": "Social Structure",
+        "社会流动": "Social Mobility",
+        "制度与组织": "Institutions & Organizations",
+        "城市与社区": "Cities & Communities",
+        "文化与规范": "Culture & Norms"
       },
       "layer": {
         "微观": "Micro",
@@ -2448,7 +2526,35 @@
         "影响中期规划": "Affects mid-term planning",
         "影响长期方向": "Affects long-term direction",
         "纯认知储备": "Cognitive reserve"
+      },
+      "topicArea": {
+        "经济学基础概念": "Economics Basics",
+        "微观经济学": "Microeconomics",
+        "宏观经济学": "Macroeconomics",
+        "著名经济学家": "Economists",
+        "经济原理与模型": "Principles & Models",
+        "经济政策": "Economic Policy"
+      },
+      "discipline": {
+        "经济学": "Economics",
+        "社会学": "Sociology"
       }
+    },
+    "discipline": {
+      "economics": {
+        "title": "Economics",
+        "description": "Organize decision-relevant knowledge about prices, markets, policy, firms, and macro mechanisms."
+      },
+      "sociology": {
+        "title": "Sociology",
+        "description": "Understand how people act inside groups and institutions through structure, mobility, organizations, cities, and norms."
+      },
+      "mapTitle": "Domains and Confidence",
+      "mapDescription": "See where this discipline already has a framework and where it is still just a familiar term."
+    },
+    "graph": {
+      "title": "Knowledge Links",
+      "description": "Put economics and sociology on the same relationship map to see how concepts explain one another."
     }
   },
   "emotion": {
@@ -2846,7 +2952,32 @@
     "empty": {
       "values": "No value keywords yet.",
       "milestones": "No future paths match the current filter.",
-      "experiments": "No experiments match the current filter."
+      "experiments": "No experiments match the current filter.",
+      "identity": "No ideal self has been written yet."
+    },
+    "tabs": {
+      "blueprint": "Blueprint",
+      "milestones": "Milestones",
+      "experiments": "Current Experiments",
+      "alignment": "Alignment Check"
+    },
+    "alignment": {
+      "title": "Alignment Check",
+      "description": "Use four questions to check whether the blueprint returns to present action.",
+      "identity": {
+        "title": "Is the ideal self clear?"
+      },
+      "values": {
+        "title": "Can values filter choices?"
+      },
+      "path": {
+        "title": "Is the path close enough?",
+        "empty": "No milestone is ready to carry the current direction yet."
+      },
+      "experiment": {
+        "title": "Is there an experiment in daily life?",
+        "empty": "No current experiment yet."
+      }
     }
   },
   "legacy": {
@@ -3301,6 +3432,10 @@
       "switchToNth": "Switch to note {{n}}"
     }
   },
+  "knowledgeTabs": {
+    "principles": "Personal Principles",
+    "socioeconomics": "Socioeconomics"
+  },
   "principles": {
     "page": {
       "eyebrow": "Principles",
@@ -3316,7 +3451,12 @@
     "tabs": {
       "entries": "Principles",
       "prompts": "Decision Calibration",
-      "relations": "Support / Conflict"
+      "relations": "Support / Conflict",
+      "practice": "Practice Loop",
+      "overview": "Overview",
+      "personal": "Personal Principles",
+      "others": "Others' Principles",
+      "practiceWorkbench": "Calibration Workbench"
     },
     "classification": {
       "domain": {
@@ -3380,7 +3520,9 @@
       "relations": "No principle relations match the current filter.",
       "priority": "No high-priority principles match the current filter.",
       "evolving": "No changing principles match the current filter.",
-      "distribution": "No distribution data yet."
+      "distribution": "No distribution data yet.",
+      "personal": "No personal principles match the current filter.",
+      "others": "No borrowed or inherited principles match the current filter."
     },
     "edit": {
       "createTitle": "Add Principle",
@@ -3393,6 +3535,7 @@
       "statementPlaceholder": "Write the principle as one action-guiding sentence.",
       "descriptionLabel": "Description",
       "domain": "Domain",
+      "domainPlaceholder": "Example: Relationships / Work / Custom Category",
       "type": "Type",
       "strength": "Strength",
       "source": "Source",
@@ -3417,7 +3560,8 @@
       "revision": {
         "summary": "Updated {{fields}}.",
         "separator": ", "
-      }
+      },
+      "perspective": "Ownership"
     },
     "enumNames": {
       "domain": {
@@ -3464,7 +3608,29 @@
         "内容": "content",
         "强度": "strength",
         "状态": "status"
+      },
+      "perspective": {
+        "个人原则": "Personal Principles",
+        "他人原则": "Others' Principles"
       }
+    },
+    "practice": {
+      "priority": "High-cost calibration first",
+      "evolving": "Being tested or revised"
+    },
+    "personal": {
+      "title": "Personal Principles",
+      "description": "View the principles you derived, confirmed through experience, and actually want to keep living by."
+    },
+    "others": {
+      "title": "Others' Principles",
+      "description": "Separate inherited, observed, or temporarily borrowed principles so you can decide which ones are truly yours."
+    },
+    "perspective": {
+      "summaryTitle": "Source and Status",
+      "summaryDescription": "See whether this set is becoming internalized, already stable, or still borrowed from others.",
+      "signalTitle": "Calibrate First",
+      "signalDescription": "Start with the non-negotiable or high-cost principles and check whether they still genuinely belong to you."
     }
   }
 }

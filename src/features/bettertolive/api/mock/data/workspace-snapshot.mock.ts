@@ -12,7 +12,7 @@ import { overviewMockData } from "@/features/bettertolive/api/mock/data/overview
 import { principlesMockData } from "@/features/bettertolive/api/mock/data/principles/principles.mock"
 import { reflectionMockData } from "@/features/bettertolive/api/mock/data/reflection/reflection.mock"
 import { relationshipsMockData } from "@/features/bettertolive/api/mock/data/relationships/relationships.mock"
-import { emptySocioeconomicsModuleData } from "@/features/bettertolive/api/fallback/empty-socioeconomics-module"
+import { socioeconomicsMockData } from "@/features/bettertolive/api/mock/data/socioeconomics/socioeconomics.mock"
 import { emptyShoppingModuleData } from "@/features/bettertolive/api/fallback/empty-shopping-module"
 
 export const workspaceSnapshotMockData = {
@@ -29,6 +29,6 @@ export const workspaceSnapshotMockData = {
   growth: growthMockData,
   memory: memoryMockData,
   legacy: emptyLegacyModuleData,
-  socioeconomics: emptySocioeconomicsModuleData,
+  socioeconomics: socioeconomicsMockData,
   future: futureMockData,
 } satisfies WorkspaceSnapshot

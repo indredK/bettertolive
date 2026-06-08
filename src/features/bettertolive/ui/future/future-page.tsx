@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { FutureBlueprint, FutureMilestone } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -140,241 +141,135 @@ export function FuturePage({
         </div>
       </div>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.02fr)_minmax(0,1.08fr)]">
-        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
-          <div className="flex items-start justify-between gap-3">
-            <SectionHeading
-              icon={Sparkles}
-              title={t("future.sections.definition.title", "理想定义")}
-              description={t(
-                "future.sections.definition.description",
-                "先把方向说清楚，再把路径写具体。",
-              )}
-              compact
-            />
-            {isControlMode ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-                onClick={() => setIsEditingBlueprint(true)}
-              >
-                <PencilLine className="size-3.5" />
-                {t("future.edit.blueprint", "编辑蓝图")}
-              </Button>
-            ) : null}
-          </div>
+      <Tabs
+        defaultValue="blueprint"
+        className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
+      >
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="blueprint">{t("future.tabs.blueprint", "蓝图")}</TabsTrigger>
+          <TabsTrigger value="milestones">{t("future.tabs.milestones", "阶段路径")}</TabsTrigger>
+          <TabsTrigger value="experiments">{t("future.tabs.experiments", "当前实验")}</TabsTrigger>
+          <TabsTrigger value="alignment">{t("future.tabs.alignment", "对齐检查")}</TabsTrigger>
+        </TabsList>
 
-          <div
-            className={cn("mt-4 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
-          >
-            <div className="grid gap-3 sm:grid-cols-3">
-              <MetricCard
-                label={t("future.metrics.values", "重要价值")}
-                value={futureBlueprint.values.length}
-                detail={t("future.metrics.valuesDetail", "价值不是口号，是持续筛选。")}
-              />
-              <MetricCard
-                label={t("future.metrics.milestones", "阶段路径")}
-                value={futureBlueprint.milestones.length}
-                detail={t("future.metrics.milestonesDetail", "把远处的方向拆成近处步骤。")}
-              />
-              <MetricCard
-                label={t("future.metrics.experiments", "当前实验")}
-                value={futureBlueprint.experiments.length}
-                detail={t("future.metrics.experimentsDetail", "先让生活里出现一点点变化。")}
-              />
-            </div>
-
-            <DefinitionBlock
-              label={t("future.definition.identity", "理想自我")}
-              value={futureBlueprint.identity}
-              icon={Target}
-              highlighted={blueprintMatches}
-              onEdit={isControlMode ? () => setIsEditingBlueprint(true) : undefined}
+        <TabsContent
+          value="blueprint"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <div className="grid h-full gap-4 min-[1240px]:grid-cols-[minmax(0,1.02fr)_minmax(0,1.08fr)]">
+            <FutureBlueprintPanel
+              blueprintMatches={blueprintMatches}
+              futureBlueprint={futureBlueprint}
+              isControlMode={isControlMode}
+              isFixedLayout={isFixedLayout}
+              onEditBlueprint={() => setIsEditingBlueprint(true)}
             />
-            <DefinitionBlock
-              label={t("future.definition.lifestyle", "理想生活")}
-              value={futureBlueprint.lifestyle}
-              icon={Compass}
-              highlighted={blueprintMatches}
-              onEdit={isControlMode ? () => setIsEditingBlueprint(true) : undefined}
-            />
-
-            <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                    {t("future.definition.values", "重要价值")}
-                  </div>
-                  <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                    {t("future.definition.valuesDesc", "这些词决定你会把时间和钱投向哪里。")}
-                  </p>
-                </div>
-                {isControlMode ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="text-[color:var(--text-secondary)]"
-                    onClick={() => setIsEditingBlueprint(true)}
-                  >
-                    <PencilLine className="size-3.5" />
-                    {t("future.edit.blueprint", "编辑蓝图")}
-                  </Button>
-                ) : null}
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {futureBlueprint.values.length > 0 ? (
-                  futureBlueprint.values.map((value) => (
-                    <Badge
-                      key={value}
-                      variant="outline"
-                      className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
-                    >
-                      {value}
-                    </Badge>
-                  ))
-                ) : (
-                  <span className="text-sm text-[color:var(--text-muted)]">
-                    {t("future.empty.values", "当前还没有价值关键词。")}
-                  </span>
-                )}
-              </div>
+            <div className="grid min-h-0 gap-4 xl:grid-rows-[minmax(0,1fr)_minmax(0,0.72fr)]">
+              <FutureMilestonesPanel
+                futureBlueprint={futureBlueprint}
+                isControlMode={isControlMode}
+                isFixedLayout={isFixedLayout}
+                milestones={filteredMilestones}
+                onCreate={() =>
+                  setEditingMilestone({
+                    isNew: true,
+                    index: null,
+                    milestone: null,
+                  })
+                }
+                onEdit={(entry, index) =>
+                  setEditingMilestone({
+                    isNew: false,
+                    index,
+                    milestone: entry,
+                  })
+                }
+              />
+              <FutureExperimentsPanel
+                experiments={filteredExperiments}
+                isControlMode={isControlMode}
+                isFixedLayout={isFixedLayout}
+                onCreate={() =>
+                  setEditingExperiment({
+                    isNew: true,
+                    index: null,
+                    experiment: "",
+                  })
+                }
+                onEdit={(entry, index) =>
+                  setEditingExperiment({
+                    isNew: false,
+                    index,
+                    experiment: entry,
+                  })
+                }
+              />
             </div>
           </div>
-        </Surface>
+        </TabsContent>
 
-        <div className="grid min-h-0 gap-4 xl:grid-rows-[minmax(0,1fr)_minmax(0,0.72fr)]">
-          <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
-            <div className="flex items-start justify-between gap-3">
-              <SectionHeading
-                icon={Target}
-                title={t("future.sections.milestones.title", "阶段路径")}
-                description={t(
-                  "future.sections.milestones.description",
-                  "先把未来拆成靠近方式，而不是终局答案。",
-                )}
-                compact
-              />
-              {isControlMode ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-                  onClick={() =>
-                    setEditingMilestone({
-                      isNew: true,
-                      index: null,
-                      milestone: null,
-                    })
-                  }
-                >
-                  <Plus className="size-3.5" />
-                  {t("future.addMilestone", "新增路径")}
-                </Button>
-              ) : null}
-            </div>
+        <TabsContent
+          value="milestones"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <FutureMilestonesPanel
+            futureBlueprint={futureBlueprint}
+            isControlMode={isControlMode}
+            isFixedLayout={isFixedLayout}
+            milestones={filteredMilestones}
+            onCreate={() =>
+              setEditingMilestone({
+                isNew: true,
+                index: null,
+                milestone: null,
+              })
+            }
+            onEdit={(entry, index) =>
+              setEditingMilestone({
+                isNew: false,
+                index,
+                milestone: entry,
+              })
+            }
+          />
+        </TabsContent>
 
-            <div
-              className={cn(
-                "mt-4 space-y-3",
-                isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
-              )}
-            >
-              {filteredMilestones.length > 0 ? (
-                filteredMilestones.map((entry) => {
-                  const index = futureBlueprint.milestones.indexOf(entry)
+        <TabsContent
+          value="experiments"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <FutureExperimentsPanel
+            experiments={filteredExperiments}
+            isControlMode={isControlMode}
+            isFixedLayout={isFixedLayout}
+            onCreate={() =>
+              setEditingExperiment({
+                isNew: true,
+                index: null,
+                experiment: "",
+              })
+            }
+            onEdit={(entry, index) =>
+              setEditingExperiment({
+                isNew: false,
+                index,
+                experiment: entry,
+              })
+            }
+          />
+        </TabsContent>
 
-                  return (
-                    <MilestoneCard
-                      key={`${entry.horizon}-${entry.summary}`}
-                      entry={entry}
-                      onEdit={
-                        isControlMode
-                          ? () =>
-                              setEditingMilestone({
-                                isNew: false,
-                                index,
-                                milestone: entry,
-                              })
-                          : undefined
-                      }
-                    />
-                  )
-                })
-              ) : (
-                <EmptyState message={t("future.empty.milestones", "当前筛选下没有未来路径。")} />
-              )}
-            </div>
-          </Surface>
-
-          <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
-            <div className="flex items-start justify-between gap-3">
-              <SectionHeading
-                icon={Compass}
-                title={t("future.sections.experiments.title", "当前实验")}
-                description={t(
-                  "future.sections.experiments.description",
-                  "不用一步到位，先让生活里出现一点点更像自己的东西。",
-                )}
-                compact
-              />
-              {isControlMode ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-                  onClick={() =>
-                    setEditingExperiment({
-                      isNew: true,
-                      index: null,
-                      experiment: "",
-                    })
-                  }
-                >
-                  <Plus className="size-3.5" />
-                  {t("future.addExperiment", "新增实验")}
-                </Button>
-              ) : null}
-            </div>
-
-            <div
-              className={cn(
-                "mt-4 space-y-3",
-                isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
-              )}
-            >
-              {filteredExperiments.length > 0 ? (
-                filteredExperiments.map(({ entry, index }) => {
-                  return (
-                    <ExperimentCard
-                      key={`${entry}-${index}`}
-                      entry={entry}
-                      editHint={t("future.edit.clickToEdit", "点击可编辑")}
-                      onEdit={
-                        isControlMode
-                          ? () =>
-                              setEditingExperiment({
-                                isNew: false,
-                                index,
-                                experiment: entry,
-                              })
-                          : undefined
-                      }
-                    />
-                  )
-                })
-              ) : (
-                <EmptyState message={t("future.empty.experiments", "当前筛选下没有实验内容。")} />
-              )}
-            </div>
-          </Surface>
-        </div>
-      </div>
+        <TabsContent
+          value="alignment"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <FutureAlignmentPanel
+            futureBlueprint={futureBlueprint}
+            isFixedLayout={isFixedLayout}
+            milestones={futureBlueprint.milestones}
+          />
+        </TabsContent>
+      </Tabs>
 
       {isEditingBlueprint ? (
         <FutureBlueprintEditDialog
@@ -399,6 +294,321 @@ export function FuturePage({
         />
       ) : null}
     </div>
+  )
+}
+
+function FutureBlueprintPanel({
+  blueprintMatches,
+  futureBlueprint,
+  isControlMode,
+  isFixedLayout,
+  onEditBlueprint,
+}: {
+  blueprintMatches: boolean
+  futureBlueprint: FutureBlueprint
+  isControlMode: boolean
+  isFixedLayout: boolean
+  onEditBlueprint: () => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
+      <div className="flex items-start justify-between gap-3">
+        <SectionHeading
+          icon={Sparkles}
+          title={t("future.sections.definition.title", "理想定义")}
+          description={t(
+            "future.sections.definition.description",
+            "先把方向说清楚，再把路径写具体。",
+          )}
+          compact
+        />
+        {isControlMode ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+            onClick={onEditBlueprint}
+          >
+            <PencilLine className="size-3.5" />
+            {t("future.edit.blueprint", "编辑蓝图")}
+          </Button>
+        ) : null}
+      </div>
+
+      <div className={cn("mt-4 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <MetricCard
+            label={t("future.metrics.values", "重要价值")}
+            value={futureBlueprint.values.length}
+            detail={t("future.metrics.valuesDetail", "价值不是口号，是持续筛选。")}
+          />
+          <MetricCard
+            label={t("future.metrics.milestones", "阶段路径")}
+            value={futureBlueprint.milestones.length}
+            detail={t("future.metrics.milestonesDetail", "把远处的方向拆成近处步骤。")}
+          />
+          <MetricCard
+            label={t("future.metrics.experiments", "当前实验")}
+            value={futureBlueprint.experiments.length}
+            detail={t("future.metrics.experimentsDetail", "先让生活里出现一点点变化。")}
+          />
+        </div>
+
+        <DefinitionBlock
+          label={t("future.definition.identity", "理想自我")}
+          value={futureBlueprint.identity}
+          icon={Target}
+          highlighted={blueprintMatches}
+          onEdit={isControlMode ? onEditBlueprint : undefined}
+        />
+        <DefinitionBlock
+          label={t("future.definition.lifestyle", "理想生活")}
+          value={futureBlueprint.lifestyle}
+          icon={Compass}
+          highlighted={blueprintMatches}
+          onEdit={isControlMode ? onEditBlueprint : undefined}
+        />
+
+        <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                {t("future.definition.values", "重要价值")}
+              </div>
+              <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
+                {t("future.definition.valuesDesc", "这些词决定你会把时间和钱投向哪里。")}
+              </p>
+            </div>
+            {isControlMode ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="text-[color:var(--text-secondary)]"
+                onClick={onEditBlueprint}
+              >
+                <PencilLine className="size-3.5" />
+                {t("future.edit.blueprint", "编辑蓝图")}
+              </Button>
+            ) : null}
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {futureBlueprint.values.length > 0 ? (
+              futureBlueprint.values.map((value) => (
+                <Badge
+                  key={value}
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+                >
+                  {value}
+                </Badge>
+              ))
+            ) : (
+              <span className="text-sm text-[color:var(--text-muted)]">
+                {t("future.empty.values", "当前还没有价值关键词。")}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </Surface>
+  )
+}
+
+function FutureMilestonesPanel({
+  futureBlueprint,
+  isControlMode,
+  isFixedLayout,
+  milestones,
+  onCreate,
+  onEdit,
+}: {
+  futureBlueprint: FutureBlueprint
+  isControlMode: boolean
+  isFixedLayout: boolean
+  milestones: FutureMilestone[]
+  onCreate: () => void
+  onEdit: (entry: FutureMilestone, index: number) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col overflow-hidden")}>
+      <div className="flex items-start justify-between gap-3">
+        <SectionHeading
+          icon={Target}
+          title={t("future.sections.milestones.title", "阶段路径")}
+          description={t(
+            "future.sections.milestones.description",
+            "先把未来拆成靠近方式，而不是终局答案。",
+          )}
+          compact
+        />
+        {isControlMode ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+            onClick={onCreate}
+          >
+            <Plus className="size-3.5" />
+            {t("future.addMilestone", "新增路径")}
+          </Button>
+        ) : null}
+      </div>
+
+      <div className={cn("mt-4 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        {milestones.length > 0 ? (
+          milestones.map((entry) => {
+            const index = futureBlueprint.milestones.indexOf(entry)
+
+            return (
+              <MilestoneCard
+                key={`${entry.horizon}-${entry.summary}`}
+                entry={entry}
+                onEdit={isControlMode ? () => onEdit(entry, index) : undefined}
+              />
+            )
+          })
+        ) : (
+          <EmptyState message={t("future.empty.milestones", "当前筛选下没有未来路径。")} />
+        )}
+      </div>
+    </Surface>
+  )
+}
+
+function FutureExperimentsPanel({
+  experiments,
+  isControlMode,
+  isFixedLayout,
+  onCreate,
+  onEdit,
+}: {
+  experiments: Array<{ entry: string; index: number }>
+  isControlMode: boolean
+  isFixedLayout: boolean
+  onCreate: () => void
+  onEdit: (entry: string, index: number) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col overflow-hidden")}>
+      <div className="flex items-start justify-between gap-3">
+        <SectionHeading
+          icon={Compass}
+          title={t("future.sections.experiments.title", "当前实验")}
+          description={t(
+            "future.sections.experiments.description",
+            "不用一步到位，先让生活里出现一点点更像自己的东西。",
+          )}
+          compact
+        />
+        {isControlMode ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+            onClick={onCreate}
+          >
+            <Plus className="size-3.5" />
+            {t("future.addExperiment", "新增实验")}
+          </Button>
+        ) : null}
+      </div>
+
+      <div className={cn("mt-4 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        {experiments.length > 0 ? (
+          experiments.map(({ entry, index }) => (
+            <ExperimentCard
+              key={`${entry}-${index}`}
+              entry={entry}
+              editHint={t("future.edit.clickToEdit", "点击可编辑")}
+              onEdit={isControlMode ? () => onEdit(entry, index) : undefined}
+            />
+          ))
+        ) : (
+          <EmptyState message={t("future.empty.experiments", "当前筛选下没有实验内容。")} />
+        )}
+      </div>
+    </Surface>
+  )
+}
+
+function FutureAlignmentPanel({
+  futureBlueprint,
+  isFixedLayout,
+  milestones,
+}: {
+  futureBlueprint: FutureBlueprint
+  isFixedLayout: boolean
+  milestones: FutureMilestone[]
+}) {
+  const { t } = useTranslation()
+  const checks = [
+    {
+      title: t("future.alignment.identity.title", "理想自我是否清楚"),
+      detail: futureBlueprint.identity || t("future.empty.identity", "还没有写下理想自我。"),
+    },
+    {
+      title: t("future.alignment.values.title", "价值是否能筛选选择"),
+      detail:
+        futureBlueprint.values.length > 0
+          ? futureBlueprint.values.join(" · ")
+          : t("future.empty.values", "当前还没有价值关键词。"),
+    },
+    {
+      title: t("future.alignment.path.title", "路径是否已经拆近"),
+      detail:
+        milestones[0]?.summary ??
+        t("future.alignment.path.empty", "还没有能承接当前方向的阶段路径。"),
+    },
+    {
+      title: t("future.alignment.experiment.title", "生活里是否已有实验"),
+      detail:
+        futureBlueprint.experiments[0] ??
+        t("future.alignment.experiment.empty", "还没有当前实验。"),
+    },
+  ]
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col overflow-hidden")}>
+      <SectionHeading
+        icon={CheckCheck}
+        title={t("future.alignment.title", "对齐检查")}
+        description={t(
+          "future.alignment.description",
+          "用四个问题检查蓝图是否已经能回到当下行动。",
+        )}
+        compact
+      />
+      <div
+        className={cn(
+          "mt-5 grid gap-3 min-[960px]:grid-cols-2",
+          isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+        )}
+      >
+        {checks.map((check) => (
+          <div
+            key={check.title}
+            className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4"
+          >
+            <div className="text-sm font-medium text-[color:var(--text-primary)]">
+              {check.title}
+            </div>
+            <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">
+              {check.detail}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Surface>
   )
 }
 

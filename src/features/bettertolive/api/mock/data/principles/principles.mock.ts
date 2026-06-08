@@ -25,6 +25,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["亲密关系", "对等", "自尊"],
+      perspective: "个人原则",
     },
     {
       id: "principle-2",
@@ -49,6 +50,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["决策", "睡眠", "延迟反应"],
+      perspective: "个人原则",
     },
     {
       id: "principle-3",
@@ -73,6 +75,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["工作节奏", "精力", "可持续"],
+      perspective: "他人原则",
     },
     {
       id: "principle-4",
@@ -97,6 +100,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["消费", "安全感", "体面"],
+      perspective: "他人原则",
     },
     {
       id: "principle-5",
@@ -114,6 +118,7 @@ export const principlesMockData = {
       decisionCue: "连续三天睡眠异常或饭后不适，就停止加码，优先修复。",
       revisionHistory: [],
       tags: ["睡眠", "身体信号", "修复"],
+      perspective: "个人原则",
     },
     {
       id: "principle-6",
@@ -131,6 +136,7 @@ export const principlesMockData = {
       decisionCue: "如果我已经预感可能延期，就先发出提醒。",
       revisionHistory: [],
       tags: ["承诺", "可靠", "沟通"],
+      perspective: "个人原则",
     },
     {
       id: "principle-7",
@@ -148,6 +154,7 @@ export const principlesMockData = {
       decisionCue: "如果计划表没有任何空白，就先删掉一项。",
       revisionHistory: [],
       tags: ["休息", "周末", "恢复"],
+      perspective: "他人原则",
     },
     {
       id: "principle-8",
@@ -165,6 +172,7 @@ export const principlesMockData = {
       decisionCue: "如果这笔承诺要压缩未来半年的弹性，就先降级方案。",
       revisionHistory: [],
       tags: ["长期主义", "预算", "余量"],
+      perspective: "个人原则",
     },
     {
       id: "principle-9",
@@ -189,6 +197,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["情绪", "沟通", "修复"],
+      perspective: "个人原则",
     },
     {
       id: "principle-10",
@@ -213,6 +222,7 @@ export const principlesMockData = {
         },
       ],
       tags: ["真实", "合群", "表达"],
+      perspective: "他人原则",
     },
   ],
   boundaries: [

@@ -255,6 +255,7 @@ export function BeliefsPage({
   ]
   const impactRows = createDistribution(BELIEF_IMPACTS, entries, (entry) => entry.impact)
   const conflictingBeliefs = entries.filter((entry) => entry.impact === "冲突中")
+  const limitingBeliefs = entries.filter((entry) => entry.impact === "限制性")
   const changingBeliefs = entries.filter(
     (entry) => entry.stability === "正在松动" || entry.stability === "正在形成",
   )
@@ -289,6 +290,7 @@ export function BeliefsPage({
           classificationSections={classificationSections}
           impactRows={impactRows}
           conflictingBeliefs={conflictingBeliefs}
+          limitingBeliefs={limitingBeliefs}
           changingBeliefs={changingBeliefs}
           beliefById={beliefById}
           entries={entries}
@@ -333,6 +335,7 @@ function BeliefsFixedDashboard({
   classificationSections,
   impactRows,
   conflictingBeliefs,
+  limitingBeliefs,
   changingBeliefs,
   beliefById,
   entries,
@@ -353,6 +356,7 @@ function BeliefsFixedDashboard({
   }>
   impactRows: DistributionRow[]
   conflictingBeliefs: BeliefEntry[]
+  limitingBeliefs: BeliefEntry[]
   changingBeliefs: BeliefEntry[]
   beliefById: Map<string, BeliefEntry>
   entries: BeliefEntry[]
@@ -434,6 +438,7 @@ function BeliefsFixedDashboard({
             <TabsTrigger value="entries">{t("beliefs.tabs.entries", "观念清单")}</TabsTrigger>
             <TabsTrigger value="cards">{t("beliefs.tabs.cards", "三层骨架")}</TabsTrigger>
             <TabsTrigger value="relations">{t("beliefs.tabs.relations", "相互关系")}</TabsTrigger>
+            <TabsTrigger value="blindspots">{t("beliefs.tabs.blindspots", "盲区问题")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -463,6 +468,36 @@ function BeliefsFixedDashboard({
 
           <TabsContent value="relations" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
             <BeliefRelationsList relations={relations} beliefById={beliefById} compact />
+          </TabsContent>
+
+          <TabsContent value="blindspots" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="grid gap-3 min-[960px]:grid-cols-2">
+              <div className="space-y-2">
+                <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                  {t("beliefs.questions.title", "反复出现的问题")}
+                </div>
+                {beliefsModule.questions.length > 0 ? (
+                  beliefsModule.questions.map((question) => (
+                    <div
+                      key={question}
+                      className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2.5 text-xs leading-5 text-[color:var(--text-secondary)]"
+                    >
+                      {question}
+                    </div>
+                  ))
+                ) : (
+                  <EmptyState
+                    message={t("beliefs.empty.questions", "当前筛选下没有可展示的问题。")}
+                    compact
+                  />
+                )}
+              </div>
+              <SignalSection
+                title={t("beliefs.signals.limiting", "可能限制我的观念")}
+                entries={limitingBeliefs}
+                emptyMessage={t("beliefs.empty.limiting", "当前筛选下没有限制性观念。")}
+              />
+            </div>
           </TabsContent>
         </Tabs>
       </Surface>

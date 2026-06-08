@@ -29,6 +29,7 @@ import type {
   PrincipleCost,
   PrincipleDomain,
   PrincipleEntry,
+  PrinciplePerspective,
   PrincipleRevision,
   PrincipleSource,
   PrincipleStatus,
@@ -39,6 +40,7 @@ import type {
 import {
   PRINCIPLE_COSTS,
   PRINCIPLE_DOMAINS,
+  PRINCIPLE_PERSPECTIVES,
   PRINCIPLE_SOURCES,
   PRINCIPLE_STATUSES,
   PRINCIPLE_STRENGTHS,
@@ -61,6 +63,7 @@ type PrincipleFormState = {
   title: string
   statement: string
   description: string
+  perspective: PrinciplePerspective
   domain: PrincipleDomain
   type: PrincipleType
   strength: PrincipleStrength
@@ -99,8 +102,13 @@ export function PrincipleEditDialog({
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
 
-    if (!form.title.trim() || !form.statement.trim() || !form.boundary.trim()) {
-      toast.error(t("principles.edit.validation.required", "请填写标题、原则表达和边界"))
+    if (
+      !form.title.trim() ||
+      !form.statement.trim() ||
+      !form.domain.trim() ||
+      !form.boundary.trim()
+    ) {
+      toast.error(t("principles.edit.validation.required", "请填写标题、原则表达、领域和边界"))
       return
     }
 
@@ -234,14 +242,33 @@ export function PrincipleEditDialog({
             </section>
 
             <section className={PRINCIPLES_DIALOG_SECTION_CLASS}>
-              <div className="grid gap-4 md:grid-cols-5">
+              <div className="grid gap-4 md:grid-cols-6">
                 <EnumField
-                  label={t("principles.edit.domain", "领域")}
-                  group="domain"
-                  options={PRINCIPLE_DOMAINS}
-                  value={form.domain}
-                  onValueChange={(domain) => updateForm({ domain: domain as PrincipleDomain })}
+                  label={t("principles.edit.perspective", "归属")}
+                  group="perspective"
+                  options={PRINCIPLE_PERSPECTIVES}
+                  value={form.perspective}
+                  onValueChange={(perspective) =>
+                    updateForm({ perspective: perspective as PrinciplePerspective })
+                  }
                 />
+                <Field label={t("principles.edit.domain", "领域")}>
+                  <Input
+                    value={form.domain}
+                    onChange={(event) => updateForm({ domain: event.target.value })}
+                    className={PRINCIPLES_DIALOG_FIELD_CLASS}
+                    list="principle-domain-suggestions"
+                    placeholder={t(
+                      "principles.edit.domainPlaceholder",
+                      "例如：关系 / 工作 / 自定义类别",
+                    )}
+                  />
+                  <datalist id="principle-domain-suggestions">
+                    {PRINCIPLE_DOMAINS.map((domain) => (
+                      <option key={domain} value={domain} />
+                    ))}
+                  </datalist>
+                </Field>
                 <EnumField
                   label={t("principles.edit.type", "类型")}
                   group="type"
@@ -355,7 +382,7 @@ function EnumField({
   options,
   value,
 }: {
-  group: "domain" | "type" | "strength" | "source" | "status"
+  group: "perspective" | "domain" | "type" | "strength" | "source" | "status"
   label: string
   onValueChange: (value: string) => void
   options: string[]
@@ -386,6 +413,7 @@ function createInitialForm(principle: PrincipleEntry | null): PrincipleFormState
     title: principle?.title ?? "",
     statement: principle?.statement ?? "",
     description: principle?.description ?? "",
+    perspective: principle?.perspective ?? inferPrinciplePerspective(principle),
     domain: principle?.domain ?? "关系",
     type: principle?.type ?? "边界",
     strength: principle?.strength ?? "强烈偏好",
@@ -415,7 +443,8 @@ function createEntryFromForm({
     title: form.title.trim(),
     statement: form.statement.trim(),
     description: form.description.trim(),
-    domain: form.domain,
+    perspective: form.perspective,
+    domain: form.domain.trim(),
     type: form.type,
     strength: form.strength,
     source: form.source,
@@ -434,6 +463,18 @@ function createEntryFromForm({
       ? [revision, ...(existingEntry?.revisionHistory ?? [])]
       : (existingEntry?.revisionHistory ?? []),
   }
+}
+
+function inferPrinciplePerspective(principle: PrincipleEntry | null): PrinciplePerspective {
+  if (principle?.perspective) {
+    return principle.perspective
+  }
+
+  if (principle?.source === "观察他人" || principle?.source === "家庭继承") {
+    return "他人原则"
+  }
+
+  return "个人原则"
 }
 
 function createRevision(

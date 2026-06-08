@@ -17,6 +17,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
   DialogContent,
@@ -139,6 +140,7 @@ export function EventsPage({
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
+  const { t } = useTranslation()
   const [editingEvent, setEditingEvent] = useState<EditingEvent | null>(null)
   const isFixedLayout = !isStackedLayout
   const sortedEvents = useMemo(() => sortEvents(events), [events])
@@ -162,27 +164,133 @@ export function EventsPage({
     >
       <EventsPageIntro searchQuery={searchQuery} />
 
-      {isFixedLayout ? (
-        <EventsFixedDashboard
-          events={sortedEvents}
-          themeRows={themeRows}
-          dateCount={dateCount}
-          latestEvent={latestEvent}
-          isControlMode={isControlMode}
-          onCreate={openCreateDialog}
-          onEdit={(event) => setEditingEvent({ isNew: false, event })}
-        />
-      ) : (
-        <EventsStackedView
-          events={sortedEvents}
-          themeRows={themeRows}
-          dateCount={dateCount}
-          latestEvent={latestEvent}
-          isControlMode={isControlMode}
-          onCreate={openCreateDialog}
-          onEdit={(event) => setEditingEvent({ isNew: false, event })}
-        />
-      )}
+      <Tabs
+        defaultValue="overview"
+        className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
+      >
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="overview">{t("events.tabs.overview")}</TabsTrigger>
+          <TabsTrigger value="timeline">{t("events.tabs.timeline")}</TabsTrigger>
+          <TabsTrigger value="themes">{t("events.tabs.themes")}</TabsTrigger>
+          <TabsTrigger value="review">{t("events.tabs.review")}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent
+          value="overview"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          {isFixedLayout ? (
+            <EventsFixedDashboard
+              events={sortedEvents}
+              themeRows={themeRows}
+              dateCount={dateCount}
+              latestEvent={latestEvent}
+              isControlMode={isControlMode}
+              onCreate={openCreateDialog}
+              onEdit={(event) => setEditingEvent({ isNew: false, event })}
+            />
+          ) : (
+            <EventsStackedView
+              events={sortedEvents}
+              themeRows={themeRows}
+              dateCount={dateCount}
+              latestEvent={latestEvent}
+              isControlMode={isControlMode}
+              onCreate={openCreateDialog}
+              onEdit={(event) => setEditingEvent({ isNew: false, event })}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent
+          value="timeline"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              icon={BookOpenText}
+              title={t("events.timeline.title")}
+              description={t("events.timeline.description")}
+              compact
+            />
+            <div className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+              <EventTimeline
+                events={sortedEvents}
+                isControlMode={isControlMode}
+                onEdit={(event) => setEditingEvent({ isNew: false, event })}
+              />
+            </div>
+          </Surface>
+        </TabsContent>
+
+        <TabsContent
+          value="themes"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              icon={Target}
+              title={t("events.themes.title")}
+              description={t("events.themes.description")}
+              compact
+            />
+            <div className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+              <ThemeList rows={themeRows} />
+            </div>
+          </Surface>
+        </TabsContent>
+
+        <TabsContent
+          value="review"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <div
+            className={cn(
+              "grid gap-3 min-[960px]:grid-cols-[360px_minmax(0,1fr)]",
+              isFixedLayout && "h-full min-h-0 overflow-hidden",
+            )}
+          >
+            <EventsQuickPanel
+              count={sortedEvents.length}
+              dateCount={dateCount}
+              isControlMode={isControlMode}
+              latestEvent={latestEvent}
+              onCreate={openCreateDialog}
+            />
+            <Surface
+              className={cn("p-4", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <SectionHeading
+                icon={Sparkles}
+                title={t("events.review.title")}
+                description={t("events.review.description")}
+                compact
+              />
+              <div
+                className={cn(
+                  "mt-3 space-y-2",
+                  isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                )}
+              >
+                {themeRows.slice(0, 4).map((row) => (
+                  <div
+                    key={row.label}
+                    className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3 text-sm text-[color:var(--text-secondary)]"
+                  >
+                    {t("events.review.themeLine", {
+                      theme: row.label,
+                      count: row.count,
+                    })}
+                  </div>
+                ))}
+                {themeRows.length === 0 ? (
+                  <EmptyState message={t("events.empty.review")} compact />
+                ) : null}
+              </div>
+            </Surface>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {editingEvent ? (
         <EventEditDialog

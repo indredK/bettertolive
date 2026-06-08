@@ -16,6 +16,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
 import type {
   FinanceCategoryRule,
@@ -155,37 +156,171 @@ export function FinancePage({
         </div>
       ) : null}
 
-      {isFixedLayout ? (
-        <FinanceFixedDashboard
-          categoryRows={categoryRows}
-          entries={entries}
-          isControlMode={isControlMode}
-          lifeSystemRows={lifeSystemRows}
-          locale={locale}
-          reviewEntries={reviewEntries}
-          summary={summary}
-          target={target}
-          categoryRules={editableFinance.categoryRules}
-          reviewPrompts={editableFinance.reviewPrompts}
-          onDeleteEntry={handleDeleteEntry}
-          onEditEntry={handleEditEntry}
-        />
-      ) : (
-        <FinanceStackedView
-          categoryRows={categoryRows}
-          entries={entries}
-          isControlMode={isControlMode}
-          lifeSystemRows={lifeSystemRows}
-          locale={locale}
-          reviewEntries={reviewEntries}
-          summary={summary}
-          target={target}
-          categoryRules={editableFinance.categoryRules}
-          reviewPrompts={editableFinance.reviewPrompts}
-          onDeleteEntry={handleDeleteEntry}
-          onEditEntry={handleEditEntry}
-        />
-      )}
+      <Tabs
+        defaultValue="overview"
+        className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
+      >
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="overview">{t("finance.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="entries">{t("finance.tabs.entries", "明细")}</TabsTrigger>
+          <TabsTrigger value="rules">{t("finance.tabs.rules", "预算规则")}</TabsTrigger>
+          <TabsTrigger value="review">{t("finance.tabs.review", "复盘线索")}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent
+          value="overview"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          {isFixedLayout ? (
+            <FinanceFixedDashboard
+              categoryRows={categoryRows}
+              entries={entries}
+              isControlMode={isControlMode}
+              lifeSystemRows={lifeSystemRows}
+              locale={locale}
+              reviewEntries={reviewEntries}
+              summary={summary}
+              target={target}
+              categoryRules={editableFinance.categoryRules}
+              reviewPrompts={editableFinance.reviewPrompts}
+              onDeleteEntry={handleDeleteEntry}
+              onEditEntry={handleEditEntry}
+            />
+          ) : (
+            <FinanceStackedView
+              categoryRows={categoryRows}
+              entries={entries}
+              isControlMode={isControlMode}
+              lifeSystemRows={lifeSystemRows}
+              locale={locale}
+              reviewEntries={reviewEntries}
+              summary={summary}
+              target={target}
+              categoryRules={editableFinance.categoryRules}
+              reviewPrompts={editableFinance.reviewPrompts}
+              onDeleteEntry={handleDeleteEntry}
+              onEditEntry={handleEditEntry}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent
+          value="entries"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              icon={Wallet}
+              title={t("finance.sections.entriesTitle", "最近账目")}
+              description={t(
+                "finance.sections.entriesDescription",
+                "收入和支出都放在同一条现实时间线上。",
+              )}
+              compact
+            />
+            <TransactionList
+              entries={entries}
+              isControlMode={isControlMode}
+              locale={locale}
+              onDeleteEntry={handleDeleteEntry}
+              onEditEntry={handleEditEntry}
+            />
+          </Surface>
+        </TabsContent>
+
+        <TabsContent
+          value="rules"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <div
+            className={cn(
+              "grid gap-3 min-[960px]:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]",
+              isFixedLayout && "h-full min-h-0 overflow-hidden",
+            )}
+          >
+            <Surface
+              className={cn("p-4", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <SectionHeading
+                icon={PieChart}
+                title={t("finance.sections.distributionTitle", "类别和生活系统")}
+                description={t(
+                  "finance.sections.distributionDescription",
+                  "先看钱流向哪里，再看它支撑了什么。",
+                )}
+                compact
+              />
+              <div
+                className={cn(
+                  "mt-3 space-y-4",
+                  isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                )}
+              >
+                <DistributionList rows={categoryRows} group="category" locale={locale} />
+                <DistributionList rows={lifeSystemRows} group="lifeSystem" locale={locale} muted />
+              </div>
+            </Surface>
+            <Surface
+              className={cn("p-4", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <SectionHeading
+                icon={Target}
+                title={t("finance.rules.title", "预算规则")}
+                description={t(
+                  "finance.rules.description",
+                  "把每类支出的意图和上限放在同一处校准。",
+                )}
+                compact
+              />
+              <div
+                className={cn(
+                  "mt-3 space-y-2",
+                  isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+                )}
+              >
+                {editableFinance.categoryRules.length > 0 ? (
+                  editableFinance.categoryRules.map((rule) => (
+                    <CategoryRuleCard key={rule.id} rule={rule} />
+                  ))
+                ) : (
+                  <EmptyState message={t("finance.empty.rules", "当前还没有预算规则。")} compact />
+                )}
+              </div>
+            </Surface>
+          </div>
+        </TabsContent>
+
+        <TabsContent
+          value="review"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
+            <SectionHeading
+              icon={Target}
+              title={t("finance.sections.reviewTitle", "目标和复盘")}
+              description={t(
+                "finance.sections.reviewDescription",
+                "目标不是压迫，而是给钱一个方向。",
+              )}
+              compact
+            />
+            <div
+              className={cn(
+                "mt-3 space-y-3",
+                isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+              )}
+            >
+              <TargetCard locale={locale} summary={summary} target={target} />
+              <ReviewPanel
+                entries={reviewEntries}
+                locale={locale}
+                prompts={editableFinance.reviewPrompts}
+                rules={editableFinance.categoryRules}
+              />
+            </div>
+          </Surface>
+        </TabsContent>
+      </Tabs>
 
       {editingEntry ? (
         <FinanceEntryEditDialog
@@ -644,6 +779,35 @@ function DistributionList({
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+function CategoryRuleCard({ rule }: { rule: FinanceCategoryRule }) {
+  const { i18n, t } = useTranslation()
+  const locale = i18n.resolvedLanguage ?? i18n.language
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-sm font-medium text-[color:var(--text-primary)]">
+          {translateFinanceEnum(t, "category", rule.category)}
+        </div>
+        {rule.monthlyLimit ? (
+          <Badge
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+          >
+            {formatCurrency(rule.monthlyLimit, locale)}
+          </Badge>
+        ) : null}
+      </div>
+      <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{rule.intent}</p>
+      {rule.reviewPrompt ? (
+        <p className="mt-2 border-t border-[color:var(--muted-surface-border)] pt-2 text-xs leading-5 text-[color:var(--text-muted)]">
+          {rule.reviewPrompt}
+        </p>
+      ) : null}
     </div>
   )
 }

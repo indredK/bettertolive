@@ -30,6 +30,9 @@ import type {
   EconLayer,
   EconRelevance,
   EconSource,
+  EconTopicArea,
+  SocioeconomicsDiscipline,
+  SocioeconomicsSourceRef,
   SocioeconomicsEntry,
   SocioeconomicsGap,
   SocioeconomicsModuleData,
@@ -40,6 +43,8 @@ import {
   ECON_LAYERS,
   ECON_RELEVANCES,
   ECON_SOURCES,
+  ECON_TOPIC_AREAS,
+  SOCIO_DISCIPLINES,
   createSocioeconomicsId,
   joinListText,
   splitListText,
@@ -72,6 +77,8 @@ export type EditingSocioeconomicsPrompt = {
 
 type EntryFormState = {
   title: string
+  discipline: SocioeconomicsDiscipline
+  topicArea: EconTopicArea
   domain: EconDomain
   layer: EconLayer
   confidence: EconConfidence
@@ -80,6 +87,7 @@ type EntryFormState = {
   summary: string
   understandingNote: string
   relatedConceptsText: string
+  sourceRefsText: string
   tagsText: string
   confidenceHistoryText: string
 }
@@ -90,9 +98,63 @@ type GapFormState = {
   nextStep: string
 }
 
+const SOCIOLOGY_DOMAINS = new Set<EconDomain>([
+  "社会结构",
+  "社会流动",
+  "制度与组织",
+  "城市与社区",
+  "文化与规范",
+])
+
+const SOCIOLOGY_TAG_KEYWORDS = ["社会", "群体", "社区", "阶层", "规范", "制度", "文化", "城市"]
+
+function inferEntryDiscipline(entry: SocioeconomicsEntry | null): SocioeconomicsDiscipline {
+  if (!entry) return "经济学"
+  if (entry.discipline) return entry.discipline
+
+  if (
+    SOCIOLOGY_DOMAINS.has(entry.domain) ||
+    entry.tags?.some((tag) => SOCIOLOGY_TAG_KEYWORDS.some((keyword) => tag.includes(keyword)))
+  ) {
+    return "社会学"
+  }
+
+  return "经济学"
+}
+
+function inferEntryTopicArea(entry: SocioeconomicsEntry | null): EconTopicArea {
+  if (!entry) return ECON_TOPIC_AREAS[0]
+  if (entry.topicArea) return entry.topicArea
+  if (inferEntryDiscipline(entry) === "社会学") return ECON_TOPIC_AREAS[0]
+
+  if (entry.tags?.some((tag) => tag.includes("经济学家") || tag.includes("人物"))) {
+    return "著名经济学家"
+  }
+
+  if (entry.tags?.some((tag) => tag.includes("模型") || tag.includes("原理"))) {
+    return "经济原理与模型"
+  }
+
+  if (entry.domain === "财政与政策") {
+    return "经济政策"
+  }
+
+  if (entry.layer === "微观") {
+    return "微观经济学"
+  }
+
+  if (entry.layer === "宏观") {
+    return "宏观经济学"
+  }
+
+  return "经济学基础概念"
+}
+
 function createInitialEntryForm(entry: SocioeconomicsEntry | null): EntryFormState {
   return {
     title: entry?.title ?? "",
+    discipline: inferEntryDiscipline(entry),
+    topicArea: inferEntryTopicArea(entry),
     domain: entry?.domain ?? ECON_DOMAINS[0],
     layer: entry?.layer ?? ECON_LAYERS[0],
     confidence: entry?.confidence ?? ECON_CONFIDENCES[0],
@@ -101,6 +163,7 @@ function createInitialEntryForm(entry: SocioeconomicsEntry | null): EntryFormSta
     summary: entry?.summary ?? "",
     understandingNote: entry?.understandingNote ?? "",
     relatedConceptsText: joinListText(entry?.relatedConcepts),
+    sourceRefsText: formatSourceRefs(entry?.sourceRefs),
     tagsText: joinListText(entry?.tags),
     confidenceHistoryText: formatConfidenceHistory(entry?.confidenceHistory),
   }
@@ -112,6 +175,30 @@ function createInitialGapForm(gap: SocioeconomicsGap | null): GapFormState {
     summary: gap?.summary ?? "",
     nextStep: gap?.nextStep ?? "",
   }
+}
+
+function formatSourceRefs(sourceRefs?: SocioeconomicsSourceRef[]) {
+  return (sourceRefs ?? []).map((item) => `${item.label} | ${item.url}`).join("\n")
+}
+
+function parseSourceRefs(text: string): SocioeconomicsSourceRef[] {
+  return text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const [label = "", url = ""] = line.split("|").map((part) => part.trim())
+
+      if (!label || !/^https?:\/\//.test(url)) {
+        throw new Error("invalid-source-ref")
+      }
+
+      return {
+        id: createSocioeconomicsId(`socio-source-${index + 1}`),
+        label,
+        url,
+      }
+    })
 }
 
 function formatConfidenceHistory(history?: EconConfidenceRevision[]) {
@@ -174,6 +261,7 @@ export function SocioeconomicsEntryEditDialog({
     }
 
     let confidenceHistory: EconConfidenceRevision[]
+    let sourceRefs: SocioeconomicsSourceRef[]
 
     try {
       confidenceHistory = parseConfidenceHistory(form.confidenceHistoryText)
@@ -187,9 +275,23 @@ export function SocioeconomicsEntryEditDialog({
       return
     }
 
+    try {
+      sourceRefs = parseSourceRefs(form.sourceRefsText)
+    } catch {
+      toast.error(
+        t(
+          "socioeconomics.edit.validation.sourceRefs",
+          "来源格式需要是：来源名称 | https://example.com",
+        ),
+      )
+      return
+    }
+
     const nextEntry: SocioeconomicsEntry = {
       id: editing.entry?.id ?? createSocioeconomicsId("socio-knowledge"),
       title: form.title.trim(),
+      discipline: form.discipline,
+      topicArea: form.discipline === "经济学" ? form.topicArea : undefined,
       domain: form.domain,
       layer: form.layer,
       confidence: form.confidence,
@@ -198,6 +300,7 @@ export function SocioeconomicsEntryEditDialog({
       summary: form.summary.trim(),
       understandingNote: form.understandingNote.trim() || undefined,
       relatedConcepts: splitListText(form.relatedConceptsText),
+      sourceRefs,
       confidenceHistory,
       tags: splitListText(form.tagsText),
     }
@@ -280,16 +383,36 @@ export function SocioeconomicsEntryEditDialog({
                     group="domain"
                     value={form.domain}
                     options={ECON_DOMAINS}
-                    onValueChange={(domain) => updateForm({ domain: domain as EconDomain })}
+                    onValueChange={(domain) => updateForm({ domain })}
                   />
                 </Field>
+
+                <Field label={t("socioeconomics.fields.discipline", "学科")}>
+                  <EnumSelect
+                    group="discipline"
+                    value={form.discipline}
+                    options={SOCIO_DISCIPLINES}
+                    onValueChange={(discipline) => updateForm({ discipline })}
+                  />
+                </Field>
+
+                {form.discipline === "经济学" ? (
+                  <Field label={t("socioeconomics.fields.topicArea", "主题子类")}>
+                    <EnumSelect
+                      group="topicArea"
+                      value={form.topicArea}
+                      options={ECON_TOPIC_AREAS}
+                      onValueChange={(topicArea) => updateForm({ topicArea })}
+                    />
+                  </Field>
+                ) : null}
 
                 <Field label={t("socioeconomics.fields.layer", "层次")}>
                   <EnumSelect
                     group="layer"
                     value={form.layer}
                     options={ECON_LAYERS}
-                    onValueChange={(layer) => updateForm({ layer: layer as EconLayer })}
+                    onValueChange={(layer) => updateForm({ layer })}
                   />
                 </Field>
 
@@ -298,9 +421,7 @@ export function SocioeconomicsEntryEditDialog({
                     group="confidence"
                     value={form.confidence}
                     options={ECON_CONFIDENCES}
-                    onValueChange={(confidence) =>
-                      updateForm({ confidence: confidence as EconConfidence })
-                    }
+                    onValueChange={(confidence) => updateForm({ confidence })}
                   />
                 </Field>
 
@@ -309,7 +430,7 @@ export function SocioeconomicsEntryEditDialog({
                     group="source"
                     value={form.source}
                     options={ECON_SOURCES}
-                    onValueChange={(source) => updateForm({ source: source as EconSource })}
+                    onValueChange={(source) => updateForm({ source })}
                   />
                 </Field>
 
@@ -318,9 +439,7 @@ export function SocioeconomicsEntryEditDialog({
                     group="relevance"
                     value={form.relevance}
                     options={ECON_RELEVANCES}
-                    onValueChange={(relevance) =>
-                      updateForm({ relevance: relevance as EconRelevance })
-                    }
+                    onValueChange={(relevance) => updateForm({ relevance })}
                   />
                 </Field>
               </div>
@@ -351,6 +470,19 @@ export function SocioeconomicsEntryEditDialog({
                     value={form.relatedConceptsText}
                     onChange={(event) => updateForm({ relatedConceptsText: event.target.value })}
                     className={SOCIO_DIALOG_FIELD_CLASS}
+                  />
+                </Field>
+
+                <Field label={t("socioeconomics.fields.sourceRefs", "权威来源")}>
+                  <Textarea
+                    value={form.sourceRefsText}
+                    onChange={(event) => updateForm({ sourceRefsText: event.target.value })}
+                    className={SOCIO_DIALOG_FIELD_CLASS}
+                    placeholder={t(
+                      "socioeconomics.edit.sourceRefsPlaceholder",
+                      "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
+                    )}
+                    rows={3}
                   />
                 </Field>
 
@@ -487,7 +619,7 @@ export function SocioeconomicsGapEditDialog({
                   group="domain"
                   value={form.domain}
                   options={ECON_DOMAINS}
-                  onValueChange={(domain) => updateForm({ domain: domain as EconDomain })}
+                  onValueChange={(domain) => updateForm({ domain })}
                 />
               </Field>
 
@@ -640,16 +772,16 @@ export function SocioeconomicsPromptEditDialog({
   )
 }
 
-function EnumSelect({
+function EnumSelect<T extends string>({
   group,
   options,
   value,
   onValueChange,
 }: {
   group: string
-  options: readonly string[]
-  value: string
-  onValueChange: (value: string) => void
+  options: readonly T[]
+  value: T
+  onValueChange: (value: T) => void
 }) {
   const { t } = useTranslation()
 

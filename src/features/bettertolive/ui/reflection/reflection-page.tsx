@@ -1,4 +1,4 @@
-import { NotebookPen, Pencil, Plus, Sparkles, Trash2 } from "lucide-react"
+import { CalendarDays, Hash, NotebookPen, Pencil, Plus, Sparkles, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
   DialogContent,
@@ -41,6 +42,11 @@ type ReflectionFormState = {
   title: string
   excerpt: string
   tagsText: string
+}
+
+type CountRow = {
+  label: string
+  count: number
 }
 
 function createReflectionId() {
@@ -97,6 +103,23 @@ function sortReflections(entries: ReflectionEntry[]) {
   )
 }
 
+function createCountRows(values: string[]) {
+  const counts = new Map<string, number>()
+  values.forEach((value) => {
+    const normalized = value.trim()
+    if (!normalized) return
+    counts.set(normalized, (counts.get(normalized) ?? 0) + 1)
+  })
+
+  return [...counts.entries()]
+    .map(([label, count]) => ({ label, count }))
+    .sort((first, second) => second.count - first.count || first.label.localeCompare(second.label))
+}
+
+function getReflectionMonth(entry: ReflectionEntry) {
+  return entry.date.slice(0, 7)
+}
+
 export function ReflectionPage({
   draftExample,
   editableReflectionModule,
@@ -117,6 +140,19 @@ export function ReflectionPage({
   const [editingReflection, setEditingReflection] = useState<EditingReflection | null>(null)
   const isFixedLayout = !isStackedLayout
   const sortedReflections = useMemo(() => sortReflections(reflections), [reflections])
+  const tagRows = useMemo(
+    () => createCountRows(sortedReflections.flatMap((entry) => entry.tags)),
+    [sortedReflections],
+  )
+  const monthRows = useMemo(
+    () => createCountRows(sortedReflections.map((entry) => getReflectionMonth(entry))),
+    [sortedReflections],
+  )
+  const reflectionPrompts = [
+    t("reflection.prompts.keep", "这件事里，我想长期保留的判断是什么？"),
+    t("reflection.prompts.pattern", "它是否重复出现在最近几次记录中？"),
+    t("reflection.prompts.next", "如果只做一个小调整，下一步是什么？"),
+  ]
 
   const handleDelete = async (entry: ReflectionEntry) => {
     const confirmed = window.confirm(
@@ -159,85 +195,77 @@ export function ReflectionPage({
         <ReflectionControlModeBadge isControlMode={isControlMode} />
       </div>
 
-      <div
-        className={cn(
-          "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.85fr)]",
-          isFixedLayout && "min-h-0 flex-1 overflow-hidden",
-        )}
+      <Tabs
+        defaultValue="overview"
+        className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
       >
-        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
-          <SectionHeading
-            icon={NotebookPen}
-            title={t("reflection.sections.draft.title", "写作起点")}
-            description={t(
-              "reflection.sections.draft.description",
-              "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。",
-            )}
-          />
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="overview">{t("reflection.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="records">{t("reflection.tabs.records", "记录库")}</TabsTrigger>
+          <TabsTrigger value="themes">{t("reflection.tabs.themes", "主题脉络")}</TabsTrigger>
+          <TabsTrigger value="writing">{t("reflection.tabs.writing", "写作支架")}</TabsTrigger>
+        </TabsList>
 
+        <TabsContent
+          value="overview"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
           <div
-            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+            className={cn(
+              "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.25fr)_minmax(340px,0.85fr)]",
+              isFixedLayout && "h-full min-h-0 overflow-hidden",
+            )}
           >
-            <div className="min-h-[240px] rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] p-5 text-sm leading-7 whitespace-pre-wrap text-[color:var(--text-secondary)]">
-              {draftExample.content}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {draftExample.tags.map((tag) => (
-                <Badge
-                  key={tag}
-                  variant="outline"
-                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                >
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
-        </Surface>
-
-        <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
-          <div className="flex items-start justify-between gap-3">
-            <SectionHeading
-              icon={Sparkles}
-              title={t("reflection.sections.recent.title", "最近反思")}
-              description={t(
-                "reflection.sections.recent.description",
-                "先展示最近写过的内容，再决定之后如何组织回看。",
-              )}
+            <ReflectionDraftPanel draftExample={draftExample} isFixedLayout={isFixedLayout} />
+            <ReflectionRecordsPanel
+              entries={sortedReflections.slice(0, 5)}
+              isControlMode={isControlMode}
+              isDeleting={saveReflectionMutation.isPending}
+              isFixedLayout={isFixedLayout}
+              onCreate={() => setEditingReflection({ isNew: true, entry: null })}
+              onDelete={handleDelete}
+              onEdit={(entry) => setEditingReflection({ isNew: false, entry })}
             />
-            {isControlMode ? (
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => setEditingReflection({ isNew: true, entry: null })}
-              >
-                <Plus className="size-4" />
-                {t("reflection.actions.create", "新增反思")}
-              </Button>
-            ) : null}
           </div>
+        </TabsContent>
 
-          <div
-            className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
-          >
-            {sortedReflections.length > 0 ? (
-              sortedReflections.map((entry) => (
-                <ReflectionEntryCard
-                  key={entry.id}
-                  entry={entry}
-                  isControlMode={isControlMode}
-                  isDeleting={saveReflectionMutation.isPending}
-                  onDelete={() => void handleDelete(entry)}
-                  onEdit={() => setEditingReflection({ isNew: false, entry })}
-                />
-              ))
-            ) : (
-              <EmptyState message={t("reflection.empty.records", "当前筛选下还没有反思记录。")} />
-            )}
-          </div>
-        </Surface>
-      </div>
+        <TabsContent
+          value="records"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <ReflectionRecordsPanel
+            entries={sortedReflections}
+            isControlMode={isControlMode}
+            isDeleting={saveReflectionMutation.isPending}
+            isFixedLayout={isFixedLayout}
+            onCreate={() => setEditingReflection({ isNew: true, entry: null })}
+            onDelete={handleDelete}
+            onEdit={(entry) => setEditingReflection({ isNew: false, entry })}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="themes"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <ReflectionThemesPanel
+            isFixedLayout={isFixedLayout}
+            monthRows={monthRows}
+            tagRows={tagRows}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="writing"
+          className={cn("mt-3", isFixedLayout && "min-h-0 flex-1 overflow-hidden")}
+        >
+          <ReflectionWritingPanel
+            draftExample={draftExample}
+            isFixedLayout={isFixedLayout}
+            prompts={reflectionPrompts}
+          />
+        </TabsContent>
+      </Tabs>
 
       {editingReflection ? (
         <ReflectionEditDialog
@@ -247,6 +275,239 @@ export function ReflectionPage({
           onClose={() => setEditingReflection(null)}
         />
       ) : null}
+    </div>
+  )
+}
+
+function ReflectionDraftPanel({
+  draftExample,
+  isFixedLayout,
+}: {
+  draftExample: ReflectionDraftExample
+  isFixedLayout: boolean
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
+      <SectionHeading
+        icon={NotebookPen}
+        title={t("reflection.sections.draft.title", "写作起点")}
+        description={t(
+          "reflection.sections.draft.description",
+          "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。",
+        )}
+      />
+
+      <div className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        <div className="min-h-[240px] rounded-lg border border-dashed border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] p-5 text-sm leading-7 whitespace-pre-wrap text-[color:var(--text-secondary)]">
+          {draftExample.content}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {draftExample.tags.map((tag) => (
+            <Badge
+              key={tag}
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+            >
+              {tag}
+            </Badge>
+          ))}
+        </div>
+      </div>
+    </Surface>
+  )
+}
+
+function ReflectionRecordsPanel({
+  entries,
+  isControlMode,
+  isDeleting,
+  isFixedLayout,
+  onCreate,
+  onDelete,
+  onEdit,
+}: {
+  entries: ReflectionEntry[]
+  isControlMode: boolean
+  isDeleting: boolean
+  isFixedLayout: boolean
+  onCreate: () => void
+  onDelete: (entry: ReflectionEntry) => Promise<void>
+  onEdit: (entry: ReflectionEntry) => void
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
+      <div className="flex items-start justify-between gap-3">
+        <SectionHeading
+          icon={Sparkles}
+          title={t("reflection.sections.recent.title", "最近反思")}
+          description={t(
+            "reflection.sections.recent.description",
+            "先展示最近写过的内容，再决定之后如何组织回看。",
+          )}
+        />
+        {isControlMode ? (
+          <Button type="button" size="sm" onClick={onCreate}>
+            <Plus className="size-4" />
+            {t("reflection.actions.create", "新增反思")}
+          </Button>
+        ) : null}
+      </div>
+
+      <div className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
+        {entries.length > 0 ? (
+          entries.map((entry) => (
+            <ReflectionEntryCard
+              key={entry.id}
+              entry={entry}
+              isControlMode={isControlMode}
+              isDeleting={isDeleting}
+              onDelete={() => void onDelete(entry)}
+              onEdit={() => onEdit(entry)}
+            />
+          ))
+        ) : (
+          <EmptyState message={t("reflection.empty.records", "当前筛选下还没有反思记录。")} />
+        )}
+      </div>
+    </Surface>
+  )
+}
+
+function ReflectionThemesPanel({
+  isFixedLayout,
+  monthRows,
+  tagRows,
+}: {
+  isFixedLayout: boolean
+  monthRows: CountRow[]
+  tagRows: CountRow[]
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
+      <SectionHeading
+        icon={Hash}
+        title={t("reflection.sections.themes.title", "主题脉络")}
+        description={t(
+          "reflection.sections.themes.description",
+          "把标签和月份放在一起看，哪些话题正在反复出现会更清楚。",
+        )}
+      />
+      <div
+        className={cn(
+          "mt-5 grid gap-4 min-[960px]:grid-cols-2",
+          isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1",
+        )}
+      >
+        <CountRowsCard
+          emptyMessage={t("reflection.empty.tags", "当前筛选下还没有标签。")}
+          icon={Hash}
+          rows={tagRows}
+          title={t("reflection.sections.themes.tags", "高频标签")}
+        />
+        <CountRowsCard
+          emptyMessage={t("reflection.empty.months", "当前筛选下还没有月份分布。")}
+          icon={CalendarDays}
+          rows={monthRows}
+          title={t("reflection.sections.themes.months", "月份分布")}
+        />
+      </div>
+    </Surface>
+  )
+}
+
+function ReflectionWritingPanel({
+  draftExample,
+  isFixedLayout,
+  prompts,
+}: {
+  draftExample: ReflectionDraftExample
+  isFixedLayout: boolean
+  prompts: string[]
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div
+      className={cn(
+        "grid gap-4 min-[960px]:grid-cols-[minmax(0,1fr)_360px]",
+        isFixedLayout && "h-full min-h-0 overflow-hidden",
+      )}
+    >
+      <ReflectionDraftPanel draftExample={draftExample} isFixedLayout={isFixedLayout} />
+      <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
+        <SectionHeading
+          icon={Sparkles}
+          title={t("reflection.sections.writingPrompts.title", "回看问题")}
+          description={t(
+            "reflection.sections.writingPrompts.description",
+            "写之前不必完整回答，先用问题把注意力放回自己身上。",
+          )}
+        />
+        <div
+          className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
+        >
+          {prompts.map((prompt) => (
+            <div
+              key={prompt}
+              className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-sm leading-6 text-[color:var(--text-secondary)]"
+            >
+              {prompt}
+            </div>
+          ))}
+        </div>
+      </Surface>
+    </div>
+  )
+}
+
+function CountRowsCard({
+  emptyMessage,
+  icon: Icon,
+  rows,
+  title,
+}: {
+  emptyMessage: string
+  icon: typeof Hash
+  rows: CountRow[]
+  title: string
+}) {
+  const total = rows.reduce((sum, row) => sum + row.count, 0)
+
+  return (
+    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-4">
+      <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
+        <Icon className="size-4" />
+        {title}
+      </div>
+      <div className="mt-4 space-y-3">
+        {rows.length > 0 ? (
+          rows.slice(0, 10).map((row) => (
+            <div key={row.label} className="space-y-1.5">
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="min-w-0 truncate text-[color:var(--text-secondary)]">
+                  {row.label}
+                </span>
+                <span className="text-xs text-[color:var(--text-muted)]">{row.count}</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-[color:var(--chip-bg)]">
+                <div
+                  className="h-1.5 rounded-full bg-[color:var(--text-secondary)]"
+                  style={{ width: `${total > 0 ? Math.max((row.count / total) * 100, 8) : 0}%` }}
+                />
+              </div>
+            </div>
+          ))
+        ) : (
+          <EmptyState message={emptyMessage} compact />
+        )}
+      </div>
     </div>
   )
 }

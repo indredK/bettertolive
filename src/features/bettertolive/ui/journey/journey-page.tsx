@@ -852,6 +852,7 @@ function JourneyFixedDashboard({
             <TabsTrigger value="timeline">{t("journey.tabs.timeline")}</TabsTrigger>
             <TabsTrigger value="growth">{t("journey.tabs.growth")}</TabsTrigger>
             <TabsTrigger value="signals">{t("journey.tabs.signals")}</TabsTrigger>
+            <TabsTrigger value="library">{t("journey.tabs.library")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="timeline" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -916,6 +917,26 @@ function JourneyFixedDashboard({
               journey.threads.length === 0 ? (
                 <EmptyState message={t("journey.empty.signals")} compact />
               ) : null}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="library" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+            <div className="grid gap-2 min-[960px]:grid-cols-2">
+              {journey.memories.length > 0 ? (
+                journey.memories.map((memory) => (
+                  <CompactTextBlock
+                    key={memory.id}
+                    title={memory.title}
+                    detail={t("journey.library.memoryDetail", {
+                      era: memory.primaryEra,
+                      type: translateJourneyEnum(t, "memoryType", memory.type),
+                      privacy: translateJourneyEnum(t, "privacy", memory.privacy),
+                    })}
+                  />
+                ))
+              ) : (
+                <EmptyState message={t("journey.empty.memories")} compact />
+              )}
             </div>
           </TabsContent>
         </Tabs>

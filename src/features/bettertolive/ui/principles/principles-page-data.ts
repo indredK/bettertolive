@@ -3,6 +3,7 @@ import type { TFunction } from "i18next"
 import type {
   PrincipleCost,
   PrincipleDomain,
+  PrinciplePerspective,
   PrincipleSource,
   PrincipleStatus,
   PrincipleStrength,
@@ -19,6 +20,8 @@ export const PRINCIPLE_DOMAINS = [
 ] satisfies PrincipleDomain[]
 
 export const PRINCIPLE_TYPES = ["边界", "标准", "底线"] satisfies PrincipleType[]
+
+export const PRINCIPLE_PERSPECTIVES = ["个人原则", "他人原则"] satisfies PrinciplePerspective[]
 
 export const PRINCIPLE_STRENGTHS = [
   "不可退让",
@@ -56,6 +59,7 @@ export const PRINCIPLES_DIALOG_FOOTER_CLASS =
   "sticky bottom-0 z-10 gap-2 border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
 
 export type PrincipleEnumGroup =
+  | "perspective"
   | "domain"
   | "type"
   | "strength"

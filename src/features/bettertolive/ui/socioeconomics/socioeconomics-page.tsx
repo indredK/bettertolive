@@ -1,13 +1,4 @@
-import {
-  Globe2,
-  Grid3x3,
-  Landmark,
-  MapPin,
-  NotebookPen,
-  Pencil,
-  Plus,
-  Telescope,
-} from "lucide-react"
+import { Globe2, Grid3x3, Landmark, Network, NotebookPen, Pencil, Plus } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -18,6 +9,8 @@ import type {
   EconConfidence,
   EconDomain,
   EconRelevance,
+  EconTopicArea,
+  SocioeconomicsDiscipline,
   SocioeconomicsEntry,
   SocioeconomicsGap,
   SocioeconomicsModuleData,
@@ -44,11 +37,19 @@ import {
   ECON_LAYERS,
   ECON_RELEVANCES,
   ECON_SOURCES,
+  ECON_TOPIC_AREAS,
+  SOCIO_DISCIPLINES,
 } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page-data"
 import { SocioeconomicsControlModeBadge } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page-shared"
 import { cn } from "@/lib/utils"
 
-type SocioeconomicsEnumGroup = "domain" | "layer" | "confidence" | "source" | "relevance"
+type SocioeconomicsEnumGroup =
+  | "discipline"
+  | "domain"
+  | "layer"
+  | "confidence"
+  | "source"
+  | "relevance"
 
 type DistributionRow = {
   label: string
@@ -83,7 +84,10 @@ function createDistribution<T extends string>(
     counts.set(value, (counts.get(value) ?? 0) + 1)
   })
 
-  return order.map((label) => ({
+  const orderedLabels = new Set<T>(order)
+  entries.forEach((entry) => orderedLabels.add(getValue(entry)))
+
+  return [...orderedLabels].map((label) => ({
     label,
     count: counts.get(label) ?? 0,
   }))
@@ -118,6 +122,53 @@ function normalizeSocioeconomicsData(
   }
 }
 
+function getEntryDiscipline(entry: SocioeconomicsEntry): SocioeconomicsDiscipline {
+  if (entry.discipline) return entry.discipline
+
+  if (
+    ["社会结构", "社会流动", "制度与组织", "城市与社区", "文化与规范"].includes(entry.domain) ||
+    entry.tags?.some((tag) =>
+      ["社会", "群体", "社区", "阶层", "规范", "制度", "文化", "城市"].some((keyword) =>
+        tag.includes(keyword),
+      ),
+    )
+  ) {
+    return "社会学"
+  }
+
+  return "经济学"
+}
+
+function getEntryTopicArea(entry: SocioeconomicsEntry): EconTopicArea | null {
+  if (getEntryDiscipline(entry) === "社会学") {
+    return null
+  }
+
+  if (entry.topicArea) return entry.topicArea
+
+  if (entry.tags?.some((tag) => tag.includes("经济学家") || tag.includes("人物"))) {
+    return "著名经济学家"
+  }
+
+  if (entry.tags?.some((tag) => tag.includes("模型") || tag.includes("原理"))) {
+    return "经济原理与模型"
+  }
+
+  if (entry.domain === "财政与政策") {
+    return "经济政策"
+  }
+
+  if (entry.layer === "微观") {
+    return "微观经济学"
+  }
+
+  if (entry.layer === "宏观") {
+    return "宏观经济学"
+  }
+
+  return "经济学基础概念"
+}
+
 export function SocioeconomicsPage({
   socioeconomicsModule,
   sourceSocioeconomicsModule,
@@ -138,10 +189,22 @@ export function SocioeconomicsPage({
     sourceSocioeconomicsModule ?? socioeconomicsModule,
   )
   const entries = displayModule.entries
+  const [activeTab, setActiveTab] = useState("overview")
   const [editingEntry, setEditingEntry] = useState<EditingSocioeconomicsEntry | null>(null)
   const [editingGap, setEditingGap] = useState<EditingSocioeconomicsGap | null>(null)
   const [editingPrompt, setEditingPrompt] = useState<EditingSocioeconomicsPrompt | null>(null)
+  const economicsEntries = entries.filter((entry) => getEntryDiscipline(entry) === "经济学")
+  const sociologyEntries = entries.filter((entry) => getEntryDiscipline(entry) === "社会学")
   const classificationSections: ClassificationSection[] = [
+    {
+      title: t("socioeconomics.classification.discipline.title", "学科"),
+      description: t(
+        "socioeconomics.classification.discipline.description",
+        "先区分经济学和社会学，再进入具体知识。",
+      ),
+      group: "discipline",
+      rows: createDistribution(SOCIO_DISCIPLINES, entries, getEntryDiscipline),
+    },
     {
       title: t("socioeconomics.classification.domain.title", "领域"),
       description: t("socioeconomics.classification.domain.description", "属于经济运行的哪一块。"),
@@ -209,33 +272,125 @@ export function SocioeconomicsPage({
         title={t("socioeconomics.page.title", "看清外部经济世界怎么运转")}
         description={t(
           "socioeconomics.page.description",
-          "按 4 维分类、看 relevance 决策距离，再用热力图找认知盲区。",
+          "按 5 维分类、看 relevance 决策距离，再用热力图找认知盲区。",
         )}
         searchQuery={searchQuery}
       />
 
       <SocioeconomicsToolbar actions={actions} />
 
-      {isFixedLayout ? (
-        <SocioeconomicsFixedDashboard
-          classificationSections={classificationSections}
-          relevanceRows={relevanceRows}
-          heatmap={heatmap}
-          entries={entries}
-          reviewItems={reviewItems}
-          socioeconomicsModule={displayModule}
-          actions={actions}
-        />
-      ) : (
-        <SocioeconomicsStackedView
-          classificationSections={classificationSections}
-          relevanceRows={relevanceRows}
-          heatmap={heatmap}
-          entries={entries}
-          socioeconomicsModule={displayModule}
-          actions={actions}
-        />
-      )}
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className={cn("min-h-0 flex-1", isFixedLayout && "overflow-hidden")}
+      >
+        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+          <TabsTrigger value="overview">{t("socioeconomics.tabs.overview", "总览")}</TabsTrigger>
+          <TabsTrigger value="economics">
+            {t("socioeconomics.tabs.economics", "经济学")}
+          </TabsTrigger>
+          <TabsTrigger value="sociology">
+            {t("socioeconomics.tabs.sociology", "社会学")}
+          </TabsTrigger>
+          <TabsTrigger value="graph">{t("socioeconomics.tabs.graph", "知识关联")}</TabsTrigger>
+          <TabsTrigger value="study">{t("socioeconomics.tabs.study", "学习队列")}</TabsTrigger>
+        </TabsList>
+
+        <TabsContent
+          value="overview"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          {isFixedLayout ? (
+            <SocioeconomicsFixedDashboard
+              classificationSections={classificationSections}
+              relevanceRows={relevanceRows}
+              heatmap={heatmap}
+              entries={entries}
+              reviewItems={reviewItems}
+              socioeconomicsModule={displayModule}
+              actions={actions}
+            />
+          ) : (
+            <SocioeconomicsStackedView
+              classificationSections={classificationSections}
+              relevanceRows={relevanceRows}
+              heatmap={heatmap}
+              entries={entries}
+              reviewItems={reviewItems}
+              socioeconomicsModule={displayModule}
+              actions={actions}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent
+          value="economics"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          <SocioeconomicsDisciplineTab
+            actions={actions}
+            description={t(
+              "socioeconomics.discipline.economics.description",
+              "围绕价格、市场、政策、公司和宏观运行机制，整理可用于现实决策的经济学知识。",
+            )}
+            discipline="经济学"
+            emptyMessage={t("socioeconomics.empty.economics", "当前筛选下没有经济学条目。")}
+            entries={economicsEntries}
+            isFixedLayout={isFixedLayout}
+            title={t("socioeconomics.discipline.economics.title", "经济学")}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="sociology"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-hidden")}
+        >
+          <SocioeconomicsDisciplineTab
+            actions={actions}
+            description={t(
+              "socioeconomics.discipline.sociology.description",
+              "围绕社会结构、流动、制度、城市社区和文化规范，理解人如何在群体与制度中行动。",
+            )}
+            discipline="社会学"
+            emptyMessage={t("socioeconomics.empty.sociology", "当前筛选下没有社会学条目。")}
+            entries={sociologyEntries}
+            isFixedLayout={isFixedLayout}
+            title={t("socioeconomics.discipline.sociology.title", "社会学")}
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="graph"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-y-auto pr-1")}
+        >
+          <Surface className="p-5">
+            <SectionHeading
+              icon={Network}
+              title={t("socioeconomics.graph.title", "知识关联")}
+              description={t(
+                "socioeconomics.graph.description",
+                "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。",
+              )}
+            />
+            <div className="mt-5">
+              <ConceptGraph entries={entries} />
+            </div>
+          </Surface>
+        </TabsContent>
+
+        <TabsContent
+          value="study"
+          className={cn("mt-3", isFixedLayout && "h-full min-h-0 overflow-y-auto pr-1")}
+        >
+          <SocioeconomicsStudyQueue
+            actions={actions}
+            compact={isFixedLayout}
+            relevanceRows={relevanceRows}
+            reviewItems={reviewItems}
+            socioeconomicsModule={displayModule}
+          />
+        </TabsContent>
+      </Tabs>
 
       {editingEntry ? (
         <SocioeconomicsEntryEditDialog
@@ -316,7 +471,7 @@ function SocioeconomicsFixedDashboard({
     <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,0.94fr)_minmax(0,1.1fr)_minmax(320px,0.88fr)] grid-rows-[minmax(0,0.9fr)_minmax(0,1fr)] gap-3 overflow-hidden">
       <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
-          <div className="grid gap-2 min-[1240px]:grid-cols-4">
+          <div className="grid gap-2 min-[1240px]:grid-cols-5">
             {classificationSections.map((section) => (
               <ClassificationPanel
                 key={section.title}
@@ -346,79 +501,14 @@ function SocioeconomicsFixedDashboard({
       </Surface>
 
       <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
-        <Tabs defaultValue="entries" className="flex min-h-0 flex-1 flex-col">
-          <TabsList className="w-full shrink-0 justify-start gap-1 rounded-lg bg-[color:var(--chip-bg)] p-1">
-            <TabsTrigger value="entries">
-              {t("socioeconomics.tabs.entries", "认知清单")}
-            </TabsTrigger>
-            <TabsTrigger value="gaps">{t("socioeconomics.tabs.gaps", "认知缺口")}</TabsTrigger>
-            <TabsTrigger value="prompts">
-              {t("socioeconomics.tabs.prompts", "复习提问")}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
-            <div className="space-y-3">
-              {entries.length > 0 ? (
-                entries.map((entry) => (
-                  <SocioeconomicsCard
-                    key={entry.id}
-                    entry={entry}
-                    compact
-                    onEdit={actions.isControlMode ? () => actions.onEditEntry(entry) : undefined}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  message={t("socioeconomics.empty.entries", "当前筛选下没有可展示的认知条目。")}
-                  compact
-                />
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="gaps" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
-            <div className="space-y-2">
-              {socioeconomicsModule.gaps.length > 0 ? (
-                socioeconomicsModule.gaps.map((gap) => (
-                  <GapCard
-                    key={gap.id}
-                    gap={gap}
-                    compact
-                    onEdit={actions.isControlMode ? () => actions.onEditGap(gap) : undefined}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  message={t("socioeconomics.empty.gaps", "当前筛选下没有可展示的认知缺口。")}
-                  compact
-                />
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="prompts" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
-            <div className="space-y-2">
-              {socioeconomicsModule.reviewPrompts.length > 0 ? (
-                socioeconomicsModule.reviewPrompts.map((prompt, index) => (
-                  <PromptCard
-                    key={`${prompt}-${index}`}
-                    prompt={prompt}
-                    compact
-                    onEdit={
-                      actions.isControlMode ? () => actions.onEditPrompt(prompt, index) : undefined
-                    }
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  message={t("socioeconomics.empty.prompts", "当前筛选下没有复习提问。")}
-                  compact
-                />
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+        <SocioeconomicsKnowledgeTabs
+          actions={actions}
+          compact
+          entries={entries}
+          relevanceRows={relevanceRows}
+          reviewItems={reviewItems}
+          socioeconomicsModule={socioeconomicsModule}
+        />
       </Surface>
 
       <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
@@ -453,6 +543,7 @@ function SocioeconomicsStackedView({
   relevanceRows,
   heatmap,
   entries,
+  reviewItems,
   socioeconomicsModule,
   actions,
 }: {
@@ -460,6 +551,7 @@ function SocioeconomicsStackedView({
   relevanceRows: DistributionRow[]
   heatmap: Map<EconDomain, Map<EconConfidence, number>>
   entries: SocioeconomicsEntry[]
+  reviewItems: SocioeconomicsEntry[]
   socioeconomicsModule: SocioeconomicsModuleData
   actions: SocioeconomicsActions
 }) {
@@ -470,13 +562,13 @@ function SocioeconomicsStackedView({
       <Surface className="p-5">
         <SectionHeading
           icon={Landmark}
-          title={t("socioeconomics.classification.title", "4 维认知分类")}
+          title={t("socioeconomics.classification.title", "5 维认知分类")}
           description={t(
             "socioeconomics.classification.description",
-            "按 4 维归类；relevance 跟着每条走，不进主筛选器。",
+            "按 5 维归类；relevance 跟着每条走，不进主筛选器。",
           )}
         />
-        <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-4">
+        <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
           {classificationSections.map((section) => (
             <ClassificationPanel
               key={section.title}
@@ -505,89 +597,470 @@ function SocioeconomicsStackedView({
         </div>
       </Surface>
 
-      <div className="grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.18fr)_minmax(320px,0.82fr)]">
-        <Surface className="p-5">
-          <SectionHeading
-            icon={Telescope}
-            title={t("socioeconomics.entries.title", "认知清单")}
-            description={t("socioeconomics.entries.description", "每条都显示掌握度和决策距离。")}
-          />
-          <div className="mt-5 space-y-4">
-            {entries.length > 0 ? (
-              entries.map((entry) => (
-                <SocioeconomicsCard
-                  key={entry.id}
-                  entry={entry}
-                  onEdit={actions.isControlMode ? () => actions.onEditEntry(entry) : undefined}
+      <Surface className="p-5">
+        <SocioeconomicsKnowledgeTabs
+          actions={actions}
+          entries={entries}
+          relevanceRows={relevanceRows}
+          reviewItems={reviewItems}
+          socioeconomicsModule={socioeconomicsModule}
+        />
+      </Surface>
+    </div>
+  )
+}
+
+function SocioeconomicsKnowledgeTabs({
+  actions,
+  compact = false,
+  entries,
+  includeWorkbenchTabs = true,
+  relevanceRows,
+  reviewItems,
+  socioeconomicsModule,
+}: {
+  actions: SocioeconomicsActions
+  compact?: boolean
+  entries: SocioeconomicsEntry[]
+  includeWorkbenchTabs?: boolean
+  relevanceRows: DistributionRow[]
+  reviewItems: SocioeconomicsEntry[]
+  socioeconomicsModule: SocioeconomicsModuleData
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Tabs defaultValue="all" className="flex min-h-0 flex-1 flex-col">
+      <TabsList className="hide-scrollbar w-full shrink-0 justify-start gap-1 overflow-x-auto rounded-lg bg-[color:var(--chip-bg)] p-1">
+        <TabsTrigger value="all">{t("socioeconomics.tabs.all", "全部")}</TabsTrigger>
+        {ECON_TOPIC_AREAS.map((topicArea) => (
+          <TabsTrigger key={topicArea} value={topicArea}>
+            {translateSocioeconomicsEnum(t, "topicArea", topicArea)}
+          </TabsTrigger>
+        ))}
+        {includeWorkbenchTabs ? (
+          <>
+            <TabsTrigger value="graph">{t("socioeconomics.tabs.graph", "关联图谱")}</TabsTrigger>
+            <TabsTrigger value="gaps">{t("socioeconomics.tabs.gaps", "认知缺口")}</TabsTrigger>
+            <TabsTrigger value="prompts">
+              {t("socioeconomics.tabs.prompts", "复习提问")}
+            </TabsTrigger>
+            <TabsTrigger value="relevance">
+              {t("socioeconomics.tabs.relevance", "决策距离")}
+            </TabsTrigger>
+          </>
+        ) : null}
+      </TabsList>
+
+      <TabsContent value="all" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+        <SocioeconomicsEntryList actions={actions} compact={compact} entries={entries} />
+      </TabsContent>
+
+      {ECON_TOPIC_AREAS.map((topicArea) => {
+        const filteredEntries = entries.filter((entry) => getEntryTopicArea(entry) === topicArea)
+
+        return (
+          <TabsContent
+            key={topicArea}
+            value={topicArea}
+            className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1"
+          >
+            <SocioeconomicsEntryList
+              actions={actions}
+              compact={compact}
+              emptyMessage={t("socioeconomics.empty.topicArea", {
+                topic: translateSocioeconomicsEnum(t, "topicArea", topicArea),
+              })}
+              entries={filteredEntries}
+            />
+          </TabsContent>
+        )
+      })}
+
+      {includeWorkbenchTabs ? (
+        <TabsContent value="graph" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <ConceptGraph entries={entries} />
+        </TabsContent>
+      ) : null}
+
+      {includeWorkbenchTabs ? (
+        <TabsContent value="gaps" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-2">
+            {socioeconomicsModule.gaps.length > 0 ? (
+              socioeconomicsModule.gaps.map((gap) => (
+                <GapCard
+                  key={gap.id}
+                  gap={gap}
+                  compact={compact}
+                  onEdit={actions.isControlMode ? () => actions.onEditGap(gap) : undefined}
                 />
               ))
             ) : (
               <EmptyState
-                message={t("socioeconomics.empty.entries", "当前筛选下没有可展示的认知条目。")}
+                message={t("socioeconomics.empty.gaps", "当前筛选下没有可展示的认知缺口。")}
                 compact
+              />
+            )}
+          </div>
+        </TabsContent>
+      ) : null}
+
+      {includeWorkbenchTabs ? (
+        <TabsContent value="prompts" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="space-y-2">
+            {socioeconomicsModule.reviewPrompts.length > 0 ? (
+              socioeconomicsModule.reviewPrompts.map((prompt, index) => (
+                <PromptCard
+                  key={`${prompt}-${index}`}
+                  prompt={prompt}
+                  compact={compact}
+                  onEdit={
+                    actions.isControlMode ? () => actions.onEditPrompt(prompt, index) : undefined
+                  }
+                />
+              ))
+            ) : (
+              <EmptyState
+                message={t("socioeconomics.empty.prompts", "当前筛选下没有复习提问。")}
+                compact
+              />
+            )}
+          </div>
+        </TabsContent>
+      ) : null}
+
+      {includeWorkbenchTabs ? (
+        <TabsContent value="relevance" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="grid gap-3 min-[960px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <RelevancePanel rows={relevanceRows} compact />
+            <div className="space-y-2">
+              <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+                {t("socioeconomics.review.title", "该先补的几条")}
+              </div>
+              {reviewItems.length > 0 ? (
+                reviewItems
+                  .slice(0, 6)
+                  .map((entry) => <ReviewSignalCard key={entry.id} entry={entry} />)
+              ) : (
+                <EmptyState
+                  message={t("socioeconomics.empty.review", "当前筛选下没有需要优先补课的条目。")}
+                  compact
+                />
+              )}
+            </div>
+          </div>
+        </TabsContent>
+      ) : null}
+    </Tabs>
+  )
+}
+
+function SocioeconomicsDisciplineTab({
+  actions,
+  description,
+  discipline,
+  emptyMessage,
+  entries,
+  isFixedLayout,
+  title,
+}: {
+  actions: SocioeconomicsActions
+  description: string
+  discipline: SocioeconomicsDiscipline
+  emptyMessage: string
+  entries: SocioeconomicsEntry[]
+  isFixedLayout: boolean
+  title: string
+}) {
+  const { t } = useTranslation()
+  const domainRows = createDistribution(ECON_DOMAINS, entries, (entry) => entry.domain)
+  const confidenceRows = createDistribution(ECON_CONFIDENCES, entries, (entry) => entry.confidence)
+  const reviewItems = [...entries]
+    .filter((entry) => entry.relevance === "直接影响当前决策" || entry.confidence === "听过名词")
+    .sort((a, b) => ECON_CONFIDENCE_ORDER[a.confidence] - ECON_CONFIDENCE_ORDER[b.confidence])
+
+  if (isFixedLayout) {
+    return (
+      <div className="grid h-full min-h-0 grid-cols-[minmax(0,1.08fr)_minmax(320px,0.92fr)] gap-3 overflow-hidden">
+        <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
+          <SectionHeading icon={Landmark} title={title} description={description} compact />
+          <div className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1">
+            {discipline === "经济学" ? (
+              <SocioeconomicsKnowledgeTabs
+                actions={actions}
+                compact
+                entries={entries}
+                includeWorkbenchTabs={false}
+                relevanceRows={createDistribution(
+                  ECON_RELEVANCES,
+                  entries,
+                  (entry) => entry.relevance,
+                )}
+                reviewItems={reviewItems}
+                socioeconomicsModule={{ entries, gaps: [], reviewPrompts: [] }}
+              />
+            ) : (
+              <SocioeconomicsEntryList
+                actions={actions}
+                compact
+                emptyMessage={emptyMessage}
+                entries={entries}
               />
             )}
           </div>
         </Surface>
 
-        <div className="space-y-4">
-          <Surface className="p-5">
+        <div className="flex min-h-0 flex-col gap-3">
+          <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
             <SectionHeading
-              icon={MapPin}
-              title={t("socioeconomics.gaps.title", "认知缺口")}
+              icon={Grid3x3}
+              title={t("socioeconomics.discipline.mapTitle", "领域与掌握度")}
               description={t(
-                "socioeconomics.gaps.description",
-                "先把哪里只是听过名词、哪里还没形成判断写出来。",
+                "socioeconomics.discipline.mapDescription",
+                "看这门学科内部哪些领域已经形成框架，哪些还只是听过名词。",
               )}
+              compact
             />
-            <div className="mt-5 space-y-3">
-              {socioeconomicsModule.gaps.length > 0 ? (
-                socioeconomicsModule.gaps.map((gap) => (
-                  <GapCard
-                    key={gap.id}
-                    gap={gap}
-                    onEdit={actions.isControlMode ? () => actions.onEditGap(gap) : undefined}
-                  />
-                ))
-              ) : (
-                <EmptyState
-                  message={t("socioeconomics.empty.gaps", "当前筛选下没有可展示的认知缺口。")}
-                  compact
-                />
-              )}
+            <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+              <ClassificationPanel
+                group="domain"
+                title={t("socioeconomics.classification.domain.title", "领域")}
+                description={t(
+                  "socioeconomics.classification.domain.description",
+                  "属于经济运行的哪一块。",
+                )}
+                rows={domainRows}
+                total={entries.length}
+              />
+              <ClassificationPanel
+                group="confidence"
+                title={t("socioeconomics.classification.confidence.title", "掌握程度")}
+                description={t(
+                  "socioeconomics.classification.confidence.description",
+                  "从听过名词到有自己的判断框架。",
+                )}
+                rows={confidenceRows}
+                total={entries.length}
+              />
             </div>
           </Surface>
 
-          <Surface className="p-5">
+          <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
             <SectionHeading
               icon={NotebookPen}
-              title={t("socioeconomics.prompts.title", "复习提问")}
+              title={t("socioeconomics.review.title", "该先补的几条")}
               description={t(
-                "socioeconomics.prompts.description",
-                "把它当作每个月对认知地图的一次例行盘点。",
+                "socioeconomics.review.description",
+                "决策距离近 + 掌握度浅，是优先补课的位置。",
               )}
+              compact
             />
-            <div className="mt-5 space-y-2">
-              {socioeconomicsModule.reviewPrompts.length > 0 ? (
-                socioeconomicsModule.reviewPrompts.map((prompt, index) => (
-                  <PromptCard
-                    key={`${prompt}-${index}`}
-                    prompt={prompt}
-                    onEdit={
-                      actions.isControlMode ? () => actions.onEditPrompt(prompt, index) : undefined
-                    }
-                  />
-                ))
+            <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+              {reviewItems.length > 0 ? (
+                reviewItems.map((entry) => <ReviewSignalCard key={entry.id} entry={entry} />)
               ) : (
-                <EmptyState
-                  message={t("socioeconomics.empty.prompts", "当前筛选下没有复习提问。")}
-                  compact
-                />
+                <EmptyState message={emptyMessage} compact />
               )}
             </div>
           </Surface>
         </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="space-y-4">
+      <Surface className="p-5">
+        <SectionHeading icon={Landmark} title={title} description={description} />
+        <div className="mt-5">
+          {discipline === "经济学" ? (
+            <SocioeconomicsKnowledgeTabs
+              actions={actions}
+              entries={entries}
+              includeWorkbenchTabs={false}
+              relevanceRows={createDistribution(
+                ECON_RELEVANCES,
+                entries,
+                (entry) => entry.relevance,
+              )}
+              reviewItems={reviewItems}
+              socioeconomicsModule={{ entries, gaps: [], reviewPrompts: [] }}
+            />
+          ) : (
+            <SocioeconomicsEntryList
+              actions={actions}
+              compact={false}
+              emptyMessage={emptyMessage}
+              entries={entries}
+            />
+          )}
+        </div>
+      </Surface>
+
+      <div className="grid gap-4 min-[1100px]:grid-cols-2">
+        <Surface className="p-5">
+          <ClassificationPanel
+            group="domain"
+            title={t("socioeconomics.classification.domain.title", "领域")}
+            description={t(
+              "socioeconomics.classification.domain.description",
+              "属于经济运行的哪一块。",
+            )}
+            rows={domainRows}
+            total={entries.length}
+          />
+        </Surface>
+        <Surface className="p-5">
+          <ClassificationPanel
+            group="confidence"
+            title={t("socioeconomics.classification.confidence.title", "掌握程度")}
+            description={t(
+              "socioeconomics.classification.confidence.description",
+              "从听过名词到有自己的判断框架。",
+            )}
+            rows={confidenceRows}
+            total={entries.length}
+          />
+        </Surface>
+      </div>
+    </div>
+  )
+}
+
+function SocioeconomicsStudyQueue({
+  actions,
+  compact,
+  relevanceRows,
+  reviewItems,
+  socioeconomicsModule,
+}: {
+  actions: SocioeconomicsActions
+  compact: boolean
+  relevanceRows: DistributionRow[]
+  reviewItems: SocioeconomicsEntry[]
+  socioeconomicsModule: SocioeconomicsModuleData
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="grid gap-3 min-[960px]:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="space-y-3">
+        <RelevancePanel rows={relevanceRows} compact={compact} />
+        <div className="space-y-2">
+          {socioeconomicsModule.reviewPrompts.length > 0 ? (
+            socioeconomicsModule.reviewPrompts.map((prompt, index) => (
+              <PromptCard
+                key={`${prompt}-${index}`}
+                compact={compact}
+                prompt={prompt}
+                onEdit={
+                  actions.isControlMode ? () => actions.onEditPrompt(prompt, index) : undefined
+                }
+              />
+            ))
+          ) : (
+            <EmptyState
+              message={t("socioeconomics.empty.prompts", "当前筛选下没有复习提问。")}
+              compact
+            />
+          )}
+        </div>
+      </div>
+      <div className="space-y-2">
+        <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
+          {t("socioeconomics.review.title", "该先补的几条")}
+        </div>
+        {reviewItems.length > 0 ? (
+          reviewItems.map((entry) => <ReviewSignalCard key={entry.id} entry={entry} />)
+        ) : (
+          <EmptyState
+            message={t("socioeconomics.empty.review", "当前筛选下没有需要优先补课的条目。")}
+            compact
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function SocioeconomicsEntryList({
+  actions,
+  compact,
+  emptyMessage,
+  entries,
+}: {
+  actions: SocioeconomicsActions
+  compact: boolean
+  emptyMessage?: string
+  entries: SocioeconomicsEntry[]
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="space-y-3">
+      {entries.length > 0 ? (
+        entries.map((entry) => (
+          <SocioeconomicsCard
+            key={entry.id}
+            entry={entry}
+            compact={compact}
+            onEdit={actions.isControlMode ? () => actions.onEditEntry(entry) : undefined}
+          />
+        ))
+      ) : (
+        <EmptyState
+          message={
+            emptyMessage ?? t("socioeconomics.empty.entries", "当前筛选下没有可展示的认知条目。")
+          }
+          compact
+        />
+      )}
+    </div>
+  )
+}
+
+function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
+  const { t } = useTranslation()
+  const links = entries.flatMap((entry) =>
+    (entry.relatedConcepts ?? []).map((concept) => ({
+      concept,
+      entry,
+    })),
+  )
+
+  if (links.length === 0) {
+    return <EmptyState message={t("socioeconomics.empty.graph", "当前还没有概念关联。")} compact />
+  }
+
+  return (
+    <div className="grid gap-3 min-[960px]:grid-cols-2">
+      {links.map(({ concept, entry }) => {
+        const topicArea = getEntryTopicArea(entry)
+
+        return (
+          <div
+            key={`${entry.id}-${concept}`}
+            className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3"
+          >
+            <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
+              <Network className="size-4" />
+              {entry.title}
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-xs text-[color:var(--text-muted)]">
+              <span>
+                {topicArea
+                  ? translateSocioeconomicsEnum(t, "topicArea", topicArea)
+                  : translateSocioeconomicsEnum(t, "discipline", getEntryDiscipline(entry))}
+              </span>
+              <span>{"->"}</span>
+              <span className="font-medium text-[color:var(--text-secondary)]">{concept}</span>
+            </div>
+            <p className="mt-2 line-clamp-2 text-xs leading-5 text-[color:var(--text-muted)]">
+              {entry.summary}
+            </p>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -760,6 +1233,8 @@ function SocioeconomicsCard({
   onEdit?: () => void
 }) {
   const { t } = useTranslation()
+  const discipline = getEntryDiscipline(entry)
+  const topicArea = getEntryTopicArea(entry)
 
   return (
     <article
@@ -770,6 +1245,20 @@ function SocioeconomicsCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Badge
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+          >
+            {translateSocioeconomicsEnum(t, "discipline", discipline)}
+          </Badge>
+          {topicArea ? (
+            <Badge
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+            >
+              {translateSocioeconomicsEnum(t, "topicArea", topicArea)}
+            </Badge>
+          ) : null}
           <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
             {translateSocioeconomicsEnum(t, "domain", entry.domain)}
           </Badge>
@@ -848,6 +1337,27 @@ function SocioeconomicsCard({
               {concept}
             </Badge>
           ))}
+        </div>
+      ) : null}
+
+      {entry.sourceRefs && entry.sourceRefs.length > 0 ? (
+        <div className="mt-3 space-y-2 border-t border-[color:var(--muted-surface-border)] pt-3">
+          <div className="text-[11px] font-medium text-[color:var(--text-muted)]">
+            {t("socioeconomics.fields.sourceRefs", "权威来源")}
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {entry.sourceRefs.map((source) => (
+              <a
+                key={source.id}
+                href={source.url}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-2 py-1 text-[11px] text-[color:var(--text-secondary)] transition hover:text-[color:var(--text-primary)]"
+              >
+                {source.label}
+              </a>
+            ))}
+          </div>
         </div>
       ) : null}
 

@@ -707,7 +707,8 @@
     "tabs": {
       "entries": "观念清单",
       "cards": "三层骨架",
-      "relations": "相互关系"
+      "relations": "相互关系",
+      "blindspots": "盲区问题"
     },
     "entries": {
       "title": "观念清单",
@@ -727,7 +728,8 @@
     },
     "signals": {
       "conflict": "正在张力中",
-      "changing": "正在变化"
+      "changing": "正在变化",
+      "limiting": "可能限制我的观念"
     },
     "attachment": {
       "title": "依恋观察"
@@ -786,7 +788,8 @@
       "cards": "当前筛选下没有三层骨架。",
       "conflicts": "当前筛选下没有冲突中的观念。",
       "changing": "当前筛选下没有正在变化的观念。",
-      "distribution": "暂无分布数据。"
+      "distribution": "暂无分布数据。",
+      "limiting": "当前筛选下没有限制性观念。"
     },
     "enums": {
       "domain": {
@@ -1762,6 +1765,16 @@
       "recent": {
         "title": "最近反思",
         "description": "先展示最近写过的内容，再决定之后如何组织回看。"
+      },
+      "themes": {
+        "title": "主题脉络",
+        "description": "把标签和月份放在一起看，哪些话题正在反复出现会更清楚。",
+        "tags": "高频标签",
+        "months": "月份分布"
+      },
+      "writingPrompts": {
+        "title": "回看问题",
+        "description": "写之前不必完整回答，先用问题把注意力放回自己身上。"
       }
     },
     "actions": {
@@ -1784,7 +1797,9 @@
       "tags": "用逗号分隔，例如：节奏，工作"
     },
     "empty": {
-      "records": "当前筛选下还没有反思记录。"
+      "records": "当前筛选下还没有反思记录。",
+      "tags": "当前筛选下还没有标签。",
+      "months": "当前筛选下还没有月份分布。"
     },
     "edit": {
       "createTitle": "新增反思",
@@ -1802,6 +1817,17 @@
       "saveFailed": "保存失败",
       "deleted": "已删除",
       "deleteFailed": "删除失败"
+    },
+    "tabs": {
+      "overview": "总览",
+      "records": "记录库",
+      "themes": "主题脉络",
+      "writing": "写作支架"
+    },
+    "prompts": {
+      "keep": "这件事里，我想长期保留的判断是什么？",
+      "pattern": "它是否重复出现在最近几次记录中？",
+      "next": "如果只做一个小调整，下一步是什么？"
     }
   },
   "events": {
@@ -1840,7 +1866,8 @@
     "empty": {
       "latest": "还没有事件记录。",
       "timeline": "当前筛选下还没有事件记录。",
-      "themes": "当前筛选下没有可展示的主题。"
+      "themes": "当前筛选下没有可展示的主题。",
+      "review": "当前还没有可回看的主题线索。"
     },
     "edit": {
       "createTitle": "新增事件",
@@ -1875,6 +1902,17 @@
       "saveFailed": "保存失败",
       "deleted": "已删除",
       "deleteFailed": "删除失败"
+    },
+    "tabs": {
+      "overview": "总览",
+      "timeline": "事件流",
+      "themes": "标签视角",
+      "review": "回看线索"
+    },
+    "review": {
+      "title": "回看线索",
+      "description": "把高频主题变成下一次复盘时能直接追问的线索。",
+      "themeLine": "{{theme}} 已出现 {{count}} 次，适合回看它背后的生活模式。"
     }
   },
   "finance": {
@@ -1911,7 +1949,8 @@
     "empty": {
       "entries": "当前筛选下还没有账目记录。",
       "distribution": "当前筛选下没有可展示的分布。",
-      "reviewEntries": "当前没有需要优先复盘的账目。"
+      "reviewEntries": "当前没有需要优先复盘的账目。",
+      "rules": "当前还没有预算规则。"
     },
     "toast": {
       "saved": "已保存账目",
@@ -1998,6 +2037,16 @@
         "反思": "反思",
         "未来": "未来"
       }
+    },
+    "tabs": {
+      "overview": "总览",
+      "entries": "明细",
+      "rules": "预算规则",
+      "review": "复盘线索"
+    },
+    "rules": {
+      "title": "预算规则",
+      "description": "把每类支出的意图和上限放在同一处校准。"
     }
   },
   "journey": {
@@ -2098,7 +2147,8 @@
     "tabs": {
       "timeline": "记忆时间线",
       "growth": "成长节点",
-      "signals": "锚点与影响"
+      "signals": "锚点与影响",
+      "library": "记忆库"
     },
     "memory": {
       "formativePowerBadge": "塑造力 · {{value}}",
@@ -2292,13 +2342,16 @@
       "noData": "当前还没有成长记忆数据。",
       "distribution": "暂无分布数据。",
       "none": "暂无"
+    },
+    "library": {
+      "memoryDetail": "{{era}} · {{type}} · {{privacy}}"
     }
   },
   "socioeconomics": {
     "page": {
       "eyebrow": "社会经济",
       "title": "看清外部经济世界怎么运转",
-      "description": "按 4 维分类、看 relevance 决策距离，再用热力图找认知盲区。"
+      "description": "按 5 维分类、看 relevance 决策距离，再用热力图找认知盲区。"
     },
     "controlMode": {
       "on": "控制模式",
@@ -2316,8 +2369,8 @@
       "save": "保存"
     },
     "classification": {
-      "title": "4 维认知分类",
-      "description": "按 4 维归类；relevance 跟着每条走，不进主筛选器。",
+      "title": "5 维认知分类",
+      "description": "按 5 维归类；relevance 跟着每条走，不进主筛选器。",
       "domain": {
         "title": "领域",
         "description": "属于经济运行的哪一块。"
@@ -2333,6 +2386,10 @@
       "source": {
         "title": "来源",
         "description": "认知从哪里建立起来。"
+      },
+      "discipline": {
+        "title": "学科",
+        "description": "先区分经济学和社会学，再进入具体知识。"
       }
     },
     "relevance": {
@@ -2345,9 +2402,16 @@
       "stackedDescription": "一眼看清哪些领域我自以为懂、其实只到名词。"
     },
     "tabs": {
+      "all": "全部",
       "entries": "认知清单",
+      "graph": "关联图谱",
       "gaps": "认知缺口",
-      "prompts": "复习提问"
+      "prompts": "复习提问",
+      "relevance": "决策距离",
+      "overview": "总览",
+      "economics": "经济学",
+      "sociology": "社会学",
+      "study": "学习队列"
     },
     "entries": {
       "title": "认知清单",
@@ -2367,13 +2431,18 @@
     },
     "empty": {
       "entries": "当前筛选下没有可展示的认知条目。",
+      "topicArea": "当前筛选下没有「{{topic}}」条目。",
+      "graph": "当前还没有概念关联。",
       "gaps": "当前筛选下没有可展示的认知缺口。",
       "prompts": "当前筛选下没有复习提问。",
       "review": "当前筛选下没有需要优先补课的条目。",
-      "distribution": "暂无分布数据。"
+      "distribution": "暂无分布数据。",
+      "economics": "当前筛选下没有经济学条目。",
+      "sociology": "当前筛选下没有社会学条目。"
     },
     "fields": {
       "title": "标题",
+      "topicArea": "主题子类",
       "domain": "领域",
       "layer": "层次",
       "confidence": "掌握程度",
@@ -2382,11 +2451,13 @@
       "summary": "摘要",
       "understandingNote": "理解笔记",
       "relatedConcepts": "相关概念",
+      "sourceRefs": "权威来源",
       "tags": "标签",
       "confidenceHistory": "掌握修订历史",
       "gapSummary": "缺口",
       "nextStep": "下一步",
-      "prompt": "复习提问"
+      "prompt": "复习提问",
+      "discipline": "学科"
     },
     "edit": {
       "entryCreateTitle": "新增认知条目",
@@ -2397,9 +2468,11 @@
       "promptCreateTitle": "新增复习提问",
       "promptEditTitle": "编辑复习提问",
       "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | 看完一组材料",
+      "sourceRefsPlaceholder": "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
       "validation": {
         "entryRequired": "请填写标题和摘要",
         "history": "掌握修订历史格式需要是：日期 | 原等级 -> 新等级 | 触发原因",
+        "sourceRefs": "来源格式需要是：来源名称 | https://example.com",
         "gapRequired": "请填写缺口和下一步",
         "promptRequired": "请填写复习提问"
       }
@@ -2423,7 +2496,12 @@
         "产业与公司": "产业与公司",
         "财政与政策": "财政与政策",
         "金融市场": "金融市场",
-        "全球与宏观": "全球与宏观"
+        "全球与宏观": "全球与宏观",
+        "社会结构": "社会结构",
+        "社会流动": "社会流动",
+        "制度与组织": "制度与组织",
+        "城市与社区": "城市与社区",
+        "文化与规范": "文化与规范"
       },
       "layer": {
         "微观": "微观",
@@ -2448,7 +2526,35 @@
         "影响中期规划": "影响中期规划",
         "影响长期方向": "影响长期方向",
         "纯认知储备": "纯认知储备"
+      },
+      "topicArea": {
+        "经济学基础概念": "经济学基础概念",
+        "微观经济学": "微观经济学",
+        "宏观经济学": "宏观经济学",
+        "著名经济学家": "著名经济学家",
+        "经济原理与模型": "经济原理与模型",
+        "经济政策": "经济政策"
+      },
+      "discipline": {
+        "经济学": "经济学",
+        "社会学": "社会学"
       }
+    },
+    "discipline": {
+      "economics": {
+        "title": "经济学",
+        "description": "围绕价格、市场、政策、公司和宏观运行机制，整理可用于现实决策的经济学知识。"
+      },
+      "sociology": {
+        "title": "社会学",
+        "description": "围绕社会结构、流动、制度、城市社区和文化规范，理解人如何在群体与制度中行动。"
+      },
+      "mapTitle": "领域与掌握度",
+      "mapDescription": "看这门学科内部哪些领域已经形成框架，哪些还只是听过名词。"
+    },
+    "graph": {
+      "title": "知识关联",
+      "description": "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。"
     }
   },
   "emotion": {
@@ -2846,7 +2952,32 @@
     "empty": {
       "values": "当前还没有价值关键词。",
       "milestones": "当前筛选下没有未来路径。",
-      "experiments": "当前筛选下没有实验内容。"
+      "experiments": "当前筛选下没有实验内容。",
+      "identity": "还没有写下理想自我。"
+    },
+    "tabs": {
+      "blueprint": "蓝图",
+      "milestones": "阶段路径",
+      "experiments": "当前实验",
+      "alignment": "对齐检查"
+    },
+    "alignment": {
+      "title": "对齐检查",
+      "description": "用四个问题检查蓝图是否已经能回到当下行动。",
+      "identity": {
+        "title": "理想自我是否清楚"
+      },
+      "values": {
+        "title": "价值是否能筛选选择"
+      },
+      "path": {
+        "title": "路径是否已经拆近",
+        "empty": "还没有能承接当前方向的阶段路径。"
+      },
+      "experiment": {
+        "title": "生活里是否已有实验",
+        "empty": "还没有当前实验。"
+      }
     }
   },
   "legacy": {
@@ -3541,6 +3672,10 @@
       }
     }
   },
+  "knowledgeTabs": {
+    "principles": "个人原则",
+    "socioeconomics": "社会经济"
+  },
   "principles": {
     "page": {
       "eyebrow": "原则",
@@ -3556,7 +3691,12 @@
     "tabs": {
       "entries": "原则清单",
       "prompts": "决策校准",
-      "relations": "支撑冲突"
+      "relations": "支撑冲突",
+      "practice": "实践回路",
+      "overview": "总览",
+      "personal": "个人原则",
+      "others": "他人原则",
+      "practiceWorkbench": "校准实践"
     },
     "classification": {
       "domain": {
@@ -3620,7 +3760,9 @@
       "relations": "当前筛选下没有原则关系。",
       "priority": "当前筛选下没有高优先级原则。",
       "evolving": "当前筛选下没有正在变化的原则。",
-      "distribution": "暂无分布数据。"
+      "distribution": "暂无分布数据。",
+      "personal": "当前筛选下没有个人原则。",
+      "others": "当前筛选下没有他人原则。"
     },
     "edit": {
       "createTitle": "新增原则",
@@ -3633,6 +3775,7 @@
       "statementPlaceholder": "把这条原则写成可以指导行动的一句话。",
       "descriptionLabel": "说明",
       "domain": "领域",
+      "domainPlaceholder": "例如：关系 / 工作 / 自定义类别",
       "type": "类型",
       "strength": "强度",
       "source": "来源",
@@ -3657,7 +3800,8 @@
       "revision": {
         "summary": "更新了{{fields}}。",
         "separator": "、"
-      }
+      },
+      "perspective": "归属"
     },
     "enumNames": {
       "domain": {
@@ -3704,7 +3848,29 @@
         "内容": "内容",
         "强度": "强度",
         "状态": "状态"
+      },
+      "perspective": {
+        "个人原则": "个人原则",
+        "他人原则": "他人原则"
       }
+    },
+    "practice": {
+      "priority": "高代价优先校准",
+      "evolving": "正在测试或修订"
+    },
+    "personal": {
+      "title": "个人原则",
+      "description": "把自己主动推导、受伤后确认、已经决定长期持有的原则放在一起看。"
+    },
+    "others": {
+      "title": "他人原则",
+      "description": "把观察他人、家庭继承或暂时借来使用的原则单独放出来，方便分辨什么真正属于自己。"
+    },
+    "perspective": {
+      "summaryTitle": "来源与状态",
+      "summaryDescription": "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
+      "signalTitle": "先校准的几条",
+      "signalDescription": "优先看不可退让或代价高的原则，确认它们是不是还真属于你。"
     }
   }
 }
