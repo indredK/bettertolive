@@ -33,9 +33,10 @@ import type {
   UnfinishedWeight,
 } from "@/features/bettertolive/types"
 import {
-  CytoscapeGraph,
+  Cytoscape2DGraph,
   type CytoscapeThemeTokens,
-} from "@/features/bettertolive/ui/shared/cytoscape-graph"
+} from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
+import { ReactForceGraph3DGraph } from "@/features/bettertolive/ui/shared/react-force-graph-3d-graph"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
@@ -700,6 +701,8 @@ type RelationshipGraphNodeMeta = {
   relationship: RelationshipPerson
 }
 
+type RelationshipGraphMode = "2d" | "3d"
+
 function RelationshipsGraphTab({
   isControlMode,
   onEditRelationship,
@@ -719,6 +722,7 @@ function RelationshipsGraphTab({
     [relationshipById, relationshipsModule],
   )
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [graphMode, setGraphMode] = useState<RelationshipGraphMode>("3d")
   const effectiveSelectedNodeId =
     selectedNodeId && graphModel.metaByNodeId.has(selectedNodeId) ? selectedNodeId : null
 
@@ -762,34 +766,94 @@ function RelationshipsGraphTab({
             />
           </div>
 
-          <CytoscapeGraph
-            canvasClassName="h-full min-h-[520px] xl:min-h-0"
-            className="min-h-0 flex-1"
-            elements={graphModel.elements}
-            exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
-            fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
-            layout={RELATIONSHIP_GRAPH_LAYOUT}
-            legend={
-              <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
-                <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
-                  {translateRelationshipEnum(t, "impact", "滋养")}
-                </Badge>
-                <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
-                  {translateRelationshipEnum(t, "impact", "消耗")}
-                </Badge>
-                <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
-                  {translateRelationshipEnum(t, "impact", "混合")}
-                </Badge>
-                <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
-                  {translateRelationshipEnum(t, "impact", "中性")}
-                </Badge>
-              </div>
-            }
-            legendPosition="bottom-left"
-            selectedNodeId={effectiveSelectedNodeId}
-            stylesheet={createRelationshipsGraphStylesheet}
-            onNodeSelect={setSelectedNodeId}
-          />
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs leading-5 text-[color:var(--text-muted)]">
+              {t(
+                "relationships.graph.helper",
+                "圈层连接人物，人物连接表达，模式会根据线索和标签与相关关系形成虚线连接。",
+              )}
+            </p>
+            <div className="flex shrink-0 items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
+              <Button
+                type="button"
+                size="sm"
+                variant={graphMode === "2d" ? "secondary" : "ghost"}
+                className="h-7 px-2.5"
+                onClick={() => setGraphMode("2d")}
+              >
+                2D
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={graphMode === "3d" ? "secondary" : "ghost"}
+                className="h-7 px-2.5"
+                onClick={() => setGraphMode("3d")}
+              >
+                3D
+              </Button>
+            </div>
+          </div>
+
+          {graphMode === "2d" ? (
+            <Cytoscape2DGraph
+              canvasClassName="h-full min-h-[520px] xl:min-h-0"
+              className="min-h-0 flex-1"
+              elements={graphModel.elements}
+              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
+              fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
+              layout={RELATIONSHIP_GRAPH_LAYOUT}
+              legend={
+                <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
+                  <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
+                    {translateRelationshipEnum(t, "impact", "滋养")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
+                    {translateRelationshipEnum(t, "impact", "消耗")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
+                    {translateRelationshipEnum(t, "impact", "混合")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
+                    {translateRelationshipEnum(t, "impact", "中性")}
+                  </Badge>
+                </div>
+              }
+              legendPosition="bottom-left"
+              selectedNodeId={effectiveSelectedNodeId}
+              stylesheet={createRelationshipsGraphStylesheet}
+              onNodeSelect={setSelectedNodeId}
+            />
+          ) : (
+            <ReactForceGraph3DGraph
+              canvasClassName="h-full min-h-[520px] xl:min-h-0"
+              className="min-h-0 flex-1"
+              elements={graphModel.elements}
+              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
+              fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
+              layout={RELATIONSHIP_GRAPH_LAYOUT}
+              legend={
+                <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
+                  <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
+                    {translateRelationshipEnum(t, "impact", "滋养")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
+                    {translateRelationshipEnum(t, "impact", "消耗")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
+                    {translateRelationshipEnum(t, "impact", "混合")}
+                  </Badge>
+                  <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
+                    {translateRelationshipEnum(t, "impact", "中性")}
+                  </Badge>
+                </div>
+              }
+              legendPosition="bottom-left"
+              selectedNodeId={effectiveSelectedNodeId}
+              stylesheet={createRelationshipsGraphStylesheet}
+              onNodeSelect={setSelectedNodeId}
+            />
+          )}
         </div>
 
         <Surface className="flex min-h-[360px] flex-col overflow-hidden p-4 xl:min-h-0">

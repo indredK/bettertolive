@@ -32,9 +32,9 @@ import {
   Surface,
 } from "@/features/bettertolive/ui/shared/shared"
 import {
-  CytoscapeGraph,
+  Cytoscape2DGraph,
   type CytoscapeThemeTokens,
-} from "@/features/bettertolive/ui/shared/cytoscape-graph"
+} from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
 import {
   type EditingSocioeconomicsEntry,
   type EditingSocioeconomicsGap,
@@ -1286,7 +1286,7 @@ function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
           />
         </div>
 
-        <CytoscapeGraph
+        <Cytoscape2DGraph
           elements={graphModel.elements}
           layout={CONCEPT_GRAPH_LAYOUT}
           legend={

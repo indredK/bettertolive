@@ -22,10 +22,11 @@ import {
   type Object3D,
 } from "three"
 import { Maximize2, Minimize2 } from "lucide-react"
-import { Component, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import { createPortal } from "react-dom"
 
 import { Button } from "@/components/ui/button"
+import type { CytoscapeThemeTokens } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
 import { cn } from "@/lib/utils"
 
 type GraphPrimitive = string | number | boolean | null | undefined
@@ -36,7 +37,7 @@ type GraphElementDefinition = {
   data: GraphElementData
 }
 
-type GraphLayoutOptions = {
+type ReactForceGraph3DLayoutOptions = {
   gravity?: number
   idealEdgeLength?: number
   name?: string
@@ -107,26 +108,6 @@ type WebkitFullscreenElement = HTMLElement & {
   webkitRequestFullscreen?: () => Promise<void> | void
 }
 
-export type CytoscapeThemeTokens = {
-  accent: string
-  chipBorder: string
-  mutedSurfaceBg: string
-  mutedSurfaceBorder: string
-  surfaceBg: string
-  surfaceBorder: string
-  textMuted: string
-  textPrimary: string
-  textSecondary: string
-  toneFutureBg: string
-  toneFutureBorder: string
-  tonePastBg: string
-  tonePastBorder: string
-  tonePresentBg: string
-  tonePresentBorder: string
-  toneValueBg: string
-  toneValueBorder: string
-}
-
 const FALLBACK_THEME_TOKENS: CytoscapeThemeTokens = {
   accent: "#2563eb",
   chipBorder: "rgba(148, 163, 184, 0.38)",
@@ -193,7 +174,7 @@ function readThemeTokens() {
   } satisfies CytoscapeThemeTokens
 }
 
-export function CytoscapeGraph({
+export function ReactForceGraph3DGraph({
   canvasClassName,
   className,
   elements,
@@ -211,7 +192,7 @@ export function CytoscapeGraph({
   elements: GraphElementDefinition[]
   exitFullscreenLabel?: string
   fullscreenLabel?: string
-  layout: GraphLayoutOptions
+  layout: ReactForceGraph3DLayoutOptions
   legend?: ReactNode
   legendPosition?: GraphLegendPosition
   selectedNodeId?: string | null
@@ -230,10 +211,6 @@ export function CytoscapeGraph({
   const [isGraphVisible, setIsGraphVisible] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [useFixedFullscreenFallback, setUseFixedFullscreenFallback] = useState(false)
-  const [runtimeError, setRuntimeError] = useState<{
-    message: string
-    resetKey: string
-  } | null>(null)
   const [theme, setTheme] = useState<CytoscapeThemeTokens>(() =>
     typeof document === "undefined" ? FALLBACK_THEME_TOKENS : readThemeTokens(),
   )
@@ -283,8 +260,7 @@ export function CytoscapeGraph({
       visibilityRevision,
     ],
   )
-  const graphError =
-    graphModel.error ?? (runtimeError?.resetKey === graphResetKey ? runtimeError.message : null)
+  const graphError = graphModel.error
   const canRenderGraph = isGraphVisible && !graphError && graphModel.data.nodes.length > 0
   const isFullscreenPresentation = isFullscreen || useFixedFullscreenFallback
   const viewRestoreSignature = [
@@ -310,13 +286,6 @@ export function CytoscapeGraph({
       }
     }
   }, [])
-
-  const handleGraphRuntimeError = useCallback(
-    (message: string) => {
-      setRuntimeError({ message, resetKey: graphResetKey })
-    },
-    [graphResetKey],
-  )
 
   useEffect(() => {
     onNodeSelectRef.current = onNodeSelect
@@ -492,21 +461,6 @@ export function CytoscapeGraph({
       return
     }
 
-    graph.refresh()
-  }, [
-    canRenderGraph,
-    dimensions.height,
-    dimensions.width,
-    graphModel.data.nodes.length,
-    layout.padding,
-  ])
-
-  useEffect(() => {
-    const graph = graphRef.current
-    if (!graph || !canRenderGraph) {
-      return
-    }
-
     if (lastViewRestoreSignatureRef.current === viewRestoreSignature) {
       return
     }
@@ -574,7 +528,7 @@ export function CytoscapeGraph({
       {legend ? (
         <div
           className={cn(
-            "pointer-events-auto absolute left-3 z-40 max-w-[calc(100%-1.5rem)] rounded-2xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]/92 p-2 shadow-sm backdrop-blur",
+            "pointer-events-auto absolute left-3 z-40 max-w-[calc(100%-1.5rem)] rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]/92 p-2 shadow-sm backdrop-blur",
             legendPosition === "bottom-left" ? "bottom-3" : "top-3 max-w-[70%]",
           )}
         >
@@ -585,7 +539,7 @@ export function CytoscapeGraph({
       {fullscreenLabel && exitFullscreenLabel ? (
         <div className="pointer-events-none absolute top-3 right-3 z-50 flex items-start justify-end">
           <div
-            className="pointer-events-auto flex items-center gap-2 rounded-2xl border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]/92 p-1 shadow-sm backdrop-blur transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-[color:var(--accent)] hover:bg-[color:var(--surface-bg)] hover:shadow-[0_14px_34px_rgba(2,6,23,0.18)]"
+            className="pointer-events-auto rounded-lg border border-[color:var(--surface-border)] bg-[color:var(--surface-bg)]/92 p-1 shadow-sm backdrop-blur transition-[background-color,border-color,box-shadow,transform] duration-200 ease-out hover:-translate-y-0.5 hover:border-[color:var(--accent)] hover:bg-[color:var(--surface-bg)] hover:shadow-[0_14px_34px_rgba(2,6,23,0.18)]"
             onPointerDown={(event) => event.stopPropagation()}
           >
             <Button
@@ -622,83 +576,81 @@ export function CytoscapeGraph({
         <div className="pointer-events-none absolute inset-x-10 bottom-8 z-0 h-28 rounded-[50%] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.16)_0%,rgba(56,189,248,0.06)_42%,transparent_72%)] blur-xl" />
         {canRenderGraph ? (
           <div className="absolute inset-0 z-10">
-            <GraphErrorBoundary onError={handleGraphRuntimeError} resetKey={graphResetKey}>
-              <ForceGraph3D
-                key={graphResetKey}
-                ref={graphRef}
-                backgroundColor="rgba(0,0,0,0)"
-                cooldownTicks={260}
-                d3AlphaDecay={0.034}
-                d3VelocityDecay={0.32}
-                enableNavigationControls
-                enableNodeDrag
-                forceEngine="d3"
-                graphData={graphModel.data}
-                height={dimensions.height}
-                linkColor={(link) => getLinkDisplayColor(link, selectedNodeId ?? null, theme)}
-                linkDirectionalArrowColor={(link) =>
-                  getLinkDisplayColor(link, selectedNodeId ?? null, theme)
-                }
-                linkDirectionalArrowLength={(link) => getLinkDirectionalArrowLength(link)}
-                linkDirectionalArrowRelPos={1}
-                linkDirectionalParticleColor={(link) =>
-                  getLinkDisplayColor(link, selectedNodeId ?? null, theme)
-                }
-                linkDirectionalParticles={(link) =>
-                  getLinkDirectionalParticleCount(link, selectedNodeId ?? null)
-                }
-                linkDirectionalParticleWidth={(link) =>
-                  getLinkDisplayWidth(link, selectedNodeId ?? null) * 0.72
-                }
-                linkHoverPrecision={6}
-                linkLabel={(link) => createLinkTooltip(link)}
-                linkOpacity={0.92}
-                linkSource="source"
-                linkTarget="target"
-                linkWidth={(link) => getLinkDisplayWidth(link, selectedNodeId ?? null)}
-                nodeId="id"
-                nodeLabel={(node) => createNodeTooltip(node)}
-                nodeOpacity={0.98}
-                nodeRelSize={3.8}
-                nodeResolution={28}
-                nodeThreeObject={(node: ForceGraphNode) => {
-                  const forceNode = node
-                  return createNodeObject(
+            <ForceGraph3D
+              key={graphResetKey}
+              ref={graphRef}
+              backgroundColor="rgba(0,0,0,0)"
+              cooldownTicks={260}
+              d3AlphaDecay={0.034}
+              d3VelocityDecay={0.32}
+              enableNavigationControls
+              enableNodeDrag
+              forceEngine="d3"
+              graphData={graphModel.data}
+              height={dimensions.height}
+              linkColor={(link) => getLinkDisplayColor(link, selectedNodeId ?? null, theme)}
+              linkDirectionalArrowColor={(link) =>
+                getLinkDisplayColor(link, selectedNodeId ?? null, theme)
+              }
+              linkDirectionalArrowLength={(link) => getLinkDirectionalArrowLength(link)}
+              linkDirectionalArrowRelPos={1}
+              linkDirectionalParticleColor={(link) =>
+                getLinkDisplayColor(link, selectedNodeId ?? null, theme)
+              }
+              linkDirectionalParticles={(link) =>
+                getLinkDirectionalParticleCount(link, selectedNodeId ?? null)
+              }
+              linkDirectionalParticleWidth={(link) =>
+                getLinkDisplayWidth(link, selectedNodeId ?? null) * 0.72
+              }
+              linkHoverPrecision={6}
+              linkLabel={(link) => createLinkTooltip(link)}
+              linkOpacity={0.92}
+              linkSource="source"
+              linkTarget="target"
+              linkWidth={(link) => getLinkDisplayWidth(link, selectedNodeId ?? null)}
+              nodeId="id"
+              nodeLabel={(node) => createNodeTooltip(node)}
+              nodeOpacity={0.98}
+              nodeRelSize={3.8}
+              nodeResolution={28}
+              nodeThreeObject={(node: ForceGraphNode) => {
+                const forceNode = node
+                return createNodeObject(
+                  forceNode,
+                  getNodeSelectionState(
                     forceNode,
-                    getNodeSelectionState(
-                      forceNode,
-                      selectedNodeId ?? null,
-                      selectedConnectedNodeIds,
-                    ),
-                    theme,
-                  )
-                }}
-                nodeThreeObjectExtend={false}
-                nodeVal={(node) => Math.max(2, (node as ForceGraphNode).size)}
-                numDimensions={3}
-                rendererConfig={{
-                  alpha: true,
-                  antialias: true,
-                  powerPreference: "high-performance",
-                }}
-                showNavInfo={false}
-                showPointerCursor={(item) => Boolean(item)}
-                warmupTicks={80}
-                width={dimensions.width}
-                onBackgroundClick={() => {
-                  onNodeSelectRef.current?.(null)
-                }}
-                onNodeClick={(node) => {
-                  onNodeSelectRef.current?.(readId((node as ForceGraphNode).id))
-                }}
-              />
-            </GraphErrorBoundary>
+                    selectedNodeId ?? null,
+                    selectedConnectedNodeIds,
+                  ),
+                  theme,
+                )
+              }}
+              nodeThreeObjectExtend={false}
+              nodeVal={(node) => Math.max(2, (node as ForceGraphNode).size)}
+              numDimensions={3}
+              rendererConfig={{
+                alpha: true,
+                antialias: true,
+                powerPreference: "high-performance",
+              }}
+              showNavInfo={false}
+              showPointerCursor={(item) => Boolean(item)}
+              warmupTicks={80}
+              width={dimensions.width}
+              onBackgroundClick={() => {
+                onNodeSelectRef.current?.(null)
+              }}
+              onNodeClick={(node) => {
+                onNodeSelectRef.current?.(readId((node as ForceGraphNode).id))
+              }}
+            />
           </div>
         ) : null}
       </div>
 
       {graphError ? (
-        <div className="absolute inset-x-6 bottom-6 rounded-2xl border border-amber-200 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm backdrop-blur">
+        <div className="absolute inset-x-6 bottom-6 rounded-lg border border-amber-200 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm backdrop-blur">
           图谱暂时无法显示：{graphError}
         </div>
       ) : null}
@@ -712,7 +664,7 @@ export function CytoscapeGraph({
 
 function createForceGraphData(
   elements: GraphElementDefinition[],
-  layout: GraphLayoutOptions,
+  layout: ReactForceGraph3DLayoutOptions,
   stylesheet: GraphStylesheetBlock[],
   layoutRevision: number,
 ): RelationshipGraphData {
@@ -938,7 +890,7 @@ function drawRoundedRect(
 
 function configureForces(
   graph: ForceGraphMethods<ForceGraphNodeData, ForceGraphLinkData>,
-  layout: GraphLayoutOptions,
+  layout: ReactForceGraph3DLayoutOptions,
 ) {
   const chargeForce = graph.d3Force("charge") as ConfigurableD3Force | undefined
   const linkForce = graph.d3Force("link") as ConfigurableD3Force | undefined
@@ -948,100 +900,6 @@ function configureForces(
   chargeForce?.strength?.(-repulsion)
   linkForce?.distance?.(idealEdgeLength)
   linkForce?.strength?.(0.58)
-}
-
-function collectVisibleAncestors(element: HTMLElement) {
-  const ancestors: HTMLElement[] = []
-  let current: HTMLElement | null = element
-
-  while (current && ancestors.length < 6) {
-    ancestors.push(current)
-    current = current.parentElement
-  }
-
-  return ancestors
-}
-
-function getFullscreenElement() {
-  const webkitDocument = document as WebkitFullscreenDocument
-  return document.fullscreenElement ?? webkitDocument.webkitFullscreenElement ?? null
-}
-
-function canRequestFullscreen(element: HTMLElement) {
-  const webkitElement = element as WebkitFullscreenElement
-  return (
-    typeof element.requestFullscreen === "function" ||
-    typeof webkitElement.webkitRequestFullscreen === "function"
-  )
-}
-
-async function requestFullscreen(element: HTMLElement) {
-  const webkitElement = element as WebkitFullscreenElement
-
-  if (typeof element.requestFullscreen === "function") {
-    await element.requestFullscreen()
-    return
-  }
-
-  if (typeof webkitElement.webkitRequestFullscreen === "function") {
-    await webkitElement.webkitRequestFullscreen()
-  }
-}
-
-async function exitFullscreen() {
-  const webkitDocument = document as WebkitFullscreenDocument
-
-  if (typeof document.exitFullscreen === "function") {
-    await document.exitFullscreen()
-    return
-  }
-
-  if (typeof webkitDocument.webkitExitFullscreen === "function") {
-    await webkitDocument.webkitExitFullscreen()
-  }
-}
-
-function isContainerVisible(container: HTMLElement | null) {
-  if (!container) {
-    return false
-  }
-
-  const rect = container.getBoundingClientRect()
-  return container.getClientRects().length > 0 && rect.width >= 120 && rect.height >= 180
-}
-
-function scheduleGraphViewRestore(callback: () => void) {
-  let firstFrame = 0
-  let secondFrame = 0
-
-  firstFrame = window.requestAnimationFrame(() => {
-    secondFrame = window.requestAnimationFrame(callback)
-  })
-
-  return () => {
-    if (firstFrame) {
-      window.cancelAnimationFrame(firstFrame)
-    }
-    if (secondFrame) {
-      window.cancelAnimationFrame(secondFrame)
-    }
-  }
-}
-
-function restoreGraphView(
-  graph: ForceGraphMethods<ForceGraphNodeData, ForceGraphLinkData>,
-  graphData: RelationshipGraphData,
-  selectedNodeId: string | null,
-  layout: GraphLayoutOptions,
-) {
-  graph.refresh()
-
-  if (selectedNodeId) {
-    focusGraphNode(graph, graphData, selectedNodeId, 260)
-    return
-  }
-
-  graph.zoomToFit(260, Math.max(36, layout.padding ?? 44))
 }
 
 function configureSceneLighting(
@@ -1058,6 +916,22 @@ function configureSceneLighting(
   rimLight.position.set(0, 160, -260)
 
   graph.lights([new AmbientLight("#93c5fd", 0.48), keyLight, fillLight, rimLight])
+}
+
+function restoreGraphView(
+  graph: ForceGraphMethods<ForceGraphNodeData, ForceGraphLinkData>,
+  graphData: RelationshipGraphData,
+  selectedNodeId: string | null,
+  layout: ReactForceGraph3DLayoutOptions,
+) {
+  graph.refresh()
+
+  if (selectedNodeId) {
+    focusGraphNode(graph, graphData, selectedNodeId, 260)
+    return
+  }
+
+  graph.zoomToFit(260, Math.max(36, layout.padding ?? 44))
 }
 
 function focusGraphNode(
@@ -1312,7 +1186,7 @@ function resolveStyleMetric(value: string | number | undefined, data: GraphEleme
 
 function computeInitialPositions(
   nodes: GraphElementDefinition[],
-  layout: GraphLayoutOptions,
+  layout: ReactForceGraph3DLayoutOptions,
   layoutRevision: number,
 ) {
   const positions = new Map<string, Position>()
@@ -1345,7 +1219,7 @@ function computeInitialPositions(
 function sanitizePosition(
   position: Position | undefined,
   id: string,
-  layout: GraphLayoutOptions,
+  layout: ReactForceGraph3DLayoutOptions,
   layoutRevision: number,
 ): Position {
   if (
@@ -1362,7 +1236,7 @@ function sanitizePosition(
 
 function createFallbackPosition(
   id: string,
-  layout: GraphLayoutOptions = {},
+  layout: ReactForceGraph3DLayoutOptions = {},
   layoutRevision = 0,
 ): Position {
   const idealEdgeLength = Math.max(80, layout.idealEdgeLength ?? 120)
@@ -1414,7 +1288,7 @@ function wrapLabel(label: string, maxChars: number, maxLines: number) {
   }
 
   if (remaining.length > 0 && lines.length > 0) {
-    lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, Math.max(1, maxChars - 1))}…`
+    lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, Math.max(1, maxChars - 1))}...`
   }
 
   return lines
@@ -1433,15 +1307,6 @@ function fallbackNodeColor(data: GraphElementData) {
   }
   if (kind === "relationship" && impact === "混合") {
     return "#fda4af"
-  }
-  if (kind === "circle") {
-    return "#bbf7d0"
-  }
-  if (kind === "note") {
-    return "#bfdbfe"
-  }
-  if (kind === "pattern") {
-    return "#fecdd3"
   }
   if (kind === "entry" && discipline === "社会学") {
     return "#bbf7d0"
@@ -1527,6 +1392,84 @@ function rgbToHex(red: number, green: number, blue: number) {
     .join("")}`
 }
 
+function collectVisibleAncestors(element: HTMLElement) {
+  const ancestors: HTMLElement[] = []
+  let current: HTMLElement | null = element
+
+  while (current && ancestors.length < 6) {
+    ancestors.push(current)
+    current = current.parentElement
+  }
+
+  return ancestors
+}
+
+function getFullscreenElement() {
+  const webkitDocument = document as WebkitFullscreenDocument
+  return document.fullscreenElement ?? webkitDocument.webkitFullscreenElement ?? null
+}
+
+function canRequestFullscreen(element: HTMLElement) {
+  const webkitElement = element as WebkitFullscreenElement
+  return (
+    typeof element.requestFullscreen === "function" ||
+    typeof webkitElement.webkitRequestFullscreen === "function"
+  )
+}
+
+async function requestFullscreen(element: HTMLElement) {
+  const webkitElement = element as WebkitFullscreenElement
+
+  if (typeof element.requestFullscreen === "function") {
+    await element.requestFullscreen()
+    return
+  }
+
+  if (typeof webkitElement.webkitRequestFullscreen === "function") {
+    await webkitElement.webkitRequestFullscreen()
+  }
+}
+
+async function exitFullscreen() {
+  const webkitDocument = document as WebkitFullscreenDocument
+
+  if (typeof document.exitFullscreen === "function") {
+    await document.exitFullscreen()
+    return
+  }
+
+  if (typeof webkitDocument.webkitExitFullscreen === "function") {
+    await webkitDocument.webkitExitFullscreen()
+  }
+}
+
+function isContainerVisible(container: HTMLElement | null) {
+  if (!container) {
+    return false
+  }
+
+  const rect = container.getBoundingClientRect()
+  return container.getClientRects().length > 0 && rect.width >= 120 && rect.height >= 180
+}
+
+function scheduleGraphViewRestore(callback: () => void) {
+  let firstFrame = 0
+  let secondFrame = 0
+
+  firstFrame = window.requestAnimationFrame(() => {
+    secondFrame = window.requestAnimationFrame(callback)
+  })
+
+  return () => {
+    if (firstFrame) {
+      window.cancelAnimationFrame(firstFrame)
+    }
+    if (secondFrame) {
+      window.cancelAnimationFrame(secondFrame)
+    }
+  }
+}
+
 function seededUnit(value: string) {
   let hash = 2166136261
 
@@ -1590,44 +1533,4 @@ function readErrorMessage(error: unknown) {
   }
 
   return String(error)
-}
-
-type GraphErrorBoundaryProps = {
-  children: ReactNode
-  onError: (message: string) => void
-  resetKey: string
-}
-
-type GraphErrorBoundaryState = {
-  hasError: boolean
-}
-
-class GraphErrorBoundary extends Component<GraphErrorBoundaryProps, GraphErrorBoundaryState> {
-  state: GraphErrorBoundaryState = {
-    hasError: false,
-  }
-
-  static getDerivedStateFromError(): GraphErrorBoundaryState {
-    return {
-      hasError: true,
-    }
-  }
-
-  componentDidCatch(error: unknown) {
-    this.props.onError(readErrorMessage(error))
-  }
-
-  componentDidUpdate(previousProps: GraphErrorBoundaryProps) {
-    if (previousProps.resetKey !== this.props.resetKey && this.state.hasError) {
-      this.setState({ hasError: false })
-    }
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return null
-    }
-
-    return this.props.children
-  }
 }
