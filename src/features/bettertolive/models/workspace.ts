@@ -458,6 +458,24 @@ export type RelationshipUnsentNote = {
   unfinishedWeight?: UnfinishedWeight
 }
 
+export type RelationshipConnectionStrength = "强" | "中" | "弱"
+
+export type RelationshipConnectionRole = {
+  id: string
+  sourceRole: string
+  targetRole: string
+  note: string
+}
+
+export type RelationshipConnection = {
+  id: string
+  sourceId: string
+  targetId: string
+  strength: RelationshipConnectionStrength
+  roles: RelationshipConnectionRole[]
+  note: string
+}
+
 export type RelationshipPerson = {
   id: string
   name: string
@@ -500,6 +518,7 @@ export type RelationshipMap = {
   circles: RelationshipCircle[]
   patterns: RelationshipPattern[]
   unsentNotes: RelationshipUnsentNote[]
+  connections: RelationshipConnection[]
 }
 
 export type MemoryType = "事件" | "地点" | "物件" | "人物" | "照片" | "领悟"

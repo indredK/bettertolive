@@ -4,9 +4,11 @@ import {
   Network,
   Pencil,
   Plus,
+  SlidersHorizontal,
   Trash2,
   Users2,
   Waypoints,
+  X,
   type LucideIcon,
 } from "lucide-react"
 import type { ReactNode } from "react"
@@ -15,23 +17,28 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveRelationshipsMutation } from "@/features/bettertolive/queries/use-save-relationships-mutation"
 import type {
   RelationshipCircle,
+  RelationshipConnection,
+  RelationshipConnectionStrength,
+  RelationshipImpact,
   RelationshipMap,
   RelationshipPattern,
   RelationshipPerson,
   RelationshipUnsentNote,
   UnfinishedWeight,
 } from "@/features/bettertolive/types"
+import {
+  buildRelationshipConnectionPerspectives,
+  createRelationshipLookup,
+  createRelationshipConnectionPairKey,
+  getRelationshipsFromCircles,
+  normalizeRelationshipsModuleData,
+  removeConnectionsForRelationship,
+  syncUnsentLineRefs,
+} from "@/features/bettertolive/models/relationship-connections"
 import {
   Cytoscape2DGraph,
   type CytoscapeThemeTokens,
@@ -51,7 +58,6 @@ import {
   INTERACTION_FREQUENCIES,
   RELATIONSHIP_DEPTHS,
   RELATIONSHIP_IMPACTS,
-  RELATIONSHIP_SELECT_CONTENT_CLASS,
   RELATIONSHIP_STAGES,
   RELATIONSHIP_TYPES,
   UNFINISHED_WEIGHTS,
@@ -91,7 +97,67 @@ const RELATIONSHIP_GRAPH_LAYOUT = {
   padding: 56,
 } as const
 
-function createRelationshipsGraphStylesheet(theme: CytoscapeThemeTokens) {
+const RELATIONSHIP_GRAPH_MARK_PALETTE = [
+  {
+    bg: "rgba(219, 234, 254, 0.82)",
+    border: "#60a5fa",
+    ink: "#1e3a8a",
+  },
+  {
+    bg: "rgba(220, 252, 231, 0.82)",
+    border: "#22c55e",
+    ink: "#14532d",
+  },
+  {
+    bg: "rgba(255, 228, 230, 0.82)",
+    border: "#fb7185",
+    ink: "#881337",
+  },
+  {
+    bg: "rgba(254, 249, 195, 0.86)",
+    border: "#f59e0b",
+    ink: "#78350f",
+  },
+  {
+    bg: "rgba(237, 233, 254, 0.84)",
+    border: "#8b5cf6",
+    ink: "#4c1d95",
+  },
+  {
+    bg: "rgba(204, 251, 241, 0.82)",
+    border: "#14b8a6",
+    ink: "#134e4a",
+  },
+] as const
+
+const RELATIONSHIP_GRAPH_IMPACT_MARKS = [
+  { bg: "rgba(34, 197, 94, 0.82)", border: "#22c55e", key: "impact-滋养", value: "滋养" },
+  { bg: "rgba(245, 158, 11, 0.84)", border: "#f59e0b", key: "impact-消耗", value: "消耗" },
+  { bg: "rgba(251, 113, 133, 0.84)", border: "#fb7185", key: "impact-混合", value: "混合" },
+  { bg: "rgba(226, 232, 240, 0.9)", border: "#94a3b8", key: "impact-中性", value: "中性" },
+] as const satisfies ReadonlyArray<{
+  bg: string
+  border: string
+  key: string
+  value: RelationshipImpact
+}>
+
+const RELATIONSHIP_GRAPH_WEIGHT_MARKS = [
+  { bg: "rgba(127, 29, 29, 0.92)", border: "#ef4444", key: "weight-heavy", value: "很重" },
+  { bg: "rgba(251, 146, 60, 0.88)", border: "#f97316", key: "weight-medium", value: "中等" },
+  { bg: "rgba(254, 240, 138, 0.9)", border: "#eab308", key: "weight-light", value: "轻微" },
+  { bg: "rgba(226, 232, 240, 0.92)", border: "#94a3b8", key: "weight-none", value: "无" },
+] as const satisfies ReadonlyArray<{
+  bg: string
+  border: string
+  key: string
+  value: UnfinishedWeight
+}>
+
+function createRelationshipsGraphStylesheet(
+  theme: CytoscapeThemeTokens,
+  markMode: RelationshipGraphMarkMode,
+) {
   return [
     {
       selector: "node",
@@ -127,34 +193,7 @@ function createRelationshipsGraphStylesheet(theme: CytoscapeThemeTokens) {
         width: "mapData(weight, 1, 5, 124, 166)",
       },
     },
-    {
-      selector: "node[kind = 'relationship'][impact = '滋养']",
-      style: {
-        "background-color": theme.tonePresentBg,
-        "border-color": theme.tonePresentBorder,
-      },
-    },
-    {
-      selector: "node[kind = 'relationship'][impact = '消耗']",
-      style: {
-        "background-color": theme.toneFutureBg,
-        "border-color": theme.toneFutureBorder,
-      },
-    },
-    {
-      selector: "node[kind = 'relationship'][impact = '混合']",
-      style: {
-        "background-color": theme.toneValueBg,
-        "border-color": theme.toneValueBorder,
-      },
-    },
-    {
-      selector: "node[kind = 'relationship'][impact = '中性']",
-      style: {
-        "background-color": theme.surfaceBg,
-        "border-color": theme.mutedSurfaceBorder,
-      },
-    },
+    ...createRelationshipNodeMarkStyles(theme, markMode),
     {
       selector: "node:selected",
       style: {
@@ -175,8 +214,16 @@ function createRelationshipsGraphStylesheet(theme: CytoscapeThemeTokens) {
         opacity: 0.72,
         "overlay-opacity": 0,
         "target-arrow-color": theme.chipBorder,
-        "target-arrow-shape": "triangle",
+        "target-arrow-shape": "none",
         width: "mapData(weight, 1, 5, 1.8, 3.2)",
+      },
+    },
+    {
+      selector: "edge[linkKind = 'explicit']",
+      style: {
+        "line-color": theme.tonePresentBorder,
+        opacity: 0.9,
+        width: "mapData(weight, 1, 6, 2.2, 4.2)",
       },
     },
     {
@@ -187,22 +234,92 @@ function createRelationshipsGraphStylesheet(theme: CytoscapeThemeTokens) {
       },
     },
     {
+      selector: "edge[linkKind = 'auxiliary']",
+      style: {
+        "line-color": theme.mutedSurfaceBorder,
+        opacity: 0.48,
+      },
+    },
+    {
       selector: "edge[linkKind = 'pattern']",
       style: {
         "line-color": theme.toneValueBorder,
         "line-style": "dashed",
-        "target-arrow-color": theme.toneValueBorder,
       },
     },
     {
       selector: "edge[linkKind = 'mixed']",
       style: {
         "line-color": theme.accent,
-        "target-arrow-color": theme.accent,
         width: "mapData(weight, 1, 6, 2.2, 4.4)",
       },
     },
   ]
+}
+
+function createRelationshipNodeMarkStyles(
+  theme: CytoscapeThemeTokens,
+  markMode: RelationshipGraphMarkMode,
+) {
+  if (markMode === "impact") {
+    return [
+      {
+        selector: "node[kind = 'relationship'][graphMarkKey = 'impact-滋养']",
+        style: {
+          "background-color": theme.tonePresentBg,
+          "border-color": theme.tonePresentBorder,
+        },
+      },
+      {
+        selector: "node[kind = 'relationship'][graphMarkKey = 'impact-消耗']",
+        style: {
+          "background-color": theme.toneFutureBg,
+          "border-color": theme.toneFutureBorder,
+        },
+      },
+      {
+        selector: "node[kind = 'relationship'][graphMarkKey = 'impact-混合']",
+        style: {
+          "background-color": theme.toneValueBg,
+          "border-color": theme.toneValueBorder,
+        },
+      },
+      {
+        selector: "node[kind = 'relationship'][graphMarkKey = 'impact-中性']",
+        style: {
+          "background-color": theme.surfaceBg,
+          "border-color": theme.mutedSurfaceBorder,
+        },
+      },
+    ]
+  }
+
+  if (markMode === "weight") {
+    return RELATIONSHIP_GRAPH_WEIGHT_MARKS.map((mark) => ({
+      selector: `node[kind = 'relationship'][graphMarkKey = '${mark.key}']`,
+      style: {
+        "background-color": mark.bg,
+        "border-color": mark.border,
+      },
+    }))
+  }
+
+  const keys =
+    markMode === "stage"
+      ? RELATIONSHIP_STAGES.map((stage) => `stage-${stage}`)
+      : RELATIONSHIP_GRAPH_MARK_PALETTE.map((_, index) => `circle-${index}`)
+
+  return keys.map((key, index) => {
+    const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+
+    return {
+      selector: `node[kind = 'relationship'][graphMarkKey = '${key}']`,
+      style: {
+        "background-color": color.bg,
+        "border-color": color.border,
+      },
+    }
+  })
 }
 
 export function RelationshipsPage({
@@ -221,18 +338,28 @@ export function RelationshipsPage({
 }) {
   const { t } = useTranslation()
   const saveRelationshipsMutation = useSaveRelationshipsMutation()
-  const sourceRelationshipsModule = editableRelationshipsModule ?? relationshipsModule
-  const relationships = useMemo(() => getRelationships(relationshipsModule), [relationshipsModule])
+  const normalizedRelationshipsModule = useMemo(
+    () => normalizeRelationshipsModuleData(relationshipsModule),
+    [relationshipsModule],
+  )
+  const sourceRelationshipsModule = useMemo(
+    () => normalizeRelationshipsModuleData(editableRelationshipsModule ?? relationshipsModule),
+    [editableRelationshipsModule, relationshipsModule],
+  )
+  const relationships = useMemo(
+    () => getRelationshipsFromCircles(normalizedRelationshipsModule.circles),
+    [normalizedRelationshipsModule.circles],
+  )
   const relationshipById = useMemo(() => createRelationshipLookup(relationships), [relationships])
   const [activeTab, setActiveTab] = useState("overview")
   const [selectedRelationshipId, setSelectedRelationshipId] = useState<string | null>(
     () => relationships[0]?.id ?? null,
   )
   const [selectedNoteId, setSelectedNoteId] = useState<string | null>(
-    () => relationshipsModule.unsentNotes[0]?.id ?? null,
+    () => normalizedRelationshipsModule.unsentNotes[0]?.id ?? null,
   )
   const [selectedPatternId, setSelectedPatternId] = useState<string | null>(
-    () => relationshipsModule.patterns[0]?.id ?? null,
+    () => normalizedRelationshipsModule.patterns[0]?.id ?? null,
   )
   const [editingRelationship, setEditingRelationship] = useState<EditingRelationship | null>(null)
   const [editingNote, setEditingNote] = useState<EditingUnsentNote | null>(null)
@@ -243,12 +370,12 @@ export function RelationshipsPage({
     relationships[0] ??
     null
   const selectedNote =
-    relationshipsModule.unsentNotes.find((note) => note.id === selectedNoteId) ??
-    relationshipsModule.unsentNotes[0] ??
+    normalizedRelationshipsModule.unsentNotes.find((note) => note.id === selectedNoteId) ??
+    normalizedRelationshipsModule.unsentNotes[0] ??
     null
   const selectedPattern =
-    relationshipsModule.patterns.find((pattern) => pattern.id === selectedPatternId) ??
-    relationshipsModule.patterns[0] ??
+    normalizedRelationshipsModule.patterns.find((pattern) => pattern.id === selectedPatternId) ??
+    normalizedRelationshipsModule.patterns[0] ??
     null
 
   const classificationSections = useMemo(
@@ -317,8 +444,8 @@ export function RelationshipsPage({
     [relationships],
   )
   const sortedUnsentNotes = useMemo(
-    () => sortUnsentNotes(relationshipsModule.unsentNotes),
-    [relationshipsModule.unsentNotes],
+    () => sortUnsentNotes(normalizedRelationshipsModule.unsentNotes),
+    [normalizedRelationshipsModule.unsentNotes],
   )
 
   const handleDeleted = () => {
@@ -431,20 +558,18 @@ export function RelationshipsPage({
 
         <TabsContent value="graph" className={tabContentClassName(isStackedLayout)}>
           <RelationshipsGraphTab
-            isControlMode={isControlMode}
             onEditRelationship={(relationship, circleId) =>
               setEditingRelationship({ isNew: false, circleId, relationship })
             }
             relationshipById={relationshipById}
-            relationships={relationships}
-            relationshipsModule={relationshipsModule}
+            relationshipsModule={normalizedRelationshipsModule}
           />
         </TabsContent>
 
         <TabsContent value="directory" className={tabContentClassName(isStackedLayout)}>
           <RelationshipsDirectoryTab
             isControlMode={isControlMode}
-            relationshipsModule={relationshipsModule}
+            relationshipsModule={normalizedRelationshipsModule}
             selectedRelationship={selectedRelationship}
             sortedUnsentNotes={sortedUnsentNotes}
             onCreate={() =>
@@ -478,7 +603,7 @@ export function RelationshipsPage({
         <TabsContent value="patterns" className={tabContentClassName(isStackedLayout)}>
           <PatternsTab
             isControlMode={isControlMode}
-            patterns={relationshipsModule.patterns}
+            patterns={normalizedRelationshipsModule.patterns}
             selectedPattern={selectedPattern}
             onCreate={() => setEditingPattern({ isNew: true, pattern: null })}
             onDelete={deletePattern}
@@ -676,24 +801,25 @@ function InsightMetric({ detail, label, value }: { detail: string; label: string
   )
 }
 
-function GraphMetric({ detail, label, value }: { detail: string; label: string; value: number }) {
-  return (
-    <div className="rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-2">
-      <div className="flex items-baseline justify-between gap-3">
-        <div className="text-[10px] tracking-[0.14em] text-[color:var(--text-muted)] uppercase">
-          {label}
-        </div>
-        <div className="text-lg font-semibold text-[color:var(--text-primary)] tabular-nums">
-          {value}
-        </div>
-      </div>
-      <p className="mt-1 text-[11px] leading-4 text-[color:var(--text-muted)]">{detail}</p>
-    </div>
-  )
+type RelationshipGraphLegendItem = {
+  bg: string
+  border: string
+  key: string
+  label: string
 }
 
 type RelationshipGraphNodeMeta = {
   circle: RelationshipCircle | null
+  connections: Array<{
+    connection: RelationshipConnection
+    otherRelationship: RelationshipPerson
+    roles: Array<{
+      id: string
+      note: string
+      otherRole: string
+      selfRole: string
+    }>
+  }>
   connectedRelationships: RelationshipPerson[]
   kind: "relationship"
   matchedPatterns: RelationshipPattern[]
@@ -702,29 +828,115 @@ type RelationshipGraphNodeMeta = {
 }
 
 type RelationshipGraphMode = "2d" | "3d"
+type RelationshipGraphMarkMode = "circle" | "impact" | "stage" | "weight"
+type RelationshipGraphScope =
+  | { mode: "global" }
+  | { maxDepth: number; mode: "centered"; rootId: string }
 
 function RelationshipsGraphTab({
-  isControlMode,
   onEditRelationship,
   relationshipById,
-  relationships,
   relationshipsModule,
 }: {
-  isControlMode: boolean
   onEditRelationship: (relationship: RelationshipPerson, circleId: string) => void
   relationshipById: Map<string, RelationshipPerson>
-  relationships: RelationshipPerson[]
   relationshipsModule: RelationshipMap
 }) {
   const { t } = useTranslation()
-  const graphModel = useMemo(
-    () => createRelationshipsGraphModel(relationshipsModule, relationshipById),
-    [relationshipById, relationshipsModule],
-  )
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
   const [graphMode, setGraphMode] = useState<RelationshipGraphMode>("3d")
+  const [graphMarkMode, setGraphMarkMode] = useState<RelationshipGraphMarkMode>("circle")
+  const [graphScope, setGraphScope] = useState<RelationshipGraphScope>({ mode: "global" })
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const handleClearGraphFocus = () => {
+    setGraphScope({ mode: "global" })
+    setSelectedNodeId(null)
+  }
+  const handleExitCenterView = () => {
+    setGraphScope({ mode: "global" })
+  }
+  const handleGraphNodeSelect = (nodeId: string | null) => {
+    if (!nodeId) {
+      if (graphScope.mode === "centered") {
+        return
+      }
+
+      handleClearGraphFocus()
+      return
+    }
+
+    setSelectedNodeId(nodeId)
+  }
+  const effectiveGraphScope =
+    graphScope.mode === "centered" && !relationshipById.has(graphScope.rootId)
+      ? ({ mode: "global" } satisfies RelationshipGraphScope)
+      : graphScope
+  const graphModel = useMemo(
+    () =>
+      createRelationshipsGraphModel({
+        markMode: graphMarkMode,
+        relationshipById,
+        relationshipsModule,
+        scope: effectiveGraphScope,
+        translateGraphLabel: (group, value) => translateRelationshipEnum(t, group, value),
+      }),
+    [effectiveGraphScope, graphMarkMode, relationshipById, relationshipsModule, t],
+  )
   const effectiveSelectedNodeId =
     selectedNodeId && graphModel.metaByNodeId.has(selectedNodeId) ? selectedNodeId : null
+  const selectedNode = effectiveSelectedNodeId
+    ? (graphModel.metaByNodeId.get(effectiveSelectedNodeId) ?? null)
+    : null
+  const graphMarkOptions = useMemo(
+    () =>
+      [
+        {
+          description: t("relationships.graph.markModes.circleDescription", "同一圈层同色"),
+          label: t("relationships.graph.markModes.circle", "按圈层"),
+          mode: "circle",
+        },
+        {
+          description: t("relationships.graph.markModes.weightDescription", "未完成越重越醒目"),
+          label: t("relationships.graph.markModes.weight", "按重量"),
+          mode: "weight",
+        },
+        {
+          description: t("relationships.graph.markModes.impactDescription", "滋养/消耗一眼分开"),
+          label: t("relationships.graph.markModes.impact", "按影响"),
+          mode: "impact",
+        },
+        {
+          description: t("relationships.graph.markModes.stageDescription", "稳定、紧张、修复分区"),
+          label: t("relationships.graph.markModes.stage", "按阶段"),
+          mode: "stage",
+        },
+      ] satisfies Array<{
+        description: string
+        label: string
+        mode: RelationshipGraphMarkMode
+      }>,
+    [t],
+  )
+  const currentGraphMarkOption = graphMarkOptions.find((option) => option.mode === graphMarkMode)
+  const graphStylesheet = useMemo(
+    () => (theme: CytoscapeThemeTokens) => createRelationshipsGraphStylesheet(theme, graphMarkMode),
+    [graphMarkMode],
+  )
+  const isCenteredGraphScope = effectiveGraphScope.mode === "centered"
+  const canClearGraphFocus = Boolean(effectiveSelectedNodeId) && !isCenteredGraphScope
+  const canCenterSelectedRelationship = Boolean(selectedNode) && !isCenteredGraphScope
+
+  const handleCenterSelectedRelationship = () => {
+    if (!selectedNode || isCenteredGraphScope) {
+      return
+    }
+
+    setSelectedNodeId(selectedNode.relationship.id)
+    setGraphScope({
+      maxDepth: 2,
+      mode: "centered",
+      rootId: selectedNode.relationship.id,
+    })
+  }
 
   if (graphModel.nodeCount === 0) {
     return (
@@ -735,63 +947,112 @@ function RelationshipsGraphTab({
     )
   }
 
-  const selectedNode = effectiveSelectedNodeId
-    ? (graphModel.metaByNodeId.get(effectiveSelectedNodeId) ?? null)
-    : null
-
   return (
     <div className="h-full min-h-0 pr-1">
       <div className="grid min-h-0 gap-4 xl:h-full xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.78fr)]">
         <div className="flex min-h-0 flex-col gap-3 xl:h-full">
-          <div className="grid gap-3 min-[720px]:grid-cols-4">
-            <GraphMetric
-              detail={t("relationships.graph.metrics.relationshipsDetail", "图谱里只展示人物节点")}
-              label={t("relationships.graph.metrics.relationships", "人物")}
-              value={relationships.length}
-            />
-            <GraphMetric
-              detail={t("relationships.graph.metrics.circlesDetail", "圈层只作为人物分组线索")}
-              label={t("relationships.graph.metrics.circles", "圈层")}
-              value={relationshipsModule.circles.length}
-            />
-            <GraphMetric
-              detail={t("relationships.graph.metrics.notesDetail", "表达只影响人物节点权重")}
-              label={t("relationships.graph.metrics.notes", "表达线索")}
-              value={graphModel.connectedNotesCount}
-            />
-            <GraphMetric
-              detail={t("relationships.graph.metrics.linksDetail", "同圈层或共同模式的人物连接")}
-              label={t("relationships.graph.metrics.links", "连接")}
-              value={graphModel.edgeCount}
-            />
-          </div>
+          <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)]/80 p-3 shadow-sm backdrop-blur">
+            <div className="flex flex-col gap-3 min-[920px]:flex-row min-[920px]:items-center min-[920px]:justify-between">
+              <div className="min-w-0 space-y-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+                  >
+                    {effectiveGraphScope.mode === "centered"
+                      ? t("relationships.graph.centeredMode", "中心视图")
+                      : t("relationships.graph.globalMode", "全局视图")}
+                  </Badge>
+                  {effectiveGraphScope.mode === "centered" ? (
+                    <Badge
+                      variant="outline"
+                      className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+                    >
+                      {t("relationships.graph.centerDepth", {
+                        count: effectiveGraphScope.maxDepth,
+                        defaultValue: `展开 ${effectiveGraphScope.maxDepth} 跳`,
+                      })}
+                    </Badge>
+                  ) : null}
+                </div>
+                <p className="text-xs leading-5 text-[color:var(--text-muted)]">
+                  {currentGraphMarkOption?.description ??
+                    t(
+                      "relationships.graph.markModes.defaultDescription",
+                      "切换维度后，节点颜色会跟着变化。",
+                    )}
+                </p>
+              </div>
 
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-xs leading-5 text-[color:var(--text-muted)]">
-              {t(
-                "relationships.graph.helper",
-                "圈层连接人物，人物连接表达，模式会根据线索和标签与相关关系形成虚线连接。",
-              )}
-            </p>
-            <div className="flex shrink-0 items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
-              <Button
-                type="button"
-                size="sm"
-                variant={graphMode === "2d" ? "secondary" : "ghost"}
-                className="h-7 px-2.5"
-                onClick={() => setGraphMode("2d")}
-              >
-                2D
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={graphMode === "3d" ? "secondary" : "ghost"}
-                className="h-7 px-2.5"
-                onClick={() => setGraphMode("3d")}
-              >
-                3D
-              </Button>
+              <div className="flex flex-col gap-2 min-[920px]:items-end">
+                <div className="flex flex-wrap items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 px-2.5"
+                    disabled={!canClearGraphFocus}
+                    onClick={handleClearGraphFocus}
+                  >
+                    {t("relationships.graph.clearFocus", "取消焦点")}
+                  </Button>
+                  {isCenteredGraphScope ? (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="h-7 px-2.5"
+                      onClick={handleExitCenterView}
+                    >
+                      {t("relationships.graph.exitCenter", "取消以它为中心")}
+                    </Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 px-2.5"
+                      disabled={!canCenterSelectedRelationship}
+                      onClick={handleCenterSelectedRelationship}
+                    >
+                      {t("relationships.graph.center", "以它为中心")}
+                    </Button>
+                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={graphMode === "2d" ? "secondary" : "ghost"}
+                    className="h-7 px-2.5"
+                    onClick={() => setGraphMode("2d")}
+                  >
+                    2D
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={graphMode === "3d" ? "secondary" : "ghost"}
+                    className="h-7 px-2.5"
+                    onClick={() => setGraphMode("3d")}
+                  >
+                    3D
+                  </Button>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
+                  {graphMarkOptions.map((option) => (
+                    <Button
+                      key={option.mode}
+                      type="button"
+                      size="sm"
+                      variant={graphMarkMode === option.mode ? "secondary" : "ghost"}
+                      className="h-7 px-2.5"
+                      onClick={() => setGraphMarkMode(option.mode)}
+                    >
+                      {option.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -802,72 +1063,61 @@ function RelationshipsGraphTab({
               elements={graphModel.elements}
               exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
               fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
-              layout={RELATIONSHIP_GRAPH_LAYOUT}
+              layout={graphModel.layout2d}
               legend={
-                <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
-                  <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
-                    {translateRelationshipEnum(t, "impact", "滋养")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
-                    {translateRelationshipEnum(t, "impact", "消耗")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
-                    {translateRelationshipEnum(t, "impact", "混合")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
-                    {translateRelationshipEnum(t, "impact", "中性")}
-                  </Badge>
-                </div>
+                <RelationshipGraphLegend
+                  items={graphModel.legendItems}
+                  title={
+                    currentGraphMarkOption?.label ??
+                    t("relationships.graph.markModes.circle", "按圈层")
+                  }
+                />
               }
               legendPosition="bottom-left"
+              nodesDraggable={effectiveGraphScope.mode === "global"}
               selectedNodeId={effectiveSelectedNodeId}
-              stylesheet={createRelationshipsGraphStylesheet}
-              onNodeSelect={setSelectedNodeId}
+              stylesheet={graphStylesheet}
+              onNodeSelect={handleGraphNodeSelect}
             />
           ) : (
             <ReactForceGraph3DGraph
               canvasClassName="h-full min-h-[520px] xl:min-h-0"
               className="min-h-0 flex-1"
+              enableNodeDrag={effectiveGraphScope.mode === "global"}
               elements={graphModel.elements}
               exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
               fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
               layout={RELATIONSHIP_GRAPH_LAYOUT}
               legend={
-                <div className="flex max-w-[24rem] flex-wrap items-center gap-1.5">
-                  <Badge className="bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-present-ink)]">
-                    {translateRelationshipEnum(t, "impact", "滋养")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--tone-future-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-future-ink)]">
-                    {translateRelationshipEnum(t, "impact", "消耗")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--tone-value-bg)] px-2 py-0.5 text-[11px] text-[color:var(--tone-value-ink)]">
-                    {translateRelationshipEnum(t, "impact", "混合")}
-                  </Badge>
-                  <Badge className="bg-[color:var(--surface-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]">
-                    {translateRelationshipEnum(t, "impact", "中性")}
-                  </Badge>
-                </div>
+                <RelationshipGraphLegend
+                  items={graphModel.legendItems}
+                  title={
+                    currentGraphMarkOption?.label ??
+                    t("relationships.graph.markModes.circle", "按圈层")
+                  }
+                />
               }
               legendPosition="bottom-left"
               selectedNodeId={effectiveSelectedNodeId}
-              stylesheet={createRelationshipsGraphStylesheet}
-              onNodeSelect={setSelectedNodeId}
+              stylesheet={graphStylesheet}
+              onNodeSelect={handleGraphNodeSelect}
             />
           )}
         </div>
 
-        <Surface className="flex min-h-[360px] flex-col overflow-hidden p-4 xl:min-h-0">
-          <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
-            <Network className="size-4" />
-            <h4 className="text-sm font-semibold tracking-tight">
-              {t("relationships.graph.detailTitle", "节点说明")}
-            </h4>
+        <Surface className="flex min-h-[360px] flex-col overflow-hidden p-0 xl:min-h-0">
+          <div className="shrink-0 border-b border-[color:var(--muted-surface-border)] px-4 py-4">
+            <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
+              <Network className="size-4" />
+              <h4 className="text-sm font-semibold tracking-tight">
+                {t("relationships.graph.detailTitle", "节点说明")}
+              </h4>
+            </div>
           </div>
 
-          <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+          <div className="min-h-0 flex-1 overflow-hidden">
             {selectedNode ? (
               <RelationshipGraphDetail
-                isControlMode={isControlMode}
                 node={selectedNode}
                 onEditRelationship={onEditRelationship}
               />
@@ -887,20 +1137,49 @@ function RelationshipsGraphTab({
   )
 }
 
+function RelationshipGraphLegend({
+  items,
+  title,
+}: {
+  items: RelationshipGraphLegendItem[]
+  title: string
+}) {
+  return (
+    <div className="max-w-[24rem] space-y-2">
+      <div className="text-[10px] font-medium tracking-wide text-[color:var(--text-muted)] uppercase">
+        {title}
+      </div>
+      <div className="flex flex-wrap items-center gap-1.5">
+        {items.slice(0, 8).map((item) => (
+          <Badge
+            key={item.key}
+            variant="outline"
+            className="border px-2 py-0.5 text-[11px] text-[color:var(--text-secondary)]"
+            style={{
+              backgroundColor: item.bg,
+              borderColor: item.border,
+            }}
+          >
+            {item.label}
+          </Badge>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function RelationshipGraphDetail({
-  isControlMode,
   node,
   onEditRelationship,
 }: {
-  isControlMode: boolean
   node: RelationshipGraphNodeMeta
   onEditRelationship: (relationship: RelationshipPerson, circleId: string) => void
 }) {
   return (
     <RelationshipGraphRelationshipDetail
       circle={node.circle}
+      connections={node.connections}
       connectedRelationships={node.connectedRelationships}
-      isControlMode={isControlMode}
       matchedPatterns={node.matchedPatterns}
       onEdit={onEditRelationship}
       relatedNotes={node.relatedNotes}
@@ -911,16 +1190,16 @@ function RelationshipGraphDetail({
 
 function RelationshipGraphRelationshipDetail({
   circle,
+  connections,
   connectedRelationships,
-  isControlMode,
   matchedPatterns,
   onEdit,
   relatedNotes,
   relationship,
 }: {
   circle: RelationshipCircle | null
+  connections: RelationshipGraphNodeMeta["connections"]
   connectedRelationships: RelationshipPerson[]
-  isControlMode: boolean
   matchedPatterns: RelationshipPattern[]
   onEdit: (relationship: RelationshipPerson, circleId: string) => void
   relatedNotes: RelationshipUnsentNote[]
@@ -929,92 +1208,157 @@ function RelationshipGraphRelationshipDetail({
   const { t } = useTranslation()
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <Badge className="bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]">
-          {t("relationships.graph.legend.relationship", "关系人物")}
-        </Badge>
-        {circle ? (
-          <Badge
-            variant="outline"
-            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-          >
-            {circle.title}
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="shrink-0 space-y-4 border-b border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)]/95 px-4 py-4 supports-[backdrop-filter]:backdrop-blur-xs">
+        <div className="flex flex-wrap gap-2">
+          <Badge className="bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]">
+            {t("relationships.graph.legend.relationship", "关系人物")}
           </Badge>
-        ) : null}
-      </div>
-
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
-            {relationship.name}
-          </h4>
-          <p className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</p>
+          {circle ? (
+            <Badge
+              variant="outline"
+              className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
+            >
+              {circle.title}
+            </Badge>
+          ) : null}
         </div>
-        {isControlMode ? (
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="shrink-0"
-            onClick={() => onEdit(relationship, circle?.id ?? "")}
-          >
-            <Pencil className="h-4 w-4" />
-            {t("relationships.common.edit", "编辑")}
-          </Button>
-        ) : null}
+
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">
+              {relationship.name}
+            </h4>
+            <p className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</p>
+          </div>
+          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="shrink-0"
+              onClick={() => onEdit(relationship, circle?.id ?? "")}
+            >
+              <Pencil className="h-4 w-4" />
+              {t("relationships.graph.editConnections", "编辑")}
+            </Button>
+          </div>
+        </div>
       </div>
 
-      <p className="text-sm leading-6 text-[color:var(--text-secondary)]">
-        {relationship.influence}
-      </p>
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-4 pr-5">
+        <p className="text-sm leading-6 text-[color:var(--text-secondary)]">
+          {relationship.influence}
+        </p>
 
-      <div className="grid gap-3 min-[640px]:grid-cols-2">
-        <RelationshipMeta
-          label={t("relationships.labels.depth", "深度")}
-          value={translateRelationshipEnum(t, "depth", relationship.depth)}
-        />
-        <RelationshipMeta
-          label={t("relationships.labels.stage", "阶段")}
-          value={translateRelationshipEnum(t, "stage", relationship.stage)}
-        />
-        <RelationshipMeta
-          label={t("relationships.labels.interaction", "互动频率")}
-          value={translateRelationshipEnum(t, "interaction", relationship.interaction)}
-        />
-        <RelationshipMeta
-          label={t("relationships.labels.impact", "影响")}
-          value={translateRelationshipEnum(t, "impact", relationship.impact)}
-        />
-      </div>
+        <div className="grid gap-3 min-[640px]:grid-cols-2">
+          <RelationshipMeta
+            label={t("relationships.labels.depth", "深度")}
+            value={translateRelationshipEnum(t, "depth", relationship.depth)}
+          />
+          <RelationshipMeta
+            label={t("relationships.labels.stage", "阶段")}
+            value={translateRelationshipEnum(t, "stage", relationship.stage)}
+          />
+          <RelationshipMeta
+            label={t("relationships.labels.interaction", "互动频率")}
+            value={translateRelationshipEnum(t, "interaction", relationship.interaction)}
+          />
+          <RelationshipMeta
+            label={t("relationships.labels.impact", "影响")}
+            value={translateRelationshipEnum(t, "impact", relationship.impact)}
+          />
+        </div>
 
-      <DetailTextBlock
-        title={t("relationships.labels.currentState", "当前")}
-        body={relationship.currentState}
-      />
-      <DetailTextBlock
-        title={t("relationships.labels.unspoken", "没说出口")}
-        body={relationship.unspokenLine}
-      />
-      <div className="grid gap-3">
-        <RelationshipGraphSignalList
-          emptyLabel={t("relationships.graph.signals.noConnectedPeople", "暂无相连人物")}
-          items={connectedRelationships.map((item) => item.name)}
-          title={t("relationships.graph.signals.connectedPeople", "图中相连")}
+        <DetailTextBlock
+          title={t("relationships.labels.currentState", "当前")}
+          body={relationship.currentState}
         />
-        <RelationshipGraphSignalList
-          emptyLabel={t("relationships.graph.signals.noPatterns", "暂无共同模式")}
-          items={matchedPatterns.map((pattern) => pattern.title)}
-          title={t("relationships.graph.signals.patterns", "匹配模式")}
+        <DetailTextBlock
+          title={t("relationships.labels.unspoken", "没说出口")}
+          body={relationship.unspokenLine}
         />
-        <RelationshipGraphSignalList
-          emptyLabel={t("relationships.graph.signals.noNotes", "暂无表达线索")}
-          items={relatedNotes.map((note) => note.theme)}
-          title={t("relationships.graph.signals.notes", "表达线索")}
-        />
+        <div className="grid gap-3">
+          <RelationshipGraphConnectionList connections={connections} />
+          <RelationshipGraphSignalList
+            emptyLabel={t("relationships.graph.signals.noConnectedPeople", "暂无相连人物")}
+            items={connectedRelationships.map((item) => item.name)}
+            title={t("relationships.graph.signals.connectedPeople", "图中相连")}
+          />
+          <RelationshipGraphSignalList
+            emptyLabel={t("relationships.graph.signals.noPatterns", "暂无共同模式")}
+            items={matchedPatterns.map((pattern) => pattern.title)}
+            title={t("relationships.graph.signals.patterns", "匹配模式")}
+          />
+          <RelationshipGraphSignalList
+            emptyLabel={t("relationships.graph.signals.noNotes", "暂无表达线索")}
+            items={relatedNotes.map((note) => note.theme)}
+            title={t("relationships.graph.signals.notes", "表达线索")}
+          />
+        </div>
+        <BadgeRow items={relationship.emotionCues} />
+        <BadgeRow items={relationship.tags} muted />
       </div>
-      <BadgeRow items={relationship.emotionCues} />
-      <BadgeRow items={relationship.tags} muted />
+    </div>
+  )
+}
+
+function RelationshipGraphConnectionList({
+  connections,
+}: {
+  connections: RelationshipGraphNodeMeta["connections"]
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
+      <div className="text-xs font-medium text-[color:var(--text-primary)]">
+        {t("relationships.graph.signals.connections", "显式人物关系")}
+      </div>
+      {connections.length > 0 ? (
+        <div className="mt-2 space-y-2">
+          {connections.map((entry) => (
+            <div
+              key={entry.connection.id}
+              className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] px-3 py-2"
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="text-sm font-medium text-[color:var(--text-primary)]">
+                  {entry.otherRelationship.name}
+                </div>
+                <Badge
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[10px] text-[color:var(--text-muted)]"
+                >
+                  {translateRelationshipEnum(t, "connectionStrength", entry.connection.strength)}
+                </Badge>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {entry.roles.map((role) => (
+                  <Badge
+                    key={role.id}
+                    variant="outline"
+                    className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
+                  >
+                    {role.selfRole} / {role.otherRole}
+                  </Badge>
+                ))}
+              </div>
+              {entry.connection.note || entry.roles.some((role) => role.note) ? (
+                <p className="mt-2 text-xs leading-5 text-[color:var(--text-muted)]">
+                  {[entry.connection.note, ...entry.roles.map((role) => role.note).filter(Boolean)]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-2 text-xs text-[color:var(--text-muted)]">
+          {t("relationships.graph.signals.noConnections", "还没有显式人物关系。")}
+        </p>
+      )}
     </div>
   )
 }
@@ -1050,6 +1394,127 @@ function RelationshipGraphSignalList({
   )
 }
 
+type RelationshipDirectoryFilters = {
+  depth: string
+  impact: string
+  interaction: string
+  stage: string
+  type: string
+}
+
+const DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS: RelationshipDirectoryFilters = {
+  type: "all",
+  depth: "all",
+  stage: "all",
+  impact: "all",
+  interaction: "all",
+}
+
+const RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS = [
+  {
+    key: "type",
+    labelKey: "relationships.filter.type",
+    defaultLabel: "类型",
+    options: RELATIONSHIP_TYPES,
+    group: "type",
+  },
+  {
+    key: "depth",
+    labelKey: "relationships.filter.depth",
+    defaultLabel: "深度",
+    options: RELATIONSHIP_DEPTHS,
+    group: "depth",
+  },
+  {
+    key: "stage",
+    labelKey: "relationships.filter.stage",
+    defaultLabel: "阶段",
+    options: RELATIONSHIP_STAGES,
+    group: "stage",
+  },
+  {
+    key: "impact",
+    labelKey: "relationships.filter.impact",
+    defaultLabel: "影响",
+    options: RELATIONSHIP_IMPACTS,
+    group: "impact",
+  },
+  {
+    key: "interaction",
+    labelKey: "relationships.filter.interaction",
+    defaultLabel: "互动频率",
+    options: INTERACTION_FREQUENCIES,
+    group: "interaction",
+  },
+] as const satisfies ReadonlyArray<{
+  defaultLabel: string
+  group: RelationshipEnumGroup
+  key: keyof RelationshipDirectoryFilters
+  labelKey: string
+  options: readonly string[]
+}>
+
+function RelationshipDirectoryFilterChip({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean
+  children: ReactNode
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "rounded-full border px-2 py-0.5 text-[11px] transition-colors",
+        active
+          ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--text-primary)]"
+          : "border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] hover:border-[color:var(--surface-border)] hover:text-[color:var(--text-primary)]",
+      )}
+    >
+      {children}
+    </button>
+  )
+}
+
+function RelationshipAppliedFilterChip({
+  label,
+  onRemove,
+}: {
+  label: string
+  onRemove: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onRemove}
+      className="inline-flex max-w-full items-center gap-1 rounded-full border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-primary)] transition-colors hover:opacity-80"
+    >
+      <span className="truncate">{label}</span>
+      <X className="size-3 shrink-0" />
+    </button>
+  )
+}
+
+function RelationshipDirectoryFilterGroup({
+  children,
+  title,
+}: {
+  children: ReactNode
+  title: string
+}) {
+  return (
+    <div className="space-y-1">
+      <div className="text-[10px] font-medium tracking-wide text-[color:var(--text-muted)] uppercase">
+        {title}
+      </div>
+      <div className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pr-1">{children}</div>
+    </div>
+  )
+}
+
 function RelationshipsDirectoryTab({
   isControlMode,
   onCreate,
@@ -1070,37 +1535,40 @@ function RelationshipsDirectoryTab({
   sortedUnsentNotes: RelationshipUnsentNote[]
 }) {
   const { t } = useTranslation()
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [depthFilter, setDepthFilter] = useState("all")
-  const [stageFilter, setStageFilter] = useState("all")
-  const [impactFilter, setImpactFilter] = useState("all")
-  const [interactionFilter, setInteractionFilter] = useState("all")
+  const [filters, setFilters] = useState(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)
+  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
   const selectedCircleId =
     selectedRelationship &&
     relationshipsModule.circles.find((circle) =>
       circle.entries.some((entry) => entry.id === selectedRelationship.id),
     )?.id
-  const hasActiveFilters =
-    typeFilter !== "all" ||
-    depthFilter !== "all" ||
-    stageFilter !== "all" ||
-    impactFilter !== "all" ||
-    interactionFilter !== "all"
+  const activeFilterCount = RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.filter(
+    (dimension) => filters[dimension.key] !== "all",
+  ).length
+  const hasActiveFilters = activeFilterCount > 0
   const filteredCircles = relationshipsModule.circles.map((circle) => ({
     ...circle,
     entries: circle.entries.filter(
       (relationship) =>
-        matchesFilter(typeFilter, relationship.type) &&
-        matchesFilter(depthFilter, relationship.depth) &&
-        matchesFilter(stageFilter, relationship.stage) &&
-        matchesFilter(impactFilter, relationship.impact) &&
-        matchesFilter(interactionFilter, relationship.interaction),
+        matchesFilter(filters.type, relationship.type) &&
+        matchesFilter(filters.depth, relationship.depth) &&
+        matchesFilter(filters.stage, relationship.stage) &&
+        matchesFilter(filters.impact, relationship.impact) &&
+        matchesFilter(filters.interaction, relationship.interaction),
     ),
   }))
   const filteredRelationshipCount = filteredCircles.reduce(
     (count, circle) => count + circle.entries.length,
     0,
   )
+
+  const clearFilters = () => {
+    setFilters(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)
+  }
+
+  const updateFilter = (key: keyof RelationshipDirectoryFilters, value: string) => {
+    setFilters((current) => ({ ...current, [key]: value }))
+  }
 
   return (
     <TwoPaneLayout>
@@ -1112,63 +1580,81 @@ function RelationshipsDirectoryTab({
           isControlMode={isControlMode}
           onCreate={onCreate}
         />
-        <div className="mt-3 shrink-0 space-y-2">
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
-            <DimensionFilterSelect
-              label={t("relationships.filter.type", "类型")}
-              value={typeFilter}
-              options={RELATIONSHIP_TYPES}
-              group="type"
-              onValueChange={setTypeFilter}
-            />
-            <DimensionFilterSelect
-              label={t("relationships.filter.depth", "深度")}
-              value={depthFilter}
-              options={RELATIONSHIP_DEPTHS}
-              group="depth"
-              onValueChange={setDepthFilter}
-            />
-            <DimensionFilterSelect
-              label={t("relationships.filter.stage", "阶段")}
-              value={stageFilter}
-              options={RELATIONSHIP_STAGES}
-              group="stage"
-              onValueChange={setStageFilter}
-            />
-            <DimensionFilterSelect
-              label={t("relationships.filter.impact", "影响")}
-              value={impactFilter}
-              options={RELATIONSHIP_IMPACTS}
-              group="impact"
-              onValueChange={setImpactFilter}
-            />
-            <DimensionFilterSelect
-              label={t("relationships.filter.interaction", "互动频率")}
-              value={interactionFilter}
-              options={INTERACTION_FREQUENCIES}
-              group="interaction"
-              onValueChange={setInteractionFilter}
-            />
-          </div>
-          {hasActiveFilters ? (
+        <div className="mt-2 shrink-0 space-y-1.5">
+          <div className="flex items-center gap-1.5">
             <Button
               type="button"
-              variant="ghost"
+              variant={isFilterPanelOpen || hasActiveFilters ? "default" : "outline"}
               size="sm"
-              className="h-7 px-2 text-xs text-[color:var(--text-muted)]"
-              onClick={() => {
-                setTypeFilter("all")
-                setDepthFilter("all")
-                setStageFilter("all")
-                setImpactFilter("all")
-                setInteractionFilter("all")
-              }}
+              className="h-7 gap-1.5 px-2 text-[11px]"
+              onClick={() => setIsFilterPanelOpen((open) => !open)}
             >
-              {t("relationships.filter.clear", "清空筛选")}
+              <SlidersHorizontal className="size-3.5" />
+              {t("relationships.filter.more", "筛选")}
+              {activeFilterCount > 0 ? (
+                <span className="bg-background/20 rounded-full px-1 tabular-nums">
+                  {activeFilterCount}
+                </span>
+              ) : null}
             </Button>
+            {hasActiveFilters ? (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="text-[11px] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
+              >
+                {t("relationships.filter.clearAll", "清空")}
+              </button>
+            ) : null}
+          </div>
+
+          {hasActiveFilters && !isFilterPanelOpen ? (
+            <div className="flex flex-wrap gap-1">
+              {RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => {
+                const value = filters[dimension.key]
+                if (value === "all") {
+                  return null
+                }
+
+                return (
+                  <RelationshipAppliedFilterChip
+                    key={dimension.key}
+                    label={`${t(dimension.labelKey, dimension.defaultLabel)}: ${translateRelationshipEnum(t, dimension.group, value)}`}
+                    onRemove={() => updateFilter(dimension.key, "all")}
+                  />
+                )
+              })}
+            </div>
+          ) : null}
+
+          {isFilterPanelOpen ? (
+            <div className="max-h-[min(38vh,11.5rem)] space-y-2 overflow-y-auto rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-2.5">
+              {RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => (
+                <RelationshipDirectoryFilterGroup
+                  key={dimension.key}
+                  title={t(dimension.labelKey, dimension.defaultLabel)}
+                >
+                  <RelationshipDirectoryFilterChip
+                    active={filters[dimension.key] === "all"}
+                    onClick={() => updateFilter(dimension.key, "all")}
+                  >
+                    {t("relationships.filter.all", "全部")}
+                  </RelationshipDirectoryFilterChip>
+                  {dimension.options.map((option) => (
+                    <RelationshipDirectoryFilterChip
+                      key={option}
+                      active={filters[dimension.key] === option}
+                      onClick={() => updateFilter(dimension.key, option)}
+                    >
+                      {translateRelationshipEnum(t, dimension.group, option)}
+                    </RelationshipDirectoryFilterChip>
+                  ))}
+                </RelationshipDirectoryFilterGroup>
+              ))}
+            </div>
           ) : null}
         </div>
-        <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-visible pr-1 lg:overflow-y-auto">
+        <div className="mt-2 min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto">
           {filteredCircles.map((circle) => (
             <div key={circle.id} className="space-y-2">
               <div className="flex items-center justify-between gap-2 px-1">
@@ -1229,45 +1715,6 @@ function RelationshipsDirectoryTab({
   )
 }
 
-function DimensionFilterSelect({
-  group,
-  label,
-  onValueChange,
-  options,
-  value,
-}: {
-  group: RelationshipEnumGroup
-  label: string
-  onValueChange: (value: string) => void
-  options: readonly string[]
-  value: string
-}) {
-  const { t } = useTranslation()
-
-  return (
-    <Select
-      value={value}
-      onValueChange={(nextValue) => {
-        if (nextValue !== null) {
-          onValueChange(nextValue)
-        }
-      }}
-    >
-      <SelectTrigger className="h-8 w-full min-w-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-xs text-[color:var(--text-secondary)]">
-        <SelectValue placeholder={label} />
-      </SelectTrigger>
-      <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
-        <SelectItem value="all">{t("relationships.filter.all", "全部")}</SelectItem>
-        {options.map((option) => (
-          <SelectItem key={option} value={option}>
-            {translateRelationshipEnum(t, group, option)}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  )
-}
-
 function RelationshipListButton({
   isSelected,
   onClick,
@@ -1284,7 +1731,7 @@ function RelationshipListButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "w-full rounded-lg border px-3 py-3 text-left transition-colors",
+        "w-full rounded-lg border px-2.5 py-2 text-left transition-colors",
         isSelected
           ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)]"
           : "border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] hover:border-[color:var(--surface-border)]",
@@ -1798,51 +2245,352 @@ function EmptyDetail({ message }: { message: string }) {
   )
 }
 
-function createRelationshipsGraphModel(
+function createRelationshipsGraphModel({
+  markMode,
+  relationshipById,
+  relationshipsModule,
+  scope,
+  translateGraphLabel,
+}: {
+  markMode: RelationshipGraphMarkMode
+  relationshipById: Map<string, RelationshipPerson>
+  relationshipsModule: RelationshipMap
+  scope: RelationshipGraphScope
+  translateGraphLabel: (group: RelationshipEnumGroup, value: string) => string
+}) {
+  const network = createRelationshipNetwork(relationshipsModule, relationshipById)
+  const scopedNodeIds =
+    scope.mode === "centered"
+      ? collectCenteredRelationshipIds(network, scope.rootId, scope.maxDepth)
+      : new Set(network.nodes.map((node) => node.relationship.id))
+  const positions2d =
+    scope.mode === "centered"
+      ? computeCenteredRingPositions2d(network, scope.rootId, scopedNodeIds)
+      : new Map<string, { x: number; y: number }>()
+  const positions3d =
+    scope.mode === "centered"
+      ? computeCenteredRingPositions3d(network, scope.rootId, positions2d)
+      : new Map<string, { x: number; y: number; z: number }>()
+  const elements: Array<{
+    data: Record<string, boolean | number | string>
+    position?: { x: number; y: number }
+  }> = []
+  const metaByNodeId = new Map<string, RelationshipGraphNodeMeta>()
+  const circleIndexById = new Map(
+    relationshipsModule.circles.map((circle, index) => [circle.id, index]),
+  )
+  let connectedNotesCount = 0
+
+  const scopedNodes = network.nodes.filter((node) => scopedNodeIds.has(node.relationship.id))
+  const legendItems = createRelationshipGraphLegendItems({
+    circles: relationshipsModule.circles,
+    markMode,
+    nodes: scopedNodes,
+    translateGraphLabel,
+  })
+
+  scopedNodes.forEach((node) => {
+    const relationshipWeight = Math.max(
+      1,
+      1 +
+        node.relatedNotes.length * 0.8 +
+        node.matchedPatterns.length * 0.65 +
+        node.relationship.events.length * 0.35 +
+        node.relationship.tags.length * 0.2 +
+        node.connections.length * 0.55,
+    )
+    const position2d = positions2d.get(node.relationship.id)
+    const position3d = positions3d.get(node.relationship.id)
+    const graphMark = createRelationshipGraphMark({
+      circleIndex: node.circle ? (circleIndexById.get(node.circle.id) ?? 0) : 0,
+      markMode,
+      relationship: node.relationship,
+    })
+
+    connectedNotesCount += node.relatedNotes.length
+    elements.push({
+      data: {
+        circle: node.circle?.title ?? "",
+        graphMarkKey: graphMark.key,
+        id: node.relationship.id,
+        impact: node.relationship.impact,
+        kind: "relationship",
+        label: node.relationship.name,
+        stage: node.relationship.stage,
+        type: node.relationship.type,
+        unfinishedWeight: node.relationship.unfinishedWeight ?? "无",
+        weight: relationshipWeight,
+        ...(position3d
+          ? {
+              x: position3d.x,
+              y: position3d.y,
+              z: position3d.z,
+            }
+          : {}),
+      },
+      position: position2d,
+    })
+    metaByNodeId.set(node.relationship.id, {
+      circle: node.circle,
+      connections: node.connections,
+      connectedRelationships: [],
+      kind: "relationship",
+      matchedPatterns: node.matchedPatterns,
+      relatedNotes: node.relatedNotes,
+      relationship: node.relationship,
+    })
+  })
+
+  network.edges
+    .filter((edge) => scopedNodeIds.has(edge.sourceId) && scopedNodeIds.has(edge.targetId))
+    .forEach((edge) => {
+      elements.push({
+        data: {
+          connectionStrength: edge.explicitStrength ?? "",
+          id: edge.id,
+          label: edge.label,
+          linkKind: edge.linkKind,
+          source: edge.sourceId,
+          target: edge.targetId,
+          weight: edge.weight,
+        },
+      })
+    })
+
+  metaByNodeId.forEach((meta, relationshipId) => {
+    meta.connectedRelationships = [
+      ...(network.connectedIdsByRelationshipId.get(relationshipId) ?? []),
+    ]
+      .filter((connectedId) => scopedNodeIds.has(connectedId))
+      .map((connectedId) => relationshipById.get(connectedId))
+      .filter((relationship): relationship is RelationshipPerson => Boolean(relationship))
+  })
+
+  return {
+    connectedNotesCount,
+    edgeCount: network.edges.filter(
+      (edge) => scopedNodeIds.has(edge.sourceId) && scopedNodeIds.has(edge.targetId),
+    ).length,
+    elements,
+    layout2d:
+      scope.mode === "centered"
+        ? { fit: true, name: "preset", padding: RELATIONSHIP_GRAPH_LAYOUT.padding }
+        : RELATIONSHIP_GRAPH_LAYOUT,
+    legendItems,
+    metaByNodeId,
+    nodeCount: metaByNodeId.size,
+  }
+}
+
+function createRelationshipGraphMark({
+  circleIndex,
+  markMode,
+  relationship,
+}: {
+  circleIndex: number
+  markMode: RelationshipGraphMarkMode
+  relationship: RelationshipPerson
+}) {
+  if (markMode === "impact") {
+    const value = relationship.impact
+    const mark = RELATIONSHIP_GRAPH_IMPACT_MARKS.find((item) => item.value === value)
+    return {
+      key: mark?.key ?? "impact-中性",
+      label: value,
+    }
+  }
+
+  if (markMode === "weight") {
+    const value = relationship.unfinishedWeight ?? "无"
+    const mark = RELATIONSHIP_GRAPH_WEIGHT_MARKS.find((item) => item.value === value)
+    return {
+      key: mark?.key ?? "weight-none",
+      label: value,
+    }
+  }
+
+  if (markMode === "stage") {
+    return {
+      key: `stage-${relationship.stage}`,
+      label: relationship.stage,
+    }
+  }
+
+  return {
+    key: `circle-${circleIndex % RELATIONSHIP_GRAPH_MARK_PALETTE.length}`,
+    label: "circle",
+  }
+}
+
+function createRelationshipGraphLegendItems({
+  circles,
+  markMode,
+  nodes,
+  translateGraphLabel,
+}: {
+  circles: RelationshipCircle[]
+  markMode: RelationshipGraphMarkMode
+  nodes: ReturnType<typeof createRelationshipNetwork>["nodes"]
+  translateGraphLabel: (group: RelationshipEnumGroup, value: string) => string
+}): RelationshipGraphLegendItem[] {
+  if (markMode === "impact") {
+    const usedValues = new Set(nodes.map((node) => node.relationship.impact))
+    return RELATIONSHIP_GRAPH_IMPACT_MARKS.filter((mark) => usedValues.has(mark.value)).map(
+      (mark) => ({
+        bg: mark.bg,
+        border: mark.border,
+        key: mark.key,
+        label: translateGraphLabel("impact", mark.value),
+      }),
+    )
+  }
+
+  if (markMode === "weight") {
+    const usedValues = new Set(nodes.map((node) => node.relationship.unfinishedWeight ?? "无"))
+    return RELATIONSHIP_GRAPH_WEIGHT_MARKS.filter((mark) => usedValues.has(mark.value)).map(
+      (mark) => ({
+        bg: mark.bg,
+        border: mark.border,
+        key: mark.key,
+        label: translateGraphLabel("unfinishedWeight", mark.value),
+      }),
+    )
+  }
+
+  if (markMode === "stage") {
+    const usedValues = new Set(nodes.map((node) => node.relationship.stage))
+    return RELATIONSHIP_STAGES.filter((stage) => usedValues.has(stage)).map((stage, index) => {
+      const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+
+      return {
+        bg: color.bg,
+        border: color.border,
+        key: `stage-${stage}`,
+        label: translateGraphLabel("stage", stage),
+      }
+    })
+  }
+
+  const usedCircleIds = new Set(nodes.map((node) => node.circle?.id).filter(Boolean))
+
+  return circles.flatMap((circle, index) => {
+    if (!usedCircleIds.has(circle.id)) {
+      return []
+    }
+
+    const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+
+    return [
+      {
+        bg: color.bg,
+        border: color.border,
+        key: `circle-${circle.id}`,
+        label: circle.title,
+      },
+    ]
+  })
+}
+
+function createRelationshipNetwork(
   relationshipsModule: RelationshipMap,
   relationshipById: Map<string, RelationshipPerson>,
 ) {
-  const metaByNodeId = new Map<string, RelationshipGraphNodeMeta>()
+  const nodes = getRelationshipsFromCircles(relationshipsModule.circles).map((relationship) => ({
+    circle:
+      relationshipsModule.circles.find((circle) =>
+        circle.entries.some((entry) => entry.id === relationship.id),
+      ) ?? null,
+    connections: buildRelationshipConnectionPerspectives(
+      relationshipsModule.connections,
+      relationship.id,
+    )
+      .map((connection) => {
+        const otherRelationship = relationshipById.get(connection.otherRelationshipId)
+        const storedConnection = relationshipsModule.connections.find(
+          (entry) => entry.id === connection.id,
+        )
+
+        if (!otherRelationship || !storedConnection) {
+          return null
+        }
+
+        return {
+          connection: storedConnection,
+          otherRelationship,
+          roles: connection.roles,
+        }
+      })
+      .filter((connection): connection is RelationshipGraphNodeMeta["connections"][number] =>
+        Boolean(connection),
+      ),
+    matchedPatterns: [] as RelationshipPattern[],
+    relatedNotes: [] as RelationshipUnsentNote[],
+    relationship,
+  }))
+  const nodeById = new Map(nodes.map((node) => [node.relationship.id, node]))
+  const notesByRelationshipId = new Map<string, RelationshipUnsentNote[]>()
   const connectedIdsByRelationshipId = new Map<string, Set<string>>()
+  const explicitConnectedIdsByRelationshipId = new Map<string, Set<string>>()
   const edgeByKey = new Map<
     string,
     {
-      linkKind: string
-      source: string
-      target: string
+      explicitStrength?: RelationshipConnectionStrength
+      id: string
+      kinds: Set<"explicit" | "pattern" | "sameCircle">
+      label: string
+      sourceId: string
+      targetId: string
       weight: number
     }
   >()
-  const elements: Array<{ data: Record<string, string | number> }> = []
-  let connectedNotesCount = 0
 
-  const notesByRelationshipId = new Map<string, RelationshipUnsentNote[]>()
   relationshipsModule.unsentNotes.forEach((note) => {
-    if (!note.relationshipId || !relationshipById.has(note.relationshipId)) {
+    if (!note.relationshipId || !nodeById.has(note.relationshipId)) {
       return
     }
 
-    connectedNotesCount += 1
     const bucket = notesByRelationshipId.get(note.relationshipId) ?? []
     bucket.push(note)
     notesByRelationshipId.set(note.relationshipId, bucket)
   })
 
-  const patternsByRelationshipId = new Map<string, RelationshipPattern[]>()
+  relationshipsModule.connections.forEach((connection) => {
+    addRelationshipEdge(
+      {
+        explicitStrength: connection.strength,
+        kind: "explicit",
+        label:
+          connection.roles.map((role) => `${role.sourceRole}/${role.targetRole}`).join(" · ") ||
+          connection.note ||
+          "explicit",
+        sourceId: connection.sourceId,
+        targetId: connection.targetId,
+        weight: connectionWeightFromStrength(connection),
+      },
+      edgeByKey,
+      connectedIdsByRelationshipId,
+      explicitConnectedIdsByRelationshipId,
+    )
+  })
+
   relationshipsModule.patterns.forEach((pattern) => {
     const matchedRelationships = inferPatternMatches(pattern, relationshipById)
 
     matchedRelationships.forEach((relationship) => {
-      const bucket = patternsByRelationshipId.get(relationship.id) ?? []
-      bucket.push(pattern)
-      patternsByRelationshipId.set(relationship.id, bucket)
+      const node = nodeById.get(relationship.id)
+      if (!node) {
+        return
+      }
+
+      node.matchedPatterns.push(pattern)
     })
 
     addRelationshipPairEdges(
       matchedRelationships,
       {
-        linkKind: "pattern",
-        weight: 1.15,
+        kind: "pattern",
+        label: pattern.title,
+        weight: 1.1,
       },
       edgeByKey,
       connectedIdsByRelationshipId,
@@ -1853,86 +2601,51 @@ function createRelationshipsGraphModel(
     addRelationshipPairEdges(
       circle.entries,
       {
-        linkKind: "sameCircle",
-        weight: Math.max(1, Math.min(2.2, circle.entries.length / 3)),
+        kind: "sameCircle",
+        label: circle.title,
+        weight: Math.max(0.85, Math.min(1.6, circle.entries.length / 3)),
       },
       edgeByKey,
       connectedIdsByRelationshipId,
     )
-
-    circle.entries.forEach((relationship) => {
-      const relatedNotes = notesByRelationshipId.get(relationship.id) ?? []
-      const matchedPatterns = patternsByRelationshipId.get(relationship.id) ?? []
-      const relationshipWeight = Math.max(
-        1,
-        1 +
-          relatedNotes.length * 0.8 +
-          matchedPatterns.length * 0.65 +
-          relationship.events.length * 0.35 +
-          relationship.tags.length * 0.2,
-      )
-
-      elements.push({
-        data: {
-          circle: circle.title,
-          id: relationship.id,
-          impact: relationship.impact,
-          kind: "relationship",
-          label: relationship.name,
-          type: relationship.type,
-          weight: relationshipWeight,
-        },
-      })
-      metaByNodeId.set(relationship.id, {
-        circle,
-        connectedRelationships: [],
-        kind: "relationship",
-        matchedPatterns,
-        relatedNotes,
-        relationship,
-      })
-    })
   })
 
-  edgeByKey.forEach((edge, key) => {
-    elements.push({
-      data: {
-        id: key,
-        linkKind: edge.linkKind,
-        source: edge.source,
-        target: edge.target,
-        weight: edge.weight,
-      },
-    })
-  })
-
-  metaByNodeId.forEach((meta, relationshipId) => {
-    meta.connectedRelationships = [...(connectedIdsByRelationshipId.get(relationshipId) ?? [])]
-      .map((connectedId) => relationshipById.get(connectedId))
-      .filter((relationship): relationship is RelationshipPerson => Boolean(relationship))
+  nodes.forEach((node) => {
+    node.relatedNotes = notesByRelationshipId.get(node.relationship.id) ?? []
   })
 
   return {
-    connectedNotesCount,
-    edgeCount: edgeByKey.size,
-    elements,
-    metaByNodeId,
-    nodeCount: metaByNodeId.size,
+    connectedIdsByRelationshipId,
+    edges: [...edgeByKey.values()].map((edge) => ({
+      explicitStrength: edge.explicitStrength,
+      id: edge.id,
+      label: edge.label,
+      linkKind: summarizeRelationshipEdgeKind(edge.kinds),
+      sourceId: edge.sourceId,
+      targetId: edge.targetId,
+      weight: edge.weight,
+    })),
+    explicitConnectedIdsByRelationshipId,
+    nodes,
   }
 }
 
 function addRelationshipPairEdges(
   relationships: RelationshipPerson[],
   edge: {
-    linkKind: string
+    kind: "pattern" | "sameCircle"
+    label: string
     weight: number
   },
   edgeByKey: Map<
     string,
     {
-      linkKind: string
-      source: string
-      target: string
+      explicitStrength?: RelationshipConnectionStrength
+      id: string
+      kinds: Set<"explicit" | "pattern" | "sameCircle">
+      label: string
+      sourceId: string
+      targetId: string
       weight: number
     }
   >,
@@ -1950,21 +2663,83 @@ function addRelationshipPairEdges(
     ) {
       const first = uniqueRelationships[firstIndex]
       const second = uniqueRelationships[secondIndex]
-      const [source, target] = [first.id, second.id].sort()
-      const key = `${source}::${target}`
-      const existing = edgeByKey.get(key)
 
-      edgeByKey.set(key, {
-        linkKind: existing && existing.linkKind !== edge.linkKind ? "mixed" : edge.linkKind,
-        source,
-        target,
-        weight: (existing?.weight ?? 0) + edge.weight,
-      })
-
-      addConnectedRelationshipId(connectedIdsByRelationshipId, source, target)
-      addConnectedRelationshipId(connectedIdsByRelationshipId, target, source)
+      addRelationshipEdge(
+        {
+          kind: edge.kind,
+          label: edge.label,
+          sourceId: first.id,
+          targetId: second.id,
+          weight: edge.weight,
+        },
+        edgeByKey,
+        connectedIdsByRelationshipId,
+      )
     }
   }
+}
+
+function addRelationshipEdge(
+  edge: {
+    explicitStrength?: RelationshipConnectionStrength
+    kind: "explicit" | "pattern" | "sameCircle"
+    label: string
+    sourceId: string
+    targetId: string
+    weight: number
+  },
+  edgeByKey: Map<
+    string,
+    {
+      explicitStrength?: RelationshipConnectionStrength
+      id: string
+      kinds: Set<"explicit" | "pattern" | "sameCircle">
+      label: string
+      sourceId: string
+      targetId: string
+      weight: number
+    }
+  >,
+  connectedIdsByRelationshipId: Map<string, Set<string>>,
+  explicitConnectedIdsByRelationshipId?: Map<string, Set<string>>,
+) {
+  const [sourceId, targetId] = [edge.sourceId, edge.targetId].sort()
+  const key = createRelationshipConnectionPairKey(sourceId, targetId)
+  const existing = edgeByKey.get(key)
+  const kinds = existing?.kinds ?? new Set<"explicit" | "pattern" | "sameCircle">()
+
+  kinds.add(edge.kind)
+
+  edgeByKey.set(key, {
+    explicitStrength: edge.explicitStrength ?? existing?.explicitStrength,
+    id: key,
+    kinds,
+    label:
+      existing?.label && existing.label !== edge.label
+        ? `${existing.label} · ${edge.label}`
+        : edge.label,
+    sourceId,
+    targetId,
+    weight: (existing?.weight ?? 0) + edge.weight,
+  })
+
+  addConnectedRelationshipId(connectedIdsByRelationshipId, sourceId, targetId)
+  addConnectedRelationshipId(connectedIdsByRelationshipId, targetId, sourceId)
+
+  if (edge.kind === "explicit" && explicitConnectedIdsByRelationshipId) {
+    addConnectedRelationshipId(explicitConnectedIdsByRelationshipId, sourceId, targetId)
+    addConnectedRelationshipId(explicitConnectedIdsByRelationshipId, targetId, sourceId)
+  }
+}
+
+function summarizeRelationshipEdgeKind(kinds: Set<"explicit" | "pattern" | "sameCircle">) {
+  if (kinds.size > 1) {
+    return kinds.has("explicit") ? "mixed" : "auxiliary"
+  }
+
+  if (kinds.has("explicit")) return "explicit"
+  if (kinds.has("pattern")) return "pattern"
+  return "sameCircle"
 }
 
 function addConnectedRelationshipId(
@@ -1975,6 +2750,165 @@ function addConnectedRelationshipId(
   const bucket = connectedIdsByRelationshipId.get(relationshipId) ?? new Set<string>()
   bucket.add(connectedRelationshipId)
   connectedIdsByRelationshipId.set(relationshipId, bucket)
+}
+
+function collectCenteredRelationshipIds(
+  network: ReturnType<typeof createRelationshipNetwork>,
+  rootId: string,
+  maxDepth: number,
+) {
+  const explicitIds = bfsRelationshipIds(
+    network.explicitConnectedIdsByRelationshipId,
+    rootId,
+    maxDepth,
+  )
+  if (explicitIds.size > 1) {
+    return explicitIds
+  }
+
+  return bfsRelationshipIds(network.connectedIdsByRelationshipId, rootId, maxDepth)
+}
+
+function bfsRelationshipIds(adjacency: Map<string, Set<string>>, rootId: string, maxDepth: number) {
+  const visited = new Set<string>([rootId])
+  const queue: Array<{ depth: number; id: string }> = [{ depth: 0, id: rootId }]
+
+  while (queue.length > 0) {
+    const current = queue.shift()
+    if (!current || current.depth >= maxDepth) {
+      continue
+    }
+
+    const nextIds = [...(adjacency.get(current.id) ?? [])].sort()
+
+    nextIds.forEach((nextId) => {
+      if (visited.has(nextId)) {
+        return
+      }
+
+      visited.add(nextId)
+      queue.push({ depth: current.depth + 1, id: nextId })
+    })
+  }
+
+  return visited
+}
+
+function computeCenteredRingPositions2d(
+  network: ReturnType<typeof createRelationshipNetwork>,
+  rootId: string,
+  scopedNodeIds: Set<string>,
+) {
+  const depthById = computeRelationshipDepths(network, rootId, scopedNodeIds)
+  const positions = new Map<string, { x: number; y: number }>()
+  const radiusByDepth = new Map<number, number>([
+    [0, 0],
+    [1, 220],
+    [2, 420],
+    [3, 560],
+  ])
+
+  positions.set(rootId, { x: 0, y: 0 })
+
+  const grouped = groupRelationshipIdsByDepth(depthById, scopedNodeIds)
+  grouped.forEach((ids, depth) => {
+    if (depth === 0) {
+      return
+    }
+
+    const radius = radiusByDepth.get(depth) ?? 220 + (depth - 1) * 180
+
+    ids.forEach((id, index) => {
+      const angle = -Math.PI / 2 + (Math.PI * 2 * index) / Math.max(ids.length, 1)
+      positions.set(id, {
+        x: Math.cos(angle) * radius,
+        y: Math.sin(angle) * radius,
+      })
+    })
+  })
+
+  return positions
+}
+
+function computeCenteredRingPositions3d(
+  network: ReturnType<typeof createRelationshipNetwork>,
+  rootId: string,
+  positions2d: Map<string, { x: number; y: number }>,
+) {
+  const depthById = computeRelationshipDepths(network, rootId, new Set(positions2d.keys()))
+  const positions = new Map<string, { x: number; y: number; z: number }>()
+
+  positions2d.forEach((position, id) => {
+    const depth = depthById.get(id) ?? 2
+    positions.set(id, {
+      x: position.x,
+      y: position.y,
+      z: depth === 0 ? 0 : depth === 1 ? 28 : depth === 2 ? -28 : 42,
+    })
+  })
+
+  return positions
+}
+
+function computeRelationshipDepths(
+  network: ReturnType<typeof createRelationshipNetwork>,
+  rootId: string,
+  scopedNodeIds: Set<string>,
+) {
+  const depthById = new Map<string, number>([[rootId, 0]])
+  const queue: Array<{ depth: number; id: string }> = [{ depth: 0, id: rootId }]
+  const adjacency =
+    collectCenteredRelationshipIds(network, rootId, 1).size > 1
+      ? network.explicitConnectedIdsByRelationshipId
+      : network.connectedIdsByRelationshipId
+
+  while (queue.length > 0) {
+    const current = queue.shift()
+    if (!current) {
+      continue
+    }
+
+    const nextIds = [...(adjacency.get(current.id) ?? [])]
+      .filter((id) => scopedNodeIds.has(id))
+      .sort()
+
+    nextIds.forEach((nextId) => {
+      if (depthById.has(nextId)) {
+        return
+      }
+
+      depthById.set(nextId, current.depth + 1)
+      queue.push({ depth: current.depth + 1, id: nextId })
+    })
+  }
+
+  scopedNodeIds.forEach((id) => {
+    if (!depthById.has(id)) {
+      depthById.set(id, 2)
+    }
+  })
+
+  return depthById
+}
+
+function groupRelationshipIdsByDepth(depthById: Map<string, number>, scopedNodeIds: Set<string>) {
+  const grouped = new Map<number, string[]>()
+
+  const sortedIds = [...scopedNodeIds].sort()
+
+  sortedIds.forEach((id) => {
+    const depth = depthById.get(id) ?? 2
+    const bucket = grouped.get(depth) ?? []
+    bucket.push(id)
+    grouped.set(depth, bucket)
+  })
+
+  return grouped
+}
+
+function connectionWeightFromStrength(connection: RelationshipConnection) {
+  const base = connection.strength === "强" ? 4.4 : connection.strength === "中" ? 3.1 : 2.1
+  return base + connection.roles.length * 0.4
 }
 
 function inferPatternMatches(
@@ -2006,14 +2940,6 @@ function normalizeTerms(values: string[]) {
     .flatMap((value) => value.split(/[，,、。\n\s]+/))
     .map((value) => value.trim().toLowerCase())
     .filter((value) => value.length >= 2)
-}
-
-function getRelationships(relationshipsModule: RelationshipMap) {
-  return relationshipsModule.circles.flatMap((circle) => circle.entries)
-}
-
-function createRelationshipLookup(relationships: RelationshipPerson[]) {
-  return new Map(relationships.map((relationship) => [relationship.id, relationship]))
 }
 
 function createDistribution<T extends string>(
@@ -2056,6 +2982,7 @@ function removeRelationship(relationshipsModule: RelationshipMap, relationshipId
       ...circle,
       entries: circle.entries.filter((entry) => entry.id !== relationshipId),
     })),
+    connections: removeConnectionsForRelationship(relationshipsModule.connections, relationshipId),
     unsentNotes: relationshipsModule.unsentNotes.map((note) =>
       note.relationshipId === relationshipId
         ? {
@@ -2068,21 +2995,6 @@ function removeRelationship(relationshipsModule: RelationshipMap, relationshipId
   }
 
   return syncUnsentLineRefs(withoutRelationship)
-}
-
-function syncUnsentLineRefs(relationshipsModule: RelationshipMap): RelationshipMap {
-  return {
-    ...relationshipsModule,
-    circles: relationshipsModule.circles.map((circle) => ({
-      ...circle,
-      entries: circle.entries.map((relationship) => ({
-        ...relationship,
-        unsentLineIds: relationshipsModule.unsentNotes
-          .filter((note) => note.relationshipId === relationship.id)
-          .map((note) => note.id),
-      })),
-    })),
-  }
 }
 
 function tabContentClassName(isStackedLayout: boolean) {

@@ -64,6 +64,7 @@ type ForceGraphNodeData = GraphElementData & {
 
 type ForceGraphLinkData = GraphElementData & {
   color: string
+  label?: string
   linkKind: string
   size: number
 }
@@ -178,6 +179,7 @@ export function ReactForceGraph3DGraph({
   canvasClassName,
   className,
   elements,
+  enableNodeDrag = true,
   exitFullscreenLabel,
   fullscreenLabel,
   layout,
@@ -190,6 +192,7 @@ export function ReactForceGraph3DGraph({
   canvasClassName?: string
   className?: string
   elements: GraphElementDefinition[]
+  enableNodeDrag?: boolean
   exitFullscreenLabel?: string
   fullscreenLabel?: string
   layout: ReactForceGraph3DLayoutOptions
@@ -207,6 +210,7 @@ export function ReactForceGraph3DGraph({
   const lastViewRestoreSignatureRef = useRef<string | null>(null)
   const wasGraphVisibleRef = useRef(false)
   const onNodeSelectRef = useRef(onNodeSelect)
+  const selectedNodeIdRef = useRef<string | null>(selectedNodeId ?? null)
   const [dimensions, setDimensions] = useState({ height: 440, width: 640 })
   const [isGraphVisible, setIsGraphVisible] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
@@ -242,36 +246,25 @@ export function ReactForceGraph3DGraph({
     () => findConnectedNodeIds(graphModel.data, selectedNodeId ?? null),
     [graphModel.data, selectedNodeId],
   )
-
-  const graphResetKey = useMemo(
-    () =>
-      [
-        graphModel.data.nodes.length,
-        graphModel.data.links.length,
-        layoutRevision,
-        visibilityRevision,
-        themeSignature(theme),
-      ].join(":"),
-    [
-      graphModel.data.links.length,
-      graphModel.data.nodes.length,
-      layoutRevision,
-      theme,
-      visibilityRevision,
-    ],
+  const graphDataSignature = useMemo(
+    () => createGraphDataSignature(graphModel.data),
+    [graphModel.data],
   )
+
   const graphError = graphModel.error
   const canRenderGraph = isGraphVisible && !graphError && graphModel.data.nodes.length > 0
   const isFullscreenPresentation = isFullscreen || useFixedFullscreenFallback
   const viewRestoreSignature = [
     dimensions.width,
     dimensions.height,
+    graphDataSignature,
     graphModel.data.nodes.length,
     graphModel.data.links.length,
     layoutRevision,
     selectedNodeId ?? "none",
     visibilityRevision,
   ].join(":")
+  const canRestoreGraphView = canRenderGraph && dimensions.width >= 120 && dimensions.height >= 180
 
   const exitGraphFullscreen = useCallback(async () => {
     setUseFixedFullscreenFallback(false)
@@ -290,6 +283,10 @@ export function ReactForceGraph3DGraph({
   useEffect(() => {
     onNodeSelectRef.current = onNodeSelect
   }, [onNodeSelect])
+
+  useEffect(() => {
+    selectedNodeIdRef.current = selectedNodeId ?? null
+  }, [selectedNodeId])
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -444,7 +441,7 @@ export function ReactForceGraph3DGraph({
     configureSceneLighting(graph, theme)
     configureForces(graph, layout)
     graph.d3ReheatSimulation()
-  }, [canRenderGraph, graphModel.data, layout, theme])
+  }, [canRenderGraph, enableNodeDrag, graphModel.data, layout, theme])
 
   useEffect(() => {
     const graph = graphRef.current
@@ -457,7 +454,7 @@ export function ReactForceGraph3DGraph({
 
   useEffect(() => {
     const graph = graphRef.current
-    if (!graph || !canRenderGraph) {
+    if (!graph || !canRestoreGraphView || !isContainerReady(containerRef.current, dimensions)) {
       return
     }
 
@@ -467,19 +464,20 @@ export function ReactForceGraph3DGraph({
 
     lastViewRestoreSignatureRef.current = viewRestoreSignature
 
-    return scheduleGraphViewRestore(() => {
-      const activeGraph = graphRef.current
-      if (!activeGraph || !isContainerVisible(containerRef.current)) {
-        return
-      }
-
-      configureSceneLighting(activeGraph, theme)
-      configureForces(activeGraph, layout)
-      activeGraph.resumeAnimation()
-      activeGraph.d3ReheatSimulation()
-      restoreGraphView(activeGraph, graphModel.data, selectedNodeId ?? null, layout)
-    })
-  }, [canRenderGraph, viewRestoreSignature, graphModel.data, layout, selectedNodeId, theme])
+    configureSceneLighting(graph, theme)
+    configureForces(graph, layout)
+    graph.resumeAnimation()
+    graph.d3ReheatSimulation()
+    restoreGraphView(graph, graphModel.data, selectedNodeId ?? null, layout)
+  }, [
+    canRestoreGraphView,
+    viewRestoreSignature,
+    graphModel.data,
+    layout,
+    selectedNodeId,
+    theme,
+    dimensions,
+  ])
 
   const handleToggleFullscreen = async () => {
     if (isFullscreenPresentation) {
@@ -577,14 +575,13 @@ export function ReactForceGraph3DGraph({
         {canRenderGraph ? (
           <div className="absolute inset-0 z-10">
             <ForceGraph3D
-              key={graphResetKey}
               ref={graphRef}
               backgroundColor="rgba(0,0,0,0)"
               cooldownTicks={260}
               d3AlphaDecay={0.034}
               d3VelocityDecay={0.32}
               enableNavigationControls
-              enableNodeDrag
+              enableNodeDrag={enableNodeDrag}
               forceEngine="d3"
               graphData={graphModel.data}
               height={dimensions.height}
@@ -592,7 +589,7 @@ export function ReactForceGraph3DGraph({
               linkDirectionalArrowColor={(link) =>
                 getLinkDisplayColor(link, selectedNodeId ?? null, theme)
               }
-              linkDirectionalArrowLength={(link) => getLinkDirectionalArrowLength(link)}
+              linkDirectionalArrowLength={() => 0}
               linkDirectionalArrowRelPos={1}
               linkDirectionalParticleColor={(link) =>
                 getLinkDisplayColor(link, selectedNodeId ?? null, theme)
@@ -642,7 +639,8 @@ export function ReactForceGraph3DGraph({
                 onNodeSelectRef.current?.(null)
               }}
               onNodeClick={(node) => {
-                onNodeSelectRef.current?.(readId((node as ForceGraphNode).id))
+                const nodeId = readId((node as ForceGraphNode).id)
+                onNodeSelectRef.current?.(nodeId === selectedNodeIdRef.current ? null : nodeId)
               }}
             />
           </div>
@@ -686,7 +684,14 @@ function createForceGraphData(
     }
 
     const style = resolveElementStyle(stylesheet, "node", element.data)
-    const position = sanitizePosition(positions.get(id), id, layout, layoutRevision)
+    const presetPosition = readPresetPosition(element.data)
+    const position = sanitizePosition(
+      presetPosition ?? positions.get(id),
+      id,
+      layout,
+      layoutRevision,
+    )
+    const fixedPosition = readFixedPosition(element.data, position)
     const size = deriveNodeSize(style, element.data)
     const kind = readString(element.data.kind) ?? "node"
     const color = normalizeRenderableColor(
@@ -708,6 +713,9 @@ function createForceGraphData(
         fallbackLabelColor(element.data),
       ),
       size,
+      fx: fixedPosition?.x,
+      fy: fixedPosition?.y,
+      fz: fixedPosition?.z,
       x: position.x,
       y: position.y,
       z: position.z,
@@ -744,6 +752,35 @@ function createForceGraphData(
     links,
     nodes,
   }
+}
+
+function createGraphDataSignature(graphData: RelationshipGraphData) {
+  const nodeSignature = graphData.nodes
+    .map((node) =>
+      [
+        readId(node.id) ?? "",
+        roundSignatureNumber(node.initialX),
+        roundSignatureNumber(node.initialY),
+        roundSignatureNumber(node.initialZ),
+        roundSignatureNumber(node.fx),
+        roundSignatureNumber(node.fy),
+        roundSignatureNumber(node.fz),
+      ].join(","),
+    )
+    .sort()
+    .join("|")
+  const linkSignature = graphData.links
+    .map((link) =>
+      [
+        readId(link.id) ?? "",
+        readEndpointId(link.source) ?? "",
+        readEndpointId(link.target) ?? "",
+      ].join(","),
+    )
+    .sort()
+    .join("|")
+
+  return `${nodeSignature}::${linkSignature}`
 }
 
 function createNodeObject(
@@ -927,7 +964,7 @@ function restoreGraphView(
   graph.refresh()
 
   if (selectedNodeId) {
-    focusGraphNode(graph, graphData, selectedNodeId, 260)
+    focusGraphNeighborhood(graph, graphData, selectedNodeId, layout, 260)
     return
   }
 
@@ -958,6 +995,72 @@ function focusGraphNode(
       z: z + distance,
     },
     { x, y, z },
+    duration,
+  )
+}
+
+function focusGraphNeighborhood(
+  graph: ForceGraphMethods<ForceGraphNodeData, ForceGraphLinkData>,
+  graphData: RelationshipGraphData,
+  nodeId: string,
+  layout: ReactForceGraph3DLayoutOptions,
+  duration = 520,
+) {
+  const nodeById = new Map(
+    graphData.nodes
+      .map((node) => [readId(node.id), node] as const)
+      .filter((entry): entry is readonly [string, ForceGraphNode] => Boolean(entry[0])),
+  )
+  const targetIds = new Set<string>([nodeId])
+
+  graphData.links.forEach((link) => {
+    const source = readEndpointId(link.source)
+    const target = readEndpointId(link.target)
+
+    if (source === nodeId && target) {
+      targetIds.add(target)
+    }
+    if (target === nodeId && source) {
+      targetIds.add(source)
+    }
+  })
+
+  const targetNodes = [...targetIds]
+    .map((targetId) => nodeById.get(targetId))
+    .filter((node): node is ForceGraphNode => Boolean(node))
+
+  if (targetNodes.length <= 1) {
+    focusGraphNode(graph, graphData, nodeId, duration)
+    return
+  }
+
+  const positions = targetNodes.map((node) => ({
+    size: Math.max(4, node.size),
+    x: ensureFiniteNumber(node.x, node.initialX),
+    y: ensureFiniteNumber(node.y, node.initialY),
+    z: ensureFiniteNumber(node.z, node.initialZ),
+  }))
+  const center = positions.reduce(
+    (resolved, position) => ({
+      x: resolved.x + position.x / positions.length,
+      y: resolved.y + position.y / positions.length,
+      z: resolved.z + position.z / positions.length,
+    }),
+    { x: 0, y: 0, z: 0 },
+  )
+  const radius = positions.reduce((resolved, position) => {
+    const distance = Math.hypot(position.x - center.x, position.y - center.y, position.z - center.z)
+    return Math.max(resolved, distance + position.size * 14)
+  }, 0)
+  const distance = Math.max(260, radius * 2.05, layout.idealEdgeLength ?? 138)
+
+  graph.cameraPosition(
+    {
+      x: center.x + distance * 0.58,
+      y: center.y + distance * 0.42,
+      z: center.z + distance,
+    },
+    center,
     duration,
   )
 }
@@ -1013,11 +1116,6 @@ function getLinkDisplayWidth(link: ForceGraphLink, selectedNodeId: string | null
   return selectedNodeId && isLinkConnectedToNode(link, selectedNodeId) ? baseWidth * 1.7 : baseWidth
 }
 
-function getLinkDirectionalArrowLength(link: ForceGraphLink) {
-  const linkKind = readString(link.linkKind)
-  return linkKind === "pattern" ? 2.4 : 3.4
-}
-
 function getLinkDirectionalParticleCount(link: ForceGraphLink, selectedNodeId: string | null) {
   if (selectedNodeId && isLinkConnectedToNode(link, selectedNodeId)) {
     return 2
@@ -1068,7 +1166,7 @@ function createNodeTooltip(node: ForceGraphNode) {
 function createLinkTooltip(link: ForceGraphLink) {
   const source = readEndpointId(link.source) ?? ""
   const target = readEndpointId(link.target) ?? ""
-  const label = readString(link.linkKind) ?? "link"
+  const label = readString(link.label) ?? readString(link.linkKind) ?? "link"
 
   return `<div style="font-size:12px;line-height:1.45"><strong>${escapeHtml(
     label,
@@ -1214,6 +1312,30 @@ function computeInitialPositions(
   })
 
   return positions
+}
+
+function readPresetPosition(data: GraphElementData) {
+  const x = readNumber(data.x, Number.NaN)
+  const y = readNumber(data.y, Number.NaN)
+  const z = readNumber(data.z, Number.NaN)
+
+  if (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) {
+    return { x, y, z } satisfies Position
+  }
+
+  return null
+}
+
+function readFixedPosition(data: GraphElementData, fallback: Position) {
+  const fx = readNumber(data.fx, Number.NaN)
+  const fy = readNumber(data.fy, Number.NaN)
+  const fz = readNumber(data.fz, Number.NaN)
+
+  if (Number.isFinite(fx) && Number.isFinite(fy) && Number.isFinite(fz)) {
+    return { x: fx, y: fy, z: fz } satisfies Position
+  }
+
+  return readBoolean(data.fixed, false) ? fallback : null
 }
 
 function sanitizePosition(
@@ -1443,31 +1565,25 @@ async function exitFullscreen() {
   }
 }
 
-function isContainerVisible(container: HTMLElement | null) {
+function isContainerReady(
+  container: HTMLElement | null,
+  dimensions: { height: number; width: number },
+) {
   if (!container) {
     return false
   }
 
   const rect = container.getBoundingClientRect()
-  return container.getClientRects().length > 0 && rect.width >= 120 && rect.height >= 180
-}
+  const roundedWidth = Math.round(rect.width)
+  const roundedHeight = Math.round(rect.height)
 
-function scheduleGraphViewRestore(callback: () => void) {
-  let firstFrame = 0
-  let secondFrame = 0
-
-  firstFrame = window.requestAnimationFrame(() => {
-    secondFrame = window.requestAnimationFrame(callback)
-  })
-
-  return () => {
-    if (firstFrame) {
-      window.cancelAnimationFrame(firstFrame)
-    }
-    if (secondFrame) {
-      window.cancelAnimationFrame(secondFrame)
-    }
-  }
+  return (
+    container.getClientRects().length > 0 &&
+    roundedWidth >= 120 &&
+    roundedHeight >= 180 &&
+    Math.abs(roundedWidth - dimensions.width) <= 2 &&
+    Math.abs(roundedHeight - dimensions.height) <= 2
+  )
 }
 
 function seededUnit(value: string) {
@@ -1506,16 +1622,29 @@ function readNumber(value: GraphPrimitive, fallback: number) {
   return Number.isFinite(numeric) ? numeric : fallback
 }
 
+function roundSignatureNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? Math.round(value * 1000) / 1000 : ""
+}
+
+function readBoolean(value: GraphPrimitive, fallback: boolean) {
+  if (typeof value === "boolean") {
+    return value
+  }
+
+  if (typeof value === "string") {
+    if (value === "true") return true
+    if (value === "false") return false
+  }
+
+  return fallback
+}
+
 function readStyleColor(value: string | number | undefined, fallback: string) {
   return typeof value === "string" && value.trim().length > 0 ? value : fallback
 }
 
 function ensureFiniteNumber(value: number | undefined, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback
-}
-
-function themeSignature(theme: CytoscapeThemeTokens) {
-  return Object.values(theme).join("|")
 }
 
 function escapeHtml(value: string) {

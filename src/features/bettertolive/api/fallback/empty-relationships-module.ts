@@ -2,6 +2,7 @@ import type { RelationshipsModuleData } from "@/features/bettertolive/models/wor
 
 export const emptyRelationshipsModuleData = {
   circles: [],
+  connections: [],
   patterns: [],
   unsentNotes: [],
 } satisfies RelationshipsModuleData

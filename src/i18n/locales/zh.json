@@ -923,6 +923,8 @@
     "filter": {
       "all": "全部",
       "clear": "清空筛选",
+      "clearAll": "清空",
+      "more": "筛选",
       "type": "类型",
       "depth": "深度",
       "stage": "阶段",
@@ -939,12 +941,20 @@
     },
     "graph": {
       "helper": "圈层连接人物，人物连接表达，模式会根据线索和标签与相关关系形成虚线连接。",
+      "centeredHelper": "中心视图会优先围绕显式人物关系展开，再附带圈层和模式的辅助边。",
       "editHint": "切换到控制模式后，这里的关系人物、想说的话和模式节点都可以直接编辑。",
       "detailTitle": "节点说明",
       "detailDescription": "选中不同类型的节点后，这里会显示它在关系网络里的位置、上下文和相关连接。",
       "emptySelection": "选中一个节点后，这里会显示详细说明。",
       "noPatternMatches": "这个模式暂时还没有匹配到关系节点。",
       "connectedRelationshipsCount": "连接 {{count}} 段关系",
+      "clearFocus": "取消焦点",
+      "center": "以它为中心",
+      "exitCenter": "取消以它为中心",
+      "editConnections": "编辑",
+      "centeredMode": "中心视图",
+      "globalMode": "全局视图",
+      "centerDepth": "展开 {{count}} 跳",
       "controls": {
         "fit": "铺满",
         "recenter": "重排",
@@ -966,6 +976,16 @@
         "notesDetail": "与关系记录相连的表达节点",
         "links": "连接",
         "linksDetail": "圈层、人物、表达和模式之间的连接"
+      },
+      "signals": {
+        "connections": "显式人物关系",
+        "noConnections": "还没有显式人物关系。",
+        "connectedPeople": "图中相连",
+        "noConnectedPeople": "暂无相连人物",
+        "patterns": "匹配模式",
+        "noPatterns": "暂无共同模式",
+        "notes": "表达线索",
+        "noNotes": "暂无表达线索"
       }
     },
     "labels": {
@@ -1011,6 +1031,20 @@
       "stage": "阶段",
       "impact": "影响",
       "interaction": "互动",
+      "connections": "人物之间的关系",
+      "connectionsDescription": "为当前人物补充和其他人物之间的真实关系。对方打开编辑时，会自动看到互相翻转后的角色。",
+      "noConnections": "还没有人物连接。可以新增一条，例如“学生 / 老师”或“朋友 / 朋友”。",
+      "noEvents": "还没有互动事件，点击上方添加。",
+      "noHistory": "还没有变化历史，点击上方添加。",
+      "relatedPerson": "关联人物",
+      "selectRelatedPerson": "选择一个人物",
+      "connectionStrength": "连接强度",
+      "connectionNote": "连接备注",
+      "connectionRolesHint": "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
+      "addConnectionRole": "新增一行关系",
+      "selfRole": "当前人物角色",
+      "otherRole": "对方角色",
+      "connectionRoleNote": "这条关系的补充说明",
       "unfinishedWeight": "未完成重量",
       "influence": "关系档案",
       "currentState": "当前状态",
@@ -1023,6 +1057,11 @@
       "tags": "标签",
       "events": "关键互动事件",
       "history": "深度 / 阶段变化历史",
+      "tabs": {
+        "connections": "人物关系",
+        "events": "互动事件",
+        "history": "变化历史"
+      },
       "date": "日期",
       "eventTitle": "事件标题",
       "eventSummary": "事件摘要",
@@ -1128,6 +1167,11 @@
         "关系条目": "关系条目",
         "独立对象": "独立对象",
         "未来的自己": "未来的自己"
+      },
+      "connectionStrength": {
+        "强": "强",
+        "中": "中",
+        "弱": "弱"
       }
     }
   },

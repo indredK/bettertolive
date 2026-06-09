@@ -6,6 +6,7 @@ import type {
   ShoppingStageTemplate,
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
+import { normalizeRelationshipsModuleData } from "@/features/bettertolive/models/relationship-connections"
 
 function filterStageTemplateByQuery(
   stage: ShoppingStageTemplate,
@@ -361,7 +362,8 @@ export function useWorkspaceViewModel({
   const principleBoundaries = principlesModule.boundaries
 
   const relationshipsModule = useMemo(() => {
-    const circles = workspace.relationships.circles.map((circle) => {
+    const normalizedRelationshipsModule = normalizeRelationshipsModuleData(workspace.relationships)
+    const circles = normalizedRelationshipsModule.circles.map((circle) => {
       if (matchesQuery(circle.title, circle.summary)) {
         return circle
       }
@@ -405,13 +407,41 @@ export function useWorkspaceViewModel({
         ),
       }
     })
-    const visibleRelationshipIds = new Set(
+    const initiallyVisibleRelationshipIds = new Set(
       circles.flatMap((circle) => circle.entries.map((entry) => entry.id)),
     )
-    const patterns = workspace.relationships.patterns.filter((entry) =>
+    const matchedConnectionRelationshipIds = new Set(
+      normalizedRelationshipsModule.connections
+        .filter((connection) =>
+          matchesQuery(
+            connection.note,
+            connection.strength,
+            ...connection.roles.flatMap((role) => [role.sourceRole, role.targetRole, role.note]),
+          ),
+        )
+        .flatMap((connection) => [connection.sourceId, connection.targetId]),
+    )
+    const boostedVisibleRelationshipIds = new Set([
+      ...initiallyVisibleRelationshipIds,
+      ...matchedConnectionRelationshipIds,
+    ])
+    const boostedCircles = normalizedRelationshipsModule.circles.map((circle) => {
+      if (matchesQuery(circle.title, circle.summary)) {
+        return circle
+      }
+
+      return {
+        ...circle,
+        entries: circle.entries.filter((entry) => boostedVisibleRelationshipIds.has(entry.id)),
+      }
+    })
+    const visibleRelationshipIds = new Set(
+      boostedCircles.flatMap((circle) => circle.entries.map((entry) => entry.id)),
+    )
+    const patterns = normalizedRelationshipsModule.patterns.filter((entry) =>
       matchesQuery(entry.title, entry.summary, ...entry.cues),
     )
-    const unsentNotes = workspace.relationships.unsentNotes.filter(
+    const unsentNotes = normalizedRelationshipsModule.unsentNotes.filter(
       (entry) =>
         matchesQuery(
           entry.targetType,
@@ -422,16 +452,28 @@ export function useWorkspaceViewModel({
           entry.unfinishedWeight,
         ) || (entry.relationshipId ? visibleRelationshipIds.has(entry.relationshipId) : false),
     )
+    const connections = normalizedRelationshipsModule.connections.filter(
+      (connection) =>
+        (visibleRelationshipIds.has(connection.sourceId) &&
+          visibleRelationshipIds.has(connection.targetId)) ||
+        matchesQuery(
+          connection.note,
+          connection.strength,
+          ...connection.roles.flatMap((role) => [role.sourceRole, role.targetRole, role.note]),
+        ),
+    )
 
     return {
-      ...workspace.relationships,
-      circles,
+      ...normalizedRelationshipsModule,
+      circles: boostedCircles,
+      connections,
       patterns,
       unsentNotes,
     }
   }, [matchesQuery, workspace.relationships])
 
   const relationshipCircles = relationshipsModule.circles
+  const relationshipConnections = relationshipsModule.connections
   const relationshipPatterns = relationshipsModule.patterns
   const relationshipUnsentNotes = relationshipsModule.unsentNotes
 
@@ -795,6 +837,7 @@ export function useWorkspaceViewModel({
     reflections,
     relationshipsModule,
     relationshipCircles,
+    relationshipConnections,
     relationshipPatterns,
     relationshipUnsentNotes,
     shoppingModule,

@@ -14,6 +14,10 @@ type GraphElementData = Record<string, GraphPrimitive>
 
 type GraphElementDefinition = {
   data: GraphElementData
+  position?: {
+    x: number
+    y: number
+  }
 }
 
 type Cytoscape2DLayoutOptions = {
@@ -139,6 +143,7 @@ export function Cytoscape2DGraph({
   layout,
   legend,
   legendPosition = "top-left",
+  nodesDraggable = true,
   selectedNodeId,
   stylesheet,
   onNodeSelect,
@@ -151,6 +156,7 @@ export function Cytoscape2DGraph({
   layout: Cytoscape2DLayoutOptions
   legend?: ReactNode
   legendPosition?: GraphLegendPosition
+  nodesDraggable?: boolean
   selectedNodeId?: string | null
   stylesheet: (theme: CytoscapeThemeTokens) => unknown
   onNodeSelect?: (nodeId: string | null) => void
@@ -374,6 +380,7 @@ export function Cytoscape2DGraph({
 
     try {
       graph = cytoscape({
+        autoungrabify: !nodesDraggable,
         autounselectify: false,
         boxSelectionEnabled: false,
         container: viewport,
@@ -403,7 +410,8 @@ export function Cytoscape2DGraph({
     setRuntimeError(null)
 
     graph.on("tap", "node", (event: cytoscape.EventObjectNode) => {
-      onNodeSelectRef.current?.(event.target.id())
+      const nodeId = event.target.id()
+      onNodeSelectRef.current?.(selectedNodeIdRef.current === nodeId ? null : nodeId)
     })
     graph.on("tap", (event) => {
       if (event.target === graph) {
@@ -442,7 +450,15 @@ export function Cytoscape2DGraph({
         graphRef.current = null
       }
     }
-  }, [canRenderGraph, graphElements, graphPadding, graphResetKey, graphStylesheet, layout])
+  }, [
+    canRenderGraph,
+    graphElements,
+    graphPadding,
+    graphResetKey,
+    graphStylesheet,
+    layout,
+    nodesDraggable,
+  ])
 
   useEffect(() => {
     const graph = graphRef.current
@@ -601,6 +617,7 @@ function createCytoscapeElements(elements: GraphElementDefinition[]) {
         id,
       },
       group: "nodes",
+      position: element.position,
     })
   })
 

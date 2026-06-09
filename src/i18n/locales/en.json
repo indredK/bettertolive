@@ -923,6 +923,8 @@
     "filter": {
       "all": "All",
       "clear": "Clear filters",
+      "clearAll": "Clear",
+      "more": "Filters",
       "type": "Type",
       "depth": "Depth",
       "stage": "Stage",
@@ -939,12 +941,20 @@
     },
     "graph": {
       "helper": "Circles connect people, people connect unsent words, and patterns add dashed links when their cues match tags or emotional signals.",
+      "centeredHelper": "Centered view prioritizes explicit person-to-person connections, then layers circle and pattern edges as supporting context.",
       "editHint": "Switch to Control Mode to edit relationship, unsent-word, and pattern nodes directly from here.",
       "detailTitle": "Node Details",
       "detailDescription": "Select different node types to see their place, context, and nearby links in the relationship network.",
       "emptySelection": "Select a node to see its details here.",
       "noPatternMatches": "This pattern does not match any relationship nodes yet.",
       "connectedRelationshipsCount": "Linked to {{count}} relationships",
+      "clearFocus": "Clear Focus",
+      "center": "Center on This Person",
+      "exitCenter": "Cancel Centering",
+      "editConnections": "Edit",
+      "centeredMode": "Centered View",
+      "globalMode": "Global View",
+      "centerDepth": "{{count}} hops expanded",
       "controls": {
         "fit": "Fit",
         "recenter": "Relayout",
@@ -966,6 +976,16 @@
         "notesDetail": "Unsent-word nodes that are linked to relationship records",
         "links": "Links",
         "linksDetail": "Connections between circles, people, notes, and patterns"
+      },
+      "signals": {
+        "connections": "Explicit Person Links",
+        "noConnections": "No explicit person links yet.",
+        "connectedPeople": "Connected in Graph",
+        "noConnectedPeople": "No connected people yet.",
+        "patterns": "Matched Patterns",
+        "noPatterns": "No shared patterns yet.",
+        "notes": "Unsent Signals",
+        "noNotes": "No expression signals yet."
       }
     },
     "labels": {
@@ -1011,6 +1031,20 @@
       "stage": "Stage",
       "impact": "Impact",
       "interaction": "Interaction",
+      "connections": "Person-to-Person Links",
+      "connectionsDescription": "Add real links between this person and others. When the other person opens edit mode, the roles will automatically flip into their perspective.",
+      "noConnections": "No person links yet. Add one like “student / teacher” or “friend / friend”.",
+      "noEvents": "No interaction events yet. Use Add above.",
+      "noHistory": "No change history yet. Use Add above.",
+      "relatedPerson": "Related Person",
+      "selectRelatedPerson": "Select a person",
+      "connectionStrength": "Connection Strength",
+      "connectionNote": "Connection Note",
+      "connectionRolesHint": "Each row is a custom reciprocal relationship, for example current person as “student” and the other person as “teacher”; from the other side, the roles are shown reversed.",
+      "addConnectionRole": "Add Relationship Row",
+      "selfRole": "Current Person Role",
+      "otherRole": "Other Person Role",
+      "connectionRoleNote": "Add detail for this relationship row",
       "unfinishedWeight": "Unfinished Weight",
       "influence": "Relationship Profile",
       "currentState": "Current State",
@@ -1023,6 +1057,11 @@
       "tags": "Tags",
       "events": "Key Interaction Events",
       "history": "Depth / Stage History",
+      "tabs": {
+        "connections": "Person Links",
+        "events": "Events",
+        "history": "History"
+      },
       "date": "Date",
       "eventTitle": "Event Title",
       "eventSummary": "Event Summary",
@@ -1128,6 +1167,11 @@
         "关系条目": "Relationship",
         "独立对象": "Independent Target",
         "未来的自己": "Future Self"
+      },
+      "connectionStrength": {
+        "强": "Strong",
+        "中": "Medium",
+        "弱": "Weak"
       }
     }
   },

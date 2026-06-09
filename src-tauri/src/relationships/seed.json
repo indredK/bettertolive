@@ -401,5 +401,73 @@
       "excerpt": "虽然我们不会再重新建立联系，但我仍希望你后来的路变得轻一点。",
       "unfinishedWeight": "轻微"
     }
+  ],
+  "connections": [
+    {
+      "id": "relationship-connection-family-line",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-mother",
+      "strength": "强",
+      "note": "这是一条很深的家庭照料链。",
+      "roles": [
+        {
+          "id": "relationship-connection-role-family-line",
+          "sourceRole": "母亲",
+          "targetRole": "女儿",
+          "note": "彼此的照顾经验延续到了下一代。"
+        }
+      ]
+    },
+    {
+      "id": "relationship-connection-mother-partner",
+      "sourceId": "relationship-mother",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "这段连接会影响日常边界和安全感。",
+      "roles": [
+        {
+          "id": "relationship-connection-role-mother-partner-1",
+          "sourceRole": "长辈",
+          "targetRole": "伴侣",
+          "note": "彼此都在适应对方的重要位置。"
+        }
+      ]
+    },
+    {
+      "id": "relationship-connection-old-friend-partner",
+      "sourceId": "relationship-old-friend",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "一段既轻松又能互相接住的关系。",
+      "roles": [
+        {
+          "id": "relationship-connection-role-old-friend-partner-1",
+          "sourceRole": "朋友",
+          "targetRole": "朋友",
+          "note": "相处起来没有太多负担。"
+        },
+        {
+          "id": "relationship-connection-role-old-friend-partner-2",
+          "sourceRole": "倾诉对象",
+          "targetRole": "倾听者",
+          "note": "压力很大时会先找对方说。"
+        }
+      ]
+    },
+    {
+      "id": "relationship-connection-colleague-mentor",
+      "sourceId": "relationship-colleague",
+      "targetId": "relationship-mentor",
+      "strength": "中",
+      "note": "现实协作之外，也带一点被带着走过的经验。",
+      "roles": [
+        {
+          "id": "relationship-connection-role-colleague-mentor-1",
+          "sourceRole": "学生",
+          "targetRole": "老师",
+          "note": "工作伙伴会把旧导师当成自己方法论的来源。"
+        }
+      ]
+    }
   ]
 }

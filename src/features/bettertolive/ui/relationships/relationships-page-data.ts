@@ -2,6 +2,7 @@ import type { TFunction } from "i18next"
 
 import type {
   InteractionFrequency,
+  RelationshipConnectionStrength,
   RelationshipChangeField,
   RelationshipDepth,
   RelationshipEventKind,
@@ -69,6 +70,12 @@ export const UNSENT_NOTE_TARGET_TYPES = [
   "未来的自己",
 ] satisfies UnsentNoteTargetType[]
 
+export const RELATIONSHIP_CONNECTION_STRENGTH_OPTIONS = [
+  "强",
+  "中",
+  "弱",
+] satisfies RelationshipConnectionStrength[]
+
 export const RELATIONSHIP_DIALOG_CONTENT_CLASS =
   "border border-foreground/10 bg-background shadow-lg"
 
@@ -77,6 +84,9 @@ export const RELATIONSHIP_DIALOG_HEADER_CLASS =
 
 export const RELATIONSHIP_DIALOG_SECTION_CLASS =
   "space-y-3 rounded-xl border border-foreground/10 bg-card/70 p-4"
+
+export const RELATIONSHIP_DIALOG_COMPACT_SECTION_CLASS =
+  "space-y-2.5 rounded-xl border border-foreground/10 bg-card/70 p-3"
 
 export const RELATIONSHIP_DIALOG_FIELD_CLASS = "w-full border-foreground/15 bg-background shadow-sm"
 
@@ -95,6 +105,7 @@ export type RelationshipEnumGroup =
   | "eventKind"
   | "changeField"
   | "targetType"
+  | "connectionStrength"
 
 export function translateRelationshipEnum(
   t: TFunction,
