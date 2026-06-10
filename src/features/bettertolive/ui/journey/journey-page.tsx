@@ -5,7 +5,6 @@ import {
   CheckCheck,
   Database,
   FileQuestion,
-  Filter,
   Lock,
   Pencil,
   Plus,
@@ -20,14 +19,11 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import type {
   EmotionalWeight,
   FormativePower,
@@ -52,7 +48,7 @@ import {
 } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
-const ALL_FILTER_VALUE = "__all__"
+const ALL_FILTER_VALUE = "all"
 
 const MEMORY_TYPES = ["事件", "地点", "物件", "人物", "照片", "领悟"] satisfies MemoryType[]
 
@@ -420,11 +416,29 @@ export function JourneyPage({
     options: FilterOption[]
   }>
 
+  const filterDimensions = useMemo<FilterPopoverDimension[]>(
+    () =>
+      filterGroups.map((group) => {
+        const enumGroup = getFilterEnumGroup(group.id)
+        return {
+          key: group.id,
+          label: group.label,
+          allLabel: group.options[0]?.label ?? t("journey.filters.all", "全部"),
+          value: filters[group.id],
+          options: group.options.slice(1).map((option) => ({
+            value: option.value,
+            label: enumGroup ? translateJourneyEnum(t, enumGroup, option.label) : option.label,
+          })),
+        }
+      }),
+    [filterGroups, filters, t],
+  )
+
   return (
     <div
       className={cn(
         "space-y-5",
-        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
+        isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-visible",
       )}
     >
       <PageIntro
@@ -436,15 +450,25 @@ export function JourneyPage({
 
       <JourneyHero journey={journey} />
 
-      <JourneyFilterBar
-        filterGroups={filterGroups}
-        filters={filters}
-        isCompact={isFixedLayout}
-        resultCount={filteredJourney.memories.length}
-        totalCount={journey.memories.length}
-        onChange={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-        onReset={() => setFilters(createEmptyFilters())}
-      />
+      <Surface className={cn("shrink-0 p-3", isFixedLayout && "p-2.5")}>
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterPopover
+            dimensions={filterDimensions}
+            popoverWidth="18rem"
+            onChangeFilter={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+            onClearAll={() => setFilters(createEmptyFilters())}
+          />
+          <Badge
+            variant="outline"
+            className="h-7 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+          >
+            {t("journey.filters.resultCount", {
+              count: filteredJourney.memories.length,
+              total: journey.memories.length,
+            })}
+          </Badge>
+        </div>
+      </Surface>
 
       {isControlMode ? (
         <JourneyControlPanel
@@ -508,112 +532,6 @@ function JourneyHero({ journey }: { journey: JourneyViewData }) {
         ))}
       </div>
     </Surface>
-  )
-}
-
-function JourneyFilterBar({
-  filterGroups,
-  filters,
-  isCompact,
-  resultCount,
-  totalCount,
-  onChange,
-  onReset,
-}: {
-  filterGroups: Array<{
-    id: keyof JourneyFilters
-    label: string
-    options: FilterOption[]
-  }>
-  filters: JourneyFilters
-  isCompact: boolean
-  resultCount: number
-  totalCount: number
-  onChange: (key: keyof JourneyFilters, value: string) => void
-  onReset: () => void
-}) {
-  const { t } = useTranslation()
-  const hasFilters = hasActiveFilters(filters)
-
-  return (
-    <Surface className={cn("shrink-0 p-3", isCompact && "p-2.5")}>
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-2 px-1 text-xs font-medium text-[color:var(--text-primary)]">
-          <Filter className="size-3.5" />
-          {t("journey.filters.title")}
-        </div>
-        {filterGroups.map((group) => (
-          <label key={group.id} className="min-w-[150px] flex-1">
-            <span className="sr-only">{group.label}</span>
-            <Select
-              value={filters[group.id]}
-              onValueChange={(value) => {
-                if (value !== null) {
-                  onChange(group.id, value)
-                }
-              }}
-            >
-              <SelectTrigger className="h-8 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]">
-                <SelectValue placeholder={group.label} />
-              </SelectTrigger>
-              <SelectContent>
-                {group.options.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    <JourneyFilterOptionLabel
-                      count={option.count}
-                      filterId={group.id}
-                      label={option.label}
-                    />
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
-        ))}
-        <Badge
-          variant="outline"
-          className="h-8 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
-        >
-          {t("journey.filters.resultCount", { count: resultCount, total: totalCount })}
-        </Badge>
-        {hasFilters ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]"
-            onClick={onReset}
-          >
-            {t("journey.filters.reset")}
-          </Button>
-        ) : null}
-      </div>
-    </Surface>
-  )
-}
-
-function JourneyFilterOptionLabel({
-  count,
-  filterId,
-  label,
-}: {
-  count?: number
-  filterId: keyof JourneyFilters
-  label: string
-}) {
-  const { t } = useTranslation()
-  const enumGroup = getFilterEnumGroup(filterId)
-  const displayLabel = enumGroup ? translateJourneyEnum(t, enumGroup, label) : label
-
-  if (typeof count !== "number") {
-    return <span>{displayLabel}</span>
-  }
-
-  return (
-    <span className="inline-flex min-w-0 items-center gap-2">
-      <span className="truncate">{displayLabel}</span>
-      <span className="shrink-0 text-[color:var(--text-muted)]">{count}</span>
-    </span>
   )
 }
 

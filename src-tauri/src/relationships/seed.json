@@ -1,21 +1,176 @@
 {
   "circles": [
     {
-      "id": "relationship-family",
-      "title": "家庭与成长绑定",
-      "summary": "最早的安全感、期待和压力，很多都从这里开始。",
+      "id": "relationship-five-generation-family",
+      "title": "五世同堂的家",
+      "summary": "高祖、曾祖、祖辈、父母和自己都健在，家里保留着跨越五代的照看、传承和日常连接。",
       "entries": [
+        {
+          "id": "relationship-great-great-grandfather",
+          "name": "高祖父",
+          "type": "家人",
+          "role": "五世同堂第一代，健在",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每月",
+          "unfinishedWeight": "轻微",
+          "influence": "他像家族时间轴的起点，让大家意识到很多生活习惯和家风不是突然出现的。",
+          "currentState": "年纪很高但精神稳定，逢年过节仍会和晚辈坐在一起聊天。",
+          "emotionalTone": "敬重、安心，也会因为他的年纪而更珍惜每次见面。",
+          "unspokenLine": "我想多听你讲以前的事，也想把这些故事记下来。",
+          "positiveImpact": "给了家里一种很深的延续感，让晚辈知道自己从哪里来。",
+          "ongoingShadow": "面对高龄亲人时，会担心时间不够，也容易把陪伴推迟到以后。",
+          "boundaryStatus": "边界清晰，主要是把陪伴变成更稳定的实际行动。",
+          "events": [
+            {
+              "id": "relationship-event-great-great-grandfather-1",
+              "date": "2026-02-10",
+              "kind": "团聚",
+              "title": "春节五代人一起拍照",
+              "summary": "家里第一次认真拍了一张五世同堂的合影。"
+            }
+          ],
+          "emotionCues": ["敬重", "传承", "珍惜", "安心"],
+          "unsentLineIds": ["unsent-great-great-grandfather"],
+          "history": [],
+          "tags": ["五世同堂", "健在", "家族源头"]
+        },
+        {
+          "id": "relationship-great-grandmother",
+          "name": "曾祖母",
+          "type": "家人",
+          "role": "五世同堂第二代，健在",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每月",
+          "unfinishedWeight": "轻微",
+          "influence": "她让家里的照料有了具体形状：饭菜、叮嘱、慢慢说话和记得每个人的近况。",
+          "currentState": "身体还算硬朗，喜欢问晚辈吃得好不好、睡得好不好。",
+          "emotionalTone": "温暖、踏实、被惦记。",
+          "unspokenLine": "你记得我们每个人，我也想认真记得你。",
+          "positiveImpact": "让我相信稳定的关心可以很朴素，但很有力量。",
+          "ongoingShadow": "有时会把被照顾当成理所当然，忘了主动回应。",
+          "boundaryStatus": "边界自然，重点是多回应她的关心。",
+          "events": [
+            {
+              "id": "relationship-event-great-grandmother-1",
+              "date": "2026-04-05",
+              "kind": "重要谈话",
+              "title": "听她讲年轻时的家",
+              "summary": "她讲了家里以前怎么过日子，也讲到一路撑过来的细节。"
+            }
+          ],
+          "emotionCues": ["温暖", "惦记", "踏实", "感谢"],
+          "unsentLineIds": ["unsent-great-grandmother"],
+          "history": [],
+          "tags": ["五世同堂", "健在", "照料"]
+        },
+        {
+          "id": "relationship-grandfather",
+          "name": "爷爷",
+          "type": "家人",
+          "role": "五世同堂第三代，健在",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每周",
+          "unfinishedWeight": "无",
+          "influence": "他是家里很多现实事务的支点，习惯用行动表达关心。",
+          "currentState": "经常帮大家协调聚餐、出行和长辈照看。",
+          "emotionalTone": "可靠、稳、偶尔有点严肃。",
+          "unspokenLine": "我知道你做了很多，只是不一定总说出来。",
+          "positiveImpact": "让我看到承担责任也可以安静而稳定。",
+          "ongoingShadow": "容易把他的严肃误解成距离。",
+          "boundaryStatus": "边界清晰，可以更多用轻松方式交流。",
+          "events": [
+            {
+              "id": "relationship-event-grandfather-1",
+              "date": "2026-05-01",
+              "kind": "团聚",
+              "title": "组织全家短途出行",
+              "summary": "他提前安排了车辆和时间，让五代人都能参与。"
+            }
+          ],
+          "emotionCues": ["可靠", "责任", "踏实", "敬重"],
+          "unsentLineIds": [],
+          "history": [],
+          "tags": ["五世同堂", "健在", "支点"]
+        },
+        {
+          "id": "relationship-grandmother",
+          "name": "奶奶",
+          "type": "家人",
+          "role": "五世同堂第三代，健在",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每周",
+          "unfinishedWeight": "轻微",
+          "influence": "她把家里的情绪温度维持得很柔和，很多紧张都会被她慢慢化开。",
+          "currentState": "会主动关心每个人，也会提醒大家别只忙工作。",
+          "emotionalTone": "亲近、柔软、被照顾。",
+          "unspokenLine": "你总是照顾大家，也要多照顾自己。",
+          "positiveImpact": "让我习惯用更温和的方式连接家人。",
+          "ongoingShadow": "担心她总把自己的需要放到最后。",
+          "boundaryStatus": "边界自然，需要更多关注她自己的感受。",
+          "events": [
+            {
+              "id": "relationship-event-grandmother-1",
+              "date": "2026-05-12",
+              "kind": "重要谈话",
+              "title": "聊到她自己的生活愿望",
+              "summary": "这次没有只聊晚辈，而是认真问了她最近想做什么。"
+            }
+          ],
+          "emotionCues": ["柔软", "照顾", "心疼", "亲近"],
+          "unsentLineIds": ["unsent-grandmother"],
+          "history": [],
+          "tags": ["五世同堂", "健在", "情绪温度"]
+        },
+        {
+          "id": "relationship-father",
+          "name": "父亲",
+          "type": "家人",
+          "role": "五世同堂第四代，健在",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "混合",
+          "interaction": "每周",
+          "unfinishedWeight": "轻微",
+          "influence": "他影响我对责任、现实安排和长期规划的理解。",
+          "currentState": "关系稳定，偶尔会因为表达方式太直接而有摩擦。",
+          "emotionalTone": "安心、压力、被期待。",
+          "unspokenLine": "我知道你希望我过得稳，但我也想按自己的节奏来。",
+          "positiveImpact": "给了我面对现实问题的耐心和执行感。",
+          "ongoingShadow": "容易把关心听成要求。",
+          "boundaryStatus": "边界基本清晰，还在练习把不同意见说得不那么紧绷。",
+          "events": [
+            {
+              "id": "relationship-event-father-1",
+              "date": "2026-06-02",
+              "kind": "重要谈话",
+              "title": "关于未来安排的一次沟通",
+              "summary": "没有马上争论，而是把各自担心的点拆开说。"
+            }
+          ],
+          "emotionCues": ["责任", "期待", "安心", "压力"],
+          "unsentLineIds": ["unsent-father"],
+          "history": [],
+          "tags": ["五世同堂", "健在", "责任"]
+        },
         {
           "id": "relationship-mother",
           "name": "母亲",
           "type": "家人",
-          "role": "核心家庭",
+          "role": "五世同堂第四代，健在",
           "depth": "亲近",
           "stage": "修复中",
           "impact": "混合",
           "interaction": "每周",
           "unfinishedWeight": "中等",
-          "influence": "让我很早学会体谅别人，也容易先照顾外界感受。",
+          "influence": "她让我很早学会体谅别人，也容易先照顾外界感受。",
           "currentState": "亲近，但需要更多边界感。",
           "emotionalTone": "靠近时有安全感，但也会很快背上责任感。",
           "unspokenLine": "我想被理解，不只是被要求懂事。",
@@ -24,25 +179,18 @@
           "boundaryStatus": "边界正在建立，尤其是关于生活选择和评价。",
           "events": [
             {
-              "id": "relationship-event-1",
+              "id": "relationship-event-mother-1",
               "date": "2026-05-12",
               "kind": "重要谈话",
               "title": "第一次认真解释自己的边界",
               "summary": "把“不想被定义”的感受说出口，对方没有完全理解，但对话开始了。"
-            },
-            {
-              "id": "relationship-event-2",
-              "date": "2026-06-01",
-              "kind": "和好",
-              "title": "一次没有升级的争执",
-              "summary": "这次没有立刻让步，而是先暂停，隔天再继续说。"
             }
           ],
           "emotionCues": ["安全感", "责任感", "愧疚", "想被理解"],
-          "unsentLineIds": ["unsent-1"],
+          "unsentLineIds": ["unsent-mother"],
           "history": [
             {
-              "id": "relationship-history-1",
+              "id": "relationship-history-mother-1",
               "date": "2026-05-12",
               "field": "stage",
               "from": "紧张",
@@ -50,45 +198,45 @@
               "note": "边界对话后，关系从回避转向可继续沟通。"
             }
           ],
-          "tags": ["家庭", "边界", "修复"]
+          "tags": ["五世同堂", "健在", "边界"]
         },
         {
-          "id": "relationship-grandmother",
-          "name": "奶奶",
-          "type": "过去重要的人",
-          "role": "已故亲人",
-          "depth": "断联",
-          "stage": "已结束",
+          "id": "relationship-self",
+          "name": "我",
+          "type": "家人",
+          "role": "五世同堂第五代，健在",
+          "depth": "亲密",
+          "stage": "建立中",
           "impact": "滋养",
-          "interaction": "已无联系",
-          "unfinishedWeight": "很重",
-          "influence": "她定义了我对家、照顾和温暖的最早理解。",
-          "currentState": "现实中已经无法联系，但记忆仍然很有重量。",
-          "emotionalTone": "想起时温暖，也会突然难过。",
-          "unspokenLine": "我还想再吃一次你做的饭，也想告诉你我现在过得还可以。",
-          "positiveImpact": "让我相信稳定的照顾可以很朴素，不需要很多解释。",
-          "ongoingShadow": "面对告别时容易延迟表达，总觉得以后还有机会。",
-          "boundaryStatus": "没有现实边界问题，重点是完成表达和安放记忆。",
+          "interaction": "每天",
+          "unfinishedWeight": "无",
+          "influence": "我是这张关系网的观察者，也是五代关系继续向前流动的一环。",
+          "currentState": "正在学习既靠近家人，也保留自己的生活节奏。",
+          "emotionalTone": "被连接、被期待、也想更自由。",
+          "unspokenLine": "我属于这个家，也属于我自己的人生。",
+          "positiveImpact": "五世同堂让我对时间、亲情和传承更有体感。",
+          "ongoingShadow": "容易在很多期待里忘记自己的真实选择。",
+          "boundaryStatus": "边界正在形成：保留亲近，也保留自主。",
           "events": [
             {
-              "id": "relationship-event-3",
-              "date": "2026-04-04",
-              "kind": "重要谈话",
-              "title": "清明时写下没有寄出的信",
-              "summary": "第一次承认这段关系里仍有很多想说的话。"
+              "id": "relationship-event-self-1",
+              "date": "2026-06-08",
+              "kind": "记录",
+              "title": "整理五代关系图谱",
+              "summary": "把家人、伴侣和朋友放在同一张图里，看见不同关系如何影响自己。"
             }
           ],
-          "emotionCues": ["想念", "亏欠", "温暖", "告别"],
-          "unsentLineIds": ["unsent-2"],
+          "emotionCues": ["连接", "自主", "传承", "自由"],
+          "unsentLineIds": ["unsent-self"],
           "history": [],
-          "tags": ["家庭味道", "告别", "食物记忆"]
+          "tags": ["五世同堂", "健在", "自我"]
         }
       ]
     },
     {
-      "id": "relationship-close",
-      "title": "亲密与朋友",
-      "summary": "主动选择的关系，最能照见自己真正需要什么样的连接。",
+      "id": "relationship-close-life",
+      "title": "伴侣与朋友",
+      "summary": "主动选择的亲密关系和朋友关系，补足家庭之外的陪伴、理解和轻松感。",
       "entries": [
         {
           "id": "relationship-partner",
@@ -104,12 +252,12 @@
           "currentState": "节奏稳定，偶尔有小摩擦但会当场处理。",
           "emotionalTone": "平静、被接住、偶尔担心自己表达过度。",
           "unspokenLine": "谢谢你让我不用一直表现得很能扛。",
-          "positiveImpact": "提高了我对亲密关系中安全表达的信心。",
+          "positiveImpact": "提高了我在亲密关系中安全表达的信心。",
           "ongoingShadow": "在疲惫时仍会担心自己需要太多。",
           "boundaryStatus": "边界清晰，冲突后能回到讨论而不是互相惩罚。",
           "events": [
             {
-              "id": "relationship-event-4",
+              "id": "relationship-event-partner-1",
               "date": "2026-05-22",
               "kind": "重要谈话",
               "title": "一次关于工作压力的深聊",
@@ -117,68 +265,44 @@
             }
           ],
           "emotionCues": ["安全感", "依赖", "坦白", "被接住"],
-          "unsentLineIds": ["unsent-3"],
+          "unsentLineIds": ["unsent-partner"],
           "history": [],
-          "tags": ["亲密", "稳定", "支持"]
+          "tags": ["伴侣", "稳定", "支持"]
         },
         {
-          "id": "relationship-old-friend",
-          "name": "多年朋友",
+          "id": "relationship-best-friend",
+          "name": "挚友",
           "type": "朋友",
-          "role": "旧友",
-          "depth": "疏远",
-          "stage": "紧张",
-          "impact": "混合",
-          "interaction": "几乎不",
-          "unfinishedWeight": "中等",
-          "influence": "曾经一起度过很轻松的阶段，也见过彼此不成熟的样子。",
-          "currentState": "偶尔点赞，但很久没有认真说话。",
-          "emotionalTone": "见面会开心，不见时心里有疙瘩。",
-          "unspokenLine": "我不知道我们是不是还愿意认真修复这段关系。",
-          "positiveImpact": "提醒我曾经可以很轻松地和人相处。",
-          "ongoingShadow": "让我看到自己遇到冷淡时会先撤退，而不是确认发生了什么。",
-          "boundaryStatus": "边界模糊，更多是回避和猜测。",
+          "role": "多年好友",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每周",
+          "unfinishedWeight": "无",
+          "influence": "这段关系让我不用解释太多，也能被理解。",
+          "currentState": "联系稳定，会互相同步近况，也会认真提醒彼此。",
+          "emotionalTone": "轻松、被懂、可靠。",
+          "unspokenLine": "有你在，我会觉得自己不是一个人硬撑。",
+          "positiveImpact": "让我知道朋友也可以像家一样可靠。",
+          "ongoingShadow": "有时太熟悉，反而忘了正式表达感谢。",
+          "boundaryStatus": "边界自然，能开玩笑也能认真说不。",
           "events": [
             {
-              "id": "relationship-event-5",
-              "date": "2026-03-08",
-              "kind": "冲突",
-              "title": "一次没有说开的沉默",
-              "summary": "消息停在误会之后，双方都没有继续解释。"
-            },
-            {
-              "id": "relationship-event-6",
-              "date": "2026-05-30",
-              "kind": "疏远",
-              "title": "从每月见面变成只偶尔点赞",
-              "summary": "互动频率下降，但心里仍有位置。"
+              "id": "relationship-event-best-friend-1",
+              "date": "2026-04-18",
+              "kind": "陪伴",
+              "title": "低谷时陪我散步",
+              "summary": "没有追问太多，只是一起走了一段路。"
             }
           ],
-          "emotionCues": ["想念", "别扭", "害怕尴尬", "遗憾"],
-          "unsentLineIds": ["unsent-4"],
-          "history": [
-            {
-              "id": "relationship-history-2",
-              "date": "2026-05-30",
-              "field": "depth",
-              "from": "亲近",
-              "to": "疏远",
-              "note": "联系频率和主动分享都明显下降。"
-            },
-            {
-              "id": "relationship-history-3",
-              "date": "2026-05-30",
-              "field": "stage",
-              "from": "稳定",
-              "to": "紧张",
-              "note": "未解释的沉默开始影响这段关系的体感。"
-            }
-          ],
-          "tags": ["朋友", "疏远", "未说开"]
+          "emotionCues": ["轻松", "被懂", "可靠", "感谢"],
+          "unsentLineIds": ["unsent-best-friend"],
+          "history": [],
+          "tags": ["朋友", "多年", "可靠"]
         },
         {
           "id": "relationship-new-friend",
-          "name": "新认识的朋友",
+          "name": "新朋友",
           "type": "朋友",
           "role": "兴趣社群",
           "depth": "熟人",
@@ -195,7 +319,7 @@
           "boundaryStatus": "边界自然，暂时没有需要处理的突破。",
           "events": [
             {
-              "id": "relationship-event-9",
+              "id": "relationship-event-new-friend-1",
               "date": "2026-06-03",
               "kind": "认识",
               "title": "第一次在读书会聊天",
@@ -205,161 +329,119 @@
           "emotionCues": ["轻松", "好奇", "谨慎"],
           "unsentLineIds": [],
           "history": [],
-          "tags": ["兴趣", "建立中", "低压力"]
-        }
-      ]
-    },
-    {
-      "id": "relationship-work-and-guidance",
-      "title": "协作与引领",
-      "summary": "工作关系和导师关系，影响能力感、方向感和现实节奏。",
-      "entries": [
+          "tags": ["朋友", "兴趣", "建立中"]
+        },
         {
-          "id": "relationship-colleague",
-          "name": "工作伙伴",
-          "type": "同事",
-          "role": "现实协作",
+          "id": "relationship-neighbor-friend",
+          "name": "邻里朋友",
+          "type": "朋友",
+          "role": "生活互助",
           "depth": "熟人",
           "stage": "稳定",
-          "impact": "中性",
-          "interaction": "每周",
-          "unfinishedWeight": "无",
-          "influence": "会影响我对能力、可靠性和价值交换的判断。",
-          "currentState": "协作稳定，但关系主要停留在功能层面。",
-          "emotionalTone": "可靠感会增强，也容易只剩效率。",
-          "unspokenLine": "我不想所有关系最后都只剩完成任务。",
-          "positiveImpact": "让我看到清晰协作本身也能带来安心。",
-          "ongoingShadow": "容易把自我价值和产出绑定在一起。",
-          "boundaryStatus": "工作边界基本清晰，但还需要防止过度负责。",
-          "events": [
-            {
-              "id": "relationship-event-7",
-              "date": "2026-05-18",
-              "kind": "重要谈话",
-              "title": "一次效率之外的坦诚交流",
-              "summary": "确认了彼此的协作压力，也让关系不只停在任务层面。"
-            }
-          ],
-          "emotionCues": ["可靠", "效率", "价值交换", "谨慎"],
-          "unsentLineIds": [],
-          "history": [],
-          "tags": ["工作", "协作", "边界"]
-        },
-        {
-          "id": "relationship-former-lead",
-          "name": "前项目负责人",
-          "type": "同事",
-          "role": "过去协作对象",
-          "depth": "疏远",
-          "stage": "已结束",
-          "impact": "消耗",
-          "interaction": "已无联系",
-          "unfinishedWeight": "中等",
-          "influence": "这段关系让我更早意识到，责任边界不清会把协作变成长期消耗。",
-          "currentState": "项目结束后已不再联系，但遇到类似管理方式时仍会被触发。",
-          "emotionalTone": "紧绷、警惕，也有一点终于离开的轻松。",
-          "unspokenLine": "我当时承担的并不都是我的责任。",
-          "positiveImpact": "帮助我看清自己需要更明确地确认职责和反馈机制。",
-          "ongoingShadow": "容易在新协作里提前进入防御状态，担心再次被模糊责任。",
-          "boundaryStatus": "现实关系已结束，重点是把旧边界经验转成新的协作原则。",
-          "events": [
-            {
-              "id": "relationship-event-10",
-              "date": "2025-12-20",
-              "kind": "断联",
-              "title": "项目收尾后停止私人沟通",
-              "summary": "没有正式冲突，但关系自然从高压协作退回到无联系状态。"
-            }
-          ],
-          "emotionCues": ["紧绷", "防御", "委屈", "松一口气"],
-          "unsentLineIds": [],
-          "history": [
-            {
-              "id": "relationship-history-4",
-              "date": "2025-12-20",
-              "field": "stage",
-              "from": "紧张",
-              "to": "已结束",
-              "note": "项目结束后，不再需要维持这段高压协作。"
-            }
-          ],
-          "tags": ["工作", "消耗", "边界经验"]
-        },
-        {
-          "id": "relationship-mentor",
-          "name": "旧导师",
-          "type": "导师/榜样",
-          "role": "方向引导",
-          "depth": "亲近",
-          "stage": "等待中",
           "impact": "滋养",
-          "interaction": "每年",
-          "unfinishedWeight": "轻微",
-          "influence": "曾经帮我把混乱的方向拆成可以走的下一步。",
-          "currentState": "很久没联系，但仍会在关键选择时想起对方说过的话。",
-          "emotionalTone": "尊重、感谢，也有一点不好意思打扰。",
-          "unspokenLine": "我想告诉你，那些建议后来真的帮到了我。",
-          "positiveImpact": "提供了职业早期的判断框架和稳定感。",
-          "ongoingShadow": "容易把对方的标准看得太高，忘记自己也可以判断。",
-          "boundaryStatus": "没有被突破的边界，更多是等待一个合适时机重新联系。",
+          "interaction": "每月",
+          "unfinishedWeight": "无",
+          "influence": "让日常生活多了一点互相照应的轻松连接。",
+          "currentState": "偶尔帮忙收快递、分享食物，关系不深但很舒服。",
+          "emotionalTone": "自然、轻松、有人情味。",
+          "unspokenLine": "这种不用太用力的关系，也让我觉得生活更安稳。",
+          "positiveImpact": "提醒我连接不一定都要很深，稳定的小互助也很珍贵。",
+          "ongoingShadow": "有时会低估这种浅连接的支持感。",
+          "boundaryStatus": "边界清楚，互助但不过度打扰。",
           "events": [
             {
-              "id": "relationship-event-8",
-              "date": "2024-11-18",
-              "kind": "疏远",
-              "title": "毕业后联系变少",
-              "summary": "关系没有结束，只是自然进入很低频的等待状态。"
+              "id": "relationship-event-neighbor-friend-1",
+              "date": "2026-05-30",
+              "kind": "互助",
+              "title": "互相照看快递和植物",
+              "summary": "短暂出门时彼此帮忙，让生活有了稳定的后援。"
             }
           ],
-          "emotionCues": ["感谢", "尊重", "不好意思", "被指引"],
-          "unsentLineIds": ["unsent-5"],
+          "emotionCues": ["自然", "互助", "轻松", "安稳"],
+          "unsentLineIds": [],
           "history": [],
-          "tags": ["导师", "方向", "感谢"]
+          "tags": ["朋友", "邻里", "互助"]
         }
       ]
     }
   ],
   "patterns": [
     {
-      "id": "relationship-pattern-1",
-      "title": "容易先做理解者",
-      "summary": "在家庭、朋友和工作关系里，常常先理解对方，再处理自己的感受。",
-      "cues": ["过度负责", "延迟表达", "怕破坏关系气氛"]
+      "id": "relationship-pattern-family-continuity",
+      "title": "五代同堂带来的延续感",
+      "summary": "高祖、曾祖、祖辈、父母和自己都还在场，关系图谱里最强的主线是家族传承和现实陪伴。",
+      "cues": ["都健在", "跨代照看", "家族故事", "稳定团聚"]
     },
     {
-      "id": "relationship-pattern-2",
-      "title": "遇到冷淡时先撤退",
-      "summary": "朋友关系里一旦出现沉默，更倾向于退后，而不是确认发生了什么。",
-      "cues": ["回避冲突", "猜测对方", "未完成重量上升"]
+      "id": "relationship-pattern-boundary-in-family",
+      "title": "亲近和自主需要同时保留",
+      "summary": "家庭关系很近，但越是亲近，越需要把生活选择、期待和边界说清楚。",
+      "cues": ["边界", "期待", "懂事", "自主"]
     },
     {
-      "id": "relationship-pattern-3",
-      "title": "被认真听见会快速恢复",
-      "summary": "滋养型关系的共同点不是热闹，而是能承接认真表达。",
-      "cues": ["安全感", "能说真话", "身体放松"]
+      "id": "relationship-pattern-chosen-support",
+      "title": "主动选择的关系补足支持",
+      "summary": "伴侣和朋友提供家庭之外的倾听、轻松和互相支持，让关系系统不只靠血缘维持。",
+      "cues": ["伴侣", "朋友", "被听见", "低压力连接"]
     }
   ],
   "unsentNotes": [
     {
-      "id": "unsent-1",
+      "id": "unsent-great-great-grandfather",
+      "targetType": "关系条目",
+      "relationshipId": "relationship-great-great-grandfather",
+      "to": "高祖父",
+      "theme": "记录",
+      "excerpt": "我想多听你讲以前的事，把这些故事留给以后的人。",
+      "unfinishedWeight": "轻微"
+    },
+    {
+      "id": "unsent-great-grandmother",
+      "targetType": "关系条目",
+      "relationshipId": "relationship-great-grandmother",
+      "to": "曾祖母",
+      "theme": "感谢",
+      "excerpt": "你记得我们每个人，我也想认真记得你。",
+      "unfinishedWeight": "轻微"
+    },
+    {
+      "id": "unsent-grandmother",
+      "targetType": "关系条目",
+      "relationshipId": "relationship-grandmother",
+      "to": "奶奶",
+      "theme": "关心",
+      "excerpt": "你总是照顾大家，也要多照顾自己。",
+      "unfinishedWeight": "轻微"
+    },
+    {
+      "id": "unsent-father",
+      "targetType": "关系条目",
+      "relationshipId": "relationship-father",
+      "to": "父亲",
+      "theme": "解释",
+      "excerpt": "我知道你希望我过得稳，但我也想按自己的节奏来。",
+      "unfinishedWeight": "轻微"
+    },
+    {
+      "id": "unsent-mother",
       "targetType": "关系条目",
       "relationshipId": "relationship-mother",
       "to": "母亲",
-      "theme": "解释",
+      "theme": "边界",
       "excerpt": "我不是不在乎你，只是我也需要一点不被定义的空间。",
       "unfinishedWeight": "中等"
     },
     {
-      "id": "unsent-2",
+      "id": "unsent-self",
       "targetType": "关系条目",
-      "relationshipId": "relationship-grandmother",
-      "to": "奶奶",
-      "theme": "告别",
-      "excerpt": "我还记得厨房里的味道，也想告诉你我现在正在学着照顾自己。",
-      "unfinishedWeight": "很重"
+      "relationshipId": "relationship-self",
+      "to": "我",
+      "theme": "提醒",
+      "excerpt": "我属于这个家，也属于我自己的人生。",
+      "unfinishedWeight": "无"
     },
     {
-      "id": "unsent-3",
+      "id": "unsent-partner",
       "targetType": "关系条目",
       "relationshipId": "relationship-partner",
       "to": "伴侣",
@@ -368,106 +450,463 @@
       "unfinishedWeight": "轻微"
     },
     {
-      "id": "unsent-4",
+      "id": "unsent-best-friend",
       "targetType": "关系条目",
-      "relationshipId": "relationship-old-friend",
-      "to": "多年朋友",
-      "theme": "修复",
-      "excerpt": "我不知道我们是不是都还在意那次沉默，但我其实还想把话说清楚。",
-      "unfinishedWeight": "中等"
-    },
-    {
-      "id": "unsent-5",
-      "targetType": "关系条目",
-      "relationshipId": "relationship-mentor",
-      "to": "旧导师",
+      "relationshipId": "relationship-best-friend",
+      "to": "挚友",
       "theme": "感谢",
-      "excerpt": "当年你帮我拆开的那些问题，后来真的成了我做选择时的支点。",
-      "unfinishedWeight": "轻微"
-    },
-    {
-      "id": "unsent-6",
-      "targetType": "未来的自己",
-      "to": "未来的自己",
-      "theme": "提醒",
-      "excerpt": "如果有一天你又开始靠过度理解别人维持关系，请先问自己累不累。",
+      "excerpt": "有你在，我会觉得自己不是一个人硬撑。",
       "unfinishedWeight": "无"
     },
     {
-      "id": "unsent-7",
-      "targetType": "独立对象",
-      "to": "曾经帮助过我的人",
-      "theme": "祝福",
-      "excerpt": "虽然我们不会再重新建立联系，但我仍希望你后来的路变得轻一点。",
-      "unfinishedWeight": "轻微"
+      "id": "unsent-future-self",
+      "targetType": "未来的自己",
+      "to": "未来的自己",
+      "theme": "提醒",
+      "excerpt": "别因为家里有很多期待，就忘记认真听自己的选择。",
+      "unfinishedWeight": "无"
     }
   ],
   "connections": [
     {
-      "id": "relationship-connection-family-line",
+      "id": "relationship-default-link-great-great-grandfather-great-grandmother",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-great-grandmother",
+      "strength": "强",
+      "note": "五世同堂中相邻代际的核心家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-grandfather",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-grandfather",
+      "strength": "中",
+      "note": "跨代传承连接，让家族经验继续向下流动。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-grandmother",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-grandmother",
+      "strength": "中",
+      "note": "跨代照看连接，让五代同堂的关系更完整。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-father",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-father",
+      "strength": "中",
+      "note": "多代家庭连接，承接家风、照看和现实支持。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-mother",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-mother",
+      "strength": "中",
+      "note": "多代家庭连接，承接家风、照看和现实支持。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-self",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-self",
+      "strength": "中",
+      "note": "五世同堂第一代与第五代之间的传承连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-partner",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "伴侣进入家庭关系网后形成的跨代家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-best-friend",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-new-friend",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-great-grandfather-neighbor-friend",
+      "sourceId": "relationship-great-great-grandfather",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-grandfather",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-grandfather",
+      "strength": "强",
+      "note": "五世同堂中相邻代际的核心家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-grandmother",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-grandmother",
+      "strength": "强",
+      "note": "五世同堂中相邻代际的核心家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-father",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-father",
+      "strength": "中",
+      "note": "跨代传承连接，让家族经验继续向下流动。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-mother",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-mother",
+      "strength": "中",
+      "note": "跨代照看连接，让五代同堂的关系更完整。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-self",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-self",
+      "strength": "中",
+      "note": "曾祖辈与晚辈之间稳定、温暖的家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-partner",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "伴侣进入家庭关系网后形成的跨代家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-best-friend",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-new-friend",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-great-grandmother-neighbor-friend",
+      "sourceId": "relationship-great-grandmother",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-grandmother",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-grandmother",
+      "strength": "强",
+      "note": "祖辈伴侣关系，是家庭照看与协调的重要支点。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-father",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-father",
+      "strength": "强",
+      "note": "相邻代际的父辈连接，承担家庭事务和传承。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-mother",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-mother",
+      "strength": "强",
+      "note": "相邻代际的家庭连接，参与照看和日常协调。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-self",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-self",
+      "strength": "强",
+      "note": "祖孙之间稳定亲近的家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-partner",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "伴侣与祖辈之间通过家庭生活形成连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-best-friend",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-new-friend",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandfather-neighbor-friend",
+      "sourceId": "relationship-grandfather",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-father",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-father",
+      "strength": "强",
+      "note": "相邻代际的家庭连接，参与照看和日常协调。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-mother",
       "sourceId": "relationship-grandmother",
       "targetId": "relationship-mother",
       "strength": "强",
-      "note": "这是一条很深的家庭照料链。",
-      "roles": [
-        {
-          "id": "relationship-connection-role-family-line",
-          "sourceRole": "母亲",
-          "targetRole": "女儿",
-          "note": "彼此的照顾经验延续到了下一代。"
-        }
-      ]
+      "note": "相邻代际的家庭连接，维持日常照料与情绪温度。",
+      "roles": []
     },
     {
-      "id": "relationship-connection-mother-partner",
+      "id": "relationship-default-link-grandmother-self",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-self",
+      "strength": "强",
+      "note": "祖孙之间亲近、温暖、稳定的家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-partner",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-partner",
+      "strength": "中",
+      "note": "伴侣与祖辈之间通过家庭生活形成连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-best-friend",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-new-friend",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-grandmother-neighbor-friend",
+      "sourceId": "relationship-grandmother",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-mother",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-mother",
+      "strength": "强",
+      "note": "父母作为同一代家庭核心，共同支撑现实生活和照看。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-self",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-self",
+      "strength": "强",
+      "note": "父亲与我之间稳定但仍在协调边界的亲近连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-partner",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-partner",
+      "strength": "强",
+      "note": "伴侣与父辈之间通过现实生活形成重要家庭连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-best-friend",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-new-friend",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-father-neighbor-friend",
+      "sourceId": "relationship-father",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-mother-self",
+      "sourceId": "relationship-mother",
+      "targetId": "relationship-self",
+      "strength": "强",
+      "note": "母亲与我之间亲近，也正在建立更清晰的边界。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-mother-partner",
       "sourceId": "relationship-mother",
       "targetId": "relationship-partner",
-      "strength": "中",
-      "note": "这段连接会影响日常边界和安全感。",
-      "roles": [
-        {
-          "id": "relationship-connection-role-mother-partner-1",
-          "sourceRole": "长辈",
-          "targetRole": "伴侣",
-          "note": "彼此都在适应对方的重要位置。"
-        }
-      ]
+      "strength": "强",
+      "note": "伴侣与母辈之间通过现实生活形成重要家庭连接。",
+      "roles": []
     },
     {
-      "id": "relationship-connection-old-friend-partner",
-      "sourceId": "relationship-old-friend",
+      "id": "relationship-default-link-mother-best-friend",
+      "sourceId": "relationship-mother",
+      "targetId": "relationship-best-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-mother-new-friend",
+      "sourceId": "relationship-mother",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-mother-neighbor-friend",
+      "sourceId": "relationship-mother",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生的轻量连接。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-self-partner",
+      "sourceId": "relationship-self",
       "targetId": "relationship-partner",
-      "strength": "中",
-      "note": "一段既轻松又能互相接住的关系。",
-      "roles": [
-        {
-          "id": "relationship-connection-role-old-friend-partner-1",
-          "sourceRole": "朋友",
-          "targetRole": "朋友",
-          "note": "相处起来没有太多负担。"
-        },
-        {
-          "id": "relationship-connection-role-old-friend-partner-2",
-          "sourceRole": "倾诉对象",
-          "targetRole": "倾听者",
-          "note": "压力很大时会先找对方说。"
-        }
-      ]
+      "strength": "强",
+      "note": "伴侣是家庭之外最稳定的亲密支持。",
+      "roles": []
     },
     {
-      "id": "relationship-connection-colleague-mentor",
-      "sourceId": "relationship-colleague",
-      "targetId": "relationship-mentor",
+      "id": "relationship-default-link-self-best-friend",
+      "sourceId": "relationship-self",
+      "targetId": "relationship-best-friend",
+      "strength": "强",
+      "note": "挚友提供低压力但可靠的长期陪伴。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-self-new-friend",
+      "sourceId": "relationship-self",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "从共同兴趣开始，仍在慢慢建立的关系。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-self-neighbor-friend",
+      "sourceId": "relationship-self",
+      "targetId": "relationship-neighbor-friend",
       "strength": "中",
-      "note": "现实协作之外，也带一点被带着走过的经验。",
-      "roles": [
-        {
-          "id": "relationship-connection-role-colleague-mentor-1",
-          "sourceRole": "学生",
-          "targetRole": "老师",
-          "note": "工作伙伴会把旧导师当成自己方法论的来源。"
-        }
-      ]
+      "note": "邻里互助带来轻量但稳定的生活支持。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-partner-best-friend",
+      "sourceId": "relationship-partner",
+      "targetId": "relationship-best-friend",
+      "strength": "中",
+      "note": "都在我的亲密支持系统里，彼此知道对方的重要性。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-partner-new-friend",
+      "sourceId": "relationship-partner",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "通过我的生活圈产生松散连接，保持自然距离。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-partner-neighbor-friend",
+      "sourceId": "relationship-partner",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "生活场景里偶尔交集，关系轻松不过度。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-best-friend-new-friend",
+      "sourceId": "relationship-best-friend",
+      "targetId": "relationship-new-friend",
+      "strength": "弱",
+      "note": "都属于朋友关系，但亲近程度和熟悉时间不同。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-best-friend-neighbor-friend",
+      "sourceId": "relationship-best-friend",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "一个偏深度陪伴，一个偏日常互助，形成不同层次支持。",
+      "roles": []
+    },
+    {
+      "id": "relationship-default-link-new-friend-neighbor-friend",
+      "sourceId": "relationship-new-friend",
+      "targetId": "relationship-neighbor-friend",
+      "strength": "弱",
+      "note": "都是轻量关系，保持低压力的自然连接。",
+      "roles": []
     }
   ]
 }

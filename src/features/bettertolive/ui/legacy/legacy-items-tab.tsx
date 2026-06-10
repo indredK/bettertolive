@@ -1,5 +1,4 @@
-import { Plus, Search, Trash2, X } from "lucide-react"
-import type { ReactNode } from "react"
+import { Plus, Search, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -36,6 +35,10 @@ import {
 } from "@/features/bettertolive/ui/legacy/legacy-page-shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import { EmptyState } from "@/features/bettertolive/ui/shared/shared"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
 
 type FilterValue<T extends string> = "all" | T
@@ -98,8 +101,59 @@ export function LegacyItemsTab({
     filteredItems.find((item) => item.id === selectedId) ?? filteredItems[0] ?? null
   const activeSelectedId = selectedItem?.id ?? null
 
-  const clearFilters = () => {
-    setLocalQuery("")
+  const filterDimensions = useMemo<FilterPopoverDimension[]>(
+    () => [
+      {
+        key: "category",
+        label: t("legacy.fields.category", "内容类别"),
+        allLabel: t("legacy.filters.all", "全部"),
+        value: category,
+        options: LEGACY_CATEGORIES.map((value) => ({
+          value,
+          label: translateLegacyEnum(t, "category", value),
+        })),
+      },
+      {
+        key: "status",
+        label: t("legacy.fields.status", "完成状态"),
+        allLabel: t("legacy.filters.all", "全部"),
+        value: status,
+        options: LEGACY_STATUSES.map((value) => ({
+          value,
+          label: translateLegacyEnum(t, "status", value),
+        })),
+      },
+      {
+        key: "visibility",
+        label: t("legacy.fields.visibility", "可见时机"),
+        allLabel: t("legacy.filters.all", "全部"),
+        value: visibility,
+        options: LEGACY_VISIBILITIES.map((value) => ({
+          value,
+          label: translateLegacyEnum(t, "visibility", value),
+        })),
+      },
+      {
+        key: "signal",
+        label: t("legacy.filters.signal", "保护信号"),
+        allLabel: t("legacy.filters.all", "全部"),
+        value: signal,
+        options: (["missingDelivery", "locked", "aiExcluded", "secondConfirm"] as const).map(
+          (value) => ({ value, label: t(`legacy.filters.${value}`, value) }),
+        ),
+      },
+    ],
+    [category, status, visibility, signal, t],
+  )
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (key === "category") setCategory(value as FilterValue<LegacyCategory>)
+    else if (key === "status") setStatus(value as FilterValue<LegacyStatus>)
+    else if (key === "visibility") setVisibility(value as FilterValue<LegacyVisibility>)
+    else if (key === "signal") setSignal(value as LegacySignalFilter)
+  }
+
+  const handleClearAll = () => {
     setCategory("all")
     setStatus("all")
     setVisibility("all")
@@ -124,73 +178,24 @@ export function LegacyItemsTab({
           ) : null}
         </div>
 
-        <div className="relative mt-3">
-          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-          <Input
-            value={localQuery}
-            onChange={(event) => setLocalQuery(event.currentTarget.value)}
-            className="h-9 pl-9"
-            placeholder={t("legacy.items.search", "搜索标题、正文、标签")}
+        <div className="mt-3 flex items-center gap-2">
+          <div className="relative min-w-0 flex-1">
+            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <Input
+              value={localQuery}
+              onChange={(event) => setLocalQuery(event.currentTarget.value)}
+              className="h-9 pl-9"
+              placeholder={t("legacy.items.search", "搜索标题、正文、标签")}
+            />
+          </div>
+          <FilterPopover
+            className="shrink-0"
+            popoverWidth="18.5rem"
+            dimensions={filterDimensions}
+            onChangeFilter={handleFilterChange}
+            onClearAll={handleClearAll}
           />
         </div>
-
-        <div className="mt-3 space-y-3">
-          <FilterGroup title={t("legacy.fields.category", "内容类别")}>
-            <FilterChip active={category === "all"} onClick={() => setCategory("all")}>
-              {t("legacy.filters.all", "全部")}
-            </FilterChip>
-            {LEGACY_CATEGORIES.map((value) => (
-              <FilterChip
-                key={value}
-                active={category === value}
-                onClick={() => setCategory(value)}
-              >
-                {translateLegacyEnum(t, "category", value)}
-              </FilterChip>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title={t("legacy.fields.status", "完成状态")}>
-            <FilterChip active={status === "all"} onClick={() => setStatus("all")}>
-              {t("legacy.filters.all", "全部")}
-            </FilterChip>
-            {LEGACY_STATUSES.map((value) => (
-              <FilterChip key={value} active={status === value} onClick={() => setStatus(value)}>
-                {translateLegacyEnum(t, "status", value)}
-              </FilterChip>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title={t("legacy.fields.visibility", "可见时机")}>
-            <FilterChip active={visibility === "all"} onClick={() => setVisibility("all")}>
-              {t("legacy.filters.all", "全部")}
-            </FilterChip>
-            {LEGACY_VISIBILITIES.map((value) => (
-              <FilterChip
-                key={value}
-                active={visibility === value}
-                onClick={() => setVisibility(value)}
-              >
-                {translateLegacyEnum(t, "visibility", value)}
-              </FilterChip>
-            ))}
-          </FilterGroup>
-
-          <FilterGroup title={t("legacy.filters.signal", "保护信号")}>
-            {(["all", "missingDelivery", "locked", "aiExcluded", "secondConfirm"] as const).map(
-              (value) => (
-                <FilterChip key={value} active={signal === value} onClick={() => setSignal(value)}>
-                  {t(`legacy.filters.${value}`, value)}
-                </FilterChip>
-              ),
-            )}
-          </FilterGroup>
-        </div>
-
-        <Button variant="ghost" size="sm" className="mt-3 justify-start" onClick={clearFilters}>
-          <X className="size-4" />
-          {t("legacy.filters.clear", "清除筛选")}
-        </Button>
 
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           {filteredItems.length > 0 ? (
@@ -390,41 +395,5 @@ function LegacyItemDetail({
         </div>
       </CardContent>
     </Card>
-  )
-}
-
-function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <div className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
-        {title}
-      </div>
-      <div className="flex max-h-24 flex-wrap gap-1.5 overflow-y-auto pr-1">{children}</div>
-    </div>
-  )
-}
-
-function FilterChip({
-  active,
-  children,
-  onClick,
-}: {
-  active: boolean
-  children: ReactNode
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-full border px-2 py-0.5 text-[11px] transition-colors",
-        active
-          ? "border-ring/50 bg-accent text-accent-foreground"
-          : "border-foreground/10 bg-background/75 text-muted-foreground hover:border-ring/40 hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
   )
 }

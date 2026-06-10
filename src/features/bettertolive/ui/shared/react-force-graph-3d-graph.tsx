@@ -208,6 +208,7 @@ export function ReactForceGraph3DGraph({
     undefined,
   )
   const lastViewRestoreSignatureRef = useRef<string | null>(null)
+  const engineReadySignatureRef = useRef<string | null>(null)
   const wasGraphVisibleRef = useRef(false)
   const onNodeSelectRef = useRef(onNodeSelect)
   const selectedNodeIdRef = useRef<string | null>(selectedNodeId ?? null)
@@ -215,6 +216,7 @@ export function ReactForceGraph3DGraph({
   const [isGraphVisible, setIsGraphVisible] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [useFixedFullscreenFallback, setUseFixedFullscreenFallback] = useState(false)
+  const [engineReadySignature, setEngineReadySignature] = useState<string | null>(null)
   const [theme, setTheme] = useState<CytoscapeThemeTokens>(() =>
     typeof document === "undefined" ? FALLBACK_THEME_TOKENS : readThemeTokens(),
   )
@@ -264,7 +266,11 @@ export function ReactForceGraph3DGraph({
     selectedNodeId ?? "none",
     visibilityRevision,
   ].join(":")
-  const canRestoreGraphView = canRenderGraph && dimensions.width >= 120 && dimensions.height >= 180
+  const canRestoreGraphView =
+    canRenderGraph &&
+    dimensions.width >= 120 &&
+    dimensions.height >= 180 &&
+    engineReadySignature === graphDataSignature
 
   const exitGraphFullscreen = useCallback(async () => {
     setUseFixedFullscreenFallback(false)
@@ -307,6 +313,11 @@ export function ReactForceGraph3DGraph({
       themeObserver.disconnect()
     }
   }, [])
+
+  useEffect(() => {
+    engineReadySignatureRef.current = null
+    lastViewRestoreSignatureRef.current = null
+  }, [graphDataSignature, canRenderGraph])
 
   useEffect(() => {
     if (!isFullscreenPresentation) {
@@ -598,11 +609,11 @@ export function ReactForceGraph3DGraph({
                 getLinkDirectionalParticleCount(link, selectedNodeId ?? null)
               }
               linkDirectionalParticleWidth={(link) =>
-                getLinkDisplayWidth(link, selectedNodeId ?? null) * 0.72
+                getLinkDisplayWidth(link, selectedNodeId ?? null) * 0.62
               }
-              linkHoverPrecision={6}
+              linkHoverPrecision={5}
               linkLabel={(link) => createLinkTooltip(link)}
-              linkOpacity={0.92}
+              linkOpacity={0.56}
               linkSource="source"
               linkTarget="target"
               linkWidth={(link) => getLinkDisplayWidth(link, selectedNodeId ?? null)}
@@ -635,6 +646,14 @@ export function ReactForceGraph3DGraph({
               showPointerCursor={(item) => Boolean(item)}
               warmupTicks={80}
               width={dimensions.width}
+              onEngineTick={() => {
+                if (engineReadySignatureRef.current === graphDataSignature) {
+                  return
+                }
+
+                engineReadySignatureRef.current = graphDataSignature
+                setEngineReadySignature(graphDataSignature)
+              }}
               onBackgroundClick={() => {
                 onNodeSelectRef.current?.(null)
               }}
@@ -792,16 +811,29 @@ function createNodeObject(
   const isSelected = selectionState === "selected"
   const isDimmed = selectionState === "dimmed"
   const accentColor = normalizeRenderableColor(theme.accent, FALLBACK_THEME_TOKENS.accent)
-  const radius = Math.max(3.8, node.size * (isSelected ? 0.95 : 0.76))
+  const radius = Math.max(3.6, node.size * (isSelected ? 0.86 : 0.68))
   const nodeColor = isSelected ? accentColor : node.color
+
+  if (!isDimmed) {
+    const glow = new Mesh(
+      new SphereGeometry(radius * (isSelected ? 1.9 : 1.45), 40, 20),
+      new MeshBasicMaterial({
+        color: nodeColor,
+        depthWrite: false,
+        opacity: isSelected ? 0.18 : 0.08,
+        transparent: true,
+      }),
+    )
+    group.add(glow)
+  }
 
   if (isSelected) {
     const halo = new Mesh(
-      new SphereGeometry(radius * 1.55, 32, 16),
+      new SphereGeometry(radius * 1.62, 40, 20),
       new MeshBasicMaterial({
         color: accentColor,
         depthWrite: false,
-        opacity: 0.22,
+        opacity: 0.16,
         transparent: true,
       }),
     )
@@ -809,14 +841,14 @@ function createNodeObject(
   }
 
   const sphere = new Mesh(
-    new SphereGeometry(radius, 32, 20),
+    new SphereGeometry(radius, 48, 28),
     new MeshStandardMaterial({
       color: nodeColor,
-      emissive: isSelected ? accentColor : nodeColor,
-      emissiveIntensity: isSelected ? 0.34 : 0.08,
-      metalness: isSelected ? 0.16 : 0.08,
-      opacity: isDimmed ? 0.34 : selectionState === "connected" ? 0.98 : 0.94,
-      roughness: isSelected ? 0.28 : 0.42,
+      emissive: isSelected ? accentColor : mixHexColor(nodeColor, "#ffffff", 0.18),
+      emissiveIntensity: isSelected ? 0.26 : 0.12,
+      metalness: 0,
+      opacity: isDimmed ? 0.26 : selectionState === "connected" ? 0.92 : 0.86,
+      roughness: 0.78,
       transparent: true,
     }),
   )
@@ -944,15 +976,15 @@ function configureSceneLighting(
   theme: CytoscapeThemeTokens,
 ) {
   const accentColor = normalizeRenderableColor(theme.accent, FALLBACK_THEME_TOKENS.accent)
-  const keyLight = new DirectionalLight("#f8fafc", 1.45)
-  const fillLight = new DirectionalLight(accentColor, 0.62)
-  const rimLight = new PointLight("#7dd3fc", 1.08, 760)
+  const keyLight = new DirectionalLight("#f8fafc", 0.82)
+  const fillLight = new DirectionalLight(accentColor, 0.46)
+  const rimLight = new PointLight("#bae6fd", 0.52, 620)
 
-  keyLight.position.set(180, 220, 260)
-  fillLight.position.set(-220, -80, 120)
-  rimLight.position.set(0, 160, -260)
+  keyLight.position.set(160, 180, 240)
+  fillLight.position.set(-220, -70, 140)
+  rimLight.position.set(0, 150, -240)
 
-  graph.lights([new AmbientLight("#93c5fd", 0.48), keyLight, fillLight, rimLight])
+  graph.lights([new AmbientLight("#bfdbfe", 0.72), keyLight, fillLight, rimLight])
 }
 
 function restoreGraphView(
@@ -1111,9 +1143,11 @@ function getLinkDisplayColor(
 }
 
 function getLinkDisplayWidth(link: ForceGraphLink, selectedNodeId: string | null) {
-  const baseWidth = Math.max(1.6, link.size)
+  const baseWidth = Math.max(0.42, link.size)
 
-  return selectedNodeId && isLinkConnectedToNode(link, selectedNodeId) ? baseWidth * 1.7 : baseWidth
+  return selectedNodeId && isLinkConnectedToNode(link, selectedNodeId)
+    ? baseWidth * 1.45
+    : baseWidth
 }
 
 function getLinkDirectionalParticleCount(link: ForceGraphLink, selectedNodeId: string | null) {
@@ -1241,7 +1275,7 @@ function deriveNodeSize(style: Record<string, string | number>, data: GraphEleme
 }
 
 function deriveEdgeSize(style: Record<string, string | number>, data: GraphElementData) {
-  return Math.max(1.7, resolveStyleMetric(style.width, data) * 1.1)
+  return Math.max(0.36, resolveStyleMetric(style.width, data) * 0.24)
 }
 
 function resolveStyleMetric(value: string | number | undefined, data: GraphElementData) {

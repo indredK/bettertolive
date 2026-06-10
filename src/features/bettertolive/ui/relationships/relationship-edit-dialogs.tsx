@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react"
+import { ChevronDown, Plus, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -710,6 +710,18 @@ function RelationshipCollectionTabs({
   updateForm: (patch: Partial<RelationshipFormState>) => void
 }) {
   const { t } = useTranslation()
+  const [expandedConnectionId, setExpandedConnectionId] = useState<string | null>(null)
+
+  const effectiveExpandedId = useMemo(() => {
+    if (form.connections.length === 0) return null
+    if (
+      expandedConnectionId &&
+      form.connections.some((connection) => connection.id === expandedConnectionId)
+    ) {
+      return expandedConnectionId
+    }
+    return form.connections[0]?.id ?? null
+  }, [form.connections, expandedConnectionId])
 
   return (
     <section
@@ -758,11 +770,13 @@ function RelationshipCollectionTabs({
           <EditableListHeader
             compact
             title={t("relationships.edit.connections", "人物之间的关系")}
-            onAdd={() =>
+            onAdd={() => {
+              const nextConnection = createEmptyConnection()
               updateForm({
-                connections: [...form.connections, createEmptyConnection()],
+                connections: [...form.connections, nextConnection],
               })
-            }
+              setExpandedConnectionId(nextConnection.id)
+            }}
           />
           <p className="mt-1.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
             {t(
@@ -777,7 +791,13 @@ function RelationshipCollectionTabs({
                   key={connection.id}
                   compact
                   connection={connection}
+                  expanded={effectiveExpandedId === connection.id}
                   relationships={relationships}
+                  onToggleExpanded={() =>
+                    setExpandedConnectionId((current) =>
+                      current === connection.id ? null : connection.id,
+                    )
+                  }
                   onAddRole={() =>
                     updateForm({
                       connections: form.connections.map((entry, entryIndex) =>
@@ -1023,55 +1043,71 @@ function EventEditor({
         compact ? "p-2.5" : "p-3",
       )}
     >
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
+          {t("relationships.edit.eventCardTitle", "互动事件")}
+        </div>
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          onClick={onRemove}
+          aria-label={t("relationships.common.delete", "删除")}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
       <div
         className={cn(
           "grid gap-2 md:grid-cols-2",
           compact
-            ? "xl:grid-cols-[120px_140px_minmax(0,1fr)_auto]"
-            : "xl:grid-cols-[140px_160px_minmax(0,1fr)_auto]",
+            ? "xl:grid-cols-[120px_140px_minmax(0,1fr)]"
+            : "xl:grid-cols-[140px_160px_minmax(0,1fr)]",
         )}
       >
-        <Input
-          value={event.date}
-          onChange={(inputEvent) => onChange({ ...event, date: inputEvent.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.date", "日期")}
-        />
-        <Select
-          value={event.kind}
-          onValueChange={(kind) => {
-            if (kind !== null) {
-              onChange({ ...event, kind })
-            }
-          }}
-        >
-          <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
-            {RELATIONSHIP_EVENT_KINDS.map((kind) => (
-              <SelectItem key={kind} value={kind}>
-                {translateRelationshipEnum(t, "eventKind", kind)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Input
-          value={event.title}
-          onChange={(inputEvent) => onChange({ ...event, title: inputEvent.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.eventTitle", "事件标题")}
-        />
-        <Button type="button" size="icon" variant="ghost" onClick={onRemove}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <Field compact={compact} label={t("relationships.edit.date", "日期")}>
+          <Input
+            value={event.date}
+            onChange={(inputEvent) => onChange({ ...event, date: inputEvent.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.eventKind", "事件类型")}>
+          <Select
+            value={event.kind}
+            onValueChange={(kind) => {
+              if (kind !== null) {
+                onChange({ ...event, kind })
+              }
+            }}
+          >
+            <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
+              {RELATIONSHIP_EVENT_KINDS.map((kind) => (
+                <SelectItem key={kind} value={kind}>
+                  {translateRelationshipEnum(t, "eventKind", kind)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.eventTitle", "事件标题")}>
+          <Input
+            value={event.title}
+            onChange={(inputEvent) => onChange({ ...event, title: inputEvent.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
       </div>
-      <Textarea
-        value={event.summary}
-        onChange={(inputEvent) => onChange({ ...event, summary: inputEvent.target.value })}
-        className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "mt-2 min-h-14" : "mt-3 min-h-20")}
-        placeholder={t("relationships.edit.eventSummary", "事件摘要")}
-      />
+      <Field compact={compact} label={t("relationships.edit.eventSummary", "事件摘要")}>
+        <Textarea
+          value={event.summary}
+          onChange={(inputEvent) => onChange({ ...event, summary: inputEvent.target.value })}
+          className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "min-h-14" : "min-h-20")}
+        />
+      </Field>
     </div>
   )
 }
@@ -1096,61 +1132,78 @@ function HistoryEditor({
         compact ? "p-2.5" : "p-3",
       )}
     >
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
+          {t("relationships.edit.historyCardTitle", "变化记录")}
+        </div>
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          onClick={onRemove}
+          aria-label={t("relationships.common.delete", "删除")}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
       <div
         className={cn(
           "grid gap-2 md:grid-cols-2",
           compact
-            ? "xl:grid-cols-[120px_108px_minmax(0,1fr)_minmax(0,1fr)_auto]"
-            : "xl:grid-cols-[140px_120px_minmax(0,1fr)_minmax(0,1fr)_auto]",
+            ? "xl:grid-cols-[120px_108px_minmax(0,1fr)_minmax(0,1fr)]"
+            : "xl:grid-cols-[140px_120px_minmax(0,1fr)_minmax(0,1fr)]",
         )}
       >
-        <Input
-          value={history.date}
-          onChange={(event) => onChange({ ...history, date: event.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.date", "日期")}
-        />
-        <Select
-          value={history.field}
-          onValueChange={(field) => {
-            if (field !== null) {
-              onChange({ ...history, field })
-            }
-          }}
-        >
-          <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
-            {RELATIONSHIP_CHANGE_FIELDS.map((field) => (
-              <SelectItem key={field} value={field}>
-                {translateRelationshipEnum(t, "changeField", field)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Input
-          value={history.from}
-          onChange={(event) => onChange({ ...history, from: event.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.from", "从")}
-        />
-        <Input
-          value={history.to}
-          onChange={(event) => onChange({ ...history, to: event.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.toValue", "到")}
-        />
-        <Button type="button" size="icon" variant="ghost" onClick={onRemove}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <Field compact={compact} label={t("relationships.edit.date", "日期")}>
+          <Input
+            value={history.date}
+            onChange={(event) => onChange({ ...history, date: event.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.changeField", "变化字段")}>
+          <Select
+            value={history.field}
+            onValueChange={(field) => {
+              if (field !== null) {
+                onChange({ ...history, field })
+              }
+            }}
+          >
+            <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
+              {RELATIONSHIP_CHANGE_FIELDS.map((field) => (
+                <SelectItem key={field} value={field}>
+                  {translateRelationshipEnum(t, "changeField", field)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.from", "从")}>
+          <Input
+            value={history.from}
+            onChange={(event) => onChange({ ...history, from: event.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.toValue", "到")}>
+          <Input
+            value={history.to}
+            onChange={(event) => onChange({ ...history, to: event.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
       </div>
-      <Textarea
-        value={history.note}
-        onChange={(event) => onChange({ ...history, note: event.target.value })}
-        className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "mt-2 min-h-14" : "mt-3 min-h-20")}
-        placeholder={t("relationships.edit.historyNote", "变化说明")}
-      />
+      <Field compact={compact} label={t("relationships.edit.historyNote", "变化说明")}>
+        <Textarea
+          value={history.note}
+          onChange={(event) => onChange({ ...history, note: event.target.value })}
+          className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "min-h-14" : "min-h-20")}
+        />
+      </Field>
     </div>
   )
 }
@@ -1158,19 +1211,27 @@ function HistoryEditor({
 function ConnectionEditor({
   compact = false,
   connection,
+  expanded,
   onAddRole,
   onChange,
   onRemove,
+  onToggleExpanded,
   relationships,
 }: {
   compact?: boolean
   connection: RelationshipConnectionPerspective
+  expanded: boolean
   onAddRole: () => void
   onChange: (connection: RelationshipConnectionPerspective) => void
   onRemove: () => void
+  onToggleExpanded: () => void
   relationships: RelationshipPerson[]
 }) {
   const { t } = useTranslation()
+  const otherRelationshipName =
+    relationships.find((relationship) => relationship.id === connection.otherRelationshipId)
+      ?.name ?? t("relationships.edit.unselectedRelatedPerson", "未选择关联人物")
+  const roleSummary = summarizeConnectionRoles(connection)
 
   return (
     <div
@@ -1179,115 +1240,159 @@ function ConnectionEditor({
         compact ? "p-2.5" : "p-3",
       )}
     >
-      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_128px_auto]">
-        <Field compact={compact} label={t("relationships.edit.relatedPerson", "关联人物")}>
-          <Select
-            value={connection.otherRelationshipId || NONE_RELATIONSHIP_ID}
-            onValueChange={(otherRelationshipId) => {
-              if (otherRelationshipId === null) {
-                return
-              }
+      <div className="flex items-start gap-2">
+        <button
+          type="button"
+          onClick={onToggleExpanded}
+          aria-expanded={expanded}
+          className="flex min-w-0 flex-1 items-start justify-between gap-3 rounded-lg px-1 py-0.5 text-left transition-colors hover:bg-black/5"
+        >
+          <div className="min-w-0 space-y-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className={cn("truncate font-medium", compact ? "text-sm" : "text-base")}>
+                {t("relationships.edit.connectionCardTitle", {
+                  name: otherRelationshipName,
+                  defaultValue: `和${otherRelationshipName}的关系`,
+                })}
+              </span>
+              <span className="rounded-full border border-[color:var(--chip-border)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
+                {translateRelationshipEnum(t, "connectionStrength", connection.strength)}
+              </span>
+            </div>
+            <div className="text-[11px] leading-4 text-[color:var(--text-muted)]">
+              {roleSummary ||
+                t(
+                  "relationships.edit.connectionCardEmpty",
+                  "还没填写角色组合，点开卡片后补充具体关系。",
+                )}
+            </div>
+          </div>
+          <ChevronDown
+            className={cn(
+              "mt-0.5 h-4 w-4 shrink-0 text-[color:var(--text-muted)] transition-transform",
+              expanded ? "rotate-180" : undefined,
+            )}
+          />
+        </button>
 
-              onChange({
-                ...connection,
-                otherRelationshipId:
-                  otherRelationshipId === NONE_RELATIONSHIP_ID ? "" : otherRelationshipId,
-              })
-            }}
+        <div className="pt-0.5">
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            onClick={onRemove}
+            aria-label={t("relationships.common.delete", "删除")}
           >
-            <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
-              <SelectItem value={NONE_RELATIONSHIP_ID}>
-                {t("relationships.edit.selectRelatedPerson", "选择一个人物")}
-              </SelectItem>
-              {relationships.map((relationship) => (
-                <SelectItem key={relationship.id} value={relationship.id}>
-                  {relationship.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </Field>
-
-        <EnumSelect
-          compact={compact}
-          label={t("relationships.edit.connectionStrength", "连接强度")}
-          value={connection.strength}
-          options={RELATIONSHIP_CONNECTION_STRENGTH_OPTIONS}
-          group="connectionStrength"
-          onValueChange={(strength) =>
-            onChange({
-              ...connection,
-              strength: strength as RelationshipConnection["strength"],
-            })
-          }
-        />
-
-        <div className="flex items-end justify-end">
-          <Button type="button" size="icon" variant="ghost" onClick={onRemove}>
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      <Field compact={compact} label={t("relationships.edit.connectionNote", "连接备注")}>
-        <Textarea
-          value={connection.note}
-          onChange={(event) =>
-            onChange({
-              ...connection,
-              note: event.target.value,
-            })
-          }
-          className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "min-h-14" : "min-h-20")}
-        />
-      </Field>
+      {expanded ? (
+        <div className={compact ? "mt-2 space-y-2" : "mt-3 space-y-3"}>
+          <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_128px]">
+            <Field compact={compact} label={t("relationships.edit.relatedPerson", "关联人物")}>
+              <Select
+                value={connection.otherRelationshipId || NONE_RELATIONSHIP_ID}
+                onValueChange={(otherRelationshipId) => {
+                  if (otherRelationshipId === null) {
+                    return
+                  }
 
-      <div className={compact ? "mt-2 space-y-2" : "mt-3 space-y-3"}>
-        <div className="text-[11px] leading-4 text-[color:var(--text-muted)]">
-          {t(
-            "relationships.edit.connectionRolesHint",
-            "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
-          )}
-        </div>
+                  onChange({
+                    ...connection,
+                    otherRelationshipId:
+                      otherRelationshipId === NONE_RELATIONSHIP_ID ? "" : otherRelationshipId,
+                  })
+                }}
+              >
+                <SelectTrigger className={RELATIONSHIP_DIALOG_FIELD_CLASS}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
+                  <SelectItem value={NONE_RELATIONSHIP_ID}>
+                    {t("relationships.edit.selectRelatedPerson", "选择一个人物")}
+                  </SelectItem>
+                  {relationships.map((relationship) => (
+                    <SelectItem key={relationship.id} value={relationship.id}>
+                      {relationship.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Field>
 
-        <div className="space-y-2">
-          {connection.roles.map((role, roleIndex) => (
-            <ConnectionRoleEditor
-              key={role.id}
+            <EnumSelect
               compact={compact}
-              role={role}
-              onChange={(nextRole) =>
+              label={t("relationships.edit.connectionStrength", "连接强度")}
+              value={connection.strength}
+              options={RELATIONSHIP_CONNECTION_STRENGTH_OPTIONS}
+              group="connectionStrength"
+              onValueChange={(strength) =>
                 onChange({
                   ...connection,
-                  roles: connection.roles.map((entry, entryIndex) =>
-                    entryIndex === roleIndex ? nextRole : entry,
-                  ),
-                })
-              }
-              onRemove={() =>
-                onChange({
-                  ...connection,
-                  roles: connection.roles.filter((_, entryIndex) => entryIndex !== roleIndex),
+                  strength: strength as RelationshipConnection["strength"],
                 })
               }
             />
-          ))}
-        </div>
+          </div>
 
-        <Button
-          type="button"
-          size={compact ? "xs" : "sm"}
-          variant="outline"
-          className={compact ? "h-7 px-2 text-xs" : undefined}
-          onClick={() => onAddRole()}
-        >
-          <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-          {t("relationships.edit.addConnectionRole", "新增一行关系")}
-        </Button>
-      </div>
+          <Field compact={compact} label={t("relationships.edit.connectionNote", "连接备注")}>
+            <Textarea
+              value={connection.note}
+              onChange={(event) =>
+                onChange({
+                  ...connection,
+                  note: event.target.value,
+                })
+              }
+              className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "min-h-14" : "min-h-20")}
+            />
+          </Field>
+
+          <div className="text-[11px] leading-4 text-[color:var(--text-muted)]">
+            {t(
+              "relationships.edit.connectionRolesHint",
+              "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
+            )}
+          </div>
+
+          <div className="space-y-2">
+            {connection.roles.map((role, roleIndex) => (
+              <ConnectionRoleEditor
+                key={role.id}
+                compact={compact}
+                role={role}
+                onChange={(nextRole) =>
+                  onChange({
+                    ...connection,
+                    roles: connection.roles.map((entry, entryIndex) =>
+                      entryIndex === roleIndex ? nextRole : entry,
+                    ),
+                  })
+                }
+                onRemove={() =>
+                  onChange({
+                    ...connection,
+                    roles: connection.roles.filter((_, entryIndex) => entryIndex !== roleIndex),
+                  })
+                }
+              />
+            ))}
+          </div>
+
+          <Button
+            type="button"
+            size={compact ? "xs" : "sm"}
+            variant="outline"
+            className={compact ? "h-7 px-2 text-xs" : undefined}
+            onClick={() => onAddRole()}
+          >
+            <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
+            {t("relationships.edit.addConnectionRole", "新增一行关系")}
+          </Button>
+        </div>
+      ) : null}
     </div>
   )
 }
@@ -1312,31 +1417,64 @@ function ConnectionRoleEditor({
         compact ? "p-2" : "p-3",
       )}
     >
-      <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-        <Input
-          value={role.selfRole}
-          onChange={(event) => onChange({ ...role, selfRole: event.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.selfRole", "当前人物角色")}
-        />
-        <Input
-          value={role.otherRole}
-          onChange={(event) => onChange({ ...role, otherRole: event.target.value })}
-          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
-          placeholder={t("relationships.edit.otherRole", "对方角色")}
-        />
-        <Button type="button" size="icon" variant="ghost" onClick={onRemove}>
+      <div className="mb-2 flex items-start justify-between gap-2">
+        <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
+          {t("relationships.edit.connectionRoleCardTitle", "关系角色")}
+        </div>
+        <Button
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          onClick={onRemove}
+          aria-label={t("relationships.common.delete", "删除")}
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
-      <Input
-        value={role.note}
-        onChange={(event) => onChange({ ...role, note: event.target.value })}
-        className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, compact ? "mt-2" : "mt-3")}
-        placeholder={t("relationships.edit.connectionRoleNote", "这条关系的补充说明")}
-      />
+      <div className="grid gap-2 md:grid-cols-2">
+        <Field compact={compact} label={t("relationships.edit.selfRole", "当前人物角色")}>
+          <Input
+            value={role.selfRole}
+            onChange={(event) => onChange({ ...role, selfRole: event.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
+        <Field compact={compact} label={t("relationships.edit.otherRole", "对方角色")}>
+          <Input
+            value={role.otherRole}
+            onChange={(event) => onChange({ ...role, otherRole: event.target.value })}
+            className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+          />
+        </Field>
+      </div>
+      <Field
+        compact={compact}
+        label={t("relationships.edit.connectionRoleNote", "这条关系的补充说明")}
+      >
+        <Input
+          value={role.note}
+          onChange={(event) => onChange({ ...role, note: event.target.value })}
+          className={RELATIONSHIP_DIALOG_FIELD_CLASS}
+        />
+      </Field>
     </div>
   )
+}
+
+function summarizeConnectionRoles(connection: RelationshipConnectionPerspective) {
+  return connection.roles
+    .map((role) => {
+      const selfRole = role.selfRole.trim()
+      const otherRole = role.otherRole.trim()
+
+      if (selfRole && otherRole) {
+        return `${selfRole} / ${otherRole}`
+      }
+
+      return selfRole || otherRole
+    })
+    .filter(Boolean)
+    .join(" · ")
 }
 
 function createEmptyConnection() {

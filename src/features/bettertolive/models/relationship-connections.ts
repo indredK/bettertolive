@@ -53,11 +53,17 @@ export function normalizeRelationshipsModuleData(
   }))
   const patterns = source.patterns ?? []
   const unsentNotes = source.unsentNotes ?? []
-  const relationshipIds = new Set(getRelationshipsFromCircles(circles).map((entry) => entry.id))
+  const relationships = getRelationshipsFromCircles(circles)
+  const relationshipIds = new Set(relationships.map((entry) => entry.id))
+  const relationshipById = createRelationshipLookup(relationships)
 
   return syncUnsentLineRefs({
     circles,
-    connections: normalizeRelationshipConnections(source.connections ?? [], relationshipIds),
+    connections: normalizeRelationshipConnections(
+      source.connections ?? [],
+      relationshipIds,
+      relationshipById,
+    ),
     patterns,
     unsentNotes,
   })
@@ -66,11 +72,12 @@ export function normalizeRelationshipsModuleData(
 export function normalizeRelationshipConnections(
   connections: RelationshipConnection[],
   validRelationshipIds: Set<string>,
+  relationshipById = new Map<string, RelationshipPerson>(),
 ) {
   const mergedByPair = new Map<string, RelationshipConnection>()
 
   connections.forEach((connection) => {
-    const normalized = normalizeSingleConnection(connection, validRelationshipIds)
+    const normalized = normalizeSingleConnection(connection, validRelationshipIds, relationshipById)
     if (!normalized) {
       return
     }
@@ -196,6 +203,7 @@ export function createRelationshipScopedId(prefix: string) {
 function normalizeSingleConnection(
   connection: RelationshipConnection,
   validRelationshipIds: Set<string>,
+  relationshipById: Map<string, RelationshipPerson>,
 ) {
   const sourceId = `${connection.sourceId ?? ""}`.trim()
   const targetId = `${connection.targetId ?? ""}`.trim()
@@ -217,19 +225,35 @@ function normalizeSingleConnection(
       .map((role) => sanitizeConnectionRole(role, shouldSwapRoles))
       .filter((role): role is RelationshipConnectionRole => Boolean(role)),
   )
-
-  if (roles.length === 0) {
-    return null
-  }
+  const visibleRoles =
+    roles.length > 0
+      ? roles
+      : [createDefaultConnectionRole(stableSourceId, stableTargetId, relationshipById)]
 
   return {
     id: `${connection.id ?? ""}`.trim() || createRelationshipScopedId("relationship-connection"),
     note: `${connection.note ?? ""}`.trim(),
-    roles,
+    roles: visibleRoles,
     sourceId: stableSourceId,
     strength: sanitizeStrength(connection.strength),
     targetId: stableTargetId,
   } satisfies RelationshipConnection
+}
+
+function createDefaultConnectionRole(
+  sourceId: string,
+  targetId: string,
+  relationshipById: Map<string, RelationshipPerson>,
+) {
+  const sourceName = relationshipById.get(sourceId)?.name.trim() || sourceId
+  const targetName = relationshipById.get(targetId)?.name.trim() || targetId
+
+  return {
+    id: `relationship-default-role-${sourceId}-${targetId}`,
+    note: "默认双向关系",
+    sourceRole: sourceName,
+    targetRole: targetName,
+  } satisfies RelationshipConnectionRole
 }
 
 function sanitizeConnectionRole(role: RelationshipConnectionRole, shouldSwapRoles: boolean) {
@@ -316,10 +340,6 @@ function createConnectionFromPerspectiveRow(
       })
       .filter((role): role is RelationshipConnectionRole => Boolean(role)),
   )
-
-  if (roles.length === 0) {
-    return null
-  }
 
   return {
     id: row.id?.trim() || createRelationshipScopedId("relationship-connection"),

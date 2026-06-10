@@ -1,7 +1,6 @@
 import {
   Brain,
   Edit3,
-  Filter,
   Lightbulb,
   Link2,
   MessagesSquare,
@@ -17,6 +16,10 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import {
   Dialog,
   DialogContent,
@@ -110,7 +113,6 @@ const DEFENSE_MECHANISMS = [
   "升华",
 ] satisfies DefenseMechanism[]
 
-const ALL_FILTER_VALUE = "__all__"
 const NONE_SELECT_VALUE = "__none__"
 
 type DistributionRow = {
@@ -119,19 +121,19 @@ type DistributionRow = {
 }
 
 type BeliefFilters = {
-  domain: BeliefDomain | null
-  layer: BeliefLayer | null
-  stability: BeliefStability | null
-  source: BeliefSource | null
+  domain: string
+  layer: string
+  stability: string
+  source: string
 }
 
 export type EditingBelief = { isNew: boolean; entry: BeliefEntry | null }
 
 const DEFAULT_FILTERS: BeliefFilters = {
-  domain: null,
-  layer: null,
-  stability: null,
-  source: null,
+  domain: "all",
+  layer: "all",
+  stability: "all",
+  source: "all",
 }
 
 function createDistribution<T extends string>(
@@ -174,17 +176,6 @@ function labelFor(t: ReturnType<typeof useTranslation>["t"], group: string, valu
   return t(`beliefs.enums.${group}.${value}`, value)
 }
 
-function updateFilter<K extends keyof BeliefFilters>(
-  current: BeliefFilters,
-  key: K,
-  value: BeliefFilters[K],
-) {
-  return {
-    ...current,
-    [key]: value,
-  }
-}
-
 function toggleValue<T extends string>(values: T[], value: T) {
   return values.includes(value) ? values.filter((item) => item !== value) : [...values, value]
 }
@@ -211,10 +202,10 @@ export function BeliefsPage({
     () =>
       allEntries.filter(
         (entry) =>
-          (!filters.domain || entry.domain === filters.domain) &&
-          (!filters.layer || entry.layer === filters.layer) &&
-          (!filters.stability || entry.stability === filters.stability) &&
-          (!filters.source || entry.source === filters.source),
+          (filters.domain === "all" || entry.domain === filters.domain) &&
+          (filters.layer === "all" || entry.layer === filters.layer) &&
+          (filters.stability === "all" || entry.stability === filters.stability) &&
+          (filters.source === "all" || entry.source === filters.source),
       ),
     [allEntries, filters],
   )
@@ -689,12 +680,59 @@ function BeliefToolbar({
 }) {
   const { t } = useTranslation()
 
+  const filterDimensions: FilterPopoverDimension[] = [
+    {
+      key: "domain",
+      label: t("beliefs.classification.domain.title", "领域"),
+      allLabel: t("beliefs.filter.all", "全部"),
+      value: filters.domain,
+      options: BELIEF_DOMAINS.map((option) => ({
+        value: option,
+        label: labelFor(t, "domain", option),
+      })),
+    },
+    {
+      key: "layer",
+      label: t("beliefs.classification.layer.title", "层次"),
+      allLabel: t("beliefs.filter.all", "全部"),
+      value: filters.layer,
+      options: BELIEF_LAYERS.map((option) => ({
+        value: option,
+        label: labelFor(t, "layer", option),
+      })),
+    },
+    {
+      key: "stability",
+      label: t("beliefs.classification.stability.title", "稳定性"),
+      allLabel: t("beliefs.filter.all", "全部"),
+      value: filters.stability,
+      options: BELIEF_STABILITIES.map((option) => ({
+        value: option,
+        label: labelFor(t, "stability", option),
+      })),
+    },
+    {
+      key: "source",
+      label: t("beliefs.classification.source.title", "来源"),
+      allLabel: t("beliefs.filter.all", "全部"),
+      value: filters.source,
+      options: BELIEF_SOURCES.map((option) => ({
+        value: option,
+        label: labelFor(t, "source", option),
+      })),
+    },
+  ]
+
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
-          <Filter className="size-4" />
-          <span>{t("beliefs.filter.title", "四维筛选")}</span>
+        <div className="flex min-w-0 items-center gap-2">
+          <FilterPopover
+            dimensions={filterDimensions}
+            popoverWidth="20.5rem"
+            onChangeFilter={(key, value) => onFilterChange({ ...filters, [key]: value })}
+            onClearAll={() => onFilterChange(DEFAULT_FILTERS)}
+          />
           <Badge
             variant="outline"
             className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
@@ -710,77 +748,6 @@ function BeliefToolbar({
           </Button>
         ) : null}
       </div>
-
-      <div className="mt-3 grid gap-2 min-[720px]:grid-cols-2 min-[1180px]:grid-cols-4">
-        <BeliefFilterSelect
-          label={t("beliefs.classification.domain.title", "领域")}
-          value={filters.domain}
-          options={BELIEF_DOMAINS}
-          enumGroup="domain"
-          onChange={(value) => onFilterChange(updateFilter(filters, "domain", value))}
-        />
-        <BeliefFilterSelect
-          label={t("beliefs.classification.layer.title", "层次")}
-          value={filters.layer}
-          options={BELIEF_LAYERS}
-          enumGroup="layer"
-          onChange={(value) => onFilterChange(updateFilter(filters, "layer", value))}
-        />
-        <BeliefFilterSelect
-          label={t("beliefs.classification.stability.title", "稳定性")}
-          value={filters.stability}
-          options={BELIEF_STABILITIES}
-          enumGroup="stability"
-          onChange={(value) => onFilterChange(updateFilter(filters, "stability", value))}
-        />
-        <BeliefFilterSelect
-          label={t("beliefs.classification.source.title", "来源")}
-          value={filters.source}
-          options={BELIEF_SOURCES}
-          enumGroup="source"
-          onChange={(value) => onFilterChange(updateFilter(filters, "source", value))}
-        />
-      </div>
-    </div>
-  )
-}
-
-function BeliefFilterSelect<T extends string>({
-  label,
-  value,
-  options,
-  enumGroup,
-  onChange,
-}: {
-  label: string
-  value: T | null
-  options: readonly T[]
-  enumGroup: string
-  onChange: (value: T | null) => void
-}) {
-  const { t } = useTranslation()
-
-  return (
-    <div className="space-y-1.5">
-      <Label className="text-[11px] text-[color:var(--text-muted)]">{label}</Label>
-      <Select
-        value={value ?? ALL_FILTER_VALUE}
-        onValueChange={(nextValue) =>
-          onChange(nextValue === ALL_FILTER_VALUE ? null : (nextValue as T))
-        }
-      >
-        <SelectTrigger className="w-full border-[color:var(--chip-border)] bg-[color:var(--surface-bg)]">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_FILTER_VALUE}>{t("beliefs.filter.all", "全部")}</SelectItem>
-          {options.map((option) => (
-            <SelectItem key={option} value={option}>
-              {labelFor(t, enumGroup, option)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
     </div>
   )
 }

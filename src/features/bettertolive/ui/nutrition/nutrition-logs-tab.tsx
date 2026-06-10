@@ -1,4 +1,8 @@
 import { Heart, History, MessageCircleHeart, Pencil, Plus } from "lucide-react"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import type { TFunction } from "i18next"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -93,26 +97,31 @@ export function NutritionLogsTab({
                 </Button>
               ) : null}
             </div>
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("nutrition.logs.search", "搜索进食、场景、反馈或食物记忆")}
-              className="border-foreground/15 bg-background"
-            />
-            <div className="flex flex-wrap gap-1.5">
-              {LOG_FILTERS.map((entry) => (
-                <button
-                  key={entry}
-                  type="button"
-                  className={cn(
-                    "border-foreground/10 bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs transition",
-                    filter === entry && "border-ring/60 bg-accent text-accent-foreground",
-                  )}
-                  onClick={() => setFilter(entry)}
-                >
-                  {t(`nutrition.logs.filters.${entry}`, entry)}
-                </button>
-              ))}
+            <div className="flex items-center gap-2">
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t("nutrition.logs.search", "搜索进食、场景、反馈或食物记忆")}
+                className="border-foreground/15 bg-background min-w-0 flex-1"
+              />
+              <FilterPopover
+                className="shrink-0"
+                popoverWidth="16rem"
+                dimensions={[
+                  {
+                    key: "filter",
+                    label: t("nutrition.logs.filterTitle", "进食类型"),
+                    allLabel: t("nutrition.logs.filters.all", "全部"),
+                    value: filter,
+                    options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
+                      value: f,
+                      label: t(`nutrition.logs.filters.${f}`, f),
+                    })),
+                  } satisfies FilterPopoverDimension,
+                ]}
+                onChangeFilter={(_, value) => setFilter(value as LogFilter)}
+                onClearAll={() => setFilter("all")}
+              />
             </div>
           </div>
           {filteredLogs.length > 0 ? (

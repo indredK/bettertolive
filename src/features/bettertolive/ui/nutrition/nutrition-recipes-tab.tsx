@@ -38,6 +38,10 @@ import {
   NutritionTagBar,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
 import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
 
 const RECIPE_FILTERS = [
@@ -77,6 +81,30 @@ export function NutritionRecipesTab({
   const recipeTags = useMemo(() => buildRecipeTags(nutrition), [nutrition])
   const effectiveActiveTag =
     activeTag === "all" || recipeTags.includes(activeTag) ? activeTag : "all"
+  const filterDimensions = useMemo<FilterPopoverDimension[]>(() => {
+    const dims: FilterPopoverDimension[] = [
+      {
+        key: "filter",
+        label: t("nutrition.recipeFilters.title", "食谱类型"),
+        allLabel: t("nutrition.recipeFilters.all", "全部"),
+        value: filter,
+        options: RECIPE_FILTERS.slice(1).map((f) => ({
+          value: f.id,
+          label: t(`nutrition.recipeFilters.${f.id}`, f.id),
+        })),
+      },
+    ]
+    if (recipeTags.length > 0) {
+      dims.push({
+        key: "tag",
+        label: t("nutrition.recipes.tagFilter", "标签筛选"),
+        allLabel: t("nutrition.recipes.allTags", "全部标签"),
+        value: effectiveActiveTag,
+        options: recipeTags.map((tag) => ({ value: tag, label: tag })),
+      })
+    }
+    return dims
+  }, [filter, effectiveActiveTag, recipeTags, t])
 
   const recipes = nutrition.recipes.filter((recipe) => {
     const text = [
@@ -119,18 +147,32 @@ export function NutritionRecipesTab({
       </div>
       <NutritionTabBody>
         <NutritionSidebarPane>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("nutrition.recipes.search", "搜索食谱、标签或餐次")}
-              className="border-foreground/15 bg-background"
+              className="border-foreground/15 bg-background min-w-0 flex-1"
+            />
+            <FilterPopover
+              className="shrink-0"
+              popoverWidth="17.5rem"
+              dimensions={filterDimensions}
+              onChangeFilter={(key, value) => {
+                if (key === "filter") setFilter(value as RecipeFilterId)
+                else if (key === "tag") setActiveTag(value)
+              }}
+              onClearAll={() => {
+                setFilter("all")
+                setActiveTag("all")
+              }}
             />
             {isControlMode ? (
               <Button
                 type="button"
                 variant="outline"
                 size="icon"
+                className="shrink-0"
                 onClick={() => setEditingRecipe({ isNew: true, recipe: null })}
                 aria-label={t("nutrition.recipeEdit.createTitle", "新增食谱")}
               >
@@ -138,55 +180,6 @@ export function NutritionRecipesTab({
               </Button>
             ) : null}
           </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {RECIPE_FILTERS.map((entry) => (
-              <button
-                key={entry.id}
-                type="button"
-                className={cn(
-                  "border-foreground/10 bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs transition",
-                  filter === entry.id && "border-ring/60 bg-accent text-accent-foreground",
-                )}
-                onClick={() => setFilter(entry.id)}
-              >
-                {t(`nutrition.recipeFilters.${entry.id}`, entry.id)}
-              </button>
-            ))}
-          </div>
-          {recipeTags.length > 0 ? (
-            <div className="border-foreground/10 bg-background/70 mt-3 rounded-2xl border p-3">
-              <div className="text-muted-foreground mb-2 text-xs font-medium">
-                {t("nutrition.recipes.tagFilter", "标签筛选")}
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                <button
-                  type="button"
-                  className={cn(
-                    "border-foreground/10 bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs transition",
-                    effectiveActiveTag === "all" &&
-                      "border-ring/60 bg-accent text-accent-foreground",
-                  )}
-                  onClick={() => setActiveTag("all")}
-                >
-                  {t("nutrition.recipes.allTags", "全部标签")}
-                </button>
-                {recipeTags.map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    className={cn(
-                      "border-foreground/10 bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs transition",
-                      effectiveActiveTag === tag &&
-                        "border-ring/60 bg-accent text-accent-foreground",
-                    )}
-                    onClick={() => setActiveTag(tag)}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ) : null}
           <div className="mt-3 space-y-2">
             {recipes.map((recipe) => (
               <RecipeListCard

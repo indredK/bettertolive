@@ -1041,7 +1041,14 @@
       "connectionStrength": "Connection Strength",
       "connectionNote": "Connection Note",
       "connectionRolesHint": "Each row is a custom reciprocal relationship, for example current person as “student” and the other person as “teacher”; from the other side, the roles are shown reversed.",
+      "connectionCardEmpty": "No role pair yet. Open the card to fill in the details.",
+      "connectionRoleCardTitle": "Relationship Role",
+      "connectionCardTitle": "Relationship with {{name}}",
       "addConnectionRole": "Add Relationship Row",
+      "eventCardTitle": "Interaction Event",
+      "eventKind": "Event Type",
+      "historyCardTitle": "Change Record",
+      "changeField": "Changed Field",
       "selfRole": "Current Person Role",
       "otherRole": "Other Person Role",
       "connectionRoleNote": "Add detail for this relationship row",
@@ -1071,6 +1078,7 @@
       "targetType": "Target Type",
       "relatedRelationship": "Related Relationship",
       "noRelationship": "No relation",
+      "unselectedRelatedPerson": "No related person selected",
       "to": "To",
       "theme": "Theme",
       "excerpt": "Content",
@@ -3532,6 +3540,32 @@
     },
     "sidebarCarousel": {
       "switchToNth": "Switch to note {{n}}"
+    },
+    "settings": {
+      "title": "Settings",
+      "button": "Settings",
+      "tabs": {
+        "about": "About",
+        "preferences": "Preferences"
+      },
+      "about": {
+        "description": "A local-first personal life management system",
+        "version": "Version",
+        "license": "License",
+        "checkUpdates": "Check for Updates",
+        "checkingUpdates": "Checking…",
+        "upToDate": "You're up to date",
+        "github": "GitHub Repository",
+        "copyright": "© 2024–2025 BetterToLive"
+      },
+      "preferences": {
+        "language": {
+          "title": "Language"
+        },
+        "appearance": {
+          "title": "Appearance"
+        }
+      }
     }
   },
   "knowledgeTabs": {
@@ -3733,6 +3767,17 @@
       "summaryDescription": "See whether this set is becoming internalized, already stable, or still borrowed from others.",
       "signalTitle": "Calibrate First",
       "signalDescription": "Start with the non-negotiable or high-cost principles and check whether they still genuinely belong to you."
+    }
+  },
+  "splash": {
+    "tagline": "Record life, know yourself",
+    "nodes": {
+      "inner": "Inner",
+      "records": "Records",
+      "relationships": "Relations",
+      "journey": "Journey",
+      "legacy": "Legacy",
+      "social": "Social"
     }
   }
 }

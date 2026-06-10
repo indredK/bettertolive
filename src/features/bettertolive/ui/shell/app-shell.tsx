@@ -15,6 +15,7 @@ import {
   Scale,
   Search,
   ScrollText,
+  Settings,
   Sparkles,
   Users2,
   Wallet,
@@ -71,6 +72,7 @@ import {
   SidebarNavigation,
   StackedNavigation,
 } from "@/features/bettertolive/ui/shell/sidebar-navigation"
+import { SettingsDialog } from "@/features/bettertolive/ui/shell/settings-dialog"
 import { WorkspaceUtilities } from "@/features/bettertolive/ui/workspace-utilities"
 import { formatWorkspaceDate } from "@/features/bettertolive/ui/shared/formatters"
 import { UI_LAYERS } from "@/lib/ui-layers"
@@ -307,6 +309,7 @@ export function BetterToLiveAppShell() {
     volume,
     nudgeVolume,
   } = useWorkspaceMusic()
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const navSections = useMemo(() => createNavSections(t), [t])
   const workspaceRhythmSlides = useMemo(() => createWorkspaceRhythmSlides(t), [t])
   const workspaceSidebarNotes = useMemo(() => createWorkspaceSidebarNotes(t), [t])
@@ -863,6 +866,18 @@ export function BetterToLiveAppShell() {
                     <NotebookPen className="size-4" />
                     {t("shell.quickRecord")}
                   </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    aria-label={t("shell.settings.button")}
+                    className={cn(
+                      "h-10 w-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-0 text-[color:var(--text-muted)] hover:bg-[color:var(--muted-surface-bg)] hover:text-[color:var(--text-primary)]",
+                      isWideLayout && "h-8 w-8",
+                    )}
+                    onClick={() => setIsSettingsOpen(true)}
+                  >
+                    <Settings className="size-4" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -920,6 +935,13 @@ export function BetterToLiveAppShell() {
       />
       <Toaster />
       <RhythmPopup slides={workspaceRhythmSlides} />
+      <SettingsDialog
+        open={isSettingsOpen}
+        onOpenChange={setIsSettingsOpen}
+        themeId={themeId}
+        themes={themes}
+        onSelectTheme={setThemeId}
+      />
     </div>
   )
 }

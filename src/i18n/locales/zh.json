@@ -1041,7 +1041,14 @@
       "connectionStrength": "连接强度",
       "connectionNote": "连接备注",
       "connectionRolesHint": "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
+      "connectionCardEmpty": "还没填写角色组合，点开卡片后补充具体关系。",
+      "connectionRoleCardTitle": "关系角色",
+      "connectionCardTitle": "和{{name}}的关系",
       "addConnectionRole": "新增一行关系",
+      "eventCardTitle": "互动事件",
+      "eventKind": "事件类型",
+      "historyCardTitle": "变化记录",
+      "changeField": "变化字段",
       "selfRole": "当前人物角色",
       "otherRole": "对方角色",
       "connectionRoleNote": "这条关系的补充说明",
@@ -1071,6 +1078,7 @@
       "targetType": "目标类型",
       "relatedRelationship": "关联关系",
       "noRelationship": "不关联",
+      "unselectedRelatedPerson": "未选择关联人物",
       "to": "对象",
       "theme": "主题",
       "excerpt": "内容",
@@ -3772,6 +3780,32 @@
           }
         }
       }
+    },
+    "settings": {
+      "title": "设置",
+      "button": "设置",
+      "tabs": {
+        "about": "关于",
+        "preferences": "偏好设置"
+      },
+      "about": {
+        "description": "本地优先的个人生活管理系统",
+        "version": "版本",
+        "license": "许可证",
+        "checkUpdates": "检查更新",
+        "checkingUpdates": "正在检查……",
+        "upToDate": "已是最新版本",
+        "github": "GitHub 仓库",
+        "copyright": "© 2024–2025 BetterToLive"
+      },
+      "preferences": {
+        "language": {
+          "title": "语言"
+        },
+        "appearance": {
+          "title": "外观"
+        }
+      }
     }
   },
   "knowledgeTabs": {
@@ -3973,6 +4007,17 @@
       "summaryDescription": "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
       "signalTitle": "先校准的几条",
       "signalDescription": "优先看不可退让或代价高的原则，确认它们是不是还真属于你。"
+    }
+  },
+  "splash": {
+    "tagline": "记录生活，认识自己",
+    "nodes": {
+      "inner": "内在",
+      "records": "记录",
+      "relationships": "关系",
+      "journey": "成长",
+      "legacy": "传承",
+      "social": "社会"
     }
   }
 }

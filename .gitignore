@@ -18,6 +18,7 @@ coverage
 *.local
 
 # Editor directories and files
+.claude
 .vscode/*
 .codebuddy
 !.vscode/extensions.json

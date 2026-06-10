@@ -1,4 +1,4 @@
-import { Search, SlidersHorizontal, X, Pencil, Plus, Trash2 } from "lucide-react"
+import { Search, Pencil, Plus, Trash2 } from "lucide-react"
 import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -37,6 +37,10 @@ import {
   ShoppingTabBody,
   ShoppingTabViewport,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
 
 // ---- Item card (compact, for the left list) ----
@@ -133,58 +137,6 @@ function DetailTextValue({ label, children }: { label: string; children: ReactNo
     <div>
       <div className="text-muted-foreground mb-1.5 text-[11px]">{label}</div>
       {children}
-    </div>
-  )
-}
-
-function FilterChip({
-  active,
-  children,
-  onClick,
-  compact = false,
-}: {
-  active: boolean
-  children: ReactNode
-  onClick: () => void
-  compact?: boolean
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-full border text-[11px] transition-colors",
-        compact ? "px-2 py-0.5" : "px-2.5 py-1",
-        active
-          ? "border-ring/50 bg-accent text-accent-foreground"
-          : "border-foreground/10 bg-background/75 text-muted-foreground hover:border-ring/40 hover:text-foreground",
-      )}
-    >
-      {children}
-    </button>
-  )
-}
-
-function AppliedFilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onRemove}
-      className="border-ring/40 bg-accent text-accent-foreground hover:bg-accent/80 inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] transition-colors"
-    >
-      <span className="truncate">{label}</span>
-      <X className="size-3 shrink-0" />
-    </button>
-  )
-}
-
-function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="space-y-1.5">
-      <div className="text-muted-foreground text-[10px] font-medium tracking-wide uppercase">
-        {title}
-      </div>
-      <div className="flex max-h-24 flex-wrap gap-1.5 overflow-y-auto pr-1">{children}</div>
     </div>
   )
 }
@@ -302,27 +254,66 @@ export function ShoppingPlanningTab({
   const [statusFilter, setStatusFilter] = useState<ShoppingStatusFilter>("all")
   const [systemFilter, setSystemFilter] = useState("all")
   const [spaceFilter, setSpaceFilter] = useState("all")
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
+  const filterDimensions = useMemo<FilterPopoverDimension[]>(
+    () => [
+      {
+        key: "status",
+        label: t("shopping.filter.status", "状态"),
+        allLabel: t("shopping.filter.all", "全部"),
+        value: statusFilter,
+        options: [
+          { value: ShoppingStatus.Owned, label: statusDisplayName(ShoppingStatus.Owned, t) },
+          { value: ShoppingStatus.Wanted, label: statusDisplayName(ShoppingStatus.Wanted, t) },
+        ],
+      },
+      {
+        key: "system",
+        label: t("shopping.filter.system", "系统"),
+        allLabel: t("shopping.filter.allSystems", "全部系统"),
+        value: systemFilter,
+        options: [
+          { value: "none", label: t("shopping.filter.noSystem", "未分配系统") },
+          ...shopping.systemDefinitions.map((system) => ({
+            value: system.id,
+            label: system.name || system.id,
+          })),
+        ],
+      },
+      {
+        key: "space",
+        label: t("shopping.filter.space", "空间"),
+        allLabel: t("shopping.filter.allSpaces", "全部空间"),
+        value: spaceFilter,
+        options: [
+          { value: "none", label: t("shopping.filter.noSpace", "未分配空间") },
+          ...shopping.spaceDefinitions.map((space) => ({
+            value: space.id,
+            label: space.name,
+          })),
+        ],
+      },
+    ],
+    [
+      shopping.systemDefinitions,
+      shopping.spaceDefinitions,
+      statusFilter,
+      systemFilter,
+      spaceFilter,
+      t,
+    ],
+  )
 
-  const activeFilterCount =
-    (statusFilter !== "all" ? 1 : 0) +
-    (systemFilter !== "all" ? 1 : 0) +
-    (spaceFilter !== "all" ? 1 : 0)
+  const handleFilterChange = (key: string, value: string) => {
+    if (key === "status") setStatusFilter(value as ShoppingStatusFilter)
+    else if (key === "system") setSystemFilter(value)
+    else if (key === "space") setSpaceFilter(value)
+  }
 
-  const activeSystemLabel =
-    systemFilter === "all"
-      ? null
-      : systemFilter === "none"
-        ? t("shopping.filter.noSystem", "未分配系统")
-        : (shopping.systemDefinitions.find((system) => system.id === systemFilter)?.name ??
-          systemFilter)
-
-  const activeSpaceLabel =
-    spaceFilter === "all"
-      ? null
-      : spaceFilter === "none"
-        ? t("shopping.filter.noSpace", "未分配空间")
-        : (shopping.spaceDefinitions.find((space) => space.id === spaceFilter)?.name ?? spaceFilter)
+  const handleClearAll = () => {
+    setStatusFilter("all")
+    setSystemFilter("all")
+    setSpaceFilter("all")
+  }
 
   const filteredItems = useMemo(() => {
     const query = localQuery.trim().toLowerCase()
@@ -433,8 +424,8 @@ export function ShoppingPlanningTab({
       <ShoppingTabBody>
         {/* 左侧：物品列表 */}
         <ShoppingSidebarPane contentClassName="gap-3">
-          <div className="shrink-0 space-y-2">
-            <div className="relative">
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="relative min-w-0 flex-1">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
               <Input
                 value={localQuery}
@@ -443,127 +434,13 @@ export function ShoppingPlanningTab({
                 className="pl-8"
               />
             </div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <FilterChip
-                active={statusFilter === "all"}
-                compact
-                onClick={() => setStatusFilter("all")}
-              >
-                {t("shopping.filter.all", "全部")}
-              </FilterChip>
-              <FilterChip
-                active={statusFilter === ShoppingStatus.Owned}
-                compact
-                onClick={() => setStatusFilter(ShoppingStatus.Owned)}
-              >
-                {statusDisplayName(ShoppingStatus.Owned, t)}
-              </FilterChip>
-              <FilterChip
-                active={statusFilter === ShoppingStatus.Wanted}
-                compact
-                onClick={() => setStatusFilter(ShoppingStatus.Wanted)}
-              >
-                {statusDisplayName(ShoppingStatus.Wanted, t)}
-              </FilterChip>
-              <Button
-                type="button"
-                variant={isFilterPanelOpen || activeFilterCount > 0 ? "default" : "outline"}
-                size="sm"
-                className="ml-auto h-7 gap-1.5 px-2 text-[11px]"
-                onClick={() => setIsFilterPanelOpen((open) => !open)}
-              >
-                <SlidersHorizontal className="size-3.5" />
-                {t("shopping.filter.more", "筛选")}
-                {activeFilterCount > 0 ? (
-                  <span className="bg-background/20 rounded-full px-1 tabular-nums">
-                    {activeFilterCount}
-                  </span>
-                ) : null}
-              </Button>
-            </div>
-
-            {activeFilterCount > 0 ? (
-              <div className="flex flex-wrap gap-1.5">
-                {statusFilter !== "all" ? (
-                  <AppliedFilterChip
-                    label={statusDisplayName(statusFilter, t)}
-                    onRemove={() => setStatusFilter("all")}
-                  />
-                ) : null}
-                {activeSystemLabel ? (
-                  <AppliedFilterChip
-                    label={`${t("shopping.filter.system", "系统")}: ${activeSystemLabel}`}
-                    onRemove={() => setSystemFilter("all")}
-                  />
-                ) : null}
-                {activeSpaceLabel ? (
-                  <AppliedFilterChip
-                    label={`${t("shopping.filter.space", "空间")}: ${activeSpaceLabel}`}
-                    onRemove={() => setSpaceFilter("all")}
-                  />
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStatusFilter("all")
-                    setSystemFilter("all")
-                    setSpaceFilter("all")
-                  }}
-                  className="text-muted-foreground hover:text-foreground rounded-full px-2 py-0.5 text-[11px]"
-                >
-                  {t("shopping.filter.clearAll", "清空")}
-                </button>
-              </div>
-            ) : null}
-
-            {isFilterPanelOpen ? (
-              <div className={cn(SHOPPING_MUTED_PANEL_CLASS, "space-y-2 rounded-xl border p-2.5")}>
-                <FilterGroup title={t("shopping.filter.system", "系统")}>
-                  <FilterChip
-                    active={systemFilter === "all"}
-                    onClick={() => setSystemFilter("all")}
-                  >
-                    {t("shopping.filter.allSystems", "全部系统")}
-                  </FilterChip>
-                  <FilterChip
-                    active={systemFilter === "none"}
-                    onClick={() => setSystemFilter("none")}
-                  >
-                    {t("shopping.filter.noSystem", "未分配系统")}
-                  </FilterChip>
-                  {shopping.systemDefinitions.map((system) => (
-                    <FilterChip
-                      key={system.id}
-                      active={systemFilter === system.id}
-                      onClick={() => setSystemFilter(system.id)}
-                    >
-                      {system.name || system.id}
-                    </FilterChip>
-                  ))}
-                </FilterGroup>
-
-                <FilterGroup title={t("shopping.filter.space", "空间")}>
-                  <FilterChip active={spaceFilter === "all"} onClick={() => setSpaceFilter("all")}>
-                    {t("shopping.filter.allSpaces", "全部空间")}
-                  </FilterChip>
-                  <FilterChip
-                    active={spaceFilter === "none"}
-                    onClick={() => setSpaceFilter("none")}
-                  >
-                    {t("shopping.filter.noSpace", "未分配空间")}
-                  </FilterChip>
-                  {shopping.spaceDefinitions.map((space) => (
-                    <FilterChip
-                      key={space.id}
-                      active={spaceFilter === space.id}
-                      onClick={() => setSpaceFilter(space.id)}
-                    >
-                      {space.name}
-                    </FilterChip>
-                  ))}
-                </FilterGroup>
-              </div>
-            ) : null}
+            <FilterPopover
+              className="shrink-0"
+              popoverWidth="16.5rem"
+              dimensions={filterDimensions}
+              onChangeFilter={handleFilterChange}
+              onClearAll={handleClearAll}
+            />
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">

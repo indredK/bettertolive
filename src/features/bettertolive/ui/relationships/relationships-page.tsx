@@ -4,11 +4,9 @@ import {
   Network,
   Pencil,
   Plus,
-  SlidersHorizontal,
   Trash2,
   Users2,
   Waypoints,
-  X,
   type LucideIcon,
 } from "lucide-react"
 import type { ReactNode } from "react"
@@ -44,6 +42,10 @@ import {
   type CytoscapeThemeTokens,
 } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
 import { ReactForceGraph3DGraph } from "@/features/bettertolive/ui/shared/react-force-graph-3d-graph"
+import {
+  FilterPopover,
+  type FilterPopoverDimension,
+} from "@/features/bettertolive/ui/shared/filter-popover"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
@@ -224,34 +226,6 @@ function createRelationshipsGraphStylesheet(
         "line-color": theme.tonePresentBorder,
         opacity: 0.9,
         width: "mapData(weight, 1, 6, 2.2, 4.2)",
-      },
-    },
-    {
-      selector: "edge[linkKind = 'sameCircle']",
-      style: {
-        "line-color": theme.tonePastBorder,
-        "target-arrow-color": theme.tonePastBorder,
-      },
-    },
-    {
-      selector: "edge[linkKind = 'auxiliary']",
-      style: {
-        "line-color": theme.mutedSurfaceBorder,
-        opacity: 0.48,
-      },
-    },
-    {
-      selector: "edge[linkKind = 'pattern']",
-      style: {
-        "line-color": theme.toneValueBorder,
-        "line-style": "dashed",
-      },
-    },
-    {
-      selector: "edge[linkKind = 'mixed']",
-      style: {
-        "line-color": theme.accent,
-        width: "mapData(weight, 1, 6, 2.2, 4.4)",
       },
     },
   ]
@@ -1454,67 +1428,6 @@ const RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS = [
   options: readonly string[]
 }>
 
-function RelationshipDirectoryFilterChip({
-  active,
-  children,
-  onClick,
-}: {
-  active: boolean
-  children: ReactNode
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "rounded-full border px-2 py-0.5 text-[11px] transition-colors",
-        active
-          ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--text-primary)]"
-          : "border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] hover:border-[color:var(--surface-border)] hover:text-[color:var(--text-primary)]",
-      )}
-    >
-      {children}
-    </button>
-  )
-}
-
-function RelationshipAppliedFilterChip({
-  label,
-  onRemove,
-}: {
-  label: string
-  onRemove: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onRemove}
-      className="inline-flex max-w-full items-center gap-1 rounded-full border border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] px-2 py-0.5 text-[11px] text-[color:var(--text-primary)] transition-colors hover:opacity-80"
-    >
-      <span className="truncate">{label}</span>
-      <X className="size-3 shrink-0" />
-    </button>
-  )
-}
-
-function RelationshipDirectoryFilterGroup({
-  children,
-  title,
-}: {
-  children: ReactNode
-  title: string
-}) {
-  return (
-    <div className="space-y-1">
-      <div className="text-[10px] font-medium tracking-wide text-[color:var(--text-muted)] uppercase">
-        {title}
-      </div>
-      <div className="flex max-h-20 flex-wrap gap-1 overflow-y-auto pr-1">{children}</div>
-    </div>
-  )
-}
-
 function RelationshipsDirectoryTab({
   isControlMode,
   onCreate,
@@ -1536,16 +1449,11 @@ function RelationshipsDirectoryTab({
 }) {
   const { t } = useTranslation()
   const [filters, setFilters] = useState(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)
-  const [isFilterPanelOpen, setIsFilterPanelOpen] = useState(false)
   const selectedCircleId =
     selectedRelationship &&
     relationshipsModule.circles.find((circle) =>
       circle.entries.some((entry) => entry.id === selectedRelationship.id),
     )?.id
-  const activeFilterCount = RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.filter(
-    (dimension) => filters[dimension.key] !== "all",
-  ).length
-  const hasActiveFilters = activeFilterCount > 0
   const filteredCircles = relationshipsModule.circles.map((circle) => ({
     ...circle,
     entries: circle.entries.filter(
@@ -1561,14 +1469,20 @@ function RelationshipsDirectoryTab({
     (count, circle) => count + circle.entries.length,
     0,
   )
-
-  const clearFilters = () => {
-    setFilters(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)
-  }
-
-  const updateFilter = (key: keyof RelationshipDirectoryFilters, value: string) => {
-    setFilters((current) => ({ ...current, [key]: value }))
-  }
+  const filterDimensions = useMemo<FilterPopoverDimension[]>(
+    () =>
+      RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => ({
+        key: dimension.key,
+        label: t(dimension.labelKey, dimension.defaultLabel),
+        allLabel: t("relationships.filter.all", "全部"),
+        value: filters[dimension.key],
+        options: dimension.options.map((option) => ({
+          value: option,
+          label: translateRelationshipEnum(t, dimension.group, option),
+        })),
+      })),
+    [filters, t],
+  )
 
   return (
     <TwoPaneLayout>
@@ -1579,81 +1493,21 @@ function RelationshipsDirectoryTab({
           count={filteredRelationshipCount}
           isControlMode={isControlMode}
           onCreate={onCreate}
+          extra={
+            <FilterPopover
+              dimensions={filterDimensions}
+              popoverWidth="20.5rem"
+              onChangeFilter={(key, value) =>
+                setFilters((current) => ({
+                  ...current,
+                  [key]: value,
+                }))
+              }
+              onClearAll={() => setFilters(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)}
+            />
+          }
         />
-        <div className="mt-2 shrink-0 space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <Button
-              type="button"
-              variant={isFilterPanelOpen || hasActiveFilters ? "default" : "outline"}
-              size="sm"
-              className="h-7 gap-1.5 px-2 text-[11px]"
-              onClick={() => setIsFilterPanelOpen((open) => !open)}
-            >
-              <SlidersHorizontal className="size-3.5" />
-              {t("relationships.filter.more", "筛选")}
-              {activeFilterCount > 0 ? (
-                <span className="bg-background/20 rounded-full px-1 tabular-nums">
-                  {activeFilterCount}
-                </span>
-              ) : null}
-            </Button>
-            {hasActiveFilters ? (
-              <button
-                type="button"
-                onClick={clearFilters}
-                className="text-[11px] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
-              >
-                {t("relationships.filter.clearAll", "清空")}
-              </button>
-            ) : null}
-          </div>
 
-          {hasActiveFilters && !isFilterPanelOpen ? (
-            <div className="flex flex-wrap gap-1">
-              {RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => {
-                const value = filters[dimension.key]
-                if (value === "all") {
-                  return null
-                }
-
-                return (
-                  <RelationshipAppliedFilterChip
-                    key={dimension.key}
-                    label={`${t(dimension.labelKey, dimension.defaultLabel)}: ${translateRelationshipEnum(t, dimension.group, value)}`}
-                    onRemove={() => updateFilter(dimension.key, "all")}
-                  />
-                )
-              })}
-            </div>
-          ) : null}
-
-          {isFilterPanelOpen ? (
-            <div className="max-h-[min(38vh,11.5rem)] space-y-2 overflow-y-auto rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-2.5">
-              {RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => (
-                <RelationshipDirectoryFilterGroup
-                  key={dimension.key}
-                  title={t(dimension.labelKey, dimension.defaultLabel)}
-                >
-                  <RelationshipDirectoryFilterChip
-                    active={filters[dimension.key] === "all"}
-                    onClick={() => updateFilter(dimension.key, "all")}
-                  >
-                    {t("relationships.filter.all", "全部")}
-                  </RelationshipDirectoryFilterChip>
-                  {dimension.options.map((option) => (
-                    <RelationshipDirectoryFilterChip
-                      key={option}
-                      active={filters[dimension.key] === option}
-                      onClick={() => updateFilter(dimension.key, option)}
-                    >
-                      {translateRelationshipEnum(t, dimension.group, option)}
-                    </RelationshipDirectoryFilterChip>
-                  ))}
-                </RelationshipDirectoryFilterGroup>
-              ))}
-            </div>
-          ) : null}
-        </div>
         <div className="mt-2 min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto">
           {filteredCircles.map((circle) => (
             <div key={circle.id} className="space-y-2">
@@ -2088,19 +1942,21 @@ function PatternsTab({
 
 function ListHeader({
   count,
+  extra,
   icon: Icon,
   isControlMode,
   onCreate,
   title,
 }: {
   count: number
+  extra?: ReactNode
   icon: LucideIcon
   isControlMode: boolean
   onCreate: () => void
   title: string
 }) {
   return (
-    <div className="flex shrink-0 items-center justify-between gap-3">
+    <div className="flex shrink-0 items-center justify-between gap-2">
       <div className="flex min-w-0 items-center gap-2 text-[color:var(--text-primary)]">
         <Icon className="size-4 shrink-0" />
         <div className="truncate text-sm font-semibold">{title}</div>
@@ -2111,11 +1967,14 @@ function ListHeader({
           {count}
         </Badge>
       </div>
-      {isControlMode ? (
-        <Button size="icon-sm" variant="outline" onClick={onCreate}>
-          <Plus className="size-3.5" />
-        </Button>
-      ) : null}
+      <div className="flex shrink-0 items-center gap-1.5">
+        {extra}
+        {isControlMode ? (
+          <Button size="icon-sm" variant="outline" onClick={onCreate}>
+            <Plus className="size-3.5" />
+          </Button>
+        ) : null}
+      </div>
     </div>
   )
 }
@@ -2530,13 +2389,11 @@ function createRelationshipNetwork(
   const nodeById = new Map(nodes.map((node) => [node.relationship.id, node]))
   const notesByRelationshipId = new Map<string, RelationshipUnsentNote[]>()
   const connectedIdsByRelationshipId = new Map<string, Set<string>>()
-  const explicitConnectedIdsByRelationshipId = new Map<string, Set<string>>()
   const edgeByKey = new Map<
     string,
     {
       explicitStrength?: RelationshipConnectionStrength
       id: string
-      kinds: Set<"explicit" | "pattern" | "sameCircle">
       label: string
       sourceId: string
       targetId: string
@@ -2569,44 +2426,6 @@ function createRelationshipNetwork(
       },
       edgeByKey,
       connectedIdsByRelationshipId,
-      explicitConnectedIdsByRelationshipId,
-    )
-  })
-
-  relationshipsModule.patterns.forEach((pattern) => {
-    const matchedRelationships = inferPatternMatches(pattern, relationshipById)
-
-    matchedRelationships.forEach((relationship) => {
-      const node = nodeById.get(relationship.id)
-      if (!node) {
-        return
-      }
-
-      node.matchedPatterns.push(pattern)
-    })
-
-    addRelationshipPairEdges(
-      matchedRelationships,
-      {
-        kind: "pattern",
-        label: pattern.title,
-        weight: 1.1,
-      },
-      edgeByKey,
-      connectedIdsByRelationshipId,
-    )
-  })
-
-  relationshipsModule.circles.forEach((circle) => {
-    addRelationshipPairEdges(
-      circle.entries,
-      {
-        kind: "sameCircle",
-        label: circle.title,
-        weight: Math.max(0.85, Math.min(1.6, circle.entries.length / 3)),
-      },
-      edgeByKey,
-      connectedIdsByRelationshipId,
     )
   })
 
@@ -2620,69 +2439,19 @@ function createRelationshipNetwork(
       explicitStrength: edge.explicitStrength,
       id: edge.id,
       label: edge.label,
-      linkKind: summarizeRelationshipEdgeKind(edge.kinds),
+      linkKind: "explicit" as const,
       sourceId: edge.sourceId,
       targetId: edge.targetId,
       weight: edge.weight,
     })),
-    explicitConnectedIdsByRelationshipId,
     nodes,
-  }
-}
-
-function addRelationshipPairEdges(
-  relationships: RelationshipPerson[],
-  edge: {
-    kind: "pattern" | "sameCircle"
-    label: string
-    weight: number
-  },
-  edgeByKey: Map<
-    string,
-    {
-      explicitStrength?: RelationshipConnectionStrength
-      id: string
-      kinds: Set<"explicit" | "pattern" | "sameCircle">
-      label: string
-      sourceId: string
-      targetId: string
-      weight: number
-    }
-  >,
-  connectedIdsByRelationshipId: Map<string, Set<string>>,
-) {
-  const uniqueRelationships = [
-    ...new Map(relationships.map((relationship) => [relationship.id, relationship])).values(),
-  ]
-
-  for (let firstIndex = 0; firstIndex < uniqueRelationships.length; firstIndex += 1) {
-    for (
-      let secondIndex = firstIndex + 1;
-      secondIndex < uniqueRelationships.length;
-      secondIndex += 1
-    ) {
-      const first = uniqueRelationships[firstIndex]
-      const second = uniqueRelationships[secondIndex]
-
-      addRelationshipEdge(
-        {
-          kind: edge.kind,
-          label: edge.label,
-          sourceId: first.id,
-          targetId: second.id,
-          weight: edge.weight,
-        },
-        edgeByKey,
-        connectedIdsByRelationshipId,
-      )
-    }
   }
 }
 
 function addRelationshipEdge(
   edge: {
     explicitStrength?: RelationshipConnectionStrength
-    kind: "explicit" | "pattern" | "sameCircle"
+    kind: "explicit"
     label: string
     sourceId: string
     targetId: string
@@ -2693,7 +2462,6 @@ function addRelationshipEdge(
     {
       explicitStrength?: RelationshipConnectionStrength
       id: string
-      kinds: Set<"explicit" | "pattern" | "sameCircle">
       label: string
       sourceId: string
       targetId: string
@@ -2701,19 +2469,14 @@ function addRelationshipEdge(
     }
   >,
   connectedIdsByRelationshipId: Map<string, Set<string>>,
-  explicitConnectedIdsByRelationshipId?: Map<string, Set<string>>,
 ) {
   const [sourceId, targetId] = [edge.sourceId, edge.targetId].sort()
   const key = createRelationshipConnectionPairKey(sourceId, targetId)
   const existing = edgeByKey.get(key)
-  const kinds = existing?.kinds ?? new Set<"explicit" | "pattern" | "sameCircle">()
-
-  kinds.add(edge.kind)
 
   edgeByKey.set(key, {
     explicitStrength: edge.explicitStrength ?? existing?.explicitStrength,
     id: key,
-    kinds,
     label:
       existing?.label && existing.label !== edge.label
         ? `${existing.label} · ${edge.label}`
@@ -2725,21 +2488,6 @@ function addRelationshipEdge(
 
   addConnectedRelationshipId(connectedIdsByRelationshipId, sourceId, targetId)
   addConnectedRelationshipId(connectedIdsByRelationshipId, targetId, sourceId)
-
-  if (edge.kind === "explicit" && explicitConnectedIdsByRelationshipId) {
-    addConnectedRelationshipId(explicitConnectedIdsByRelationshipId, sourceId, targetId)
-    addConnectedRelationshipId(explicitConnectedIdsByRelationshipId, targetId, sourceId)
-  }
-}
-
-function summarizeRelationshipEdgeKind(kinds: Set<"explicit" | "pattern" | "sameCircle">) {
-  if (kinds.size > 1) {
-    return kinds.has("explicit") ? "mixed" : "auxiliary"
-  }
-
-  if (kinds.has("explicit")) return "explicit"
-  if (kinds.has("pattern")) return "pattern"
-  return "sameCircle"
 }
 
 function addConnectedRelationshipId(
@@ -2757,15 +2505,6 @@ function collectCenteredRelationshipIds(
   rootId: string,
   maxDepth: number,
 ) {
-  const explicitIds = bfsRelationshipIds(
-    network.explicitConnectedIdsByRelationshipId,
-    rootId,
-    maxDepth,
-  )
-  if (explicitIds.size > 1) {
-    return explicitIds
-  }
-
   return bfsRelationshipIds(network.connectedIdsByRelationshipId, rootId, maxDepth)
 }
 
@@ -2857,10 +2596,7 @@ function computeRelationshipDepths(
 ) {
   const depthById = new Map<string, number>([[rootId, 0]])
   const queue: Array<{ depth: number; id: string }> = [{ depth: 0, id: rootId }]
-  const adjacency =
-    collectCenteredRelationshipIds(network, rootId, 1).size > 1
-      ? network.explicitConnectedIdsByRelationshipId
-      : network.connectedIdsByRelationshipId
+  const adjacency = network.connectedIdsByRelationshipId
 
   while (queue.length > 0) {
     const current = queue.shift()
@@ -2909,37 +2645,6 @@ function groupRelationshipIdsByDepth(depthById: Map<string, number>, scopedNodeI
 function connectionWeightFromStrength(connection: RelationshipConnection) {
   const base = connection.strength === "强" ? 4.4 : connection.strength === "中" ? 3.1 : 2.1
   return base + connection.roles.length * 0.4
-}
-
-function inferPatternMatches(
-  pattern: RelationshipPattern,
-  relationshipById: Map<string, RelationshipPerson>,
-) {
-  const patternTerms = normalizeTerms([pattern.title, pattern.summary, ...pattern.cues])
-
-  return [...relationshipById.values()].filter((relationship) => {
-    const relationshipTerms = normalizeTerms([
-      relationship.name,
-      relationship.role,
-      relationship.currentState,
-      relationship.influence,
-      relationship.unspokenLine,
-      relationship.positiveImpact,
-      relationship.ongoingShadow,
-      relationship.boundaryStatus,
-      ...relationship.tags,
-      ...relationship.emotionCues,
-    ])
-
-    return patternTerms.some((term) => relationshipTerms.some((source) => source.includes(term)))
-  })
-}
-
-function normalizeTerms(values: string[]) {
-  return values
-    .flatMap((value) => value.split(/[，,、。\n\s]+/))
-    .map((value) => value.trim().toLowerCase())
-    .filter((value) => value.length >= 2)
 }
 
 function createDistribution<T extends string>(
