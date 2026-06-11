@@ -1,6 +1,7 @@
 import { Heart, History, MessageCircleHeart, Pencil, Plus } from "lucide-react"
 import {
-  FilterPopover,
+  FilterAppliedChips,
+  FilterPopoverButton,
   type FilterPopoverDimension,
 } from "@/features/bettertolive/ui/shared/filter-popover"
 import type { TFunction } from "i18next"
@@ -97,16 +98,34 @@ export function NutritionLogsTab({
                 </Button>
               ) : null}
             </div>
-            <div className="flex items-center gap-2">
-              <Input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("nutrition.logs.search", "搜索进食、场景、反馈或食物记忆")}
-                className="border-foreground/15 bg-background min-w-0 flex-1"
-              />
-              <FilterPopover
-                className="shrink-0"
-                popoverWidth="16rem"
+            <div className="space-y-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+                <Input
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder={t("nutrition.logs.search", "搜索进食、场景、反馈或食物记忆")}
+                  className="border-foreground/15 bg-background min-w-0 flex-1"
+                />
+                <FilterPopoverButton
+                  className="shrink-0"
+                  popoverWidth="16rem"
+                  dimensions={[
+                    {
+                      key: "filter",
+                      label: t("nutrition.logs.filterTitle", "进食类型"),
+                      allLabel: t("nutrition.logs.filters.all", "全部"),
+                      value: filter,
+                      options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
+                        value: f,
+                        label: t(`nutrition.logs.filters.${f}`, f),
+                      })),
+                    } satisfies FilterPopoverDimension,
+                  ]}
+                  onChangeFilter={(_, value) => setFilter(value as LogFilter)}
+                  onClearAll={() => setFilter("all")}
+                />
+              </div>
+              <FilterAppliedChips
                 dimensions={[
                   {
                     key: "filter",
@@ -120,7 +139,6 @@ export function NutritionLogsTab({
                   } satisfies FilterPopoverDimension,
                 ]}
                 onChangeFilter={(_, value) => setFilter(value as LogFilter)}
-                onClearAll={() => setFilter("all")}
               />
             </div>
           </div>

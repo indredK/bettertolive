@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveRelationshipsMutation } from "@/features/bettertolive/queries/use-save-relationships-mutation"
+import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import type {
   RelationshipCircle,
   RelationshipConnection,
@@ -42,10 +43,8 @@ import {
   type CytoscapeThemeTokens,
 } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
 import { ReactForceGraph3DGraph } from "@/features/bettertolive/ui/shared/react-force-graph-3d-graph"
-import {
-  FilterPopover,
-  type FilterPopoverDimension,
-} from "@/features/bettertolive/ui/shared/filter-popover"
+import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
+import { FilterablePanel } from "@/features/bettertolive/ui/shared/filterable-panel"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
@@ -305,7 +304,6 @@ export function RelationshipsPage({
 }: {
   editableRelationshipsModule?: RelationshipMap
   relationshipsModule: RelationshipMap
-  searchQuery: string
   isStackedLayout?: boolean
   isControlMode?: boolean
   onRefresh?: () => void
@@ -1448,6 +1446,8 @@ function RelationshipsDirectoryTab({
   sortedUnsentNotes: RelationshipUnsentNote[]
 }) {
   const { t } = useTranslation()
+  const searchQuery = useWorkspaceUiStore((state) => state.searchQuery)
+  const setSearchQuery = useWorkspaceUiStore((state) => state.setSearchQuery)
   const [filters, setFilters] = useState(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)
   const selectedCircleId =
     selectedRelationship &&
@@ -1486,62 +1486,67 @@ function RelationshipsDirectoryTab({
 
   return (
     <TwoPaneLayout>
-      <Surface className="flex min-h-0 flex-col overflow-visible p-3 lg:w-[22rem] lg:shrink-0 lg:overflow-hidden">
-        <ListHeader
-          icon={Users2}
-          title={t("relationships.directory.title", "关系档案")}
-          count={filteredRelationshipCount}
-          isControlMode={isControlMode}
-          onCreate={onCreate}
-          extra={
-            <FilterPopover
-              dimensions={filterDimensions}
-              popoverWidth="20.5rem"
-              onChangeFilter={(key, value) =>
-                setFilters((current) => ({
-                  ...current,
-                  [key]: value,
-                }))
-              }
-              onClearAll={() => setFilters(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)}
+      <FilterablePanel
+        className="flex min-h-0 flex-col overflow-visible lg:w-[22rem] lg:shrink-0 lg:overflow-hidden"
+        header={
+          <div className="flex items-center justify-between gap-2">
+            <ListHeader
+              icon={Users2}
+              title={t("relationships.directory.title", "关系档案")}
+              count={filteredRelationshipCount}
             />
-          }
-        />
-
-        <div className="mt-2 min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto">
-          {filteredCircles.map((circle) => (
-            <div key={circle.id} className="space-y-2">
-              <div className="flex items-center justify-between gap-2 px-1">
-                <div className="min-w-0 truncate text-xs font-medium text-[color:var(--text-muted)]">
-                  {circle.title}
-                </div>
-                <Badge
-                  variant="outline"
-                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[10px] text-[color:var(--text-muted)]"
-                >
-                  {circle.entries.length}
-                </Badge>
+            {isControlMode ? (
+              <Button size="icon-sm" variant="outline" onClick={onCreate}>
+                <Plus className="size-3.5" />
+              </Button>
+            ) : null}
+          </div>
+        }
+        bodyClassName="min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto"
+        dimensions={filterDimensions}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        onChangeFilter={(key, value) =>
+          setFilters((current) => ({
+            ...current,
+            [key]: value,
+          }))
+        }
+        onClearAll={() => setFilters(DEFAULT_RELATIONSHIP_DIRECTORY_FILTERS)}
+        popoverWidth="20.5rem"
+      >
+        {filteredCircles.map((circle) => (
+          <div key={circle.id} className="space-y-2">
+            <div className="flex items-center justify-between gap-2 px-1">
+              <div className="min-w-0 truncate text-xs font-medium text-[color:var(--text-muted)]">
+                {circle.title}
               </div>
-              <div className="space-y-2">
-                {circle.entries.map((relationship) => (
-                  <RelationshipListButton
-                    key={relationship.id}
-                    isSelected={selectedRelationship?.id === relationship.id}
-                    relationship={relationship}
-                    onClick={() => onSelect(relationship.id)}
-                  />
-                ))}
-              </div>
+              <Badge
+                variant="outline"
+                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[10px] text-[color:var(--text-muted)]"
+              >
+                {circle.entries.length}
+              </Badge>
             </div>
-          ))}
-          {filteredRelationshipCount === 0 ? (
-            <EmptyState
-              message={t("relationships.empty.directory", "当前筛选下没有关系。")}
-              compact
-            />
-          ) : null}
-        </div>
-      </Surface>
+            <div className="space-y-2">
+              {circle.entries.map((relationship) => (
+                <RelationshipListButton
+                  key={relationship.id}
+                  isSelected={selectedRelationship?.id === relationship.id}
+                  relationship={relationship}
+                  onClick={() => onSelect(relationship.id)}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+        {filteredRelationshipCount === 0 ? (
+          <EmptyState
+            message={t("relationships.empty.directory", "当前筛选下没有关系。")}
+            compact
+          />
+        ) : null}
+      </FilterablePanel>
 
       <div className="min-h-[360px] flex-1 lg:min-h-0">
         {selectedRelationship ? (
@@ -1784,13 +1789,18 @@ function UnsentNotesTab({
   return (
     <TwoPaneLayout>
       <Surface className="flex min-h-0 flex-col overflow-visible p-3 lg:w-80 lg:shrink-0 lg:overflow-hidden">
-        <ListHeader
-          icon={MessageCircleMore}
-          title={t("relationships.unsent.title", "想说的话")}
-          count={notes.length}
-          isControlMode={isControlMode}
-          onCreate={onCreate}
-        />
+        <div className="flex items-center justify-between gap-2">
+          <ListHeader
+            icon={MessageCircleMore}
+            title={t("relationships.unsent.title", "想说的话")}
+            count={notes.length}
+          />
+          {isControlMode ? (
+            <Button size="icon-sm" variant="outline" onClick={onCreate}>
+              <Plus className="size-3.5" />
+            </Button>
+          ) : null}
+        </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {notes.map((note) => (
             <button
@@ -1884,13 +1894,18 @@ function PatternsTab({
   return (
     <TwoPaneLayout>
       <Surface className="flex min-h-0 flex-col overflow-visible p-3 lg:w-80 lg:shrink-0 lg:overflow-hidden">
-        <ListHeader
-          icon={Activity}
-          title={t("relationships.patterns.title", "跨关系模式")}
-          count={patterns.length}
-          isControlMode={isControlMode}
-          onCreate={onCreate}
-        />
+        <div className="flex items-center justify-between gap-2">
+          <ListHeader
+            icon={Activity}
+            title={t("relationships.patterns.title", "跨关系模式")}
+            count={patterns.length}
+          />
+          {isControlMode ? (
+            <Button size="icon-sm" variant="outline" onClick={onCreate}>
+              <Plus className="size-3.5" />
+            </Button>
+          ) : null}
+        </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {patterns.map((pattern) => (
             <button
@@ -1942,21 +1957,15 @@ function PatternsTab({
 
 function ListHeader({
   count,
-  extra,
   icon: Icon,
-  isControlMode,
-  onCreate,
   title,
 }: {
   count: number
-  extra?: ReactNode
   icon: LucideIcon
-  isControlMode: boolean
-  onCreate: () => void
   title: string
 }) {
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2">
+    <div className="flex shrink-0 items-center gap-2">
       <div className="flex min-w-0 items-center gap-2 text-[color:var(--text-primary)]">
         <Icon className="size-4 shrink-0" />
         <div className="truncate text-sm font-semibold">{title}</div>
@@ -1966,14 +1975,6 @@ function ListHeader({
         >
           {count}
         </Badge>
-      </div>
-      <div className="flex shrink-0 items-center gap-1.5">
-        {extra}
-        {isControlMode ? (
-          <Button size="icon-sm" variant="outline" onClick={onCreate}>
-            <Plus className="size-3.5" />
-          </Button>
-        ) : null}
       </div>
     </div>
   )

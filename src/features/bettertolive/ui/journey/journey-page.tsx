@@ -20,10 +20,9 @@ import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import {
-  FilterPopover,
-  type FilterPopoverDimension,
-} from "@/features/bettertolive/ui/shared/filter-popover"
+import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
+import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
+import { FilterablePanel } from "@/features/bettertolive/ui/shared/filterable-panel"
 import type {
   EmotionalWeight,
   FormativePower,
@@ -40,12 +39,7 @@ import {
   JourneyEditDialog,
   type EditingJourneyItem,
 } from "@/features/bettertolive/ui/journey/journey-edit-dialog"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 const ALL_FILTER_VALUE = "all"
@@ -264,18 +258,18 @@ export function JourneyPage({
   journey,
   editableGrowth,
   editableMemory,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   journey: JourneyViewData
   editableGrowth: GrowthModuleData
   editableMemory: MemoryWorkspaceModuleData
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
   const { t } = useTranslation()
+  const searchQuery = useWorkspaceUiStore((state) => state.searchQuery)
+  const setSearchQuery = useWorkspaceUiStore((state) => state.setSearchQuery)
   const [filters, setFilters] = useState<JourneyFilters>(() => createEmptyFilters())
   const [editingJourneyItem, setEditingJourneyItem] = useState<EditingJourneyItem | null>(null)
   const isFixedLayout = !isStackedLayout
@@ -441,34 +435,28 @@ export function JourneyPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-visible",
       )}
     >
-      <PageIntro
-        eyebrow={t("journey.page.eyebrow")}
-        title={t("journey.page.title")}
-        description={t("journey.page.description")}
-        searchQuery={searchQuery}
-      />
-
       <JourneyHero journey={journey} />
 
-      <Surface className={cn("shrink-0 p-3", isFixedLayout && "p-2.5")}>
-        <div className="flex flex-wrap items-center gap-2">
-          <FilterPopover
-            dimensions={filterDimensions}
-            popoverWidth="18rem"
-            onChangeFilter={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
-            onClearAll={() => setFilters(createEmptyFilters())}
-          />
+      <FilterablePanel
+        className={isFixedLayout ? "p-2.5" : undefined}
+        dimensions={filterDimensions}
+        header={
           <Badge
             variant="outline"
-            className="h-7 border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
+            className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
           >
             {t("journey.filters.resultCount", {
               count: filteredJourney.memories.length,
               total: journey.memories.length,
             })}
           </Badge>
-        </div>
-      </Surface>
+        }
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        onChangeFilter={(key, value) => setFilters((current) => ({ ...current, [key]: value }))}
+        onClearAll={() => setFilters(createEmptyFilters())}
+        popoverWidth="18rem"
+      />
 
       {isControlMode ? (
         <JourneyControlPanel

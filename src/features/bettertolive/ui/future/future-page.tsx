@@ -78,67 +78,28 @@ export function FuturePage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 space-y-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-            >
-              {t("future.page.eyebrow", "未来蓝图")}
-            </Badge>
-            {isControlMode ? (
-              <Badge className="bg-[color:var(--tone-future-bg)] text-[color:var(--tone-future-ink)]">
-                {t("future.controlMode.on", "控制模式")}
-              </Badge>
-            ) : (
-              <Badge
-                variant="outline"
-                className="border-[color:var(--chip-border)] bg-[color:var(--muted-surface-bg)] text-[color:var(--text-muted)]"
-              >
-                {t("future.controlMode.off", "浏览模式")}
-              </Badge>
-            )}
-            {normalizedQuery ? (
-              <Badge variant="outline" className="border-[color:var(--chip-border)]">
-                {t("future.searching", "当前筛选：{{query}}", { query: searchQuery.trim() })}
-              </Badge>
-            ) : null}
-          </div>
-          <h1 className="text-xl font-semibold tracking-tight text-[color:var(--text-primary)]">
-            {t("future.page.title", "把想成为的人说清楚")}
-          </h1>
-          <p className="max-w-3xl text-sm leading-6 text-[color:var(--text-secondary)]">
-            {t(
-              "future.page.description",
-              "未来不是系统替你预测的结果，而是你主动写下的方向。这里承接理想自我、理想生活、重要价值和阶段路径。",
-            )}
-          </p>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2">
-          {onRefresh ? (
-            <Button
-              type="button"
-              variant="outline"
-              className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-              onClick={onRefresh}
-            >
-              <RefreshCcw className="size-4" />
-              {t("future.refresh", "刷新")}
-            </Button>
-          ) : null}
-          {isControlMode ? (
-            <Button
-              type="button"
-              className="bg-[color:var(--tone-future-ink)] text-[color:var(--tone-future-bg)] hover:opacity-90"
-              onClick={() => setIsEditingBlueprint(true)}
-            >
-              <PencilLine className="size-4" />
-              {t("future.edit.blueprint", "编辑蓝图")}
-            </Button>
-          ) : null}
-        </div>
+      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+        {onRefresh ? (
+          <Button
+            type="button"
+            variant="outline"
+            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+            onClick={onRefresh}
+          >
+            <RefreshCcw className="size-4" />
+            {t("future.refresh", "刷新")}
+          </Button>
+        ) : null}
+        {isControlMode ? (
+          <Button
+            type="button"
+            className="bg-[color:var(--tone-future-ink)] text-[color:var(--tone-future-bg)] hover:opacity-90"
+            onClick={() => setIsEditingBlueprint(true)}
+          >
+            <PencilLine className="size-4" />
+            {t("future.edit.blueprint", "编辑蓝图")}
+          </Button>
+        ) : null}
       </div>
 
       <Tabs

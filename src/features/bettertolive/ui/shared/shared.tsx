@@ -1,5 +1,4 @@
 import { type ComponentProps } from "react"
-import { useTranslation } from "react-i18next"
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -12,7 +11,6 @@ import {
   type LucideIcon,
 } from "lucide-react"
 
-import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 import type { RecentRecord } from "@/features/bettertolive/types"
 
@@ -32,43 +30,6 @@ const KIND_BADGE_STYLES: Record<RecentRecord["kind"], string> = {
   情绪: "bg-[color:var(--tone-present-border)] text-[color:var(--tone-present-ink)]",
   记忆: "bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]",
   托付: "bg-[color:var(--tone-future-border)] text-[color:var(--tone-future-ink)]",
-}
-
-export function PageIntro({
-  eyebrow,
-  title,
-  description,
-  searchQuery,
-}: {
-  eyebrow: string
-  title: string
-  description: string
-  searchQuery: string
-}) {
-  const { t } = useTranslation()
-  const normalizedSearchQuery = searchQuery.trim()
-
-  return (
-    <div className="shrink-0">
-      <div className="text-xs tracking-[0.22em] text-[color:var(--text-muted)] uppercase">
-        {eyebrow}
-      </div>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-[color:var(--text-primary)] sm:text-3xl">
-        {title}
-      </h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--text-secondary)]">
-        {description}
-      </p>
-      {normalizedSearchQuery ? (
-        <Badge
-          variant="outline"
-          className="mt-3 w-fit border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-        >
-          {t("shell.search.activeFilter", { query: normalizedSearchQuery })}
-        </Badge>
-      ) : null}
-    </div>
-  )
 }
 
 export function SummarySurface({

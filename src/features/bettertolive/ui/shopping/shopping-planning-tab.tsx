@@ -38,7 +38,8 @@ import {
   ShoppingTabViewport,
 } from "@/features/bettertolive/ui/shopping/shopping-page-shared"
 import {
-  FilterPopover,
+  FilterAppliedChips,
+  FilterPopoverButton,
   type FilterPopoverDimension,
 } from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
@@ -424,23 +425,26 @@ export function ShoppingPlanningTab({
       <ShoppingTabBody>
         {/* 左侧：物品列表 */}
         <ShoppingSidebarPane contentClassName="gap-3">
-          <div className="flex shrink-0 items-center gap-2">
-            <div className="relative min-w-0 flex-1">
-              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
-              <Input
-                value={localQuery}
-                onChange={(event) => setLocalQuery(event.target.value)}
-                placeholder={t("shopping.planning.searchPlaceholder", "搜索物品 / 子级 / 渠道")}
-                className="pl-8"
+          <div className="shrink-0 space-y-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <div className="relative min-w-0 flex-1">
+                <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2" />
+                <Input
+                  value={localQuery}
+                  onChange={(event) => setLocalQuery(event.target.value)}
+                  placeholder={t("shopping.planning.searchPlaceholder", "搜索物品 / 子级 / 渠道")}
+                  className="pl-8"
+                />
+              </div>
+              <FilterPopoverButton
+                className="shrink-0"
+                popoverWidth="16.5rem"
+                dimensions={filterDimensions}
+                onChangeFilter={handleFilterChange}
+                onClearAll={handleClearAll}
               />
             </div>
-            <FilterPopover
-              className="shrink-0"
-              popoverWidth="16.5rem"
-              dimensions={filterDimensions}
-              onChangeFilter={handleFilterChange}
-              onClearAll={handleClearAll}
-            />
+            <FilterAppliedChips dimensions={filterDimensions} onChangeFilter={handleFilterChange} />
           </div>
 
           <div className="min-h-0 flex-1 overflow-y-auto">

@@ -13,18 +13,15 @@ import { LegacyItemsTab } from "@/features/bettertolive/ui/legacy/legacy-items-t
 import { LegacyOverviewTab } from "@/features/bettertolive/ui/legacy/legacy-overview-tab"
 import { LegacyRelationshipExpressionTab } from "@/features/bettertolive/ui/legacy/legacy-relationship-expression-tab"
 import { LegacyTrustBoundariesTab } from "@/features/bettertolive/ui/legacy/legacy-trust-boundaries-tab"
-import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function LegacyPage({
   legacy,
-  searchQuery,
   isStackedLayout = false,
   isControlMode = false,
   onRefresh,
 }: {
   legacy: LegacyModuleData
-  searchQuery: string
   isStackedLayout?: boolean
   isControlMode?: boolean
   onRefresh?: () => void
@@ -52,16 +49,6 @@ export function LegacyPage({
         isStackedLayout ? "min-h-full gap-4 overflow-visible" : "h-full gap-6 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("legacy.pageEyebrow", "生命整理")}
-        title={t("legacy.pageTitle", "把重要的话提前安放好")}
-        description={t(
-          "legacy.pageDescription",
-          "条目库是唯一维护入口；总览、交付地图、关系表达和边界与信任都只是同一份内容的不同视角。",
-        )}
-        searchQuery={searchQuery}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}

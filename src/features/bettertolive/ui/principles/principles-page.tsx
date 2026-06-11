@@ -25,12 +25,7 @@ import {
   type PrincipleEnumGroup,
   translatePrincipleEnum,
 } from "@/features/bettertolive/ui/principles/principles-page-data"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 type DistributionRow = {
@@ -85,14 +80,12 @@ function getPrinciplePerspective(principle: PrincipleEntry): PrinciplePerspectiv
 export function PrinciplesPage({
   editablePrinciplesModule,
   principlesModule,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
   onRefresh,
 }: {
   editablePrinciplesModule?: PrinciplesModuleData
   principlesModule: PrinciplesModuleData
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
   onRefresh?: () => void
@@ -167,16 +160,6 @@ export function PrinciplesPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("principles.page.eyebrow", "原则")}
-        title={t("principles.page.title", "把原则、边界和底线整理成决策体系")}
-        description={t(
-          "principles.page.description",
-          "这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。",
-        )}
-        searchQuery={searchQuery}
-      />
-
       <PrinciplesControlStrip
         isControlMode={isControlMode}
         principlesCount={principles.length}

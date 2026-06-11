@@ -24,12 +24,7 @@ import type {
   ReflectionEntry,
   ReflectionModuleData,
 } from "@/features/bettertolive/types"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 type EditingReflection = {
@@ -124,14 +119,12 @@ export function ReflectionPage({
   draftExample,
   editableReflectionModule,
   reflections,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   draftExample: ReflectionDraftExample
   editableReflectionModule: ReflectionModuleData
   reflections: ReflectionEntry[]
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
@@ -182,16 +175,7 @@ export function ReflectionPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
-        <PageIntro
-          eyebrow={t("reflection.page.eyebrow", "反思")}
-          title={t("reflection.page.title", "先把此刻写下来")}
-          description={t(
-            "reflection.page.description",
-            "表达不需要完整，真实比完整更重要。这里会成为你最自然的输入入口。",
-          )}
-          searchQuery={searchQuery}
-        />
+      <div className="flex shrink-0 justify-end">
         <ReflectionControlModeBadge isControlMode={isControlMode} />
       </div>
 

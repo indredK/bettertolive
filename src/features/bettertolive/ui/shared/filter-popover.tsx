@@ -30,6 +30,32 @@ export function FilterPopover({
   onChangeFilter: (key: string, value: string) => void
   onClearAll: () => void
 }) {
+  return (
+    <div className={cn("space-y-1.5", className)}>
+      <FilterPopoverButton
+        dimensions={dimensions}
+        popoverWidth={popoverWidth}
+        onChangeFilter={onChangeFilter}
+        onClearAll={onClearAll}
+      />
+      <FilterAppliedChips dimensions={dimensions} onChangeFilter={onChangeFilter} />
+    </div>
+  )
+}
+
+export function FilterPopoverButton({
+  className,
+  dimensions,
+  popoverWidth,
+  onChangeFilter,
+  onClearAll,
+}: {
+  className?: string
+  dimensions: FilterPopoverDimension[]
+  popoverWidth?: string
+  onChangeFilter: (key: string, value: string) => void
+  onClearAll: () => void
+}) {
   const { t } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -51,80 +77,93 @@ export function FilterPopover({
   }, [isOpen])
 
   return (
-    <div className={cn("space-y-1.5", className)}>
-      <div className="relative" ref={containerRef}>
-        <Button
-          type="button"
-          variant={isOpen || hasActiveFilters ? "default" : "outline"}
-          size="sm"
-          className="h-7 gap-1.5 px-2 text-[11px]"
-          onClick={() => setIsOpen((prev) => !prev)}
-        >
-          <SlidersHorizontal className="size-3.5" />
-          {t("common.filter.label", "筛选")}
-          {activeFilterCount > 0 ? (
-            <span
-              role="button"
-              aria-label={t("common.filter.clearAll", "清空")}
-              className="group/clear relative inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-white/20 px-0.5"
-              onClick={(e) => {
-                e.stopPropagation()
-                onClearAll()
-              }}
-            >
-              <span className="text-[10px] tabular-nums group-hover/clear:invisible">
-                {activeFilterCount}
-              </span>
-              <X className="absolute size-2.5 opacity-0 transition-opacity group-hover/clear:opacity-100" />
-            </span>
-          ) : null}
-        </Button>
-
-        {isOpen ? (
-          <div
-            className="absolute top-full right-0 z-50 mt-1.5 space-y-2 rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] p-2.5 shadow-lg backdrop-blur-xl"
-            style={{ width: popoverWidth }}
+    <div className={cn("relative", className)} ref={containerRef}>
+      <Button
+        type="button"
+        variant={isOpen || hasActiveFilters ? "default" : "outline"}
+        size="sm"
+        className="h-9 gap-1.5 px-3 text-[12px]"
+        onClick={() => setIsOpen((prev) => !prev)}
+      >
+        <SlidersHorizontal className="size-3.5" />
+        {t("common.filter.label", "筛选")}
+        {activeFilterCount > 0 ? (
+          <span
+            role="button"
+            aria-label={t("common.filter.clearAll", "清空")}
+            className="group/clear relative inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-white/20 px-0.5"
+            onClick={(e) => {
+              e.stopPropagation()
+              onClearAll()
+            }}
           >
-            {dimensions.map((dimension) => (
-              <FilterPopoverGroup key={dimension.key} title={dimension.label}>
-                <FilterPopoverChip
-                  active={dimension.value === "all"}
-                  onClick={() => onChangeFilter(dimension.key, "all")}
-                >
-                  {dimension.allLabel}
-                </FilterPopoverChip>
-                {dimension.options.map((option) => (
-                  <FilterPopoverChip
-                    key={option.value}
-                    active={dimension.value === option.value}
-                    onClick={() => onChangeFilter(dimension.key, option.value)}
-                  >
-                    {option.label}
-                  </FilterPopoverChip>
-                ))}
-              </FilterPopoverGroup>
-            ))}
-          </div>
+            <span className="text-[10px] tabular-nums group-hover/clear:invisible">
+              {activeFilterCount}
+            </span>
+            <X className="absolute size-2.5 opacity-0 transition-opacity group-hover/clear:opacity-100" />
+          </span>
         ) : null}
-      </div>
+      </Button>
 
-      {hasActiveFilters ? (
-        <div className="flex flex-wrap gap-1">
-          {dimensions.map((dimension) => {
-            if (dimension.value === "all") return null
-            const option = dimension.options.find((o) => o.value === dimension.value)
-            const valueLabel = option?.label ?? dimension.value
-
-            return (
-              <FilterAppliedChip
-                key={dimension.key}
-                label={`${dimension.label}: ${valueLabel}`}
-                onRemove={() => onChangeFilter(dimension.key, "all")}
-              />
-            )
-          })}
+      {isOpen ? (
+        <div
+          className="absolute top-full right-0 z-50 mt-1.5 space-y-2 rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] p-2.5 shadow-lg backdrop-blur-xl"
+          style={{ width: popoverWidth }}
+        >
+          {dimensions.map((dimension) => (
+            <FilterPopoverGroup key={dimension.key} title={dimension.label}>
+              <FilterPopoverChip
+                active={dimension.value === "all"}
+                onClick={() => onChangeFilter(dimension.key, "all")}
+              >
+                {dimension.allLabel}
+              </FilterPopoverChip>
+              {dimension.options.map((option) => (
+                <FilterPopoverChip
+                  key={option.value}
+                  active={dimension.value === option.value}
+                  onClick={() => onChangeFilter(dimension.key, option.value)}
+                >
+                  {option.label}
+                </FilterPopoverChip>
+              ))}
+            </FilterPopoverGroup>
+          ))}
         </div>
       ) : null}
+    </div>
+  )
+}
+
+export function FilterAppliedChips({
+  className,
+  dimensions,
+  onChangeFilter,
+}: {
+  className?: string
+  dimensions: FilterPopoverDimension[]
+  onChangeFilter: (key: string, value: string) => void
+}) {
+  const activeDimensions = dimensions.filter((dimension) => dimension.value !== "all")
+
+  if (activeDimensions.length === 0) {
+    return null
+  }
+
+  return (
+    <div className={cn("flex flex-wrap gap-1", className)}>
+      {activeDimensions.map((dimension) => {
+        const option = dimension.options.find((entry) => entry.value === dimension.value)
+        const valueLabel = option?.label ?? dimension.value
+
+        return (
+          <FilterAppliedChip
+            key={dimension.key}
+            label={`${dimension.label}: ${valueLabel}`}
+            onRemove={() => onChangeFilter(dimension.key, "all")}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -31,12 +31,7 @@ import {
 import { translateFinanceEnum } from "@/features/bettertolive/ui/finance/finance-i18n"
 import { getEntryMonth, getLatestMonth } from "@/features/bettertolive/ui/finance/finance-page-data"
 import { formatCurrency } from "@/features/bettertolive/ui/shared/formatters"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 type FinanceSummary = {
@@ -64,13 +59,11 @@ const EMPTY_FINANCE: FinanceModuleData = {
 export function FinancePage({
   financeModule,
   editableFinanceModule,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   financeModule: FinanceModuleData
   editableFinanceModule?: FinanceModuleData
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
@@ -137,16 +130,6 @@ export function FinancePage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("finance.page.eyebrow", "记账")}
-        title={t("finance.page.title", "让现实资源流向成为证据")}
-        description={t(
-          "finance.page.description",
-          "收入、支出、类别和复盘状态一起看，帮助你判断钱正在塑造怎样的生活。",
-        )}
-        searchQuery={searchQuery}
-      />
-
       {isControlMode ? (
         <div className="flex shrink-0 justify-end">
           <Button className="gap-2" onClick={handleCreateEntry}>

@@ -36,7 +36,8 @@ import {
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import { EmptyState } from "@/features/bettertolive/ui/shared/shared"
 import {
-  FilterPopover,
+  FilterAppliedChips,
+  FilterPopoverButton,
   type FilterPopoverDimension,
 } from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
@@ -178,23 +179,26 @@ export function LegacyItemsTab({
           ) : null}
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
-          <div className="relative min-w-0 flex-1">
-            <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-            <Input
-              value={localQuery}
-              onChange={(event) => setLocalQuery(event.currentTarget.value)}
-              className="h-9 pl-9"
-              placeholder={t("legacy.items.search", "搜索标题、正文、标签")}
+        <div className="mt-3 space-y-2">
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+              <Input
+                value={localQuery}
+                onChange={(event) => setLocalQuery(event.currentTarget.value)}
+                className="h-9 pl-9"
+                placeholder={t("legacy.items.search", "搜索标题、正文、标签")}
+              />
+            </div>
+            <FilterPopoverButton
+              className="shrink-0"
+              popoverWidth="18.5rem"
+              dimensions={filterDimensions}
+              onChangeFilter={handleFilterChange}
+              onClearAll={handleClearAll}
             />
           </div>
-          <FilterPopover
-            className="shrink-0"
-            popoverWidth="18.5rem"
-            dimensions={filterDimensions}
-            onChangeFilter={handleFilterChange}
-            onClearAll={handleClearAll}
-          />
+          <FilterAppliedChips dimensions={filterDimensions} onChangeFilter={handleFilterChange} />
         </div>
 
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">

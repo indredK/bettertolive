@@ -25,12 +25,7 @@ import type {
   SocioeconomicsGap,
   SocioeconomicsModuleData,
 } from "@/features/bettertolive/types"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import {
   Cytoscape2DGraph,
   type CytoscapeThemeTokens,
@@ -308,13 +303,11 @@ function createConceptGraphStylesheet(theme: CytoscapeThemeTokens) {
 export function SocioeconomicsPage({
   socioeconomicsModule,
   sourceSocioeconomicsModule,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   socioeconomicsModule: SocioeconomicsModuleData
   sourceSocioeconomicsModule?: SocioeconomicsModuleData
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
@@ -403,16 +396,6 @@ export function SocioeconomicsPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("socioeconomics.page.eyebrow", "社会经济")}
-        title={t("socioeconomics.page.title", "看清外部经济世界怎么运转")}
-        description={t(
-          "socioeconomics.page.description",
-          "按 5 维分类、看 relevance 决策距离，再用热力图找认知盲区。",
-        )}
-        searchQuery={searchQuery}
-      />
-
       <SocioeconomicsToolbar actions={actions} />
 
       <Tabs

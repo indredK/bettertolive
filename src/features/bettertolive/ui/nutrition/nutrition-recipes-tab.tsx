@@ -39,7 +39,8 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
 import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
 import {
-  FilterPopover,
+  FilterAppliedChips,
+  FilterPopoverButton,
   type FilterPopoverDimension,
 } from "@/features/bettertolive/ui/shared/filter-popover"
 import { cn } from "@/lib/utils"
@@ -144,41 +145,50 @@ export function NutritionRecipesTab({
           <h3 className="text-lg font-medium">{t("nutrition.recipes.title", "食谱库")}</h3>
           <NutritionControlModeBadge isControlMode={isControlMode} />
         </div>
+        {isControlMode ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="shrink-0"
+            onClick={() => setEditingRecipe({ isNew: true, recipe: null })}
+            aria-label={t("nutrition.recipeEdit.createTitle", "新增食谱")}
+          >
+            <Plus className="size-4" />
+          </Button>
+        ) : null}
       </div>
       <NutritionTabBody>
         <NutritionSidebarPane>
-          <div className="flex items-center gap-2">
-            <Input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("nutrition.recipes.search", "搜索食谱、标签或餐次")}
-              className="border-foreground/15 bg-background min-w-0 flex-1"
-            />
-            <FilterPopover
-              className="shrink-0"
-              popoverWidth="17.5rem"
+          <div className="space-y-2">
+            <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
+              <Input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={t("nutrition.recipes.search", "搜索食谱、标签或餐次")}
+                className="border-foreground/15 bg-background min-w-0 flex-1"
+              />
+              <FilterPopoverButton
+                className="shrink-0"
+                popoverWidth="17.5rem"
+                dimensions={filterDimensions}
+                onChangeFilter={(key, value) => {
+                  if (key === "filter") setFilter(value as RecipeFilterId)
+                  else if (key === "tag") setActiveTag(value)
+                }}
+                onClearAll={() => {
+                  setFilter("all")
+                  setActiveTag("all")
+                }}
+              />
+            </div>
+            <FilterAppliedChips
               dimensions={filterDimensions}
               onChangeFilter={(key, value) => {
                 if (key === "filter") setFilter(value as RecipeFilterId)
                 else if (key === "tag") setActiveTag(value)
               }}
-              onClearAll={() => {
-                setFilter("all")
-                setActiveTag("all")
-              }}
             />
-            {isControlMode ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                className="shrink-0"
-                onClick={() => setEditingRecipe({ isNew: true, recipe: null })}
-                aria-label={t("nutrition.recipeEdit.createTitle", "新增食谱")}
-              >
-                <Plus className="size-4" />
-              </Button>
-            ) : null}
           </div>
           <div className="mt-3 space-y-2">
             {recipes.map((recipe) => (

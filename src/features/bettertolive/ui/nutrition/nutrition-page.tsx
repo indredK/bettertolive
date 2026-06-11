@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
-import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { NutritionDailyPlanTab } from "@/features/bettertolive/ui/nutrition/nutrition-daily-plan-tab"
 import { NutritionFoodsTab } from "@/features/bettertolive/ui/nutrition/nutrition-foods-tab"
 import { NutritionLogsTab } from "@/features/bettertolive/ui/nutrition/nutrition-logs-tab"
@@ -29,13 +28,11 @@ const EMPTY_WEEKLY_REVIEW: NutritionModuleData["weeklyReview"] = {
 export function NutritionPage({
   editableNutrition,
   nutrition,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   editableNutrition?: NutritionModuleData
   nutrition: NutritionModuleData
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
@@ -56,16 +53,6 @@ export function NutritionPage({
         isStackedLayout ? "min-h-full" : "h-full overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("nutrition.page.eyebrow", "饮食")}
-        title={t("nutrition.page.title", "个人饮食工作台")}
-        description={t(
-          "nutrition.page.description",
-          "食谱库 + 食品分类 + 营养成分表 + 每日计划 + 进食记录",
-        )}
-        searchQuery={searchQuery}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}

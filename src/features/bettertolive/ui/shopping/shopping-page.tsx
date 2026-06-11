@@ -10,7 +10,6 @@ import type {
   ShoppingSystemDefinition,
   ShoppingSpaceDefinition,
 } from "@/features/bettertolive/types"
-import { PageIntro } from "@/features/bettertolive/ui/shared/shared"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
@@ -74,13 +73,6 @@ export function ShoppingPage({
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden">
-      <PageIntro
-        eyebrow={t("shopping.pageEyebrow", "Shopping")}
-        title={t("shopping.pageTitle", "购物")}
-        description={t("shopping.pageDescription", "物件库 + 物件系统 + 空间场景 + 阶段适用")}
-        searchQuery={searchQuery}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}

@@ -16,10 +16,9 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  FilterPopover,
-  type FilterPopoverDimension,
-} from "@/features/bettertolive/ui/shared/filter-popover"
+import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
+import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
+import { FilterablePanel } from "@/features/bettertolive/ui/shared/filterable-panel"
 import {
   Dialog,
   DialogContent,
@@ -58,12 +57,7 @@ import type {
   CognitiveDistortion,
   DefenseMechanism,
 } from "@/features/bettertolive/types"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import { cn } from "@/lib/utils"
 
@@ -182,13 +176,11 @@ function toggleValue<T extends string>(values: T[], value: T) {
 
 export function BeliefsPage({
   beliefsModule,
-  searchQuery,
   isStackedLayout = false,
   isControlMode = false,
   onRefresh,
 }: {
   beliefsModule: BeliefsModuleData
-  searchQuery: string
   isStackedLayout?: boolean
   isControlMode?: boolean
   onRefresh?: () => void
@@ -269,13 +261,6 @@ export function BeliefsPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("beliefs.page.eyebrow", "观念")}
-        title={t("beliefs.page.title", "观念图谱")}
-        description={t("beliefs.page.description", "4 维分类 + impact 分布 + 心理学解读")}
-        searchQuery={searchQuery}
-      />
-
       {isFixedLayout ? (
         <BeliefsFixedDashboard
           classificationSections={classificationSections}
@@ -679,6 +664,8 @@ function BeliefToolbar({
   onCreate: () => void
 }) {
   const { t } = useTranslation()
+  const searchQuery = useWorkspaceUiStore((state) => state.searchQuery)
+  const setSearchQuery = useWorkspaceUiStore((state) => state.setSearchQuery)
 
   const filterDimensions: FilterPopoverDimension[] = [
     {
@@ -724,31 +711,30 @@ function BeliefToolbar({
   ]
 
   return (
-    <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-3 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <FilterPopover
-            dimensions={filterDimensions}
-            popoverWidth="20.5rem"
-            onChangeFilter={(key, value) => onFilterChange({ ...filters, [key]: value })}
-            onClearAll={() => onFilterChange(DEFAULT_FILTERS)}
-          />
+    <FilterablePanel
+      dimensions={filterDimensions}
+      header={
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <Badge
             variant="outline"
             className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
           >
             {t("beliefs.filter.count", "{{count}} 条", { count: total })}
           </Badge>
+          {isControlMode ? (
+            <Button size="sm" onClick={onCreate}>
+              <Plus className="size-3.5" />
+              {t("beliefs.actions.create", "新增观念")}
+            </Button>
+          ) : null}
         </div>
-
-        {isControlMode ? (
-          <Button size="sm" onClick={onCreate}>
-            <Plus className="size-3.5" />
-            {t("beliefs.actions.create", "新增观念")}
-          </Button>
-        ) : null}
-      </div>
-    </div>
+      }
+      searchQuery={searchQuery}
+      onSearchQueryChange={setSearchQuery}
+      onChangeFilter={(key, value) => onFilterChange({ ...filters, [key]: value })}
+      onClearAll={() => onFilterChange(DEFAULT_FILTERS)}
+      popoverWidth="20.5rem"
+    />
   )
 }
 

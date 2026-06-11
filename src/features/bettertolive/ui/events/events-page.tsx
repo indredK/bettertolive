@@ -130,13 +130,11 @@ function getDateBucket(event: EventEntry) {
 export function EventsPage({
   editableEventsModule,
   events,
-  searchQuery,
   isControlMode = false,
   isStackedLayout = false,
 }: {
   editableEventsModule: EventsModuleData
   events: EventEntry[]
-  searchQuery: string
   isControlMode?: boolean
   isStackedLayout?: boolean
 }) {
@@ -162,8 +160,6 @@ export function EventsPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <EventsPageIntro searchQuery={searchQuery} />
-
       <Tabs
         defaultValue="overview"
         className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
@@ -299,32 +295,6 @@ export function EventsPage({
           eventsModule={editableEventsModule}
           onClose={() => setEditingEvent(null)}
         />
-      ) : null}
-    </div>
-  )
-}
-
-function EventsPageIntro({ searchQuery }: { searchQuery: string }) {
-  const { t } = useTranslation()
-
-  return (
-    <div className="shrink-0">
-      <div className="text-xs text-[color:var(--text-muted)] uppercase">
-        {t("events.page.eyebrow")}
-      </div>
-      <h2 className="mt-2 text-2xl font-semibold text-[color:var(--text-primary)] sm:text-3xl">
-        {t("events.page.title")}
-      </h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-[color:var(--text-secondary)]">
-        {t("events.page.description")}
-      </p>
-      {searchQuery.trim() ? (
-        <Badge
-          variant="outline"
-          className="mt-3 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-        >
-          {t("events.search.active", { query: searchQuery.trim() })}
-        </Badge>
       ) : null}
     </div>
   )

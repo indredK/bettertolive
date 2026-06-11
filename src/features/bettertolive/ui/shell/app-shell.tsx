@@ -317,6 +317,8 @@ export function BetterToLiveAppShell() {
   const isWideLayout = layoutMode === "wide"
   const isCompactLayout = layoutMode === "compact"
   const isStackedLayout = layoutMode === "stacked"
+  const usesEmbeddedFilterSearch =
+    activeView === "beliefs" || activeView === "journey" || activeView === "relationships"
   const isHorizontalHeader = !isStackedLayout
   const showSidebar = !isStackedLayout
   const isSidebarInteractive = showSidebar
@@ -394,7 +396,6 @@ export function BetterToLiveAppShell() {
             editableReflectionModule={workspaceQuery.workspaceSnapshot.reflection}
             draftExample={viewModel.reflectionDraftExample}
             reflections={viewModel.reflections}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -404,7 +405,6 @@ export function BetterToLiveAppShell() {
           <EventsPage
             editableEventsModule={workspaceQuery.workspaceSnapshot.events}
             events={viewModel.events}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -417,7 +417,6 @@ export function BetterToLiveAppShell() {
               entries: viewModel.transactions,
             }}
             editableFinanceModule={workspaceQuery.workspaceSnapshot.finance}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -427,7 +426,6 @@ export function BetterToLiveAppShell() {
           <ShoppingPage
             shopping={viewModel.shoppingModule}
             searchQuery={searchQuery}
-            isWideLayout={isWideLayout}
             isStackedLayout={isStackedLayout}
             isControlMode={isShoppingManagementMode}
             onRefresh={() => workspaceQuery.refetch()}
@@ -438,7 +436,6 @@ export function BetterToLiveAppShell() {
           <NutritionPage
             nutrition={viewModel.nutritionModule}
             editableNutrition={workspaceQuery.workspaceSnapshot.nutrition}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -448,7 +445,6 @@ export function BetterToLiveAppShell() {
           <EmotionPage
             emotionModule={viewModel.emotionModule}
             editableEmotionModule={workspaceQuery.workspaceSnapshot.emotion}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -457,7 +453,6 @@ export function BetterToLiveAppShell() {
         return (
           <BeliefsPage
             beliefsModule={viewModel.beliefsModule}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
             onRefresh={() => workspaceQuery.refetch()}
@@ -468,7 +463,6 @@ export function BetterToLiveAppShell() {
           <PrinciplesPage
             principlesModule={viewModel.principlesModule}
             editablePrinciplesModule={workspaceQuery.workspaceSnapshot.principles}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
             onRefresh={() => workspaceQuery.refetch()}
@@ -479,7 +473,6 @@ export function BetterToLiveAppShell() {
           <RelationshipsPage
             relationshipsModule={viewModel.relationshipsModule}
             editableRelationshipsModule={workspaceQuery.workspaceSnapshot.relationships}
-            searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
             isControlMode={isShoppingManagementMode}
             onRefresh={() => workspaceQuery.refetch()}
@@ -491,7 +484,6 @@ export function BetterToLiveAppShell() {
             journey={viewModel.journeyData}
             editableGrowth={workspaceQuery.workspaceSnapshot.growth}
             editableMemory={workspaceQuery.workspaceSnapshot.memory}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -500,7 +492,6 @@ export function BetterToLiveAppShell() {
         return (
           <LegacyPage
             legacy={viewModel.legacyModule}
-            searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
             isControlMode={isShoppingManagementMode}
             onRefresh={() => workspaceQuery.refetch()}
@@ -511,7 +502,6 @@ export function BetterToLiveAppShell() {
           <SocioeconomicsPage
             socioeconomicsModule={viewModel.socioeconomicsModule}
             sourceSocioeconomicsModule={workspaceQuery.workspaceSnapshot.socioeconomics}
-            searchQuery={searchQuery}
             isControlMode={isShoppingManagementMode}
             isStackedLayout={isStackedLayout}
           />
@@ -532,10 +522,8 @@ export function BetterToLiveAppShell() {
         return (
           <OverviewPage
             dailyPulse={viewModel.dailyPulse}
-            greeting={viewModel.greeting}
             recentRecords={viewModel.recentRecords}
             onNavigate={setActiveView}
-            searchQuery={searchQuery}
             isStackedLayout={isStackedLayout}
           />
         )
@@ -800,30 +788,33 @@ export function BetterToLiveAppShell() {
 
               <div
                 className={cn(
-                  "grid gap-3",
+                  usesEmbeddedFilterSearch ? "flex justify-end gap-3" : "grid gap-3",
                   isHorizontalHeader &&
+                    !usesEmbeddedFilterSearch &&
                     "ml-6 min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center",
                 )}
                 data-testid="workspace-header-actions"
               >
-                <div
-                  className={cn(
-                    "relative min-w-0",
-                    isHorizontalHeader ? "w-full max-w-[400px] justify-self-end" : "w-full",
-                  )}
-                >
-                  <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[color:var(--text-muted)]" />
-                  <Input
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                {usesEmbeddedFilterSearch ? null : (
+                  <div
                     className={cn(
-                      "h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]",
-                      isWideLayout && "h-8",
+                      "relative min-w-0",
+                      isHorizontalHeader ? "w-full max-w-[400px] justify-self-end" : "w-full",
                     )}
-                    placeholder={t("shell.searchPlaceholder")}
-                    aria-label={t("shell.searchAria")}
-                  />
-                </div>
+                  >
+                    <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-[color:var(--text-muted)]" />
+                    <Input
+                      value={searchQuery}
+                      onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                      className={cn(
+                        "h-10 w-full border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] pl-9 text-sm text-[color:var(--text-primary)] shadow-none placeholder:text-[color:var(--text-muted)]",
+                        isWideLayout && "h-8",
+                      )}
+                      placeholder={t("shell.searchPlaceholder")}
+                      aria-label={t("shell.searchAria")}
+                    />
+                  </div>
+                )}
                 <div
                   className={cn(
                     "flex items-center gap-3",

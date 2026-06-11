@@ -19,7 +19,6 @@ import { useTranslation } from "react-i18next"
 import type { AppView, RecentRecord } from "@/features/bettertolive/types"
 import {
   EmptyState,
-  PageIntro,
   QuickActionButton,
   RecordStream,
   SectionHeading,
@@ -28,18 +27,14 @@ import {
 import { cn } from "@/lib/utils"
 
 export function OverviewPage({
-  greeting,
   dailyPulse,
   recentRecords,
   onNavigate,
-  searchQuery,
   isStackedLayout = false,
 }: {
-  greeting: string
   dailyPulse: string[]
   recentRecords: RecentRecord[]
   onNavigate: (view: AppView) => void
-  searchQuery: string
   isStackedLayout?: boolean
 }) {
   const { t } = useTranslation()
@@ -162,13 +157,6 @@ export function OverviewPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("overview.page.eyebrow", "总览")}
-        title={t("overview.page.title", "先看全局，再决定从哪里开始")}
-        description={greeting}
-        searchQuery={searchQuery}
-      />
-
       <div
         className={cn(
           "grid gap-4 min-[1240px]:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.92fr)]",

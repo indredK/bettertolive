@@ -40,12 +40,7 @@ import {
   type EmotionTextListKey,
 } from "@/features/bettertolive/ui/emotion/emotion-edit-dialog"
 import { translateEmotionEnum } from "@/features/bettertolive/ui/emotion/emotion-i18n"
-import {
-  EmptyState,
-  PageIntro,
-  SectionHeading,
-  Surface,
-} from "@/features/bettertolive/ui/shared/shared"
+import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
 
 type EmotionTab = "overview" | "today" | "timeline" | "triggers" | "toolbox"
@@ -68,13 +63,11 @@ export function EmotionPage({
   emotionModule,
   isControlMode = false,
   isStackedLayout = false,
-  searchQuery,
 }: {
   editableEmotionModule: EmotionModuleData
   emotionModule: EmotionModuleData
   isControlMode?: boolean
   isStackedLayout?: boolean
-  searchQuery: string
 }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<EmotionTab>("overview")
@@ -97,16 +90,6 @@ export function EmotionPage({
         isStackedLayout ? "min-h-full" : "h-full overflow-hidden",
       )}
     >
-      <PageIntro
-        eyebrow={t("emotion.page.eyebrow", "情绪情感")}
-        title={t("emotion.page.title", "看见最近的心理天气")}
-        description={t(
-          "emotion.page.description",
-          "把波动、触发因素和对自己有效的恢复方式放在一起看。",
-        )}
-        searchQuery={searchQuery}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={(value) => setActiveTab(value as EmotionTab)}
