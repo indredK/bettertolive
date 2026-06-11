@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
@@ -213,16 +213,15 @@ export function ShoppingStagesTab({
                             })}
                           </span>
                         </button>
-                        <AnimatedButton
+                        <AnimatedIconButton
                           show={isControlMode}
-                          containerClassName="shrink-0"
                           size="icon-sm"
                           variant="ghost"
-                          className="h-6 w-6"
+                          className="h-6 w-6 shrink-0"
+                          label={t("shopping.stages.edit", "编辑阶段")}
+                          icon={<Pencil className="size-3" />}
                           onClick={() => onEditStage(stage)}
-                        >
-                          <Pencil className="size-3" />
-                        </AnimatedButton>
+                        />
                       </div>
                     </div>
                   </SortableShoppingCard>
@@ -245,15 +244,14 @@ export function ShoppingStagesTab({
                       <div className="text-muted-foreground text-xs">{activeStage.focus}</div>
                     )}
                   </div>
-                  <AnimatedButton
+                  <AnimatedIconButton
                     show={isControlMode}
-                    containerClassName="shrink-0"
                     variant="outline"
                     size="sm"
+                    label={t("shopping.stages.delete", "删除阶段")}
+                    icon={<Trash2 className="h-4 w-4" />}
                     onClick={() => handleDelete(activeStage.id, activeStage.name)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </AnimatedButton>
+                  />
                 </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden">
                   <Tabs

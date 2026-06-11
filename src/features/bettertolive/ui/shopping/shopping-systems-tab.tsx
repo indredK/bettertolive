@@ -7,7 +7,7 @@ import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type {
   ShoppingItem,
@@ -84,16 +84,15 @@ function SystemMapCard({
             <div className="text-muted-foreground truncate text-[11px]">{system.summary}</div>
           )}
         </button>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode}
-          containerClassName="shrink-0"
           size="icon-sm"
           variant="ghost"
-          className="h-6 w-6"
+          className="h-6 w-6 shrink-0"
+          label={t("shopping.systems.edit", "编辑系统")}
+          icon={<Pencil className="size-3" />}
           onClick={() => onEditSystem(system)}
-        >
-          <Pencil className="size-3" />
-        </AnimatedButton>
+        />
       </div>
     </div>
   )
@@ -130,15 +129,14 @@ function SystemDetailPanel({
                 })}
           </div>
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode && Boolean(onDelete)}
-          containerClassName="shrink-0"
           variant="outline"
           size="sm"
+          label={t("shopping.systems.delete", "删除系统")}
+          icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </AnimatedButton>
+        />
       </CardHeader>
       <CardContent className="min-h-0 flex-1 overflow-y-auto">
         {system.keyQuestion && (

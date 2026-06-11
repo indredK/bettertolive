@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { LegacyItem, LegacyModuleData } from "@/features/bettertolive/types"
 import { LegacyDeliveryMapTab } from "@/features/bettertolive/ui/legacy/legacy-delivery-map-tab"
@@ -59,7 +59,7 @@ export function LegacyPage({
           isStackedLayout ? "overflow-visible" : "overflow-hidden",
         )}
       >
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <ActionGroup>
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
               <TabsTrigger value="overview">{t("legacy.tabs.overview", "总览")}</TabsTrigger>
@@ -76,13 +76,15 @@ export function LegacyPage({
             </TabsList>
           </div>
 
-          {isControlMode && activeTab === "items" ? (
-            <Button size="sm" onClick={() => handleEditItem(null)}>
-              <Plus className="size-4" />
-              {t("legacy.actions.add", "新增")}
-            </Button>
-          ) : null}
-        </div>
+          <AnimatedButton
+            show={isControlMode && activeTab === "items"}
+            size="sm"
+            onClick={() => handleEditItem(null)}
+          >
+            <Plus className="size-4" />
+            {t("legacy.actions.add", "新增")}
+          </AnimatedButton>
+        </ActionGroup>
 
         <TabsContent value="overview" className={tabContentClassName}>
           <LegacyOverviewTab

@@ -14,7 +14,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveRelationshipsMutation } from "@/features/bettertolive/queries/use-save-relationships-mutation"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
@@ -957,7 +957,11 @@ function RelationshipsGraphTab({
               </div>
 
               <div className="flex flex-col gap-2 min-[920px]:items-end">
-                <div className="flex flex-wrap items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
+                <ActionGroup
+                  gap="compact"
+                  wrap={false}
+                  className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1"
+                >
                   <Button
                     type="button"
                     size="sm"
@@ -1008,9 +1012,13 @@ function RelationshipsGraphTab({
                   >
                     3D
                   </Button>
-                </div>
+                </ActionGroup>
 
-                <div className="flex flex-wrap items-center gap-1 rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1">
+                <ActionGroup
+                  gap="compact"
+                  wrap={false}
+                  className="rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] p-1"
+                >
                   {graphMarkOptions.map((option) => (
                     <Button
                       key={option.mode}
@@ -1023,7 +1031,7 @@ function RelationshipsGraphTab({
                       {option.label}
                     </Button>
                   ))}
-                </div>
+                </ActionGroup>
               </div>
             </div>
           </div>
@@ -1203,7 +1211,7 @@ function RelationshipGraphRelationshipDetail({
             </h4>
             <p className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</p>
           </div>
-          <div className="flex shrink-0 flex-wrap justify-end gap-2">
+          <ActionGroup justify="end">
             <Button
               type="button"
               size="sm"
@@ -1214,7 +1222,7 @@ function RelationshipGraphRelationshipDetail({
               <Pencil className="h-4 w-4" />
               {t("relationships.graph.editConnections", "编辑")}
             </Button>
-          </div>
+          </ActionGroup>
         </div>
       </div>
 
@@ -1495,14 +1503,14 @@ function RelationshipsDirectoryTab({
               title={t("relationships.directory.title", "关系档案")}
               count={filteredRelationshipCount}
             />
-            <AnimatedButton
+            <AnimatedIconButton
               show={isControlMode}
               size="icon-sm"
               variant="outline"
+              label={t("relationships.directory.add", "新增关系")}
+              icon={<Plus className="size-3.5" />}
               onClick={onCreate}
-            >
-              <Plus className="size-3.5" />
-            </AnimatedButton>
+            />
           </div>
         }
         bodyClassName="min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto"
@@ -1662,7 +1670,7 @@ function RelationshipDetailPanel({
           </h3>
           <div className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</div>
         </div>
-        <div className="flex shrink-0 gap-2">
+        <ActionGroup justify="end">
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
             <Pencil className="h-4 w-4" />
             {t("relationships.common.edit", "编辑")}
@@ -1671,7 +1679,7 @@ function RelationshipDetailPanel({
             <Trash2 className="h-4 w-4" />
             {t("relationships.common.delete", "删除")}
           </AnimatedButton>
-        </div>
+        </ActionGroup>
       </div>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-visible pt-4 pr-1 lg:overflow-y-auto">
@@ -1796,9 +1804,14 @@ function UnsentNotesTab({
             title={t("relationships.unsent.title", "想说的话")}
             count={notes.length}
           />
-          <AnimatedButton show={isControlMode} size="icon-sm" variant="outline" onClick={onCreate}>
-            <Plus className="size-3.5" />
-          </AnimatedButton>
+          <AnimatedIconButton
+            show={isControlMode}
+            size="icon-sm"
+            variant="outline"
+            label={t("relationships.unsent.add", "新增想说的话")}
+            icon={<Plus className="size-3.5" />}
+            onClick={onCreate}
+          />
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {notes.map((note) => (
@@ -1899,9 +1912,14 @@ function PatternsTab({
             title={t("relationships.patterns.title", "跨关系模式")}
             count={patterns.length}
           />
-          <AnimatedButton show={isControlMode} size="icon-sm" variant="outline" onClick={onCreate}>
-            <Plus className="size-3.5" />
-          </AnimatedButton>
+          <AnimatedIconButton
+            show={isControlMode}
+            size="icon-sm"
+            variant="outline"
+            label={t("relationships.patterns.add", "新增模式")}
+            icon={<Plus className="size-3.5" />}
+            onClick={onCreate}
+          />
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {patterns.map((pattern) => (
@@ -2003,7 +2021,7 @@ function DetailHeader({
         </Badge>
         <h3 className="mt-3 text-lg font-semibold text-[color:var(--text-primary)]">{title}</h3>
       </div>
-      <div className="flex shrink-0 gap-2">
+      <ActionGroup justify="end">
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
           <Pencil className="h-4 w-4" />
           {t("relationships.common.edit", "编辑")}
@@ -2012,7 +2030,7 @@ function DetailHeader({
           <Trash2 className="h-4 w-4" />
           {t("relationships.common.delete", "删除")}
         </AnimatedButton>
-      </div>
+      </ActionGroup>
     </div>
   )
 }

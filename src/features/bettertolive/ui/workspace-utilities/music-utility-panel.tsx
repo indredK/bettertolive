@@ -2,6 +2,7 @@ import { ChevronRight, Minus, Pause, Play, Plus } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
 import { cn } from "@/lib/utils"
 
@@ -38,6 +39,11 @@ export function MusicUtilityPanel({
     `shell.music.presets.${musicPresetId}.description`,
     musicDescription,
   )
+  const toggleMusicLabel = isPlaying
+    ? t("shell.music.pause", "暂停播放")
+    : t("shell.music.play", "开始播放")
+  const decreaseVolumeLabel = t("shell.music.volumeDown", "降低音量")
+  const increaseVolumeLabel = t("shell.music.volumeUp", "提高音量")
 
   return (
     <div
@@ -53,14 +59,22 @@ export function MusicUtilityPanel({
             {t("shell.music.description")}
           </p>
         </div>
-        <Button
-          size="icon-sm"
-          variant="outline"
-          className="bg-white/80"
-          onClick={() => void onToggleMusic()}
-        >
-          {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger
+            render={
+              <Button
+                aria-label={toggleMusicLabel}
+                size="icon-sm"
+                variant="outline"
+                className="bg-white/80"
+                onClick={() => void onToggleMusic()}
+              >
+                {isPlaying ? <Pause className="size-4" /> : <Play className="size-4" />}
+              </Button>
+            }
+          />
+          <TooltipContent>{toggleMusicLabel}</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="mt-4 rounded-xl border border-[color:var(--chip-border)] bg-white/70 px-4 py-3">
@@ -120,22 +134,38 @@ export function MusicUtilityPanel({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="icon-sm"
-            variant="outline"
-            className="bg-white/80"
-            onClick={() => onNudgeVolume(-8)}
-          >
-            <Minus className="size-4" />
-          </Button>
-          <Button
-            size="icon-sm"
-            variant="outline"
-            className="bg-white/80"
-            onClick={() => onNudgeVolume(8)}
-          >
-            <Plus className="size-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  aria-label={decreaseVolumeLabel}
+                  size="icon-sm"
+                  variant="outline"
+                  className="bg-white/80"
+                  onClick={() => onNudgeVolume(-8)}
+                >
+                  <Minus className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>{decreaseVolumeLabel}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Button
+                  aria-label={increaseVolumeLabel}
+                  size="icon-sm"
+                  variant="outline"
+                  className="bg-white/80"
+                  onClick={() => onNudgeVolume(8)}
+                >
+                  <Plus className="size-4" />
+                </Button>
+              }
+            />
+            <TooltipContent>{increaseVolumeLabel}</TooltipContent>
+          </Tooltip>
         </div>
       </div>
     </div>

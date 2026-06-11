@@ -522,6 +522,7 @@ export function NutritionRecipeEditDialog({
                         size="icon-sm"
                         onClick={() => removeIngredient(index)}
                         disabled={form.ingredients.length <= 1}
+                        tooltip={t("nutrition.recipeEdit.delete", "删除")}
                       >
                         <Trash2 className="size-4" />
                       </Button>

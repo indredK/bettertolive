@@ -2,7 +2,8 @@ import { Boxes, Plus } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedVisibility } from "@/components/ui/animated-visibility"
+import { ActionGroup, AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
 import { NutritionDailyPlanTab } from "@/features/bettertolive/ui/nutrition/nutrition-daily-plan-tab"
@@ -66,7 +67,7 @@ export function NutritionPage({
           isStackedLayout ? "overflow-visible" : "overflow-hidden",
         )}
       >
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <ActionGroup>
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
               <TabsTrigger value="overview">{t("nutrition.tabs.overview", "总览")}</TabsTrigger>
@@ -82,46 +83,52 @@ export function NutritionPage({
             </TabsList>
           </div>
 
-          {isControlMode ? (
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
-              {activeTab === "dailyPlan" ? (
-                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("dailyPlan")}>
-                  <Plus className="size-4" />
-                  {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
-                </AnimatedButton>
-              ) : null}
-              {activeTab === "recipes" ? (
-                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("recipe")}>
-                  <Plus className="size-4" />
-                  {t("nutrition.recipeEdit.createTitle", "新增食谱")}
-                </AnimatedButton>
-              ) : null}
-              {activeTab === "foods" ? (
-                <>
-                  <AnimatedButton
-                    show
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setPendingCreateAction("foodCategory")}
-                  >
-                    <Boxes className="size-4" />
-                    {t("nutrition.categoryEdit.createTitle", "新增食品分类")}
-                  </AnimatedButton>
-                  <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("food")}>
-                    <Plus className="size-4" />
-                    {t("nutrition.foodEdit.createTitle", "新增食品")}
-                  </AnimatedButton>
-                </>
-              ) : null}
-              {activeTab === "logs" ? (
-                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("mealLog")}>
-                  <Plus className="size-4" />
-                  {t("nutrition.logEdit.createTitle", "新增进食记录")}
-                </AnimatedButton>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
+          <AnimatedVisibility show={isControlMode} className="shrink-0">
+            <ActionGroup>
+              <AnimatedButton
+                show={activeTab === "dailyPlan"}
+                size="sm"
+                onClick={() => setPendingCreateAction("dailyPlan")}
+              >
+                <Plus className="size-4" />
+                {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
+              </AnimatedButton>
+              <AnimatedButton
+                show={activeTab === "recipes"}
+                size="sm"
+                onClick={() => setPendingCreateAction("recipe")}
+              >
+                <Plus className="size-4" />
+                {t("nutrition.recipeEdit.createTitle", "新增食谱")}
+              </AnimatedButton>
+              <AnimatedButton
+                show={activeTab === "foods"}
+                size="sm"
+                variant="outline"
+                onClick={() => setPendingCreateAction("foodCategory")}
+              >
+                <Boxes className="size-4" />
+                {t("nutrition.categoryEdit.createTitle", "新增食品分类")}
+              </AnimatedButton>
+              <AnimatedButton
+                show={activeTab === "foods"}
+                size="sm"
+                onClick={() => setPendingCreateAction("food")}
+              >
+                <Plus className="size-4" />
+                {t("nutrition.foodEdit.createTitle", "新增食品")}
+              </AnimatedButton>
+              <AnimatedButton
+                show={activeTab === "logs"}
+                size="sm"
+                onClick={() => setPendingCreateAction("mealLog")}
+              >
+                <Plus className="size-4" />
+                {t("nutrition.logEdit.createTitle", "新增进食记录")}
+              </AnimatedButton>
+            </ActionGroup>
+          </AnimatedVisibility>
+        </ActionGroup>
 
         <TabsContent value="overview" className={tabContentClassName}>
           <NutritionOverviewTab

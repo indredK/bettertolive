@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { MealLog, NutritionModuleData, Recipe } from "@/features/bettertolive/types"
@@ -293,16 +293,17 @@ function RecipeDetail({
             <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
               {t("nutrition.recipes.personalLibrary", "个人食谱库")}
             </Badge>
-            <AnimatedButton
+            <AnimatedIconButton
               show={Boolean(onEdit)}
               type="button"
               variant="outline"
               size="sm"
+              label={t("nutrition.recipeEdit.editAction", "编辑")}
+              icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
             >
-              <Pencil className="size-3.5" />
               {t("nutrition.recipeEdit.editAction", "编辑")}
-            </AnimatedButton>
+            </AnimatedIconButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{recipe.name}</h3>
           <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6">{recipe.summary}</p>

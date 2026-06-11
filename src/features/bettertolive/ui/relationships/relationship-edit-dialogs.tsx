@@ -1053,6 +1053,7 @@ function EventEditor({
           variant="ghost"
           onClick={onRemove}
           aria-label={t("relationships.common.delete", "删除")}
+          tooltip={t("relationships.common.delete", "删除")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1142,6 +1143,7 @@ function HistoryEditor({
           variant="ghost"
           onClick={onRemove}
           aria-label={t("relationships.common.delete", "删除")}
+          tooltip={t("relationships.common.delete", "删除")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1282,6 +1284,7 @@ function ConnectionEditor({
             variant="ghost"
             onClick={onRemove}
             aria-label={t("relationships.common.delete", "删除")}
+            tooltip={t("relationships.common.delete", "删除")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -1427,6 +1430,7 @@ function ConnectionRoleEditor({
           variant="ghost"
           onClick={onRemove}
           aria-label={t("relationships.common.delete", "删除")}
+          tooltip={t("relationships.common.delete", "删除")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>

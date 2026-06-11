@@ -1,6 +1,8 @@
 import { type ReactNode, forwardRef } from "react"
 import { AnimatePresence, m, useReducedMotion } from "motion/react"
 
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { BUTTON_TAP_SCALE, BUTTON_TAP_TRANSITION } from "@/lib/app-motion"
 import { cn } from "@/lib/utils"
 
 const utilityRingMask =
@@ -17,6 +19,7 @@ export const UtilityIconButton = forwardRef<
   {
     children: ReactNode
     label: string
+    tooltip?: ReactNode | null
     contentKey?: string | number
     badge?: number | null
     dot?: boolean
@@ -29,6 +32,7 @@ export const UtilityIconButton = forwardRef<
   {
     children,
     label,
+    tooltip,
     contentKey,
     badge = null,
     dot = false,
@@ -41,8 +45,9 @@ export const UtilityIconButton = forwardRef<
 ) {
   const prefersReducedMotion = useReducedMotion()
   const iconKey = contentKey ?? label
+  const resolvedTooltip = tooltip === undefined ? label : tooltip
 
-  return (
+  const button = (
     <m.button
       ref={ref}
       type="button"
@@ -50,8 +55,8 @@ export const UtilityIconButton = forwardRef<
       aria-haspopup={popupType}
       aria-label={label}
       data-testid={testId}
-      whileTap={{ scale: 0.92 }}
-      transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: BUTTON_TAP_SCALE }}
+      transition={BUTTON_TAP_TRANSITION}
       className={cn(
         "group relative isolate flex size-8 cursor-pointer items-center justify-center overflow-visible rounded-full border border-transparent outline-none",
         isActive ? "text-[color:var(--nav-active-border)]" : "text-[color:var(--text-muted)]",
@@ -293,5 +298,16 @@ export const UtilityIconButton = forwardRef<
         <span className="absolute -right-0.5 -bottom-0.5 z-20 size-2 rounded-full border border-white bg-emerald-500" />
       ) : null}
     </m.button>
+  )
+
+  if (resolvedTooltip == null) {
+    return button
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={button} />
+      <TooltipContent>{resolvedTooltip}</TooltipContent>
+    </Tooltip>
   )
 })

@@ -13,7 +13,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { FutureBlueprint, FutureMilestone } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
@@ -96,7 +96,7 @@ export function FuturePage({
             </TabsList>
           </div>
 
-          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+          <ActionGroup justify="end" className="self-start">
             {onRefresh ? (
               <Button
                 type="button"
@@ -117,7 +117,7 @@ export function FuturePage({
               <PencilLine className="size-4" />
               {t("future.edit.blueprint", "编辑蓝图")}
             </AnimatedButton>
-          </div>
+          </ActionGroup>
         </div>
 
         <TabsContent
@@ -601,6 +601,8 @@ function DefinitionBlock({
   onEdit?: () => void
   value: string
 }) {
+  const { t } = useTranslation()
+
   return (
     <div
       className={cn(
@@ -615,16 +617,16 @@ function DefinitionBlock({
           <Icon className="size-4" />
           <div className="text-sm font-medium">{label}</div>
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={Boolean(onEdit)}
           type="button"
           variant="ghost"
           size="sm"
           className="text-[color:var(--text-secondary)]"
+          label={t("future.edit.blueprint", "编辑蓝图")}
+          icon={<PencilLine className="size-3.5" />}
           onClick={onEdit}
-        >
-          <PencilLine className="size-3.5" />
-        </AnimatedButton>
+        />
       </div>
       <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">{value || " "}</p>
     </div>
@@ -632,6 +634,8 @@ function DefinitionBlock({
 }
 
 function MilestoneCard({ entry, onEdit }: { entry: FutureMilestone; onEdit?: () => void }) {
+  const { t } = useTranslation()
+
   return (
     <div
       className={cn(
@@ -647,15 +651,15 @@ function MilestoneCard({ entry, onEdit }: { entry: FutureMilestone; onEdit?: () 
         >
           {entry.horizon}
         </Badge>
-        <AnimatedButton
+        <AnimatedIconButton
           show={Boolean(onEdit)}
           type="button"
           variant="ghost"
           size="sm"
+          label={t("future.edit.milestone", "编辑路径")}
+          icon={<PencilLine className="size-3.5" />}
           onClick={onEdit}
-        >
-          <PencilLine className="size-3.5" />
-        </AnimatedButton>
+        />
       </div>
       <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">{entry.summary}</p>
       <ul className="mt-3 space-y-2 text-sm text-[color:var(--text-muted)]">

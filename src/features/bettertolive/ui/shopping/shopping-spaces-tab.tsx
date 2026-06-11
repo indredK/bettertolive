@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type {
   ShoppingItem,
@@ -83,16 +83,15 @@ function SpaceMapCard({
             </span>
           </div>
         </button>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode}
-          containerClassName="shrink-0"
           size="icon-sm"
           variant="ghost"
-          className="h-6 w-6"
+          className="h-6 w-6 shrink-0"
+          label={t("shopping.spaces.edit", "编辑空间")}
+          icon={<Pencil className="size-3" />}
           onClick={() => onEditSpace(space)}
-        >
-          <Pencil className="size-3" />
-        </AnimatedButton>
+        />
       </div>
     </div>
   )
@@ -130,15 +129,14 @@ function SpaceDetailPanel({
             {t("shopping.spaces.summary", { total: items.length, systems: systemIds.length })}
           </div>
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode && Boolean(onDelete)}
-          containerClassName="shrink-0"
           variant="outline"
           size="sm"
+          label={t("shopping.spaces.delete", "删除空间")}
+          icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </AnimatedButton>
+        />
       </CardHeader>
       <CardContent className="min-h-0 flex-1 overflow-y-auto">
         {items.length > 0 ? (

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { AnimatedIconButton, Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -401,6 +401,7 @@ export function NutritionDailyPlanEditDialog({
                           size="icon-sm"
                           onClick={() => removeSlot(slotIndex)}
                           disabled={form.slots.length <= 1 || referencedSlotIds.has(slot.id)}
+                          tooltip={t("nutrition.dailyPlanEdit.delete", "删除")}
                         >
                           <Trash2 className="size-4" />
                         </Button>
@@ -622,9 +623,15 @@ function PlanEntryRow({
       ) : null}
 
       <div className="flex items-end">
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-          <Trash2 className="size-4" />
-        </Button>
+        <AnimatedIconButton
+          show
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          label={t("nutrition.dailyPlanEdit.removeEntry", "移除条目")}
+          icon={<Trash2 className="size-4" />}
+          onClick={onRemove}
+        />
       </div>
     </div>
   )

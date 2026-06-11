@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
@@ -714,7 +714,7 @@ function BeliefToolbar({
     <FilterablePanel
       dimensions={filterDimensions}
       header={
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <ActionGroup justify="between" className="items-center">
           <Badge
             variant="outline"
             className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
@@ -725,7 +725,7 @@ function BeliefToolbar({
             <Plus className="size-3.5" />
             {t("beliefs.actions.create", "新增观念")}
           </AnimatedButton>
-        </div>
+        </ActionGroup>
       }
       searchQuery={searchQuery}
       onSearchQueryChange={setSearchQuery}
@@ -962,15 +962,14 @@ function BeliefCard({
           </Badge>
           <ImpactBadge impact={entry.impact} />
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode && Boolean(onEdit)}
           variant="ghost"
           size="icon-sm"
+          label={t("beliefs.actions.edit", "编辑")}
+          icon={<Edit3 className="size-3.5" />}
           onClick={onEdit}
-          aria-label={t("beliefs.actions.edit", "编辑")}
-        >
-          <Edit3 className="size-3.5" />
-        </AnimatedButton>
+        />
       </div>
 
       <h3

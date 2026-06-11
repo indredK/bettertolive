@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useSaveNutritionMutation } from "@/features/bettertolive/queries/use-save-nutrition-mutation"
 import type {
@@ -191,16 +191,17 @@ export function NutritionDailyPlanTab({
                     >
                       {t("nutrition.dailyPlan.planNote", "计划是预案，不是打卡压力")}
                     </Badge>
-                    <AnimatedButton
+                    <AnimatedIconButton
                       show={isControlMode}
                       type="button"
                       variant="outline"
                       size="sm"
+                      label={t("nutrition.dailyPlanEdit.editAction", "编辑")}
+                      icon={<Pencil className="size-3.5" />}
                       onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
                     >
-                      <Pencil className="size-3.5" />
                       {t("nutrition.dailyPlanEdit.editAction", "编辑")}
-                    </AnimatedButton>
+                    </AnimatedIconButton>
                   </div>
                 </div>
 

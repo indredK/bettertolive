@@ -3,7 +3,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { AnimatedIconButton, Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -347,9 +347,15 @@ function StageItemEditorCard({
             </div>
           )}
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemoveItem}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <AnimatedIconButton
+          show
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          label={t("shopping.stages.removeItem", "移除物品")}
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={onRemoveItem}
+        />
       </div>
 
       <div className="grid gap-3">

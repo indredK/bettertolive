@@ -10,7 +10,6 @@ import { BellRing, Eye, Globe, Music4, Palette, Pencil, Settings } from "lucide-
 import { useTranslation } from "react-i18next"
 
 import { LiquidGlassSurface } from "@/components/ui/liquid-glass"
-import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
@@ -270,37 +269,23 @@ export function WorkspaceUtilities({
           <Globe className="size-4" />
         </UtilityIconButton>
 
-        <Tooltip>
-          <TooltipTrigger>
-            <UtilityIconButton
-              isActive={isShoppingManagementMode}
-              label={shoppingModeLabel}
-              testId="management-mode-trigger"
-              onClick={toggleShoppingManagementMode}
-            >
-              {isShoppingManagementMode ? (
-                <Pencil className="size-4" />
-              ) : (
-                <Eye className="size-4" />
-              )}
-            </UtilityIconButton>
-          </TooltipTrigger>
-          <TooltipContent>{shoppingModeLabel}</TooltipContent>
-        </Tooltip>
+        <UtilityIconButton
+          isActive={isShoppingManagementMode}
+          label={shoppingModeLabel}
+          testId="management-mode-trigger"
+          onClick={toggleShoppingManagementMode}
+        >
+          {isShoppingManagementMode ? <Pencil className="size-4" /> : <Eye className="size-4" />}
+        </UtilityIconButton>
 
-        <Tooltip>
-          <TooltipTrigger>
-            <UtilityIconButton
-              isActive={false}
-              label={t("shell.settings.button")}
-              testId="settings-trigger"
-              onClick={onOpenSettings}
-            >
-              <Settings className="size-4" />
-            </UtilityIconButton>
-          </TooltipTrigger>
-          <TooltipContent>{t("shell.settings.button")}</TooltipContent>
-        </Tooltip>
+        <UtilityIconButton
+          isActive={false}
+          label={t("shell.settings.button")}
+          testId="settings-trigger"
+          onClick={onOpenSettings}
+        >
+          <Settings className="size-4" />
+        </UtilityIconButton>
       </LiquidGlassSurface>
 
       <UtilityPanelPortal

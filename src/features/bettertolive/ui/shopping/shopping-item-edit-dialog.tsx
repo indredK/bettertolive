@@ -3,7 +3,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { AnimatedIconButton, Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
@@ -388,9 +388,15 @@ function ChildEditorCard({
         <div className="text-sm font-medium">
           {t("shopping.item.childLabel", { defaultValue: "子级 {{index}}", index: childIndex + 1 })}
         </div>
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <AnimatedIconButton
+          show
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          label={t("shopping.item.removeChild", "移除子级")}
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={onRemove}
+        />
       </div>
 
       <div className="space-y-1.5">
@@ -580,9 +586,15 @@ function ChildChannelEditorRow({
         />
       </div>
       <div className="flex items-end">
-        <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <AnimatedIconButton
+          show
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          label={t("shopping.item.removeChannel", "移除渠道")}
+          icon={<Trash2 className="h-4 w-4" />}
+          onClick={onRemove}
+        />
       </div>
     </div>
   )

@@ -242,6 +242,7 @@ function MessageCard({
             aria-label={t("shell.notifications.close")}
             className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             onClick={() => onDismiss(notification.id)}
+            tooltip={t("shell.notifications.close")}
           >
             <X className="size-4" />
           </Button>
@@ -338,6 +339,7 @@ function NotificationCard({
           aria-label={t("shell.notifications.close")}
           className="shrink-0 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           onClick={() => onDismiss(notification.id)}
+          tooltip={t("shell.notifications.close")}
         >
           <X className="size-4" />
         </Button>

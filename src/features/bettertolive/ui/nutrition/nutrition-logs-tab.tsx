@@ -9,7 +9,7 @@ import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { MealLog, NutritionModuleData } from "@/features/bettertolive/types"
@@ -265,15 +265,15 @@ function LogCard({
               </Badge>
             ) : null}
           </div>
-          <AnimatedButton
+          <AnimatedIconButton
             show={Boolean(onEdit)}
             type="button"
             variant="ghost"
             size="icon-sm"
+            label={t("nutrition.logs.edit", "编辑进食记录")}
+            icon={<Pencil className="size-3.5" />}
             onClick={onEdit}
-          >
-            <Pencil className="size-3.5" />
-          </AnimatedButton>
+          />
         </div>
       </div>
 

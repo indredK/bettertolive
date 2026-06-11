@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -515,29 +515,25 @@ function ReflectionEntryCard({
           </h3>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <AnimatedButton
+          <AnimatedIconButton
             show={isControlMode}
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={t("reflection.actions.edit", "编辑反思")}
-            title={t("reflection.actions.edit", "编辑反思")}
+            label={t("reflection.actions.edit", "编辑反思")}
+            icon={<Pencil className="size-4" />}
             onClick={onEdit}
-          >
-            <Pencil className="size-4" />
-          </AnimatedButton>
-          <AnimatedButton
+          />
+          <AnimatedIconButton
             show={isControlMode}
             type="button"
             variant="ghost"
             size="icon-sm"
-            aria-label={t("reflection.actions.delete", "删除")}
-            title={t("reflection.actions.delete", "删除")}
+            label={t("reflection.actions.delete", "删除")}
+            icon={<Trash2 className="size-4" />}
             disabled={isDeleting}
             onClick={onDelete}
-          >
-            <Trash2 className="size-4" />
-          </AnimatedButton>
+          />
         </div>
       </div>
       <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{entry.excerpt}</p>

@@ -26,7 +26,7 @@ import {
 } from "recharts"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
 import { NutritionProfileEditDialog } from "@/features/bettertolive/ui/nutrition/nutrition-profile-edit-dialog"
@@ -293,16 +293,15 @@ export function NutritionOverviewTab({
                     {t("nutrition.overview.profile", "饮食意图")}
                   </h3>
                 </div>
-                <AnimatedButton
+                <AnimatedIconButton
                   show={isControlMode}
                   type="button"
                   variant="ghost"
                   size="icon-sm"
+                  label={t("nutrition.profileEdit.title", "编辑饮食档案")}
+                  icon={<Pencil className="size-3.5" />}
                   onClick={() => setIsEditingProfile(true)}
-                  aria-label={t("nutrition.profileEdit.title", "编辑饮食档案")}
-                >
-                  <Pencil className="size-3.5" />
-                </AnimatedButton>
+                />
               </div>
               <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
                 {t(

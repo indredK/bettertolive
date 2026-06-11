@@ -4,7 +4,7 @@ import { Children, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Button } from "@/components/ui/button"
+import { AnimatedIconButton, Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -448,6 +448,8 @@ function ProfileRow({
   onRemove: () => void
   select: ReactNode
 }) {
+  const { t } = useTranslation()
+
   return (
     <div className="border-foreground/10 bg-background/70 grid gap-3 rounded-xl border p-3 lg:grid-cols-[180px_minmax(0,1fr)_auto]">
       <div>{select}</div>
@@ -465,9 +467,15 @@ function ProfileRow({
           placeholder={notePlaceholder}
         />
       </div>
-      <Button type="button" variant="ghost" size="icon-sm" onClick={onRemove}>
-        <Trash2 className="size-3.5" />
-      </Button>
+      <AnimatedIconButton
+        show
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        label={t("nutrition.profileEdit.removeGoal", "移除目标")}
+        icon={<Trash2 className="size-3.5" />}
+        onClick={onRemove}
+      />
     </div>
   )
 }

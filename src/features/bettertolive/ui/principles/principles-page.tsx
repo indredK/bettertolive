@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Activity, CheckCheck, Pencil, Plus, Scale, Shield, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   PrincipleEntry,
@@ -1057,7 +1057,7 @@ function PrinciplesControlStrip({
   const { t } = useTranslation()
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+    <ActionGroup justify="end" className="items-center">
       <span className="text-xs text-[color:var(--text-muted)]">
         {t("principles.controlMode.summary", {
           defaultValue: "{{count}} 条原则 · {{relations}} 个关系",
@@ -1069,7 +1069,7 @@ function PrinciplesControlStrip({
         <Plus className="size-4" />
         {t("principles.controlMode.add", "新增原则")}
       </AnimatedButton>
-    </div>
+    </ActionGroup>
   )
 }
 
@@ -1114,16 +1114,16 @@ function PrincipleCard({
         >
           {translatePrincipleEnum(t, "status", principle.status)}
         </Badge>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode && Boolean(onEdit)}
           containerClassName="ml-auto"
           type="button"
           size="icon-sm"
           variant="ghost"
+          label={t("principles.actions.edit", "编辑")}
+          icon={<Pencil className="size-3.5" />}
           onClick={onEdit}
-        >
-          <Pencil className="size-3.5" />
-        </AnimatedButton>
+        />
       </div>
 
       <h3

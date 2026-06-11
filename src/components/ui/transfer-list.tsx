@@ -146,8 +146,8 @@ export function TransferList({
             size="icon-sm"
             onClick={handleAddAll}
             disabled={filteredAvailableItems.length === 0}
-            title={labels.addAll}
             aria-label={labels.addAll}
+            tooltip={labels.addAll}
           >
             <ChevronsRight />
           </Button>
@@ -157,8 +157,8 @@ export function TransferList({
             size="icon-sm"
             onClick={handleAddChecked}
             disabled={availableChecked.size === 0}
-            title={labels.addChecked}
             aria-label={labels.addChecked}
+            tooltip={labels.addChecked}
           >
             <ChevronRight />
           </Button>
@@ -168,8 +168,8 @@ export function TransferList({
             size="icon-sm"
             onClick={handleRemoveChecked}
             disabled={selectedChecked.size === 0}
-            title={labels.removeChecked}
             aria-label={labels.removeChecked}
+            tooltip={labels.removeChecked}
           >
             <ChevronLeft />
           </Button>
@@ -179,8 +179,8 @@ export function TransferList({
             size="icon-sm"
             onClick={handleRemoveAll}
             disabled={filteredSelectedItems.length === 0}
-            title={labels.removeAll}
             aria-label={labels.removeAll}
+            tooltip={labels.removeAll}
           >
             <ChevronsLeft />
           </Button>

@@ -17,7 +17,7 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EmotionCheckIn,
@@ -726,7 +726,7 @@ function CardHeaderActions({
   return (
     <div className="flex items-start justify-between gap-3">
       <SectionHeading icon={icon} title={title} description={description} compact />
-      <div className="flex shrink-0 flex-wrap justify-end gap-2">
+      <ActionGroup justify="end">
         <AnimatedButton
           show={isControlMode && Boolean(onEdit)}
           type="button"
@@ -747,7 +747,7 @@ function CardHeaderActions({
           <Plus className="size-3.5" />
           {addLabel ?? t("emotion.actions.add", "新增")}
         </AnimatedButton>
-      </div>
+      </ActionGroup>
     </div>
   )
 }
@@ -766,23 +766,25 @@ function PanelListHeader({
   return (
     <div className="flex items-center justify-between gap-3">
       <div className="text-xs tracking-wide text-[color:var(--text-muted)] uppercase">{title}</div>
-      <AnimatedButton
-        show={isControlMode}
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onAdd}
-      >
-        <Plus className="size-3.5" />
-        {addLabel}
-      </AnimatedButton>
+      <ActionGroup justify="end" className="shrink-0">
+        <AnimatedButton
+          show={isControlMode}
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onAdd}
+        >
+          <Plus className="size-3.5" />
+          {addLabel}
+        </AnimatedButton>
+      </ActionGroup>
     </div>
   )
 }
 
 function EditButton({ label, onClick }: { label: string; onClick?: () => void }) {
   return (
-    <AnimatedButton
+    <AnimatedIconButton
       show={Boolean(onClick)}
       containerClassName="absolute top-2 right-2"
       layout={false}
@@ -790,11 +792,10 @@ function EditButton({ label, onClick }: { label: string; onClick?: () => void })
       variant="ghost"
       size="icon-sm"
       className="size-7 rounded-md border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
+      label={label}
+      icon={<Pencil className="size-3.5" />}
       onClick={onClick}
-    >
-      <Pencil className="size-3.5" />
-      <span className="sr-only">{label}</span>
-    </AnimatedButton>
+    />
   )
 }
 

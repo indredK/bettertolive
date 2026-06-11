@@ -4,7 +4,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { AnimatedIconButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { ShoppingItem, ShoppingModuleData } from "@/features/bettertolive/types"
@@ -86,16 +86,15 @@ function PlanItemCard({
             </Badge>
           </div>
         </button>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode}
-          containerClassName="shrink-0"
           size="icon-sm"
           variant="ghost"
-          className="h-6 w-6"
+          className="h-6 w-6 shrink-0"
+          label={t("shopping.planning.edit", "编辑物品")}
+          icon={<Pencil className="size-3" />}
           onClick={onEdit}
-        >
-          <Pencil className="size-3" />
-        </AnimatedButton>
+        />
       </div>
     </div>
   )
@@ -176,15 +175,14 @@ function PlanItemDetail({
             </div>
           )}
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={isControlMode && Boolean(onDelete)}
-          containerClassName="shrink-0"
           variant="outline"
           size="sm"
+          label={t("shopping.planning.delete", "删除物品")}
+          icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </AnimatedButton>
+        />
       </CardHeader>
       <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4">
         {/* 标签区：系统 + 空间 合并到一行 */}

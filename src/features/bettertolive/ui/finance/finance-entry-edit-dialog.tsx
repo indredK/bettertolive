@@ -204,7 +204,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -244,7 +244,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -273,7 +273,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -295,7 +295,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -317,7 +317,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -339,7 +339,7 @@ export function FinanceEntryEditDialog({
                   }
                 }}
               >
-                <SelectTrigger>
+                <SelectTrigger fullWidth>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

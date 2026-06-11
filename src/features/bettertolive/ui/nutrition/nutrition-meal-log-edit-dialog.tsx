@@ -616,6 +616,7 @@ function LogEntryRow({
           size="icon-sm"
           onClick={onRemove}
           disabled={removeDisabled}
+          tooltip={t("nutrition.mealLogEdit.delete", "删除")}
         >
           <Trash2 className="size-4" />
         </Button>

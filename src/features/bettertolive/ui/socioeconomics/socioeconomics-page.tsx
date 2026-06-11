@@ -13,7 +13,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EconConfidence,
@@ -551,7 +551,7 @@ function SocioeconomicsToolbar({ actions }: { actions: SocioeconomicsActions }) 
   const { t } = useTranslation()
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center gap-2">
+    <ActionGroup>
       <AnimatedButton show={actions.isControlMode} size="sm" onClick={actions.onCreateEntry}>
         <Plus className="size-3.5" />
         {t("socioeconomics.actions.addEntry", "新增条目")}
@@ -574,7 +574,7 @@ function SocioeconomicsToolbar({ actions }: { actions: SocioeconomicsActions }) 
         <Plus className="size-3.5" />
         {t("socioeconomics.actions.addPrompt", "新增提问")}
       </AnimatedButton>
-    </div>
+    </ActionGroup>
   )
 }
 
@@ -1733,16 +1733,15 @@ function SocioeconomicsCard({
           <ConfidenceBadge confidence={entry.confidence} />
           <RelevanceBadge relevance={entry.relevance} />
         </div>
-        <AnimatedButton
+        <AnimatedIconButton
           show={Boolean(onEdit)}
           type="button"
           variant="ghost"
           size="icon-sm"
-          aria-label={t("socioeconomics.actions.editEntry", "编辑条目")}
+          label={t("socioeconomics.actions.editEntry", "编辑条目")}
+          icon={<Pencil className="size-3.5" />}
           onClick={onEdit}
-        >
-          <Pencil className="size-3.5" />
-        </AnimatedButton>
+        />
       </div>
 
       <h3
@@ -1925,16 +1924,15 @@ function GapCard({
             >
               {translateSocioeconomicsEnum(t, "domain", gap.domain)}
             </Badge>
-            <AnimatedButton
+            <AnimatedIconButton
               show={Boolean(onEdit)}
               type="button"
               variant="ghost"
               size="icon-sm"
-              aria-label={t("socioeconomics.actions.editGap", "编辑缺口")}
+              label={t("socioeconomics.actions.editGap", "编辑缺口")}
+              icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
-            >
-              <Pencil className="size-3.5" />
-            </AnimatedButton>
+            />
           </div>
           <p
             className={cn(
@@ -1980,16 +1978,15 @@ function PromptCard({
       )}
     >
       <span className="min-w-0">{prompt}</span>
-      <AnimatedButton
+      <AnimatedIconButton
         show={Boolean(onEdit)}
         type="button"
         variant="ghost"
         size="icon-sm"
-        aria-label={t("socioeconomics.actions.editPrompt", "编辑提问")}
+        label={t("socioeconomics.actions.editPrompt", "编辑提问")}
+        icon={<Pencil className="size-3.5" />}
         onClick={onEdit}
-      >
-        <Pencil className="size-3.5" />
-      </AnimatedButton>
+      />
     </div>
   )
 }

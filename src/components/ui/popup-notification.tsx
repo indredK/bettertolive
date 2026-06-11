@@ -286,6 +286,7 @@ export function PopupNotificationHeader({
           className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
           onClick={onClose}
           aria-label={closeLabel}
+          tooltip={closeLabel}
         >
           <X className="size-4" />
         </Button>

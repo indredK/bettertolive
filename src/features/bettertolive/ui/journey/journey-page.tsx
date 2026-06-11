@@ -17,8 +17,9 @@ import type { TFunction } from "i18next"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { AnimatedVisibility } from "@/components/ui/animated-visibility"
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
@@ -458,14 +459,14 @@ export function JourneyPage({
         popoverWidth="18rem"
       />
 
-      {isControlMode ? (
+      <AnimatedVisibility show={isControlMode}>
         <JourneyControlPanel
           journey={editableJourney}
           memoryById={editableMemoryById}
           isCompact={isFixedLayout}
           onEdit={setEditingJourneyItem}
         />
-      ) : null}
+      </AnimatedVisibility>
 
       {isFixedLayout ? (
         <JourneyFixedDashboard
@@ -974,7 +975,7 @@ function JourneyControlPanel({
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
+      <ActionGroup className="mt-3">
         <AnimatedButton
           show
           type="button"
@@ -1025,7 +1026,7 @@ function JourneyControlPanel({
           <Plus className="size-3.5" />
           {t("journey.actions.addThread")}
         </AnimatedButton>
-      </div>
+      </ActionGroup>
 
       <div className="mt-3 grid gap-2 min-[960px]:grid-cols-2 min-[1280px]:grid-cols-3">
         <JourneyManagementList
@@ -1141,16 +1142,15 @@ function JourneyManagementList({
                   </div>
                 ) : null}
               </div>
-              <AnimatedButton
+              <AnimatedIconButton
                 show
                 type="button"
                 variant="ghost"
                 size="icon-xs"
-                aria-label={t("journey.actions.edit")}
+                label={t("journey.actions.edit")}
+                icon={<Pencil className="size-3.5" />}
                 onClick={row.onEdit}
-              >
-                <Pencil className="size-3.5" />
-              </AnimatedButton>
+              />
             </div>
           ))
         ) : (

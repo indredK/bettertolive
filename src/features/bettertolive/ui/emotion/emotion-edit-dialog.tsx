@@ -1175,7 +1175,10 @@ function SelectField<T extends string>({
         value={value}
         onValueChange={(nextValue) => nextValue !== null && onChange(nextValue)}
       >
-        <SelectTrigger className="w-full border-[color:var(--chip-border)] bg-[color:var(--surface-bg)]">
+        <SelectTrigger
+          fullWidth
+          className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)]"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

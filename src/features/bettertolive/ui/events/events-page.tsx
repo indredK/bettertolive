@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -558,17 +558,15 @@ function EventTimelineCard({
             </h3>
           </div>
 
-          <AnimatedButton
+          <AnimatedIconButton
             show={isControlMode}
             type="button"
             variant="ghost"
             size="icon-sm"
-            title={t("events.actions.edit")}
-            aria-label={t("events.actions.edit")}
+            label={t("events.actions.edit")}
+            icon={<Pencil className="size-3.5" />}
             onClick={onEdit}
-          >
-            <Pencil className="size-3.5" />
-          </AnimatedButton>
+          />
         </div>
 
         <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{event.excerpt}</p>

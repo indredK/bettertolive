@@ -29,6 +29,13 @@ export const ACTION_BUTTON_TRANSITION: Transition = {
   ease: [0.22, 1, 0.36, 1],
 }
 
+export const BUTTON_TAP_SCALE = 0.92
+
+export const BUTTON_TAP_TRANSITION: Transition = {
+  duration: 0.15,
+  ease: [0.22, 1, 0.36, 1],
+}
+
 export const ACTION_BUTTON_PRESENCE: PresenceMotion = {
   initial: {
     opacity: 0,

@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton } from "@/components/ui/button"
+import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
 import type {
@@ -694,26 +694,24 @@ function TransactionCard({
             {isIncome ? "+" : "-"}
             {formatCurrency(entry.amount, locale)}
           </div>
-          <div className="flex gap-1">
-            <AnimatedButton
+          <ActionGroup gap="compact" wrap={false}>
+            <AnimatedIconButton
               show={isControlMode}
-              aria-label={t("finance.actions.editEntry", "编辑账目")}
-              size="icon-sm"
               variant="outline"
+              size="icon-sm"
+              label={t("finance.actions.editEntry", "编辑账目")}
+              icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
-            >
-              <Pencil className="size-3.5" />
-            </AnimatedButton>
-            <AnimatedButton
+            />
+            <AnimatedIconButton
               show={isControlMode}
-              aria-label={t("finance.actions.deleteEntry", "删除账目")}
-              size="icon-sm"
               variant="outline"
+              size="icon-sm"
+              label={t("finance.actions.deleteEntry", "删除账目")}
+              icon={<Trash2 className="size-3.5" />}
               onClick={onDelete}
-            >
-              <Trash2 className="size-3.5" />
-            </AnimatedButton>
-          </div>
+            />
+          </ActionGroup>
         </div>
       </div>
     </article>

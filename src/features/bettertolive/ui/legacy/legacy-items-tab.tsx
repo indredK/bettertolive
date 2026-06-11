@@ -1,9 +1,9 @@
-import { Search, Trash2 } from "lucide-react"
+import { Pencil, Search, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { AnimatedButton, Button } from "@/components/ui/button"
+import { AnimatedIconButton, Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { deleteLegacyItem } from "@/features/bettertolive/api/legacy-crud-api"
@@ -279,12 +279,24 @@ function LegacyItemDetail({
             <p className="text-muted-foreground mt-1 text-sm leading-6">{item.summary}</p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <AnimatedButton show={isControlMode} variant="outline" size="sm" onClick={onEdit}>
+            <AnimatedIconButton
+              show={isControlMode}
+              variant="outline"
+              size="sm"
+              label={t("legacy.actions.edit", "编辑")}
+              icon={<Pencil className="size-4" />}
+              onClick={onEdit}
+            >
               {t("legacy.actions.edit", "编辑")}
-            </AnimatedButton>
-            <AnimatedButton show={isControlMode} variant="outline" size="sm" onClick={handleDelete}>
-              <Trash2 className="size-4" />
-            </AnimatedButton>
+            </AnimatedIconButton>
+            <AnimatedIconButton
+              show={isControlMode}
+              variant="outline"
+              size="sm"
+              label={t("legacy.actions.delete", "删除")}
+              icon={<Trash2 className="size-4" />}
+              onClick={handleDelete}
+            />
           </div>
         </div>
       </CardHeader>
