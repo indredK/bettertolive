@@ -3305,8 +3305,6 @@
   },
   "shell": {
     "brandSubtitle": "Personal Life Workbench",
-    "tagline": "Local-first / Self-knowledge system",
-    "modeBadge": "V1 Mock",
     "expandSidebar": "Expand menu column",
     "collapseSidebar": "Collapse menu column",
     "searchPlaceholder": "Search records, beliefs, relationships, or growth clues",
@@ -3327,7 +3325,9 @@
       "theme": "Theme",
       "notifications": "Notifications",
       "music": "Music",
-      "managementMode": "Management Mode"
+      "managementMode": "Management Mode",
+      "browseMode": "Browse Mode",
+      "editMode": "Edit Mode"
     },
     "themes": {
       "title": "Theme",

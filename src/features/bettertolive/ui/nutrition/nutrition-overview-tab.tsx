@@ -26,7 +26,7 @@ import {
 } from "recharts"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
 import { NutritionProfileEditDialog } from "@/features/bettertolive/ui/nutrition/nutrition-profile-edit-dialog"
@@ -40,7 +40,6 @@ import {
 import {
   NUTRITION_CONTROL_BADGE_CLASS,
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionMetricCard,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
 import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
@@ -108,7 +107,6 @@ export function NutritionOverviewTab({
                     <Badge variant="outline" className={NUTRITION_CONTROL_BADGE_CLASS}>
                       {t("nutrition.overview.eyebrow", "今日饮食总览")}
                     </Badge>
-                    <NutritionControlModeBadge isControlMode={isControlMode} />
                   </div>
                   <div className="max-w-2xl space-y-2">
                     <h2 className="text-[1.45rem] font-semibold tracking-tight sm:text-[1.7rem]">
@@ -295,17 +293,16 @@ export function NutritionOverviewTab({
                     {t("nutrition.overview.profile", "饮食意图")}
                   </h3>
                 </div>
-                {isControlMode ? (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon-sm"
-                    onClick={() => setIsEditingProfile(true)}
-                    aria-label={t("nutrition.profileEdit.title", "编辑饮食档案")}
-                  >
-                    <Pencil className="size-3.5" />
-                  </Button>
-                ) : null}
+                <AnimatedButton
+                  show={isControlMode}
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => setIsEditingProfile(true)}
+                  aria-label={t("nutrition.profileEdit.title", "编辑饮食档案")}
+                >
+                  <Pencil className="size-3.5" />
+                </AnimatedButton>
               </div>
               <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
                 {t(

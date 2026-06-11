@@ -1,10 +1,10 @@
-import { Boxes, Leaf, Pencil, Plus, Search } from "lucide-react"
+import { Boxes, Leaf, Pencil, Search } from "lucide-react"
 import type { TFunction } from "i18next"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type {
@@ -26,7 +26,6 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionDetailPane,
   NutritionEmptyDetailCard,
   NutritionMetricCard,
@@ -42,12 +41,20 @@ import { cn } from "@/lib/utils"
 const ALL_CATEGORY_ID = "all"
 
 export function NutritionFoodsTab({
+  createCategoryRequested = false,
+  createFoodRequested = false,
   editableNutrition,
   isControlMode = false,
+  onCategoryCreateHandled,
+  onFoodCreateHandled,
   nutrition,
 }: {
+  createCategoryRequested?: boolean
+  createFoodRequested?: boolean
   editableNutrition?: NutritionModuleData
   isControlMode?: boolean
+  onCategoryCreateHandled?: () => void
+  onFoodCreateHandled?: () => void
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
@@ -92,45 +99,29 @@ export function NutritionFoodsTab({
   })
   const activeFood = foods.find((food) => food.id === activeFoodId) ?? foods[0] ?? null
 
+  useEffect(() => {
+    if (!isControlMode || !createFoodRequested) return
+    setTimeout(() => setEditingFood({ isNew: true, food: null }), 0)
+    onFoodCreateHandled?.()
+  }, [createFoodRequested, isControlMode, onFoodCreateHandled])
+
+  useEffect(() => {
+    if (!isControlMode || !createCategoryRequested) return
+    setTimeout(() => setEditingCategory({ isNew: true, category: null }), 0)
+    onCategoryCreateHandled?.()
+  }, [createCategoryRequested, isControlMode, onCategoryCreateHandled])
+
   return (
     <NutritionTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("nutrition.foods.title", "食品分类")}</h3>
-          <NutritionControlModeBadge isControlMode={isControlMode} />
-        </div>
-      </div>
       <NutritionTabBody>
         <NutritionSidebarPane className="xl:w-86">
-          <div className="flex gap-2">
+          <div>
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder={t("nutrition.foods.search", "搜索食品、分类或储存方式")}
               className="border-foreground/15 bg-background"
             />
-            {isControlMode ? (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setEditingFood({ isNew: true, food: null })}
-                  aria-label={t("nutrition.foodEdit.createTitle", "新增食品")}
-                >
-                  <Plus className="size-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setEditingCategory({ isNew: true, category: null })}
-                  aria-label={t("nutrition.categoryEdit.createTitle", "新增食品分类")}
-                >
-                  <Boxes className="size-4" />
-                </Button>
-              </>
-            ) : null}
           </div>
 
           <div className="mt-3 space-y-3">
@@ -199,19 +190,18 @@ export function NutritionFoodsTab({
                     >
                       {foods.length}
                     </Badge>
-                    {isControlMode && activeCategory ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon-sm"
-                        onClick={() =>
-                          setEditingCategory({ isNew: false, category: activeCategory })
-                        }
-                        aria-label={t("nutrition.categoryEdit.editTitle", "编辑食品分类")}
-                      >
-                        <Pencil className="size-3.5" />
-                      </Button>
-                    ) : null}
+                    <AnimatedButton
+                      show={isControlMode && Boolean(activeCategory)}
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      onClick={() =>
+                        setEditingCategory({ isNew: false, category: activeCategory! })
+                      }
+                      aria-label={t("nutrition.categoryEdit.editTitle", "编辑食品分类")}
+                    >
+                      <Pencil className="size-3.5" />
+                    </AnimatedButton>
                   </div>
                 </div>
 
@@ -366,12 +356,16 @@ function FoodDetail({
             <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
               {t("nutrition.foods.baseLibrary", "食品基础库")}
             </Badge>
-            {onEdit ? (
-              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
-                <Pencil className="size-3.5" />
-                {t("nutrition.foodEdit.editAction", "编辑")}
-              </Button>
-            ) : null}
+            <AnimatedButton
+              show={Boolean(onEdit)}
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+            >
+              <Pencil className="size-3.5" />
+              {t("nutrition.foodEdit.editAction", "编辑")}
+            </AnimatedButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{food.name}</h3>
           <p className="text-muted-foreground mt-2 text-sm leading-6">

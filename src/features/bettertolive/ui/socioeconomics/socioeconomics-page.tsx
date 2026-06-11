@@ -13,7 +13,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   EconConfidence,
@@ -49,7 +49,7 @@ import {
   ECON_TOPIC_AREAS,
   SOCIO_DISCIPLINES,
 } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page-data"
-import { SocioeconomicsControlModeBadge } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page-shared"
+
 import { cn } from "@/lib/utils"
 
 type SocioeconomicsEnumGroup =
@@ -396,24 +396,30 @@ export function SocioeconomicsPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <SocioeconomicsToolbar actions={actions} />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
         className={cn("min-h-0 flex-1", isFixedLayout && "overflow-hidden")}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("socioeconomics.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="economics">
-            {t("socioeconomics.tabs.economics", "经济学")}
-          </TabsTrigger>
-          <TabsTrigger value="sociology">
-            {t("socioeconomics.tabs.sociology", "社会学")}
-          </TabsTrigger>
-          <TabsTrigger value="graph">{t("socioeconomics.tabs.graph", "知识关联")}</TabsTrigger>
-          <TabsTrigger value="study">{t("socioeconomics.tabs.study", "学习队列")}</TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 items-center gap-2 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">
+                {t("socioeconomics.tabs.overview", "总览")}
+              </TabsTrigger>
+              <TabsTrigger value="economics">
+                {t("socioeconomics.tabs.economics", "经济学")}
+              </TabsTrigger>
+              <TabsTrigger value="sociology">
+                {t("socioeconomics.tabs.sociology", "社会学")}
+              </TabsTrigger>
+              <TabsTrigger value="graph">{t("socioeconomics.tabs.graph", "知识关联")}</TabsTrigger>
+              <TabsTrigger value="study">{t("socioeconomics.tabs.study", "学习队列")}</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <SocioeconomicsToolbar actions={actions} />
+        </div>
 
         <TabsContent
           value="overview"
@@ -545,24 +551,29 @@ function SocioeconomicsToolbar({ actions }: { actions: SocioeconomicsActions }) 
   const { t } = useTranslation()
 
   return (
-    <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
-      <SocioeconomicsControlModeBadge isControlMode={actions.isControlMode} />
-      {actions.isControlMode ? (
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={actions.onCreateEntry}>
-            <Plus className="size-3.5" />
-            {t("socioeconomics.actions.addEntry", "新增条目")}
-          </Button>
-          <Button size="sm" variant="outline" onClick={actions.onCreateGap}>
-            <Plus className="size-3.5" />
-            {t("socioeconomics.actions.addGap", "新增缺口")}
-          </Button>
-          <Button size="sm" variant="outline" onClick={actions.onCreatePrompt}>
-            <Plus className="size-3.5" />
-            {t("socioeconomics.actions.addPrompt", "新增提问")}
-          </Button>
-        </div>
-      ) : null}
+    <div className="flex shrink-0 flex-wrap items-center gap-2">
+      <AnimatedButton show={actions.isControlMode} size="sm" onClick={actions.onCreateEntry}>
+        <Plus className="size-3.5" />
+        {t("socioeconomics.actions.addEntry", "新增条目")}
+      </AnimatedButton>
+      <AnimatedButton
+        show={actions.isControlMode}
+        size="sm"
+        variant="outline"
+        onClick={actions.onCreateGap}
+      >
+        <Plus className="size-3.5" />
+        {t("socioeconomics.actions.addGap", "新增缺口")}
+      </AnimatedButton>
+      <AnimatedButton
+        show={actions.isControlMode}
+        size="sm"
+        variant="outline"
+        onClick={actions.onCreatePrompt}
+      >
+        <Plus className="size-3.5" />
+        {t("socioeconomics.actions.addPrompt", "新增提问")}
+      </AnimatedButton>
     </div>
   )
 }
@@ -1722,17 +1733,16 @@ function SocioeconomicsCard({
           <ConfidenceBadge confidence={entry.confidence} />
           <RelevanceBadge relevance={entry.relevance} />
         </div>
-        {onEdit ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            aria-label={t("socioeconomics.actions.editEntry", "编辑条目")}
-            onClick={onEdit}
-          >
-            <Pencil className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={Boolean(onEdit)}
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          aria-label={t("socioeconomics.actions.editEntry", "编辑条目")}
+          onClick={onEdit}
+        >
+          <Pencil className="size-3.5" />
+        </AnimatedButton>
       </div>
 
       <h3
@@ -1915,17 +1925,16 @@ function GapCard({
             >
               {translateSocioeconomicsEnum(t, "domain", gap.domain)}
             </Badge>
-            {onEdit ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                aria-label={t("socioeconomics.actions.editGap", "编辑缺口")}
-                onClick={onEdit}
-              >
-                <Pencil className="size-3.5" />
-              </Button>
-            ) : null}
+            <AnimatedButton
+              show={Boolean(onEdit)}
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              aria-label={t("socioeconomics.actions.editGap", "编辑缺口")}
+              onClick={onEdit}
+            >
+              <Pencil className="size-3.5" />
+            </AnimatedButton>
           </div>
           <p
             className={cn(
@@ -1971,17 +1980,16 @@ function PromptCard({
       )}
     >
       <span className="min-w-0">{prompt}</span>
-      {onEdit ? (
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon-sm"
-          aria-label={t("socioeconomics.actions.editPrompt", "编辑提问")}
-          onClick={onEdit}
-        >
-          <Pencil className="size-3.5" />
-        </Button>
-      ) : null}
+      <AnimatedButton
+        show={Boolean(onEdit)}
+        type="button"
+        variant="ghost"
+        size="icon-sm"
+        aria-label={t("socioeconomics.actions.editPrompt", "编辑提问")}
+        onClick={onEdit}
+      >
+        <Pencil className="size-3.5" />
+      </AnimatedButton>
     </div>
   )
 }

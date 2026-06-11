@@ -97,6 +97,7 @@ export function SidebarNoteCarousel({
                 aria-label={t("shell.sidebarCarousel.switchToNth", { n: index + 1 })}
                 aria-pressed={index === selectedIndex}
                 onClick={() => scrollTo(index)}
+                onMouseEnter={() => scrollTo(index)}
                 className={cn(
                   "rounded-full px-1.5 py-0.5 text-[10px] transition-colors",
                   index === selectedIndex

@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -437,12 +437,10 @@ function EventsQuickPanel({
           description={t("events.capture.description")}
           compact
         />
-        {isControlMode ? (
-          <Button type="button" size="sm" onClick={onCreate}>
-            <Plus data-icon="inline-start" />
-            {t("events.actions.create")}
-          </Button>
-        ) : null}
+        <AnimatedButton show={isControlMode} type="button" size="sm" onClick={onCreate}>
+          <Plus data-icon="inline-start" />
+          {t("events.actions.create")}
+        </AnimatedButton>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
@@ -560,18 +558,17 @@ function EventTimelineCard({
             </h3>
           </div>
 
-          {isControlMode ? (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              title={t("events.actions.edit")}
-              aria-label={t("events.actions.edit")}
-              onClick={onEdit}
-            >
-              <Pencil className="size-3.5" />
-            </Button>
-          ) : null}
+          <AnimatedButton
+            show={isControlMode}
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            title={t("events.actions.edit")}
+            aria-label={t("events.actions.edit")}
+            onClick={onEdit}
+          >
+            <Pencil className="size-3.5" />
+          </AnimatedButton>
         </div>
 
         <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{event.excerpt}</p>

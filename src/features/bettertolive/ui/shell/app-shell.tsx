@@ -8,14 +8,12 @@ import {
   Lightbulb,
   ListTodo,
   NotebookPen,
-  PanelLeftClose,
   RefreshCcw,
   Route,
   Salad,
   Scale,
   Search,
   ScrollText,
-  Settings,
   Sparkles,
   Users2,
   Wallet,
@@ -61,11 +59,10 @@ import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/so
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
-  getSidebarHeaderTransition,
-  getSidebarNoteContentTransition,
   getSidebarPadding,
   getSidebarTransitionStyle,
   getSidebarWidth,
+  SIDEBAR_CAROUSEL_TRANSITION,
   SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH,
 } from "@/features/bettertolive/ui/shell/sidebar-shell-motion"
 import {
@@ -77,14 +74,9 @@ import { WorkspaceUtilities } from "@/features/bettertolive/ui/workspace-utiliti
 import { formatWorkspaceDate } from "@/features/bettertolive/ui/shared/formatters"
 import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
-import {
-  APP_FADE_TRANSITION,
-  SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE,
-  CONTENT_ENTER_PRESENCE,
-  SIDEBAR_BOTTOM_PANEL_PRESENCE,
-  SIDEBAR_FADE_TRANSITION,
-  SIDEBAR_HEADER_CONTENT_PRESENCE,
-} from "@/lib/app-motion"
+import { APP_FADE_TRANSITION, CONTENT_ENTER_PRESENCE } from "@/lib/app-motion"
+
+const SCRAMBLE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@!&%+-"
 
 type NavItem = {
   view: AppView
@@ -262,6 +254,56 @@ function useWorkspaceLayoutMode() {
   return layoutMode
 }
 
+function scrambleLabel(label: string, revealProgress: number) {
+  return label
+    .split("")
+    .map((character, index) => {
+      if (character.trim().length === 0 || index < revealProgress) {
+        return character
+      }
+
+      return SCRAMBLE_GLYPHS[Math.floor(Math.random() * SCRAMBLE_GLYPHS.length)] ?? character
+    })
+    .join("")
+}
+
+function SidebarBrandTitle({ isActive, label }: { isActive: boolean; label: string }) {
+  const [displayLabel, setDisplayLabel] = useState(label)
+
+  useEffect(() => {
+    if (!isActive) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting label when inactive is a derived state sync
+      setDisplayLabel(label)
+      return
+    }
+
+    if (typeof window === "undefined") {
+      setDisplayLabel(label)
+      return
+    }
+
+    let frame = 0
+    const maxFrames = Math.max(12, label.length * 4)
+    const intervalId = window.setInterval(() => {
+      frame += 1
+      const revealProgress = frame / 3.6
+      setDisplayLabel(scrambleLabel(label, revealProgress))
+
+      if (frame >= maxFrames) {
+        window.clearInterval(intervalId)
+        setDisplayLabel(label)
+      }
+    }, 34)
+
+    return () => {
+      window.clearInterval(intervalId)
+      setDisplayLabel(label)
+    }
+  }, [isActive, label])
+
+  return <span>{displayLabel}</span>
+}
+
 export function BetterToLiveAppShell() {
   const { t, i18n } = useTranslation()
   const reduceMotion = useReducedMotion()
@@ -310,6 +352,7 @@ export function BetterToLiveAppShell() {
     nudgeVolume,
   } = useWorkspaceMusic()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [isSidebarBrandHovered, setIsSidebarBrandHovered] = useState(false)
   const navSections = useMemo(() => createNavSections(t), [t])
   const workspaceRhythmSlides = useMemo(() => createWorkspaceRhythmSlides(t), [t])
   const workspaceSidebarNotes = useMemo(() => createWorkspaceSidebarNotes(t), [t])
@@ -321,7 +364,6 @@ export function BetterToLiveAppShell() {
     activeView === "beliefs" || activeView === "journey" || activeView === "relationships"
   const isHorizontalHeader = !isStackedLayout
   const showSidebar = !isStackedLayout
-  const isSidebarInteractive = showSidebar
   const effectiveSidebarCollapsed = isStackedLayout
     ? true
     : isCompactLayout
@@ -329,15 +371,7 @@ export function BetterToLiveAppShell() {
       : isSidebarCollapsed
   const sidebarWidth = getSidebarWidth(effectiveSidebarCollapsed)
   const sidebarPadding = getSidebarPadding(effectiveSidebarCollapsed)
-  const sidebarTransitionStyle = getSidebarTransitionStyle(
-    prefersReducedMotion,
-    effectiveSidebarCollapsed,
-  )
-  const sidebarHeaderTransition = getSidebarHeaderTransition(
-    prefersReducedMotion,
-    effectiveSidebarCollapsed,
-  )
-  const sidebarNoteContentTransition = getSidebarNoteContentTransition(prefersReducedMotion)
+  const sidebarTransitionStyle = getSidebarTransitionStyle()
   const currentViewLabel = t(`shell.views.${activeView}`)
   const currentLocale = i18n.resolvedLanguage ?? i18n.language
 
@@ -566,97 +600,59 @@ export function BetterToLiveAppShell() {
               paddingTop: `${sidebarPadding.y}px`,
               paddingBottom: `${sidebarPadding.y}px`,
               transition: sidebarTransitionStyle,
-              willChange: "width, padding",
             }}
           >
             <div className="absolute inset-0 -z-10" style={{ background: "var(--aside-bg)" }} />
 
             <div className="shrink-0">
-              <m.div
-                layout="position"
-                transition={sidebarHeaderTransition}
-                className="flex items-start"
+              <m.button
+                type="button"
+                data-testid="sidebar-brand-toggle"
+                onClick={handleSidebarCollapseToggle}
+                onHoverStart={() => setIsSidebarBrandHovered(true)}
+                onHoverEnd={() => setIsSidebarBrandHovered(false)}
+                onFocus={() => setIsSidebarBrandHovered(true)}
+                onBlur={() => setIsSidebarBrandHovered(false)}
+                aria-expanded={!effectiveSidebarCollapsed}
+                aria-label={
+                  effectiveSidebarCollapsed ? t("shell.expandSidebar") : t("shell.collapseSidebar")
+                }
+                className="group flex h-14 w-full cursor-pointer items-center rounded-lg px-[10px] text-left focus-visible:ring-2 focus-visible:ring-[color:var(--text-primary)]/20 focus-visible:outline-none"
               >
-                <div className="flex min-w-0 flex-1 items-start gap-2">
-                  <div className="flex w-14 shrink-0 justify-center">
-                    <m.button
+                <div className={cn("flex min-w-0 flex-1 items-center gap-2")}>
+                  <div className="relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]">
+                    <m.span
+                      aria-hidden
                       initial={false}
-                      animate={{
-                        x: 0,
-                      }}
-                      transition={sidebarHeaderTransition}
-                      type="button"
-                      data-testid={
-                        effectiveSidebarCollapsed && isSidebarInteractive
-                          ? "sidebar-brand-toggle"
-                          : undefined
+                      animate={
+                        prefersReducedMotion
+                          ? { opacity: 0 }
+                          : isSidebarBrandHovered
+                            ? { opacity: [0, 0.9, 0], x: ["-140%", "220%"] }
+                            : { opacity: 0, x: "-140%" }
                       }
-                      onClick={
-                        effectiveSidebarCollapsed && isSidebarInteractive
-                          ? handleSidebarCollapseToggle
-                          : undefined
-                      }
-                      aria-label={
-                        effectiveSidebarCollapsed && isSidebarInteractive
-                          ? t("shell.expandSidebar")
-                          : undefined
-                      }
-                      aria-hidden={effectiveSidebarCollapsed ? undefined : true}
-                      tabIndex={effectiveSidebarCollapsed && isSidebarInteractive ? 0 : -1}
-                      className={cn(
-                        "flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)] transition-opacity",
-                        effectiveSidebarCollapsed
-                          ? isSidebarInteractive
-                            ? "cursor-pointer hover:opacity-90"
-                            : "pointer-events-none cursor-default"
-                          : "pointer-events-none cursor-default",
-                      )}
-                    >
-                      <Sparkles className="size-4" />
-                    </m.button>
+                      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                      className="pointer-events-none absolute inset-y-0 left-[-32%] w-1/2 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.18),rgba(255,255,255,0.95),rgba(255,255,255,0.18),transparent)] mix-blend-screen"
+                    />
+                    <Sparkles className="size-4" />
                   </div>
-                  <AnimatePresence initial={false}>
-                    {effectiveSidebarCollapsed ? null : (
-                      <m.div
-                        key="sidebar-header-content"
-                        initial={SIDEBAR_HEADER_CONTENT_PRESENCE.initial}
-                        animate={SIDEBAR_HEADER_CONTENT_PRESENCE.animate}
-                        exit={SIDEBAR_HEADER_CONTENT_PRESENCE.exit}
-                        transition={sidebarHeaderTransition}
-                        className="flex min-w-0 flex-1 items-start justify-between gap-3 overflow-hidden"
-                      >
-                        <div className="min-w-0 overflow-hidden">
-                          <h1 className="truncate text-[1.15rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
-                            BetterToLive
-                          </h1>
-                          <p className="truncate text-sm text-[color:var(--text-muted)]">
-                            {t("shell.brandSubtitle")}
-                          </p>
-                        </div>
-                        <div className="flex shrink-0 flex-col items-end gap-2">
-                          <Badge
-                            variant="outline"
-                            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                          >
-                            {t("shell.modeBadge")}
-                          </Badge>
-
-                          <button
-                            type="button"
-                            data-testid="sidebar-toggle"
-                            onClick={handleSidebarCollapseToggle}
-                            aria-expanded={!effectiveSidebarCollapsed}
-                            aria-label={t("shell.collapseSidebar")}
-                            className="flex size-8 items-center justify-center rounded-lg border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)] transition-colors hover:text-[color:var(--text-primary)]"
-                          >
-                            <PanelLeftClose className="size-4" />
-                          </button>
-                        </div>
-                      </m.div>
-                    )}
-                  </AnimatePresence>
+                  {effectiveSidebarCollapsed ? null : (
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-3 overflow-hidden">
+                      <div className="min-w-0 overflow-hidden">
+                        <h1 className="truncate text-[1.15rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
+                          <SidebarBrandTitle
+                            isActive={isSidebarBrandHovered && !prefersReducedMotion}
+                            label="BetterToLive"
+                          />
+                        </h1>
+                        <p className="truncate text-sm text-[color:var(--text-muted)]">
+                          {t("shell.brandSubtitle")}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </m.div>
+              </m.button>
             </div>
 
             <SidebarNavigation
@@ -667,32 +663,21 @@ export function BetterToLiveAppShell() {
             />
 
             <AnimatePresence initial={false}>
-              {effectiveSidebarCollapsed ? null : (
+              {!effectiveSidebarCollapsed && (
                 <m.div
-                  key="sidebar-note-carousel-shell"
-                  initial={SIDEBAR_BOTTOM_PANEL_PRESENCE.initial}
-                  animate={SIDEBAR_BOTTOM_PANEL_PRESENCE.animate}
-                  exit={SIDEBAR_BOTTOM_PANEL_PRESENCE.exit}
-                  transition={SIDEBAR_FADE_TRANSITION}
-                  className="mt-3 overflow-hidden"
+                  key="sidebar-carousel"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  transition={SIDEBAR_CAROUSEL_TRANSITION}
+                  className="mt-3"
+                  style={{ width: SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH }}
                 >
-                  <m.div
-                    initial={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.initial}
-                    animate={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.animate}
-                    exit={SIDEBAR_BOTTOM_PANEL_CONTENT_PRESENCE.exit}
-                    transition={sidebarNoteContentTransition}
-                    style={{
-                      width: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
-                      minWidth: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
-                      maxWidth: `${SIDEBAR_EXPANDED_CONTENT_FRAME_WIDTH}px`,
-                    }}
-                  >
-                    <SidebarNoteCarousel
-                      key={activeView}
-                      icon={Waypoints}
-                      note={currentSidebarNote}
-                    />
-                  </m.div>
+                  <SidebarNoteCarousel
+                    key={activeView}
+                    icon={Waypoints}
+                    note={currentSidebarNote}
+                  />
                 </m.div>
               )}
             </AnimatePresence>
@@ -702,37 +687,21 @@ export function BetterToLiveAppShell() {
         <main className={cn("min-w-0", !isStackedLayout && "flex flex-1 flex-col overflow-hidden")}>
           {isStackedLayout ? (
             <>
-              <section
-                className={cn(
-                  "relative shrink-0 border-b border-[color:var(--surface-border)] px-4 py-4 backdrop-blur-xl",
-                  UI_LAYERS.header,
-                )}
-              >
+              <section className={cn("relative h-14 shrink-0 px-4", UI_LAYERS.header)}>
                 <div
                   className="absolute inset-0 -z-10"
                   style={{ backgroundColor: "var(--aside-bg)" }}
                 />
-                <div className="mx-auto flex w-full max-w-[1500px] items-center justify-between gap-3">
+                <div className="mx-auto flex h-full w-full max-w-[1500px] items-center gap-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)]">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[color:var(--text-primary)] text-[color:var(--hero-ink)]">
                       <Sparkles className="size-4" />
                     </div>
                     <div className="min-w-0">
                       <h1 className="truncate text-[1.05rem] font-semibold tracking-tight text-[color:var(--text-primary)]">
                         BetterToLive
                       </h1>
-                      <p className="text-sm text-[color:var(--text-muted)]">
-                        {t("shell.brandSubtitle")}
-                      </p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                    >
-                      {t("shell.modeBadge")}
-                    </Badge>
                   </div>
                 </div>
               </section>
@@ -745,45 +714,35 @@ export function BetterToLiveAppShell() {
           ) : null}
 
           <header
-            className={cn(
-              "relative shrink-0 border-b border-[color:var(--surface-border)] px-4 py-4 backdrop-blur-xl",
-              isWideLayout && "px-6 py-2.5",
-              UI_LAYERS.header,
-            )}
+            className={cn("relative h-14 shrink-0 px-4", isWideLayout && "px-6", UI_LAYERS.header)}
           >
             <div
-              className={cn("absolute inset-x-0 top-0 -z-10 h-[88px]", isWideLayout && "h-[70px]")}
+              className="absolute inset-x-0 top-0 -z-10 h-full"
               style={{ backgroundColor: "var(--topbar-bg)" }}
             />
             <div
               className={cn(
-                "mx-auto flex w-full max-w-[1500px] flex-col gap-3",
-                isHorizontalHeader && "flex-row items-center justify-between",
-                isWideLayout && "gap-2.5",
+                "mx-auto flex h-full w-full max-w-[1500px] items-center",
+                isHorizontalHeader ? "flex-row justify-between" : "flex-col justify-center gap-3",
               )}
               data-testid="workspace-header-shell"
               data-orientation={isHorizontalHeader ? "row" : "column"}
             >
-              <div className="min-w-0">
-                <div className="text-xs tracking-[0.22em] text-[color:var(--text-muted)] uppercase">
-                  {t("shell.tagline")}
-                </div>
-                <div className="mt-1 flex flex-wrap items-center gap-3">
-                  <h2
-                    className={cn(
-                      "text-[1.35rem] font-semibold tracking-tight text-[color:var(--text-primary)]",
-                      isWideLayout && "text-[1.2rem]",
-                    )}
-                  >
-                    {currentViewLabel}
-                  </h2>
-                  <Badge
-                    variant="outline"
-                    className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
-                  >
-                    {formatWorkspaceDate(new Date(), currentLocale)}
-                  </Badge>
-                </div>
+              <div className="flex min-w-0 flex-wrap items-center gap-3">
+                <h2
+                  className={cn(
+                    "text-[1.35rem] font-semibold tracking-tight text-[color:var(--text-primary)]",
+                    isWideLayout && "text-[1.2rem]",
+                  )}
+                >
+                  {currentViewLabel}
+                </h2>
+                <Badge
+                  variant="outline"
+                  className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]"
+                >
+                  {formatWorkspaceDate(new Date(), currentLocale)}
+                </Badge>
               </div>
 
               <div
@@ -821,6 +780,18 @@ export function BetterToLiveAppShell() {
                     isHorizontalHeader ? "shrink-0 justify-end" : "flex-wrap justify-start",
                   )}
                 >
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className={cn(
+                      "h-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 text-[color:var(--text-primary)] hover:bg-[color:var(--muted-surface-bg)]",
+                      isWideLayout && "h-8 px-2.5",
+                    )}
+                    onClick={() => setActiveView("reflection")}
+                  >
+                    <NotebookPen className="size-4" />
+                    {t("shell.quickRecord")}
+                  </Button>
                   <div className="shrink-0">
                     <WorkspaceUtilities
                       themeId={themeId}
@@ -843,32 +814,9 @@ export function BetterToLiveAppShell() {
                       onSelectMusicPreset={selectPreset}
                       onToggleMusic={togglePlayback}
                       onNudgeVolume={nudgeVolume}
+                      onOpenSettings={() => setIsSettingsOpen(true)}
                     />
                   </div>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    className={cn(
-                      "h-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-3 text-[color:var(--text-primary)] hover:bg-[color:var(--muted-surface-bg)]",
-                      isWideLayout && "h-8 px-2.5",
-                    )}
-                    onClick={() => setActiveView("reflection")}
-                  >
-                    <NotebookPen className="size-4" />
-                    {t("shell.quickRecord")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    aria-label={t("shell.settings.button")}
-                    className={cn(
-                      "h-10 w-10 shrink-0 border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-0 text-[color:var(--text-muted)] hover:bg-[color:var(--muted-surface-bg)] hover:text-[color:var(--text-primary)]",
-                      isWideLayout && "h-8 w-8",
-                    )}
-                    onClick={() => setIsSettingsOpen(true)}
-                  >
-                    <Settings className="size-4" />
-                  </Button>
                 </div>
               </div>
             </div>
@@ -903,16 +851,18 @@ export function BetterToLiveAppShell() {
                 </Button>
               </div>
             ) : null}
-            <m.div
-              key={activeView}
-              initial={CONTENT_ENTER_PRESENCE.initial}
-              animate={CONTENT_ENTER_PRESENCE.animate}
-              exit={CONTENT_ENTER_PRESENCE.exit}
-              transition={APP_FADE_TRANSITION}
-              className={cn(!isStackedLayout && "h-full min-h-0 flex-1")}
-            >
-              {pageContent}
-            </m.div>
+            <AnimatePresence initial={false} mode="wait">
+              <m.div
+                key={activeView}
+                initial={CONTENT_ENTER_PRESENCE.initial}
+                animate={CONTENT_ENTER_PRESENCE.animate}
+                exit={CONTENT_ENTER_PRESENCE.exit}
+                transition={APP_FADE_TRANSITION}
+                className={cn(!isStackedLayout && "h-full min-h-0 flex-1")}
+              >
+                {pageContent}
+              </m.div>
+            </AnimatePresence>
           </div>
         </main>
       </div>

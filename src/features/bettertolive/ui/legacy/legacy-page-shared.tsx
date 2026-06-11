@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Lock, Pencil } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { LegacyItem } from "@/features/bettertolive/types"
 import {
@@ -237,11 +237,15 @@ export function LegacyItemSummaryCard({
             ) : null}
           </div>
         </button>
-        {onEdit ? (
-          <Button size="icon-sm" variant="ghost" className="h-7 w-7 shrink-0" onClick={onEdit}>
-            <Pencil className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={Boolean(onEdit)}
+          size="icon-sm"
+          variant="ghost"
+          className="h-7 w-7 shrink-0"
+          onClick={onEdit}
+        >
+          <Pencil className="size-3.5" />
+        </AnimatedButton>
       </div>
     </article>
   )

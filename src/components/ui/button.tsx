@@ -1,6 +1,13 @@
+import type { ComponentProps } from "react"
 import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
+import { AnimatePresence, m, type Transition, useReducedMotion } from "motion/react"
 
+import {
+  ACTION_BUTTON_PRESENCE,
+  ACTION_BUTTON_TRANSITION,
+  type PresenceMotion,
+} from "@/lib/app-motion"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
@@ -40,12 +47,7 @@ const buttonVariants = cva(
   },
 )
 
-function Button({
-  className,
-  variant = "default",
-  size = "default",
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+function Button({ className, variant = "default", size = "default", ...props }: ButtonProps) {
   return (
     <ButtonPrimitive
       data-slot="button"
@@ -55,4 +57,67 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+type ButtonProps = ButtonPrimitive.Props & VariantProps<typeof buttonVariants>
+
+type AnimatedButtonProps = ButtonProps & {
+  show: boolean
+  containerClassName?: string
+  presence?: Partial<PresenceMotion>
+  reducedMotionPresence?: Partial<PresenceMotion>
+  presenceMode?: ComponentProps<typeof AnimatePresence>["mode"]
+  layout?: boolean
+  transition?: Transition
+}
+
+const REDUCED_MOTION_BUTTON_PRESENCE: PresenceMotion = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+}
+
+function AnimatedButton({
+  show,
+  containerClassName,
+  presence,
+  reducedMotionPresence,
+  presenceMode = "wait",
+  layout = true,
+  transition = ACTION_BUTTON_TRANSITION,
+  ...props
+}: AnimatedButtonProps) {
+  const prefersReducedMotion = useReducedMotion()
+  const resolvedPresence: PresenceMotion = {
+    initial: presence?.initial ?? ACTION_BUTTON_PRESENCE.initial,
+    animate: presence?.animate ?? ACTION_BUTTON_PRESENCE.animate,
+    exit: presence?.exit ?? ACTION_BUTTON_PRESENCE.exit,
+  }
+  const resolvedReducedMotionPresence: PresenceMotion = {
+    initial: reducedMotionPresence?.initial ?? REDUCED_MOTION_BUTTON_PRESENCE.initial,
+    animate: reducedMotionPresence?.animate ?? REDUCED_MOTION_BUTTON_PRESENCE.animate,
+    exit: reducedMotionPresence?.exit ?? REDUCED_MOTION_BUTTON_PRESENCE.exit,
+  }
+
+  return (
+    <AnimatePresence initial={false} mode={presenceMode}>
+      {show ? (
+        <m.span
+          layout={layout}
+          initial={
+            prefersReducedMotion ? resolvedReducedMotionPresence.initial : resolvedPresence.initial
+          }
+          animate={
+            prefersReducedMotion ? resolvedReducedMotionPresence.animate : resolvedPresence.animate
+          }
+          exit={prefersReducedMotion ? resolvedReducedMotionPresence.exit : resolvedPresence.exit}
+          transition={transition}
+          style={{ perspective: 1200, transformStyle: "preserve-3d" }}
+          className={cn("inline-flex origin-center", containerClassName)}
+        >
+          <Button {...props} />
+        </m.span>
+      ) : null}
+    </AnimatePresence>
+  )
+}
+
+export { AnimatedButton, Button, buttonVariants }

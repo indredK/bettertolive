@@ -1,6 +1,8 @@
+import { Boxes, Plus } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
+import { AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
 import { NutritionDailyPlanTab } from "@/features/bettertolive/ui/nutrition/nutrition-daily-plan-tab"
@@ -25,6 +27,8 @@ const EMPTY_WEEKLY_REVIEW: NutritionModuleData["weeklyReview"] = {
   crossViews: [],
 }
 
+type NutritionCreateAction = "dailyPlan" | "food" | "foodCategory" | "mealLog" | "recipe"
+
 export function NutritionPage({
   editableNutrition,
   nutrition,
@@ -38,6 +42,7 @@ export function NutritionPage({
 }) {
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("overview")
+  const [pendingCreateAction, setPendingCreateAction] = useState<NutritionCreateAction | null>(null)
   const normalizedNutrition = normalizeNutritionData(nutrition)
   const normalizedEditableNutrition = normalizeNutritionData(editableNutrition ?? nutrition)
   const controlModeKey = isControlMode ? "control" : "browse"
@@ -56,16 +61,67 @@ export function NutritionPage({
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className={cn("min-h-0 flex-1", isStackedLayout ? "overflow-visible" : "overflow-hidden")}
+        className={cn(
+          "min-h-0 flex-1 flex-col",
+          isStackedLayout ? "overflow-visible" : "overflow-hidden",
+        )}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("nutrition.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="dailyPlan">{t("nutrition.tabs.dailyPlan", "每日计划")}</TabsTrigger>
-          <TabsTrigger value="recipes">{t("nutrition.tabs.recipes", "食谱库")}</TabsTrigger>
-          <TabsTrigger value="foods">{t("nutrition.tabs.foods", "食品分类")}</TabsTrigger>
-          <TabsTrigger value="nutrients">{t("nutrition.tabs.nutrients", "营养成分表")}</TabsTrigger>
-          <TabsTrigger value="logs">{t("nutrition.tabs.logs", "进食记录")}</TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">{t("nutrition.tabs.overview", "总览")}</TabsTrigger>
+              <TabsTrigger value="dailyPlan">
+                {t("nutrition.tabs.dailyPlan", "每日计划")}
+              </TabsTrigger>
+              <TabsTrigger value="recipes">{t("nutrition.tabs.recipes", "食谱库")}</TabsTrigger>
+              <TabsTrigger value="foods">{t("nutrition.tabs.foods", "食品分类")}</TabsTrigger>
+              <TabsTrigger value="nutrients">
+                {t("nutrition.tabs.nutrients", "营养成分表")}
+              </TabsTrigger>
+              <TabsTrigger value="logs">{t("nutrition.tabs.logs", "进食记录")}</TabsTrigger>
+            </TabsList>
+          </div>
+
+          {isControlMode ? (
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {activeTab === "dailyPlan" ? (
+                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("dailyPlan")}>
+                  <Plus className="size-4" />
+                  {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
+                </AnimatedButton>
+              ) : null}
+              {activeTab === "recipes" ? (
+                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("recipe")}>
+                  <Plus className="size-4" />
+                  {t("nutrition.recipeEdit.createTitle", "新增食谱")}
+                </AnimatedButton>
+              ) : null}
+              {activeTab === "foods" ? (
+                <>
+                  <AnimatedButton
+                    show
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setPendingCreateAction("foodCategory")}
+                  >
+                    <Boxes className="size-4" />
+                    {t("nutrition.categoryEdit.createTitle", "新增食品分类")}
+                  </AnimatedButton>
+                  <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("food")}>
+                    <Plus className="size-4" />
+                    {t("nutrition.foodEdit.createTitle", "新增食品")}
+                  </AnimatedButton>
+                </>
+              ) : null}
+              {activeTab === "logs" ? (
+                <AnimatedButton show size="sm" onClick={() => setPendingCreateAction("mealLog")}>
+                  <Plus className="size-4" />
+                  {t("nutrition.logEdit.createTitle", "新增进食记录")}
+                </AnimatedButton>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
 
         <TabsContent value="overview" className={tabContentClassName}>
           <NutritionOverviewTab
@@ -82,6 +138,10 @@ export function NutritionPage({
             nutrition={normalizedNutrition}
             editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
+            createRequested={pendingCreateAction === "dailyPlan"}
+            onCreateHandled={() =>
+              setPendingCreateAction((current) => (current === "dailyPlan" ? null : current))
+            }
           />
         </TabsContent>
 
@@ -91,6 +151,10 @@ export function NutritionPage({
             nutrition={normalizedNutrition}
             editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
+            createRequested={pendingCreateAction === "recipe"}
+            onCreateHandled={() =>
+              setPendingCreateAction((current) => (current === "recipe" ? null : current))
+            }
           />
         </TabsContent>
 
@@ -100,11 +164,19 @@ export function NutritionPage({
             nutrition={normalizedNutrition}
             editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
+            createFoodRequested={pendingCreateAction === "food"}
+            createCategoryRequested={pendingCreateAction === "foodCategory"}
+            onFoodCreateHandled={() =>
+              setPendingCreateAction((current) => (current === "food" ? null : current))
+            }
+            onCategoryCreateHandled={() =>
+              setPendingCreateAction((current) => (current === "foodCategory" ? null : current))
+            }
           />
         </TabsContent>
 
         <TabsContent value="nutrients" className={tabContentClassName}>
-          <NutritionNutrientsTab nutrition={normalizedNutrition} isControlMode={isControlMode} />
+          <NutritionNutrientsTab nutrition={normalizedNutrition} />
         </TabsContent>
 
         <TabsContent value="logs" className={tabContentClassName}>
@@ -113,6 +185,10 @@ export function NutritionPage({
             nutrition={normalizedNutrition}
             editableNutrition={normalizedEditableNutrition}
             isControlMode={isControlMode}
+            createRequested={pendingCreateAction === "mealLog"}
+            onCreateHandled={() =>
+              setPendingCreateAction((current) => (current === "mealLog" ? null : current))
+            }
           />
         </TabsContent>
       </Tabs>

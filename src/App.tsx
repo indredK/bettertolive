@@ -2,6 +2,7 @@ import { useState } from "react"
 import { QueryClientProvider } from "@tanstack/react-query"
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react"
 
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "@/i18n/config"
 import { BetterToLiveAppShell } from "@/features/bettertolive/ui/shell/app-shell"
 import { SplashScreen } from "@/features/bettertolive/ui/shell/splash-screen"
@@ -20,16 +21,18 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <LazyMotion features={domAnimation}>
-        <MotionConfig
-          reducedMotion={import.meta.env.MODE === "test" ? "always" : "user"}
-          transition={APP_LAYOUT_TRANSITION}
-        >
-          <LocaleSyncBridge />
-          {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
-          <BetterToLiveAppShell />
-        </MotionConfig>
-      </LazyMotion>
+      <TooltipProvider>
+        <LazyMotion features={domAnimation}>
+          <MotionConfig
+            reducedMotion={import.meta.env.MODE === "test" ? "always" : "user"}
+            transition={APP_LAYOUT_TRANSITION}
+          >
+            <LocaleSyncBridge />
+            {!splashDone && <SplashScreen onComplete={() => setSplashDone(true)} />}
+            <BetterToLiveAppShell />
+          </MotionConfig>
+        </LazyMotion>
+      </TooltipProvider>
     </QueryClientProvider>
   )
 }

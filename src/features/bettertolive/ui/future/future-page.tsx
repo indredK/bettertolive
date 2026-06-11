@@ -13,7 +13,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { FutureBlueprint, FutureMilestone } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
@@ -78,40 +78,47 @@ export function FuturePage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
-        {onRefresh ? (
-          <Button
-            type="button"
-            variant="outline"
-            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-            onClick={onRefresh}
-          >
-            <RefreshCcw className="size-4" />
-            {t("future.refresh", "刷新")}
-          </Button>
-        ) : null}
-        {isControlMode ? (
-          <Button
-            type="button"
-            className="bg-[color:var(--tone-future-ink)] text-[color:var(--tone-future-bg)] hover:opacity-90"
-            onClick={() => setIsEditingBlueprint(true)}
-          >
-            <PencilLine className="size-4" />
-            {t("future.edit.blueprint", "编辑蓝图")}
-          </Button>
-        ) : null}
-      </div>
-
       <Tabs
         defaultValue="blueprint"
         className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="blueprint">{t("future.tabs.blueprint", "蓝图")}</TabsTrigger>
-          <TabsTrigger value="milestones">{t("future.tabs.milestones", "阶段路径")}</TabsTrigger>
-          <TabsTrigger value="experiments">{t("future.tabs.experiments", "当前实验")}</TabsTrigger>
-          <TabsTrigger value="alignment">{t("future.tabs.alignment", "对齐检查")}</TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 items-center gap-2 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="blueprint">{t("future.tabs.blueprint", "蓝图")}</TabsTrigger>
+              <TabsTrigger value="milestones">
+                {t("future.tabs.milestones", "阶段路径")}
+              </TabsTrigger>
+              <TabsTrigger value="experiments">
+                {t("future.tabs.experiments", "当前实验")}
+              </TabsTrigger>
+              <TabsTrigger value="alignment">{t("future.tabs.alignment", "对齐检查")}</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            {onRefresh ? (
+              <Button
+                type="button"
+                variant="outline"
+                className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+                onClick={onRefresh}
+              >
+                <RefreshCcw className="size-4" />
+                {t("future.refresh", "刷新")}
+              </Button>
+            ) : null}
+            <AnimatedButton
+              show={isControlMode}
+              type="button"
+              className="bg-[color:var(--tone-future-ink)] text-[color:var(--tone-future-bg)] hover:opacity-90"
+              onClick={() => setIsEditingBlueprint(true)}
+            >
+              <PencilLine className="size-4" />
+              {t("future.edit.blueprint", "编辑蓝图")}
+            </AnimatedButton>
+          </div>
+        </div>
 
         <TabsContent
           value="blueprint"
@@ -285,18 +292,17 @@ function FutureBlueprintPanel({
           )}
           compact
         />
-        {isControlMode ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-            onClick={onEditBlueprint}
-          >
-            <PencilLine className="size-3.5" />
-            {t("future.edit.blueprint", "编辑蓝图")}
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={isControlMode}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+          onClick={onEditBlueprint}
+        >
+          <PencilLine className="size-3.5" />
+          {t("future.edit.blueprint", "编辑蓝图")}
+        </AnimatedButton>
       </div>
 
       <div className={cn("mt-4 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -343,18 +349,17 @@ function FutureBlueprintPanel({
                 {t("future.definition.valuesDesc", "这些词决定你会把时间和钱投向哪里。")}
               </p>
             </div>
-            {isControlMode ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="text-[color:var(--text-secondary)]"
-                onClick={onEditBlueprint}
-              >
-                <PencilLine className="size-3.5" />
-                {t("future.edit.blueprint", "编辑蓝图")}
-              </Button>
-            ) : null}
+            <AnimatedButton
+              show={isControlMode}
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-[color:var(--text-secondary)]"
+              onClick={onEditBlueprint}
+            >
+              <PencilLine className="size-3.5" />
+              {t("future.edit.blueprint", "编辑蓝图")}
+            </AnimatedButton>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {futureBlueprint.values.length > 0 ? (
@@ -408,18 +413,17 @@ function FutureMilestonesPanel({
           )}
           compact
         />
-        {isControlMode ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-            onClick={onCreate}
-          >
-            <Plus className="size-3.5" />
-            {t("future.addMilestone", "新增路径")}
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={isControlMode}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+          onClick={onCreate}
+        >
+          <Plus className="size-3.5" />
+          {t("future.addMilestone", "新增路径")}
+        </AnimatedButton>
       </div>
 
       <div className={cn("mt-4 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -470,18 +474,17 @@ function FutureExperimentsPanel({
           )}
           compact
         />
-        {isControlMode ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
-            onClick={onCreate}
-          >
-            <Plus className="size-3.5" />
-            {t("future.addExperiment", "新增实验")}
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={isControlMode}
+          type="button"
+          variant="outline"
+          size="sm"
+          className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+          onClick={onCreate}
+        >
+          <Plus className="size-3.5" />
+          {t("future.addExperiment", "新增实验")}
+        </AnimatedButton>
       </div>
 
       <div className={cn("mt-4 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -612,17 +615,16 @@ function DefinitionBlock({
           <Icon className="size-4" />
           <div className="text-sm font-medium">{label}</div>
         </div>
-        {onEdit ? (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="text-[color:var(--text-secondary)]"
-            onClick={onEdit}
-          >
-            <PencilLine className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={Boolean(onEdit)}
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="text-[color:var(--text-secondary)]"
+          onClick={onEdit}
+        >
+          <PencilLine className="size-3.5" />
+        </AnimatedButton>
       </div>
       <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">{value || " "}</p>
     </div>
@@ -645,11 +647,15 @@ function MilestoneCard({ entry, onEdit }: { entry: FutureMilestone; onEdit?: () 
         >
           {entry.horizon}
         </Badge>
-        {onEdit ? (
-          <Button type="button" variant="ghost" size="sm" onClick={onEdit}>
-            <PencilLine className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={Boolean(onEdit)}
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onEdit}
+        >
+          <PencilLine className="size-3.5" />
+        </AnimatedButton>
       </div>
       <p className="mt-3 text-sm leading-6 text-[color:var(--text-secondary)]">{entry.summary}</p>
       <ul className="mt-3 space-y-2 text-sm text-[color:var(--text-muted)]">

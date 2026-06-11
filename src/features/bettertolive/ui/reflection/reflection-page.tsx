@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -175,10 +175,6 @@ export function ReflectionPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <div className="flex shrink-0 justify-end">
-        <ReflectionControlModeBadge isControlMode={isControlMode} />
-      </div>
-
       <Tabs
         defaultValue="overview"
         className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
@@ -334,12 +330,10 @@ function ReflectionRecordsPanel({
             "先展示最近写过的内容，再决定之后如何组织回看。",
           )}
         />
-        {isControlMode ? (
-          <Button type="button" size="sm" onClick={onCreate}>
-            <Plus className="size-4" />
-            {t("reflection.actions.create", "新增反思")}
-          </Button>
-        ) : null}
+        <AnimatedButton show={isControlMode} type="button" size="sm" onClick={onCreate}>
+          <Plus className="size-4" />
+          {t("reflection.actions.create", "新增反思")}
+        </AnimatedButton>
       </div>
 
       <div className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -496,25 +490,6 @@ function CountRowsCard({
   )
 }
 
-function ReflectionControlModeBadge({ isControlMode }: { isControlMode: boolean }) {
-  const { t } = useTranslation()
-
-  return (
-    <span
-      className={cn(
-        "rounded-full border px-2 py-0.5 text-[11px]",
-        isControlMode
-          ? "border-[color:var(--tone-present-border)] bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]"
-          : "border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]",
-      )}
-    >
-      {isControlMode
-        ? t("reflection.controlMode.on", "控制模式")
-        : t("reflection.controlMode.off", "浏览模式")}
-    </span>
-  )
-}
-
 function ReflectionEntryCard({
   entry,
   isControlMode,
@@ -539,31 +514,31 @@ function ReflectionEntryCard({
             {entry.title}
           </h3>
         </div>
-        {isControlMode ? (
-          <div className="flex shrink-0 items-center gap-1">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t("reflection.actions.edit", "编辑反思")}
-              title={t("reflection.actions.edit", "编辑反思")}
-              onClick={onEdit}
-            >
-              <Pencil className="size-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              aria-label={t("reflection.actions.delete", "删除")}
-              title={t("reflection.actions.delete", "删除")}
-              disabled={isDeleting}
-              onClick={onDelete}
-            >
-              <Trash2 className="size-4" />
-            </Button>
-          </div>
-        ) : null}
+        <div className="flex shrink-0 items-center gap-1">
+          <AnimatedButton
+            show={isControlMode}
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("reflection.actions.edit", "编辑反思")}
+            title={t("reflection.actions.edit", "编辑反思")}
+            onClick={onEdit}
+          >
+            <Pencil className="size-4" />
+          </AnimatedButton>
+          <AnimatedButton
+            show={isControlMode}
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            aria-label={t("reflection.actions.delete", "删除")}
+            title={t("reflection.actions.delete", "删除")}
+            disabled={isDeleting}
+            onClick={onDelete}
+          >
+            <Trash2 className="size-4" />
+          </AnimatedButton>
+        </div>
       </div>
       <p className="mt-2 text-sm leading-6 text-[color:var(--text-secondary)]">{entry.excerpt}</p>
       {entry.tags.length > 0 ? (

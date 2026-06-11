@@ -6,9 +6,11 @@ import {
   useRef,
   useState,
 } from "react"
-import { BellRing, Globe, Music4, Palette, Wrench } from "lucide-react"
+import { BellRing, Eye, Globe, Music4, Palette, Pencil, Settings } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { LiquidGlassSurface } from "@/components/ui/liquid-glass"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import type {
   WorkspaceNotification,
   WorkspaceNotificationInput,
@@ -58,6 +60,7 @@ export function WorkspaceUtilities({
   onSelectMusicPreset,
   onToggleMusic,
   onNudgeVolume,
+  onOpenSettings,
 }: {
   themeId: WorkspaceThemeId
   themes: WorkspaceTheme[]
@@ -83,6 +86,7 @@ export function WorkspaceUtilities({
   onSelectMusicPreset: (presetId: WorkspaceMusicPresetId) => void
   onToggleMusic: () => void | Promise<void>
   onNudgeVolume: (delta: number) => void
+  onOpenSettings: () => void
 }) {
   const { t } = useTranslation()
   const [openPanel, setOpenPanel] = useState<UtilityPanel>(null)
@@ -100,6 +104,9 @@ export function WorkspaceUtilities({
   const toggleShoppingManagementMode = useWorkspaceUiStore(
     (state) => state.toggleShoppingManagementMode,
   )
+  const shoppingModeLabel = isShoppingManagementMode
+    ? t("shell.utilities.editMode")
+    : t("shell.utilities.browseMode")
 
   const updatePanelPosition = useCallback(() => {
     if (openPanel === null || typeof window === "undefined") {
@@ -200,25 +207,15 @@ export function WorkspaceUtilities({
 
   return (
     <>
-      <div
+      <LiquidGlassSurface
         ref={containerRef}
-        className="flex items-center gap-1 rounded-full border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-1.5 py-1"
+        className="rounded-full border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)]"
+        contentClassName="flex items-center gap-1 px-1.5 py-1"
+        tone="vivid"
+        style={{
+          boxShadow: "0 16px 30px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.58)",
+        }}
       >
-        <UtilityIconButton
-          ref={themeTriggerRef}
-          isActive={openPanel === "themes"}
-          label={t("shell.utilities.theme")}
-          popupType="dialog"
-          testId="theme-center-trigger"
-          onClick={() => setOpenPanel((current) => (current === "themes" ? null : "themes"))}
-        >
-          <Palette className="size-4" />
-          <span
-            className="absolute -right-0.5 -bottom-0.5 size-2.5 rounded-full border border-white/90 shadow-sm"
-            style={{ backgroundColor: currentTheme.swatches[0] }}
-          />
-        </UtilityIconButton>
-
         <UtilityIconButton
           ref={notificationTriggerRef}
           isActive={openPanel === "notifications"}
@@ -231,6 +228,21 @@ export function WorkspaceUtilities({
           }
         >
           <BellRing className="size-4" />
+        </UtilityIconButton>
+
+        <UtilityIconButton
+          ref={themeTriggerRef}
+          isActive={openPanel === "themes"}
+          label={t("shell.utilities.theme")}
+          popupType="dialog"
+          testId="theme-center-trigger"
+          onClick={() => setOpenPanel((current) => (current === "themes" ? null : "themes"))}
+        >
+          <Palette className="size-4" />
+          <span
+            className="absolute -right-0.5 -bottom-0.5 z-20 size-2.5 rounded-full border border-white/90 shadow-sm"
+            style={{ backgroundColor: currentTheme.swatches[0] }}
+          />
         </UtilityIconButton>
 
         <UtilityIconButton
@@ -258,15 +270,38 @@ export function WorkspaceUtilities({
           <Globe className="size-4" />
         </UtilityIconButton>
 
-        <UtilityIconButton
-          isActive={isShoppingManagementMode}
-          label={t("shell.utilities.managementMode")}
-          testId="management-mode-trigger"
-          onClick={toggleShoppingManagementMode}
-        >
-          <Wrench className="size-4" />
-        </UtilityIconButton>
-      </div>
+        <Tooltip>
+          <TooltipTrigger>
+            <UtilityIconButton
+              isActive={isShoppingManagementMode}
+              label={shoppingModeLabel}
+              testId="management-mode-trigger"
+              onClick={toggleShoppingManagementMode}
+            >
+              {isShoppingManagementMode ? (
+                <Pencil className="size-4" />
+              ) : (
+                <Eye className="size-4" />
+              )}
+            </UtilityIconButton>
+          </TooltipTrigger>
+          <TooltipContent>{shoppingModeLabel}</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger>
+            <UtilityIconButton
+              isActive={false}
+              label={t("shell.settings.button")}
+              testId="settings-trigger"
+              onClick={onOpenSettings}
+            >
+              <Settings className="size-4" />
+            </UtilityIconButton>
+          </TooltipTrigger>
+          <TooltipContent>{t("shell.settings.button")}</TooltipContent>
+        </Tooltip>
+      </LiquidGlassSurface>
 
       <UtilityPanelPortal
         isOpen={openPanel !== null}

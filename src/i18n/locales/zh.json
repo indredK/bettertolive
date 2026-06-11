@@ -3305,8 +3305,6 @@
   },
   "shell": {
     "brandSubtitle": "个人的人生工作台",
-    "tagline": "本地优先 / 自我认知系统",
-    "modeBadge": "V1 Mock",
     "expandSidebar": "展开菜单列",
     "collapseSidebar": "收起菜单列",
     "searchPlaceholder": "搜索记录、观念、关系或成长线索",
@@ -3327,7 +3325,9 @@
       "theme": "主题切换",
       "notifications": "通知中心",
       "music": "播放音乐",
-      "managementMode": "管理模式"
+      "managementMode": "管理模式",
+      "browseMode": "浏览模式",
+      "editMode": "编辑模式"
     },
     "themes": {
       "title": "主题切换",

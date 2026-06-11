@@ -1,15 +1,15 @@
-import { Heart, History, MessageCircleHeart, Pencil, Plus } from "lucide-react"
+import { Heart, History, MessageCircleHeart, Pencil } from "lucide-react"
 import {
   FilterAppliedChips,
   FilterPopoverButton,
   type FilterPopoverDimension,
 } from "@/features/bettertolive/ui/shared/filter-popover"
 import type { TFunction } from "i18next"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { MealLog, NutritionModuleData } from "@/features/bettertolive/types"
@@ -23,7 +23,6 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionPanel,
   NutritionTabViewport,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
@@ -35,12 +34,16 @@ const LOG_FILTERS = ["all", "linkedPlan", "linkedMemory", "changed", "needsCare"
 type LogFilter = (typeof LOG_FILTERS)[number]
 
 export function NutritionLogsTab({
+  createRequested = false,
   editableNutrition,
   isControlMode = false,
+  onCreateHandled,
   nutrition,
 }: {
+  createRequested?: boolean
   editableNutrition?: NutritionModuleData
   isControlMode?: boolean
+  onCreateHandled?: () => void
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
@@ -66,37 +69,27 @@ export function NutritionLogsTab({
     })
   }, [filter, lookups, nutrition.foodMemories, nutrition.mealLogs, query, t])
 
+  useEffect(() => {
+    if (!isControlMode || !createRequested) return
+    setTimeout(() => setEditingLog({ isNew: true, log: null }), 0)
+    onCreateHandled?.()
+  }, [createRequested, isControlMode, onCreateHandled])
+
   return (
     <NutritionTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("nutrition.logs.title", "进食记录")}</h3>
-          <NutritionControlModeBadge isControlMode={isControlMode} />
-        </div>
-      </div>
       <div className="grid min-h-[620px] flex-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.42fr)]">
-        <NutritionPanel
-          title={t("nutrition.logs.title", "进食记录")}
-          count={filteredLogs.length}
-          className="min-h-0 overflow-hidden"
-          contentClassName="space-y-3 p-4"
-        >
+        <NutritionPanel className="min-h-0 overflow-hidden" contentClassName="space-y-3 p-4">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-muted-foreground text-xs leading-5">
                 {t("nutrition.logs.description", "记录真实发生的进食，用来校准计划。")}
               </p>
-              {isControlMode ? (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingLog({ isNew: true, log: null })}
-                >
-                  <Plus className="size-3.5" />
-                  {t("nutrition.logEdit.createTitle", "新增进食记录")}
-                </Button>
-              ) : null}
+              <Badge
+                variant="outline"
+                className="border-foreground/10 bg-muted text-muted-foreground"
+              >
+                {filteredLogs.length}
+              </Badge>
             </div>
             <div className="space-y-2">
               <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
@@ -272,11 +265,15 @@ function LogCard({
               </Badge>
             ) : null}
           </div>
-          {onEdit ? (
-            <Button type="button" variant="ghost" size="icon-sm" onClick={onEdit}>
-              <Pencil className="size-3.5" />
-            </Button>
-          ) : null}
+          <AnimatedButton
+            show={Boolean(onEdit)}
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            onClick={onEdit}
+          >
+            <Pencil className="size-3.5" />
+          </AnimatedButton>
         </div>
       </div>
 

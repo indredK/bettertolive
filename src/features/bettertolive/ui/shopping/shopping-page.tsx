@@ -1,7 +1,9 @@
+import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   ShoppingItem,
@@ -76,15 +78,48 @@ export function ShoppingPage({
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className="min-h-0 flex-1 overflow-hidden"
+        className="min-h-0 flex-1 flex-col overflow-hidden"
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("shopping.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="planning">{t("shopping.tabs.planning", "物件库")}</TabsTrigger>
-          <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
-          <TabsTrigger value="spaces">{t("shopping.tabs.spaces", "空间场景")}</TabsTrigger>
-          <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">{t("shopping.tabs.overview", "总览")}</TabsTrigger>
+              <TabsTrigger value="planning">{t("shopping.tabs.planning", "物件库")}</TabsTrigger>
+              <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
+              <TabsTrigger value="spaces">{t("shopping.tabs.spaces", "空间场景")}</TabsTrigger>
+              <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
+            </TabsList>
+          </div>
+
+          {isControlMode ? (
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              {activeTab === "planning" ? (
+                <Button size="sm" onClick={() => handleEditItem(null)}>
+                  <Plus className="size-4" />
+                  {t("shopping.planning.addItem", "新增物品")}
+                </Button>
+              ) : null}
+              {activeTab === "systems" ? (
+                <Button size="sm" onClick={() => setEditingSystem({ isNew: true, system: null })}>
+                  <Plus className="size-4" />
+                  {t("shopping.systems.addSystem", "新增系统")}
+                </Button>
+              ) : null}
+              {activeTab === "spaces" ? (
+                <Button size="sm" onClick={() => setEditingSpace({ isNew: true, space: null })}>
+                  <Plus className="size-4" />
+                  {t("shopping.spaces.addSpace", "新增空间")}
+                </Button>
+              ) : null}
+              {activeTab === "stages" ? (
+                <Button size="sm" onClick={() => setEditingStage({ isNew: true, stage: null })}>
+                  <Plus className="size-4" />
+                  {t("shopping.stages.addStage", "新增阶段")}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
 
         <TabsContent value="overview" className="h-full min-h-0 overflow-hidden">
           <ShoppingOverviewTab shopping={shopping} />

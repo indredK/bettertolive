@@ -1,10 +1,10 @@
-import { Search, Pencil, Plus, Trash2 } from "lucide-react"
+import { Search, Pencil, Trash2 } from "lucide-react"
 import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { ShoppingItem, ShoppingModuleData } from "@/features/bettertolive/types"
@@ -26,8 +26,6 @@ import {
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   SHOPPING_DETAIL_CARD_CLASS,
-  SHOPPING_CONTROL_BADGE_CLASS,
-  SHOPPING_IDLE_BADGE_CLASS,
   SHOPPING_MUTED_PANEL_CLASS,
   SHOPPING_SELECTABLE_CARD_CLASS,
   SHOPPING_SELECTED_CARD_CLASS,
@@ -88,11 +86,16 @@ function PlanItemCard({
             </Badge>
           </div>
         </button>
-        {isControlMode && (
-          <Button size="icon-sm" variant="ghost" className="h-6 w-6 shrink-0" onClick={onEdit}>
-            <Pencil className="size-3" />
-          </Button>
-        )}
+        <AnimatedButton
+          show={isControlMode}
+          containerClassName="shrink-0"
+          size="icon-sm"
+          variant="ghost"
+          className="h-6 w-6"
+          onClick={onEdit}
+        >
+          <Pencil className="size-3" />
+        </AnimatedButton>
       </div>
     </div>
   )
@@ -173,13 +176,15 @@ function PlanItemDetail({
             </div>
           )}
         </div>
-        {isControlMode && onDelete && (
-          <div className="flex shrink-0 items-center gap-2">
-            <Button variant="outline" size="sm" onClick={onDelete}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+        <AnimatedButton
+          show={isControlMode && Boolean(onDelete)}
+          containerClassName="shrink-0"
+          variant="outline"
+          size="sm"
+          onClick={onDelete}
+        >
+          <Trash2 className="h-4 w-4" />
+        </AnimatedButton>
       </CardHeader>
       <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4">
         {/* 标签区：系统 + 空间 合并到一行 */}
@@ -400,28 +405,6 @@ export function ShoppingPlanningTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("shopping.planning.title", "物件库")}</h3>
-          <span
-            className={cn(
-              "rounded-full border px-2 py-0.5 text-[11px]",
-              isControlMode ? SHOPPING_CONTROL_BADGE_CLASS : SHOPPING_IDLE_BADGE_CLASS,
-            )}
-          >
-            {isControlMode
-              ? t("shopping.controlMode.on", "控制模式")
-              : t("shopping.controlMode.off", "浏览模式")}
-          </span>
-        </div>
-        {isControlMode && (
-          <Button size="sm" onClick={() => onEditItem(null)}>
-            <Plus className="mr-1 h-4 w-4" />
-            {t("shopping.planning.addItem", "新增物品")}
-          </Button>
-        )}
-      </div>
-
       <ShoppingTabBody>
         {/* 左侧：物品列表 */}
         <ShoppingSidebarPane contentClassName="gap-3">

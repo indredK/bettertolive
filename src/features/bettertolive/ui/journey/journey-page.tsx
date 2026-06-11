@@ -18,7 +18,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
@@ -975,7 +975,8 @@ function JourneyControlPanel({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button
+        <AnimatedButton
+          show
           type="button"
           size="sm"
           variant="outline"
@@ -983,8 +984,9 @@ function JourneyControlPanel({
         >
           <Plus className="size-3.5" />
           {t("journey.actions.addMemory")}
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
+          show
           type="button"
           size="sm"
           variant="outline"
@@ -992,8 +994,9 @@ function JourneyControlPanel({
         >
           <Plus className="size-3.5" />
           {t("journey.actions.addGrowth")}
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
+          show
           type="button"
           size="sm"
           variant="outline"
@@ -1001,8 +1004,9 @@ function JourneyControlPanel({
         >
           <Plus className="size-3.5" />
           {t("journey.actions.addAnchor")}
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
+          show
           type="button"
           size="sm"
           variant="outline"
@@ -1010,8 +1014,9 @@ function JourneyControlPanel({
         >
           <Plus className="size-3.5" />
           {t("journey.actions.addPrompt")}
-        </Button>
-        <Button
+        </AnimatedButton>
+        <AnimatedButton
+          show
           type="button"
           size="sm"
           variant="outline"
@@ -1019,7 +1024,7 @@ function JourneyControlPanel({
         >
           <Plus className="size-3.5" />
           {t("journey.actions.addThread")}
-        </Button>
+        </AnimatedButton>
       </div>
 
       <div className="mt-3 grid gap-2 min-[960px]:grid-cols-2 min-[1280px]:grid-cols-3">
@@ -1136,7 +1141,8 @@ function JourneyManagementList({
                   </div>
                 ) : null}
               </div>
-              <Button
+              <AnimatedButton
+                show
                 type="button"
                 variant="ghost"
                 size="icon-xs"
@@ -1144,7 +1150,7 @@ function JourneyManagementList({
                 onClick={row.onEdit}
               >
                 <Pencil className="size-3.5" />
-              </Button>
+              </AnimatedButton>
             </div>
           ))
         ) : (

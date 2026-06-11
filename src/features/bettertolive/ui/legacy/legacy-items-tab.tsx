@@ -1,9 +1,9 @@
-import { Plus, Search, Trash2 } from "lucide-react"
+import { Search, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { deleteLegacyItem } from "@/features/bettertolive/api/legacy-crud-api"
@@ -164,22 +164,7 @@ export function LegacyItemsTab({
   return (
     <LegacyTabBody>
       <LegacySidebarPane>
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-sm font-medium">
-            {t("legacy.items.title", "条目库")}
-            <span className="text-muted-foreground ml-2 text-xs tabular-nums">
-              {filteredItems.length}/{items.length}
-            </span>
-          </div>
-          {isControlMode ? (
-            <Button size="sm" onClick={() => onEditItem(null)}>
-              <Plus className="size-4" />
-              {t("legacy.actions.add", "新增")}
-            </Button>
-          ) : null}
-        </div>
-
-        <div className="mt-3 space-y-2">
+        <div className="space-y-2">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2">
             <div className="relative min-w-0 flex-1">
               <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
@@ -202,6 +187,9 @@ export function LegacyItemsTab({
         </div>
 
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
+          <div className="text-muted-foreground text-[11px] tabular-nums">
+            {filteredItems.length}/{items.length}
+          </div>
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
               <LegacyItemSummaryCard
@@ -290,16 +278,14 @@ function LegacyItemDetail({
             <CardTitle className="text-base">{item.title}</CardTitle>
             <p className="text-muted-foreground mt-1 text-sm leading-6">{item.summary}</p>
           </div>
-          {isControlMode ? (
-            <div className="flex shrink-0 items-center gap-2">
-              <Button variant="outline" size="sm" onClick={onEdit}>
-                {t("legacy.actions.edit", "编辑")}
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleDelete}>
-                <Trash2 className="size-4" />
-              </Button>
-            </div>
-          ) : null}
+          <div className="flex shrink-0 items-center gap-2">
+            <AnimatedButton show={isControlMode} variant="outline" size="sm" onClick={onEdit}>
+              {t("legacy.actions.edit", "编辑")}
+            </AnimatedButton>
+            <AnimatedButton show={isControlMode} variant="outline" size="sm" onClick={handleDelete}>
+              <Trash2 className="size-4" />
+            </AnimatedButton>
+          </div>
         </div>
       </CardHeader>
 

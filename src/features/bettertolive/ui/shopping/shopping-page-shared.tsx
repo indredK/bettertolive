@@ -46,10 +46,6 @@ export const SHOPPING_SELECTED_CARD_CLASS =
 
 export const SHOPPING_MUTED_PANEL_CLASS = "border-foreground/10 bg-muted/25"
 
-export const SHOPPING_CONTROL_BADGE_CLASS = "border-ring/50 bg-accent text-accent-foreground"
-
-export const SHOPPING_IDLE_BADGE_CLASS = "border-foreground/10 bg-muted text-muted-foreground"
-
 /**
  * 物品卡片(各 Tab 复用)。
  * 展示物品的核心信息:名称、状态、标签、子级、价格、备注。

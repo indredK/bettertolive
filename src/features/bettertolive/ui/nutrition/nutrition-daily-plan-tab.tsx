@@ -1,10 +1,10 @@
-import { CalendarRange, CircleCheck, ClipboardCheck, Pencil, Plus, Utensils } from "lucide-react"
-import { useMemo, useState } from "react"
+import { CalendarRange, CircleCheck, ClipboardCheck, Pencil, Utensils } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { useSaveNutritionMutation } from "@/features/bettertolive/queries/use-save-nutrition-mutation"
 import type {
@@ -32,7 +32,6 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionDetailPane,
   NutritionMetricCard,
   NutritionSelectableCard,
@@ -44,12 +43,16 @@ import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nut
 import { cn } from "@/lib/utils"
 
 export function NutritionDailyPlanTab({
+  createRequested = false,
   editableNutrition,
   isControlMode = false,
+  onCreateHandled,
   nutrition,
 }: {
+  createRequested?: boolean
   editableNutrition?: NutritionModuleData
   isControlMode?: boolean
+  onCreateHandled?: () => void
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
@@ -72,6 +75,12 @@ export function NutritionDailyPlanTab({
       ),
     [sourceNutrition.mealLogs],
   )
+
+  useEffect(() => {
+    if (!isControlMode || !createRequested) return
+    setTimeout(() => setEditingPlan({ isNew: true, plan: null }), 0)
+    onCreateHandled?.()
+  }, [createRequested, isControlMode, onCreateHandled])
 
   const handleGenerateMealLog = async (plan: DailyPlan, slot: DailyMealSlot) => {
     if (!isControlMode || slot.entries.length === 0 || generatedSourceLogBySlotId.has(slot.id)) {
@@ -127,16 +136,6 @@ export function NutritionDailyPlanTab({
             <p className="text-muted-foreground text-sm">
               {t("nutrition.dailyPlan.emptyPlan", "暂无每日计划。")}
             </p>
-            {isControlMode ? (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setEditingPlan({ isNew: true, plan: null })}
-              >
-                <Plus className="size-4" />
-                {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
-              </Button>
-            ) : null}
           </CardContent>
         </Card>
         {isControlMode && editingPlan ? (
@@ -152,12 +151,6 @@ export function NutritionDailyPlanTab({
 
   return (
     <NutritionTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("nutrition.dailyPlan.title", "每日计划")}</h3>
-          <NutritionControlModeBadge isControlMode={isControlMode} />
-        </div>
-      </div>
       <NutritionTabBody>
         <NutritionSidebarPane>
           <div className="mb-3 flex items-center justify-between gap-2 px-1">
@@ -165,17 +158,6 @@ export function NutritionDailyPlanTab({
               <CalendarRange className="size-4" />
               {t("nutrition.dailyPlan.week", "一周计划")}
             </div>
-            {isControlMode ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="icon-sm"
-                onClick={() => setEditingPlan({ isNew: true, plan: null })}
-                aria-label={t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
-              >
-                <Plus className="size-3.5" />
-              </Button>
-            ) : null}
           </div>
           <div className="space-y-2">
             {nutrition.dailyPlans.map((plan) => (
@@ -209,17 +191,16 @@ export function NutritionDailyPlanTab({
                     >
                       {t("nutrition.dailyPlan.planNote", "计划是预案，不是打卡压力")}
                     </Badge>
-                    {isControlMode ? (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
-                      >
-                        <Pencil className="size-3.5" />
-                        {t("nutrition.dailyPlanEdit.editAction", "编辑")}
-                      </Button>
-                    ) : null}
+                    <AnimatedButton
+                      show={isControlMode}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
+                    >
+                      <Pencil className="size-3.5" />
+                      {t("nutrition.dailyPlanEdit.editAction", "编辑")}
+                    </AnimatedButton>
                   </div>
                 </div>
 
@@ -241,28 +222,27 @@ export function NutritionDailyPlanTab({
                           {t(`nutrition.status.${slot.status}`, slot.status)}
                         </Badge>
                       </div>
-                      {isControlMode ? (
-                        <div className="mt-3 flex flex-wrap items-center gap-2">
-                          <Button
-                            type="button"
-                            variant={
-                              generatedSourceLogBySlotId.has(slot.id) ? "secondary" : "outline"
-                            }
-                            size="sm"
-                            disabled={
-                              slot.entries.length === 0 ||
-                              generatedSourceLogBySlotId.has(slot.id) ||
-                              saveNutritionMutation.isPending
-                            }
-                            onClick={() => handleGenerateMealLog(activePlan, slot)}
-                          >
-                            <ClipboardCheck className="size-3.5" />
-                            {generatedSourceLogBySlotId.has(slot.id)
-                              ? t("nutrition.dailyPlan.logGeneratedAction", "已生成记录")
-                              : t("nutrition.dailyPlan.generateLog", "生成进食记录")}
-                          </Button>
-                        </div>
-                      ) : null}
+                      <div className="mt-3 flex flex-wrap items-center gap-2">
+                        <AnimatedButton
+                          show={isControlMode}
+                          type="button"
+                          variant={
+                            generatedSourceLogBySlotId.has(slot.id) ? "secondary" : "outline"
+                          }
+                          size="sm"
+                          disabled={
+                            slot.entries.length === 0 ||
+                            generatedSourceLogBySlotId.has(slot.id) ||
+                            saveNutritionMutation.isPending
+                          }
+                          onClick={() => handleGenerateMealLog(activePlan, slot)}
+                        >
+                          <ClipboardCheck className="size-3.5" />
+                          {generatedSourceLogBySlotId.has(slot.id)
+                            ? t("nutrition.dailyPlan.logGeneratedAction", "已生成记录")
+                            : t("nutrition.dailyPlan.generateLog", "生成进食记录")}
+                        </AnimatedButton>
+                      </div>
 
                       <div className="mt-4 min-h-0 flex-1 space-y-2">
                         {slot.entries.length > 0 ? (

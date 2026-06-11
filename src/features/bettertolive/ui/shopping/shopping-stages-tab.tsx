@@ -1,4 +1,4 @@
-import { Pencil, Plus, Trash2 } from "lucide-react"
+import { Pencil, Trash2 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -6,7 +6,7 @@ import { toast } from "sonner"
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
@@ -21,9 +21,7 @@ import {
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
-  SHOPPING_CONTROL_BADGE_CLASS,
   SHOPPING_DETAIL_CARD_CLASS,
-  SHOPPING_IDLE_BADGE_CLASS,
   SHOPPING_MUTED_PANEL_CLASS,
   SHOPPING_SELECTABLE_CARD_CLASS,
   SHOPPING_SELECTED_CARD_CLASS,
@@ -172,28 +170,6 @@ export function ShoppingStagesTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("shopping.stages.title", "阶段适用")}</h3>
-          <span
-            className={cn(
-              "rounded-full border px-2 py-0.5 text-[11px]",
-              isControlMode ? SHOPPING_CONTROL_BADGE_CLASS : SHOPPING_IDLE_BADGE_CLASS,
-            )}
-          >
-            {isControlMode
-              ? t("shopping.controlMode.on", "控制模式")
-              : t("shopping.controlMode.off", "浏览模式")}
-          </span>
-        </div>
-        {isControlMode && (
-          <Button size="sm" onClick={() => onEditStage(null)}>
-            <Plus className="mr-1 h-4 w-4" />
-            {t("shopping.stages.addStage", "新增阶段")}
-          </Button>
-        )}
-      </div>
-
       {visibleStageTemplates.length === 0 ? (
         <div
           className={cn(
@@ -237,16 +213,16 @@ export function ShoppingStagesTab({
                             })}
                           </span>
                         </button>
-                        {isControlMode && (
-                          <Button
-                            size="icon-sm"
-                            variant="ghost"
-                            className="h-6 w-6 shrink-0"
-                            onClick={() => onEditStage(stage)}
-                          >
-                            <Pencil className="size-3" />
-                          </Button>
-                        )}
+                        <AnimatedButton
+                          show={isControlMode}
+                          containerClassName="shrink-0"
+                          size="icon-sm"
+                          variant="ghost"
+                          className="h-6 w-6"
+                          onClick={() => onEditStage(stage)}
+                        >
+                          <Pencil className="size-3" />
+                        </AnimatedButton>
                       </div>
                     </div>
                   </SortableShoppingCard>
@@ -269,17 +245,15 @@ export function ShoppingStagesTab({
                       <div className="text-muted-foreground text-xs">{activeStage.focus}</div>
                     )}
                   </div>
-                  {isControlMode && (
-                    <div className="flex shrink-0 items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDelete(activeStage.id, activeStage.name)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
+                  <AnimatedButton
+                    show={isControlMode}
+                    containerClassName="shrink-0"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(activeStage.id, activeStage.name)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </AnimatedButton>
                 </CardHeader>
                 <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden">
                   <Tabs

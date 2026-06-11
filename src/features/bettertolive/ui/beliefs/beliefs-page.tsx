@@ -14,7 +14,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
 import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
@@ -721,12 +721,10 @@ function BeliefToolbar({
           >
             {t("beliefs.filter.count", "{{count}} 条", { count: total })}
           </Badge>
-          {isControlMode ? (
-            <Button size="sm" onClick={onCreate}>
-              <Plus className="size-3.5" />
-              {t("beliefs.actions.create", "新增观念")}
-            </Button>
-          ) : null}
+          <AnimatedButton show={isControlMode} size="sm" onClick={onCreate}>
+            <Plus className="size-3.5" />
+            {t("beliefs.actions.create", "新增观念")}
+          </AnimatedButton>
         </div>
       }
       searchQuery={searchQuery}
@@ -964,16 +962,15 @@ function BeliefCard({
           </Badge>
           <ImpactBadge impact={entry.impact} />
         </div>
-        {isControlMode && onEdit ? (
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={onEdit}
-            aria-label={t("beliefs.actions.edit", "编辑")}
-          >
-            <Edit3 className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={isControlMode && Boolean(onEdit)}
+          variant="ghost"
+          size="icon-sm"
+          onClick={onEdit}
+          aria-label={t("beliefs.actions.edit", "编辑")}
+        >
+          <Edit3 className="size-3.5" />
+        </AnimatedButton>
       </div>
 
       <h3

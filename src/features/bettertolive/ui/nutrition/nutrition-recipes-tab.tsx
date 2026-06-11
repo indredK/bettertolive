@@ -1,18 +1,9 @@
-import {
-  ChefHat,
-  Clock,
-  Flame,
-  Heart,
-  ListChecks,
-  MessageCircleHeart,
-  Pencil,
-  Plus,
-} from "lucide-react"
-import { useMemo, useState } from "react"
+import { ChefHat, Clock, Flame, Heart, ListChecks, MessageCircleHeart, Pencil } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import type { MealLog, NutritionModuleData, Recipe } from "@/features/bettertolive/types"
@@ -27,7 +18,6 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionDetailPane,
   NutritionEmptyDetailCard,
   NutritionMetricCard,
@@ -62,12 +52,16 @@ type RecipeFilter = (typeof RECIPE_FILTERS)[number]
 type RecipeFilterId = RecipeFilter["id"]
 
 export function NutritionRecipesTab({
+  createRequested = false,
   editableNutrition,
   isControlMode = false,
+  onCreateHandled,
   nutrition,
 }: {
+  createRequested?: boolean
   editableNutrition?: NutritionModuleData
   isControlMode?: boolean
+  onCreateHandled?: () => void
   nutrition: NutritionModuleData
 }) {
   const { t } = useTranslation()
@@ -138,26 +132,14 @@ export function NutritionRecipesTab({
   })
   const activeRecipe = recipes.find((recipe) => recipe.id === activeRecipeId) ?? recipes[0] ?? null
 
+  useEffect(() => {
+    if (!isControlMode || !createRequested) return
+    setTimeout(() => setEditingRecipe({ isNew: true, recipe: null }), 0)
+    onCreateHandled?.()
+  }, [createRequested, isControlMode, onCreateHandled])
+
   return (
     <NutritionTabViewport>
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("nutrition.recipes.title", "食谱库")}</h3>
-          <NutritionControlModeBadge isControlMode={isControlMode} />
-        </div>
-        {isControlMode ? (
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            className="shrink-0"
-            onClick={() => setEditingRecipe({ isNew: true, recipe: null })}
-            aria-label={t("nutrition.recipeEdit.createTitle", "新增食谱")}
-          >
-            <Plus className="size-4" />
-          </Button>
-        ) : null}
-      </div>
       <NutritionTabBody>
         <NutritionSidebarPane>
           <div className="space-y-2">
@@ -311,12 +293,16 @@ function RecipeDetail({
             <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
               {t("nutrition.recipes.personalLibrary", "个人食谱库")}
             </Badge>
-            {onEdit ? (
-              <Button type="button" variant="outline" size="sm" onClick={onEdit}>
-                <Pencil className="size-3.5" />
-                {t("nutrition.recipeEdit.editAction", "编辑")}
-              </Button>
-            ) : null}
+            <AnimatedButton
+              show={Boolean(onEdit)}
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onEdit}
+            >
+              <Pencil className="size-3.5" />
+              {t("nutrition.recipeEdit.editAction", "编辑")}
+            </AnimatedButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{recipe.name}</h3>
           <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-6">{recipe.summary}</p>

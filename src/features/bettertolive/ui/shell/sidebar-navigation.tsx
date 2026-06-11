@@ -1,26 +1,21 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ArrowDown, ArrowUp, type LucideIcon } from "lucide-react"
-import { m, useReducedMotion, type Transition } from "motion/react"
+import { AnimatePresence, m, useReducedMotion } from "motion/react"
 import { useTranslation } from "react-i18next"
 
 import type { AppView } from "@/features/bettertolive/types"
+import {
+  SIDEBAR_EXPAND_TRANSITION,
+  SIDEBAR_COLLAPSE_TRANSITION,
+} from "@/features/bettertolive/ui/shell/sidebar-shell-motion"
 import { cn } from "@/lib/utils"
 
 const PREVIEW_LIMIT = 4
 const VISIBILITY_OFFSET = 12
-
-const SIDEBAR_NAV_EASE = [0.22, 1, 0.36, 1] as const
-
-function getNavCopyTransition(isCollapsed: boolean, reduceMotion: boolean): Transition {
-  if (reduceMotion) {
-    return { duration: 0.1 }
-  }
-
-  return {
-    duration: isCollapsed ? 0.16 : 0.2,
-    delay: isCollapsed ? 0 : 0.28,
-    ease: SIDEBAR_NAV_EASE,
-  }
+const ICON_HOVER_DELAY_MS = 500
+const ICON_SWEEP_TRANSITION = {
+  duration: 0.62,
+  ease: [0.22, 1, 0.36, 1] as const,
 }
 
 export type SidebarNavigationItem = {
@@ -46,6 +41,68 @@ type PreviewState = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max)
+}
+
+function useDelayedHover(isHovered: boolean, delayMs: number) {
+  const [isDelayedHover, setIsDelayedHover] = useState(false)
+
+  useEffect(() => {
+    if (!isHovered) {
+      setTimeout(() => setIsDelayedHover(false), 0)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setIsDelayedHover(true)
+    }, delayMs)
+
+    return () => window.clearTimeout(timer)
+  }, [delayMs, isHovered])
+
+  return isDelayedHover
+}
+
+function SweepIcon({
+  Icon,
+  isActive,
+  isHovered,
+}: {
+  Icon: LucideIcon
+  isActive: boolean
+  isHovered: boolean
+}) {
+  const prefersReducedMotion = useReducedMotion()
+  const isSweepVisible = useDelayedHover(isHovered, ICON_HOVER_DELAY_MS)
+
+  return (
+    <div
+      className={cn(
+        "relative flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-lg border",
+        isActive
+          ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
+          : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
+      )}
+      style={{ perspective: 900 }}
+    >
+      <AnimatePresence initial={false}>
+        {isSweepVisible ? (
+          <m.span
+            aria-hidden
+            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: "-120%" }}
+            animate={
+              prefersReducedMotion
+                ? { opacity: 0.5 }
+                : { opacity: [0, 0.8, 0], x: ["-120%", "180%"] }
+            }
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, x: "180%" }}
+            transition={ICON_SWEEP_TRANSITION}
+            className="pointer-events-none absolute inset-y-0 left-[-26%] w-1/2 bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.22),rgba(255,255,255,0.92),rgba(255,255,255,0.22),transparent)] mix-blend-screen"
+          />
+        ) : null}
+      </AnimatePresence>
+      <Icon className="relative z-10 size-4" />
+    </div>
+  )
 }
 
 function SidebarPreviewBand({
@@ -135,6 +192,105 @@ function SidebarPreviewBand({
   )
 }
 
+const NavItem = forwardRef<
+  HTMLButtonElement,
+  {
+    item: SidebarNavigationItem
+    isActive: boolean
+    isCollapsed: boolean
+    onSelectView: (view: AppView) => void
+  }
+>(function NavItem({ item, isActive, isCollapsed, onSelectView }, ref) {
+  const { t } = useTranslation()
+  const transition = isCollapsed ? SIDEBAR_COLLAPSE_TRANSITION : SIDEBAR_EXPAND_TRANSITION
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <m.button
+      ref={ref}
+      type="button"
+      data-testid={`nav-${item.view}`}
+      onClick={() => onSelectView(item.view)}
+      aria-current={isActive ? "page" : undefined}
+      aria-label={t("shell.nav.itemAria", { label: item.label })}
+      title={isCollapsed ? item.label : undefined}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className={cn(
+        "relative flex h-[56px] items-center gap-2.5 overflow-hidden rounded-lg px-[10px] text-left",
+        "w-full",
+        isActive
+          ? "bg-[color:var(--nav-active-bg)]"
+          : "bg-transparent hover:bg-[color:var(--surface-bg)]",
+      )}
+    >
+      <SweepIcon Icon={item.icon} isActive={isActive} isHovered={isHovered} />
+      <AnimatePresence initial={false}>
+        {!isCollapsed && (
+          <m.div
+            key="nav-item-text"
+            initial={{ opacity: 0, width: 0, x: -8 }}
+            animate={{ opacity: 1, width: "auto", x: 0 }}
+            exit={{ opacity: 0, width: 0, x: -8 }}
+            transition={transition}
+            className="flex min-w-0 flex-1 items-center gap-3 overflow-hidden"
+          >
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
+                {item.label}
+              </div>
+              <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
+                {item.hint}
+              </div>
+            </div>
+            <span className="shrink-0 text-[color:var(--text-muted)]">&rsaquo;</span>
+          </m.div>
+        )}
+      </AnimatePresence>
+    </m.button>
+  )
+})
+
+function StackedNavItem({
+  item,
+  isActive,
+  onSelectView,
+}: {
+  item: StackedNavigationEntry
+  isActive: boolean
+  onSelectView: (view: AppView) => void
+}) {
+  const { t } = useTranslation()
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <button
+      type="button"
+      data-testid={`nav-${item.view}`}
+      onClick={() => onSelectView(item.view)}
+      aria-current={isActive ? "page" : undefined}
+      aria-label={t("shell.nav.itemAria", { label: item.label })}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className={cn(
+        "flex min-w-[118px] shrink-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition-all",
+        isActive
+          ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
+          : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
+      )}
+      style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
+    >
+      <SweepIcon Icon={item.icon} isActive={isActive} isHovered={isHovered} />
+      <div className="min-w-0">
+        <div className="text-sm font-medium text-[color:var(--text-primary)]">{item.label}</div>
+        <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
+          {item.sectionTitle}
+        </div>
+      </div>
+    </button>
+  )
+}
+
 export function SidebarNavigation({
   activeView,
   isCollapsed = false,
@@ -146,7 +302,6 @@ export function SidebarNavigation({
   onSelectView: (view: AppView) => void
   sections: SidebarNavigationSection[]
 }) {
-  const { t } = useTranslation()
   const scrollViewportRef = useRef<HTMLElement | null>(null)
   const itemRefs = useRef<Partial<Record<AppView, HTMLButtonElement | null>>>({})
   const animationFrameRef = useRef<number | null>(null)
@@ -155,7 +310,6 @@ export function SidebarNavigation({
     firstVisibleIndex: 0,
     lastVisibleIndex: Math.max(0, flattenedItems.length - 1),
   }))
-  const reduceMotion = useReducedMotion()
 
   const measureVisibleRange = useCallback(() => {
     const container = scrollViewportRef.current
@@ -326,166 +480,50 @@ export function SidebarNavigation({
   const bottomPreviewItems = hiddenAfter.slice(0, PREVIEW_LIMIT)
   const topStrength = hiddenBefore.length / Math.max(1, flattenedItems.length)
   const bottomStrength = hiddenAfter.length / Math.max(1, flattenedItems.length)
-  const copyTransition = getNavCopyTransition(isCollapsed, reduceMotion ?? false)
-  const itemGridColumns = isCollapsed ? "32px 0px 0px" : "32px minmax(0, 1fr) 10px"
-  const itemColumnGap = isCollapsed ? "0px" : "0.625rem"
-  const navGap = isCollapsed ? "0.375rem" : "0.875rem"
-  const sectionGap = isCollapsed ? "0px" : "0.375rem"
-  const itemListGap = isCollapsed ? "0.375rem" : "0.375rem"
-  const itemPaddingInline = "0.625rem"
 
   return (
-    <m.section
-      layout
-      className="mt-3 flex min-h-0 flex-1 flex-col rounded-lg border border-[color:var(--chip-border)] px-0 py-2"
-    >
-      <m.div
-        animate={{
-          height: isCollapsed ? 0 : "auto",
-          opacity: isCollapsed ? 0 : 1,
-        }}
-        transition={copyTransition}
-        className="overflow-hidden"
-        aria-hidden={isCollapsed}
-      >
-        <div className={cn(isCollapsed ? "pointer-events-none" : "")}>
-          <SidebarPreviewBand
-            activeView={activeView}
-            direction="top"
-            hiddenCount={hiddenBefore.length}
-            items={topPreviewItems}
-            onSelectView={onSelectView}
-            strength={topStrength}
-          />
-        </div>
-      </m.div>
+    <section className="mt-3 flex min-h-0 flex-1 flex-col px-0">
+      {isCollapsed ? null : (
+        <SidebarPreviewBand
+          activeView={activeView}
+          direction="top"
+          hiddenCount={hiddenBefore.length}
+          items={topPreviewItems}
+          onSelectView={onSelectView}
+          strength={topStrength}
+        />
+      )}
 
-      <m.nav
+      <nav
         ref={scrollViewportRef}
         data-testid="sidebar-nav-scroll"
-        animate={{ rowGap: navGap }}
-        transition={copyTransition}
-        className="hide-scrollbar grid min-h-0 flex-1 content-start overflow-y-auto overscroll-contain py-2"
+        className="hide-scrollbar grid min-h-0 flex-1 content-start gap-1 overflow-y-auto overscroll-contain py-2"
       >
-        {sections.map((section) => (
-          <m.div
-            key={section.title}
-            animate={{ rowGap: sectionGap }}
-            transition={copyTransition}
-            className="grid"
-          >
-            <m.div
-              animate={{
-                height: isCollapsed ? 0 : 16,
-                marginBottom: isCollapsed ? 0 : 2,
-                opacity: isCollapsed ? 0 : 1,
-                x: isCollapsed ? -4 : 0,
-              }}
-              transition={copyTransition}
-              aria-hidden={isCollapsed}
-              className="col-span-full overflow-hidden px-1 text-[11px] tracking-[0.18em] text-[color:var(--text-muted)] uppercase"
-            >
-              {section.title}
-            </m.div>
-            <m.div animate={{ rowGap: itemListGap }} transition={copyTransition} className="grid">
-              {section.items.map((item) => {
-                const Icon = item.icon
-                const isActive = item.view === activeView
-
-                return (
-                  <m.button
-                    key={item.view}
-                    ref={(node) => {
-                      itemRefs.current[item.view] = node
-                    }}
-                    type="button"
-                    data-testid={`nav-${item.view}`}
-                    onClick={() => onSelectView(item.view)}
-                    aria-current={isActive ? "page" : undefined}
-                    aria-label={t("shell.nav.itemAria", { label: item.label })}
-                    title={isCollapsed ? item.label : undefined}
-                    animate={{
-                      columnGap: itemColumnGap,
-                      gridTemplateColumns: itemGridColumns,
-                      paddingLeft: itemPaddingInline,
-                      paddingRight: itemPaddingInline,
-                    }}
-                    transition={copyTransition}
-                    className={cn(
-                      "grid h-[56px] items-center gap-2.5 overflow-hidden rounded-lg border text-left transition-colors",
-                      "w-full",
-                      isActive
-                        ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
-                        : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
-                    )}
-                    style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
-                  >
-                    <div
-                      className={cn(
-                        "flex size-8 items-center justify-center rounded-lg border",
-                        isActive
-                          ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
-                          : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
-                      )}
-                    >
-                      <Icon className="size-4" />
-                    </div>
-                    <m.div
-                      animate={{
-                        opacity: isCollapsed ? 0 : 1,
-                        x: isCollapsed ? -6 : 0,
-                      }}
-                      transition={copyTransition}
-                      aria-hidden={isCollapsed}
-                      className="min-w-0 overflow-hidden"
-                    >
-                      <div className="truncate text-sm font-medium text-[color:var(--text-primary)]">
-                        {item.label}
-                      </div>
-                      <div className="mt-0.5 truncate text-[11px] leading-4 text-[color:var(--text-muted)]">
-                        {item.hint}
-                      </div>
-                    </m.div>
-                    <m.span
-                      animate={{
-                        opacity: isCollapsed ? 0 : 1,
-                        x: isCollapsed ? -4 : 0,
-                      }}
-                      transition={copyTransition}
-                      aria-hidden={isCollapsed}
-                      className="overflow-hidden text-[color:var(--text-muted)]"
-                    >
-                      &rsaquo;
-                    </m.span>
-                  </m.button>
-                )
-              })}
-            </m.div>
-          </m.div>
-        ))}
-      </m.nav>
-
-      <m.div
-        animate={{
-          height: isCollapsed ? 0 : "auto",
-          opacity: isCollapsed ? 0 : 1,
-        }}
-        transition={copyTransition}
-        className="overflow-hidden"
-        aria-hidden={isCollapsed}
-      >
-        <div className={cn(isCollapsed ? "pointer-events-none" : "")}>
-          <SidebarPreviewBand
-            activeView={activeView}
-            direction="bottom"
-            hiddenCount={hiddenAfter.length}
-            items={bottomPreviewItems}
+        {flattenedItems.map((item) => (
+          <NavItem
+            key={item.view}
+            ref={(node) => {
+              itemRefs.current[item.view] = node
+            }}
+            item={item}
+            isActive={item.view === activeView}
+            isCollapsed={isCollapsed}
             onSelectView={onSelectView}
-            strength={bottomStrength}
           />
-        </div>
-      </m.div>
-    </m.section>
+        ))}
+      </nav>
+
+      {isCollapsed ? null : (
+        <SidebarPreviewBand
+          activeView={activeView}
+          direction="bottom"
+          hiddenCount={hiddenAfter.length}
+          items={bottomPreviewItems}
+          onSelectView={onSelectView}
+          strength={bottomStrength}
+        />
+      )}
+    </section>
   )
 }
 
@@ -509,68 +547,22 @@ export function StackedNavigation({
       ),
     [sections],
   )
-  const activeEntry = entries.find((entry) => entry.view === activeView) ?? entries[0]
 
   return (
-    <section
-      className="border-b border-[color:var(--surface-border)] backdrop-blur-xl"
-      data-testid="stacked-navigation"
-    >
-      <div className="mx-auto w-full max-w-[1500px] px-4 py-4">
-        <div className="hide-scrollbar -mx-1 overflow-x-auto pb-1">
+    <section className="h-14" data-testid="stacked-navigation">
+      <div className="mx-auto flex h-full w-full max-w-[1500px] items-center px-4">
+        <div className="hide-scrollbar -mx-1 overflow-x-auto">
           <nav aria-label={t("shell.nav.ariaLabel")} className="flex w-max min-w-full gap-2 px-1">
-            {entries.map((item) => {
-              const Icon = item.icon
-              const isActive = item.view === activeView
-
-              return (
-                <button
-                  key={item.view}
-                  type="button"
-                  data-testid={`nav-${item.view}`}
-                  onClick={() => onSelectView(item.view)}
-                  aria-current={isActive ? "page" : undefined}
-                  aria-label={t("shell.nav.itemAria", { label: item.label })}
-                  className={cn(
-                    "flex min-w-[118px] shrink-0 items-center gap-2 rounded-xl border px-3 py-2.5 text-left transition-all",
-                    isActive
-                      ? "border-[color:var(--nav-active-border)] bg-[color:var(--nav-active-bg)]"
-                      : "border-[color:var(--nav-idle-border)] bg-[color:var(--nav-idle-bg)] hover:bg-[color:var(--surface-bg)]",
-                  )}
-                  style={isActive ? { boxShadow: "var(--surface-shadow)" } : undefined}
-                >
-                  <div
-                    className={cn(
-                      "flex size-8 shrink-0 items-center justify-center rounded-lg border",
-                      isActive
-                        ? "border-transparent bg-[color:var(--nav-active-icon-bg)] text-[color:var(--nav-active-icon-ink)]"
-                        : "border-[color:var(--nav-icon-border)] bg-[color:var(--nav-icon-bg)] text-[color:var(--text-muted)]",
-                    )}
-                  >
-                    <Icon className="size-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                      {item.label}
-                    </div>
-                    <div className="mt-0.5 truncate text-[11px] text-[color:var(--text-muted)]">
-                      {item.sectionTitle}
-                    </div>
-                  </div>
-                </button>
-              )
-            })}
+            {entries.map((item) => (
+              <StackedNavItem
+                key={item.view}
+                item={item}
+                isActive={item.view === activeView}
+                onSelectView={onSelectView}
+              />
+            ))}
           </nav>
         </div>
-
-        {activeEntry ? (
-          <div className="mt-3 flex items-center gap-2 text-xs text-[color:var(--text-muted)]">
-            <span className="rounded-full border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-2 py-1">
-              {activeEntry.sectionTitle}
-            </span>
-            <span className="truncate">{activeEntry.hint}</span>
-          </div>
-        ) : null}
       </div>
     </section>
   )

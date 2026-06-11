@@ -38,7 +38,6 @@ import {
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
-  NutritionControlModeBadge,
   NutritionPanel,
   NutritionTabViewport,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
@@ -57,13 +56,7 @@ type NutrientTableRow = {
 
 const MODES = ["foods", "recipes", "plans"] satisfies NutrientMode[]
 
-export function NutritionNutrientsTab({
-  isControlMode = false,
-  nutrition,
-}: {
-  isControlMode?: boolean
-  nutrition: NutritionModuleData
-}) {
+export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModuleData }) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<NutrientMode>("foods")
   const [categoryId, setCategoryId] = useState("all")
@@ -232,15 +225,7 @@ export function NutritionNutrientsTab({
 
   return (
     <NutritionTabViewport className="overflow-hidden">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-3">
-          <h3 className="text-lg font-medium">{t("nutrition.nutrients.title", "营养成分表")}</h3>
-          <NutritionControlModeBadge isControlMode={isControlMode} />
-        </div>
-      </div>
       <NutritionPanel
-        title={t("nutrition.nutrients.title", "营养成分表")}
-        count={rows.length}
         className={cn(NUTRITION_DETAIL_CARD_CLASS, "min-h-0 flex-1 overflow-hidden")}
         contentClassName="flex min-h-0 flex-col p-4"
       >

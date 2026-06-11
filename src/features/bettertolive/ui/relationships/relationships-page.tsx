@@ -14,7 +14,7 @@ import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveRelationshipsMutation } from "@/features/bettertolive/queries/use-save-relationships-mutation"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
@@ -1495,11 +1495,14 @@ function RelationshipsDirectoryTab({
               title={t("relationships.directory.title", "关系档案")}
               count={filteredRelationshipCount}
             />
-            {isControlMode ? (
-              <Button size="icon-sm" variant="outline" onClick={onCreate}>
-                <Plus className="size-3.5" />
-              </Button>
-            ) : null}
+            <AnimatedButton
+              show={isControlMode}
+              size="icon-sm"
+              variant="outline"
+              onClick={onCreate}
+            >
+              <Plus className="size-3.5" />
+            </AnimatedButton>
           </div>
         }
         bodyClassName="min-h-0 flex-1 space-y-2.5 overflow-visible pr-1 lg:overflow-y-auto"
@@ -1659,18 +1662,16 @@ function RelationshipDetailPanel({
           </h3>
           <div className="mt-1 text-sm text-[color:var(--text-muted)]">{relationship.role}</div>
         </div>
-        {isControlMode ? (
-          <div className="flex shrink-0 gap-2">
-            <Button size="sm" variant="outline" onClick={onEdit}>
-              <Pencil className="h-4 w-4" />
-              {t("relationships.common.edit", "编辑")}
-            </Button>
-            <Button size="sm" variant="outline" onClick={onDelete}>
-              <Trash2 className="h-4 w-4" />
-              {t("relationships.common.delete", "删除")}
-            </Button>
-          </div>
-        ) : null}
+        <div className="flex shrink-0 gap-2">
+          <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
+            <Pencil className="h-4 w-4" />
+            {t("relationships.common.edit", "编辑")}
+          </AnimatedButton>
+          <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
+            <Trash2 className="h-4 w-4" />
+            {t("relationships.common.delete", "删除")}
+          </AnimatedButton>
+        </div>
       </div>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-visible pt-4 pr-1 lg:overflow-y-auto">
@@ -1795,11 +1796,9 @@ function UnsentNotesTab({
             title={t("relationships.unsent.title", "想说的话")}
             count={notes.length}
           />
-          {isControlMode ? (
-            <Button size="icon-sm" variant="outline" onClick={onCreate}>
-              <Plus className="size-3.5" />
-            </Button>
-          ) : null}
+          <AnimatedButton show={isControlMode} size="icon-sm" variant="outline" onClick={onCreate}>
+            <Plus className="size-3.5" />
+          </AnimatedButton>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {notes.map((note) => (
@@ -1900,11 +1899,9 @@ function PatternsTab({
             title={t("relationships.patterns.title", "跨关系模式")}
             count={patterns.length}
           />
-          {isControlMode ? (
-            <Button size="icon-sm" variant="outline" onClick={onCreate}>
-              <Plus className="size-3.5" />
-            </Button>
-          ) : null}
+          <AnimatedButton show={isControlMode} size="icon-sm" variant="outline" onClick={onCreate}>
+            <Plus className="size-3.5" />
+          </AnimatedButton>
         </div>
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-visible pr-1 lg:overflow-y-auto">
           {patterns.map((pattern) => (
@@ -2006,18 +2003,16 @@ function DetailHeader({
         </Badge>
         <h3 className="mt-3 text-lg font-semibold text-[color:var(--text-primary)]">{title}</h3>
       </div>
-      {isControlMode ? (
-        <div className="flex shrink-0 gap-2">
-          <Button size="sm" variant="outline" onClick={onEdit}>
-            <Pencil className="h-4 w-4" />
-            {t("relationships.common.edit", "编辑")}
-          </Button>
-          <Button size="sm" variant="outline" onClick={onDelete}>
-            <Trash2 className="h-4 w-4" />
-            {t("relationships.common.delete", "删除")}
-          </Button>
-        </div>
-      ) : null}
+      <div className="flex shrink-0 gap-2">
+        <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
+          <Pencil className="h-4 w-4" />
+          {t("relationships.common.edit", "编辑")}
+        </AnimatedButton>
+        <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
+          <Trash2 className="h-4 w-4" />
+          {t("relationships.common.delete", "删除")}
+        </AnimatedButton>
+      </div>
     </div>
   )
 }

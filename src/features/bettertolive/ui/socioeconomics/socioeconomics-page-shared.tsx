@@ -1,7 +1,4 @@
 import type { ReactNode } from "react"
-import { useTranslation } from "react-i18next"
-
-import { cn } from "@/lib/utils"
 
 export const SOCIO_DIALOG_CONTENT_CLASS = "border border-foreground/10 bg-background shadow-lg"
 
@@ -15,27 +12,6 @@ export const SOCIO_DIALOG_FIELD_CLASS = "w-full border-foreground/15 bg-backgrou
 
 export const SOCIO_DIALOG_FOOTER_CLASS =
   "sticky bottom-0 z-10 gap-2 border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
-
-export const SOCIO_IDLE_BADGE_CLASS = "border-foreground/10 bg-muted text-muted-foreground"
-
-export const SOCIO_CONTROL_BADGE_CLASS = "border-ring/50 bg-accent text-accent-foreground"
-
-export function SocioeconomicsControlModeBadge({ isControlMode }: { isControlMode: boolean }) {
-  const { t } = useTranslation()
-
-  return (
-    <span
-      className={cn(
-        "rounded-full border px-2 py-0.5 text-[11px]",
-        isControlMode ? SOCIO_CONTROL_BADGE_CLASS : SOCIO_IDLE_BADGE_CLASS,
-      )}
-    >
-      {isControlMode
-        ? t("socioeconomics.controlMode.on", "控制模式")
-        : t("socioeconomics.controlMode.off", "浏览模式")}
-    </span>
-  )
-}
 
 export function SocioeconomicsDialogField({
   children,

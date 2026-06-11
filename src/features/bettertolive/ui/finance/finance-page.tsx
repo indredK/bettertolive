@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
 import type {
@@ -130,25 +130,30 @@ export function FinancePage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      {isControlMode ? (
-        <div className="flex shrink-0 justify-end">
-          <Button className="gap-2" onClick={handleCreateEntry}>
-            <Plus className="size-4" />
-            {t("finance.actions.addEntry", "记一笔")}
-          </Button>
-        </div>
-      ) : null}
-
       <Tabs
         defaultValue="overview"
         className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("finance.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="entries">{t("finance.tabs.entries", "明细")}</TabsTrigger>
-          <TabsTrigger value="rules">{t("finance.tabs.rules", "预算规则")}</TabsTrigger>
-          <TabsTrigger value="review">{t("finance.tabs.review", "复盘线索")}</TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 items-center gap-2 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">{t("finance.tabs.overview", "总览")}</TabsTrigger>
+              <TabsTrigger value="entries">{t("finance.tabs.entries", "明细")}</TabsTrigger>
+              <TabsTrigger value="rules">{t("finance.tabs.rules", "预算规则")}</TabsTrigger>
+              <TabsTrigger value="review">{t("finance.tabs.review", "复盘线索")}</TabsTrigger>
+            </TabsList>
+          </div>
+
+          <AnimatedButton
+            show={isControlMode}
+            containerClassName="shrink-0"
+            className="gap-2"
+            onClick={handleCreateEntry}
+          >
+            <Plus className="size-4" />
+            {t("finance.actions.addEntry", "记一笔")}
+          </AnimatedButton>
+        </div>
 
         <TabsContent
           value="overview"
@@ -689,26 +694,26 @@ function TransactionCard({
             {isIncome ? "+" : "-"}
             {formatCurrency(entry.amount, locale)}
           </div>
-          {isControlMode ? (
-            <div className="flex gap-1">
-              <Button
-                aria-label={t("finance.actions.editEntry", "编辑账目")}
-                size="icon-sm"
-                variant="outline"
-                onClick={onEdit}
-              >
-                <Pencil className="size-3.5" />
-              </Button>
-              <Button
-                aria-label={t("finance.actions.deleteEntry", "删除账目")}
-                size="icon-sm"
-                variant="outline"
-                onClick={onDelete}
-              >
-                <Trash2 className="size-3.5" />
-              </Button>
-            </div>
-          ) : null}
+          <div className="flex gap-1">
+            <AnimatedButton
+              show={isControlMode}
+              aria-label={t("finance.actions.editEntry", "编辑账目")}
+              size="icon-sm"
+              variant="outline"
+              onClick={onEdit}
+            >
+              <Pencil className="size-3.5" />
+            </AnimatedButton>
+            <AnimatedButton
+              show={isControlMode}
+              aria-label={t("finance.actions.deleteEntry", "删除账目")}
+              size="icon-sm"
+              variant="outline"
+              onClick={onDelete}
+            >
+              <Trash2 className="size-3.5" />
+            </AnimatedButton>
+          </div>
         </div>
       </div>
     </article>

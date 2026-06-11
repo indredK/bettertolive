@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 import type { LucideIcon } from "lucide-react"
-import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -175,20 +174,24 @@ export function NutritionPanel({
   className?: string
   contentClassName?: string
   count?: number
-  title: string
+  title?: string
 }) {
+  const showHeader = Boolean(title) || typeof count === "number"
+
   return (
     <Card className={cn(NUTRITION_DETAIL_CARD_CLASS, "flex min-h-0 flex-col", className)}>
-      <CardHeader className="shrink-0 pb-3">
-        <div className="flex items-center justify-between gap-3">
-          <CardTitle className="text-sm font-medium">{title}</CardTitle>
-          {typeof count === "number" ? (
-            <Badge variant="outline" className="text-muted-foreground text-[10px]">
-              {count}
-            </Badge>
-          ) : null}
-        </div>
-      </CardHeader>
+      {showHeader ? (
+        <CardHeader className="shrink-0 pb-3">
+          <div className="flex items-center justify-between gap-3">
+            {title ? <CardTitle className="text-sm font-medium">{title}</CardTitle> : <span />}
+            {typeof count === "number" ? (
+              <Badge variant="outline" className="text-muted-foreground text-[10px]">
+                {count}
+              </Badge>
+            ) : null}
+          </div>
+        </CardHeader>
+      ) : null}
       <CardContent className={cn("min-h-0 flex-1 overflow-y-auto", contentClassName)}>
         {children}
       </CardContent>
@@ -205,22 +208,5 @@ export function NutritionTagBar({ names, className }: { names: string[]; classNa
         </Badge>
       ))}
     </div>
-  )
-}
-
-export function NutritionControlModeBadge({ isControlMode }: { isControlMode: boolean }) {
-  const { t } = useTranslation()
-
-  return (
-    <span
-      className={cn(
-        "rounded-full border px-2 py-0.5 text-[11px]",
-        isControlMode ? NUTRITION_CONTROL_BADGE_CLASS : NUTRITION_IDLE_BADGE_CLASS,
-      )}
-    >
-      {isControlMode
-        ? t("nutrition.controlMode.on", "控制模式")
-        : t("nutrition.controlMode.off", "浏览模式")}
-    </span>
   )
 }

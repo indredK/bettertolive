@@ -1,7 +1,9 @@
+import { Plus } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { LegacyItem, LegacyModuleData } from "@/features/bettertolive/types"
 import { LegacyDeliveryMapTab } from "@/features/bettertolive/ui/legacy/legacy-delivery-map-tab"
@@ -52,19 +54,35 @@ export function LegacyPage({
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
-        className={cn("min-h-0 flex-1", isStackedLayout ? "overflow-visible" : "overflow-hidden")}
+        className={cn(
+          "min-h-0 flex-1 flex-col",
+          isStackedLayout ? "overflow-visible" : "overflow-hidden",
+        )}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("legacy.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="items">{t("legacy.tabs.items", "条目库")}</TabsTrigger>
-          <TabsTrigger value="deliveryMap">{t("legacy.tabs.deliveryMap", "交付地图")}</TabsTrigger>
-          <TabsTrigger value="relationshipExpression">
-            {t("legacy.tabs.relationshipExpression", "关系表达")}
-          </TabsTrigger>
-          <TabsTrigger value="trustBoundaries">
-            {t("legacy.tabs.trustBoundaries", "边界与信任")}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">{t("legacy.tabs.overview", "总览")}</TabsTrigger>
+              <TabsTrigger value="items">{t("legacy.tabs.items", "条目库")}</TabsTrigger>
+              <TabsTrigger value="deliveryMap">
+                {t("legacy.tabs.deliveryMap", "交付地图")}
+              </TabsTrigger>
+              <TabsTrigger value="relationshipExpression">
+                {t("legacy.tabs.relationshipExpression", "关系表达")}
+              </TabsTrigger>
+              <TabsTrigger value="trustBoundaries">
+                {t("legacy.tabs.trustBoundaries", "边界与信任")}
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {isControlMode && activeTab === "items" ? (
+            <Button size="sm" onClick={() => handleEditItem(null)}>
+              <Plus className="size-4" />
+              {t("legacy.actions.add", "新增")}
+            </Button>
+          ) : null}
+        </div>
 
         <TabsContent value="overview" className={tabContentClassName}>
           <LegacyOverviewTab

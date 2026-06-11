@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 import { Activity, CheckCheck, Pencil, Plus, Scale, Shield, Waypoints } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { AnimatedButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type {
   PrincipleEntry,
@@ -160,26 +160,32 @@ export function PrinciplesPage({
         isFixedLayout && "flex h-full min-h-0 flex-col gap-3 space-y-0 overflow-hidden",
       )}
     >
-      <PrinciplesControlStrip
-        isControlMode={isControlMode}
-        principlesCount={principles.length}
-        relationsCount={principlesModule.relations.length}
-        onCreate={() => setEditingPrinciple({ isNew: true, principle: null })}
-      />
-
       <Tabs
         value={activeTab}
         onValueChange={setActiveTab}
         className={cn("min-h-0 flex-1", isFixedLayout && "overflow-hidden")}
       >
-        <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("principles.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="personal">{t("principles.tabs.personal", "个人原则")}</TabsTrigger>
-          <TabsTrigger value="others">{t("principles.tabs.others", "他人原则")}</TabsTrigger>
-          <TabsTrigger value="practice">
-            {t("principles.tabs.practiceWorkbench", "校准实践")}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex shrink-0 items-center gap-2 overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
+              <TabsTrigger value="overview">{t("principles.tabs.overview", "总览")}</TabsTrigger>
+              <TabsTrigger value="personal">
+                {t("principles.tabs.personal", "个人原则")}
+              </TabsTrigger>
+              <TabsTrigger value="others">{t("principles.tabs.others", "他人原则")}</TabsTrigger>
+              <TabsTrigger value="practice">
+                {t("principles.tabs.practiceWorkbench", "校准实践")}
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <PrinciplesControlStrip
+            isControlMode={isControlMode}
+            principlesCount={principles.length}
+            relationsCount={principlesModule.relations.length}
+            onCreate={() => setEditingPrinciple({ isNew: true, principle: null })}
+          />
+        </div>
 
         <TabsContent
           value="overview"
@@ -1051,35 +1057,18 @@ function PrinciplesControlStrip({
   const { t } = useTranslation()
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge
-          variant="outline"
-          className={cn(
-            "border-[color:var(--chip-border)]",
-            isControlMode
-              ? "bg-[color:var(--tone-value-bg)] text-[color:var(--tone-value-ink)]"
-              : "bg-[color:var(--chip-bg)] text-[color:var(--text-muted)]",
-          )}
-        >
-          {isControlMode
-            ? t("principles.controlMode.on", "控制模式")
-            : t("principles.controlMode.off", "浏览模式")}
-        </Badge>
-        <span className="text-xs text-[color:var(--text-muted)]">
-          {t("principles.controlMode.summary", {
-            defaultValue: "{{count}} 条原则 · {{relations}} 个关系",
-            count: principlesCount,
-            relations: relationsCount,
-          })}
-        </span>
-      </div>
-      {isControlMode ? (
-        <Button type="button" size="sm" onClick={onCreate}>
-          <Plus className="size-4" />
-          {t("principles.controlMode.add", "新增原则")}
-        </Button>
-      ) : null}
+    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+      <span className="text-xs text-[color:var(--text-muted)]">
+        {t("principles.controlMode.summary", {
+          defaultValue: "{{count}} 条原则 · {{relations}} 个关系",
+          count: principlesCount,
+          relations: relationsCount,
+        })}
+      </span>
+      <AnimatedButton show={isControlMode} type="button" size="sm" onClick={onCreate}>
+        <Plus className="size-4" />
+        {t("principles.controlMode.add", "新增原则")}
+      </AnimatedButton>
     </div>
   )
 }
@@ -1125,11 +1114,16 @@ function PrincipleCard({
         >
           {translatePrincipleEnum(t, "status", principle.status)}
         </Badge>
-        {isControlMode && onEdit ? (
-          <Button type="button" size="icon-sm" variant="ghost" className="ml-auto" onClick={onEdit}>
-            <Pencil className="size-3.5" />
-          </Button>
-        ) : null}
+        <AnimatedButton
+          show={isControlMode && Boolean(onEdit)}
+          containerClassName="ml-auto"
+          type="button"
+          size="icon-sm"
+          variant="ghost"
+          onClick={onEdit}
+        >
+          <Pencil className="size-3.5" />
+        </AnimatedButton>
       </div>
 
       <h3
