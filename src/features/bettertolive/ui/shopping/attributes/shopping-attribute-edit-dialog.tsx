@@ -36,7 +36,7 @@ import {
   SHOPPING_DIALOG_FOOTER_CLASS,
   SHOPPING_DIALOG_HEADER_CLASS,
   SHOPPING_DIALOG_SECTION_CLASS,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import {
   shoppingAttributeKindDisplayName,
   shoppingAttributeSemanticDisplayName,

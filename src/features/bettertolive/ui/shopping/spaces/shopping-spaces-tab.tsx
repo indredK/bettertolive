@@ -17,7 +17,7 @@ import {
   deleteSpaceDefinition,
   reorderSpaceDefinitions,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import { itemHasStatusSemantic } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   ItemCard,
@@ -30,8 +30,8 @@ import {
   ShoppingSidebarPane,
   ShoppingTabBody,
   ShoppingTabViewport,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
-import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
+import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/_shared/shopping-sortable-card"
 import { cn } from "@/lib/utils"
 
 // ---- Left-side space card ----

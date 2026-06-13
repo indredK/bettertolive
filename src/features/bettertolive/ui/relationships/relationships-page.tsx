@@ -46,7 +46,7 @@ import { ReactForceGraph3DGraph } from "@/features/bettertolive/ui/shared/react-
 import { type FilterPopoverDimension } from "@/features/bettertolive/ui/shared/filter-popover"
 import { FilterablePanel } from "@/features/bettertolive/ui/shared/filterable-panel"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import {
   type EditingRelationship,
   type EditingRelationshipPattern,

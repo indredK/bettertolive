@@ -58,7 +58,7 @@ import type {
   DefenseMechanism,
 } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import { cn } from "@/lib/utils"
 
 const BELIEF_DOMAINS = [

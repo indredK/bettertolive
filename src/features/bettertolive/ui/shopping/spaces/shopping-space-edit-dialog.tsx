@@ -20,15 +20,15 @@ import {
   deleteSpaceDefinition,
   updateSpaceDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
-import { ShoppingItemShuttle } from "@/features/bettertolive/ui/shopping/shopping-item-shuttle"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
+import { ShoppingItemShuttle } from "@/features/bettertolive/ui/shopping/_shared/shopping-item-shuttle"
 import {
   SHOPPING_DIALOG_CONTENT_CLASS,
   SHOPPING_DIALOG_FIELD_CLASS,
   SHOPPING_DIALOG_FOOTER_CLASS,
   SHOPPING_DIALOG_HEADER_CLASS,
   SHOPPING_DIALOG_SECTION_CLASS,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
 export function ShoppingSpaceEditDialog({

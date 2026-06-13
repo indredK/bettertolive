@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { EmptyState } from "@/features/bettertolive/ui/shared/shared"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   CivilizationProfile,
   WorldHistoryTimelineEvent,

@@ -32,7 +32,7 @@ import type {
 import { ShoppingLifecycle, ShoppingStatus } from "@/features/bettertolive/types"
 import type { ShoppingItemForm } from "@/features/bettertolive/api/bettertolive-api"
 import { createItem, deleteItem, updateItem } from "@/features/bettertolive/api/shopping-crud-api"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import {
   depreciationDisplayName,
   lifecycleDisplayName,
@@ -48,7 +48,7 @@ import {
   SHOPPING_DIALOG_HEADER_CLASS,
   SHOPPING_DIALOG_PANEL_CLASS,
   SHOPPING_DIALOG_SECTION_CLASS,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
 export type EditingItem = { isNew: boolean; item: ShoppingItem | null }

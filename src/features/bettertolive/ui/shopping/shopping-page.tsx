@@ -13,22 +13,22 @@ import type {
   ShoppingSystemDefinition,
   ShoppingSpaceDefinition,
 } from "@/features/bettertolive/types"
-import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
-import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
-import { ShoppingAttributesTab } from "@/features/bettertolive/ui/shopping/shopping-attributes-tab"
-import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
-import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
-import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
+import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/overview/shopping-overview-tab"
+import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/planning/shopping-planning-tab"
+import { ShoppingAttributesTab } from "@/features/bettertolive/ui/shopping/attributes/shopping-attributes-tab"
+import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/spaces/shopping-spaces-tab"
+import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/stages/shopping-stages-tab"
+import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/systems/shopping-systems-tab"
 import {
   ShoppingItemEditDialog,
   type EditingItem,
-} from "@/features/bettertolive/ui/shopping/shopping-item-edit-dialog"
+} from "@/features/bettertolive/ui/shopping/planning/shopping-item-edit-dialog"
 import {
   ShoppingStageEditDialog,
   type EditingStage,
-} from "@/features/bettertolive/ui/shopping/shopping-stage-edit-dialog"
-import { ShoppingSpaceEditDialog } from "@/features/bettertolive/ui/shopping/shopping-space-edit-dialog"
-import { ShoppingSystemEditDialog } from "@/features/bettertolive/ui/shopping/shopping-system-edit-dialog"
+} from "@/features/bettertolive/ui/shopping/stages/shopping-stage-edit-dialog"
+import { ShoppingSpaceEditDialog } from "@/features/bettertolive/ui/shopping/spaces/shopping-space-edit-dialog"
+import { ShoppingSystemEditDialog } from "@/features/bettertolive/ui/shopping/systems/shopping-system-edit-dialog"
 
 export function ShoppingPage({
   shopping,

@@ -19,7 +19,7 @@ import {
   reorderAttributeDefinitions,
   updateAttributeDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import { ShoppingAttributeEditDialog } from "@/features/bettertolive/ui/shopping/shopping-attribute-edit-dialog"
+import { ShoppingAttributeEditDialog } from "@/features/bettertolive/ui/shopping/attributes/shopping-attribute-edit-dialog"
 import {
   SHOPPING_DETAIL_CARD_CLASS,
   SHOPPING_MUTED_PANEL_CLASS,
@@ -30,7 +30,7 @@ import {
   ShoppingSidebarPane,
   ShoppingTabBody,
   ShoppingTabViewport,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import {
   depreciationStyle,
   shoppingAttributeDisplayName,
@@ -41,7 +41,7 @@ import {
   shoppingAttributeStyleTokenDisplayName,
   statusStyle,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
-import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
+import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/_shared/shopping-sortable-card"
 import { cn } from "@/lib/utils"
 
 const ATTRIBUTE_KIND_META: ShoppingAttributeKind[] = [

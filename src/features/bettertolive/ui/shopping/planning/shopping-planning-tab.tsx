@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import type { ShoppingItem, ShoppingModuleData } from "@/features/bettertolive/types"
 import { ShoppingStatus } from "@/features/bettertolive/types"
 import { deleteItem } from "@/features/bettertolive/api/shopping-crud-api"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import {
   depreciationStyle,
   SYSTEM_CHIP_STYLE,
@@ -35,7 +35,7 @@ import {
   ShoppingSidebarPane,
   ShoppingTabBody,
   ShoppingTabViewport,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import {
   FilterAppliedChips,
   FilterPopoverButton,

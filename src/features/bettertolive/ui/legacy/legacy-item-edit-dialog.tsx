@@ -52,7 +52,7 @@ import {
   LEGACY_DIALOG_FOOTER_CLASS,
   LEGACY_DIALOG_SECTION_CLASS,
 } from "@/features/bettertolive/ui/legacy/legacy-page-shared"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import { cn } from "@/lib/utils"
 
 export type EditingLegacyItem = {

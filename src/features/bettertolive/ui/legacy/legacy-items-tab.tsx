@@ -34,7 +34,7 @@ import {
   LegacyTabBody,
   LegacyWarningCallout,
 } from "@/features/bettertolive/ui/legacy/legacy-page-shared"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import { EmptyState } from "@/features/bettertolive/ui/shared/shared"
 import {
   FilterAppliedChips,

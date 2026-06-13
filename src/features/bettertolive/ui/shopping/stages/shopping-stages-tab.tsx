@@ -19,7 +19,7 @@ import {
   deleteStageTemplate,
   reorderStageTemplates,
 } from "@/features/bettertolive/api/shopping-crud-api"
-import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import {
   SHOPPING_DETAIL_CARD_CLASS,
   SHOPPING_MUTED_PANEL_CLASS,
@@ -30,12 +30,12 @@ import {
   ShoppingSidebarPane,
   ShoppingTabBody,
   ShoppingTabViewport,
-} from "@/features/bettertolive/ui/shopping/shopping-page-shared"
+} from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import {
   buildStageDimensionGroups,
   type ShoppingStageViewMode,
-} from "@/features/bettertolive/ui/shopping/shopping-stage-utils"
-import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/shopping-sortable-card"
+} from "@/features/bettertolive/ui/shopping/stages/shopping-stage-utils"
+import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/_shared/shopping-sortable-card"
 import { cn } from "@/lib/utils"
 
 export function ShoppingStagesTab({
