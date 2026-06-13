@@ -25,6 +25,12 @@ export const commands = {
 	deleteShoppingStageTemplate: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_stage_template", { id })),
 	reorderStageTemplates: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_stage_templates", { orderedIds })),
 	listShoppingSpaceDefinitions: () => typedError<ShoppingSpaceDefinitionDto[], string>(__TAURI_INVOKE("list_shopping_space_definitions")),
+	listShoppingAttributeDefinitions: () => typedError<ShoppingAttributeDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_attribute_definitions")),
+	listShoppingAttributeDefinitionsForManagement: () => typedError<ShoppingAttributeDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_attribute_definitions_for_management")),
+	createShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("create_shopping_attribute_definition", { form })),
+	updateShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("update_shopping_attribute_definition", { form })),
+	disableShoppingAttributeDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("disable_shopping_attribute_definition", { id })),
+	reorderShoppingAttributeDefinitions: (kind: string, orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_attribute_definitions", { kind, orderedIds })),
 	createShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("create_shopping_space_definition", { form })),
 	updateShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("update_shopping_space_definition", { form })),
 	deleteShoppingSpaceDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_space_definition", { id })),
@@ -43,6 +49,20 @@ export const commands = {
 };
 
 /* Types */
+export type AttributeDefinitionFormDto = {
+	id?: string | null,
+	kind: string,
+	code: string,
+	semanticKey?: string | null,
+	label: string,
+	labelEn?: string | null,
+	description?: string,
+	styleToken?: string | null,
+	rank?: number | null,
+	isEnabled?: boolean,
+	isSystem?: boolean,
+};
+
 export type BeliefCardDto = {
 	id: string,
 	label: string,
@@ -288,6 +308,38 @@ export type PageContentRow = {
 	updated_at: string,
 };
 
+export type ShoppingAttributeDefinitionDto = ShoppingAttributeDefinitionDto_Serialize | ShoppingAttributeDefinitionDto_Deserialize;
+
+export type ShoppingAttributeDefinitionDto_Deserialize = {
+	id: string,
+	kind: string,
+	code: string,
+	semanticKey: string | null,
+	label: string,
+	labelEn: string | null,
+	description?: string,
+	styleToken: string | null,
+	rank: number | null,
+	sortOrder: number,
+	isEnabled: boolean,
+	isSystem: boolean,
+};
+
+export type ShoppingAttributeDefinitionDto_Serialize = {
+	id: string,
+	kind: string,
+	code: string,
+	semanticKey?: string | null,
+	label: string,
+	labelEn?: string | null,
+	description: string,
+	styleToken?: string | null,
+	rank?: number | null,
+	sortOrder: number,
+	isEnabled: boolean,
+	isSystem: boolean,
+};
+
 export type ShoppingBoundaryEntryDto = {
 	id: string,
 	item: string,
@@ -366,6 +418,7 @@ export type ShoppingModuleDto_Deserialize = {
 	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
+	attributeDefinitions: ShoppingAttributeDefinitionDto_Deserialize[],
 	spotlights: ShoppingSpotlightDto[],
 	items: ShoppingItemDto_Deserialize[],
 	stageTemplates: ShoppingStageTemplateDto[],
@@ -377,6 +430,7 @@ export type ShoppingModuleDto_Serialize = {
 	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
 	spaceDefinitions: ShoppingSpaceDefinitionDto[],
+	attributeDefinitions: ShoppingAttributeDefinitionDto_Serialize[],
 	spotlights: ShoppingSpotlightDto[],
 	items: ShoppingItemDto_Serialize[],
 	stageTemplates: ShoppingStageTemplateDto[],

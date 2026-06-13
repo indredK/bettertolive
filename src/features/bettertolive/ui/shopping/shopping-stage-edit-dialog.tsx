@@ -258,6 +258,7 @@ export function ShoppingStageEditDialog({
 
             <ShoppingItemShuttle
               items={shopping.items}
+              attributeDefinitions={shopping.attributeDefinitions}
               selectedIds={selectedItemIds}
               onChange={syncItemsFromIds}
               scope="stage"

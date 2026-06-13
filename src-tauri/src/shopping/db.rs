@@ -129,6 +129,27 @@ fn create_new_schema(conn: &Connection) -> SqliteResult<()> {
         [],
     )?;
 
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS shopping_attribute_definitions (
+            id TEXT PRIMARY KEY,
+            kind TEXT NOT NULL,
+            code TEXT NOT NULL,
+            semantic_key TEXT,
+            label TEXT NOT NULL,
+            label_en TEXT,
+            description TEXT NOT NULL DEFAULT '',
+            style_token TEXT,
+            rank INTEGER,
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            is_enabled INTEGER NOT NULL DEFAULT 1,
+            is_system INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            UNIQUE(kind, code)
+        )",
+        [],
+    )?;
+
     // 兼容：旧表可能缺少 note 列
     add_column_if_missing(
         conn,
@@ -387,6 +408,37 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
                     now,
                 ],
             )?;
+            }
+        }
+    }
+
+    // ---- Attribute definitions ----
+    if table_is_empty(conn, "shopping_attribute_definitions")? {
+        if let Some(definitions) = seed["attributeDefinitions"].as_array() {
+            for (i, definition) in definitions.iter().enumerate() {
+                conn.execute(
+                    "INSERT INTO shopping_attribute_definitions (
+                        id, kind, code, semantic_key, label, label_en, description, style_token,
+                        rank, sort_order, is_enabled, is_system, created_at, updated_at
+                    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, 1, ?11, ?12)",
+                    rusqlite::params![
+                        definition["id"].as_str().unwrap_or(""),
+                        definition["kind"].as_str().unwrap_or(""),
+                        definition["code"].as_str().unwrap_or(""),
+                        definition["semanticKey"].as_str(),
+                        definition["label"].as_str().unwrap_or(""),
+                        definition["labelEn"].as_str(),
+                        definition["description"].as_str().unwrap_or(""),
+                        definition["styleToken"].as_str(),
+                        definition["rank"].as_i64().map(|v| v as i32),
+                        definition["sortOrder"]
+                            .as_i64()
+                            .map(|v| v as i32)
+                            .unwrap_or(i as i32),
+                        now,
+                        now,
+                    ],
+                )?;
             }
         }
     }

@@ -1,5 +1,6 @@
 import type { TFunction } from "i18next"
 import {
+  type ShoppingAttributeDefinition,
   ShoppingDepreciation,
   ShoppingHealthStatus,
   ShoppingLane,
@@ -83,6 +84,75 @@ export const FAST_DEPRECIATION = new Set<ShoppingDepreciation>([
   ShoppingDepreciation.Fast,
 ])
 
+const STYLE_TOKEN_CLASSNAME: Record<string, string> = {
+  accent: "border-foreground/10 bg-accent text-accent-foreground",
+  secondary: "border-foreground/10 bg-secondary text-secondary-foreground",
+  muted: "border-foreground/10 bg-muted text-muted-foreground",
+  card: "border-foreground/10 bg-card text-card-foreground",
+}
+
+type AttributeKind = ShoppingAttributeDefinition["kind"]
+
+function findAttributeDefinition(
+  definitions: ShoppingAttributeDefinition[] | undefined,
+  kind: AttributeKind,
+  code: string | null | undefined,
+) {
+  if (!code) return null
+  return (
+    definitions?.find((definition) => definition.kind === kind && definition.code === code) ?? null
+  )
+}
+
+function findAttributeBySemanticKey(
+  definitions: ShoppingAttributeDefinition[] | undefined,
+  kind: AttributeKind,
+  semanticKey: string,
+) {
+  return (
+    definitions?.find(
+      (definition) => definition.kind === kind && definition.semanticKey === semanticKey,
+    ) ?? null
+  )
+}
+
+function resolveAttributeLabel(
+  definitions: ShoppingAttributeDefinition[] | undefined,
+  kind: AttributeKind,
+  code: string | null | undefined,
+  locale: string | undefined,
+) {
+  const definition = findAttributeDefinition(definitions, kind, code)
+  if (!definition) return null
+  const isEnglish = locale?.startsWith("en")
+  return isEnglish ? definition.labelEn || definition.label : definition.label
+}
+
+function resolveAttributeStyle(
+  definitions: ShoppingAttributeDefinition[] | undefined,
+  kind: AttributeKind,
+  code: string | null | undefined,
+) {
+  const definition = findAttributeDefinition(definitions, kind, code)
+  const token = definition?.styleToken ?? undefined
+  return token ? STYLE_TOKEN_CLASSNAME[token] : null
+}
+
+function resolveAttributeOptions<T extends string>(
+  definitions: ShoppingAttributeDefinition[] | undefined,
+  kind: AttributeKind,
+  fallback: readonly T[],
+) {
+  const options = (definitions ?? [])
+    .filter((definition) => definition.kind === kind && definition.isEnabled)
+    .sort(
+      (left, right) => left.sortOrder - right.sortOrder || left.label.localeCompare(right.label),
+    )
+    .map((definition) => definition.code as T)
+
+  return options.length > 0 ? options : [...fallback]
+}
+
 // ===== 工具函数 =====
 
 export function chunkList<T>(items: T[], size: number) {
@@ -98,14 +168,46 @@ export function formatPrice(amount: number) {
 }
 
 export function itemHasStatus(item: ShoppingItem, status: ShoppingStatus) {
-  if (item.children.length === 0) {
-    return status === ShoppingStatus.Owned
-  }
-  return item.children.some((child) => (child.status ?? ShoppingStatus.Owned) === status)
+  return itemHasStatusSemantic(item, status === ShoppingStatus.Wanted ? "wanted" : "owned")
 }
 
 export function itemPrimaryStatus(item: ShoppingItem) {
   return itemHasStatus(item, ShoppingStatus.Wanted) ? ShoppingStatus.Wanted : ShoppingStatus.Owned
+}
+
+export function itemHasStatusSemantic(
+  item: ShoppingItem,
+  semanticKey: "owned" | "wanted",
+  definitions?: ShoppingAttributeDefinition[],
+) {
+  const statusCode =
+    findAttributeBySemanticKey(definitions, "status", semanticKey)?.code ??
+    (semanticKey === "wanted" ? ShoppingStatus.Wanted : ShoppingStatus.Owned)
+  if (item.children.length === 0) {
+    return semanticKey === "owned"
+  }
+  return item.children.some((child) => (child.status ?? ShoppingStatus.Owned) === statusCode)
+}
+
+export function itemPrimaryStatusCode(
+  item: ShoppingItem,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  const wantedCode =
+    findAttributeBySemanticKey(definitions, "status", "wanted")?.code ?? ShoppingStatus.Wanted
+  const ownedCode =
+    findAttributeBySemanticKey(definitions, "status", "owned")?.code ?? ShoppingStatus.Owned
+  return itemHasStatusSemantic(item, "wanted", definitions) ? wantedCode : ownedCode
+}
+
+export function semanticStatusCode(
+  semanticKey: "owned" | "wanted",
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    findAttributeBySemanticKey(definitions, "status", semanticKey)?.code ??
+    (semanticKey === "wanted" ? ShoppingStatus.Wanted : ShoppingStatus.Owned)
+  )
 }
 
 // ===== 显示名称(i18n + fallback) =====
@@ -114,32 +216,170 @@ export function systemDisplayName(systemId: ShoppingSystem, t: TFunction): strin
   return t(`shopping.enumNames.system.${systemId}`, systemId)
 }
 
-export function lifecycleDisplayName(lc: ShoppingLifecycle, t: TFunction): string {
-  return t(`shopping.enumNames.lifecycle.${lc}`, lc as string)
+export function lifecycleDisplayName(
+  lc: ShoppingLifecycle | string,
+  t: TFunction,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "lifecycle",
+      lc,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ?? t(`shopping.enumNames.lifecycle.${lc}`, lc)
+  )
 }
 
-export function depreciationDisplayName(dep: ShoppingDepreciation, t: TFunction): string {
-  return t(`shopping.enumNames.depreciation.${dep}`, dep as string)
+export function depreciationDisplayName(
+  dep: ShoppingDepreciation | string,
+  t: TFunction,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "depreciation",
+      dep,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ?? t(`shopping.enumNames.depreciation.${dep}`, dep)
+  )
 }
 
-export function statusDisplayName(status: ShoppingStatus | string, t: TFunction): string {
-  return t(`shopping.enumNames.status.${status}`, status === "Owned" ? "已有" : "待购")
+export function statusDisplayName(
+  status: ShoppingStatus | string,
+  t: TFunction,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "status",
+      status,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ??
+    t(
+      `shopping.enumNames.status.${status}`,
+      status === "Owned" ? "已有" : status === "Wanted" ? "待购" : String(status),
+    )
+  )
 }
 
 export function laneDisplayName(
   lane: ShoppingLane | string | null | undefined,
   t: TFunction,
+  definitions?: ShoppingAttributeDefinition[],
 ): string {
   if (!lane) return ""
-  const fallback = lane === "Now" ? "立即买" : lane === "Wait" ? "等好价" : "先不买"
-  return t(`shopping.enumNames.lane.${lane}`, fallback)
+  const fallback =
+    lane === "Now"
+      ? "立即买"
+      : lane === "Wait"
+        ? "等好价"
+        : lane === "Hold"
+          ? "先不买"
+          : String(lane)
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "lane",
+      lane,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ?? t(`shopping.enumNames.lane.${lane}`, fallback)
+  )
 }
 
 export function healthStatusDisplayName(
   status: ShoppingHealthStatus | string,
   t: TFunction,
+  definitions?: ShoppingAttributeDefinition[],
 ): string {
-  return t(`shopping.enumNames.healthStatus.${status}`, status)
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "health_status",
+      status,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ?? t(`shopping.enumNames.healthStatus.${status}`, status)
+  )
+}
+
+export function shoppingAttributeKindDisplayName(kind: AttributeKind, t: TFunction): string {
+  return t(`shopping.attributes.kindOptions.${kind}`, kind)
+}
+
+export function shoppingAttributeDisplayName(definition: ShoppingAttributeDefinition): string {
+  const isEnglish = i18next.resolvedLanguage?.startsWith("en")
+  return isEnglish ? definition.labelEn || definition.label : definition.label
+}
+
+export function shoppingAttributeSemanticDisplayName(
+  semanticKey: string | null | undefined,
+  t: TFunction,
+): string {
+  if (!semanticKey) return t("shopping.attributes.none", "未设置")
+  return t(`shopping.attributes.semanticOptions.${semanticKey}`, semanticKey)
+}
+
+export function shoppingAttributeStyleTokenDisplayName(
+  styleToken: string | null | undefined,
+  t: TFunction,
+): string {
+  if (!styleToken) return t("shopping.attributes.none", "未设置")
+  return t(`shopping.attributes.styleOptions.${styleToken}`, styleToken)
+}
+
+export function shoppingAttributeEnabledDisplayName(isEnabled: boolean, t: TFunction): string {
+  return isEnabled
+    ? t("shopping.attributes.enabled", "已启用")
+    : t("shopping.attributes.disabled", "已停用")
+}
+
+export function statusStyle(
+  status: ShoppingStatus | string,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeStyle(definitions, "status", status) ?? STATUS_STYLES[status as ShoppingStatus]
+  )
+}
+
+export function lifecycleStyle(
+  lifecycle: ShoppingLifecycle | string,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeStyle(definitions, "lifecycle", lifecycle) ??
+    LIFECYCLE_STYLES[lifecycle as ShoppingLifecycle]
+  )
+}
+
+export function depreciationStyle(
+  depreciation: ShoppingDepreciation | string,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeStyle(definitions, "depreciation", depreciation) ??
+    DEPRECIATION_STYLES[depreciation as ShoppingDepreciation]
+  )
+}
+
+export function shoppingStatusOptions(
+  definitions?: ShoppingAttributeDefinition[],
+): ShoppingStatus[] {
+  return resolveAttributeOptions(definitions, "status", SHOPPING_STATUS_OPTIONS)
+}
+
+export function shoppingLifecycleOptions(
+  definitions?: ShoppingAttributeDefinition[],
+): ShoppingLifecycle[] {
+  return resolveAttributeOptions(definitions, "lifecycle", SHOPPING_LIFECYCLE_OPTIONS)
+}
+
+export function shoppingDepreciationOptions(
+  definitions?: ShoppingAttributeDefinition[],
+): ShoppingDepreciation[] {
+  return resolveAttributeOptions(definitions, "depreciation", SHOPPING_DEPRECIATION_OPTIONS)
 }
 
 /**

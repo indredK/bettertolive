@@ -11,7 +11,8 @@
       "spaces": "Space Scenes",
       "stages": "Stage Fit",
       "planning": "Item Library",
-      "admin": "Admin"
+      "admin": "Admin",
+      "attributes": "Attribute Dictionary"
     },
     "cardGrid": {
       "addNew": "Add New"
@@ -140,6 +141,71 @@
       "overpriced": "Overpriced",
       "watchOnly": "Watch only",
       "title": "Price Signal"
+    },
+    "attributes": {
+      "create": "Create Attribute",
+      "edit": "Edit Attribute",
+      "add": "Add",
+      "kind": "Category",
+      "code": "Code",
+      "label": "Chinese Label",
+      "labelEn": "English Label",
+      "semanticKey": "Semantic Key",
+      "styleToken": "Style",
+      "rank": "Rank / Sort Weight",
+      "description": "Description",
+      "state": "State",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "enable": "Enable Attribute",
+      "disable": "Disable Attribute",
+      "none": "Not set",
+      "noSemantic": "Not set",
+      "noStyle": "Not set",
+      "emptyHint": "No attribute definitions in this category yet",
+      "selectPrompt": "Select an attribute from the left to view details",
+      "reordered": "Attribute order updated",
+      "kindOptions": {
+        "status": "Status",
+        "lane": "Lane",
+        "lifecycle": "Lifecycle",
+        "depreciation": "Depreciation",
+        "health_status": "Health Status",
+        "channel": "Channel"
+      },
+      "semanticOptions": {
+        "owned": "Owned",
+        "wanted": "Wanted",
+        "now": "Buy now",
+        "wait": "Wait for deal",
+        "hold": "Hold off",
+        "consumable": "Consumable",
+        "durable": "Durable",
+        "tool": "Tool",
+        "emotional": "Emotional",
+        "very_fast": "Very fast",
+        "fast": "Fast",
+        "medium": "Medium",
+        "slow": "Slow",
+        "no_depreciation": "No depreciation",
+        "stable_use": "Stable use",
+        "consider_upgrade": "Consider upgrade",
+        "need_restock": "Need restock",
+        "missing_parts": "Missing parts",
+        "need_complete": "Need completion"
+      },
+      "styleOptions": {
+        "accent": "Accent",
+        "secondary": "Secondary",
+        "muted": "Muted",
+        "card": "Card"
+      }
+    },
+    "error": {
+      "idNameRequired": "Missing system ID",
+      "nameRequired": "Please enter a name",
+      "semanticRequired": "This category requires a semantic key",
+      "itemRequired": "Please enter a name and choose at least one system and one space"
     },
     "validation": {
       "required": "Please enter {{field}}",

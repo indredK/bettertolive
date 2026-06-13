@@ -1,15 +1,15 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use crate::shopping::dto::{
-    ShoppingBoundaryEntryDto, ShoppingItemChildChannelDto, ShoppingItemChildDto, ShoppingItemDto,
-    ShoppingLifestyleCollectionDto, ShoppingModuleDto, ShoppingOverviewDimensionPulseDto,
-    ShoppingOverviewDto, ShoppingOverviewStagePulseDto, ShoppingSpaceDefinitionDto,
-    ShoppingSpotlightDto, ShoppingStageItemDto, ShoppingStageItemTiersDto,
-    ShoppingStageTemplateDto, ShoppingSystemDefinitionDto,
+    ShoppingAttributeDefinitionDto, ShoppingBoundaryEntryDto, ShoppingItemChildChannelDto,
+    ShoppingItemChildDto, ShoppingItemDto, ShoppingLifestyleCollectionDto, ShoppingModuleDto,
+    ShoppingOverviewDimensionPulseDto, ShoppingOverviewDto, ShoppingOverviewStagePulseDto,
+    ShoppingSpaceDefinitionDto, ShoppingSpotlightDto, ShoppingStageItemDto,
+    ShoppingStageItemTiersDto, ShoppingStageTemplateDto, ShoppingSystemDefinitionDto,
 };
 use crate::shopping::models::{
-    ItemChildWriteModel, ItemRow, PageContentRow, SpaceDefinitionRow, StageItemRow,
-    StageTemplateRow, SystemDefinitionRow,
+    AttributeDefinitionRow, ItemChildWriteModel, ItemRow, PageContentRow, SpaceDefinitionRow,
+    StageItemRow, StageTemplateRow, SystemDefinitionRow,
 };
 use rusqlite::{params, Connection};
 use std::collections::HashSet;
@@ -38,6 +38,25 @@ fn row_to_space_definition(row: &rusqlite::Row) -> rusqlite::Result<SpaceDefinit
         name: row.get("name")?,
         note: row.get("note")?,
         sort_order: row.get("sort_order")?,
+        created_at: row.get("created_at")?,
+        updated_at: row.get("updated_at")?,
+    })
+}
+
+fn row_to_attribute_definition(row: &rusqlite::Row) -> rusqlite::Result<AttributeDefinitionRow> {
+    Ok(AttributeDefinitionRow {
+        id: row.get("id")?,
+        kind: row.get("kind")?,
+        code: row.get("code")?,
+        semantic_key: row.get("semantic_key")?,
+        label: row.get("label")?,
+        label_en: row.get("label_en")?,
+        description: row.get("description")?,
+        style_token: row.get("style_token")?,
+        rank: row.get("rank")?,
+        sort_order: row.get("sort_order")?,
+        is_enabled: row.get("is_enabled")?,
+        is_system: row.get("is_system")?,
         created_at: row.get("created_at")?,
         updated_at: row.get("updated_at")?,
     })
@@ -109,6 +128,18 @@ fn row_to_page_content(row: &rusqlite::Row) -> rusqlite::Result<PageContentRow> 
 }
 
 impl ShoppingRepository {
+    const SUPPORTED_ATTRIBUTE_KINDS: [&'static str; 6] = [
+        "status",
+        "lane",
+        "lifecycle",
+        "depreciation",
+        "health_status",
+        "channel",
+    ];
+
+    const REQUIRED_STATUS_SEMANTICS: [&'static str; 2] = ["owned", "wanted"];
+    const REQUIRED_LANE_SEMANTICS: [&'static str; 3] = ["now", "wait", "hold"];
+
     fn count_to_i32(count: usize) -> i32 {
         i32::try_from(count).unwrap_or(i32::MAX)
     }
@@ -130,6 +161,124 @@ impl ShoppingRepository {
         let sql = format!("SELECT EXISTS(SELECT 1 FROM {table} WHERE {id_column} = ?1)");
         conn.query_row(&sql, params![id], |row| row.get::<_, bool>(0))
             .map_err(|e| e.to_string())
+    }
+
+    fn normalize_attribute_kind(kind: &str) -> Result<String, String> {
+        let normalized = kind.trim();
+        if Self::SUPPORTED_ATTRIBUTE_KINDS.contains(&normalized) {
+            Ok(normalized.to_string())
+        } else {
+            Err(format!("unsupported attribute kind: {kind}"))
+        }
+    }
+
+    fn row_to_attribute_definition_dto(
+        row: AttributeDefinitionRow,
+    ) -> ShoppingAttributeDefinitionDto {
+        ShoppingAttributeDefinitionDto {
+            id: row.id,
+            kind: row.kind,
+            code: row.code,
+            semantic_key: row.semantic_key,
+            label: row.label,
+            label_en: row.label_en,
+            description: row.description,
+            style_token: row.style_token,
+            rank: row.rank,
+            sort_order: row.sort_order,
+            is_enabled: row.is_enabled,
+            is_system: row.is_system,
+        }
+    }
+
+    fn validate_attribute_semantic(kind: &str, semantic_key: Option<&str>) -> Result<(), String> {
+        let normalized_semantic = semantic_key
+            .map(str::trim)
+            .filter(|value| !value.is_empty());
+        match kind {
+            "status" => {
+                let Some(key) = normalized_semantic else {
+                    return Err("status requires semanticKey".to_string());
+                };
+                if Self::REQUIRED_STATUS_SEMANTICS.contains(&key) {
+                    Ok(())
+                } else {
+                    Err(format!("invalid status semanticKey: {key}"))
+                }
+            }
+            "lane" => {
+                let Some(key) = normalized_semantic else {
+                    return Err("lane requires semanticKey".to_string());
+                };
+                if Self::REQUIRED_LANE_SEMANTICS.contains(&key) {
+                    Ok(())
+                } else {
+                    Err(format!("invalid lane semanticKey: {key}"))
+                }
+            }
+            _ => Ok(()),
+        }
+    }
+
+    fn attribute_code_exists(conn: &Connection, kind: &str, code: &str) -> Result<bool, String> {
+        conn.query_row(
+            "SELECT EXISTS(
+                SELECT 1
+                FROM shopping_attribute_definitions
+                WHERE kind = ?1 AND code = ?2 AND is_enabled = 1
+            )",
+            params![kind, code],
+            |row| row.get::<_, bool>(0),
+        )
+        .map_err(|e| e.to_string())
+    }
+
+    fn require_enabled_attribute_code(
+        conn: &Connection,
+        kind: &str,
+        code: Option<&str>,
+        required: bool,
+    ) -> Result<Option<String>, String> {
+        let normalized = code.map(str::trim).filter(|value| !value.is_empty());
+        match normalized {
+            Some(value) => {
+                if Self::attribute_code_exists(conn, kind, value)? {
+                    Ok(Some(value.to_string()))
+                } else {
+                    Err(format!("invalid {kind}: {value}"))
+                }
+            }
+            None if required => Err(format!("{kind} is required")),
+            None => Ok(None),
+        }
+    }
+
+    fn ensure_required_semantic_keys(conn: &Connection, kind: &str) -> Result<(), String> {
+        let required = match kind {
+            "status" => Self::REQUIRED_STATUS_SEMANTICS.as_slice(),
+            "lane" => Self::REQUIRED_LANE_SEMANTICS.as_slice(),
+            _ => return Ok(()),
+        };
+
+        for semantic_key in required {
+            let exists = conn
+                .query_row(
+                    "SELECT EXISTS(
+                        SELECT 1 FROM shopping_attribute_definitions
+                        WHERE kind = ?1 AND semantic_key = ?2 AND is_enabled = 1
+                    )",
+                    params![kind, semantic_key],
+                    |row| row.get::<_, bool>(0),
+                )
+                .map_err(|e| e.to_string())?;
+            if !exists {
+                return Err(format!(
+                    "missing required semanticKey for {kind}: {semantic_key}"
+                ));
+            }
+        }
+
+        Ok(())
     }
 
     fn normalize_optional_reference(
@@ -254,6 +403,7 @@ impl ShoppingRepository {
     pub fn get_shopping_module_aggregated(conn: &Connection) -> Result<ShoppingModuleDto, String> {
         let system_definitions = Self::list_system_definitions_dto(conn)?;
         let space_definitions = Self::list_space_definitions_dto(conn)?;
+        let attribute_definitions = Self::list_attribute_definitions_dto(conn)?;
         let items = Self::list_items_dto(conn)?;
         let stage_templates = Self::list_stage_templates_dto(conn)?;
         let spotlights = Self::list_spotlights(conn)?;
@@ -273,6 +423,7 @@ impl ShoppingRepository {
             overview,
             system_definitions,
             space_definitions,
+            attribute_definitions,
             items,
             stage_templates,
             spotlights,
@@ -559,6 +710,300 @@ impl ShoppingRepository {
         Ok(defs)
     }
 
+    pub fn list_attribute_definitions_dto(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingAttributeDefinitionDto>, String> {
+        Self::list_attribute_definitions_with_enabled_filter(conn, true)
+    }
+
+    pub fn list_all_attribute_definitions_dto(
+        conn: &Connection,
+    ) -> Result<Vec<ShoppingAttributeDefinitionDto>, String> {
+        Self::list_attribute_definitions_with_enabled_filter(conn, false)
+    }
+
+    fn list_attribute_definitions_with_enabled_filter(
+        conn: &Connection,
+        enabled_only: bool,
+    ) -> Result<Vec<ShoppingAttributeDefinitionDto>, String> {
+        let sql = if enabled_only {
+            "SELECT *
+             FROM shopping_attribute_definitions
+             WHERE is_enabled = 1
+             ORDER BY kind, sort_order, id"
+        } else {
+            "SELECT *
+             FROM shopping_attribute_definitions
+             ORDER BY kind, sort_order, id"
+        };
+        let mut stmt = conn.prepare(sql).map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], row_to_attribute_definition)
+            .map_err(|e| e.to_string())?;
+
+        let mut defs = Vec::new();
+        for row in rows {
+            defs.push(Self::row_to_attribute_definition_dto(
+                row.map_err(|e| e.to_string())?,
+            ));
+        }
+        Ok(defs)
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn create_attribute_definition(
+        conn: &Connection,
+        id: &str,
+        kind: &str,
+        code: &str,
+        semantic_key: Option<&str>,
+        label: &str,
+        label_en: Option<&str>,
+        description: &str,
+        style_token: Option<&str>,
+        rank: Option<i32>,
+        is_enabled: bool,
+        is_system: bool,
+        now: &str,
+    ) -> Result<ShoppingAttributeDefinitionDto, String> {
+        let normalized_kind = Self::normalize_attribute_kind(kind)?;
+        Self::validate_attribute_semantic(&normalized_kind, semantic_key)?;
+        let normalized_code = code.trim();
+        if normalized_code.is_empty() {
+            return Err("code is required".to_string());
+        }
+        let normalized_label = label.trim();
+        if normalized_label.is_empty() {
+            return Err("label is required".to_string());
+        }
+
+        let next_order: i32 = conn
+            .query_row(
+                "SELECT COALESCE(MAX(sort_order), -1) + 1
+                 FROM shopping_attribute_definitions
+                 WHERE kind = ?1",
+                params![&normalized_kind],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+
+        conn.execute(
+            "INSERT INTO shopping_attribute_definitions (
+                id, kind, code, semantic_key, label, label_en, description, style_token,
+                rank, sort_order, is_enabled, is_system, created_at, updated_at
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
+            params![
+                id,
+                &normalized_kind,
+                normalized_code,
+                semantic_key
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty()),
+                normalized_label,
+                label_en.map(str::trim).filter(|value| !value.is_empty()),
+                description.trim(),
+                style_token.map(str::trim).filter(|value| !value.is_empty()),
+                rank,
+                next_order,
+                is_enabled,
+                is_system,
+                now,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Self::ensure_required_semantic_keys(conn, &normalized_kind)?;
+
+        Ok(ShoppingAttributeDefinitionDto {
+            id: id.to_string(),
+            kind: normalized_kind,
+            code: normalized_code.to_string(),
+            semantic_key: semantic_key
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            label: normalized_label.to_string(),
+            label_en: label_en
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            description: description.trim().to_string(),
+            style_token: style_token
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            rank,
+            sort_order: next_order,
+            is_enabled,
+            is_system,
+        })
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    pub fn update_attribute_definition(
+        conn: &Connection,
+        id: &str,
+        kind: &str,
+        code: &str,
+        semantic_key: Option<&str>,
+        label: &str,
+        label_en: Option<&str>,
+        description: &str,
+        style_token: Option<&str>,
+        rank: Option<i32>,
+        is_enabled: bool,
+        is_system: bool,
+        now: &str,
+    ) -> Result<ShoppingAttributeDefinitionDto, String> {
+        let normalized_kind = Self::normalize_attribute_kind(kind)?;
+        Self::validate_attribute_semantic(&normalized_kind, semantic_key)?;
+        let normalized_code = code.trim();
+        if normalized_code.is_empty() {
+            return Err("code is required".to_string());
+        }
+        let normalized_label = label.trim();
+        if normalized_label.is_empty() {
+            return Err("label is required".to_string());
+        }
+
+        let existing_row = conn
+            .query_row(
+                "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
+                params![id],
+                row_to_attribute_definition,
+            )
+            .map_err(|e| e.to_string())?;
+
+        if existing_row.is_system
+            && (existing_row.kind == "status" || existing_row.kind == "lane")
+            && (existing_row.kind != normalized_kind
+                || existing_row.code != normalized_code
+                || existing_row.semantic_key.as_deref()
+                    != semantic_key
+                        .map(str::trim)
+                        .filter(|value| !value.is_empty()))
+        {
+            return Err(format!(
+                "system {kind} identity fields are immutable",
+                kind = existing_row.kind
+            ));
+        }
+
+        conn.execute(
+            "UPDATE shopping_attribute_definitions
+             SET kind = ?2, code = ?3, semantic_key = ?4, label = ?5, label_en = ?6,
+                 description = ?7, style_token = ?8, rank = ?9, is_enabled = ?10,
+                 is_system = ?11, updated_at = ?12
+             WHERE id = ?1",
+            params![
+                id,
+                &normalized_kind,
+                normalized_code,
+                semantic_key
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty()),
+                normalized_label,
+                label_en.map(str::trim).filter(|value| !value.is_empty()),
+                description.trim(),
+                style_token.map(str::trim).filter(|value| !value.is_empty()),
+                rank,
+                is_enabled,
+                is_system,
+                now,
+            ],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Self::ensure_required_semantic_keys(conn, &normalized_kind)?;
+
+        let sort_order = conn
+            .query_row(
+                "SELECT sort_order FROM shopping_attribute_definitions WHERE id = ?1",
+                params![id],
+                |row| row.get::<_, i32>(0),
+            )
+            .map_err(|e| e.to_string())?;
+
+        Ok(ShoppingAttributeDefinitionDto {
+            id: id.to_string(),
+            kind: normalized_kind,
+            code: normalized_code.to_string(),
+            semantic_key: semantic_key
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            label: normalized_label.to_string(),
+            label_en: label_en
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            description: description.trim().to_string(),
+            style_token: style_token
+                .map(str::trim)
+                .filter(|value| !value.is_empty())
+                .map(ToOwned::to_owned),
+            rank,
+            sort_order,
+            is_enabled,
+            is_system,
+        })
+    }
+
+    pub fn disable_attribute_definition(
+        conn: &Connection,
+        id: &str,
+        now: &str,
+    ) -> Result<(), String> {
+        let existing_row = conn
+            .query_row(
+                "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
+                params![id],
+                row_to_attribute_definition,
+            )
+            .map_err(|e| e.to_string())?;
+
+        if existing_row.is_system
+            && (existing_row.kind == "status" || existing_row.kind == "lane")
+            && existing_row.semantic_key.is_some()
+        {
+            return Err(format!(
+                "system {kind} with required semanticKey cannot be disabled",
+                kind = existing_row.kind
+            ));
+        }
+
+        conn.execute(
+            "UPDATE shopping_attribute_definitions
+             SET is_enabled = 0, updated_at = ?2
+             WHERE id = ?1",
+            params![id, now],
+        )
+        .map_err(|e| e.to_string())?;
+
+        Self::ensure_required_semantic_keys(conn, &existing_row.kind)?;
+        Ok(())
+    }
+
+    pub fn reorder_attribute_definitions(
+        conn: &Connection,
+        kind: &str,
+        ordered_ids: &[String],
+        now: &str,
+    ) -> Result<(), String> {
+        let normalized_kind = Self::normalize_attribute_kind(kind)?;
+        for (index, id) in ordered_ids.iter().enumerate() {
+            conn.execute(
+                "UPDATE shopping_attribute_definitions
+                 SET sort_order = ?3, updated_at = ?4
+                 WHERE id = ?1 AND kind = ?2",
+                params![id, &normalized_kind, index as i32, now],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+        Ok(())
+    }
+
     pub fn create_space_definition(
         conn: &Connection,
         id: &str,
@@ -839,6 +1284,9 @@ impl ShoppingRepository {
         is_update: bool,
         now: &str,
     ) -> Result<(), String> {
+        Self::ensure_required_semantic_keys(conn, "status")?;
+        Self::validate_item_children_attributes(conn, children)?;
+
         if is_update {
             Self::delete_stage_tiers_for_item_children(conn, id)?;
             conn.execute(
@@ -950,6 +1398,28 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
         }
 
+        Ok(())
+    }
+
+    fn validate_item_children_attributes(
+        conn: &Connection,
+        children: &[ItemChildWriteModel],
+    ) -> Result<(), String> {
+        for child in children {
+            Self::require_enabled_attribute_code(conn, "status", child.status.as_deref(), true)?;
+            Self::require_enabled_attribute_code(
+                conn,
+                "lifecycle",
+                child.lifecycle.as_deref(),
+                true,
+            )?;
+            Self::require_enabled_attribute_code(
+                conn,
+                "depreciation",
+                child.depreciation.as_deref(),
+                false,
+            )?;
+        }
         Ok(())
     }
 

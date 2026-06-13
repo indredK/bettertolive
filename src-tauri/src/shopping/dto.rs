@@ -40,6 +40,28 @@ pub struct ShoppingSpaceDefinitionDto {
     pub note: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingAttributeDefinitionDto {
+    pub id: String,
+    pub kind: String,
+    pub code: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic_key: Option<String>,
+    pub label: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label_en: Option<String>,
+    #[serde(default)]
+    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub style_token: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rank: Option<i32>,
+    pub sort_order: i32,
+    pub is_enabled: bool,
+    pub is_system: bool,
+}
+
 // ---- 物品(统一,跨 Tab 共享) ----
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
@@ -176,6 +198,7 @@ pub struct ShoppingModuleDto {
     pub overview: ShoppingOverviewDto,
     pub system_definitions: Vec<ShoppingSystemDefinitionDto>,
     pub space_definitions: Vec<ShoppingSpaceDefinitionDto>,
+    pub attribute_definitions: Vec<ShoppingAttributeDefinitionDto>,
     pub spotlights: Vec<ShoppingSpotlightDto>,
     pub items: Vec<ShoppingItemDto>,
     pub stage_templates: Vec<ShoppingStageTemplateDto>,

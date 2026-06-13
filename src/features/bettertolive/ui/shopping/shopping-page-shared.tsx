@@ -3,15 +3,16 @@ import { useTranslation } from "react-i18next"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type {
+  ShoppingAttributeDefinition,
   ShoppingItem,
   ShoppingSpaceDefinition,
   ShoppingSystemDefinition,
 } from "@/features/bettertolive/types"
 import {
   SPACE_CHIP_STYLE,
-  STATUS_STYLES,
   SYSTEM_CHIP_STYLE,
-  itemPrimaryStatus,
+  itemPrimaryStatusCode,
+  statusStyle,
   statusDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { cn } from "@/lib/utils"
@@ -54,15 +55,17 @@ export function ItemCard({
   item,
   systemDefinitions,
   spaceDefinitions,
+  attributeDefinitions,
   onEdit,
 }: {
   item: ShoppingItem
   systemDefinitions: ShoppingSystemDefinition[]
   spaceDefinitions: ShoppingSpaceDefinition[]
+  attributeDefinitions?: ShoppingAttributeDefinition[]
   onEdit?: () => void
 }) {
   const { t } = useTranslation()
-  const status = itemPrimaryStatus(item)
+  const status = itemPrimaryStatusCode(item, attributeDefinitions)
 
   const systemNames = item.systemTags
     .map((id) => systemDefinitions.find((s) => s.id === id)?.name ?? id)
@@ -79,8 +82,8 @@ export function ItemCard({
     >
       <div className="flex items-center justify-between gap-2">
         <div className="font-medium">{item.name}</div>
-        <Badge variant="outline" className={STATUS_STYLES[status]}>
-          {statusDisplayName(status, t)}
+        <Badge variant="outline" className={statusStyle(status, attributeDefinitions)}>
+          {statusDisplayName(status, t, attributeDefinitions)}
         </Badge>
       </div>
 

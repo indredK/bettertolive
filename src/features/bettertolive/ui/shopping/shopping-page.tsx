@@ -15,6 +15,7 @@ import type {
 } from "@/features/bettertolive/types"
 import { ShoppingOverviewTab } from "@/features/bettertolive/ui/shopping/shopping-overview-tab"
 import { ShoppingPlanningTab } from "@/features/bettertolive/ui/shopping/shopping-planning-tab"
+import { ShoppingAttributesTab } from "@/features/bettertolive/ui/shopping/shopping-attributes-tab"
 import { ShoppingSpacesTab } from "@/features/bettertolive/ui/shopping/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/ui/shopping/shopping-stages-tab"
 import { ShoppingSystemsTab } from "@/features/bettertolive/ui/shopping/shopping-systems-tab"
@@ -89,6 +90,9 @@ export function ShoppingPage({
               <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
               <TabsTrigger value="spaces">{t("shopping.tabs.spaces", "空间场景")}</TabsTrigger>
               <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
+              <TabsTrigger value="attributes">
+                {t("shopping.tabs.attributes", "属性字典")}
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -176,6 +180,14 @@ export function ShoppingPage({
               setEditingStage({ isNew: stage === null, stage })
             }
             onDeleted={refresh}
+          />
+        </TabsContent>
+
+        <TabsContent value="attributes" className="h-full min-h-0 overflow-hidden">
+          <ShoppingAttributesTab
+            shopping={shopping}
+            isControlMode={isControlMode}
+            onRefresh={refresh}
           />
         </TabsContent>
       </Tabs>

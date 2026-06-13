@@ -29,6 +29,24 @@ pub struct SpaceDefinitionRow {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct AttributeDefinitionRow {
+    pub id: String,
+    pub kind: String,
+    pub code: String,
+    pub semantic_key: Option<String>,
+    pub label: String,
+    pub label_en: Option<String>,
+    pub description: String,
+    pub style_token: Option<String>,
+    pub rank: Option<i32>,
+    pub sort_order: i32,
+    pub is_enabled: bool,
+    pub is_system: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
 pub struct ItemRow {
     pub id: String,
     pub name: String,

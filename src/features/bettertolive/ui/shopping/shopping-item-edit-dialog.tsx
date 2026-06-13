@@ -34,11 +34,11 @@ import type { ShoppingItemForm } from "@/features/bettertolive/api/bettertolive-
 import { createItem, deleteItem, updateItem } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
-  SHOPPING_DEPRECIATION_OPTIONS,
-  SHOPPING_LIFECYCLE_OPTIONS,
-  SHOPPING_STATUS_OPTIONS,
   depreciationDisplayName,
   lifecycleDisplayName,
+  shoppingDepreciationOptions,
+  shoppingLifecycleOptions,
+  shoppingStatusOptions,
   statusDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
@@ -93,6 +93,7 @@ export function ShoppingItemEditDialog({
   const [systemTags, setSystemTags] = useState<string[]>(seed?.systemTags ?? [])
   const [spaceTags, setSpaceTags] = useState<string[]>(seed?.spaceTags ?? [])
   const [note, setNote] = useState(seed?.note ?? "")
+  const attributeDefinitions = shopping.attributeDefinitions
 
   const toggleTag = (list: string[], setter: (value: string[]) => void, id: string) => {
     if (list.includes(id)) {
@@ -307,6 +308,7 @@ export function ShoppingItemEditDialog({
                     key={child.id}
                     child={child}
                     childIndex={index}
+                    attributeDefinitions={attributeDefinitions}
                     onRemove={() => removeChild(index)}
                     onChange={(updater) => updateChild(index, updater)}
                     onAddChannel={() => addChannelToChild(index)}
@@ -368,6 +370,7 @@ function TagSelectorPanel({
 function ChildEditorCard({
   child,
   childIndex,
+  attributeDefinitions,
   onRemove,
   onChange,
   onAddChannel,
@@ -375,6 +378,7 @@ function ChildEditorCard({
 }: {
   child: ShoppingItemChild
   childIndex: number
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
   onRemove: () => void
   onChange: (updater: (child: ShoppingItemChild) => ShoppingItemChild) => void
   onAddChannel: () => void
@@ -422,9 +426,9 @@ function ChildEditorCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SHOPPING_STATUS_OPTIONS.map((option) => (
+              {shoppingStatusOptions(attributeDefinitions).map((option) => (
                 <SelectItem key={option} value={option}>
-                  {statusDisplayName(option, t)}
+                  {statusDisplayName(option, t, attributeDefinitions)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -443,9 +447,9 @@ function ChildEditorCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {SHOPPING_LIFECYCLE_OPTIONS.map((option) => (
+              {shoppingLifecycleOptions(attributeDefinitions).map((option) => (
                 <SelectItem key={option} value={option}>
-                  {lifecycleDisplayName(option, t)}
+                  {lifecycleDisplayName(option, t, attributeDefinitions)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -471,9 +475,9 @@ function ChildEditorCard({
               <SelectItem value={NONE_SELECT_VALUE}>
                 {t("shopping.item.depPlaceholder", "可选")}
               </SelectItem>
-              {SHOPPING_DEPRECIATION_OPTIONS.map((option) => (
+              {shoppingDepreciationOptions(attributeDefinitions).map((option) => (
                 <SelectItem key={option} value={option}>
-                  {depreciationDisplayName(option, t)}
+                  {depreciationDisplayName(option, t, attributeDefinitions)}
                 </SelectItem>
               ))}
             </SelectContent>

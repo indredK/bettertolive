@@ -173,6 +173,7 @@ export function ShoppingSpaceEditDialog({
             <div className="mt-2 min-h-0 flex-1 overflow-hidden">
               <ShoppingItemShuttle
                 items={shopping.items}
+                attributeDefinitions={shopping.attributeDefinitions}
                 selectedIds={validSelectedItemIds}
                 onChange={setSelectedItemIds}
                 scope="space"

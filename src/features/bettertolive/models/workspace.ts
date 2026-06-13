@@ -120,6 +120,31 @@ export type ShoppingSpaceDefinition = {
   note?: string
 }
 
+export type ShoppingAttributeKind =
+  | "status"
+  | "lane"
+  | "lifecycle"
+  | "depreciation"
+  | "health_status"
+  | "channel"
+
+export type ShoppingAttributeStyleToken = "accent" | "secondary" | "muted" | "card"
+
+export type ShoppingAttributeDefinition = {
+  id: string
+  kind: ShoppingAttributeKind
+  code: string
+  semanticKey?: string | null
+  label: string
+  labelEn?: string | null
+  description?: string
+  styleToken?: ShoppingAttributeStyleToken | null
+  rank?: number | null
+  sortOrder: number
+  isEnabled: boolean
+  isSystem: boolean
+}
+
 // ===== 物品属性枚举 =====
 
 // 物品状态:已有 / 待购
@@ -173,9 +198,9 @@ export type ShoppingItemChildChannelPrice = {
 export type ShoppingItemChild = {
   id: string
   name: string
-  status?: ShoppingStatus
-  lifecycle?: ShoppingLifecycle
-  depreciation?: ShoppingDepreciation
+  status?: ShoppingStatus | string
+  lifecycle?: ShoppingLifecycle | string
+  depreciation?: ShoppingDepreciation | string
   channelPrices?: ShoppingItemChildChannelPrice[]
 }
 
@@ -855,6 +880,7 @@ export type ShoppingModuleData = {
   overview: ShoppingOverview
   systemDefinitions: ShoppingSystemDefinition[]
   spaceDefinitions: ShoppingSpaceDefinition[]
+  attributeDefinitions: ShoppingAttributeDefinition[]
   spotlights: ShoppingSpotlight[]
   items: ShoppingItem[]
   stageTemplates: ShoppingStageTemplate[]

@@ -2,8 +2,8 @@
 
 use crate::shopping::db::{chrono_now, write_tx};
 use crate::shopping::dto::{
-    ShoppingItemDto, ShoppingModuleDto, ShoppingSpaceDefinitionDto, ShoppingStageTemplateDto,
-    WorkspaceSnapshotDto,
+    ShoppingAttributeDefinitionDto, ShoppingItemDto, ShoppingModuleDto, ShoppingSpaceDefinitionDto,
+    ShoppingStageTemplateDto, WorkspaceSnapshotDto,
 };
 use crate::shopping::models::{ItemChildChannelWriteModel, ItemChildWriteModel, PageContentRow};
 use crate::shopping::repository::ShoppingRepository;
@@ -194,6 +194,34 @@ pub struct SpaceDefinitionFormDto {
     pub note: String,
 }
 
+#[derive(Debug, serde::Deserialize, specta::Type)]
+#[serde(rename_all = "camelCase")]
+pub struct AttributeDefinitionFormDto {
+    #[serde(default)]
+    pub id: Option<String>,
+    pub kind: String,
+    pub code: String,
+    #[serde(default)]
+    pub semantic_key: Option<String>,
+    pub label: String,
+    #[serde(default)]
+    pub label_en: Option<String>,
+    #[serde(default)]
+    pub description: String,
+    #[serde(default)]
+    pub style_token: Option<String>,
+    #[serde(default)]
+    pub rank: Option<i32>,
+    #[serde(default = "default_true")]
+    pub is_enabled: bool,
+    #[serde(default = "default_true")]
+    pub is_system: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn list_shopping_space_definitions(
@@ -201,6 +229,107 @@ pub fn list_shopping_space_definitions(
 ) -> Result<Vec<ShoppingSpaceDefinitionDto>, String> {
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     ShoppingRepository::list_space_definitions_dto(&conn)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn list_shopping_attribute_definitions(
+    state: State<AppState>,
+) -> Result<Vec<ShoppingAttributeDefinitionDto>, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::list_attribute_definitions_dto(&conn)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn list_shopping_attribute_definitions_for_management(
+    state: State<AppState>,
+) -> Result<Vec<ShoppingAttributeDefinitionDto>, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::list_all_attribute_definitions_dto(&conn)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn create_shopping_attribute_definition(
+    state: State<AppState>,
+    form: AttributeDefinitionFormDto,
+) -> Result<ShoppingAttributeDefinitionDto, String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let id = form.id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::create_attribute_definition(
+            tx,
+            &id,
+            &form.kind,
+            &form.code,
+            form.semantic_key.as_deref(),
+            &form.label,
+            form.label_en.as_deref(),
+            &form.description,
+            form.style_token.as_deref(),
+            form.rank,
+            form.is_enabled,
+            form.is_system,
+            &now,
+        )
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn update_shopping_attribute_definition(
+    state: State<AppState>,
+    form: AttributeDefinitionFormDto,
+) -> Result<ShoppingAttributeDefinitionDto, String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let id = form.id.ok_or("id is required for update")?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::update_attribute_definition(
+            tx,
+            &id,
+            &form.kind,
+            &form.code,
+            form.semantic_key.as_deref(),
+            &form.label,
+            form.label_en.as_deref(),
+            &form.description,
+            form.style_token.as_deref(),
+            form.rank,
+            form.is_enabled,
+            form.is_system,
+            &now,
+        )
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn disable_shopping_attribute_definition(
+    state: State<AppState>,
+    id: String,
+) -> Result<(), String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::disable_attribute_definition(tx, &id, &now)
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn reorder_shopping_attribute_definitions(
+    state: State<AppState>,
+    kind: String,
+    ordered_ids: Vec<String>,
+) -> Result<(), String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::reorder_attribute_definitions(tx, &kind, &ordered_ids, &now)
+    })
 }
 
 #[tauri::command]

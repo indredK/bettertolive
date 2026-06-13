@@ -222,6 +222,7 @@ export function ShoppingSystemEditDialog({
             <div className="mt-3 min-h-0 flex-1 overflow-hidden">
               <ShoppingItemShuttle
                 items={shopping.items}
+                attributeDefinitions={shopping.attributeDefinitions}
                 selectedIds={validSelectedItemIds}
                 onChange={setSelectedItemIds}
                 scope="system"

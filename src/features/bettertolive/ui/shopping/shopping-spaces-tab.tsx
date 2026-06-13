@@ -13,13 +13,12 @@ import type {
   ShoppingModuleData,
   ShoppingSpaceDefinition,
 } from "@/features/bettertolive/types"
-import { ShoppingStatus } from "@/features/bettertolive/types"
 import {
   deleteSpaceDefinition,
   reorderSpaceDefinitions,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
-import { itemHasStatus } from "@/features/bettertolive/ui/shopping/shopping-page-data"
+import { itemHasStatusSemantic } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   ItemCard,
   SHOPPING_DETAIL_CARD_CLASS,
@@ -44,6 +43,7 @@ function SpaceMapCard({
   isControlMode,
   onSelect,
   onEditSpace,
+  attributeDefinitions,
 }: {
   space: ShoppingSpaceDefinition
   items: ShoppingItem[]
@@ -51,10 +51,11 @@ function SpaceMapCard({
   isControlMode: boolean
   onSelect: (id: string) => void
   onEditSpace: (space: ShoppingSpaceDefinition) => void
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
 }) {
   const { t } = useTranslation()
-  const owned = items.filter((i) => itemHasStatus(i, ShoppingStatus.Owned))
-  const wanted = items.filter((i) => itemHasStatus(i, ShoppingStatus.Wanted))
+  const owned = items.filter((i) => itemHasStatusSemantic(i, "owned", attributeDefinitions))
+  const wanted = items.filter((i) => itemHasStatusSemantic(i, "wanted", attributeDefinitions))
 
   return (
     <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, isSelected && SHOPPING_SELECTED_CARD_CLASS)}>
@@ -147,6 +148,7 @@ function SpaceDetailPanel({
                 item={item}
                 systemDefinitions={shopping.systemDefinitions}
                 spaceDefinitions={shopping.spaceDefinitions}
+                attributeDefinitions={shopping.attributeDefinitions}
               />
             ))}
           </div>
@@ -306,6 +308,7 @@ export function ShoppingSpacesTab({
                           isControlMode={isControlMode}
                           onSelect={setSelectedSpaceId}
                           onEditSpace={onEditSpace}
+                          attributeDefinitions={shopping.attributeDefinitions}
                         />
                       </SortableShoppingCard>
                     </div>

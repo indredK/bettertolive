@@ -14,13 +14,12 @@ import type {
   ShoppingModuleData,
   ShoppingSystemDefinition,
 } from "@/features/bettertolive/types"
-import { ShoppingStatus } from "@/features/bettertolive/types"
 import {
   deleteSystemDefinition,
   reorderSystemDefinitions,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
-import { itemHasStatus } from "@/features/bettertolive/ui/shopping/shopping-page-data"
+import { itemHasStatusSemantic } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
   ItemCard,
   SHOPPING_DETAIL_CARD_CLASS,
@@ -45,6 +44,7 @@ function SystemMapCard({
   isControlMode,
   onSelect,
   onEditSystem,
+  attributeDefinitions,
 }: {
   system: ShoppingSystemDefinition
   items: ShoppingItem[]
@@ -52,10 +52,11 @@ function SystemMapCard({
   isControlMode: boolean
   onSelect: (id: string) => void
   onEditSystem: (system: ShoppingSystemDefinition) => void
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
 }) {
   const { t } = useTranslation()
-  const owned = items.filter((i) => itemHasStatus(i, ShoppingStatus.Owned))
-  const wanted = items.filter((i) => itemHasStatus(i, ShoppingStatus.Wanted))
+  const owned = items.filter((i) => itemHasStatusSemantic(i, "owned", attributeDefinitions))
+  const wanted = items.filter((i) => itemHasStatusSemantic(i, "wanted", attributeDefinitions))
 
   return (
     <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, isSelected && SHOPPING_SELECTED_CARD_CLASS)}>
@@ -159,6 +160,7 @@ function SystemDetailPanel({
                 item={item}
                 systemDefinitions={shopping.systemDefinitions}
                 spaceDefinitions={shopping.spaceDefinitions}
+                attributeDefinitions={shopping.attributeDefinitions}
               />
             ))}
           </div>
@@ -320,6 +322,7 @@ export function ShoppingSystemsTab({
                           isControlMode={isControlMode}
                           onSelect={setSelectedSystemId}
                           onEditSystem={onEditSystem}
+                          attributeDefinitions={shopping.attributeDefinitions}
                         />
                       </SortableShoppingCard>
                     </div>

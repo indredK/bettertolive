@@ -11,7 +11,8 @@
       "spaces": "空间场景",
       "stages": "阶段适用",
       "planning": "物件库",
-      "admin": "管理"
+      "admin": "管理",
+      "attributes": "属性字典"
     },
     "cardGrid": {
       "addNew": "新增"
@@ -140,6 +141,71 @@
       "overpriced": "偏贵",
       "watchOnly": "观望",
       "title": "价格信号"
+    },
+    "attributes": {
+      "create": "新增属性",
+      "edit": "编辑属性",
+      "add": "新增",
+      "kind": "分类",
+      "code": "代码",
+      "label": "中文名",
+      "labelEn": "英文名",
+      "semanticKey": "语义键",
+      "styleToken": "样式",
+      "rank": "等级 / 排序权重",
+      "description": "说明",
+      "state": "状态",
+      "enabled": "已启用",
+      "disabled": "已停用",
+      "enable": "启用属性",
+      "disable": "停用属性",
+      "none": "未设置",
+      "noSemantic": "不设置",
+      "noStyle": "不设置",
+      "emptyHint": "当前分类下还没有属性定义",
+      "selectPrompt": "从左侧选择一个属性查看详情",
+      "reordered": "属性顺序已更新",
+      "kindOptions": {
+        "status": "状态",
+        "lane": "泳道",
+        "lifecycle": "生命周期",
+        "depreciation": "折旧",
+        "health_status": "健康状态",
+        "channel": "渠道"
+      },
+      "semanticOptions": {
+        "owned": "已有",
+        "wanted": "待购",
+        "now": "立即买",
+        "wait": "等好价",
+        "hold": "先不买",
+        "consumable": "消耗品",
+        "durable": "耐用品",
+        "tool": "工具型",
+        "emotional": "情感型",
+        "very_fast": "极快折旧",
+        "fast": "较快折旧",
+        "medium": "中等折旧",
+        "slow": "慢折旧",
+        "no_depreciation": "不折旧或升值",
+        "stable_use": "稳定使用",
+        "consider_upgrade": "考虑升级",
+        "need_restock": "需要补货",
+        "missing_parts": "缺补件",
+        "need_complete": "需要补齐"
+      },
+      "styleOptions": {
+        "accent": "强调",
+        "secondary": "次强调",
+        "muted": "弱化",
+        "card": "卡片"
+      }
+    },
+    "error": {
+      "idNameRequired": "缺少系统 ID",
+      "nameRequired": "请填写名称",
+      "semanticRequired": "该类型必须设置语义键",
+      "itemRequired": "请填写名称,并至少各选一个系统和空间"
     },
     "validation": {
       "required": "请填写{{field}}",

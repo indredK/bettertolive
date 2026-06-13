@@ -12,16 +12,17 @@ import { ShoppingStatus } from "@/features/bettertolive/types"
 import { deleteItem } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/shopping-delete"
 import {
-  DEPRECIATION_STYLES,
-  LIFECYCLE_STYLES,
-  STATUS_STYLES,
+  depreciationStyle,
   SYSTEM_CHIP_STYLE,
   SPACE_CHIP_STYLE,
   depreciationDisplayName,
   formatPrice,
-  itemHasStatus,
-  itemPrimaryStatus,
+  itemHasStatusSemantic,
+  itemPrimaryStatusCode,
+  lifecycleStyle,
   lifecycleDisplayName,
+  semanticStatusCode,
+  statusStyle,
   statusDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import {
@@ -52,15 +53,17 @@ function PlanItemCard({
   onSelect,
   onEdit,
   isControlMode,
+  attributeDefinitions,
 }: {
   item: ShoppingItem
   isSelected: boolean
   onSelect: (id: string) => void
   onEdit: () => void
   isControlMode: boolean
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
 }) {
   const { t } = useTranslation()
-  const status = itemPrimaryStatus(item)
+  const status = itemPrimaryStatusCode(item, attributeDefinitions)
 
   return (
     <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, isSelected && SHOPPING_SELECTED_CARD_CLASS)}>
@@ -74,9 +77,9 @@ function PlanItemCard({
           <div className="flex flex-wrap gap-1">
             <Badge
               variant="outline"
-              className={cn("px-1.5 py-0 text-[10px]", STATUS_STYLES[status])}
+              className={cn("px-1.5 py-0 text-[10px]", statusStyle(status, attributeDefinitions))}
             >
-              {statusDisplayName(status, t)}
+              {statusDisplayName(status, t, attributeDefinitions)}
             </Badge>
             <Badge variant="outline" className="text-muted-foreground px-1.5 py-0 text-[10px]">
               {t("shopping.item.childCount", {
@@ -149,11 +152,13 @@ function PlanItemDetail({
   shopping,
   isControlMode,
   onDelete,
+  attributeDefinitions,
 }: {
   item: ShoppingItem
   shopping: ShoppingModuleData
   isControlMode: boolean
   onDelete?: () => void
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
 }) {
   const { t } = useTranslation()
 
@@ -216,7 +221,11 @@ function PlanItemDetail({
           <DetailPanelSection title={t("shopping.item.children", "子级")}>
             <div className="space-y-2.5">
               {item.children.map((child) => (
-                <ItemChildDetailCard key={child.id} child={child} />
+                <ItemChildDetailCard
+                  key={child.id}
+                  child={child}
+                  attributeDefinitions={attributeDefinitions}
+                />
               ))}
             </div>
           </DetailPanelSection>
@@ -258,6 +267,7 @@ export function ShoppingPlanningTab({
   const [statusFilter, setStatusFilter] = useState<ShoppingStatusFilter>("all")
   const [systemFilter, setSystemFilter] = useState("all")
   const [spaceFilter, setSpaceFilter] = useState("all")
+  const attributeDefinitions = shopping.attributeDefinitions
   const filterDimensions = useMemo<FilterPopoverDimension[]>(
     () => [
       {
@@ -266,8 +276,22 @@ export function ShoppingPlanningTab({
         allLabel: t("shopping.filter.all", "全部"),
         value: statusFilter,
         options: [
-          { value: ShoppingStatus.Owned, label: statusDisplayName(ShoppingStatus.Owned, t) },
-          { value: ShoppingStatus.Wanted, label: statusDisplayName(ShoppingStatus.Wanted, t) },
+          {
+            value: ShoppingStatus.Owned,
+            label: statusDisplayName(
+              semanticStatusCode("owned", attributeDefinitions),
+              t,
+              attributeDefinitions,
+            ),
+          },
+          {
+            value: ShoppingStatus.Wanted,
+            label: statusDisplayName(
+              semanticStatusCode("wanted", attributeDefinitions),
+              t,
+              attributeDefinitions,
+            ),
+          },
         ],
       },
       {
@@ -300,6 +324,7 @@ export function ShoppingPlanningTab({
     [
       shopping.systemDefinitions,
       shopping.spaceDefinitions,
+      attributeDefinitions,
       statusFilter,
       systemFilter,
       spaceFilter,
@@ -338,11 +363,17 @@ export function ShoppingPlanningTab({
         if (!text.includes(query)) return false
       }
 
-      if (statusFilter === ShoppingStatus.Owned && !itemHasStatus(item, ShoppingStatus.Owned)) {
+      if (
+        statusFilter === ShoppingStatus.Owned &&
+        !itemHasStatusSemantic(item, "owned", attributeDefinitions)
+      ) {
         return false
       }
 
-      if (statusFilter === ShoppingStatus.Wanted && !itemHasStatus(item, ShoppingStatus.Wanted)) {
+      if (
+        statusFilter === ShoppingStatus.Wanted &&
+        !itemHasStatusSemantic(item, "wanted", attributeDefinitions)
+      ) {
         return false
       }
 
@@ -366,7 +397,7 @@ export function ShoppingPlanningTab({
 
       return true
     })
-  }, [items, localQuery, spaceFilter, statusFilter, systemFilter])
+  }, [attributeDefinitions, items, localQuery, spaceFilter, statusFilter, systemFilter])
 
   const selectedItem = useMemo(
     () => filteredItems.find((i) => i.id === selectedId) ?? filteredItems[0] ?? null,
@@ -445,6 +476,7 @@ export function ShoppingPlanningTab({
                   onSelect={setSelectedId}
                   onEdit={() => onEditItem(item)}
                   isControlMode={isControlMode}
+                  attributeDefinitions={attributeDefinitions}
                 />
               ))}
               {filteredItems.length === 0 && (
@@ -463,6 +495,7 @@ export function ShoppingPlanningTab({
               item={selectedItem}
               shopping={shopping}
               isControlMode={isControlMode}
+              attributeDefinitions={attributeDefinitions}
               onDelete={
                 isControlMode ? () => handleDelete(selectedItem.id, selectedItem.name) : undefined
               }
@@ -478,7 +511,13 @@ export function ShoppingPlanningTab({
   )
 }
 
-function ItemChildDetailCard({ child }: { child: ShoppingItem["children"][number] }) {
+function ItemChildDetailCard({
+  child,
+  attributeDefinitions,
+}: {
+  child: ShoppingItem["children"][number]
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
+}) {
   const { t } = useTranslation()
   const channelPrices = child.channelPrices ?? []
   const hasChannelPrices = channelPrices.length > 0
@@ -491,25 +530,34 @@ function ItemChildDetailCard({ child }: { child: ShoppingItem["children"][number
           {child.status ? (
             <Badge
               variant="outline"
-              className={cn("px-1.5 py-0 text-[10px]", STATUS_STYLES[child.status])}
+              className={cn(
+                "px-1.5 py-0 text-[10px]",
+                statusStyle(child.status, attributeDefinitions),
+              )}
             >
-              {statusDisplayName(child.status, t)}
+              {statusDisplayName(child.status, t, attributeDefinitions)}
             </Badge>
           ) : null}
           {child.lifecycle ? (
             <Badge
               variant="outline"
-              className={cn("px-1.5 py-0 text-[10px]", LIFECYCLE_STYLES[child.lifecycle])}
+              className={cn(
+                "px-1.5 py-0 text-[10px]",
+                lifecycleStyle(child.lifecycle, attributeDefinitions),
+              )}
             >
-              {lifecycleDisplayName(child.lifecycle, t)}
+              {lifecycleDisplayName(child.lifecycle, t, attributeDefinitions)}
             </Badge>
           ) : null}
           {child.depreciation ? (
             <Badge
               variant="outline"
-              className={cn("px-1.5 py-0 text-[10px]", DEPRECIATION_STYLES[child.depreciation])}
+              className={cn(
+                "px-1.5 py-0 text-[10px]",
+                depreciationStyle(child.depreciation, attributeDefinitions),
+              )}
             >
-              {depreciationDisplayName(child.depreciation, t)}
+              {depreciationDisplayName(child.depreciation, t, attributeDefinitions)}
             </Badge>
           ) : null}
         </div>

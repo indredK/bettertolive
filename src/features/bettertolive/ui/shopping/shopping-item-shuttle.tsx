@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { TransferList, type TransferListItem } from "@/components/ui/transfer-list"
-import type { ShoppingItem } from "@/features/bettertolive/types"
+import type { ShoppingAttributeDefinition, ShoppingItem } from "@/features/bettertolive/types"
 import {
-  STATUS_STYLES,
-  itemPrimaryStatus,
+  itemPrimaryStatusCode,
+  statusStyle,
   statusDisplayName,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 
@@ -14,12 +14,14 @@ type ShuttleScope = "system" | "space" | "stage"
 
 export function ShoppingItemShuttle({
   items,
+  attributeDefinitions,
   selectedIds,
   onChange,
   scope,
   className,
 }: {
   items: ShoppingItem[]
+  attributeDefinitions?: ShoppingAttributeDefinition[]
   selectedIds: string[]
   onChange: (ids: string[]) => void
   scope: ShuttleScope
@@ -30,7 +32,7 @@ export function ShoppingItemShuttle({
   const transferItems = useMemo<TransferListItem[]>(
     () =>
       items.map((item) => {
-        const status = itemPrimaryStatus(item)
+        const status = itemPrimaryStatusCode(item, attributeDefinitions)
         return {
           id: item.id,
           title: item.name,
@@ -51,14 +53,14 @@ export function ShoppingItemShuttle({
           meta: (
             <Badge
               variant="outline"
-              className={`h-4.5 px-1.5 text-[10px] leading-none ${STATUS_STYLES[status]}`}
+              className={`h-4.5 px-1.5 text-[10px] leading-none ${statusStyle(status, attributeDefinitions)}`}
             >
-              {statusDisplayName(status, t)}
+              {statusDisplayName(status, t, attributeDefinitions)}
             </Badge>
           ),
         }
       }),
-    [items, t],
+    [attributeDefinitions, items, t],
   )
 
   return (

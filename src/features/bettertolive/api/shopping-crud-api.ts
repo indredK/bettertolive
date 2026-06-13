@@ -2,6 +2,7 @@ import { invoke } from "@tauri-apps/api/core"
 
 import { resolveBetterToLiveApiMode } from "@/features/bettertolive/api/config"
 import type {
+  ShoppingAttributeDefinitionForm,
   ShoppingItemForm,
   ShoppingPageContentForm,
   ShoppingPageContentRow,
@@ -10,6 +11,7 @@ import type {
   ShoppingSystemDefinitionForm,
 } from "@/features/bettertolive/api/bettertolive-api"
 import type {
+  ShoppingAttributeDefinition,
   ShoppingItem,
   ShoppingSpaceDefinition,
   ShoppingStageTemplate,
@@ -117,6 +119,47 @@ export async function reorderStageTemplates(orderedIds: string[]): Promise<void>
 export async function reorderShoppingPageContents(orderedIds: string[]): Promise<void> {
   if (isMock()) return
   return invoke("reorder_shopping_page_contents", { orderedIds })
+}
+
+// ---- Attribute Definitions ----
+
+export async function listAttributeDefinitions(): Promise<ShoppingAttributeDefinition[]> {
+  if (isMock()) return []
+  return invoke<ShoppingAttributeDefinition[]>("list_shopping_attribute_definitions")
+}
+
+export async function listAttributeDefinitionsForManagement(): Promise<
+  ShoppingAttributeDefinition[]
+> {
+  if (isMock()) return []
+  return invoke<ShoppingAttributeDefinition[]>("list_shopping_attribute_definitions_for_management")
+}
+
+export async function createAttributeDefinition(
+  form: ShoppingAttributeDefinitionForm,
+): Promise<ShoppingAttributeDefinition> {
+  if (isMock()) throw new Error("Shopping CRUD is not available in mock mode")
+  return invoke("create_shopping_attribute_definition", { form })
+}
+
+export async function updateAttributeDefinition(
+  form: ShoppingAttributeDefinitionForm & { id: string },
+): Promise<ShoppingAttributeDefinition> {
+  if (isMock()) throw new Error("Shopping CRUD is not available in mock mode")
+  return invoke("update_shopping_attribute_definition", { form })
+}
+
+export async function disableAttributeDefinition(id: string): Promise<void> {
+  if (isMock()) throw new Error("Shopping CRUD is not available in mock mode")
+  return invoke("disable_shopping_attribute_definition", { id })
+}
+
+export async function reorderAttributeDefinitions(
+  kind: string,
+  orderedIds: string[],
+): Promise<void> {
+  if (isMock()) return
+  return invoke("reorder_shopping_attribute_definitions", { kind, orderedIds })
 }
 
 // ---- System Definitions ----

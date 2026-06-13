@@ -18,6 +18,7 @@ export const emptyShoppingModuleData = {
   },
   systemDefinitions: [],
   spaceDefinitions: [],
+  attributeDefinitions: [],
   spotlights: [],
   items: [],
   stageTemplates: [],

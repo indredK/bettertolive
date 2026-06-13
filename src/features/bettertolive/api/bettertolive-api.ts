@@ -111,6 +111,20 @@ export type ShoppingSpaceDefinitionForm = {
   note?: string
 }
 
+export type ShoppingAttributeDefinitionForm = {
+  id?: string | null
+  kind: string
+  code: string
+  semanticKey?: string | null
+  label: string
+  labelEn?: string | null
+  description?: string
+  styleToken?: string | null
+  rank?: number | null
+  isEnabled?: boolean
+  isSystem?: boolean
+}
+
 export type ShoppingPageContentRow = {
   id: string
   content_type: string
