@@ -40,6 +40,10 @@ import {
   NUTRITION_DIALOG_HEADER_CLASS,
   NUTRITION_DIALOG_SECTION_CLASS,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
+import {
+  NUTRITION_BODY_FEEDBACK_OPTIONS,
+  NUTRITION_VALUE_DENSITY_OPTIONS,
+} from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
 import { cn } from "@/lib/utils"
 
@@ -93,8 +97,8 @@ const TRIGGER_OPTIONS: MealTrigger[] = [
   "不想浪费",
   "看到就想吃",
 ]
-const VALUE_DENSITY_OPTIONS: ValueDensity[] = ["高", "中", "低", "不划算"]
-const BODY_FEEDBACK_OPTIONS: BodyFeedback[] = ["满足舒服", "普通", "偏重偏胀", "不适", "想再吃"]
+const VALUE_DENSITY_OPTIONS = NUTRITION_VALUE_DENSITY_OPTIONS
+const BODY_FEEDBACK_OPTIONS = NUTRITION_BODY_FEEDBACK_OPTIONS
 const NONE_VALUE = "__none__"
 
 function normalizeSelectValue(value: string | null) {

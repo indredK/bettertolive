@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next"
 import type { LegacyItem, LegacyModuleData } from "@/features/bettertolive/types"
 import {
   buildLegacyStats,
+  LEGACY_STATUS_FINAL,
   requiresDeliveryCondition,
 } from "@/features/bettertolive/ui/legacy/legacy-page-data"
 import {
@@ -28,7 +29,7 @@ export function LegacyTrustBoundariesTab({
   const stats = buildLegacyStats(items)
   const aiExcluded = items.filter((item) => item.excludeFromAi)
   const secondConfirm = items.filter((item) => item.requiresSecondConfirm)
-  const locked = items.filter((item) => item.isLocked || item.status === "最终版")
+  const locked = items.filter((item) => item.isLocked || item.status === LEGACY_STATUS_FINAL)
   const missingDelivery = items.filter(
     (item) => requiresDeliveryCondition(item.visibility) && !item.deliveryCondition?.trim(),
   )

@@ -1,6 +1,12 @@
 import type { BeliefEntryForm, BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
 import { WORLD_HISTORY_SEED } from "@/features/bettertolive/ui/worldhistory/world-history-data"
+import {
+  LEGACY_EMOTIONAL_LOAD_HEAVY,
+  LEGACY_RECIPIENT_SELF,
+  LEGACY_STATUS_FINAL,
+  LEGACY_VISIBILITY_AFTER_DEATH,
+} from "@/features/bettertolive/ui/legacy/legacy-page-data"
 import type {
   BeliefEntry,
   BeliefsModuleData,
@@ -108,7 +114,7 @@ function formToBeliefEntry(form: BeliefEntryForm, existing?: BeliefEntry): Belie
 function formToLegacyItem(form: LegacyItemForm, existing?: LegacyItem): LegacyItem {
   const now = todayIsoDate()
   const emotionalLoad = form.emotionalLoad
-  const isFinal = form.status === "最终版"
+  const isFinal = form.status === LEGACY_STATUS_FINAL
 
   return {
     id: existing?.id ?? form.id ?? `legacy-item-${Date.now()}`,
@@ -126,12 +132,13 @@ function formToLegacyItem(form: LegacyItemForm, existing?: LegacyItem): LegacyIt
     content: form.content.trim(),
     contentPreview: makeLegacyPreview(form.content),
     isLocked: form.isLocked || isFinal,
-    requiresSecondConfirm: form.requiresSecondConfirm || emotionalLoad === "很重",
+    requiresSecondConfirm:
+      form.requiresSecondConfirm || emotionalLoad === LEGACY_EMOTIONAL_LOAD_HEAVY,
     excludeFromAi:
       form.excludeFromAi ||
-      form.recipient === "仅自己" ||
-      emotionalLoad === "很重" ||
-      form.visibility === "我离世后",
+      form.recipient === LEGACY_RECIPIENT_SELF ||
+      emotionalLoad === LEGACY_EMOTIONAL_LOAD_HEAVY ||
+      form.visibility === LEGACY_VISIBILITY_AFTER_DEATH,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
     finalizedAt: isFinal ? (existing?.finalizedAt ?? now) : undefined,

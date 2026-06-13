@@ -5,11 +5,14 @@
   "windows": ["main"],
   "permissions": [
     "core:default",
-    "opener:default",
-    "sql:default",
-    "store:default",
     "notification:default",
-    "fs:default",
-    "dialog:default"
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "https://github.com/**" }]
+    },
+    {
+      "identifier": "fs:scope",
+      "allow": ["$APPDATA/**"]
+    }
   ]
 }

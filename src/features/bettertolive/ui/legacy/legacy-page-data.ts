@@ -47,6 +47,15 @@ export const LEGACY_STATUSES = [
 
 export const EMOTIONAL_LOADS = ["很重", "中等", "轻微", "平静"] satisfies EmotionalLoad[]
 
+export const LEGACY_STATUS_FINAL = "最终版" satisfies LegacyStatus
+export const LEGACY_STATUS_BASIC_COMPLETE = "基本完成" satisfies LegacyStatus
+export const LEGACY_RECIPIENT_SELF = "仅自己" satisfies LegacyRecipient
+export const LEGACY_EMOTIONAL_LOAD_HEAVY = "很重" satisfies EmotionalLoad
+export const LEGACY_VISIBILITY_AFTER_DEATH = "我离世后" satisfies LegacyVisibility
+export const LEGACY_URGENCY_CRITICAL = "关键信息" satisfies LegacyUrgency
+export const LEGACY_CATEGORY_DIRECTIVE = "重要交代" satisfies LegacyCategory
+export const LEGACY_CATEGORY_LETTER = "留给某人的话" satisfies LegacyCategory
+
 export type LegacyDistributionRow<T extends string = string> = {
   label: T
   count: number
@@ -101,10 +110,10 @@ export type LegacyRelationshipBuckets = {
   unlinked: LegacyItem[]
 }
 
-const COMPLETE_STATUSES = new Set<LegacyStatus>(["已完成", "最终版"])
+const COMPLETE_STATUSES = new Set<LegacyStatus>(["已完成", LEGACY_STATUS_FINAL])
 const DELIVERY_CONDITION_VISIBILITIES = new Set<LegacyVisibility>([
   "某个时间后",
-  "我离世后",
+  LEGACY_VISIBILITY_AFTER_DEATH,
   "条件触发",
 ])
 
@@ -125,7 +134,7 @@ export function legacyRecipientLabel(item: LegacyItem, t: TFunction) {
   if (item.recipient === "特定的人" && item.recipientName) {
     return `${recipient} · ${item.recipientName}`
   }
-  if (item.recipientName && item.recipient !== "仅自己") {
+  if (item.recipientName && item.recipient !== LEGACY_RECIPIENT_SELF) {
     return `${recipient} · ${item.recipientName}`
   }
   return recipient
@@ -154,13 +163,15 @@ export function buildLegacyStats(items: LegacyItem[]): LegacyStats {
   return {
     totalCount: items.length,
     criticalDraftCount: items.filter(
-      (item) => item.urgency === "关键信息" && !isLegacyComplete(item.status),
+      (item) => item.urgency === LEGACY_URGENCY_CRITICAL && !isLegacyComplete(item.status),
     ).length,
     missingDeliveryConditionCount: items.filter(
       (item) => requiresDeliveryCondition(item.visibility) && !item.deliveryCondition?.trim(),
     ).length,
-    finalLockedCount: items.filter((item) => item.status === "最终版" || item.isLocked).length,
-    heavyLoadCount: items.filter((item) => item.emotionalLoad === "很重").length,
+    finalLockedCount: items.filter((item) => item.status === LEGACY_STATUS_FINAL || item.isLocked)
+      .length,
+    heavyLoadCount: items.filter((item) => item.emotionalLoad === LEGACY_EMOTIONAL_LOAD_HEAVY)
+      .length,
     aiExcludedCount: items.filter((item) => item.excludeFromAi).length,
     secondConfirmCount: items.filter((item) => item.requiresSecondConfirm).length,
   }
@@ -175,10 +186,10 @@ export function getLegacyDeliveryWarnings(item: LegacyItem): LegacyDeliveryWarni
   if (item.recipient === "特定的人" && !item.recipientName?.trim() && !item.relatedRelationshipId) {
     warnings.push({ kind: "missingRecipient", itemId: item.id })
   }
-  if (item.urgency === "关键信息" && !isLegacyComplete(item.status)) {
+  if (item.urgency === LEGACY_URGENCY_CRITICAL && !isLegacyComplete(item.status)) {
     warnings.push({ kind: "criticalDraft", itemId: item.id })
   }
-  if (item.status === "最终版" && !item.isLocked) {
+  if (item.status === LEGACY_STATUS_FINAL && !item.isLocked) {
     warnings.push({ kind: "finalUnlocked", itemId: item.id })
   }
 
@@ -237,7 +248,7 @@ export function buildLegacyRelationshipBuckets(items: LegacyItem[]): LegacyRelat
   const expressionItems = sortLegacyItems(
     items.filter(
       (item) =>
-        item.category === "留给某人的话" ||
+        item.category === LEGACY_CATEGORY_LETTER ||
         (item.category === "未完成的事" &&
           Boolean(item.relatedRelationshipId || item.recipientName)),
     ),
@@ -246,12 +257,12 @@ export function buildLegacyRelationshipBuckets(items: LegacyItem[]): LegacyRelat
   return {
     now: expressionItems.filter((item) => item.visibility === "现在"),
     future: expressionItems.filter(
-      (item) => item.visibility !== "现在" && item.recipient !== "仅自己",
+      (item) => item.visibility !== "现在" && item.recipient !== LEGACY_RECIPIENT_SELF,
     ),
-    private: expressionItems.filter((item) => item.recipient === "仅自己"),
+    private: expressionItems.filter((item) => item.recipient === LEGACY_RECIPIENT_SELF),
     unlinked: expressionItems.filter(
       (item) =>
-        item.recipient !== "仅自己" &&
+        item.recipient !== LEGACY_RECIPIENT_SELF &&
         !item.relatedRelationshipId &&
         (!item.recipientName || item.recipient === "特定的人"),
     ),
@@ -262,8 +273,8 @@ export function createLegacyItemForm(item?: LegacyItem | null): LegacyItemForm {
   return {
     id: item?.id,
     title: item?.title ?? "",
-    category: item?.category ?? "重要交代",
-    recipient: item?.recipient ?? "仅自己",
+    category: item?.category ?? LEGACY_CATEGORY_DIRECTIVE,
+    recipient: item?.recipient ?? LEGACY_RECIPIENT_SELF,
     recipientName: item?.recipientName ?? "",
     relatedRelationshipId: item?.relatedRelationshipId ?? "",
     urgency: item?.urgency ?? "重要",
@@ -275,7 +286,7 @@ export function createLegacyItemForm(item?: LegacyItem | null): LegacyItemForm {
     content: item?.content ?? item?.contentPreview ?? "",
     isLocked: item?.isLocked ?? false,
     requiresSecondConfirm: item?.requiresSecondConfirm ?? false,
-    excludeFromAi: item?.excludeFromAi ?? item?.recipient === "仅自己",
+    excludeFromAi: item?.excludeFromAi ?? item?.recipient === LEGACY_RECIPIENT_SELF,
     reviewCue: item?.reviewCue ?? "",
     tags: item?.tags ?? [],
   }

@@ -7,6 +7,10 @@ import type {
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
 import { normalizeRelationshipsModuleData } from "@/features/bettertolive/models/relationship-connections"
+import {
+  LEGACY_CATEGORY_DIRECTIVE,
+  LEGACY_CATEGORY_LETTER,
+} from "@/features/bettertolive/ui/legacy/legacy-page-data"
 
 function filterStageTemplateByQuery(
   stage: ShoppingStageTemplate,
@@ -495,9 +499,7 @@ export function useWorkspaceViewModel({
           entry.summary,
           entry.content,
           entry.contentPreview,
-          entry.isLocked ? "锁定" : "可修改",
-          entry.requiresSecondConfirm ? "二次确认" : "",
-          entry.excludeFromAi ? "不参与AI" : "",
+          // 布尔标志不参与自由文本搜索；使用专用过滤器代替
           entry.createdAt,
           entry.updatedAt,
           entry.finalizedAt,
@@ -514,8 +516,10 @@ export function useWorkspaceViewModel({
   )
 
   const legacyItems = legacyModule.items
-  const legacyDirectives = legacyItems.filter((entry) => entry.category === "重要交代")
-  const legacyLetters = legacyItems.filter((entry) => entry.category === "留给某人的话")
+  const legacyDirectives = legacyItems.filter(
+    (entry) => entry.category === LEGACY_CATEGORY_DIRECTIVE,
+  )
+  const legacyLetters = legacyItems.filter((entry) => entry.category === LEGACY_CATEGORY_LETTER)
 
   const milestones = useMemo(
     () =>

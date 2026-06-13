@@ -20,6 +20,7 @@ import {
 import {
   buildNutritionLookups,
   formatEntryTitle,
+  logNeedsCare,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import {
   NUTRITION_DETAIL_CARD_CLASS,
@@ -337,17 +338,7 @@ function matchesLogFilter(log: MealLog, filter: LogFilter) {
     return Boolean(log.changeReason)
   }
 
-  return logNeedsCare(log)
-}
-
-function logNeedsCare(log: MealLog) {
-  return (
-    log.bodyFeedback === "偏重偏胀" ||
-    log.bodyFeedback === "不适" ||
-    log.bodyFeedback === "想再吃" ||
-    log.valueDensity === "低" ||
-    log.valueDensity === "不划算"
-  )
+  return logNeedsCare(log.bodyFeedback, log.valueDensity)
 }
 
 function buildLogSearchText(

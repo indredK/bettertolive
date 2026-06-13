@@ -1,6 +1,6 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
-use crate::shopping::db::chrono_now;
+use crate::shopping::db::{chrono_now, write_tx};
 use crate::shopping::dto::{
     ShoppingItemDto, ShoppingModuleDto, ShoppingSpaceDefinitionDto, ShoppingStageTemplateDto,
     WorkspaceSnapshotDto,
@@ -23,7 +23,6 @@ use crate::{
     socioeconomics::commands::{get_socioeconomics, SocioeconomicsState},
 };
 use crate::{legacy::dto::LegacyModuleDto, legacy::repository::LegacyRepository};
-use rusqlite::params;
 use std::sync::Mutex;
 use tauri::State;
 
@@ -153,21 +152,10 @@ pub fn update_system_definition(
 #[tauri::command]
 #[specta::specta]
 pub fn delete_system_definition(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::delete_system_definition(&conn, &id);
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::delete_system_definition(tx, &id)
+    })
 }
 
 #[tauri::command]
@@ -242,21 +230,10 @@ pub fn update_shopping_space_definition(
 #[tauri::command]
 #[specta::specta]
 pub fn delete_shopping_space_definition(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::delete_space_definition(&conn, &id);
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::delete_space_definition(tx, &id)
+    })
 }
 
 #[tauri::command]
@@ -378,7 +355,7 @@ pub fn create_shopping_item(
     state: State<AppState>,
     form: ItemFormDto,
 ) -> Result<ShoppingItemDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form
         .id
         .clone()
@@ -386,29 +363,19 @@ pub fn create_shopping_item(
     let now = chrono_now();
     let children = item_form_to_args(&form, &id);
 
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::upsert_item(
-        &conn,
-        &id,
-        &form.name,
-        &form.note,
-        &children,
-        &form.system_tags,
-        &form.space_tags,
-        false,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::upsert_item(
+            tx,
+            &id,
+            &form.name,
+            &form.note,
+            &children,
+            &form.system_tags,
+            &form.space_tags,
+            false,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_item_by_id(&conn, &id)?.ok_or("Failed to load created item".to_string())
 }
@@ -419,34 +386,24 @@ pub fn update_shopping_item(
     state: State<AppState>,
     form: ItemFormDto,
 ) -> Result<ShoppingItemDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.clone().ok_or("id is required for update")?;
     let now = chrono_now();
     let children = item_form_to_args(&form, &id);
 
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::upsert_item(
-        &conn,
-        &id,
-        &form.name,
-        &form.note,
-        &children,
-        &form.system_tags,
-        &form.space_tags,
-        true,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::upsert_item(
+            tx,
+            &id,
+            &form.name,
+            &form.note,
+            &children,
+            &form.system_tags,
+            &form.space_tags,
+            true,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_item_by_id(&conn, &id)?.ok_or("Failed to load updated item".to_string())
 }
@@ -454,21 +411,8 @@ pub fn update_shopping_item(
 #[tauri::command]
 #[specta::specta]
 pub fn delete_shopping_item(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::delete_item(&conn, &id);
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| ShoppingRepository::delete_item(tx, &id))
 }
 
 // =====================
@@ -538,7 +482,7 @@ pub fn create_shopping_stage_template(
     state: State<AppState>,
     form: StageTemplateFormDto,
 ) -> Result<ShoppingStageTemplateDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form
         .id
         .clone()
@@ -546,30 +490,20 @@ pub fn create_shopping_stage_template(
     let now = chrono_now();
     let items = stage_form_to_args(&form);
 
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::upsert_stage_template(
-        &conn,
-        &id,
-        &form.name,
-        &form.description,
-        &form.focus,
-        &form.system_dimension_ids,
-        &form.space_dimension_ids,
-        &items,
-        false,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::upsert_stage_template(
+            tx,
+            &id,
+            &form.name,
+            &form.description,
+            &form.focus,
+            &form.system_dimension_ids,
+            &form.space_dimension_ids,
+            &items,
+            false,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_stage_template_by_id(&conn, &id)?
         .ok_or("Failed to load created stage template".to_string())
@@ -581,35 +515,25 @@ pub fn update_shopping_stage_template(
     state: State<AppState>,
     form: StageTemplateFormDto,
 ) -> Result<ShoppingStageTemplateDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.clone().ok_or("id is required for update")?;
     let now = chrono_now();
     let items = stage_form_to_args(&form);
 
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::upsert_stage_template(
-        &conn,
-        &id,
-        &form.name,
-        &form.description,
-        &form.focus,
-        &form.system_dimension_ids,
-        &form.space_dimension_ids,
-        &items,
-        true,
-        &now,
-    );
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map_err(|e| e.to_string())?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::upsert_stage_template(
+            tx,
+            &id,
+            &form.name,
+            &form.description,
+            &form.focus,
+            &form.system_dimension_ids,
+            &form.space_dimension_ids,
+            &items,
+            true,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_stage_template_by_id(&conn, &id)?
         .ok_or("Failed to load updated stage template".to_string())
@@ -618,21 +542,10 @@ pub fn update_shopping_stage_template(
 #[tauri::command]
 #[specta::specta]
 pub fn delete_shopping_stage_template(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    conn.execute("BEGIN TRANSACTION", params![])
-        .map_err(|e| e.to_string())?;
-
-    let result = ShoppingRepository::delete_stage_template(&conn, &id);
-
-    if let Err(err) = result {
-        conn.execute("ROLLBACK", params![])
-            .map_err(|e| e.to_string())?;
-        return Err(err);
-    }
-
-    conn.execute("COMMIT", params![])
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::delete_stage_template(tx, &id)
+    })
 }
 
 #[tauri::command]

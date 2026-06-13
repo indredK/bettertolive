@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { subscribeWithSelector } from "zustand/middleware"
 
 import type { AppView } from "@/features/bettertolive/models/workspace"
 import { readWorkspaceViewFromLocation } from "@/features/bettertolive/config/workspace-view-route"
@@ -95,28 +96,31 @@ function createInitialWorkspaceUiState() {
   }
 }
 
-export const useWorkspaceUiStore = create<WorkspaceUiState>((set) => ({
-  ...createInitialWorkspaceUiState(),
-  setActiveView: (activeView) =>
-    set((state) => (state.activeView === activeView ? state : { activeView })),
-  toggleSidebarCollapsed: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
-  setSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }),
-  toggleCompactSidebarExpanded: () =>
-    set((state) => ({
-      isCompactSidebarExpanded: !state.isCompactSidebarExpanded,
-    })),
-  setCompactSidebarExpanded: (isCompactSidebarExpanded) => set({ isCompactSidebarExpanded }),
-  setSearchQuery: (searchQuery) => set({ searchQuery }),
-  toggleShoppingManagementMode: () =>
-    set((state) => ({ isShoppingManagementMode: !state.isShoppingManagementMode })),
-}))
+export const useWorkspaceUiStore = create<WorkspaceUiState>()(
+  subscribeWithSelector((set) => ({
+    ...createInitialWorkspaceUiState(),
+    setActiveView: (activeView) =>
+      set((state) => (state.activeView === activeView ? state : { activeView })),
+    toggleSidebarCollapsed: () =>
+      set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
+    setSidebarCollapsed: (isSidebarCollapsed) => set({ isSidebarCollapsed }),
+    toggleCompactSidebarExpanded: () =>
+      set((state) => ({
+        isCompactSidebarExpanded: !state.isCompactSidebarExpanded,
+      })),
+    setCompactSidebarExpanded: (isCompactSidebarExpanded) => set({ isCompactSidebarExpanded }),
+    setSearchQuery: (searchQuery) => set({ searchQuery }),
+    toggleShoppingManagementMode: () =>
+      set((state) => ({ isShoppingManagementMode: !state.isShoppingManagementMode })),
+  })),
+)
 
-useWorkspaceUiStore.subscribe((state) => {
-  persistWorkspaceUiState({
-    isSidebarCollapsed: state.isSidebarCollapsed,
-    isCompactSidebarExpanded: state.isCompactSidebarExpanded,
-  })
-})
+useWorkspaceUiStore.subscribe(
+  (s) => [s.isSidebarCollapsed, s.isCompactSidebarExpanded] as const,
+  ([isSidebarCollapsed, isCompactSidebarExpanded]) => {
+    persistWorkspaceUiState({ isSidebarCollapsed, isCompactSidebarExpanded })
+  },
+)
 
 export function resetWorkspaceUiStore(
   options: {

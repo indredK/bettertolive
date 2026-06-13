@@ -1,16 +1,35 @@
 use rusqlite::{Connection, Result as SqliteResult};
 use std::path::Path;
+use std::time::Duration;
+
+/// 在事务中执行写操作,自动 COMMIT / ROLLBACK。
+pub fn write_tx<T>(
+    conn: &mut Connection,
+    f: impl FnOnce(&rusqlite::Transaction<'_>) -> Result<T, String>,
+) -> Result<T, String> {
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    let value = f(&tx)?;
+    tx.commit().map_err(|e| e.to_string())?;
+    Ok(value)
+}
 
 /// 创建或打开 SQLite 数据库,确保 schema 就位。
-/// 注:本次重构采用激进策略 — 旧表全部 DROP,重建新表。开发期间数据丢失可接受。
 pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
-    let conn = Connection::open(db_path)?;
+    let mut conn = Connection::open(db_path)?;
 
     conn.execute_batch("PRAGMA journal_mode=WAL;")?;
     conn.execute_batch("PRAGMA foreign_keys=ON;")?;
+    conn.busy_timeout(Duration::from_secs(5))?;
 
-    // 删除旧 schema(owned/plan 分裂、purchase_lanes、price_references 都已不再使用)
-    drop_legacy_tables(&conn)?;
+    let tx = conn.transaction()?;
+    tx.execute_batch(
+        "CREATE TABLE IF NOT EXISTS schema_migrations(
+            version INTEGER PRIMARY KEY,
+            applied_at TEXT NOT NULL
+        );",
+    )?;
+    apply_migrations(&tx)?;
+    tx.commit()?;
 
     create_new_schema(&conn)?;
 
@@ -21,28 +40,55 @@ pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
     Ok(conn)
 }
 
+fn apply_migrations(tx: &rusqlite::Transaction<'_>) -> SqliteResult<()> {
+    let already_applied: i64 = tx
+        .query_row(
+            "SELECT COUNT(*) FROM schema_migrations WHERE version = 2",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+
+    if already_applied == 0 {
+        tx.execute_batch(
+            "CREATE TABLE IF NOT EXISTS shopping_items (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                status TEXT NOT NULL,
+                lane TEXT,
+                lifecycle TEXT NOT NULL,
+                depreciation TEXT,
+                entry_price REAL,
+                sweet_spot_price REAL,
+                overpay_price REAL,
+                note TEXT NOT NULL DEFAULT '',
+                quantity INTEGER,
+                health_status TEXT,
+                replacement_cue TEXT,
+                reason TEXT,
+                target_lifestyle TEXT,
+                current_price REAL,
+                buy_below_price REAL,
+                keywords_json TEXT,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                is_archived INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL
+            );",
+        )?;
+        tx.execute(
+            "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES(2, datetime('now'))",
+            [],
+        )?;
+    }
+    Ok(())
+}
+
 fn table_is_empty(conn: &Connection, table: &str) -> SqliteResult<bool> {
     let count: i64 = conn.query_row(&format!("SELECT COUNT(*) FROM {}", table), [], |row| {
         row.get(0)
     })?;
     Ok(count == 0)
-}
-
-fn drop_legacy_tables(conn: &Connection) -> SqliteResult<()> {
-    conn.execute_batch(
-        "PRAGMA foreign_keys=OFF;
-         DROP TABLE IF EXISTS shopping_owned_item_spaces;
-         DROP TABLE IF EXISTS shopping_owned_item_stages;
-         DROP TABLE IF EXISTS shopping_owned_items;
-         DROP TABLE IF EXISTS shopping_plan_item_spaces;
-         DROP TABLE IF EXISTS shopping_plan_item_stages;
-         DROP TABLE IF EXISTS shopping_plan_item_tags;
-         DROP TABLE IF EXISTS shopping_plan_items;
-         DROP TABLE IF EXISTS shopping_purchase_lanes;
-         DROP TABLE IF EXISTS shopping_module_content;
-         PRAGMA foreign_keys=ON;",
-    )?;
-    Ok(())
 }
 
 fn create_new_schema(conn: &Connection) -> SqliteResult<()> {

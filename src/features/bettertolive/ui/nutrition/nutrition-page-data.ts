@@ -1,11 +1,65 @@
 import type {
+  BodyFeedback,
   DailyPlan,
   DailyPlanEntry,
   FoodItem,
   FoodNutrientProfile,
   NutritionModuleData,
   Recipe,
+  ValueDensity,
 } from "@/features/bettertolive/types"
+
+// 稳定的业务枚举常量，语言无关；i18n 只负责展示。
+export const NutritionBodyFeedback = {
+  Satisfied: "满足舒服" as BodyFeedback,
+  Normal: "普通" as BodyFeedback,
+  Heavy: "偏重偏胀" as BodyFeedback,
+  Uncomfortable: "不适" as BodyFeedback,
+  WantsMore: "想再吃" as BodyFeedback,
+} as const
+
+export const NUTRITION_BODY_FEEDBACK_OPTIONS: BodyFeedback[] = [
+  NutritionBodyFeedback.Satisfied,
+  NutritionBodyFeedback.Normal,
+  NutritionBodyFeedback.Heavy,
+  NutritionBodyFeedback.Uncomfortable,
+  NutritionBodyFeedback.WantsMore,
+]
+
+export const NutritionValueDensity = {
+  High: "高" as ValueDensity,
+  Medium: "中" as ValueDensity,
+  Low: "低" as ValueDensity,
+  NotWorthIt: "不划算" as ValueDensity,
+} as const
+
+export const NUTRITION_VALUE_DENSITY_OPTIONS: ValueDensity[] = [
+  NutritionValueDensity.High,
+  NutritionValueDensity.Medium,
+  NutritionValueDensity.Low,
+  NutritionValueDensity.NotWorthIt,
+]
+
+const NEEDS_CARE_BODY_FEEDBACK = new Set<BodyFeedback>([
+  NutritionBodyFeedback.Heavy,
+  NutritionBodyFeedback.Uncomfortable,
+  NutritionBodyFeedback.WantsMore,
+])
+
+const NEEDS_CARE_VALUE_DENSITY = new Set<ValueDensity>([
+  NutritionValueDensity.Low,
+  NutritionValueDensity.NotWorthIt,
+])
+
+export function logNeedsCare(
+  bodyFeedback: BodyFeedback | undefined,
+  valueDensity: ValueDensity | undefined,
+) {
+  return (
+    NEEDS_CARE_BODY_FEEDBACK.has(bodyFeedback ?? ("" as BodyFeedback)) ||
+    NEEDS_CARE_VALUE_DENSITY.has(valueDensity ?? ("" as ValueDensity))
+  )
+}
 
 export type NutritionTotals = {
   energyKcal: number

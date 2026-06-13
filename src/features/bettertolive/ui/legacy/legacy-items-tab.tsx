@@ -18,6 +18,7 @@ import {
   legacyRecipientLabel,
   legacyWarningLabel,
   LEGACY_CATEGORIES,
+  LEGACY_STATUS_FINAL,
   LEGACY_STATUSES,
   LEGACY_VISIBILITIES,
   translateLegacyEnum,
@@ -90,7 +91,7 @@ export function LegacyItemsTab({
         signal === "all" ||
         (signal === "missingDelivery" &&
           getLegacyDeliveryWarnings(item).some((w) => w.kind === "missingDelivery")) ||
-        (signal === "locked" && (item.isLocked || item.status === "最终版")) ||
+        (signal === "locked" && (item.isLocked || item.status === LEGACY_STATUS_FINAL)) ||
         (signal === "aiExcluded" && item.excludeFromAi) ||
         (signal === "secondConfirm" && item.requiresSecondConfirm)
 

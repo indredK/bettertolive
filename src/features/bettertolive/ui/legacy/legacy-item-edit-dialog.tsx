@@ -33,9 +33,15 @@ import {
   createLegacyItemForm,
   EMOTIONAL_LOADS,
   LEGACY_CATEGORIES,
+  LEGACY_EMOTIONAL_LOAD_HEAVY,
+  LEGACY_RECIPIENT_SELF,
   LEGACY_RECIPIENTS,
+  LEGACY_STATUS_BASIC_COMPLETE,
+  LEGACY_STATUS_FINAL,
   LEGACY_STATUSES,
+  LEGACY_URGENCY_CRITICAL,
   LEGACY_URGENCIES,
+  LEGACY_VISIBILITY_AFTER_DEATH,
   LEGACY_VISIBILITIES,
   requiresDeliveryCondition,
   translateLegacyEnum,
@@ -76,25 +82,32 @@ export function LegacyItemEditDialog({
     form.title.trim().length > 0 && form.summary.trim().length > 0 && form.content.trim().length > 0
   const showDeliveryCondition = requiresDeliveryCondition(form.visibility)
   const criticalFinalMissingDelivery =
-    form.urgency === "关键信息" && form.status === "最终版" && !form.deliveryCondition?.trim()
+    form.urgency === LEGACY_URGENCY_CRITICAL &&
+    form.status === LEGACY_STATUS_FINAL &&
+    !form.deliveryCondition?.trim()
 
   const patchForm = <K extends keyof LegacyItemForm>(key: K, value: LegacyItemForm[K]) => {
     setForm((current) => {
       const next = { ...current, [key]: value }
-      if (key === "status" && value === "最终版") {
+      if (key === "status" && value === LEGACY_STATUS_FINAL) {
         next.isLocked = true
       }
-      if (key === "status" && current.status === "最终版" && value !== "最终版" && !editing.isNew) {
+      if (
+        key === "status" &&
+        current.status === LEGACY_STATUS_FINAL &&
+        value !== LEGACY_STATUS_FINAL &&
+        !editing.isNew
+      ) {
         next.isLocked = false
       }
-      if (key === "recipient" && value === "仅自己") {
+      if (key === "recipient" && value === LEGACY_RECIPIENT_SELF) {
         next.excludeFromAi = true
       }
-      if (key === "emotionalLoad" && value === "很重") {
+      if (key === "emotionalLoad" && value === LEGACY_EMOTIONAL_LOAD_HEAVY) {
         next.requiresSecondConfirm = true
         next.excludeFromAi = true
       }
-      if (key === "visibility" && value === "我离世后") {
+      if (key === "visibility" && value === LEGACY_VISIBILITY_AFTER_DEATH) {
         next.excludeFromAi = true
       }
       return next
@@ -105,7 +118,8 @@ export function LegacyItemEditDialog({
     setIsUnlocked(true)
     setForm((current) => ({
       ...current,
-      status: current.status === "最终版" ? "基本完成" : current.status,
+      status:
+        current.status === LEGACY_STATUS_FINAL ? LEGACY_STATUS_BASIC_COMPLETE : current.status,
       isLocked: false,
     }))
   }
@@ -316,7 +330,7 @@ export function LegacyItemEditDialog({
             <Field label={t("legacy.fields.recipientName", "具体接收者")}>
               <Input
                 value={form.recipientName ?? ""}
-                disabled={isReadOnly || form.recipient === "仅自己"}
+                disabled={isReadOnly || form.recipient === LEGACY_RECIPIENT_SELF}
                 onChange={(event) => patchForm("recipientName", event.currentTarget.value)}
                 className={LEGACY_DIALOG_FIELD_CLASS}
               />
@@ -334,7 +348,9 @@ export function LegacyItemEditDialog({
             {showDeliveryCondition ? (
               <Field
                 label={t("legacy.fields.deliveryCondition", "交付条件")}
-                required={form.urgency === "关键信息" && form.status === "最终版"}
+                required={
+                  form.urgency === LEGACY_URGENCY_CRITICAL && form.status === LEGACY_STATUS_FINAL
+                }
               >
                 <Textarea
                   value={form.deliveryCondition ?? ""}
@@ -359,7 +375,7 @@ export function LegacyItemEditDialog({
               <CheckboxLine
                 label={t("legacy.fields.isLocked", "锁定条目")}
                 checked={form.isLocked}
-                disabled={isReadOnly || form.status === "最终版"}
+                disabled={isReadOnly || form.status === LEGACY_STATUS_FINAL}
                 onChange={(checked) => patchForm("isLocked", checked)}
               />
               <CheckboxLine
