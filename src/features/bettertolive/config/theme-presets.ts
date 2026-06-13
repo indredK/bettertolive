@@ -110,6 +110,19 @@ const tideUiVars = {
   "--sidebar-ring": "oklch(0.65 0.095 213)",
 }
 
+// 世界历史模块：节点分类强调色 + 连线高亮色。
+// 这是一组跨主题一致的语义分类色（类似品牌分类标识），
+// 选值兼顾「浅色面板上作前景」与「深色 tooltip(--hero-bg) 上作文字」两种场景的可读性。
+const worldHistoryVars = {
+  "--wh-kind-catalyst": "#B45309",
+  "--wh-kind-nutrition": "#059669",
+  "--wh-kind-customs": "#7C3AED",
+  "--wh-kind-conflict": "#DC2626",
+  "--wh-kind-prohibition": "#78716C",
+  "--wh-kind-faith": "#D97706",
+  "--wh-link-active": "#10B981",
+}
+
 export const workspaceThemes = [
   {
     id: "morning",
@@ -118,6 +131,7 @@ export const workspaceThemes = [
     swatches: ["#cfe0f5", "#d7ecdf", "#f2e4af"],
     vars: {
       ...morningUiVars,
+      ...worldHistoryVars,
       "--app-bg":
         "radial-gradient(circle at top left, rgba(207,223,245,0.95), transparent 30%), radial-gradient(circle at 85% 0%, rgba(238,223,200,0.8), transparent 28%), linear-gradient(180deg, #f5f7fa 0%, #f6f2eb 100%)",
       "--app-grid": "rgba(15, 23, 42, 0.03)",
@@ -203,6 +217,7 @@ export const workspaceThemes = [
     swatches: ["#efe4d4", "#d9dbc0", "#d7b8a4"],
     vars: {
       ...linenUiVars,
+      ...worldHistoryVars,
       "--app-bg":
         "radial-gradient(circle at top left, rgba(239,228,212,0.92), transparent 34%), radial-gradient(circle at 88% 6%, rgba(214,184,164,0.48), transparent 24%), linear-gradient(180deg, #faf6ef 0%, #f3eee6 100%)",
       "--app-grid": "rgba(68, 54, 43, 0.04)",
@@ -288,6 +303,7 @@ export const workspaceThemes = [
     swatches: ["#dfe6f6", "#d8ece7", "#e8dcf5"],
     vars: {
       ...tideUiVars,
+      ...worldHistoryVars,
       "--app-bg":
         "radial-gradient(circle at top left, rgba(223,230,246,0.92), transparent 32%), radial-gradient(circle at 85% 8%, rgba(232,220,245,0.64), transparent 26%), linear-gradient(180deg, #f5f7fb 0%, #eef3f4 100%)",
       "--app-grid": "rgba(30, 41, 59, 0.035)",

@@ -13,6 +13,7 @@ export type AppView =
   | "legacy"
   | "socioeconomics"
   | "future"
+  | "worldhistory"
 
 export type ReflectionEntry = {
   id: string
@@ -1200,6 +1201,84 @@ export type SocioeconomicsModuleData = {
   entries: SocioeconomicsEntry[]
   gaps: SocioeconomicsGap[]
   reviewPrompts: string[]
+}
+
+// ===== 世界历史模块 =====
+
+export type CivilizationId = "greek" | "egypt" | "chinese" | "maya"
+
+export type GeopoliticalDimension =
+  | "calories"
+  | "defense"
+  | "trust"
+  | "authority"
+  | "taboos"
+  | "abstract"
+
+export type CausalNodeKind =
+  | "catalyst"
+  | "nutrition"
+  | "customs"
+  | "conflict"
+  | "prohibition"
+  | "faith"
+
+export type CausalNode = {
+  id: string
+  kind: CausalNodeKind
+  civilizationId: CivilizationId
+  label: string
+  description: string
+  causalExplanation: string
+  x: number // 百分比 0-100
+  y: number // 百分比 0-100
+}
+
+export type CausalLink = {
+  id: string
+  sourceId: string
+  targetId: string
+  civilizationId: CivilizationId
+  label: string
+}
+
+export type CivilizationProfile = {
+  id: CivilizationId
+  name: string
+  nameEn: string
+  era: string
+  location: string
+  summary: string
+  indices: Record<GeopoliticalDimension, number> // 0-100
+  color: string
+  icon: string
+}
+
+export type WorldHistoryTimelineEvent = {
+  id: string
+  civilizationId: CivilizationId
+  year: number
+  label: string
+  summary: string
+  parentId?: string
+}
+
+export type ComparisonPreset = {
+  id: string
+  title: string
+  civA: CivilizationId
+  civB: CivilizationId
+  thesis: string
+  analysis: string
+  conclusion: string
+}
+
+export type WorldHistoryModuleData = {
+  civilizations: CivilizationProfile[]
+  causalNodes: CausalNode[]
+  causalLinks: CausalLink[]
+  timelineEvents: WorldHistoryTimelineEvent[]
+  comparisonPresets: ComparisonPreset[]
 }
 
 export type WorkspaceSnapshot = {

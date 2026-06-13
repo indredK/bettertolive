@@ -66,5 +66,6 @@ export function createWorkspaceSidebarNotes(t: TFunction): Record<AppView, Works
     legacy: createSidebarNote(t, "legacy", ["place", "fit", "purpose"]),
     socioeconomics: createSidebarNote(t, "socioeconomics", ["sort", "fit", "purpose"]),
     future: createSidebarNote(t, "future", ["draw", "fit", "purpose"]),
+    worldhistory: createSidebarNote(t, "worldhistory", ["explore", "fit", "purpose"]),
   }
 }

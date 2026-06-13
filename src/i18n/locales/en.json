@@ -3446,7 +3446,8 @@
       "journey": "Growth Memory",
       "legacy": "Life Organizing",
       "socioeconomics": "Socioeconomics",
-      "future": "Future Blueprint"
+      "future": "Future Blueprint",
+      "worldhistory": "World History"
     },
     "nav": {
       "ariaLabel": "Page Navigation",
@@ -3458,7 +3459,8 @@
         "selfMap": "Self Map",
         "lifeOrganizing": "Life Organizing",
         "externalWorld": "External World",
-        "direction": "Direction"
+        "direction": "Direction",
+        "worldHistory": "World History"
       },
       "items": {
         "overview": {
@@ -3516,6 +3518,10 @@
         "future": {
           "label": "Future",
           "hint": "Ideal self and life direction"
+        },
+        "worldhistory": {
+          "label": "World History",
+          "hint": "Geo-Civilization Causal Constellation"
         }
       }
     },
@@ -3540,6 +3546,25 @@
     },
     "sidebarCarousel": {
       "switchToNth": "Switch to note {{n}}"
+    },
+    "sidebarNotes": {
+      "worldhistory": {
+        "heading": "World History Notes",
+        "lines": {
+          "explore": {
+            "label": "Explore",
+            "text": "Trace the causal evolution of four ancient civilizations through a geopolitical materialist lens."
+          },
+          "fit": {
+            "label": "Best For",
+            "text": "Useful when you want to understand civilizational choices and institutional diversity from first-layer geographic constraints."
+          },
+          "purpose": {
+            "label": "Purpose",
+            "text": "The goal is not to memorize history, but to see how the same survival pressure can produce different civilizational paths."
+          }
+        }
+      }
     },
     "settings": {
       "title": "Settings",
@@ -3767,6 +3792,100 @@
       "summaryDescription": "See whether this set is becoming internalized, already stable, or still borrowed from others.",
       "signalTitle": "Calibrate First",
       "signalDescription": "Start with the non-negotiable or high-cost principles and check whether they still genuinely belong to you."
+    }
+  },
+  "worldhistory": {
+    "title": "Human Civilization Geo-Causal Star Map",
+    "subtitle": "Cross-cultural comparison from a geo-materialist perspective",
+    "tabs": {
+      "star": "Star Map",
+      "gantt": "Evolution",
+      "arena": "Arena"
+    },
+    "actions": {
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    },
+    "narrative": {
+      "prev": "Previous",
+      "next": "Next",
+      "stop": "Stop",
+      "start": "Walk through causal chain step by step",
+      "counter": "Causal chain {{current}} / {{total}}"
+    },
+    "nodeKind": {
+      "catalyst": "Geo-Catalyst",
+      "nutrition": "Food & Nutrition",
+      "customs": "Customs & Ethics",
+      "conflict": "Conflict & Battle",
+      "prohibition": "Life & Taboo",
+      "faith": "Faith & Law"
+    },
+    "nodeGlyph": {
+      "catalyst": "C",
+      "nutrition": "N",
+      "customs": "E",
+      "conflict": "B",
+      "prohibition": "T",
+      "faith": "F"
+    },
+    "dimension": {
+      "calories": "Staple Calories",
+      "defense": "Defense & Isolation",
+      "trust": "Trust & Contract",
+      "authority": "Power & Control",
+      "taboos": "Taboo & Discipline",
+      "abstract": "Abstract Thought"
+    },
+    "event": {
+      "newLabel": "New Event",
+      "namePlaceholder": "Event name",
+      "summaryPlaceholder": "Event summary",
+      "deleteAria": "Delete event"
+    },
+    "preset": {
+      "newLabel": "New Verdict",
+      "titlePlaceholder": "Verdict title",
+      "thesisPlaceholder": "Thesis",
+      "analysisPlaceholder": "Analysis",
+      "conclusionPlaceholder": "Conclusion",
+      "deleteAria": "Delete verdict",
+      "noPresets": "This pair of civilizations has no verdicts",
+      "noPresetsHint": ", click \"Add Verdict\" to create one"
+    },
+    "star": {
+      "suffix": "Causal Map",
+      "collapse": "Collapse",
+      "nodeNamePlaceholder": "Node name",
+      "descriptionPlaceholder": "Phenomenon description",
+      "causalPlaceholder": "Causal chain explanation",
+      "causalLabel": "Causal chain:"
+    },
+    "gantt": {
+      "bc": "BC ",
+      "ad": "AD ",
+      "yearPrefix": "BC",
+      "suffix": "Evolution Timeline",
+      "addEvent": "Add Event",
+      "ganttMode": "Gantt",
+      "treeMode": "Causal Tree",
+      "noEvents": "No events yet"
+    },
+    "arena": {
+      "title": "Cross-Civilization Dialectical Arena",
+      "needsTwo": "At least two civilizations needed for comparison",
+      "classicVerdicts": "Classic Verdicts",
+      "addPreset": "Add Verdict",
+      "dimension": "Dimension",
+      "diff": "Diff"
+    },
+    "civilization": {
+      "greek": "Ancient Greece",
+      "egypt": "Ancient Egypt",
+      "chinese": "Chinese Civilization",
+      "maya": "Maya Civilization"
     }
   },
   "splash": {

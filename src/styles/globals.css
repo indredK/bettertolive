@@ -79,6 +79,32 @@
 :root {
   --background: oklch(0.985 0.012 82);
   --foreground: oklch(0.24 0.035 253);
+
+  --text-primary: #0f172a;
+  --text-secondary: #1f2937;
+  --text-muted: #64748b;
+  --surface-bg: rgba(255, 255, 255, 0.82);
+  --surface-border: rgba(15, 23, 42, 0.08);
+  --muted-surface-bg: rgba(248, 250, 252, 0.92);
+  --muted-surface-border: rgba(148, 163, 184, 0.22);
+  --hero-bg: #0f172a;
+  --hero-ink: #f8fafc;
+  --hero-muted: rgba(241, 245, 249, 0.8);
+  --chip-bg: rgba(255, 255, 255, 0.86);
+  --chip-border: rgba(148, 163, 184, 0.25);
+  --app-bg: linear-gradient(180deg, #f5f7fa 0%, #f6f2eb 100%);
+  --app-grid: rgba(15, 23, 42, 0.03);
+  --aside-bg: rgba(255, 255, 255, 0.66);
+  --topbar-bg: rgba(255, 255, 255, 0.56);
+  --dialog-bg: #ffffff;
+  --surface-shadow: 0 16px 40px rgba(15, 23, 42, 0.06);
+  --wh-kind-catalyst: #b45309;
+  --wh-kind-nutrition: #059669;
+  --wh-kind-customs: #7c3aed;
+  --wh-kind-conflict: #dc2626;
+  --wh-kind-prohibition: #78716c;
+  --wh-kind-faith: #d97706;
+  --wh-link-active: #10b981;
   --card: oklch(0.995 0.006 93);
   --card-foreground: oklch(0.24 0.035 253);
   --popover: oklch(0.995 0.006 93);
@@ -114,6 +140,32 @@
 .dark {
   --background: oklch(0.18 0.03 252);
   --foreground: oklch(0.94 0.015 88);
+
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  --surface-bg: rgba(30, 41, 59, 0.82);
+  --surface-border: rgba(241, 245, 249, 0.1);
+  --muted-surface-bg: rgba(30, 41, 59, 0.6);
+  --muted-surface-border: rgba(148, 163, 184, 0.15);
+  --hero-bg: #0f172a;
+  --hero-ink: #f8fafc;
+  --hero-muted: rgba(241, 245, 249, 0.7);
+  --chip-bg: rgba(30, 41, 59, 0.7);
+  --chip-border: rgba(148, 163, 184, 0.2);
+  --app-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+  --app-grid: rgba(241, 245, 249, 0.03);
+  --aside-bg: rgba(15, 23, 42, 0.66);
+  --topbar-bg: rgba(15, 23, 42, 0.56);
+  --dialog-bg: #1e293b;
+  --surface-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  --wh-kind-catalyst: #f59e0b;
+  --wh-kind-nutrition: #34d399;
+  --wh-kind-customs: #a78bfa;
+  --wh-kind-conflict: #f87171;
+  --wh-kind-prohibition: #a8a29e;
+  --wh-kind-faith: #fbbf24;
+  --wh-link-active: #34d399;
   --card: oklch(0.23 0.035 252);
   --card-foreground: oklch(0.94 0.015 88);
   --popover: oklch(0.23 0.035 252);

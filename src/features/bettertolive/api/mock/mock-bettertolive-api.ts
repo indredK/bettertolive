@@ -1,5 +1,6 @@
 import type { BeliefEntryForm, BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
+import { WORLD_HISTORY_SEED } from "@/features/bettertolive/ui/worldhistory/world-history-data"
 import type {
   BeliefEntry,
   BeliefsModuleData,
@@ -17,6 +18,7 @@ import type {
   ReflectionModuleData,
   RelationshipsModuleData,
   SocioeconomicsModuleData,
+  WorldHistoryModuleData,
 } from "@/features/bettertolive/types"
 
 const MOCK_API_LATENCY_MS = 80
@@ -37,6 +39,7 @@ let legacyApiData: LegacyWorkspaceModuleData = cloneMockData(workspaceSnapshotMo
 let socioeconomicsData: SocioeconomicsModuleData = cloneMockData(
   workspaceSnapshotMockData.socioeconomics,
 )
+let worldHistoryMockData: WorldHistoryModuleData = cloneMockData(WORLD_HISTORY_SEED)
 
 function cloneMockData<T>(data: T): T {
   if (typeof data === "undefined") {
@@ -268,6 +271,11 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
     getFuture: () => withMockLatency(futureMockData),
     saveFuture: (future) => {
       futureMockData = cloneMockData(future)
+      return withMockLatency(undefined)
+    },
+    getWorldHistory: () => withMockLatency(worldHistoryMockData),
+    saveWorldHistory: (worldHistory) => {
+      worldHistoryMockData = cloneMockData(worldHistory)
       return withMockLatency(undefined)
     },
     getWorkspaceSnapshot: () =>

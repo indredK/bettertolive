@@ -1,0 +1,640 @@
+{
+  "civilizations": [
+    {
+      "id": "greek",
+      "name": "古希腊",
+      "nameEn": "Ancient Greece",
+      "era": "约公元前800年–前146年",
+      "location": "爱琴海沿岸·伯罗奔尼撒半岛",
+      "summary": "破碎多山的地理格局催生出数百个独立城邦，海洋阻隔带来的自保安全感与贫瘠土地迫使的海外殖民贸易，共同塑造了人类历史上最早的公民自治实验与理性哲学传统。",
+      "indices": {
+        "calories": 38,
+        "defense": 72,
+        "trust": 78,
+        "authority": 30,
+        "taboos": 25,
+        "abstract": 92
+      },
+      "color": "#3B82F6",
+      "icon": "🏛️"
+    },
+    {
+      "id": "egypt",
+      "name": "古埃及",
+      "nameEn": "Ancient Egypt",
+      "era": "约公元前3100年–前332年",
+      "location": "尼罗河流域·撒哈拉东北部",
+      "summary": "尼罗河周期性泛滥带来了极高产出的冲积平原农业，但同时也迫使社会形成精密的水利管理官僚系统。沙漠屏障赋予了长久的安全边界，法老的神权统治由此被自然神圣化。",
+      "indices": {
+        "calories": 88,
+        "defense": 90,
+        "trust": 25,
+        "authority": 95,
+        "taboos": 62,
+        "abstract": 85
+      },
+      "color": "#F59E0B",
+      "icon": "𓂀"
+    },
+    {
+      "id": "chinese",
+      "name": "华夏文明",
+      "nameEn": "Chinese Civilization",
+      "era": "约公元前2070年–延续至今",
+      "location": "黄河流域·东亚大陆",
+      "summary": "大河流域的季风灌溉农业在提供充足卡路里的同时，也面临黄河反复泛滥的持续威胁，因此催生了人类历史上规模最大、延续最久的中央集权帝国治理体系，以血缘宗法制作为底层信任协议。",
+      "indices": {
+        "calories": 72,
+        "defense": 55,
+        "trust": 42,
+        "authority": 88,
+        "taboos": 68,
+        "abstract": 76
+      },
+      "color": "#EF4444",
+      "icon": "🐉"
+    },
+    {
+      "id": "maya",
+      "name": "玛雅文明",
+      "nameEn": "Maya Civilization",
+      "era": "约公元前2000年–公元1697年",
+      "location": "中美洲热带雨林·尤卡坦半岛",
+      "summary": "热带雨林提供的玉米农业养活了密集城邦，但缺乏大型驯化畜力与金属工具，使生存竞争高度依赖精密的天文历法与神学仪式。城邦间的仪式性战争与血祭禁忌构成了独特的演化路径。",
+      "indices": {
+        "calories": 55,
+        "defense": 40,
+        "trust": 45,
+        "authority": 72,
+        "taboos": 88,
+        "abstract": 90
+      },
+      "color": "#10B981",
+      "icon": "🌽"
+    }
+  ],
+  "causalNodes": [
+    {
+      "id": "greek-catalyst",
+      "kind": "catalyst",
+      "civilizationId": "greek",
+      "label": "多山群岛·破碎地形",
+      "description": "巴尔干半岛85%为山地，海岸线曲折多岛屿，无法形成统一冲积平原。",
+      "causalExplanation": "破碎地形使统一帝国极难维系，城邦成为唯一可行的政治单元。海洋既是保护屏障，也是对外联系的通道。",
+      "x": 8,
+      "y": 30
+    },
+    {
+      "id": "greek-nutrition",
+      "kind": "nutrition",
+      "civilizationId": "greek",
+      "label": "贫瘠土壤·橄榄与贸易",
+      "description": "石灰岩贫瘠土壤迫使种植橄榄、葡萄等经济作物，依赖地中海贸易换取谷物。",
+      "causalExplanation": "本土谷物不足倒逼外向型海洋贸易经济，商业契约精神在交换中被反复强化。",
+      "x": 24,
+      "y": 55
+    },
+    {
+      "id": "greek-customs",
+      "kind": "customs",
+      "civilizationId": "greek",
+      "label": "公民大会·城邦自治",
+      "description": "雅典五百人议事会与陶片放逐制，是人类最早的直接民主实践。",
+      "causalExplanation": "破碎地缘+海洋安全边际，使平民拥有博弈筹码，无需绝对君主来组织生存。",
+      "x": 40,
+      "y": 18
+    },
+    {
+      "id": "greek-conflict",
+      "kind": "conflict",
+      "civilizationId": "greek",
+      "label": "希波战争与伯罗奔尼撒",
+      "description": "城邦联盟两次击败波斯帝国，随后陷入雅典与斯巴达的三十年自毁式内战。",
+      "causalExplanation": "海洋地盾保护了生存底线，但城邦间的权力均衡在缺乏统一框架时迅速滑向内耗。",
+      "x": 56,
+      "y": 48
+    },
+    {
+      "id": "greek-prohibition",
+      "kind": "prohibition",
+      "civilizationId": "greek",
+      "label": "僭主恐惧·放逐制度",
+      "description": "陶片放逐法（Ostracism）让公民可以投票驱逐任何被认为威胁民主的个人。",
+      "causalExplanation": "在无官僚强制力的城邦体系中，放逐成为防止个人权力集中的唯一制度化约束。",
+      "x": 72,
+      "y": 70
+    },
+    {
+      "id": "greek-faith",
+      "kind": "faith",
+      "civilizationId": "greek",
+      "label": "理性哲学·逻各斯信仰",
+      "description": "苏格拉底、柏拉图、亚里士多德的理性追问，从神话叙事中剥离出「逻辑」本身。",
+      "causalExplanation": "城邦自治的安全感 + 殖民地多元文化碰撞，让思维得以从实用生存剥离，转向终极抽象——逻辑、数学与形而上学。",
+      "x": 88,
+      "y": 25
+    },
+    {
+      "id": "egypt-catalyst",
+      "kind": "catalyst",
+      "civilizationId": "egypt",
+      "label": "尼罗河·沙漠屏障",
+      "description": "东西沙漠+南北瀑布形成天然堡垒，尼罗河年复一年的泛滥带来丰厚淤泥。",
+      "causalExplanation": "极度安全的外部环境 + 极度依赖河流灌溉的内部结构 → 法老被自然神圣化为尼罗河秩序的化身。",
+      "x": 8,
+      "y": 62
+    },
+    {
+      "id": "egypt-nutrition",
+      "kind": "nutrition",
+      "civilizationId": "egypt",
+      "label": "冲积农业·丰裕谷仓",
+      "description": "尼罗河每年沉积的新鲜淤泥使埃及成为古代地中海世界的粮仓。",
+      "causalExplanation": "极高的农业亩产使大量剩余人口得以从事祭司、书记和建筑工作，支撑了巨大的金字塔工程。",
+      "x": 24,
+      "y": 35
+    },
+    {
+      "id": "egypt-customs",
+      "kind": "customs",
+      "civilizationId": "egypt",
+      "label": "神圣王权·法老即神",
+      "description": "法老被视为荷鲁斯神的化身，其统治权直接源于宇宙秩序（Ma'at）。",
+      "causalExplanation": "沙漠绝对安全 + 尼罗河灌溉需要统一调度 → 法老作为「调控洪水者」被赋予神格。",
+      "x": 40,
+      "y": 58
+    },
+    {
+      "id": "egypt-conflict",
+      "kind": "conflict",
+      "civilizationId": "egypt",
+      "label": "喜克索斯入侵·战车革命",
+      "description": "前17世纪喜克索斯人带来战车技术征服下埃及，迫使埃及人军事革新后反攻统一。",
+      "causalExplanation": "沙漠屏障被战车技术突破，暴露了纯自然防御的脆弱性，驱动埃及走向更主动的帝国扩张。",
+      "x": 56,
+      "y": 22
+    },
+    {
+      "id": "egypt-prohibition",
+      "kind": "prohibition",
+      "civilizationId": "egypt",
+      "label": "亡灵书·道德审判",
+      "description": "古埃及死者须在奥西里斯面前接受心脏与真理之羽的称量，说谎者被怪物吞噬。",
+      "causalExplanation": "在绝对神权统治下，道德约束不是由法律而是由死后审判来执行——将社会规训内化为灵魂命运。",
+      "x": 72,
+      "y": 52
+    },
+    {
+      "id": "egypt-faith",
+      "kind": "faith",
+      "civilizationId": "egypt",
+      "label": "来世建筑·灵魂不灭",
+      "description": "金字塔、帝王谷、木乃伊技术，将国家资源的核心比例投入到来世居住与灵魂保存中。",
+      "causalExplanation": "尼罗河的周期性泛滥→死亡与重生的自然隐喻→被抽象为灵魂不灭的神学体系→驱动了人类史上最大规模的来世建筑投资。",
+      "x": 88,
+      "y": 60
+    },
+    {
+      "id": "chinese-catalyst",
+      "kind": "catalyst",
+      "civilizationId": "chinese",
+      "label": "黄土高原·季风黄河",
+      "description": "黄河流域的黄土易于耕作但水土流失严重，黄河含沙量全球最高，频繁改道溃堤。",
+      "causalExplanation": "黄河治理超出任何地方势力能力 → 必须由跨区域中央权威统一调动人力物力 → 中央集权成为生存必需。",
+      "x": 8,
+      "y": 55
+    },
+    {
+      "id": "chinese-nutrition",
+      "kind": "nutrition",
+      "civilizationId": "chinese",
+      "label": "粟稻农业·精耕细作",
+      "description": "北粟南稻的双主粮体系，配合农历节气与水利工程，养活了世界最大农业人口。",
+      "causalExplanation": "高产出精耕农业依赖密集人力投入→形成「多子多福」的宗族生育逻辑→以血缘为纽带的超大规模人口组织。",
+      "x": 24,
+      "y": 22
+    },
+    {
+      "id": "chinese-customs",
+      "kind": "customs",
+      "civilizationId": "chinese",
+      "label": "宗法制·血缘伦理",
+      "description": "以父系血缘关系为核心构建社会组织，从家族到国家的「家国同构」体系。",
+      "causalExplanation": "精耕农业需要稳定的代际劳动协作 → 血缘宗法成为最底层的信任协议 → 国家直接从家族伦理中推导政治合法性。",
+      "x": 40,
+      "y": 45
+    },
+    {
+      "id": "chinese-conflict",
+      "kind": "conflict",
+      "civilizationId": "chinese",
+      "label": "大禹治水·统一叙事",
+      "description": "从尧舜禹到夏商周，「治水」成为中华文明最早的集体记忆与合法性来源。",
+      "causalExplanation": "黄河流域反复洪灾迫使各部落放弃独立，选择接受一个超越血缘的最高治水调度者 → 「天命」概念诞生。",
+      "x": 56,
+      "y": 65
+    },
+    {
+      "id": "chinese-prohibition",
+      "kind": "prohibition",
+      "civilizationId": "chinese",
+      "label": "礼教纲常·身体规训",
+      "description": "从周礼到儒家三纲五常，将社会秩序内化为个人身体行为规范。",
+      "causalExplanation": "大宗族+中央集权的双层结构中，礼教以「身体规训」替代法治，降低了大帝国的治理成本。",
+      "x": 72,
+      "y": 35
+    },
+    {
+      "id": "chinese-faith",
+      "kind": "faith",
+      "civilizationId": "chinese",
+      "label": "天道循环·实用理性",
+      "description": "从易经的阴阳五行到儒家「天人感应」，形成一种非人格化的宇宙秩序信仰。",
+      "causalExplanation": "黄河的周期性洪水与季风节律 → 「循环」成为核心宇宙隐喻 → 非人格化的「道」替代了人格化的创世神。",
+      "x": 88,
+      "y": 42
+    },
+    {
+      "id": "maya-catalyst",
+      "kind": "catalyst",
+      "civilizationId": "maya",
+      "label": "热带雨林·石灰岩地貌",
+      "description": "尤卡坦半岛为多孔石灰岩台地，地表水稀缺，依赖天然洞穴（Cenote）获取淡水。",
+      "causalExplanation": "水资源获取依赖对喀斯特地貌的精确认知 → 天文观测与水文学被绑定到宗教体系中 → 祭司阶层获得无上权威。",
+      "x": 8,
+      "y": 42
+    },
+    {
+      "id": "maya-nutrition",
+      "kind": "nutrition",
+      "civilizationId": "maya",
+      "label": "玉米·三位一体农业",
+      "description": "玉米、豆类、南瓜的「三姐妹」混种体系，在没有大型畜力和金属农具的条件下维持了高密度城邦。",
+      "causalExplanation": "玉米农耕的高密度产出+无畜力限制→城邦集中度极高→但土壤退化周期也驱动了周期性城邦崩溃与迁移。",
+      "x": 24,
+      "y": 68
+    },
+    {
+      "id": "maya-customs",
+      "kind": "customs",
+      "civilizationId": "maya",
+      "label": "城邦联盟·球赛政治",
+      "description": "数十个城邦通过联姻、贸易与仪式性球赛维系竞争性共存。",
+      "causalExplanation": "热带雨林阻隔统一帝国形成，但共享的书写系统与历法使城邦间保持文化一体感。",
+      "x": 40,
+      "y": 28
+    },
+    {
+      "id": "maya-conflict",
+      "kind": "conflict",
+      "civilizationId": "maya",
+      "label": "星战仪式·俘虏献祭",
+      "description": "玛雅战争不以领土征服为目标，而是以捕获高等俘虏用于献祭为核心。",
+      "causalExplanation": "无畜力+热带环境使长期占领成本极高 → 仪式性战争成为文化选择 → 俘虏献祭成为宇宙再生的符号。",
+      "x": 56,
+      "y": 38
+    },
+    {
+      "id": "maya-prohibition",
+      "kind": "prohibition",
+      "civilizationId": "maya",
+      "label": "血祭与身体禁忌",
+      "description": "王室通过刺舌、刺耳、包皮放血等自体献祭与神灵沟通，维系宇宙平衡。",
+      "causalExplanation": "高密度城邦+环境脆弱→生存焦虑被投射为「宇宙需要血才能延续」→统治者以身体疼痛换取政治合法性。",
+      "x": 72,
+      "y": 55
+    },
+    {
+      "id": "maya-faith",
+      "kind": "faith",
+      "civilizationId": "maya",
+      "label": "历法神学·天文数学",
+      "description": "精确到19年误差仅2小时的太阳历、260天卓尔金历和长计历构成宇宙时间观。",
+      "causalExplanation": "石灰岩取水依赖雨季预判 → 极度精确的天文观测 → 被抽象为「时间即神性」的世界观 → 零概念与二十进制数学诞生。",
+      "x": 88,
+      "y": 18
+    }
+  ],
+  "causalLinks": [
+    {
+      "id": "gl-1",
+      "sourceId": "greek-catalyst",
+      "targetId": "greek-nutrition",
+      "civilizationId": "greek",
+      "label": "破碎山地→贸易依赖"
+    },
+    {
+      "id": "gl-2",
+      "sourceId": "greek-nutrition",
+      "targetId": "greek-customs",
+      "civilizationId": "greek",
+      "label": "商业契约→公民平等意识"
+    },
+    {
+      "id": "gl-3",
+      "sourceId": "greek-customs",
+      "targetId": "greek-conflict",
+      "civilizationId": "greek",
+      "label": "城邦独立→联盟与内耗"
+    },
+    {
+      "id": "gl-4",
+      "sourceId": "greek-conflict",
+      "targetId": "greek-prohibition",
+      "civilizationId": "greek",
+      "label": "内战创伤→放逐制度化"
+    },
+    {
+      "id": "gl-5",
+      "sourceId": "greek-prohibition",
+      "targetId": "greek-faith",
+      "civilizationId": "greek",
+      "label": "制度安全→理性闲暇"
+    },
+    {
+      "id": "el-1",
+      "sourceId": "egypt-catalyst",
+      "targetId": "egypt-nutrition",
+      "civilizationId": "egypt",
+      "label": "沙漠庇护→农业专注"
+    },
+    {
+      "id": "el-2",
+      "sourceId": "egypt-nutrition",
+      "targetId": "egypt-customs",
+      "civilizationId": "egypt",
+      "label": "农业盈余→神权官僚"
+    },
+    {
+      "id": "el-3",
+      "sourceId": "egypt-customs",
+      "targetId": "egypt-conflict",
+      "civilizationId": "egypt",
+      "label": "封闭自信→外来冲击"
+    },
+    {
+      "id": "el-4",
+      "sourceId": "egypt-conflict",
+      "targetId": "egypt-prohibition",
+      "civilizationId": "egypt",
+      "label": "危机→道德强化"
+    },
+    {
+      "id": "el-5",
+      "sourceId": "egypt-prohibition",
+      "targetId": "egypt-faith",
+      "civilizationId": "egypt",
+      "label": "审判恐惧→来世投资"
+    },
+    {
+      "id": "cl-1",
+      "sourceId": "chinese-catalyst",
+      "targetId": "chinese-nutrition",
+      "civilizationId": "chinese",
+      "label": "治水需求→精耕农业"
+    },
+    {
+      "id": "cl-2",
+      "sourceId": "chinese-nutrition",
+      "targetId": "chinese-customs",
+      "civilizationId": "chinese",
+      "label": "精耕→宗族社会"
+    },
+    {
+      "id": "cl-3",
+      "sourceId": "chinese-customs",
+      "targetId": "chinese-conflict",
+      "civilizationId": "chinese",
+      "label": "宗族扩张→统一需求"
+    },
+    {
+      "id": "cl-4",
+      "sourceId": "chinese-conflict",
+      "targetId": "chinese-prohibition",
+      "civilizationId": "chinese",
+      "label": "中央集权→礼教规训"
+    },
+    {
+      "id": "cl-5",
+      "sourceId": "chinese-prohibition",
+      "targetId": "chinese-faith",
+      "civilizationId": "chinese",
+      "label": "伦理体系→天道哲学"
+    },
+    {
+      "id": "ml-1",
+      "sourceId": "maya-catalyst",
+      "targetId": "maya-nutrition",
+      "civilizationId": "maya",
+      "label": "石灰岩取水→玉米密集"
+    },
+    {
+      "id": "ml-2",
+      "sourceId": "maya-nutrition",
+      "targetId": "maya-customs",
+      "civilizationId": "maya",
+      "label": "高密度→城邦联盟"
+    },
+    {
+      "id": "ml-3",
+      "sourceId": "maya-customs",
+      "targetId": "maya-conflict",
+      "civilizationId": "maya",
+      "label": "竞争共存→仪式战争"
+    },
+    {
+      "id": "ml-4",
+      "sourceId": "maya-conflict",
+      "targetId": "maya-prohibition",
+      "civilizationId": "maya",
+      "label": "俘虏→牺牲禁忌"
+    },
+    {
+      "id": "ml-5",
+      "sourceId": "maya-prohibition",
+      "targetId": "maya-faith",
+      "civilizationId": "maya",
+      "label": "禁忌→宇宙数学"
+    }
+  ],
+  "timelineEvents": [
+    {
+      "id": "t-e-1",
+      "civilizationId": "egypt",
+      "year": -3100,
+      "label": "埃及统一",
+      "summary": "那尔迈(美尼斯)统一上下埃及，开启早王朝时期。"
+    },
+    {
+      "id": "t-e-2",
+      "civilizationId": "egypt",
+      "year": -2600,
+      "label": "大金字塔建造",
+      "summary": "胡夫金字塔在吉萨建造，标志古王国鼎盛。"
+    },
+    {
+      "id": "t-e-3",
+      "civilizationId": "egypt",
+      "year": -1650,
+      "label": "喜克索斯入侵",
+      "summary": "喜克索斯人引入战车技术，统治下埃及百余年。"
+    },
+    {
+      "id": "t-e-4",
+      "civilizationId": "egypt",
+      "year": -1332,
+      "label": "图坦卡蒙",
+      "summary": "少年法老图坦卡蒙短暂在位，其墓葬后世完整出土。"
+    },
+    {
+      "id": "t-e-5",
+      "civilizationId": "egypt",
+      "year": -332,
+      "label": "亚历山大征服",
+      "summary": "亚历山大大帝进入埃及，托勒密王朝开启希腊化时期。"
+    },
+    {
+      "id": "t-c-1",
+      "civilizationId": "chinese",
+      "year": -2070,
+      "label": "夏朝建立",
+      "summary": "大禹治水后建立中国第一个世袭王朝。"
+    },
+    {
+      "id": "t-c-2",
+      "civilizationId": "chinese",
+      "year": -1600,
+      "label": "商朝·甲骨文",
+      "summary": "商朝建立，留下最早的系统文字——甲骨文。"
+    },
+    {
+      "id": "t-c-3",
+      "civilizationId": "chinese",
+      "year": -1046,
+      "label": "周朝·封建制度",
+      "summary": "武王伐纣建立周朝，推行宗法封建制。"
+    },
+    {
+      "id": "t-c-4",
+      "civilizationId": "chinese",
+      "year": -221,
+      "label": "秦统一六国",
+      "summary": "秦始皇统一中国，建立中央集权郡县制。"
+    },
+    {
+      "id": "t-c-5",
+      "civilizationId": "chinese",
+      "year": -136,
+      "label": "独尊儒术",
+      "summary": "汉武帝采纳董仲舒建议，儒学成为官方意识形态。"
+    },
+    {
+      "id": "t-g-1",
+      "civilizationId": "greek",
+      "year": -776,
+      "label": "首届奥运会",
+      "summary": "第一届奥林匹克运动会在奥林匹亚举行。"
+    },
+    {
+      "id": "t-g-2",
+      "civilizationId": "greek",
+      "year": -508,
+      "label": "雅典民主改革",
+      "summary": "克里斯提尼改革确立雅典民主制度。"
+    },
+    {
+      "id": "t-g-3",
+      "civilizationId": "greek",
+      "year": -480,
+      "label": "温泉关战役",
+      "summary": "三百斯巴达勇士在温泉关阻击波斯大军。"
+    },
+    {
+      "id": "t-g-4",
+      "civilizationId": "greek",
+      "year": -431,
+      "label": "伯罗奔尼撒战争",
+      "summary": "雅典与斯巴达爆发持续30年的希腊内战。"
+    },
+    {
+      "id": "t-g-5",
+      "civilizationId": "greek",
+      "year": -336,
+      "label": "亚历山大即位",
+      "summary": "亚历山大继承马其顿王位，开启希腊化时代。"
+    },
+    {
+      "id": "t-m-1",
+      "civilizationId": "maya",
+      "year": -2000,
+      "label": "玛雅前古典期",
+      "summary": "玛雅文明在尤卡坦半岛和中美洲形成定居农业。"
+    },
+    {
+      "id": "t-m-2",
+      "civilizationId": "maya",
+      "year": -300,
+      "label": "古典期城邦兴起",
+      "summary": "蒂卡尔、帕伦克等主要城邦开始建造大型金字塔神庙。"
+    },
+    {
+      "id": "t-m-3",
+      "civilizationId": "maya",
+      "year": 300,
+      "label": "玛雅文字系统",
+      "summary": "成熟的象形文字系统广泛使用于纪念碑和手抄本。"
+    },
+    {
+      "id": "t-m-4",
+      "civilizationId": "maya",
+      "year": 900,
+      "label": "古典期崩溃",
+      "summary": "南部低地城邦大规模废弃，人口骤降，原因至今争议。"
+    },
+    {
+      "id": "t-m-5",
+      "civilizationId": "maya",
+      "year": 1517,
+      "label": "西班牙人抵达",
+      "summary": "西班牙征服者抵达尤卡坦，玛雅文明进入终结阶段。"
+    }
+  ],
+  "comparisonPresets": [
+    {
+      "id": "flood-vs-osiris",
+      "title": "大禹治水 vs 奥西里斯重生",
+      "civA": "chinese",
+      "civB": "egypt",
+      "thesis": "两大河流文明在面对「洪水」这一共同威胁时，分别构建了「主动治理」与「神话轮回」两种截然不同的文化应对模式。",
+      "analysis": "华夏久居黄泛区，治水是现实的生存斗争，大禹被塑造为'三过家门不入'的奉献型古圣王，从而奠定了'以血缘义务交换治水权力'的合法性逻辑。古埃及享受着尼罗河可预测的温和泛滥，洪水不是灾难而是祝福，因此法老的合法性源自'保证河流复活秩序'的神圣能力，奥西里斯被兄弟杀害后又复活的叙事成为民族集体潜意识。大禹代表了'人定胜天'的能动精神，奥西里斯代表了'自然即神'的顺从信仰。这两种文化原型至今仍深埋在各自文明的底层心理中。",
+      "conclusion": "同一地质要素（河流泛滥），因可预测性不同，催生了'中央集权的治水行政'与'神权体系下的死后审判'两条截然不同的文明轨道路径。前者指向世俗政治，后者指向宗教终极。"
+    },
+    {
+      "id": "ostracism-vs-name-erasure",
+      "title": "陶片放逐 vs 名字消灭",
+      "civA": "greek",
+      "civB": "egypt",
+      "thesis": "古希腊的「陶片放逐」与古埃及的「名字消灭(Damnatio Memoriae)」是两种针对权力失控的预防性制度，但其底层信任结构完全不同。",
+      "analysis": "雅典的陶片放逐是公民群体的集体决策——只要6000票通过就可以将任何人放逐10年，体现了城邦公民的横向信任与对独裁的集体恐惧。而埃及的名字消灭则由法老及其祭司阶层自上而下执行——从纪念碑与铭文中凿除不忠者的名字，认为这将剥夺死者的来世存在。这体现了埃及社会的纵向信任——一切合法性来源于法老，反抗法老即意味着从「存在」层面被删除。前者是民主的保险丝，后者是神权的终极审判。",
+      "conclusion": "两套制度同为「控制个人权力膨胀」的机制，但雅典依赖的是公民的集体理性选择，埃及依赖的是法老的个人神意裁断。信任体系的性质决定了政治制度的形态——横向信任孕育民主，纵向信任必然走向绝对君主制。"
+    },
+    {
+      "id": "calendar-vs-prophecy",
+      "title": "华夏农事历 vs 玛雅宇宙历",
+      "civA": "chinese",
+      "civB": "maya",
+      "thesis": "华夏文明的「农历」和玛雅文明的「卓尔金历/长计历」同为精密天文观测的产物，但其哲学基底分别指向「实用农业」与「宇宙循环神学」。",
+      "analysis": "华夏农历以二十四节气为核心，精确标注农时——清明下种、霜降收割，历法的终极目的是服务于农业生产的精密管理。这是'经验理性'的巅峰——观察天象是为了更好地播种。玛雅的卓尔金历260天为一个循环，与玉米种植的180-200天生长周期高度相关，但被赋予了占卜个人命运的神学功能——每一天都由一位神祇承载，决定一个人的性格与命运。长计历更进一步，将时间延伸到数百万年的宇宙大循环。一个是'天时为农事服务'，一个是'天时即命运本身'。同一种天文精确性，在两种文明中被应用到了截然不同的方向上。",
+      "conclusion": "精密天文学在两大古文明中分别服务于'增产'与'通神'，地缘生存压力决定了同一门科学被赋予的具体社会功能。华夏的历法是工具理性，玛雅的历法是信仰理性。"
+    },
+    {
+      "id": "philosophy-vs-pyramid",
+      "title": "雅典学院 vs 金字塔",
+      "civA": "greek",
+      "civB": "egypt",
+      "thesis": "古希腊将剩余资源投入「抽象思维」，古埃及将剩余资源投入「来世建筑」——同一份农业盈余，两种完全不同的投资方向。",
+      "analysis": "埃及尼罗河谷的农业剩余极为丰厚，但在绝对神权体制下，剩余资源的主要流向是金字塔、神庙和来世墓葬。这些巨型石制建筑既是法老权力的展示，也是神学体系的物质化。而希腊本土贫瘠，剩余资源极为有限，却通过海上贸易积累了财富。在城邦自治的自由空气中，这笔财富没有被投入陵墓，而是被投入了雅典学园、戏剧节和公共辩论。「闲暇」在古代世界是奢侈品，雅典人用它来思考存在的意义，孟斐斯的祭司用它来建造不朽的陵墓。",
+      "conclusion": "同等份额的农业盈余，在神权体制中成为权力的物质化纪念碑，在民主体制中成为思想的催化剂。制度形态决定剩余资源的分配方向，进而决定了文明的终极成就形态。"
+    }
+  ]
+}

@@ -17,6 +17,7 @@ const WORKSPACE_VIEWS = [
   "legacy",
   "socioeconomics",
   "future",
+  "worldhistory",
 ] satisfies AppView[]
 
 function isAppView(value: string): value is AppView {

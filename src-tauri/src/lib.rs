@@ -13,6 +13,7 @@ mod reflection;
 mod relationships;
 mod shopping;
 mod socioeconomics;
+mod worldhistory;
 
 use beliefs::commands::{
     create_belief_entry, delete_belief_entry, get_beliefs, update_belief_entry, BeliefsState,
@@ -46,6 +47,7 @@ use socioeconomics::commands::{get_socioeconomics, save_socioeconomics, Socioeco
 use specta_typescript::Typescript;
 use std::sync::Mutex;
 use tauri::Manager;
+use worldhistory::commands::{get_world_history, save_world_history, WorldHistoryState};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -166,6 +168,9 @@ pub fn run() {
             app.manage(FutureState {
                 data_path: app_data_dir.join("future.json"),
             });
+            app.manage(WorldHistoryState {
+                data_path: app_data_dir.join("worldhistory.json"),
+            });
 
             Ok(())
         })
@@ -203,6 +208,8 @@ pub fn run() {
             save_socioeconomics,
             get_future,
             save_future,
+            get_world_history,
+            save_world_history,
             get_shopping,
             get_workspace_snapshot,
             list_shopping_items,

@@ -22,6 +22,7 @@ import type {
   ShoppingModuleData,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
+  WorldHistoryModuleData,
 } from "@/features/bettertolive/models/workspace"
 
 function getOverviewFromRust() {
@@ -128,6 +129,14 @@ async function saveSocioeconomicsToRust(socioeconomics: SocioeconomicsModuleData
   await invoke("save_socioeconomics", { socioeconomics })
 }
 
+function getWorldHistoryFromRust() {
+  return invoke<WorldHistoryModuleData>("get_world_history")
+}
+
+async function saveWorldHistoryToRust(worldHistory: WorldHistoryModuleData) {
+  await invoke("save_world_history", { worldHistory })
+}
+
 export function createLiveBetterToLiveApi(): BetterToLiveApi {
   return {
     // ---- Tauri commands (Rust backend) ----
@@ -174,5 +183,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     saveSocioeconomics: (socioeconomics) => saveSocioeconomicsToRust(socioeconomics),
     getFuture: () => getFutureFromRust(),
     saveFuture: (future) => saveFutureToRust(future),
+    getWorldHistory: () => getWorldHistoryFromRust(),
+    saveWorldHistory: (worldHistory) => saveWorldHistoryToRust(worldHistory),
   }
 }

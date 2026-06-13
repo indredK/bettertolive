@@ -3446,7 +3446,8 @@
       "journey": "成长记忆",
       "legacy": "生命整理",
       "socioeconomics": "社会经济",
-      "future": "未来蓝图"
+      "future": "未来蓝图",
+      "worldhistory": "世界历史"
     },
     "nav": {
       "ariaLabel": "页面导航",
@@ -3458,7 +3459,8 @@
         "selfMap": "自我图谱",
         "lifeOrganizing": "生命整理",
         "externalWorld": "外部世界",
-        "direction": "方向"
+        "direction": "方向",
+        "worldHistory": "世界历史"
       },
       "items": {
         "overview": {
@@ -3516,6 +3518,10 @@
         "future": {
           "label": "未来",
           "hint": "理想自我和生活方向"
+        },
+        "worldhistory": {
+          "label": "世界历史",
+          "hint": "地缘文明因果星图"
         }
       }
     },
@@ -3779,6 +3785,23 @@
             "text": "未来蓝图不是预测，而是你愿意靠近的定义。"
           }
         }
+      },
+      "worldhistory": {
+        "heading": "世界历史说明",
+        "lines": {
+          "explore": {
+            "label": "探索",
+            "text": "地缘唯物主义视角下四大古文明的因果演化链路。"
+          },
+          "fit": {
+            "label": "适合",
+            "text": "适合从底层地缘逻辑理解文明选择和人类制度多样性。"
+          },
+          "purpose": {
+            "label": "目的",
+            "text": "不是学习历史，而是理解同一生存压力如何催生不同文明路径。"
+          }
+        }
       }
     },
     "settings": {
@@ -4007,6 +4030,100 @@
       "summaryDescription": "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
       "signalTitle": "先校准的几条",
       "signalDescription": "优先看不可退让或代价高的原则，确认它们是不是还真属于你。"
+    }
+  },
+  "worldhistory": {
+    "title": "人类文明地缘因果星图",
+    "subtitle": "地缘唯物主义视角下的跨文化比较",
+    "tabs": {
+      "star": "星图",
+      "gantt": "演进",
+      "arena": "对质"
+    },
+    "actions": {
+      "edit": "编辑",
+      "save": "保存",
+      "saving": "保存中…",
+      "cancel": "取消"
+    },
+    "narrative": {
+      "prev": "上一步",
+      "next": "下一步",
+      "stop": "结束",
+      "start": "沿因果链逐步导览",
+      "counter": "因果链 {{current}} / {{total}}"
+    },
+    "nodeKind": {
+      "catalyst": "地缘催化",
+      "nutrition": "食物营养",
+      "customs": "风民人伦",
+      "conflict": "冲突战役",
+      "prohibition": "生死禁避",
+      "faith": "信仰法度"
+    },
+    "nodeGlyph": {
+      "catalyst": "催",
+      "nutrition": "养",
+      "customs": "伦",
+      "conflict": "战",
+      "prohibition": "禁",
+      "faith": "信"
+    },
+    "dimension": {
+      "calories": "主食卡路里",
+      "defense": "防灾隔离",
+      "trust": "互信契约",
+      "authority": "强权管制",
+      "taboos": "禁忌规训",
+      "abstract": "玄思抽象"
+    },
+    "event": {
+      "newLabel": "新事件",
+      "namePlaceholder": "事件名称",
+      "summaryPlaceholder": "事件摘要",
+      "deleteAria": "删除事件"
+    },
+    "preset": {
+      "newLabel": "新判词",
+      "titlePlaceholder": "判词标题",
+      "thesisPlaceholder": "论题",
+      "analysisPlaceholder": "分析",
+      "conclusionPlaceholder": "结论",
+      "deleteAria": "删除判词",
+      "noPresets": "这对文明暂无判词",
+      "noPresetsHint": "，点击「新增判词」添加"
+    },
+    "star": {
+      "suffix": "因果链路星图",
+      "collapse": "收起",
+      "nodeNamePlaceholder": "节点名称",
+      "descriptionPlaceholder": "现象描述",
+      "causalPlaceholder": "因果链解释",
+      "causalLabel": "因果链："
+    },
+    "gantt": {
+      "bc": "公元前 ",
+      "ad": "公元 ",
+      "yearPrefix": "前",
+      "suffix": "演进时间轴",
+      "addEvent": "新增事件",
+      "ganttMode": "甘特横轴",
+      "treeMode": "因果树",
+      "noEvents": "暂无事件"
+    },
+    "arena": {
+      "title": "跨文明辩证对质场",
+      "needsTwo": "至少需要两个文明才能进行对质",
+      "classicVerdicts": "经典古判词",
+      "addPreset": "新增判词",
+      "dimension": "维度",
+      "diff": "差"
+    },
+    "civilization": {
+      "greek": "古希腊",
+      "egypt": "古埃及",
+      "chinese": "华夏文明",
+      "maya": "玛雅文明"
     }
   },
   "splash": {

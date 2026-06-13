@@ -25,6 +25,7 @@ import type {
   ShoppingStageTemplate,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
+  WorldHistoryModuleData,
 } from "@/features/bettertolive/models/workspace"
 
 // ---- Shopping CRUD types ----
@@ -170,6 +171,8 @@ export type BetterToLiveApi = {
   saveSocioeconomics: (socioeconomics: SocioeconomicsModuleData) => Promise<void>
   getFuture: () => Promise<FutureModuleData>
   saveFuture: (future: FutureModuleData) => Promise<void>
+  getWorldHistory: () => Promise<WorldHistoryModuleData>
+  saveWorldHistory: (worldHistory: WorldHistoryModuleData) => Promise<void>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>
 }
 

@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   BookOpenText,
   Compass,
+  Globe,
   HeartPulse,
   Landmark,
   LayoutDashboard,
@@ -56,6 +57,7 @@ import { ReflectionPage } from "@/features/bettertolive/ui/reflection/reflection
 import { RelationshipsPage } from "@/features/bettertolive/ui/relationships/relationships-page"
 import { ShoppingPage } from "@/features/bettertolive/ui/shopping/shopping-page"
 import { SocioeconomicsPage } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page"
+import { WorldHistoryPage } from "@/features/bettertolive/ui/worldhistory/world-history-page"
 import { SidebarNoteCarousel } from "@/features/bettertolive/ui/shell/sidebar-carousel"
 import { RhythmPopup } from "@/features/bettertolive/ui/shell/rhythm-popup"
 import {
@@ -211,6 +213,17 @@ function createNavSections(t: TFunction): Array<{
           label: t("shell.nav.items.future.label"),
           hint: t("shell.nav.items.future.hint"),
           icon: Compass,
+        },
+      ],
+    },
+    {
+      title: t("shell.nav.groups.worldHistory"),
+      items: [
+        {
+          view: "worldhistory",
+          label: t("shell.nav.items.worldhistory.label"),
+          hint: t("shell.nav.items.worldhistory.hint"),
+          icon: Globe,
         },
       ],
     },
@@ -549,6 +562,13 @@ export function BetterToLiveAppShell() {
             isStackedLayout={isStackedLayout}
             isControlMode={isShoppingManagementMode}
             onRefresh={() => workspaceQuery.refetch()}
+          />
+        )
+      case "worldhistory":
+        return (
+          <WorldHistoryPage
+            isStackedLayout={isStackedLayout}
+            isControlMode={isShoppingManagementMode}
           />
         )
       case "overview":
