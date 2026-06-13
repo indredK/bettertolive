@@ -51,7 +51,6 @@ pub struct ItemRow {
     pub id: String,
     pub name: String,
     pub status: String,
-    pub lane: Option<String>,
     pub lifecycle: String,
     pub depreciation: Option<String>,
     pub entry_price: Option<f64>,
@@ -60,7 +59,6 @@ pub struct ItemRow {
     pub note: String,
     // owned 来的可选字段
     pub quantity: Option<i32>,
-    pub health_status: Option<String>,
     pub replacement_cue: Option<String>,
     // plan 来的可选字段
     pub reason: Option<String>,

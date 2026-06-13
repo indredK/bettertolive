@@ -140,39 +140,6 @@
       "sortOrder": 1
     },
     {
-      "id": "shopping-lane-now",
-      "kind": "lane",
-      "code": "Now",
-      "semanticKey": "now",
-      "label": "立即买",
-      "labelEn": "Buy now",
-      "description": "当前就需要买的项目",
-      "styleToken": "accent",
-      "sortOrder": 0
-    },
-    {
-      "id": "shopping-lane-wait",
-      "kind": "lane",
-      "code": "Wait",
-      "semanticKey": "wait",
-      "label": "等好价",
-      "labelEn": "Wait for price",
-      "description": "需求存在，但仍等待更合适价格",
-      "styleToken": "accent",
-      "sortOrder": 1
-    },
-    {
-      "id": "shopping-lane-hold",
-      "kind": "lane",
-      "code": "Hold",
-      "semanticKey": "hold",
-      "label": "先不买",
-      "labelEn": "Hold",
-      "description": "明确先不进入采购动作",
-      "styleToken": "muted",
-      "sortOrder": 2
-    },
-    {
       "id": "shopping-lifecycle-consumable",
       "kind": "lifecycle",
       "code": "Consumable",
@@ -275,61 +242,6 @@
       "styleToken": "card",
       "rank": 4,
       "sortOrder": 4
-    },
-    {
-      "id": "shopping-health-stable-use",
-      "kind": "health_status",
-      "code": "StableUse",
-      "semanticKey": "stable_use",
-      "label": "稳定使用",
-      "labelEn": "Stable use",
-      "description": "当前使用状态稳定，无需额外动作",
-      "styleToken": "accent",
-      "sortOrder": 0
-    },
-    {
-      "id": "shopping-health-consider-upgrade",
-      "kind": "health_status",
-      "code": "ConsiderUpgrade",
-      "semanticKey": "consider_upgrade",
-      "label": "考虑升级",
-      "labelEn": "Consider upgrade",
-      "description": "还能用，但体验或性能已接近升级边界",
-      "styleToken": "secondary",
-      "sortOrder": 1
-    },
-    {
-      "id": "shopping-health-need-restock",
-      "kind": "health_status",
-      "code": "NeedRestock",
-      "semanticKey": "need_restock",
-      "label": "需要补货",
-      "labelEn": "Need restock",
-      "description": "库存正在下降，需要补充",
-      "styleToken": "secondary",
-      "sortOrder": 2
-    },
-    {
-      "id": "shopping-health-missing-parts",
-      "kind": "health_status",
-      "code": "MissingParts",
-      "semanticKey": "missing_parts",
-      "label": "缺少部件",
-      "labelEn": "Missing parts",
-      "description": "本体可用，但关键附件或部件缺失",
-      "styleToken": "muted",
-      "sortOrder": 3
-    },
-    {
-      "id": "shopping-health-need-complete",
-      "kind": "health_status",
-      "code": "NeedComplete",
-      "semanticKey": "need_complete",
-      "label": "需要补齐",
-      "labelEn": "Need completion",
-      "description": "单件存在但整体系统仍不完整",
-      "styleToken": "muted",
-      "sortOrder": 4
     }
   ],
   "items": [
@@ -352,8 +264,7 @@
       "entryPrice": 1500,
       "sweetSpotPrice": 3500,
       "overpayPrice": 8000,
-      "quantity": 1,
-      "healthStatus": "ConsiderUpgrade"
+      "quantity": 1
     },
     {
       "id": "item-blackout-curtain",
@@ -373,8 +284,7 @@
       "entryPrice": 80,
       "sweetSpotPrice": 250,
       "overpayPrice": 800,
-      "quantity": 2,
-      "healthStatus": "StableUse"
+      "quantity": 2
     },
     {
       "id": "item-desk-lamp",
@@ -394,8 +304,7 @@
       "entryPrice": 150,
       "sweetSpotPrice": 400,
       "overpayPrice": 1500,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-pot",
@@ -416,8 +325,7 @@
       "entryPrice": 100,
       "sweetSpotPrice": 350,
       "overpayPrice": 1200,
-      "quantity": 2,
-      "healthStatus": "StableUse"
+      "quantity": 2
     },
     {
       "id": "item-laundry-liquid",
@@ -436,14 +344,12 @@
       "entryPrice": 15,
       "sweetSpotPrice": 35,
       "overpayPrice": 80,
-      "quantity": 3,
-      "healthStatus": "NeedRestock"
+      "quantity": 3
     },
     {
       "id": "item-detergent",
       "name": "洗洁精",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Consumable",
       "note": "厨房与卫生间常备,目前快用完。",
       "children": [
@@ -466,7 +372,6 @@
       "id": "item-trash-bag",
       "name": "垃圾袋",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Consumable",
       "note": "和洗洁精一起补,顺手买大包装。",
       "children": [
@@ -501,8 +406,7 @@
       "entryPrice": 25,
       "sweetSpotPrice": 60,
       "overpayPrice": 150,
-      "quantity": 8,
-      "healthStatus": "StableUse"
+      "quantity": 8
     },
     {
       "id": "item-router",
@@ -523,14 +427,12 @@
       "entryPrice": 150,
       "sweetSpotPrice": 350,
       "overpayPrice": 1200,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-power-strip",
       "name": "插线板",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Durable",
       "depreciation": "Slow",
       "note": "玄关充电与吸尘器共用一个集中位。",
@@ -568,14 +470,12 @@
       "entryPrice": 80,
       "sweetSpotPrice": 200,
       "overpayPrice": 600,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-medicine-drawer",
       "name": "常备药",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Consumable",
       "note": "感冒药、肠胃药、创可贴、退烧药,每半年看一次有效期。",
       "children": [
@@ -611,8 +511,7 @@
       "entryPrice": 150,
       "sweetSpotPrice": 350,
       "overpayPrice": 1500,
-      "quantity": 2,
-      "healthStatus": "StableUse"
+      "quantity": 2
     },
     {
       "id": "item-slippers",
@@ -631,8 +530,7 @@
       "entryPrice": 30,
       "sweetSpotPrice": 80,
       "overpayPrice": 200,
-      "quantity": 4,
-      "healthStatus": "StableUse"
+      "quantity": 4
     },
     {
       "id": "item-commute-backpack",
@@ -652,8 +550,7 @@
       "entryPrice": 200,
       "sweetSpotPrice": 500,
       "overpayPrice": 1800,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-laptop-stand",
@@ -673,8 +570,7 @@
       "entryPrice": 50,
       "sweetSpotPrice": 150,
       "overpayPrice": 500,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-scent-candle",
@@ -693,8 +589,7 @@
       "entryPrice": 50,
       "sweetSpotPrice": 150,
       "overpayPrice": 500,
-      "quantity": 3,
-      "healthStatus": "StableUse"
+      "quantity": 3
     },
     {
       "id": "item-photo-box",
@@ -709,8 +604,7 @@
       "systemTags": ["Entertainment"],
       "spaceTags": ["space-study"],
       "channels": ["手作"],
-      "quantity": 2,
-      "healthStatus": "StableUse"
+      "quantity": 2
     },
     {
       "id": "item-cat-bowl",
@@ -730,8 +624,7 @@
       "entryPrice": 30,
       "sweetSpotPrice": 80,
       "overpayPrice": 250,
-      "quantity": 2,
-      "healthStatus": "StableUse"
+      "quantity": 2
     },
     {
       "id": "item-cat-litter-box",
@@ -751,8 +644,7 @@
       "entryPrice": 80,
       "sweetSpotPrice": 250,
       "overpayPrice": 3000,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-cat-carrier",
@@ -772,14 +664,12 @@
       "entryPrice": 80,
       "sweetSpotPrice": 200,
       "overpayPrice": 800,
-      "quantity": 1,
-      "healthStatus": "StableUse"
+      "quantity": 1
     },
     {
       "id": "item-cat-food",
       "name": "猫粮",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Consumable",
       "note": "看一下库存,准备囤一个月量。",
       "children": [
@@ -801,7 +691,6 @@
       "id": "item-cat-litter",
       "name": "猫砂",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Consumable",
       "note": "豆腐砂混合膨润土用,味道与结团都更好。",
       "children": [
@@ -822,7 +711,6 @@
       "id": "item-dehumidifier",
       "name": "除湿机",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Durable",
       "depreciation": "Medium",
       "note": "梅雨季前补齐,先看 8L 入门款。",
@@ -845,7 +733,6 @@
       "id": "item-bedside-lamp",
       "name": "床边灯",
       "status": "Wanted",
-      "lane": "Now",
       "lifecycle": "Durable",
       "depreciation": "Slow",
       "note": "暖光、可调亮度,睡前不刺眼。",
@@ -868,7 +755,6 @@
       "id": "item-ergo-chair",
       "name": "人体工学椅",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Medium",
       "note": "实测半年再下手,等 618 或双 11 大促。",
@@ -891,7 +777,6 @@
       "id": "item-monitor",
       "name": "便携显示器",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Fast",
       "note": "新机折旧快,等成熟款落价。",
@@ -914,7 +799,6 @@
       "id": "item-vacuum",
       "name": "吸尘器",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Medium",
       "note": "等 4 字头大促价。",
@@ -937,7 +821,6 @@
       "id": "item-mattress-upgrade",
       "name": "床垫升级",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Slow",
       "note": "现床垫还能用半年,等大促窗口。",
@@ -959,7 +842,6 @@
       "id": "item-folding-dining-table",
       "name": "折叠餐桌",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Slow",
       "note": "小户型方案,平时折起。",
@@ -981,7 +863,6 @@
       "id": "item-cat-tree",
       "name": "猫爬架",
       "status": "Wanted",
-      "lane": "Wait",
       "lifecycle": "Durable",
       "depreciation": "Medium",
       "note": "等中型款大促。",
@@ -1004,7 +885,6 @@
       "id": "item-projector",
       "name": "投影仪",
       "status": "Wanted",
-      "lane": "Hold",
       "lifecycle": "Durable",
       "depreciation": "VeryFast",
       "note": "高折旧 + 幸福感物品,先按住。",
@@ -1026,7 +906,6 @@
       "id": "item-coffee-machine",
       "name": "半自动咖啡机",
       "status": "Wanted",
-      "lane": "Hold",
       "lifecycle": "Durable",
       "depreciation": "Medium",
       "note": "现阶段挂耳已经够喝,等更稳定生活节奏再说。",
@@ -1048,7 +927,6 @@
       "id": "item-treadmill",
       "name": "折叠跑步机",
       "status": "Wanted",
-      "lane": "Hold",
       "lifecycle": "Durable",
       "depreciation": "Fast",
       "note": "占地大、易吃灰,先约公园跑。",
@@ -1069,7 +947,6 @@
       "id": "item-side-table",
       "name": "复古边几",
       "status": "Wanted",
-      "lane": "Hold",
       "lifecycle": "Durable",
       "depreciation": "Slow",
       "note": "纯陈设需求,先按住。",

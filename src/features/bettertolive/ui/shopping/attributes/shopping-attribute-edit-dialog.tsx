@@ -46,10 +46,8 @@ import { cn } from "@/lib/utils"
 
 const ATTRIBUTE_KIND_OPTIONS: ShoppingAttributeKind[] = [
   "status",
-  "lane",
   "lifecycle",
   "depreciation",
-  "health_status",
   "channel",
 ]
 
@@ -60,16 +58,8 @@ const NONE_SEMANTIC_VALUE = "__none_semantic__"
 
 const SEMANTIC_OPTIONS: Record<ShoppingAttributeKind, string[]> = {
   status: ["owned", "wanted"],
-  lane: ["now", "wait", "hold"],
   lifecycle: ["consumable", "durable", "tool", "emotional"],
   depreciation: ["very_fast", "fast", "medium", "slow", "no_depreciation"],
-  health_status: [
-    "stable_use",
-    "consider_upgrade",
-    "need_restock",
-    "missing_parts",
-    "need_complete",
-  ],
   channel: [],
 }
 
@@ -88,7 +78,7 @@ export function ShoppingAttributeEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.definition
-  const identityLocked = Boolean(seed?.isSystem && (seed.kind === "status" || seed.kind === "lane"))
+  const identityLocked = Boolean(seed?.isSystem && seed.kind === "status")
   const [kind, setKind] = useState<ShoppingAttributeKind>(
     seed?.kind ?? editing.defaultKind ?? "depreciation",
   )
@@ -103,7 +93,7 @@ export function ShoppingAttributeEditDialog({
   const [rank, setRank] = useState(seed?.rank != null ? String(seed.rank) : "")
 
   const semanticOptions = useMemo(() => SEMANTIC_OPTIONS[kind] ?? [], [kind])
-  const semanticRequired = kind === "status" || kind === "lane"
+  const semanticRequired = kind === "status"
 
   const canSubmit = label.trim().length > 0 && code.trim().length > 0
 

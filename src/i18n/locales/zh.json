@@ -1,4 +1,10 @@
 {
+  "common": {
+    "filter": {
+      "label": "筛选",
+      "clearAll": "清空"
+    }
+  },
   "shopping": {
     "page": {
       "eyebrow": "生活物品",
@@ -167,18 +173,13 @@
       "reordered": "属性顺序已更新",
       "kindOptions": {
         "status": "状态",
-        "lane": "泳道",
         "lifecycle": "生命周期",
         "depreciation": "折旧",
-        "health_status": "健康状态",
         "channel": "渠道"
       },
       "semanticOptions": {
         "owned": "已有",
         "wanted": "待购",
-        "now": "立即买",
-        "wait": "等好价",
-        "hold": "先不买",
         "consumable": "消耗品",
         "durable": "耐用品",
         "tool": "工具型",
@@ -187,12 +188,7 @@
         "fast": "较快折旧",
         "medium": "中等折旧",
         "slow": "慢折旧",
-        "no_depreciation": "不折旧或升值",
-        "stable_use": "稳定使用",
-        "consider_upgrade": "考虑升级",
-        "need_restock": "需要补货",
-        "missing_parts": "缺补件",
-        "need_complete": "需要补齐"
+        "no_depreciation": "不折旧或升值"
       },
       "styleOptions": {
         "accent": "强调",
@@ -203,9 +199,8 @@
     },
     "error": {
       "idNameRequired": "缺少系统 ID",
-      "nameRequired": "请填写名称",
-      "semanticRequired": "该类型必须设置语义键",
-      "itemRequired": "请填写名称,并至少各选一个系统和空间"
+      "itemRequired": "请填写名称,并至少各选一个系统和空间",
+      "nameRequired": "请填写名称"
     },
     "validation": {
       "required": "请填写{{field}}",
@@ -268,34 +263,10 @@
         "Slow": "慢折旧",
         "NoDepreciation": "不折旧或升值"
       },
-      "ownedStatus": {
-        "StableUse": "稳定使用",
-        "ConsiderUpgrade": "考虑升级",
-        "NeedRestock": "需要补货",
-        "MissingParts": "缺补件",
-        "NeedComplete": "需要补齐"
-      },
-      "healthStatus": {
-        "StableUse": "稳定使用",
-        "ConsiderUpgrade": "考虑升级",
-        "NeedRestock": "需要补货",
-        "MissingParts": "缺补件",
-        "NeedComplete": "需要补齐"
-      },
       "status": {
         "Owned": "已有",
         "Wanted": "待购"
-      },
-      "lane": {
-        "Now": "立即买",
-        "Wait": "等好价",
-        "Hold": "先不买"
       }
-    },
-    "laneName": {
-      "buy-now": "立即补齐",
-      "watch-price": "等好价",
-      "hold": "先不买"
     },
     "systems": {
       "coreQuestion": "核心问题：{{question}}",
@@ -686,11 +657,6 @@
       "on": "控制模式",
       "off": "浏览模式"
     },
-    "error": {
-      "idNameRequired": "缺少系统 ID",
-      "itemRequired": "请填写名称,并至少各选一个系统和空间",
-      "nameRequired": "请填写名称"
-    },
     "confirm": {
       "deleteItem": "确定删除 {{name}} 吗？",
       "deleteSystem": "确定删除 {{name}} 吗？",
@@ -699,13 +665,17 @@
     },
     "filter": {
       "all": "全部",
+      "allChannels": "全部渠道",
       "allSpaces": "全部空间",
       "allSystems": "全部系统",
+      "channel": "渠道",
       "clearAll": "清空",
       "more": "筛选",
+      "noChannel": "无渠道",
       "noSpace": "未分配空间",
       "noSystem": "未分配系统",
       "space": "空间",
+      "status": "状态",
       "system": "系统"
     },
     "sortable": {

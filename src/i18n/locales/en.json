@@ -1,4 +1,10 @@
 {
+  "common": {
+    "filter": {
+      "label": "Filter",
+      "clearAll": "Clear all"
+    }
+  },
   "shopping": {
     "page": {
       "eyebrow": "Living Items",
@@ -167,18 +173,13 @@
       "reordered": "Attribute order updated",
       "kindOptions": {
         "status": "Status",
-        "lane": "Lane",
         "lifecycle": "Lifecycle",
         "depreciation": "Depreciation",
-        "health_status": "Health Status",
         "channel": "Channel"
       },
       "semanticOptions": {
         "owned": "Owned",
         "wanted": "Wanted",
-        "now": "Buy now",
-        "wait": "Wait for deal",
-        "hold": "Hold off",
         "consumable": "Consumable",
         "durable": "Durable",
         "tool": "Tool",
@@ -187,12 +188,7 @@
         "fast": "Fast",
         "medium": "Medium",
         "slow": "Slow",
-        "no_depreciation": "No depreciation",
-        "stable_use": "Stable use",
-        "consider_upgrade": "Consider upgrade",
-        "need_restock": "Need restock",
-        "missing_parts": "Missing parts",
-        "need_complete": "Need completion"
+        "no_depreciation": "No depreciation"
       },
       "styleOptions": {
         "accent": "Accent",
@@ -203,9 +199,8 @@
     },
     "error": {
       "idNameRequired": "Missing system ID",
-      "nameRequired": "Please enter a name",
-      "semanticRequired": "This category requires a semantic key",
-      "itemRequired": "Please enter a name and choose at least one system and one space"
+      "itemRequired": "Enter a name and select at least one system and one space",
+      "nameRequired": "Enter a name"
     },
     "validation": {
       "required": "Please enter {{field}}",
@@ -268,34 +263,10 @@
         "Slow": "Slow",
         "NoDepreciation": "No Depreciation"
       },
-      "ownedStatus": {
-        "StableUse": "In Stable Use",
-        "ConsiderUpgrade": "Consider Upgrade",
-        "NeedRestock": "Need Restock",
-        "MissingParts": "Missing Parts",
-        "NeedComplete": "Need Completion"
-      },
-      "healthStatus": {
-        "StableUse": "In Stable Use",
-        "ConsiderUpgrade": "Consider Upgrade",
-        "NeedRestock": "Need Restock",
-        "MissingParts": "Missing Parts",
-        "NeedComplete": "Need Completion"
-      },
       "status": {
         "Owned": "Owned",
         "Wanted": "Wanted"
-      },
-      "lane": {
-        "Now": "Buy now",
-        "Wait": "Wait for deal",
-        "Hold": "Hold off"
       }
-    },
-    "laneName": {
-      "buy-now": "Buy Now",
-      "watch-price": "Wait for Deal",
-      "hold": "Hold Off"
     },
     "systems": {
       "coreQuestion": "Core Question: {{question}}",
@@ -686,11 +657,6 @@
       "on": "Control Mode",
       "off": "Browse Mode"
     },
-    "error": {
-      "idNameRequired": "Missing system ID",
-      "itemRequired": "Enter a name and select at least one system and one space",
-      "nameRequired": "Enter a name"
-    },
     "confirm": {
       "deleteItem": "Delete {{name}}?",
       "deleteSystem": "Delete {{name}}?",
@@ -699,13 +665,17 @@
     },
     "filter": {
       "all": "All",
+      "allChannels": "All channels",
       "allSpaces": "All spaces",
       "allSystems": "All systems",
+      "channel": "Channel",
       "clearAll": "Clear all",
       "more": "Filters",
+      "noChannel": "No channel",
       "noSpace": "No space",
       "noSystem": "No system",
       "space": "Space",
+      "status": "Status",
       "system": "System"
     },
     "sortable": {

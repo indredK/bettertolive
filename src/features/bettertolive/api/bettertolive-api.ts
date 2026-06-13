@@ -47,7 +47,6 @@ export type ShoppingItemRow = {
   id: string
   name: string
   status: string
-  lane: string | null
   lifecycle: string
   depreciation: string | null
   entry_price: number | null
@@ -55,7 +54,6 @@ export type ShoppingItemRow = {
   overpay_price: number | null
   note: string
   quantity: number | null
-  health_status: string | null
   replacement_cue: string | null
   reason: string | null
   target_lifestyle: string | null

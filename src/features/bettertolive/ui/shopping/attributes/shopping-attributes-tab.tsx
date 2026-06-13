@@ -48,8 +48,6 @@ const ATTRIBUTE_KIND_META: ShoppingAttributeKind[] = [
   "depreciation",
   "lifecycle",
   "status",
-  "lane",
-  "health_status",
   "channel",
 ]
 
@@ -199,22 +197,38 @@ export function ShoppingAttributesTab({
 
   return (
     <ShoppingTabViewport>
-      <div className="flex flex-wrap gap-2">
-        {grouped.map((group) => (
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          {grouped.map((group) => (
+            <Button
+              key={group.kind}
+              type="button"
+              variant={selectedKind === group.kind ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setSelectedKind(group.kind)
+                setSelectedAttributeId(null)
+              }}
+            >
+              {group.label}
+              <span className="text-xs opacity-70">{group.items.length}</span>
+            </Button>
+          ))}
+        </div>
+        {isControlMode ? (
           <Button
-            key={group.kind}
             type="button"
-            variant={selectedKind === group.kind ? "default" : "outline"}
             size="sm"
-            onClick={() => {
-              setSelectedKind(group.kind)
-              setSelectedAttributeId(null)
-            }}
+            variant="outline"
+            className="shrink-0"
+            onClick={() =>
+              setEditing({ isNew: true, definition: null, defaultKind: selectedGroup?.kind })
+            }
           >
-            {group.label}
-            <span className="text-xs opacity-70">{group.items.length}</span>
+            <Plus className="size-4" />
+            {t("shopping.attributes.add", "新增")}
           </Button>
-        ))}
+        ) : null}
       </div>
 
       {selectedGroup && selectedGroup.items.length === 0 && !isControlMode ? (
@@ -229,22 +243,7 @@ export function ShoppingAttributesTab({
       ) : (
         <ShoppingTabBody>
           <ShoppingSidebarPane contentClassName="gap-2">
-            <div className="flex items-center justify-between gap-2">
-              <div className="text-sm font-medium">{selectedGroup?.label}</div>
-              {isControlMode ? (
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={() =>
-                    setEditing({ isNew: true, definition: null, defaultKind: selectedGroup?.kind })
-                  }
-                >
-                  <Plus className="size-4" />
-                  {t("shopping.attributes.add", "新增")}
-                </Button>
-              ) : null}
-            </div>
+            <div className="text-sm font-medium">{selectedGroup?.label}</div>
 
             <DndContext onDragEnd={handleDragEnd}>
               <SortableContext items={orderedIds} strategy={verticalListSortingStrategy}>

@@ -2,8 +2,6 @@ import type { TFunction } from "i18next"
 import {
   type ShoppingAttributeDefinition,
   ShoppingDepreciation,
-  ShoppingHealthStatus,
-  ShoppingLane,
   ShoppingLifecycle,
   ShoppingStatus,
 } from "@/features/bettertolive/types"
@@ -37,12 +35,6 @@ export const STATUS_STYLES: Record<ShoppingStatus, string> = {
   [ShoppingStatus.Wanted]: "border-foreground/10 bg-secondary text-secondary-foreground",
 }
 
-export const LANE_STYLES: Record<ShoppingLane, string> = {
-  [ShoppingLane.Now]: "border-foreground/10 bg-accent text-accent-foreground",
-  [ShoppingLane.Wait]: "border-foreground/10 bg-accent text-accent-foreground",
-  [ShoppingLane.Hold]: "border-foreground/10 bg-muted text-muted-foreground",
-}
-
 // ===== 枚举选项 =====
 
 export const SHOPPING_LIFECYCLE_OPTIONS: ShoppingLifecycle[] = [
@@ -63,20 +55,6 @@ export const SHOPPING_DEPRECIATION_OPTIONS: ShoppingDepreciation[] = [
 export const SHOPPING_STATUS_OPTIONS: ShoppingStatus[] = [
   ShoppingStatus.Owned,
   ShoppingStatus.Wanted,
-]
-
-export const SHOPPING_LANE_OPTIONS: ShoppingLane[] = [
-  ShoppingLane.Now,
-  ShoppingLane.Wait,
-  ShoppingLane.Hold,
-]
-
-export const SHOPPING_HEALTH_STATUS_OPTIONS: ShoppingHealthStatus[] = [
-  ShoppingHealthStatus.StableUse,
-  ShoppingHealthStatus.ConsiderUpgrade,
-  ShoppingHealthStatus.NeedRestock,
-  ShoppingHealthStatus.MissingParts,
-  ShoppingHealthStatus.NeedComplete,
 ]
 
 export const FAST_DEPRECIATION = new Set<ShoppingDepreciation>([
@@ -262,45 +240,6 @@ export function statusDisplayName(
       `shopping.enumNames.status.${status}`,
       status === "Owned" ? "已有" : status === "Wanted" ? "待购" : String(status),
     )
-  )
-}
-
-export function laneDisplayName(
-  lane: ShoppingLane | string | null | undefined,
-  t: TFunction,
-  definitions?: ShoppingAttributeDefinition[],
-): string {
-  if (!lane) return ""
-  const fallback =
-    lane === "Now"
-      ? "立即买"
-      : lane === "Wait"
-        ? "等好价"
-        : lane === "Hold"
-          ? "先不买"
-          : String(lane)
-  return (
-    resolveAttributeLabel(
-      definitions,
-      "lane",
-      lane,
-      i18next.resolvedLanguage ?? i18next.language,
-    ) ?? t(`shopping.enumNames.lane.${lane}`, fallback)
-  )
-}
-
-export function healthStatusDisplayName(
-  status: ShoppingHealthStatus | string,
-  t: TFunction,
-  definitions?: ShoppingAttributeDefinition[],
-): string {
-  return (
-    resolveAttributeLabel(
-      definitions,
-      "health_status",
-      status,
-      i18next.resolvedLanguage ?? i18next.language,
-    ) ?? t(`shopping.enumNames.healthStatus.${status}`, status)
   )
 }
 

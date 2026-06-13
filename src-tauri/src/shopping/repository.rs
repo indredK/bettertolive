@@ -67,7 +67,6 @@ fn row_to_item(row: &rusqlite::Row) -> rusqlite::Result<ItemRow> {
         id: row.get("id")?,
         name: row.get("name")?,
         status: row.get("status")?,
-        lane: row.get("lane")?,
         lifecycle: row.get("lifecycle")?,
         depreciation: row.get("depreciation")?,
         entry_price: row.get("entry_price")?,
@@ -75,7 +74,6 @@ fn row_to_item(row: &rusqlite::Row) -> rusqlite::Result<ItemRow> {
         overpay_price: row.get("overpay_price")?,
         note: row.get("note")?,
         quantity: row.get("quantity")?,
-        health_status: row.get("health_status")?,
         replacement_cue: row.get("replacement_cue")?,
         reason: row.get("reason")?,
         target_lifestyle: row.get("target_lifestyle")?,
@@ -128,17 +126,10 @@ fn row_to_page_content(row: &rusqlite::Row) -> rusqlite::Result<PageContentRow> 
 }
 
 impl ShoppingRepository {
-    const SUPPORTED_ATTRIBUTE_KINDS: [&'static str; 6] = [
-        "status",
-        "lane",
-        "lifecycle",
-        "depreciation",
-        "health_status",
-        "channel",
-    ];
+    const SUPPORTED_ATTRIBUTE_KINDS: [&'static str; 4] =
+        ["status", "lifecycle", "depreciation", "channel"];
 
     const REQUIRED_STATUS_SEMANTICS: [&'static str; 2] = ["owned", "wanted"];
-    const REQUIRED_LANE_SEMANTICS: [&'static str; 3] = ["now", "wait", "hold"];
 
     fn count_to_i32(count: usize) -> i32 {
         i32::try_from(count).unwrap_or(i32::MAX)
@@ -206,16 +197,6 @@ impl ShoppingRepository {
                     Err(format!("invalid status semanticKey: {key}"))
                 }
             }
-            "lane" => {
-                let Some(key) = normalized_semantic else {
-                    return Err("lane requires semanticKey".to_string());
-                };
-                if Self::REQUIRED_LANE_SEMANTICS.contains(&key) {
-                    Ok(())
-                } else {
-                    Err(format!("invalid lane semanticKey: {key}"))
-                }
-            }
             _ => Ok(()),
         }
     }
@@ -256,7 +237,6 @@ impl ShoppingRepository {
     fn ensure_required_semantic_keys(conn: &Connection, kind: &str) -> Result<(), String> {
         let required = match kind {
             "status" => Self::REQUIRED_STATUS_SEMANTICS.as_slice(),
-            "lane" => Self::REQUIRED_LANE_SEMANTICS.as_slice(),
             _ => return Ok(()),
         };
 
@@ -876,7 +856,7 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
 
         if existing_row.is_system
-            && (existing_row.kind == "status" || existing_row.kind == "lane")
+            && existing_row.kind == "status"
             && (existing_row.kind != normalized_kind
                 || existing_row.code != normalized_code
                 || existing_row.semantic_key.as_deref()
@@ -964,7 +944,7 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
 
         if existing_row.is_system
-            && (existing_row.kind == "status" || existing_row.kind == "lane")
+            && existing_row.kind == "status"
             && existing_row.semantic_key.is_some()
         {
             return Err(format!(
@@ -1328,12 +1308,12 @@ impl ShoppingRepository {
                 .map_err(|e| e.to_string())?;
             conn.execute(
                 "INSERT INTO shopping_items (
-                    id, name, status, lane, lifecycle, depreciation,
+                    id, name, status, lifecycle, depreciation,
                     entry_price, sweet_spot_price, overpay_price,
-                    note, quantity, health_status, replacement_cue,
+                    note, quantity, replacement_cue,
                     reason, target_lifestyle, current_price, buy_below_price, keywords_json,
                     sort_order, is_archived, created_at, updated_at
-                ) VALUES (?1, ?2, 'Owned', NULL, 'Durable', NULL, NULL, NULL, NULL, ?3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?4, 0, ?5, ?6)",
+                ) VALUES (?1, ?2, 'Owned', 'Durable', NULL, NULL, NULL, NULL, ?3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ?4, 0, ?5, ?6)",
                 params![
                     id, name, note, next_order, now, now,
                 ],

@@ -95,6 +95,18 @@ export function ShoppingItemEditDialog({
   const [note, setNote] = useState(seed?.note ?? "")
   const attributeDefinitions = shopping.attributeDefinitions
 
+  const channelOptions = useMemo(() => {
+    const names = new Set<string>()
+    for (const item of shopping.items) {
+      for (const child of item.children) {
+        for (const cp of child.channelPrices ?? []) {
+          if (cp.channel) names.add(cp.channel)
+        }
+      }
+    }
+    return Array.from(names).sort((a, b) => a.localeCompare(b))
+  }, [shopping.items])
+
   const toggleTag = (list: string[], setter: (value: string[]) => void, id: string) => {
     if (list.includes(id)) {
       setter(list.filter((entry) => entry !== id))
@@ -309,6 +321,7 @@ export function ShoppingItemEditDialog({
                     child={child}
                     childIndex={index}
                     attributeDefinitions={attributeDefinitions}
+                    channelOptions={channelOptions}
                     onRemove={() => removeChild(index)}
                     onChange={(updater) => updateChild(index, updater)}
                     onAddChannel={() => addChannelToChild(index)}
@@ -371,6 +384,7 @@ function ChildEditorCard({
   child,
   childIndex,
   attributeDefinitions,
+  channelOptions,
   onRemove,
   onChange,
   onAddChannel,
@@ -379,6 +393,7 @@ function ChildEditorCard({
   child: ShoppingItemChild
   childIndex: number
   attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
+  channelOptions: string[]
   onRemove: () => void
   onChange: (updater: (child: ShoppingItemChild) => ShoppingItemChild) => void
   onAddChannel: () => void
@@ -506,6 +521,7 @@ function ChildEditorCard({
               <ChildChannelEditorRow
                 key={channelPrice.id}
                 channelPrice={channelPrice}
+                channelOptions={channelOptions}
                 onChange={(updater) =>
                   onChange((current) => ({
                     ...current,
@@ -526,10 +542,12 @@ function ChildEditorCard({
 
 function ChildChannelEditorRow({
   channelPrice,
+  channelOptions,
   onChange,
   onRemove,
 }: {
   channelPrice: ShoppingItemChildChannelPrice
+  channelOptions: string[]
   onChange: (
     updater: (channelPrice: ShoppingItemChildChannelPrice) => ShoppingItemChildChannelPrice,
   ) => void
@@ -537,15 +555,33 @@ function ChildChannelEditorRow({
 }) {
   const { t } = useTranslation()
 
+  const combinedOptions = useMemo(() => {
+    const allOptions = new Set(channelOptions)
+    if (channelPrice.channel) allOptions.add(channelPrice.channel)
+    return Array.from(allOptions).sort((a, b) => a.localeCompare(b))
+  }, [channelOptions, channelPrice.channel])
+
   return (
     <div className="border-foreground/10 bg-background/85 grid gap-3 rounded-lg border p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_auto]">
       <div className="space-y-1.5">
         <Label>{t("shopping.item.channelName", "渠道")}</Label>
-        <Input
-          value={channelPrice.channel}
-          onChange={(event) => onChange((current) => ({ ...current, channel: event.target.value }))}
-          className={SHOPPING_DIALOG_FIELD_CLASS}
-        />
+        <Select
+          value={channelPrice.channel ?? ""}
+          onValueChange={(value) =>
+            onChange((current) => ({ ...current, channel: String(value ?? "") }))
+          }
+        >
+          <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS}>
+            <SelectValue placeholder={t("shopping.item.channelName", "渠道")} />
+          </SelectTrigger>
+          <SelectContent>
+            {combinedOptions.map((option) => (
+              <SelectItem key={option} value={option}>
+                {option}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <div className="space-y-1.5">
         <Label>{t("shopping.priceRef.entry", "入门价")}</Label>

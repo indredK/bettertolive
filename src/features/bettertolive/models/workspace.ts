@@ -120,13 +120,7 @@ export type ShoppingSpaceDefinition = {
   note?: string
 }
 
-export type ShoppingAttributeKind =
-  | "status"
-  | "lane"
-  | "lifecycle"
-  | "depreciation"
-  | "health_status"
-  | "channel"
+export type ShoppingAttributeKind = "status" | "lifecycle" | "depreciation" | "channel"
 
 export type ShoppingAttributeStyleToken = "accent" | "secondary" | "muted" | "card"
 
@@ -153,13 +147,6 @@ export enum ShoppingStatus {
   Wanted = "Wanted",
 }
 
-// 采购泳道:仅 status=Wanted 时有意义
-export enum ShoppingLane {
-  Now = "Now", // 立即买
-  Wait = "Wait", // 等好价
-  Hold = "Hold", // 先不买
-}
-
 export enum ShoppingLifecycle {
   Consumable = "Consumable",
   Durable = "Durable",
@@ -173,15 +160,6 @@ export enum ShoppingDepreciation {
   Medium = "Medium",
   Slow = "Slow",
   NoDepreciation = "NoDepreciation",
-}
-
-// 已有物品的健康状态(原 ShoppingOwnedStatus 改名,避免与 ShoppingStatus 冲突)
-export enum ShoppingHealthStatus {
-  StableUse = "StableUse",
-  ConsiderUpgrade = "ConsiderUpgrade",
-  NeedRestock = "NeedRestock",
-  MissingParts = "MissingParts",
-  NeedComplete = "NeedComplete",
 }
 
 // ===== 物品(统一,跨 Tab 共享) =====
