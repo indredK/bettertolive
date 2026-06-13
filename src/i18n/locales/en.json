@@ -195,12 +195,29 @@
         "secondary": "Secondary",
         "muted": "Muted",
         "card": "Card"
+      },
+      "hint": {
+        "kind": "Determines which dimension this attribute belongs to. Items use these as dropdown options.",
+        "code": "Use PascalCase, e.g. Consumable. Cannot be changed after creation.",
+        "codeLocked": "Code cannot be changed after creation — it is the stable database identifier.",
+        "label": "The label shown in the UI. Can be changed at any time.",
+        "labelEn": "Shown when the language is set to English. Falls back to the Chinese label if empty.",
+        "semanticStatus": "Built-in identifier for owned/wanted logic. Must match the system's business semantics. Locked for system attributes.",
+        "semanticChannel": "Channel attributes do not support semantic keys. Leave empty.",
+        "semantic": "Links this attribute to a built-in semantic (optional). Custom attributes usually leave this empty.",
+        "styleToken": "Badge background: accent=primary · secondary=secondary · muted=muted grey · card=card",
+        "rank": "Assign an order weight for ranked attributes (e.g. depreciation rate). Lower = lower rank. Leave empty for unordered attributes.",
+        "description": "Explains the meaning of this attribute. Only shown in the attribute management panel."
       }
     },
     "error": {
       "idNameRequired": "Missing system ID",
       "itemRequired": "Enter a name and select at least one system and one space",
-      "nameRequired": "Enter a name"
+      "nameRequired": "Enter a name",
+      "semanticRequired": "This category requires a semantic key",
+      "codeEmpty": "Code cannot be empty",
+      "codeFormat": "Only letters, digits, and underscores are allowed, e.g. Consumable",
+      "rankInvalid": "Please enter a valid number"
     },
     "validation": {
       "required": "Please enter {{field}}",
@@ -413,7 +430,8 @@
         "low": "Minimum",
         "base": "Base",
         "up": "Upgrade"
-      }
+      },
+      "removeItem": "Remove item"
     },
     "planning": {
       "filter": "Filter",
@@ -638,7 +656,9 @@
         "taobao": "Taobao",
         "pinduoduo": "Pinduoduo",
         "douyin": "Douyin"
-      }
+      },
+      "removeChild": "Remove child",
+      "removeChannel": "Remove channel"
     },
     "priceRef": {
       "entry": "Entry price",

@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react"
+import { Plus, TriangleAlert, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -34,6 +34,7 @@ import type { ShoppingItemForm } from "@/features/bettertolive/api/bettertolive-
 import { createItem, deleteItem, updateItem } from "@/features/bettertolive/api/shopping-crud-api"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import {
+  channelDisplayName,
   depreciationDisplayName,
   lifecycleDisplayName,
   shoppingDepreciationOptions,
@@ -70,15 +71,7 @@ export function ShoppingItemEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.item
-  const defaultChildChannels = useMemo(
-    () => [
-      t("shopping.item.defaultChannels.jd", "京东"),
-      t("shopping.item.defaultChannels.taobao", "淘宝"),
-      t("shopping.item.defaultChannels.pinduoduo", "拼多多"),
-      t("shopping.item.defaultChannels.douyin", "抖音"),
-    ],
-    [t],
-  )
+  const attributeDefinitions = shopping.attributeDefinitions
 
   const [name, setName] = useState(seed?.name ?? "")
   const [children, setChildren] = useState<ShoppingItemChild[]>(() =>
@@ -93,19 +86,16 @@ export function ShoppingItemEditDialog({
   const [systemTags, setSystemTags] = useState<string[]>(seed?.systemTags ?? [])
   const [spaceTags, setSpaceTags] = useState<string[]>(seed?.spaceTags ?? [])
   const [note, setNote] = useState(seed?.note ?? "")
-  const attributeDefinitions = shopping.attributeDefinitions
 
-  const channelOptions = useMemo(() => {
-    const names = new Set<string>()
-    for (const item of shopping.items) {
-      for (const child of item.children) {
-        for (const cp of child.channelPrices ?? []) {
-          if (cp.channel) names.add(cp.channel)
-        }
-      }
-    }
-    return Array.from(names).sort((a, b) => a.localeCompare(b))
-  }, [shopping.items])
+  // 渠道选项来自属性字典 channel 类的启用条目
+  const channelOptions = useMemo(
+    () =>
+      (attributeDefinitions ?? [])
+        .filter((d) => d.kind === "channel" && d.isEnabled)
+        .sort((a, b) => a.sortOrder - b.sortOrder || a.label.localeCompare(b.label))
+        .map((d) => d.code),
+    [attributeDefinitions],
+  )
 
   const toggleTag = (list: string[], setter: (value: string[]) => void, id: string) => {
     if (list.includes(id)) {
@@ -125,13 +115,7 @@ export function ShoppingItemEditDialog({
   }
 
   const addChild = () => {
-    setChildren((current) => [
-      ...current,
-      createDefaultChildDraft({
-        index: current.length,
-        defaultChannels: defaultChildChannels,
-      }),
-    ])
+    setChildren((current) => [...current, createDefaultChildDraft({ index: current.length })])
   }
 
   const removeChild = (childIndex: number) => {
@@ -401,6 +385,66 @@ function ChildEditorCard({
 }) {
   const { t } = useTranslation()
 
+  // 计算各属性的启用选项（只含 enabled），加入当前值（即使已禁用）确保显示
+  const enabledStatusCodes = useMemo(
+    () => new Set(shoppingStatusOptions(attributeDefinitions)),
+    [attributeDefinitions],
+  )
+  const enabledLifecycleCodes = useMemo(
+    () => new Set(shoppingLifecycleOptions(attributeDefinitions)),
+    [attributeDefinitions],
+  )
+  const enabledDepreciationCodes = useMemo(
+    () => new Set(shoppingDepreciationOptions(attributeDefinitions)),
+    [attributeDefinitions],
+  )
+
+  const statusOptions = useMemo(() => {
+    const base = [...enabledStatusCodes] as ShoppingStatus[]
+    const cur = child.status
+    if (cur && !enabledStatusCodes.has(cur as ShoppingStatus))
+      return [cur as ShoppingStatus, ...base]
+    return base
+  }, [enabledStatusCodes, child.status])
+
+  const lifecycleOptions = useMemo(() => {
+    const base = [...enabledLifecycleCodes] as ShoppingLifecycle[]
+    const cur = child.lifecycle
+    if (cur && !enabledLifecycleCodes.has(cur as ShoppingLifecycle))
+      return [cur as ShoppingLifecycle, ...base]
+    return base
+  }, [enabledLifecycleCodes, child.lifecycle])
+
+  const depreciationOptions = useMemo(() => {
+    const base = [...enabledDepreciationCodes] as ShoppingDepreciation[]
+    const cur = child.depreciation
+    if (cur && !enabledDepreciationCodes.has(cur as ShoppingDepreciation))
+      return [cur as ShoppingDepreciation, ...base]
+    return base
+  }, [enabledDepreciationCodes, child.depreciation])
+
+  // 已禁用 codes 集合（用于标记下拉选项）
+  const disabledStatusCodes = useMemo(
+    () => new Set(statusOptions.filter((o) => !enabledStatusCodes.has(o))),
+    [statusOptions, enabledStatusCodes],
+  )
+  const disabledLifecycleCodes = useMemo(
+    () => new Set(lifecycleOptions.filter((o) => !enabledLifecycleCodes.has(o))),
+    [lifecycleOptions, enabledLifecycleCodes],
+  )
+  const disabledDepreciationCodes = useMemo(
+    () => new Set(depreciationOptions.filter((o) => !enabledDepreciationCodes.has(o))),
+    [depreciationOptions, enabledDepreciationCodes],
+  )
+
+  // 当前值是否已禁用
+  const isStatusDisabled = !!child.status && disabledStatusCodes.has(child.status as ShoppingStatus)
+  const isLifecycleDisabled =
+    !!child.lifecycle && disabledLifecycleCodes.has(child.lifecycle as ShoppingLifecycle)
+  const isDepreciationDisabled =
+    !!child.depreciation &&
+    disabledDepreciationCodes.has(child.depreciation as ShoppingDepreciation)
+
   return (
     <div className={cn(SHOPPING_DIALOG_PANEL_CLASS, "space-y-4 p-4")}>
       <div className="flex items-center justify-between gap-3">
@@ -441,13 +485,22 @@ function ChildEditorCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {shoppingStatusOptions(attributeDefinitions).map((option) => (
+              {statusOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {statusDisplayName(option, t, attributeDefinitions)}
+                  {disabledStatusCodes.has(option) && (
+                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {isStatusDisabled && (
+            <p className="flex items-center gap-1 text-[11px] text-amber-500">
+              <TriangleAlert className="h-3 w-3 shrink-0" />
+              当前状态已停用，建议重新选择
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -462,13 +515,22 @@ function ChildEditorCard({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {shoppingLifecycleOptions(attributeDefinitions).map((option) => (
+              {lifecycleOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {lifecycleDisplayName(option, t, attributeDefinitions)}
+                  {disabledLifecycleCodes.has(option) && (
+                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {isLifecycleDisabled && (
+            <p className="flex items-center gap-1 text-[11px] text-amber-500">
+              <TriangleAlert className="h-3 w-3 shrink-0" />
+              当前生命周期已停用，建议重新选择
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -490,13 +552,22 @@ function ChildEditorCard({
               <SelectItem value={NONE_SELECT_VALUE}>
                 {t("shopping.item.depPlaceholder", "可选")}
               </SelectItem>
-              {shoppingDepreciationOptions(attributeDefinitions).map((option) => (
+              {depreciationOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {depreciationDisplayName(option, t, attributeDefinitions)}
+                  {disabledDepreciationCodes.has(option) && (
+                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                  )}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+          {isDepreciationDisabled && (
+            <p className="flex items-center gap-1 text-[11px] text-amber-500">
+              <TriangleAlert className="h-3 w-3 shrink-0" />
+              当前折旧已停用，建议重新选择
+            </p>
+          )}
         </div>
       </div>
 
@@ -522,6 +593,7 @@ function ChildEditorCard({
                 key={channelPrice.id}
                 channelPrice={channelPrice}
                 channelOptions={channelOptions}
+                attributeDefinitions={attributeDefinitions}
                 onChange={(updater) =>
                   onChange((current) => ({
                     ...current,
@@ -543,11 +615,13 @@ function ChildEditorCard({
 function ChildChannelEditorRow({
   channelPrice,
   channelOptions,
+  attributeDefinitions,
   onChange,
   onRemove,
 }: {
   channelPrice: ShoppingItemChildChannelPrice
   channelOptions: string[]
+  attributeDefinitions: ShoppingModuleData["attributeDefinitions"]
   onChange: (
     updater: (channelPrice: ShoppingItemChildChannelPrice) => ShoppingItemChildChannelPrice,
   ) => void
@@ -560,6 +634,8 @@ function ChildChannelEditorRow({
     if (channelPrice.channel) allOptions.add(channelPrice.channel)
     return Array.from(allOptions).sort((a, b) => a.localeCompare(b))
   }, [channelOptions, channelPrice.channel])
+
+  const isChannelDisabled = !!channelPrice.channel && !channelOptions.includes(channelPrice.channel)
 
   return (
     <div className="border-foreground/10 bg-background/85 grid gap-3 rounded-lg border p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_auto]">
@@ -577,11 +653,20 @@ function ChildChannelEditorRow({
           <SelectContent>
             {combinedOptions.map((option) => (
               <SelectItem key={option} value={option}>
-                {option}
+                {channelDisplayName(option, attributeDefinitions)}
+                {!channelOptions.includes(option) && (
+                  <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                )}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        {isChannelDisabled && (
+          <p className="flex items-center gap-1 text-[11px] text-amber-500">
+            <TriangleAlert className="h-3 w-3 shrink-0" />
+            当前渠道已停用，建议重新选择
+          </p>
+        )}
       </div>
       <div className="space-y-1.5">
         <Label>{t("shopping.priceRef.entry", "入门价")}</Label>
@@ -660,22 +745,14 @@ function normalizeChildDraft(
   }
 }
 
-function createDefaultChildDraft({
-  index,
-  defaultChannels,
-}: {
-  index: number
-  defaultChannels: string[]
-}): ShoppingItemChild {
+function createDefaultChildDraft({ index }: { index: number }): ShoppingItemChild {
   return {
     id: createLocalId("child", index),
     name: "",
     status: ShoppingStatus.Owned,
     lifecycle: ShoppingLifecycle.Durable,
     depreciation: undefined,
-    channelPrices: defaultChannels.map((channel, channelIndex) =>
-      createChannelPriceDraft(channel, channelIndex),
-    ),
+    channelPrices: [],
   }
 }
 

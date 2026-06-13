@@ -46,6 +46,7 @@ export const commands = {
 	assignSystemDefinitionItems: (systemId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_system_definition_items", { systemId, itemIds })),
 	assignSpaceDefinitionItems: (spaceId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_space_definition_items", { spaceId, itemIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
+	countItemsUsingShoppingAttribute: (kind: string, code: string) => typedError<number, string>(__TAURI_INVOKE("count_items_using_shopping_attribute", { kind, code })),
 };
 
 /* Types */

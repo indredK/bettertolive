@@ -1,21 +1,27 @@
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { Pencil, Plus, Power, PowerOff } from "lucide-react"
+import { Pencil, Plus, Power, PowerOff, TriangleAlert } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
-import { Badge } from "@/components/ui/badge"
 import { AnimatedIconButton, Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import type {
   ShoppingAttributeDefinition,
   ShoppingAttributeKind,
   ShoppingModuleData,
 } from "@/features/bettertolive/types"
 import {
+  countItemsUsingAttribute,
   disableAttributeDefinition,
-  listAttributeDefinitionsForManagement,
   reorderAttributeDefinitions,
   updateAttributeDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
@@ -32,14 +38,11 @@ import {
   ShoppingTabViewport,
 } from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import {
-  depreciationStyle,
   shoppingAttributeDisplayName,
-  lifecycleStyle,
   shoppingAttributeEnabledDisplayName,
   shoppingAttributeKindDisplayName,
   shoppingAttributeSemanticDisplayName,
   shoppingAttributeStyleTokenDisplayName,
-  statusStyle,
 } from "@/features/bettertolive/ui/shopping/shopping-page-data"
 import { SortableShoppingCard } from "@/features/bettertolive/ui/shopping/_shared/shopping-sortable-card"
 import { cn } from "@/lib/utils"
@@ -51,19 +54,6 @@ const ATTRIBUTE_KIND_META: ShoppingAttributeKind[] = [
   "channel",
 ]
 
-function attributeBadgeClassName(attribute: ShoppingAttributeDefinition) {
-  if (attribute.kind === "status") return statusStyle(attribute.code, [attribute])
-  if (attribute.kind === "lifecycle") return lifecycleStyle(attribute.code, [attribute])
-  if (attribute.kind === "depreciation") return depreciationStyle(attribute.code, [attribute])
-  if (attribute.styleToken === "accent")
-    return "border-foreground/10 bg-accent text-accent-foreground"
-  if (attribute.styleToken === "secondary") {
-    return "border-foreground/10 bg-secondary text-secondary-foreground"
-  }
-  if (attribute.styleToken === "card") return "border-foreground/10 bg-card text-card-foreground"
-  return "border-foreground/10 bg-muted text-muted-foreground"
-}
-
 export function ShoppingAttributesTab({
   shopping,
   isControlMode,
@@ -74,8 +64,12 @@ export function ShoppingAttributesTab({
   onRefresh: () => void
 }) {
   const { t } = useTranslation()
-  const [definitions, setDefinitions] = useState<ShoppingAttributeDefinition[]>(
-    shopping.attributeDefinitions,
+  // 乐观更新补丁层：prop 是服务端真值，patches 是未 commit 的本地覆盖
+  const [patches, setPatches] = useState<Record<string, Partial<ShoppingAttributeDefinition>>>({})
+  const definitions = useMemo(
+    () =>
+      shopping.attributeDefinitions.map((d) => (patches[d.id] ? { ...d, ...patches[d.id] } : d)),
+    [shopping.attributeDefinitions, patches],
   )
   const [selectedKind, setSelectedKind] = useState<ShoppingAttributeKind>("depreciation")
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
@@ -84,29 +78,19 @@ export function ShoppingAttributesTab({
     definition: ShoppingAttributeDefinition | null
     defaultKind?: ShoppingAttributeKind
   } | null>(null)
+  const [disableConfirm, setDisableConfirm] = useState<{
+    attribute: ShoppingAttributeDefinition
+  } | null>(null)
 
-  useEffect(() => {
-    let cancelled = false
+  const patchDefinition = (id: string, patch: Partial<ShoppingAttributeDefinition>) =>
+    setPatches((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
 
-    const loadDefinitions = async () => {
-      try {
-        const items = await listAttributeDefinitionsForManagement()
-        if (!cancelled) {
-          setDefinitions(items)
-        }
-      } catch (error) {
-        if (!cancelled) {
-          toast.error(String(error))
-        }
-      }
-    }
-
-    void loadDefinitions()
-
-    return () => {
-      cancelled = true
-    }
-  }, [shopping.attributeDefinitions])
+  const clearPatch = (id: string) =>
+    setPatches((prev) => {
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
 
   const grouped = useMemo(() => {
     return ATTRIBUTE_KIND_META.map((kind) => ({
@@ -174,11 +158,23 @@ export function ShoppingAttributesTab({
     }
   }
 
-  const handleToggleEnabled = async (attribute: ShoppingAttributeDefinition) => {
+  const executeDisable = async (attribute: ShoppingAttributeDefinition) => {
+    patchDefinition(attribute.id, { isEnabled: false })
     try {
-      if (attribute.isEnabled) {
-        await disableAttributeDefinition(attribute.id)
-      } else {
+      await disableAttributeDefinition(attribute.id)
+      toast.success(t("shopping.attributes.disableSuccess", "属性已停用"))
+      clearPatch(attribute.id)
+      onRefresh()
+    } catch (error) {
+      clearPatch(attribute.id)
+      toast.error(String(error))
+    }
+  }
+
+  const handleToggleEnabled = async (attribute: ShoppingAttributeDefinition) => {
+    if (!attribute.isEnabled) {
+      patchDefinition(attribute.id, { isEnabled: true })
+      try {
         await updateAttributeDefinition({
           ...attribute,
           labelEn: attribute.labelEn ?? null,
@@ -188,8 +184,24 @@ export function ShoppingAttributesTab({
           rank: attribute.rank ?? null,
           isEnabled: true,
         })
+        toast.success(t("shopping.attributes.enableSuccess", "属性已启用"))
+        clearPatch(attribute.id)
+        onRefresh()
+      } catch (error) {
+        clearPatch(attribute.id)
+        toast.error(String(error))
       }
-      onRefresh()
+      return
+    }
+
+    // 禁用：查引用计数，有引用则弹确认
+    try {
+      const count = await countItemsUsingAttribute(attribute.kind, attribute.code)
+      if (count === 0) {
+        await executeDisable(attribute)
+      } else {
+        setDisableConfirm({ attribute })
+      }
     } catch (error) {
       toast.error(String(error))
     }
@@ -253,37 +265,75 @@ export function ShoppingAttributesTab({
                     id={attribute.id}
                     disabled={!isControlMode}
                   >
-                    <button
-                      type="button"
-                      onClick={() => setSelectedAttributeId(attribute.id)}
+                    <div
                       className={cn(
                         SHOPPING_SELECTABLE_CARD_CLASS,
                         selectedAttribute?.id === attribute.id && SHOPPING_SELECTED_CARD_CLASS,
-                        "flex w-full flex-col gap-2 py-2.5 pr-3 pl-8 text-left",
+                        "flex w-full items-center gap-1 py-2 pr-1.5 pl-8",
+                        !attribute.isEnabled && "opacity-50",
                       )}
                     >
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="min-w-0">
-                          <div className="truncate text-[13px] font-medium">
-                            {shoppingAttributeDisplayName(attribute)}
-                          </div>
-                          <div className="text-muted-foreground truncate text-[11px]">
-                            {attribute.code}
-                          </div>
-                        </div>
-                        <Badge
-                          variant="outline"
+                      <button
+                        type="button"
+                        onClick={() => setSelectedAttributeId(attribute.id)}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div
                           className={cn(
-                            "px-1.5 py-0 text-[10px]",
-                            attributeBadgeClassName(attribute),
+                            "truncate text-[13px] font-medium",
+                            !attribute.isEnabled && "line-through",
                           )}
                         >
-                          {attribute.semanticKey
-                            ? shoppingAttributeSemanticDisplayName(attribute.semanticKey, t)
-                            : shoppingAttributeKindDisplayName(attribute.kind, t)}
-                        </Badge>
-                      </div>
-                    </button>
+                          {shoppingAttributeDisplayName(attribute)}
+                        </div>
+                        <div className="text-muted-foreground truncate text-[11px]">
+                          {attribute.code}
+                        </div>
+                      </button>
+
+                      {isControlMode && (
+                        <div className="flex shrink-0 items-center gap-0.5">
+                          <AnimatedIconButton
+                            show
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            label={t("shopping.attributes.edit", "编辑属性")}
+                            icon={<Pencil className="h-3.5 w-3.5" />}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setEditing({
+                                isNew: false,
+                                definition: attribute,
+                                defaultKind: selectedKind,
+                              })
+                            }}
+                          />
+                          <AnimatedIconButton
+                            show
+                            type="button"
+                            variant="ghost"
+                            size="icon-sm"
+                            label={
+                              attribute.isEnabled
+                                ? t("shopping.attributes.disable", "停用属性")
+                                : t("shopping.attributes.enable", "启用属性")
+                            }
+                            icon={
+                              attribute.isEnabled ? (
+                                <PowerOff className="h-3.5 w-3.5" />
+                              ) : (
+                                <Power className="h-3.5 w-3.5" />
+                              )
+                            }
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              void handleToggleEnabled(attribute)
+                            }}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </SortableShoppingCard>
                 ))}
               </SortableContext>
@@ -293,46 +343,19 @@ export function ShoppingAttributesTab({
           <ShoppingDetailPane>
             {selectedAttribute ? (
               <Card className={cn(SHOPPING_DETAIL_CARD_CLASS, "flex h-full min-h-0 flex-col")}>
-                <CardHeader className="flex shrink-0 flex-row items-start justify-between gap-3">
+                <CardHeader className="flex shrink-0 flex-row items-start gap-3">
                   <div className="min-w-0">
-                    <CardTitle>{shoppingAttributeDisplayName(selectedAttribute)}</CardTitle>
+                    <CardTitle
+                      className={cn(!selectedAttribute.isEnabled && "text-muted-foreground")}
+                    >
+                      {shoppingAttributeDisplayName(selectedAttribute)}
+                      {!selectedAttribute.isEnabled && (
+                        <span className="ml-2 text-sm font-normal text-amber-500">(已停用)</span>
+                      )}
+                    </CardTitle>
                     <div className="text-muted-foreground mt-0.5 text-xs">
                       {selectedAttribute.code}
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <AnimatedIconButton
-                      show={isControlMode}
-                      variant="outline"
-                      size="sm"
-                      label={t("shopping.attributes.edit", "编辑属性")}
-                      icon={<Pencil className="h-4 w-4" />}
-                      onClick={() =>
-                        setEditing({
-                          isNew: false,
-                          definition: selectedAttribute,
-                          defaultKind: selectedKind,
-                        })
-                      }
-                    />
-                    <AnimatedIconButton
-                      show={isControlMode}
-                      variant="outline"
-                      size="sm"
-                      label={
-                        selectedAttribute.isEnabled
-                          ? t("shopping.attributes.disable", "停用属性")
-                          : t("shopping.attributes.enable", "启用属性")
-                      }
-                      icon={
-                        selectedAttribute.isEnabled ? (
-                          <PowerOff className="h-4 w-4" />
-                        ) : (
-                          <Power className="h-4 w-4" />
-                        )
-                      }
-                      onClick={() => void handleToggleEnabled(selectedAttribute)}
-                    />
                   </div>
                 </CardHeader>
                 <CardContent className="min-h-0 flex-1 space-y-4 overflow-y-auto">
@@ -368,10 +391,21 @@ export function ShoppingAttributesTab({
                             : t("shopping.attributes.none", "未设置")
                         }
                       />
-                      <DetailRow
-                        label={t("shopping.attributes.state", "状态")}
-                        value={shoppingAttributeEnabledDisplayName(selectedAttribute.isEnabled, t)}
-                      />
+                      <div>
+                        <div className="text-muted-foreground text-[11px]">
+                          {t("shopping.attributes.state", "状态")}
+                        </div>
+                        {selectedAttribute.isEnabled ? (
+                          <div className="text-sm font-medium text-green-600 dark:text-green-400">
+                            {shoppingAttributeEnabledDisplayName(true, t)}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1 text-sm font-medium text-amber-500">
+                            <PowerOff className="h-3.5 w-3.5 shrink-0" />
+                            {shoppingAttributeEnabledDisplayName(false, t)}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -404,6 +438,51 @@ export function ShoppingAttributesTab({
             toast.success(t("shopping.toast.saved", "已保存"))
           }}
         />
+      ) : null}
+
+      {disableConfirm ? (
+        <Dialog open onOpenChange={(open) => !open && setDisableConfirm(null)}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <TriangleAlert className="h-5 w-5 text-amber-500" />
+                停用属性「{shoppingAttributeDisplayName(disableConfirm.attribute)}」
+              </DialogTitle>
+            </DialogHeader>
+            <div className="text-muted-foreground space-y-3 text-sm">
+              <p>有物品正在引用该属性。</p>
+              <ul className="space-y-1 text-xs">
+                <li className="flex items-center gap-1.5">
+                  <span className="text-green-600">✓</span>
+                  已有物品仍可正常保存（旧值透传）
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="text-green-600">✓</span>
+                  停用属性在编辑界面会显示警告标记
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <span className="text-amber-500">✗</span>
+                  停用属性不可再被新物品选用
+                </li>
+              </ul>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDisableConfirm(null)}>
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={async () => {
+                  const attr = disableConfirm.attribute
+                  setDisableConfirm(null)
+                  await executeDisable(attr)
+                }}
+              >
+                确认停用
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       ) : null}
     </ShoppingTabViewport>
   )

@@ -12,9 +12,15 @@ use crate::shopping::models::{
     StageItemRow, StageTemplateRow, SystemDefinitionRow,
 };
 use rusqlite::{params, Connection};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 pub struct ShoppingRepository;
+
+struct ExistingChildCodes {
+    status: Option<String>,
+    lifecycle: Option<String>,
+    depreciation: Option<String>,
+}
 
 // ===== 行→struct 映射 =====
 
@@ -214,26 +220,6 @@ impl ShoppingRepository {
         .map_err(|e| e.to_string())
     }
 
-    fn require_enabled_attribute_code(
-        conn: &Connection,
-        kind: &str,
-        code: Option<&str>,
-        required: bool,
-    ) -> Result<Option<String>, String> {
-        let normalized = code.map(str::trim).filter(|value| !value.is_empty());
-        match normalized {
-            Some(value) => {
-                if Self::attribute_code_exists(conn, kind, value)? {
-                    Ok(Some(value.to_string()))
-                } else {
-                    Err(format!("invalid {kind}: {value}"))
-                }
-            }
-            None if required => Err(format!("{kind} is required")),
-            None => Ok(None),
-        }
-    }
-
     fn ensure_required_semantic_keys(conn: &Connection, kind: &str) -> Result<(), String> {
         let required = match kind {
             "status" => Self::REQUIRED_STATUS_SEMANTICS.as_slice(),
@@ -383,7 +369,7 @@ impl ShoppingRepository {
     pub fn get_shopping_module_aggregated(conn: &Connection) -> Result<ShoppingModuleDto, String> {
         let system_definitions = Self::list_system_definitions_dto(conn)?;
         let space_definitions = Self::list_space_definitions_dto(conn)?;
-        let attribute_definitions = Self::list_attribute_definitions_dto(conn)?;
+        let attribute_definitions = Self::list_all_attribute_definitions_dto(conn)?;
         let items = Self::list_items_dto(conn)?;
         let stage_templates = Self::list_stage_templates_dto(conn)?;
         let spotlights = Self::list_spotlights(conn)?;
@@ -757,6 +743,20 @@ impl ShoppingRepository {
             return Err("label is required".to_string());
         }
 
+        // (kind, code) 唯一性校验，返回友好错误
+        let code_exists: bool = conn
+            .query_row(
+                "SELECT EXISTS(SELECT 1 FROM shopping_attribute_definitions WHERE kind = ?1 AND code = ?2)",
+                params![&normalized_kind, normalized_code],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+        if code_exists {
+            return Err(format!(
+                "code '{normalized_code}' already exists in kind '{normalized_kind}'"
+            ));
+        }
+
         let next_order: i32 = conn
             .query_row(
                 "SELECT COALESCE(MAX(sort_order), -1) + 1
@@ -943,6 +943,7 @@ impl ShoppingRepository {
             )
             .map_err(|e| e.to_string())?;
 
+        // 系统 status 属性不可禁用
         if existing_row.is_system
             && existing_row.kind == "status"
             && existing_row.semantic_key.is_some()
@@ -953,6 +954,26 @@ impl ShoppingRepository {
             ));
         }
 
+        // 禁用前验证：若该属性携带 status 语义键，确认不是该语义的最后一个启用属性
+        if let Some(ref sk) = existing_row.semantic_key {
+            if existing_row.kind == "status" {
+                let remaining: i32 = conn
+                    .query_row(
+                        "SELECT COUNT(*) FROM shopping_attribute_definitions
+                         WHERE kind = 'status' AND semantic_key = ?1
+                               AND is_enabled = 1 AND id != ?2",
+                        params![sk, id],
+                        |row| row.get(0),
+                    )
+                    .map_err(|e| e.to_string())?;
+                if remaining == 0 {
+                    return Err(format!(
+                        "cannot disable: no other enabled attribute covers semantic '{sk}'"
+                    ));
+                }
+            }
+        }
+
         conn.execute(
             "UPDATE shopping_attribute_definitions
              SET is_enabled = 0, updated_at = ?2
@@ -961,7 +982,6 @@ impl ShoppingRepository {
         )
         .map_err(|e| e.to_string())?;
 
-        Self::ensure_required_semantic_keys(conn, &existing_row.kind)?;
         Ok(())
     }
 
@@ -1265,7 +1285,14 @@ impl ShoppingRepository {
         now: &str,
     ) -> Result<(), String> {
         Self::ensure_required_semantic_keys(conn, "status")?;
-        Self::validate_item_children_attributes(conn, children)?;
+
+        let existing_codes: Option<HashMap<String, ExistingChildCodes>> = if is_update {
+            Some(Self::load_existing_child_codes(conn, id)?)
+        } else {
+            None
+        };
+
+        Self::validate_item_children_attributes(conn, children, existing_codes.as_ref())?;
 
         if is_update {
             Self::delete_stage_tiers_for_item_children(conn, id)?;
@@ -1384,23 +1411,105 @@ impl ShoppingRepository {
     fn validate_item_children_attributes(
         conn: &Connection,
         children: &[ItemChildWriteModel],
+        existing_codes: Option<&HashMap<String, ExistingChildCodes>>,
     ) -> Result<(), String> {
         for child in children {
-            Self::require_enabled_attribute_code(conn, "status", child.status.as_deref(), true)?;
-            Self::require_enabled_attribute_code(
+            let existing = existing_codes.and_then(|m| m.get(&child.id));
+            Self::require_attribute_code_for_write(
+                conn,
+                "status",
+                child.status.as_deref(),
+                true,
+                existing.and_then(|e| e.status.as_deref()),
+            )?;
+            Self::require_attribute_code_for_write(
                 conn,
                 "lifecycle",
                 child.lifecycle.as_deref(),
                 true,
+                existing.and_then(|e| e.lifecycle.as_deref()),
             )?;
-            Self::require_enabled_attribute_code(
+            Self::require_attribute_code_for_write(
                 conn,
                 "depreciation",
                 child.depreciation.as_deref(),
                 false,
+                existing.and_then(|e| e.depreciation.as_deref()),
             )?;
         }
         Ok(())
+    }
+
+    /// UPDATE 时允许保留原值（即使已禁用），只拒绝「新赋一个禁用值」；
+    /// CREATE 时 existing_code 为 None，走严格校验。
+    fn require_attribute_code_for_write(
+        conn: &Connection,
+        kind: &str,
+        code: Option<&str>,
+        required: bool,
+        existing_code: Option<&str>,
+    ) -> Result<Option<String>, String> {
+        let normalized = code.map(str::trim).filter(|v| !v.is_empty());
+        match normalized {
+            None if required => Err(format!("{kind} is required")),
+            None => Ok(None),
+            Some(value) => {
+                if Self::attribute_code_exists(conn, kind, value)? {
+                    return Ok(Some(value.to_string()));
+                }
+                if existing_code.map(str::trim) == Some(value) {
+                    return Ok(Some(value.to_string()));
+                }
+                Err(format!("invalid {kind}: {value} (disabled or not found)"))
+            }
+        }
+    }
+
+    fn load_existing_child_codes(
+        conn: &Connection,
+        item_id: &str,
+    ) -> Result<HashMap<String, ExistingChildCodes>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, status, lifecycle, depreciation
+                 FROM shopping_item_children
+                 WHERE item_id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map(params![item_id], |row| {
+                Ok((
+                    row.get::<_, String>("id")?,
+                    ExistingChildCodes {
+                        status: row.get("status")?,
+                        lifecycle: row.get("lifecycle")?,
+                        depreciation: row.get("depreciation")?,
+                    },
+                ))
+            })
+            .map_err(|e| e.to_string())?;
+        let mut map = HashMap::new();
+        for row in rows {
+            let (id, codes) = row.map_err(|e| e.to_string())?;
+            map.insert(id, codes);
+        }
+        Ok(map)
+    }
+
+    pub fn count_children_using_attribute(
+        conn: &Connection,
+        kind: &str,
+        code: &str,
+    ) -> Result<i32, String> {
+        let sql = match kind {
+            "status" => "SELECT COUNT(*) FROM shopping_item_children WHERE status = ?1",
+            "lifecycle" => "SELECT COUNT(*) FROM shopping_item_children WHERE lifecycle = ?1",
+            "depreciation" => "SELECT COUNT(*) FROM shopping_item_children WHERE depreciation = ?1",
+            "channel" => "SELECT COUNT(*) FROM shopping_item_child_channels WHERE channel = ?1",
+            _ => return Ok(0),
+        };
+        conn.query_row(sql, params![code], |row| row.get::<_, i32>(0))
+            .map_err(|e| e.to_string())
     }
 
     pub fn delete_item(conn: &Connection, id: &str) -> Result<(), String> {

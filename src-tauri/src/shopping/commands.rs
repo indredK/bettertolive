@@ -320,6 +320,17 @@ pub fn disable_shopping_attribute_definition(
 
 #[tauri::command]
 #[specta::specta]
+pub fn count_items_using_shopping_attribute(
+    state: State<AppState>,
+    kind: String,
+    code: String,
+) -> Result<i32, String> {
+    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    ShoppingRepository::count_children_using_attribute(&conn, &kind, &code)
+}
+
+#[tauri::command]
+#[specta::specta]
 pub fn reorder_shopping_attribute_definitions(
     state: State<AppState>,
     kind: String,

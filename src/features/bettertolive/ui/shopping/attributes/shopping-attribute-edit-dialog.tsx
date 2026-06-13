@@ -63,6 +63,29 @@ const SEMANTIC_OPTIONS: Record<ShoppingAttributeKind, string[]> = {
   channel: [],
 }
 
+const CODE_PATTERN = /^[A-Za-z0-9_]+$/
+
+function FieldLabel({
+  children,
+  required,
+  htmlFor,
+}: {
+  children: React.ReactNode
+  required?: boolean
+  htmlFor?: string
+}) {
+  return (
+    <Label htmlFor={htmlFor}>
+      {children}
+      {required && <span className="text-destructive ml-0.5">*</span>}
+    </Label>
+  )
+}
+
+function FieldHint({ children }: { children: React.ReactNode }) {
+  return <p className="text-muted-foreground text-[11px]">{children}</p>
+}
+
 export function ShoppingAttributeEditDialog({
   editing,
   onClose,
@@ -78,7 +101,11 @@ export function ShoppingAttributeEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.definition
+  // 系统 status 属性：kind/code/semanticKey 全部锁定
   const identityLocked = Boolean(seed?.isSystem && seed.kind === "status")
+  // 编辑模式下 code 统一锁定（code 是稳定持久化标识符）
+  const codeLocked = !editing.isNew || identityLocked
+
   const [kind, setKind] = useState<ShoppingAttributeKind>(
     seed?.kind ?? editing.defaultKind ?? "depreciation",
   )
@@ -95,15 +122,37 @@ export function ShoppingAttributeEditDialog({
   const semanticOptions = useMemo(() => SEMANTIC_OPTIONS[kind] ?? [], [kind])
   const semanticRequired = kind === "status"
 
-  const canSubmit = label.trim().length > 0 && code.trim().length > 0
+  const codeError = useMemo(() => {
+    const trimmed = code.trim()
+    if (!trimmed) return t("shopping.error.codeEmpty", "代码不能为空")
+    if (!CODE_PATTERN.test(trimmed))
+      return t("shopping.error.codeFormat", "只允许字母、数字和下划线，如 Consumable")
+    return null
+  }, [code, t])
+
+  const rankError = useMemo(() => {
+    const trimmed = rank.trim()
+    if (!trimmed) return null
+    const n = Number(trimmed)
+    if (!Number.isFinite(n)) return t("shopping.error.rankInvalid", "请输入有效数字")
+    return null
+  }, [rank, t])
+
+  const canSubmit =
+    label.trim().length > 0 &&
+    codeError === null &&
+    rankError === null &&
+    (!semanticRequired || semanticKey.trim().length > 0)
 
   const handleSubmit = async () => {
     if (!canSubmit) {
-      toast.error(t("shopping.error.nameRequired", "请填写名称"))
-      return
-    }
-    if (semanticRequired && !semanticKey.trim()) {
-      toast.error(t("shopping.error.semanticRequired", "该类型必须设置语义键"))
+      if (codeError) {
+        toast.error(codeError)
+      } else if (semanticRequired && !semanticKey.trim()) {
+        toast.error(t("shopping.error.semanticRequired", "该类型必须设置语义键"))
+      } else {
+        toast.error(t("shopping.error.nameRequired", "请填写中文名"))
+      }
       return
     }
 
@@ -133,6 +182,12 @@ export function ShoppingAttributeEditDialog({
     }
   }
 
+  const semanticHint = useMemo(() => {
+    if (kind === "status") return t("shopping.attributes.hint.semanticStatus")
+    if (kind === "channel") return t("shopping.attributes.hint.semanticChannel")
+    return t("shopping.attributes.hint.semantic")
+  }, [kind, t])
+
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent
@@ -151,8 +206,9 @@ export function ShoppingAttributeEditDialog({
 
         <div className="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
           <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
+            {/* 分类 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.kind", "分类")}</Label>
+              <FieldLabel required>{t("shopping.attributes.kind", "分类")}</FieldLabel>
               <Select
                 value={kind}
                 onValueChange={(value) => setKind(value as ShoppingAttributeKind)}
@@ -168,40 +224,59 @@ export function ShoppingAttributeEditDialog({
                   ))}
                 </SelectContent>
               </Select>
+              <FieldHint>{t("shopping.attributes.hint.kind")}</FieldHint>
             </div>
 
+            {/* 代码 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.code", "代码")}</Label>
+              <FieldLabel required>{t("shopping.attributes.code", "代码")}</FieldLabel>
               <Input
                 value={code}
                 onChange={(event) => setCode(event.target.value)}
-                className={SHOPPING_DIALOG_FIELD_CLASS}
-                disabled={identityLocked}
+                className={cn(
+                  SHOPPING_DIALOG_FIELD_CLASS,
+                  !codeLocked && codeError && code.trim() && "border-destructive",
+                )}
+                disabled={codeLocked}
               />
+              {codeLocked ? (
+                <FieldHint>{t("shopping.attributes.hint.codeLocked")}</FieldHint>
+              ) : codeError && code.trim() ? (
+                <p className="text-destructive text-[11px]">{codeError}</p>
+              ) : (
+                <FieldHint>{t("shopping.attributes.hint.code")}</FieldHint>
+              )}
             </div>
 
+            {/* 中文名 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.label", "中文名")}</Label>
+              <FieldLabel required>{t("shopping.attributes.label", "中文名")}</FieldLabel>
               <Input
                 value={label}
                 onChange={(event) => setLabel(event.target.value)}
                 className={SHOPPING_DIALOG_FIELD_CLASS}
               />
+              <FieldHint>{t("shopping.attributes.hint.label")}</FieldHint>
             </div>
 
+            {/* 英文名 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.labelEn", "英文名")}</Label>
+              <FieldLabel>{t("shopping.attributes.labelEn", "英文名")}</FieldLabel>
               <Input
                 value={labelEn}
                 onChange={(event) => setLabelEn(event.target.value)}
                 className={SHOPPING_DIALOG_FIELD_CLASS}
               />
+              <FieldHint>{t("shopping.attributes.hint.labelEn")}</FieldHint>
             </div>
           </div>
 
           <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
+            {/* 语义键 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.semanticKey", "语义键")}</Label>
+              <FieldLabel required={semanticRequired}>
+                {t("shopping.attributes.semanticKey", "语义键")}
+              </FieldLabel>
               {semanticOptions.length > 0 ? (
                 <Select
                   value={semanticKey || NONE_SEMANTIC_VALUE}
@@ -231,12 +306,15 @@ export function ShoppingAttributeEditDialog({
                   onChange={(event) => setSemanticKey(event.target.value)}
                   className={SHOPPING_DIALOG_FIELD_CLASS}
                   disabled={identityLocked}
+                  placeholder={t("shopping.attributes.noSemantic", "不设置")}
                 />
               )}
+              <FieldHint>{semanticHint}</FieldHint>
             </div>
 
+            {/* 样式 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.styleToken", "样式")}</Label>
+              <FieldLabel>{t("shopping.attributes.styleToken", "样式")}</FieldLabel>
               <Select
                 value={styleToken || NONE_STYLE_VALUE}
                 onValueChange={(value) =>
@@ -259,26 +337,35 @@ export function ShoppingAttributeEditDialog({
                   ))}
                 </SelectContent>
               </Select>
+              <FieldHint>{t("shopping.attributes.hint.styleToken")}</FieldHint>
             </div>
 
+            {/* 等级/排序权重 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.rank", "等级 / 排序权重")}</Label>
+              <FieldLabel>{t("shopping.attributes.rank", "等级 / 排序权重")}</FieldLabel>
               <Input
                 type="number"
                 value={rank}
                 onChange={(event) => setRank(event.target.value)}
-                className={SHOPPING_DIALOG_FIELD_CLASS}
+                className={cn(SHOPPING_DIALOG_FIELD_CLASS, rankError && "border-destructive")}
               />
+              {rankError ? (
+                <p className="text-destructive text-[11px]">{rankError}</p>
+              ) : (
+                <FieldHint>{t("shopping.attributes.hint.rank")}</FieldHint>
+              )}
             </div>
 
+            {/* 说明 */}
             <div className="space-y-1.5">
-              <Label>{t("shopping.attributes.description", "说明")}</Label>
+              <FieldLabel>{t("shopping.attributes.description", "说明")}</FieldLabel>
               <Textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
                 rows={6}
                 className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
               />
+              <FieldHint>{t("shopping.attributes.hint.description")}</FieldHint>
             </div>
           </div>
         </div>

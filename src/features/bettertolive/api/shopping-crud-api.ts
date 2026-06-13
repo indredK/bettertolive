@@ -154,6 +154,11 @@ export async function disableAttributeDefinition(id: string): Promise<void> {
   return invoke("disable_shopping_attribute_definition", { id })
 }
 
+export async function countItemsUsingAttribute(kind: string, code: string): Promise<number> {
+  if (isMock()) return 0
+  return invoke<number>("count_items_using_shopping_attribute", { kind, code })
+}
+
 export async function reorderAttributeDefinitions(
   kind: string,
   orderedIds: string[],

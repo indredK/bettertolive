@@ -243,6 +243,20 @@ export function statusDisplayName(
   )
 }
 
+export function channelDisplayName(
+  code: string,
+  definitions?: ShoppingAttributeDefinition[],
+): string {
+  return (
+    resolveAttributeLabel(
+      definitions,
+      "channel",
+      code,
+      i18next.resolvedLanguage ?? i18next.language,
+    ) ?? code
+  )
+}
+
 export function shoppingAttributeKindDisplayName(kind: AttributeKind, t: TFunction): string {
   return t(`shopping.attributes.kindOptions.${kind}`, kind)
 }

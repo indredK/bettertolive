@@ -195,12 +195,29 @@
         "secondary": "次强调",
         "muted": "弱化",
         "card": "卡片"
+      },
+      "hint": {
+        "kind": "决定该属性适用的维度。物件编辑中对应下拉的选项即来自此处。",
+        "code": "建议使用 PascalCase，如 Consumable。创建后不可修改。",
+        "codeLocked": "代码创建后不可修改，是存入数据库的稳定标识符。",
+        "label": "在界面上显示的名称，可随时修改。",
+        "labelEn": "切换英文语言时显示，留空则回退到中文名。",
+        "semanticStatus": "系统用于识别「已拥有/待购入」的内置标识，必须与业务逻辑对应。系统属性已锁定。",
+        "semanticChannel": "渠道类暂不支持语义键，留空即可。",
+        "semantic": "将该属性与内置业务语义关联（可选）。自定义属性通常无需设置。",
+        "styleToken": "accent=主色调 · secondary=次要色 · muted=柔和灰 · card=卡片色",
+        "rank": "给有序属性（如折旧率）赋值，数值越小表示等级越低。普通属性可留空。",
+        "description": "对该属性含义的解释，仅在属性管理页展示，不影响物品显示。"
       }
     },
     "error": {
       "idNameRequired": "缺少系统 ID",
       "itemRequired": "请填写名称,并至少各选一个系统和空间",
-      "nameRequired": "请填写名称"
+      "nameRequired": "请填写名称",
+      "semanticRequired": "该类型必须设置语义键",
+      "codeEmpty": "代码不能为空",
+      "codeFormat": "只允许字母、数字和下划线，如 Consumable",
+      "rankInvalid": "请输入有效数字"
     },
     "validation": {
       "required": "请填写{{field}}",
@@ -413,7 +430,8 @@
         "low": "最低",
         "base": "基础",
         "up": "升级"
-      }
+      },
+      "removeItem": "移除物品"
     },
     "planning": {
       "filter": "筛选",
@@ -638,7 +656,9 @@
         "taobao": "淘宝",
         "pinduoduo": "拼多多",
         "douyin": "抖音"
-      }
+      },
+      "removeChild": "移除子级",
+      "removeChannel": "移除渠道"
     },
     "priceRef": {
       "entry": "入门价",
