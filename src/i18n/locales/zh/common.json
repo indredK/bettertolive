@@ -1,0 +1,68 @@
+{
+  "filter": {
+    "label": "筛选",
+    "clearAll": "清空"
+  },
+  "actions": {
+    "save": "保存",
+    "saving": "保存中…",
+    "cancel": "取消",
+    "delete": "删除",
+    "deleting": "删除中…",
+    "confirm": "确定",
+    "close": "关闭",
+    "edit": "编辑",
+    "add": "添加",
+    "create": "新建",
+    "deleted": "已删除",
+    "undo": "撤销",
+    "retry": "重试"
+  },
+  "multiSelect": {
+    "placeholder": "请选择",
+    "searchPlaceholder": "搜索…",
+    "emptyMessage": "没有匹配的选项"
+  },
+  "sortable": {
+    "dragHandle": "拖动排序",
+    "sortOrder": "排序"
+  },
+  "ui": {
+    "collapse": "收起",
+    "expand": "展开"
+  },
+  "confirm": {
+    "deleteItem": "确定删除 {{name}} 吗？",
+    "unsavedChanges": "当前有未保存的修改，确定要关闭吗？"
+  },
+  "toast": {
+    "saved": "已保存",
+    "saveFailed": "保存失败",
+    "deleted": "已删除",
+    "deleteFailed": "删除失败",
+    "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
+    "deleteUndone": "已撤销删除：{{name}}"
+  },
+  "controlMode": {
+    "on": "控制模式",
+    "off": "浏览模式"
+  },
+  "form": {
+    "tagsPlaceholder": "用逗号分隔"
+  },
+  "empty": {
+    "noData": "暂无分布数据。"
+  },
+  "validation": {
+    "required": "请填写{{field}}",
+    "maxLength": "{{field}}最多 {{count}} 个字符",
+    "maxItems": "{{field}}最多 {{count}} 项",
+    "invalidOption": "{{field}}的选项无效",
+    "nonNegative": "{{field}}不能小于 0",
+    "integer": "{{field}}必须是整数",
+    "maxNumber": "{{field}}不能大于 {{count}}",
+    "invalidJson": "{{field}}必须是有效 JSON",
+    "jsonArray": "{{field}}必须是 JSON 数组",
+    "invalidForm": "表单内容不符合要求，请检查后再保存"
+  }
+}

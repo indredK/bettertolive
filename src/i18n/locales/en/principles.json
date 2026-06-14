@@ -1,0 +1,193 @@
+{
+  "page": {
+    "eyebrow": "Principles",
+    "title": "Organize principles, boundaries, and bottom lines into a decision system",
+    "description": "This page does more than list principles: it shows what each one protects, where it came from, how firm it is, and what it costs to keep."
+  },
+  "controlMode": {
+    "on": "Control Mode",
+    "off": "Browse Mode",
+    "summary": "{{count}} principles · {{relations}} relations",
+    "add": "Add Principle"
+  },
+  "tabs": {
+    "entries": "Principles",
+    "prompts": "Decision Calibration",
+    "relations": "Support / Conflict",
+    "practice": "Practice Loop",
+    "overview": "Overview",
+    "personal": "Personal Principles",
+    "others": "Others' Principles",
+    "practiceWorkbench": "Calibration Workbench"
+  },
+  "classification": {
+    "domain": {
+      "title": "Domain",
+      "description": "Which part of life it mainly protects."
+    },
+    "type": {
+      "title": "Type",
+      "description": "Whether it is a bottom line, boundary, or standard."
+    },
+    "strength": {
+      "title": "Strength",
+      "description": "How non-negotiable it is."
+    },
+    "source": {
+      "title": "Source",
+      "description": "Where it came from."
+    },
+    "status": {
+      "title": "Status",
+      "description": "Whether it is still active."
+    }
+  },
+  "sections": {
+    "classification": {
+      "title": "5-Dimension Classification",
+      "description": "These dimensions organize and review the decision system; cost stays in details and calibration."
+    },
+    "entries": {
+      "title": "Principle List",
+      "description": "Cost is always visible in details, so the real price of each principle stays in view."
+    },
+    "boundaries": {
+      "title": "Where I No Longer Yield",
+      "description": "Bottom lines are not performance; they mark what cannot keep being crossed."
+    },
+    "prompts": {
+      "title": "Decision Calibration",
+      "description": "For a concrete choice, pull up the related principles first, then check strength and cost."
+    },
+    "relations": {
+      "title": "Support And Conflict",
+      "description": "Principles are not isolated dots; they can support each other or pull in different directions."
+    }
+  },
+  "cost": {
+    "title": "Cost Annotation",
+    "description": "Cost is an evaluation attribute for a single principle. It shows what you need to prepare to keep it, and stays out of the main filters."
+  },
+  "meta": {
+    "source": "Source",
+    "cost": "Cost",
+    "protectedValue": "Protected Value",
+    "decisionCue": "Calibration Cue",
+    "boundary": "Boundary"
+  },
+  "empty": {
+    "entries": "No principles match the current filter.",
+    "boundaries": "No bottom lines match the current filter.",
+    "prompts": "No decision prompts match the current filter.",
+    "relations": "No principle relations match the current filter.",
+    "priority": "No high-priority principles match the current filter.",
+    "evolving": "No changing principles match the current filter.",
+    "distribution": "No distribution data yet.",
+    "personal": "No personal principles match the current filter.",
+    "others": "No borrowed or inherited principles match the current filter."
+  },
+  "edit": {
+    "createTitle": "Add Principle",
+    "editTitle": "Edit Principle",
+    "description": "The 5 classification dimensions organize the decision system; cost evaluates the price of keeping one principle.",
+    "title": "Title",
+    "titlePlaceholder": "Example: Avoid important decisions late at night",
+    "cost": "Cost",
+    "statement": "Statement",
+    "statementPlaceholder": "Write the principle as one action-guiding sentence.",
+    "descriptionLabel": "Description",
+    "domain": "Domain",
+    "domainPlaceholder": "Example: Relationships / Work / Custom Category",
+    "type": "Type",
+    "strength": "Strength",
+    "source": "Source",
+    "status": "Status",
+    "boundary": "Boundary",
+    "protectedValue": "Protected Value",
+    "decisionCue": "Calibration Cue",
+    "tags": "Tags",
+    "tagsPlaceholder": "Separate with commas",
+    "confirmDelete": "Delete this principle?",
+    "saved": "Principle saved",
+    "saveFailed": "Failed to save principle",
+    "deleted": "Principle deleted",
+    "deleteFailed": "Failed to delete principle",
+    "validation": {
+      "required": "Please fill in title, statement, and boundary"
+    },
+    "revision": {
+      "summary": "Updated {{fields}}.",
+      "separator": ", "
+    },
+    "perspective": "Ownership"
+  },
+  "enumNames": {
+    "domain": {
+      "关系": "Relationships",
+      "工作": "Work",
+      "金钱": "Money",
+      "健康": "Health",
+      "时间": "Time",
+      "诚信": "Integrity"
+    },
+    "type": {
+      "边界": "Boundary",
+      "标准": "Standard",
+      "底线": "Bottom Line"
+    },
+    "strength": {
+      "不可退让": "Non-negotiable",
+      "强烈偏好": "Strong Preference",
+      "参考指引": "Reference Guide"
+    },
+    "source": {
+      "受伤后确立": "After Being Hurt",
+      "观察他人": "Observed In Others",
+      "主动推导": "Deliberately Derived",
+      "家庭继承": "Family Inheritance"
+    },
+    "status": {
+      "生效中": "Active",
+      "正在测试": "Testing",
+      "已修订": "Revised",
+      "已放弃": "Abandoned"
+    },
+    "cost": {
+      "高代价": "High Cost",
+      "中等代价": "Medium Cost",
+      "低代价": "Low Cost",
+      "零代价": "No Cost"
+    },
+    "relation": {
+      "支撑": "Supports",
+      "冲突": "Conflicts"
+    },
+    "revisionField": {
+      "内容": "content",
+      "强度": "strength",
+      "状态": "status"
+    },
+    "perspective": {
+      "个人原则": "Personal Principles",
+      "他人原则": "Others' Principles"
+    }
+  },
+  "practice": {
+    "priority": "High-cost calibration first",
+    "evolving": "Being tested or revised"
+  },
+  "personal": {
+    "title": "Personal Principles",
+    "description": "View the principles you derived, confirmed through experience, and actually want to keep living by."
+  },
+  "others": {
+    "title": "Others' Principles",
+    "description": "Separate inherited, observed, or temporarily borrowed principles so you can decide which ones are truly yours."
+  },
+  "perspective": {
+    "summaryTitle": "Source and Status",
+    "summaryDescription": "See whether this set is becoming internalized, already stable, or still borrowed from others.",
+    "signalTitle": "Calibrate First",
+    "signalDescription": "Start with the non-negotiable or high-cost principles and check whether they still genuinely belong to you."
+  }
+}

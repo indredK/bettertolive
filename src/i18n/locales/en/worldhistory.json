@@ -1,0 +1,99 @@
+{
+  "title": "Human Civilization Geo-Causal Star Map",
+  "subtitle": "Cross-cultural comparison from a geo-materialist perspective",
+  "tabs": {
+    "star": "Star Map",
+    "gantt": "Evolution",
+    "arena": "Arena"
+  },
+  "actions": {
+    "saving": "Saving..."
+  },
+  "narrative": {
+    "prev": "Previous",
+    "next": "Next",
+    "stop": "Stop",
+    "start": "Walk through causal chain step by step",
+    "counter": "Causal chain {{current}} / {{total}}"
+  },
+  "nodeKind": {
+    "catalyst": "Geo-Catalyst",
+    "nutrition": "Food & Nutrition",
+    "customs": "Customs & Ethics",
+    "conflict": "Conflict & Battle",
+    "prohibition": "Life & Taboo",
+    "faith": "Faith & Law"
+  },
+  "nodeGlyph": {
+    "catalyst": "C",
+    "nutrition": "N",
+    "customs": "E",
+    "conflict": "B",
+    "prohibition": "T",
+    "faith": "F"
+  },
+  "dimension": {
+    "calories": "Staple Calories",
+    "defense": "Defense & Isolation",
+    "trust": "Trust & Contract",
+    "authority": "Power & Control",
+    "taboos": "Taboo & Discipline",
+    "abstract": "Abstract Thought"
+  },
+  "event": {
+    "newLabel": "New Event",
+    "namePlaceholder": "Event name",
+    "summaryPlaceholder": "Event summary",
+    "deleteAria": "Delete event",
+    "deletePending": "Queued for deletion. Undo is available for 5 seconds.",
+    "deleteSuccess": "Deleted event",
+    "deleteFailed": "Failed to delete event",
+    "undoLabel": "Undo",
+    "deleteUndone": "Deletion undone"
+  },
+  "preset": {
+    "newLabel": "New Verdict",
+    "titlePlaceholder": "Verdict title",
+    "thesisPlaceholder": "Thesis",
+    "analysisPlaceholder": "Analysis",
+    "conclusionPlaceholder": "Conclusion",
+    "deleteAria": "Delete verdict",
+    "noPresets": "This pair of civilizations has no verdicts",
+    "noPresetsHint": ", click \"Add Verdict\" to create one",
+    "deletePending": "Queued for deletion. Undo is available for 5 seconds.",
+    "deleteSuccess": "Deleted verdict",
+    "deleteFailed": "Failed to delete verdict",
+    "deleteUndone": "Deletion undone"
+  },
+  "star": {
+    "suffix": "Causal Map",
+    "nodeNamePlaceholder": "Node name",
+    "descriptionPlaceholder": "Phenomenon description",
+    "causalPlaceholder": "Causal chain explanation",
+    "causalLabel": "Causal chain:"
+  },
+  "gantt": {
+    "bc": "BC ",
+    "ad": "AD ",
+    "yearPrefix": "BC",
+    "suffix": "Evolution Timeline",
+    "addEvent": "Add Event",
+    "ganttMode": "Gantt",
+    "treeMode": "Causal Tree",
+    "noEvents": "No events yet"
+  },
+  "arena": {
+    "title": "Cross-Civilization Dialectical Arena",
+    "needsTwo": "At least two civilizations needed for comparison",
+    "classicVerdicts": "Classic Verdicts",
+    "addPreset": "Add Verdict",
+    "dimension": "Dimension",
+    "diff": "Diff"
+  },
+  "civilization": {
+    "greek": "Ancient Greece",
+    "egypt": "Ancient Egypt",
+    "chinese": "Chinese Civilization",
+    "maya": "Maya Civilization"
+  }
+}

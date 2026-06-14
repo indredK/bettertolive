@@ -1,0 +1,183 @@
+{
+  "page": {
+    "eyebrow": "观念",
+    "title": "观念图谱",
+    "description": "按 4 维分类、查看 impact 分布，并把心理学视角作为可选解读层。"
+  },
+  "classification": {
+    "title": "4 维观念分类",
+    "description": "按 4 维分组、过滤、看认知地图；impact 跟着每条走，不进主筛选器。",
+    "domain": {
+      "title": "领域",
+      "description": "它主要作用于哪个生活面。"
+    },
+    "layer": {
+      "title": "层次",
+      "description": "它在认知的哪一层。"
+    },
+    "stability": {
+      "title": "稳定性",
+      "description": "它现在是否还在变化。"
+    },
+    "source": {
+      "title": "来源",
+      "description": "它从哪里长出来。"
+    }
+  },
+  "filter": {
+    "title": "四维筛选",
+    "all": "全部",
+    "count": "{{count}} 条"
+  },
+  "impact": {
+    "title": "影响方向 (impact)",
+    "description": "影响方向不是第 5 维分类，而是每条观念的内禀属性。"
+  },
+  "tabs": {
+    "entries": "观念清单",
+    "cards": "三层骨架",
+    "relations": "相互关系",
+    "blindspots": "盲区问题"
+  },
+  "entries": {
+    "title": "观念清单",
+    "description": "详情里始终显示 impact 与心理学解读。"
+  },
+  "questions": {
+    "title": "反复出现的问题",
+    "description": "把会反复追问自己的问题先收进来。"
+  },
+  "relations": {
+    "title": "相互关系",
+    "description": "观念之间会相似、对立或派生。"
+  },
+  "cards": {
+    "title": "三层骨架",
+    "description": "世界观、人生观和价值观的摘要骨架。"
+  },
+  "signals": {
+    "conflict": "正在张力中",
+    "changing": "正在变化",
+    "limiting": "可能限制我的观念"
+  },
+  "attachment": {
+    "title": "依恋观察"
+  },
+  "psych": {
+    "title": "心理学解读 (可选)"
+  },
+  "field": {
+    "title": "标题",
+    "statement": "观念表述",
+    "description": "说明",
+    "source": "来源",
+    "impact": "影响方向",
+    "secondaryDomains": "次要领域",
+    "cbtLayer": "CBT 层次",
+    "cognitiveDistortions": "认知扭曲",
+    "defenseMechanism": "防御机制",
+    "attachmentNote": "依恋观察",
+    "tags": "标签"
+  },
+  "form": {
+    "basic": "基本内容",
+    "classification": "分类与解读",
+    "optional": "可选",
+    "tagsPlaceholder": "用逗号分隔"
+  },
+  "actions": {
+    "create": "新增观念",
+    "editEntry": "编辑观念"
+  },
+  "toast": {
+    "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
+    "deleteSuccess": "已删除观念：{{name}}",
+    "deleteFailed": "删除观念失败",
+    "deleteUndone": "已撤销删除：{{name}}"
+  },
+  "undo": "撤销",
+  "error": {
+    "required": "请填写标题和观念表述"
+  },
+  "revision": {
+    "autoSummary": "管理模式更新了这条观念。"
+  },
+  "empty": {
+    "questions": "当前筛选下没有可展示的问题。",
+    "entries": "当前筛选下没有可展示的观念条目。",
+    "relations": "当前筛选下没有观念关系。",
+    "cards": "当前筛选下没有三层骨架。",
+    "conflicts": "当前筛选下没有冲突中的观念。",
+    "changing": "当前筛选下没有正在变化的观念。",
+    "distribution": "暂无分布数据。",
+    "limiting": "当前筛选下没有限制性观念。"
+  },
+  "enums": {
+    "domain": {
+      "关系": "关系",
+      "工作": "工作",
+      "金钱": "金钱",
+      "自我": "自我",
+      "社会": "社会",
+      "时间": "时间",
+      "意义": "意义"
+    },
+    "layer": {
+      "世界观": "世界观",
+      "人生观": "人生观",
+      "价值观": "价值观"
+    },
+    "stability": {
+      "稳定": "稳定",
+      "正在松动": "正在松动",
+      "正在形成": "正在形成",
+      "已放弃": "已放弃"
+    },
+    "source": {
+      "亲身经历": "亲身经历",
+      "家庭继承": "家庭继承",
+      "社会环境": "社会环境",
+      "主动反思": "主动反思",
+      "创伤反应": "创伤反应"
+    },
+    "impact": {
+      "支撑性": "支撑性",
+      "限制性": "限制性",
+      "中性": "中性",
+      "冲突中": "冲突中"
+    },
+    "cbtLayer": {
+      "自动思维": "自动思维",
+      "中间信念": "中间信念",
+      "核心信念": "核心信念"
+    },
+    "cognitiveDistortion": {
+      "全有或全无": "全有或全无",
+      "过度概括": "过度概括",
+      "灾难化": "灾难化",
+      "读心术": "读心术",
+      "应该陈述": "应该陈述",
+      "个人化": "个人化",
+      "情绪推理": "情绪推理",
+      "贴标签": "贴标签"
+    },
+    "defenseMechanism": {
+      "否认": "否认",
+      "投射": "投射",
+      "合理化": "合理化",
+      "理智化": "理智化",
+      "反向形成": "反向形成",
+      "升华": "升华"
+    },
+    "relationType": {
+      "相似": "相似",
+      "冲突": "冲突",
+      "派生": "派生"
+    },
+    "revisionField": {
+      "内容": "内容",
+      "稳定性": "稳定性",
+      "影响": "影响"
+    }
+  }
+}

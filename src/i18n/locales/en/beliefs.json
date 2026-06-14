@@ -1,0 +1,183 @@
+{
+  "page": {
+    "eyebrow": "Beliefs",
+    "title": "Belief Map",
+    "description": "Classify beliefs with 4 dimensions, read impact distribution, and keep psychology as an optional lens."
+  },
+  "classification": {
+    "title": "4-D Belief Classification",
+    "description": "Group, filter, and map cognition by 4 dimensions; impact stays on each belief, not in the main filters.",
+    "domain": {
+      "title": "Domain",
+      "description": "Which part of life this belief acts on."
+    },
+    "layer": {
+      "title": "Layer",
+      "description": "Where it sits in cognition."
+    },
+    "stability": {
+      "title": "Stability",
+      "description": "Whether it is still changing."
+    },
+    "source": {
+      "title": "Source",
+      "description": "Where it grew from."
+    }
+  },
+  "filter": {
+    "title": "4-D Filters",
+    "all": "All",
+    "count": "{{count}} items"
+  },
+  "impact": {
+    "title": "Impact Direction",
+    "description": "Impact is not a fifth classification dimension; it belongs to each belief."
+  },
+  "tabs": {
+    "entries": "Belief List",
+    "cards": "Three-Layer Frame",
+    "relations": "Relations",
+    "blindspots": "Blind Spots"
+  },
+  "entries": {
+    "title": "Belief List",
+    "description": "Details always show impact and the optional psychology lens."
+  },
+  "questions": {
+    "title": "Recurring Questions",
+    "description": "Keep the questions you repeatedly ask yourself."
+  },
+  "relations": {
+    "title": "Relations",
+    "description": "Beliefs can be similar, opposed, or derived from each other."
+  },
+  "cards": {
+    "title": "Three-Layer Frame",
+    "description": "A summary frame for worldview, life view, and values."
+  },
+  "signals": {
+    "conflict": "In Tension",
+    "changing": "Changing",
+    "limiting": "Possibly limiting beliefs"
+  },
+  "attachment": {
+    "title": "Attachment Note"
+  },
+  "psych": {
+    "title": "Psychology Lens (Optional)"
+  },
+  "field": {
+    "title": "Title",
+    "statement": "Belief Statement",
+    "description": "Description",
+    "source": "Source",
+    "impact": "Impact",
+    "secondaryDomains": "Secondary Domains",
+    "cbtLayer": "CBT Layer",
+    "cognitiveDistortions": "Cognitive Distortions",
+    "defenseMechanism": "Defense Mechanism",
+    "attachmentNote": "Attachment Note",
+    "tags": "Tags"
+  },
+  "form": {
+    "basic": "Basic Content",
+    "classification": "Classification and Lens",
+    "optional": "Optional",
+    "tagsPlaceholder": "Separate with commas"
+  },
+  "actions": {
+    "create": "Add Belief",
+    "editEntry": "Edit Belief"
+  },
+  "toast": {
+    "deletePending": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+    "deleteSuccess": "Deleted belief: {{name}}",
+    "deleteFailed": "Failed to delete belief",
+    "deleteUndone": "Deletion undone: {{name}}"
+  },
+  "undo": "Undo",
+  "error": {
+    "required": "Enter a title and belief statement"
+  },
+  "revision": {
+    "autoSummary": "Updated this belief in management mode."
+  },
+  "empty": {
+    "questions": "No questions under the current filter.",
+    "entries": "No beliefs under the current filter.",
+    "relations": "No belief relations under the current filter.",
+    "cards": "No three-layer frame under the current filter.",
+    "conflicts": "No conflicting beliefs under the current filter.",
+    "changing": "No changing beliefs under the current filter.",
+    "distribution": "No distribution data yet.",
+    "limiting": "No limiting beliefs under the current filter."
+  },
+  "enums": {
+    "domain": {
+      "关系": "Relationships",
+      "工作": "Work",
+      "金钱": "Money",
+      "自我": "Self",
+      "社会": "Society",
+      "时间": "Time",
+      "意义": "Meaning"
+    },
+    "layer": {
+      "世界观": "Worldview",
+      "人生观": "Life View",
+      "价值观": "Values"
+    },
+    "stability": {
+      "稳定": "Stable",
+      "正在松动": "Loosening",
+      "正在形成": "Forming",
+      "已放弃": "Abandoned"
+    },
+    "source": {
+      "亲身经历": "Lived Experience",
+      "家庭继承": "Family Inheritance",
+      "社会环境": "Social Environment",
+      "主动反思": "Active Reflection",
+      "创伤反应": "Trauma Response"
+    },
+    "impact": {
+      "支撑性": "Supportive",
+      "限制性": "Limiting",
+      "中性": "Neutral",
+      "冲突中": "In Conflict"
+    },
+    "cbtLayer": {
+      "自动思维": "Automatic Thought",
+      "中间信念": "Intermediate Belief",
+      "核心信念": "Core Belief"
+    },
+    "cognitiveDistortion": {
+      "全有或全无": "All-or-Nothing",
+      "过度概括": "Overgeneralization",
+      "灾难化": "Catastrophizing",
+      "读心术": "Mind Reading",
+      "应该陈述": "Should Statements",
+      "个人化": "Personalization",
+      "情绪推理": "Emotional Reasoning",
+      "贴标签": "Labeling"
+    },
+    "defenseMechanism": {
+      "否认": "Denial",
+      "投射": "Projection",
+      "合理化": "Rationalization",
+      "理智化": "Intellectualization",
+      "反向形成": "Reaction Formation",
+      "升华": "Sublimation"
+    },
+    "relationType": {
+      "相似": "Similar",
+      "冲突": "Conflict",
+      "派生": "Derived"
+    },
+    "revisionField": {
+      "内容": "Content",
+      "稳定性": "Stability",
+      "影响": "Impact"
+    }
+  }
+}

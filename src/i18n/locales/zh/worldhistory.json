@@ -1,0 +1,99 @@
+{
+  "title": "人类文明地缘因果星图",
+  "subtitle": "地缘唯物主义视角下的跨文化比较",
+  "tabs": {
+    "star": "星图",
+    "gantt": "演进",
+    "arena": "对质"
+  },
+  "actions": {
+    "saving": "保存中…"
+  },
+  "narrative": {
+    "prev": "上一步",
+    "next": "下一步",
+    "stop": "结束",
+    "start": "沿因果链逐步导览",
+    "counter": "因果链 {{current}} / {{total}}"
+  },
+  "nodeKind": {
+    "catalyst": "地缘催化",
+    "nutrition": "食物营养",
+    "customs": "风民人伦",
+    "conflict": "冲突战役",
+    "prohibition": "生死禁避",
+    "faith": "信仰法度"
+  },
+  "nodeGlyph": {
+    "catalyst": "催",
+    "nutrition": "养",
+    "customs": "伦",
+    "conflict": "战",
+    "prohibition": "禁",
+    "faith": "信"
+  },
+  "dimension": {
+    "calories": "主食卡路里",
+    "defense": "防灾隔离",
+    "trust": "互信契约",
+    "authority": "强权管制",
+    "taboos": "禁忌规训",
+    "abstract": "玄思抽象"
+  },
+  "event": {
+    "newLabel": "新事件",
+    "namePlaceholder": "事件名称",
+    "summaryPlaceholder": "事件摘要",
+    "deleteAria": "删除事件",
+    "deletePending": "已加入删除队列，5 秒内可撤销",
+    "deleteSuccess": "已删除事件",
+    "deleteFailed": "删除事件失败",
+    "undoLabel": "撤销",
+    "deleteUndone": "已撤销删除"
+  },
+  "preset": {
+    "newLabel": "新判词",
+    "titlePlaceholder": "判词标题",
+    "thesisPlaceholder": "论题",
+    "analysisPlaceholder": "分析",
+    "conclusionPlaceholder": "结论",
+    "deleteAria": "删除判词",
+    "noPresets": "这对文明暂无判词",
+    "noPresetsHint": "，点击「新增判词」添加",
+    "deletePending": "已加入删除队列，5 秒内可撤销",
+    "deleteSuccess": "已删除判词",
+    "deleteFailed": "删除判词失败",
+    "deleteUndone": "已撤销删除"
+  },
+  "star": {
+    "suffix": "因果链路星图",
+    "nodeNamePlaceholder": "节点名称",
+    "descriptionPlaceholder": "现象描述",
+    "causalPlaceholder": "因果链解释",
+    "causalLabel": "因果链："
+  },
+  "gantt": {
+    "bc": "公元前 ",
+    "ad": "公元 ",
+    "yearPrefix": "前",
+    "suffix": "演进时间轴",
+    "addEvent": "新增事件",
+    "ganttMode": "甘特横轴",
+    "treeMode": "因果树",
+    "noEvents": "暂无事件"
+  },
+  "arena": {
+    "title": "跨文明辩证对质场",
+    "needsTwo": "至少需要两个文明才能进行对质",
+    "classicVerdicts": "经典古判词",
+    "addPreset": "新增判词",
+    "dimension": "维度",
+    "diff": "差"
+  },
+  "civilization": {
+    "greek": "古希腊",
+    "egypt": "古埃及",
+    "chinese": "华夏文明",
+    "maya": "玛雅文明"
+  }
+}

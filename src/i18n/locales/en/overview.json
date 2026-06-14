@@ -1,0 +1,87 @@
+{
+  "page": {
+    "eyebrow": "Overview",
+    "title": "See the whole picture before choosing where to begin"
+  },
+  "sections": {
+    "recent": {
+      "title": "Recent Records",
+      "description": "Start by seeing yourself through recent events and recent words."
+    },
+    "logic": {
+      "title": "Page Logic",
+      "description": "Make the reason for this workspace structure clear first."
+    },
+    "pulse": {
+      "title": "Today’s Observations",
+      "description": "Give yourself an honest enough starting point."
+    },
+    "quick": {
+      "title": "Quick Entry",
+      "description": "Start with action, then decide whether to open it further."
+    }
+  },
+  "logic": {
+    "record": {
+      "title": "Recording Workbench",
+      "detail": "Reflection, events, finance, and living items capture how you are actually living right now."
+    },
+    "inner": {
+      "title": "Inner State",
+      "detail": "The emotions page carries recent psychological waves, triggers, and recovery methods that work for you."
+    },
+    "selfMap": {
+      "title": "Self Map",
+      "detail": "Beliefs, principles, relationships, growth, and memories explain why you have become this version of yourself."
+    },
+    "legacyFuture": {
+      "title": "Legacy and Future",
+      "detail": "Legacy organizes important words and entrusted matters, while the future blueprint brings ideal self and stage paths forward."
+    }
+  },
+  "quickActions": {
+    "reflection": {
+      "label": "Write a reflection",
+      "description": "Put down the thoughts and feelings of this moment first."
+    },
+    "events": {
+      "label": "Record an event",
+      "description": "Add a timeline fragment and keep a recent life detail."
+    },
+    "finance": {
+      "label": "Record spending",
+      "description": "Make real choices and lifestyle evidence visible."
+    },
+    "emotion": {
+      "label": "View emotion waves",
+      "description": "See recent inner weather and triggers together."
+    },
+    "future": {
+      "label": "Clarify future direction",
+      "description": "Make ideal self and lifestyle clearer."
+    },
+    "beliefs": {
+      "label": "Open belief map",
+      "description": "See how your worldview and values currently look."
+    },
+    "relationships": {
+      "label": "Review relationships",
+      "description": "Put important people, patterns, and unsaid words in one place."
+    },
+    "journey": {
+      "label": "Review growth memories",
+      "description": "Reconnect life stages, memory nodes, places, and objects."
+    },
+    "legacy": {
+      "label": "Organize entrusted words",
+      "description": "Place words, concerns, and instructions for the future."
+    }
+  },
+  "currentFocus": {
+    "title": "Current Focus",
+    "description": "Bring the new modules onto the same desk first, so they can be viewed, switched, and grounded in basic data."
+  },
+  "empty": {
+    "recent": "No recent records match the current filter."
+  }
+}

@@ -1,0 +1,300 @@
+{
+  "page": {
+    "eyebrow": "Emotions",
+    "title": "Read the recent inner weather",
+    "description": "See emotional waves, triggers, and recovery methods in one place."
+  },
+  "tabs": {
+    "overview": "Overview",
+    "today": "Today",
+    "timeline": "Timeline",
+    "triggers": "Triggers",
+    "toolbox": "Recovery Toolkit"
+  },
+  "actions": {
+    "add": "Add",
+    "addCheckIn": "Add Entry",
+    "addTrendPoint": "Add Trend Point",
+    "addSegment": "Add Segment",
+    "addLoop": "Add Loop",
+    "addTrigger": "Add Trigger",
+    "addLifestyleLink": "Add Link",
+    "addEnvironmentCue": "Add Environment",
+    "addRelationshipCue": "Add Relationship",
+    "addTool": "Add Tool",
+    "addRecoveryNote": "Add Recovery Note",
+    "editCheckIn": "Edit Emotion Entry",
+    "editSegment": "Edit Segment",
+    "editLoop": "Edit Loop",
+    "editTrigger": "Edit Trigger",
+    "editLifestyleLink": "Edit Link",
+    "editEnvironmentCue": "Edit Environment",
+    "editRelationshipCue": "Edit Relationship",
+    "editTool": "Edit Tool",
+    "editMinimalSteps": "Edit Minimal Steps",
+    "editIneffectiveActions": "Edit Warnings",
+    "editRecoveryNote": "Edit Recovery Note"
+  },
+  "overview": {
+    "title": "Emotion Overview",
+    "averageScore": "Average Intensity",
+    "bestWindow": "Best Window",
+    "worstWindow": "Hardest Window",
+    "window": "Window",
+    "topTags": "Frequent Emotion Tags",
+    "conclusion": "One-line Summary"
+  },
+  "today": {
+    "title": "Today’s Emotion Entry",
+    "description": "Intensity, body signals, and immediate impulses.",
+    "longDescription": "Turn vague emotion into a sample you can revisit.",
+    "recent": "Recent Entries",
+    "promptTitle": "Entry Path",
+    "promptDescription": "Intensity, tags, triggers, and needs all feed later pattern observation.",
+    "prompt": {
+      "feeling": "Name the feeling first",
+      "feelingBody": "It does not need to be exact; pick the closest word.",
+      "body": "Then check the body",
+      "bodyBody": "Shoulders, chest, appetite, and sleepiness often know before language does.",
+      "need": "Finally name the need",
+      "needBody": "Not to fix it immediately, but to know what would feel safer now."
+    }
+  },
+  "timeline": {
+    "title": "Emotion Timeline",
+    "description": "Read peaks, dips, and recovery periods through time.",
+    "chartTitle": "7-day Intensity",
+    "chartHint": "0–10, higher means tighter",
+    "segments": "Period Summary",
+    "loopTitle": "Recurring Loops",
+    "loopDescription": "See rhythms that are not random."
+  },
+  "triggers": {
+    "title": "Triggers",
+    "description": "Connect emotion with concrete life events.",
+    "lifestyle": "Lifestyle Links",
+    "lifestyleDesc": "Sleep, food, movement, and screen time.",
+    "environment": "Environment Cues",
+    "environmentDesc": "Contexts that tend to worsen state.",
+    "relationships": "Relationship Cues",
+    "relationshipsDesc": "Relationships that tend to create more fluctuation."
+  },
+  "toolbox": {
+    "title": "Soothing & Recovery Toolkit",
+    "description": "When things are hard, stabilize first and analyze later.",
+    "minimalSteps": "If things are already bad, only do these three",
+    "ineffective": "Actions that make things worse",
+    "ineffectiveDesc": "Avoid these paths when your state is low.",
+    "recoveryNotes": "What has held me before",
+    "recoveryNotesDesc": "Past effective recovery experiences can be used again."
+  },
+  "common": {
+    "intensity": "Intensity",
+    "bodySignal": "Body Signal",
+    "triggerEvent": "Trigger Event",
+    "impulse": "Impulse",
+    "needRightNow": "Need Right Now",
+    "bodyPrefix": "Body",
+    "impulsePrefix": "Want to ",
+    "recent": "Recent",
+    "when": "Best when",
+    "effect": "Effect"
+  },
+  "empty": {
+    "checkIns": "No emotion entries yet.",
+    "today": "No entry for today yet.",
+    "trend": "No emotion samples to chart yet.",
+    "timelineSegments": "No period summaries yet.",
+    "loopPatterns": "No recurring loop has been identified yet.",
+    "triggers": "No triggers under the current filter.",
+    "lifestyleLinks": "No lifestyle links yet.",
+    "environmentCues": "No environment cues yet.",
+    "relationshipCues": "No relationship cues yet.",
+    "tools": "No recovery tools under the current filter.",
+    "minimalRecoverySteps": "No minimal recovery steps yet.",
+    "ineffectiveActions": "No ineffective action warnings yet.",
+    "recoveryNotes": "No recovery notes yet."
+  },
+  "toast": {
+    "saved": "Emotion data saved",
+    "deleted": "Emotion data deleted"
+  },
+  "editor": {
+    "description": "This content is saved to backend emotion data instead of temporary page mock data.",
+    "none": "None",
+    "confirmDelete": "Delete this emotion data?",
+    "validation": {
+      "required": "Fill in the required fields"
+    },
+    "overview": {
+      "title": "Edit Emotion Overview",
+      "description": "Maintain the recent window, intensity, and one-line summary.",
+      "tagsPlaceholder": "Anxiety,4"
+    },
+    "textList": {
+      "minimalRecoverySteps": "Edit Minimal Recovery Steps",
+      "ineffectiveActions": "Edit Ineffective Action Warnings",
+      "description": "One item per line; saved back to the backend."
+    },
+    "placeholders": {
+      "list": "One per line, or separate with commas"
+    },
+    "fields": {
+      "date": "Time",
+      "state": "Overall State",
+      "summary": "What is happening now",
+      "intensity": "Intensity",
+      "impulse": "Impulse",
+      "bodySignal": "Body Signal",
+      "emotionTags": "Emotion Tags",
+      "tags": "Context Tags",
+      "triggerEvent": "Trigger Event",
+      "needRightNow": "Need Right Now",
+      "label": "Label",
+      "score": "Intensity Score",
+      "primaryState": "Primary State",
+      "note": "Note",
+      "title": "Title",
+      "category": "Category",
+      "cues": "Cues",
+      "recentExamples": "Recent Examples",
+      "kind": "Type",
+      "description": "Description",
+      "when": "Best When",
+      "contactScript": "Words to Say",
+      "range": "Time Range",
+      "trend": "Trend",
+      "frequency": "Frequency",
+      "factor": "Factor",
+      "direction": "Direction",
+      "observation": "Observation",
+      "context": "Context",
+      "who": "Person / Relationship",
+      "pattern": "Pattern",
+      "what": "What Happened",
+      "effect": "Effect",
+      "windowLabel": "Observation Window",
+      "averageScore": "Average Intensity",
+      "bestWindow": "Better Window",
+      "worstWindow": "Harder Window",
+      "topEmotionTags": "Frequent Emotion Tags",
+      "conclusion": "One-line Summary"
+    },
+    "checkIn": {
+      "createTitle": "Add Emotion Entry",
+      "editTitle": "Edit Emotion Entry"
+    },
+    "trendPoint": {
+      "createTitle": "Add Trend Point",
+      "editTitle": "Edit Trend Point"
+    },
+    "trigger": {
+      "createTitle": "Add Trigger",
+      "editTitle": "Edit Trigger"
+    },
+    "tool": {
+      "createTitle": "Add Recovery Tool",
+      "editTitle": "Edit Recovery Tool"
+    },
+    "timelineSegment": {
+      "createTitle": "Add Period Segment",
+      "editTitle": "Edit Period Segment"
+    },
+    "loopPattern": {
+      "createTitle": "Add Loop Pattern",
+      "editTitle": "Edit Loop Pattern"
+    },
+    "lifestyleLink": {
+      "createTitle": "Add Lifestyle Link",
+      "editTitle": "Edit Lifestyle Link"
+    },
+    "environmentCue": {
+      "createTitle": "Add Environment Cue",
+      "editTitle": "Edit Environment Cue"
+    },
+    "relationshipCue": {
+      "createTitle": "Add Relationship Cue",
+      "editTitle": "Edit Relationship Cue"
+    },
+    "recoveryNote": {
+      "createTitle": "Add Recovery Note",
+      "editTitle": "Edit Recovery Note"
+    }
+  },
+  "enum": {
+    "state": {
+      "平静": "Calm",
+      "回稳": "Stabilizing",
+      "低压焦虑": "Low-grade Anxiety",
+      "易怒": "Irritable",
+      "麻木": "Numb",
+      "空": "Empty",
+      "委屈": "Hurt",
+      "难过": "Sad",
+      "高压后空掉": "Empty After Pressure",
+      "松弛": "Relaxed",
+      "期待": "Hopeful"
+    },
+    "emotionTag": {
+      "难过": "Sad",
+      "焦虑": "Anxious",
+      "空": "Empty",
+      "平静": "Calm",
+      "委屈": "Hurt",
+      "愤怒": "Angry",
+      "松弛": "Relaxed",
+      "期待": "Hopeful",
+      "羞愧": "Ashamed",
+      "恐惧": "Afraid",
+      "孤独": "Lonely",
+      "兴奋": "Excited"
+    },
+    "impulse": {
+      "逃避": "Avoid",
+      "倾诉": "Talk",
+      "睡觉": "Sleep",
+      "吃东西": "Eat",
+      "出门": "Go Out",
+      "沉默": "Stay Silent",
+      "运动": "Move",
+      "刷手机": "Scroll"
+    },
+    "triggerCategory": {
+      "工作": "Work",
+      "家庭": "Family",
+      "亲密关系": "Intimate Relationship",
+      "金钱": "Money",
+      "睡眠": "Sleep",
+      "社交": "Social",
+      "自我否定": "Self-negation",
+      "环境": "Environment"
+    },
+    "toolKind": {
+      "有效": "Effective",
+      "无效": "Ineffective",
+      "极简三步": "Minimal Three Steps",
+      "可联系": "Contact"
+    },
+    "segmentTrend": {
+      "持续恶化": "Worsening",
+      "逐渐恢复": "Recovering",
+      "起伏波动": "Fluctuating",
+      "平稳": "Stable"
+    },
+    "lifestyleFactor": {
+      "睡眠": "Sleep",
+      "饮食": "Food",
+      "运动": "Movement",
+      "经期": "Cycle",
+      "饮酒": "Alcohol",
+      "屏幕时长": "Screen Time",
+      "通勤": "Commute",
+      "独处": "Solitude"
+    },
+    "linkDirection": {
+      "正相关": "Positive",
+      "负相关": "Negative",
+      "混合": "Mixed"
+    }
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "page": {
+    "eyebrow": "记账",
+    "title": "让现实资源流向成为证据",
+    "description": "收入、支出、类别和复盘状态一起看，帮助你判断钱正在塑造怎样的生活。"
+  },
+  "actions": {
+    "addEntry": "记一笔",
+    "editEntry": "编辑账目",
+    "deleteEntry": "删除账目"
+  },
+  "summary": {
+    "income": "本月收入",
+    "expense": "本月支出",
+    "net": "本月结余",
+    "weeklyExpense": "近 7 日支出",
+    "dailyAverage": "日均 {{value}}"
+  },
+  "sections": {
+    "entriesTitle": "最近账目",
+    "entriesDescription": "收入和支出都放在同一条现实时间线上。",
+    "distributionTitle": "类别和生活系统",
+    "distributionDescription": "先看钱流向哪里，再看它支撑了什么。",
+    "reviewTitle": "目标和复盘",
+    "reviewDescription": "目标不是压迫，而是给钱一个方向。"
+  },
+  "target": {
+    "empty": "当前月份还没有目标。",
+    "expenseLimit": "支出上限",
+    "savingTarget": "储蓄目标"
+  },
+  "empty": {
+    "entries": "当前筛选下还没有账目记录。",
+    "distribution": "当前筛选下没有可展示的分布。",
+    "reviewEntries": "当前没有需要优先复盘的账目。",
+    "rules": "当前还没有预算规则。"
+  },
+  "toast": {
+    "saved": "已保存账目",
+    "saveFailed": "保存失败",
+    "deleted": "已删除账目",
+    "deleteFailed": "删除失败"
+  },
+  "edit": {
+    "createTitle": "新增账目",
+    "editTitle": "编辑账目",
+    "description": "记录金额，也保留这笔钱背后的生活语境。",
+    "tagsPlaceholder": "每行一个标签",
+    "validation": {
+      "required": "请填写日期、标题、类别和有效金额",
+      "amountPositive": "金额需要大于 0"
+    },
+    "fields": {
+      "date": "日期",
+      "direction": "方向",
+      "label": "标题",
+      "amount": "金额",
+      "category": "类别",
+      "account": "账户",
+      "lifeSystem": "生活系统",
+      "necessity": "必要性",
+      "reviewStatus": "复盘状态",
+      "linkedModule": "关联模块",
+      "note": "说明",
+      "tags": "标签"
+    }
+  },
+  "enum": {
+    "direction": {
+      "expense": "支出",
+      "income": "收入"
+    },
+    "category": {
+      "餐饮": "餐饮",
+      "居住": "居住",
+      "交通": "交通",
+      "购物": "购物",
+      "学习成长": "学习成长",
+      "健康": "健康",
+      "社交": "社交",
+      "娱乐": "娱乐",
+      "收入": "收入",
+      "储蓄": "储蓄",
+      "其他": "其他"
+    },
+    "lifeSystem": {
+      "基本生活": "基本生活",
+      "身体健康": "身体健康",
+      "关系社交": "关系社交",
+      "成长学习": "成长学习",
+      "居住环境": "居住环境",
+      "自由安全": "自由安全",
+      "娱乐恢复": "娱乐恢复"
+    },
+    "necessity": {
+      "生存必需": "生存必需",
+      "稳定维护": "稳定维护",
+      "体验改善": "体验改善",
+      "长期投资": "长期投资",
+      "冲动/待复盘": "冲动/待复盘"
+    },
+    "reviewStatus": {
+      "已确认": "已确认",
+      "待复盘": "待复盘",
+      "可优化": "可优化",
+      "值得保留": "值得保留"
+    },
+    "linkedModule": {
+      "手动录入": "手动录入",
+      "购物": "购物",
+      "饮食": "饮食",
+      "记事": "记事",
+      "反思": "反思",
+      "未来": "未来"
+    }
+  },
+  "tabs": {
+    "overview": "总览",
+    "entries": "明细",
+    "rules": "预算规则",
+    "review": "复盘线索"
+  },
+  "rules": {
+    "title": "预算规则",
+    "description": "把每类支出的意图和上限放在同一处校准。"
+  }
+}

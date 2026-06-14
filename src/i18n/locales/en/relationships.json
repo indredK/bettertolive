@@ -1,0 +1,313 @@
+{
+  "page": {
+    "eyebrow": "Relationships",
+    "title": "Relationship States and Unfinished Words",
+    "description": "Use five classification dimensions to see your relationship world, and unfinished weight to hold what has not been said yet.",
+    "currentFilter": "Current filter: {{query}}",
+    "relationshipCount": "Relationships",
+    "noteCount": "Notes"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "graph": "Relationship Graph",
+    "directory": "Directory",
+    "unsent": "Unsent Words",
+    "patterns": "Patterns"
+  },
+  "actions": {
+    "addRelationship": "Add Relationship",
+    "addNote": "Add Note"
+  },
+  "common": {
+    "add": "Add",
+    "undo": "Undo"
+  },
+  "overview": {
+    "classificationHeading": "Five-Dimension Relationship Map",
+    "classificationDescription": "These dimensions group and observe the relationship world; unfinished weight stays in details and unsent words.",
+    "typeTitle": "Type",
+    "typeDescription": "What is the core bond here?",
+    "depthTitle": "Depth",
+    "depthDescription": "How open can I be in this relationship?",
+    "stageTitle": "Stage",
+    "stageDescription": "Where is this relationship moving now?",
+    "impactTitle": "Impact",
+    "impactDescription": "Is it nourishing, draining, neutral, or mixed?",
+    "interactionTitle": "Interaction",
+    "interactionDescription": "How often do we connect?",
+    "unfinishedHeading": "Unfinished Weight",
+    "unfinishedDescription": "Unfinished weight evaluates a single relationship and does not belong in the main filters.",
+    "nourishing": "Nourishing",
+    "nourishingDetail": "Relationships that restore or strengthen you",
+    "draining": "Draining",
+    "drainingDetail": "Relationships that need boundaries or fresh judgment",
+    "repairing": "Tense / Repairing",
+    "repairingDetail": "Relationships most worth gently checking now",
+    "heavy": "Heavy",
+    "heavyDetail": "Unfinished words to write down or process first"
+  },
+  "directory": {
+    "title": "Relationship Directory"
+  },
+  "filter": {
+    "all": "All",
+    "clear": "Clear filters",
+    "clearAll": "Clear",
+    "more": "Filters",
+    "type": "Type",
+    "depth": "Depth",
+    "stage": "Stage",
+    "impact": "Impact",
+    "interaction": "Interaction"
+  },
+  "unsent": {
+    "title": "Unsent Words",
+    "relatedRelationship": "Related relationship: {{name}}"
+  },
+  "patterns": {
+    "title": "Cross-Relationship Patterns",
+    "kicker": "Relationship Pattern"
+  },
+  "graph": {
+    "helper": "Circles connect people, people connect unsent words, and patterns add dashed links when their cues match tags or emotional signals.",
+    "centeredHelper": "Centered view prioritizes explicit person-to-person connections, then layers circle and pattern edges as supporting context.",
+    "editHint": "Switch to Control Mode to edit relationship, unsent-word, and pattern nodes directly from here.",
+    "detailTitle": "Node Details",
+    "detailDescription": "Select different node types to see their place, context, and nearby links in the relationship network.",
+    "emptySelection": "Select a node to see its details here.",
+    "noPatternMatches": "This pattern does not match any relationship nodes yet.",
+    "connectedRelationshipsCount": "Linked to {{count}} relationships",
+    "clearFocus": "Clear Focus",
+    "center": "Center on This Person",
+    "exitCenter": "Cancel Centering",
+    "editConnections": "Edit",
+    "centeredMode": "Centered View",
+    "globalMode": "Global View",
+    "centerDepth": "{{count}} hops expanded",
+    "controls": {
+      "fit": "Fit",
+      "recenter": "Relayout",
+      "fullscreen": "Fullscreen",
+      "exitFullscreen": "Exit Fullscreen"
+    },
+    "legend": {
+      "circle": "Circle",
+      "relationship": "Relationship",
+      "note": "Unsent Words",
+      "pattern": "Pattern"
+    },
+    "metrics": {
+      "circles": "Circles",
+      "circlesDetail": "How many relationship circles are in the current map",
+      "relationships": "Relationships",
+      "relationshipsDetail": "Relationship people currently shown as graph nodes",
+      "notes": "Notes",
+      "notesDetail": "Unsent-word nodes that are linked to relationship records",
+      "links": "Links",
+      "linksDetail": "Connections between circles, people, notes, and patterns"
+    },
+    "signals": {
+      "connections": "Explicit Person Links",
+      "noConnections": "No explicit person links yet.",
+      "connectedPeople": "Connected in Graph",
+      "noConnectedPeople": "No connected people yet.",
+      "patterns": "Matched Patterns",
+      "noPatterns": "No shared patterns yet.",
+      "notes": "Unsent Signals",
+      "noNotes": "No expression signals yet."
+    }
+  },
+  "labels": {
+    "depth": "Depth",
+    "stage": "Stage",
+    "interaction": "Interaction",
+    "impact": "Impact",
+    "currentState": "Current",
+    "boundary": "Boundary",
+    "unspoken": "Unspoken",
+    "positiveImpact": "Positive Impact",
+    "ongoingShadow": "Ongoing Shadow",
+    "events": "Key Events",
+    "history": "Change History",
+    "relatedNotes": "Related Unsent Words"
+  },
+  "empty": {
+    "distribution": "No distribution data yet.",
+    "events": "No key events yet.",
+    "history": "No depth or stage changes yet.",
+    "relatedNotes": "No related notes yet.",
+    "graph": "No relationship links to show yet.",
+    "directory": "No relationships under current filters.",
+    "selectRelationship": "Select a relationship from the left.",
+    "selectNote": "Select a note from the left.",
+    "selectPattern": "Select a pattern from the left."
+  },
+  "edit": {
+    "createRelationship": "Add Relationship",
+    "editRelationship": "Edit Relationship",
+    "relationshipDescription": "The five dimensions classify the relationship world; unfinished weight follows single relationships and unsent words.",
+    "createNote": "Add Unsent Words",
+    "editNote": "Edit Unsent Words",
+    "noteDescription": "Write to an existing relationship, an independent target, or your future self.",
+    "createPattern": "Add Pattern",
+    "editPattern": "Edit Pattern",
+    "patternDescription": "Review repeated roles and paths across relationships.",
+    "name": "Name",
+    "role": "Role",
+    "circle": "Circle",
+    "type": "Type",
+    "depth": "Depth",
+    "stage": "Stage",
+    "impact": "Impact",
+    "interaction": "Interaction",
+    "connections": "Person-to-Person Links",
+    "connectionsDescription": "Add real links between this person and others. When the other person opens edit mode, the roles will automatically flip into their perspective.",
+    "noConnections": "No person links yet. Add one like “student / teacher” or “friend / friend”.",
+    "noEvents": "No interaction events yet. Use Add above.",
+    "noHistory": "No change history yet. Use Add above.",
+    "relatedPerson": "Related Person",
+    "selectRelatedPerson": "Select a person",
+    "connectionStrength": "Connection Strength",
+    "connectionNote": "Connection Note",
+    "connectionRolesHint": "Each row is a custom reciprocal relationship, for example current person as “student” and the other person as “teacher”; from the other side, the roles are shown reversed.",
+    "connectionCardEmpty": "No role pair yet. Open the card to fill in the details.",
+    "connectionRoleCardTitle": "Relationship Role",
+    "connectionCardTitle": "Relationship with {{name}}",
+    "addConnectionRole": "Add Relationship Row",
+    "eventCardTitle": "Interaction Event",
+    "eventKind": "Event Type",
+    "historyCardTitle": "Change Record",
+    "changeField": "Changed Field",
+    "selfRole": "Current Person Role",
+    "otherRole": "Other Person Role",
+    "connectionRoleNote": "Add detail for this relationship row",
+    "unfinishedWeight": "Unfinished Weight",
+    "influence": "Relationship Profile",
+    "currentState": "Current State",
+    "emotionalTone": "Emotional Tone",
+    "unspokenLine": "Unspoken Line",
+    "positiveImpact": "Positive Impact",
+    "ongoingShadow": "Ongoing Shadow",
+    "boundaryStatus": "Boundary State",
+    "emotionCues": "Emotion Tags",
+    "tags": "Tags",
+    "events": "Key Interaction Events",
+    "history": "Depth / Stage History",
+    "tabs": {
+      "connections": "Person Links",
+      "events": "Events",
+      "history": "History"
+    },
+    "date": "Date",
+    "eventTitle": "Event Title",
+    "eventSummary": "Event Summary",
+    "from": "From",
+    "toValue": "To",
+    "historyNote": "Change Note",
+    "targetType": "Target Type",
+    "relatedRelationship": "Related Relationship",
+    "noRelationship": "No relation",
+    "unselectedRelatedPerson": "No related person selected",
+    "to": "To",
+    "theme": "Theme",
+    "excerpt": "Content",
+    "title": "Title",
+    "summary": "Summary",
+    "cues": "Cues",
+    "saved": "Relationship saved",
+    "noteSaved": "Unsent words saved",
+    "patternSaved": "Pattern saved",
+    "saveFailed": "Save failed",
+    "validation": {
+      "relationshipRequired": "Enter a name and role",
+      "noteRequired": "Enter target, theme, and content",
+      "patternRequired": "Enter title and summary"
+    }
+  },
+  "confirm": {
+    "deleteNote": "Delete these unsent words?",
+    "deletePattern": "Delete this relationship pattern?"
+  },
+  "toast": {
+    "deleteRelationshipPending": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
+    "deleteRelationshipSuccess": "Deleted relationship: {{name}}",
+    "deleteRelationshipFailed": "Failed to delete relationship",
+    "deleteRelationshipUndone": "Deletion undone: {{name}}",
+    "deleteNotePending": "Queued for deletion. Undo is available for 5 seconds.",
+    "deleteNoteSuccess": "Deleted unsent words",
+    "deleteNoteFailed": "Failed to delete unsent words",
+    "deleteNoteUndone": "Deletion undone",
+    "deletePatternPending": "Queued for deletion. Undo is available for 5 seconds.",
+    "deletePatternSuccess": "Deleted relationship pattern",
+    "deletePatternFailed": "Failed to delete relationship pattern",
+    "deletePatternUndone": "Deletion undone"
+  },
+  "enumNames": {
+    "type": {
+      "家人": "Family",
+      "伴侣": "Partner",
+      "朋友": "Friend",
+      "同事": "Colleague",
+      "过去重要的人": "Important Past Person",
+      "导师/榜样": "Mentor / Model"
+    },
+    "depth": {
+      "亲密": "Intimate",
+      "亲近": "Close",
+      "熟人": "Acquaintance",
+      "疏远": "Distant",
+      "断联": "No Contact"
+    },
+    "stage": {
+      "建立中": "Building",
+      "稳定": "Stable",
+      "紧张": "Tense",
+      "修复中": "Repairing",
+      "已结束": "Ended",
+      "等待中": "Waiting"
+    },
+    "impact": {
+      "滋养": "Nourishing",
+      "消耗": "Draining",
+      "中性": "Neutral",
+      "混合": "Mixed"
+    },
+    "interaction": {
+      "每天": "Daily",
+      "每周": "Weekly",
+      "每月": "Monthly",
+      "每年": "Yearly",
+      "几乎不": "Rarely",
+      "已无联系": "No Contact"
+    },
+    "unfinishedWeight": {
+      "很重": "Heavy",
+      "中等": "Medium",
+      "轻微": "Light",
+      "无": "None"
+    },
+    "eventKind": {
+      "认识": "Met",
+      "重要谈话": "Important Talk",
+      "冲突": "Conflict",
+      "和好": "Repaired",
+      "疏远": "Drifted",
+      "断联": "No Contact",
+      "重逢": "Reunion"
+    },
+    "changeField": {
+      "depth": "Depth",
+      "stage": "Stage"
+    },
+    "targetType": {
+      "关系条目": "Relationship",
+      "独立对象": "Independent Target",
+      "未来的自己": "Future Self"
+    },
+    "connectionStrength": {
+      "强": "Strong",
+      "中": "Medium",
+      "弱": "Weak"
+    }
+  }
+}

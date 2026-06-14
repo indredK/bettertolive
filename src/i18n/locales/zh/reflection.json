@@ -1,0 +1,67 @@
+{
+  "page": {
+    "eyebrow": "反思",
+    "title": "先把此刻写下来",
+    "description": "表达不需要完整，真实比完整更重要。这里会成为你最自然的输入入口。"
+  },
+  "sections": {
+    "draft": {
+      "title": "写作起点",
+      "description": "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。"
+    },
+    "recent": {
+      "title": "最近反思",
+      "description": "先展示最近写过的内容，再决定之后如何组织回看。"
+    },
+    "themes": {
+      "title": "主题脉络",
+      "description": "把标签和月份放在一起看，哪些话题正在反复出现会更清楚。",
+      "tags": "高频标签",
+      "months": "月份分布"
+    },
+    "writingPrompts": {
+      "title": "回看问题",
+      "description": "写之前不必完整回答，先用问题把注意力放回自己身上。"
+    }
+  },
+  "actions": {
+    "create": "新增反思",
+    "edit": "编辑反思"
+  },
+  "fields": {
+    "date": "时间",
+    "title": "标题",
+    "excerpt": "反思内容",
+    "tags": "标签"
+  },
+  "placeholders": {
+    "date": "例如：2026-06-08 21:10",
+    "title": "例如：今天真正想保留的东西",
+    "excerpt": "今天发生了什么？我看见了什么？以后回看时需要记住什么？",
+    "tags": "用逗号分隔，例如：节奏，工作"
+  },
+  "empty": {
+    "records": "当前筛选下还没有反思记录。",
+    "tags": "当前筛选下还没有标签。",
+    "months": "当前筛选下还没有月份分布。"
+  },
+  "edit": {
+    "createTitle": "新增反思",
+    "editTitle": "编辑反思",
+    "description": "保留时间、标题、正文摘要和少量标签即可。"
+  },
+  "validation": {
+    "required": "请填写时间、标题和反思内容"
+  },
+  "tabs": {
+    "overview": "总览",
+    "records": "记录库",
+    "themes": "主题脉络",
+    "writing": "写作支架"
+  },
+  "prompts": {
+    "keep": "这件事里，我想长期保留的判断是什么？",
+    "pattern": "它是否重复出现在最近几次记录中？",
+    "next": "如果只做一个小调整，下一步是什么？"
+  }
+}

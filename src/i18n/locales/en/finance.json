@@ -1,0 +1,127 @@
+{
+  "page": {
+    "eyebrow": "Finance",
+    "title": "Turn resource flow into evidence",
+    "description": "Look at income, expenses, categories, and review status together to see what kind of life your money is shaping."
+  },
+  "actions": {
+    "addEntry": "Add Entry",
+    "editEntry": "Edit entry",
+    "deleteEntry": "Delete entry"
+  },
+  "summary": {
+    "income": "Monthly Income",
+    "expense": "Monthly Expense",
+    "net": "Monthly Balance",
+    "weeklyExpense": "Last 7 Days",
+    "dailyAverage": "Daily avg {{value}}"
+  },
+  "sections": {
+    "entriesTitle": "Recent Entries",
+    "entriesDescription": "Income and expenses stay on the same real-life timeline.",
+    "distributionTitle": "Categories and life systems",
+    "distributionDescription": "See where money goes first, then what part of life it supports.",
+    "reviewTitle": "Targets and review",
+    "reviewDescription": "Targets are not pressure. They give money a direction."
+  },
+  "target": {
+    "empty": "There is no target for the current month yet.",
+    "expenseLimit": "Expense limit",
+    "savingTarget": "Saving target"
+  },
+  "empty": {
+    "entries": "No finance entries under the current filter.",
+    "distribution": "No distribution data under the current filter.",
+    "reviewEntries": "There are no priority entries to review right now.",
+    "rules": "No budget rules yet."
+  },
+  "toast": {
+    "saved": "Entry saved",
+    "saveFailed": "Save failed",
+    "deleted": "Entry deleted",
+    "deleteFailed": "Delete failed"
+  },
+  "edit": {
+    "createTitle": "Create Entry",
+    "editTitle": "Edit Entry",
+    "description": "Capture the amount, and also the life context behind it.",
+    "tagsPlaceholder": "One tag per line",
+    "validation": {
+      "required": "Please fill in date, title, category, and a valid amount",
+      "amountPositive": "Amount must be greater than 0"
+    },
+    "fields": {
+      "date": "Date",
+      "direction": "Direction",
+      "label": "Label",
+      "amount": "Amount",
+      "category": "Category",
+      "account": "Account",
+      "lifeSystem": "Life system",
+      "necessity": "Necessity",
+      "reviewStatus": "Review status",
+      "linkedModule": "Linked module",
+      "note": "Note",
+      "tags": "Tags"
+    }
+  },
+  "enum": {
+    "direction": {
+      "expense": "Expense",
+      "income": "Income"
+    },
+    "category": {
+      "餐饮": "Food",
+      "居住": "Housing",
+      "交通": "Transport",
+      "购物": "Shopping",
+      "学习成长": "Learning",
+      "健康": "Health",
+      "社交": "Social",
+      "娱乐": "Entertainment",
+      "收入": "Income",
+      "储蓄": "Savings",
+      "其他": "Other"
+    },
+    "lifeSystem": {
+      "基本生活": "Basic living",
+      "身体健康": "Physical health",
+      "关系社交": "Relationships",
+      "成长学习": "Growth and learning",
+      "居住环境": "Living environment",
+      "自由安全": "Freedom and safety",
+      "娱乐恢复": "Play and recovery"
+    },
+    "necessity": {
+      "生存必需": "Essential",
+      "稳定维护": "Stability maintenance",
+      "体验改善": "Experience upgrade",
+      "长期投资": "Long-term investment",
+      "冲动/待复盘": "Impulse / review later"
+    },
+    "reviewStatus": {
+      "已确认": "Confirmed",
+      "待复盘": "Needs review",
+      "可优化": "Can optimize",
+      "值得保留": "Worth keeping"
+    },
+    "linkedModule": {
+      "手动录入": "Manual entry",
+      "购物": "Shopping",
+      "饮食": "Nutrition",
+      "记事": "Events",
+      "反思": "Reflection",
+      "未来": "Future"
+    }
+  },
+  "tabs": {
+    "overview": "Overview",
+    "entries": "Entries",
+    "rules": "Budget Rules",
+    "review": "Review Cues"
+  },
+  "rules": {
+    "title": "Budget Rules",
+    "description": "Calibrate each category’s intent and limit in one place."
+  }
+}

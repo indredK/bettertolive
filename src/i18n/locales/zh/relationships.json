@@ -1,0 +1,313 @@
+{
+  "page": {
+    "eyebrow": "关系深化",
+    "title": "关系状态与未完成表达",
+    "description": "用 5 个分类维度看关系世界，用未完成重量承接那些还没说出口的话。",
+    "currentFilter": "当前筛选：{{query}}",
+    "relationshipCount": "关系",
+    "noteCount": "表达"
+  },
+  "tabs": {
+    "overview": "总览",
+    "graph": "关系图谱",
+    "directory": "关系档案",
+    "unsent": "想说的话",
+    "patterns": "跨关系模式"
+  },
+  "actions": {
+    "addRelationship": "新增关系",
+    "addNote": "新增表达"
+  },
+  "common": {
+    "add": "添加",
+    "undo": "撤销"
+  },
+  "overview": {
+    "classificationHeading": "5 维关系分类",
+    "classificationDescription": "这些维度负责分组和观察关系世界；未完成重量留在详情和想说的话里。",
+    "typeTitle": "类型",
+    "typeDescription": "这个人的纽带本质是什么。",
+    "depthTitle": "深度",
+    "depthDescription": "我在这段关系里有多敞开。",
+    "stageTitle": "阶段",
+    "stageDescription": "这段关系现在在往哪里走。",
+    "impactTitle": "影响",
+    "impactDescription": "它滋养、消耗，还是混合。",
+    "interactionTitle": "互动频率",
+    "interactionDescription": "多久会联系一次。",
+    "unfinishedHeading": "未完成重量",
+    "unfinishedDescription": "未完成重量是单段关系的评估属性，用来判断还有多少没说完的话，不进入主筛选器。",
+    "nourishing": "滋养",
+    "nourishingDetail": "让人恢复或更有力量的关系",
+    "draining": "消耗",
+    "drainingDetail": "需要边界或重新判断的关系",
+    "repairing": "紧张 / 修复",
+    "repairingDetail": "当前最适合被温和检查的关系",
+    "heavy": "很重",
+    "heavyDetail": "优先写下或处理的未完成表达"
+  },
+  "directory": {
+    "title": "关系档案"
+  },
+  "filter": {
+    "all": "全部",
+    "clear": "清空筛选",
+    "clearAll": "清空",
+    "more": "筛选",
+    "type": "类型",
+    "depth": "深度",
+    "stage": "阶段",
+    "impact": "影响",
+    "interaction": "互动频率"
+  },
+  "unsent": {
+    "title": "想说的话",
+    "relatedRelationship": "关联关系：{{name}}"
+  },
+  "patterns": {
+    "title": "跨关系模式",
+    "kicker": "关系模式"
+  },
+  "graph": {
+    "helper": "圈层连接人物，人物连接表达，模式会根据线索和标签与相关关系形成虚线连接。",
+    "centeredHelper": "中心视图会优先围绕显式人物关系展开，再附带圈层和模式的辅助边。",
+    "editHint": "切换到控制模式后，这里的关系人物、想说的话和模式节点都可以直接编辑。",
+    "detailTitle": "节点说明",
+    "detailDescription": "选中不同类型的节点后，这里会显示它在关系网络里的位置、上下文和相关连接。",
+    "emptySelection": "选中一个节点后，这里会显示详细说明。",
+    "noPatternMatches": "这个模式暂时还没有匹配到关系节点。",
+    "connectedRelationshipsCount": "连接 {{count}} 段关系",
+    "clearFocus": "取消焦点",
+    "center": "以它为中心",
+    "exitCenter": "取消以它为中心",
+    "editConnections": "编辑",
+    "centeredMode": "中心视图",
+    "globalMode": "全局视图",
+    "centerDepth": "展开 {{count}} 跳",
+    "controls": {
+      "fit": "铺满",
+      "recenter": "重排",
+      "fullscreen": "全屏",
+      "exitFullscreen": "退出全屏"
+    },
+    "legend": {
+      "circle": "圈层",
+      "relationship": "关系人物",
+      "note": "想说的话",
+      "pattern": "模式"
+    },
+    "metrics": {
+      "circles": "圈层",
+      "circlesDetail": "当前关系圈层的总数",
+      "relationships": "关系",
+      "relationshipsDetail": "进入图谱的人物关系节点",
+      "notes": "表达",
+      "notesDetail": "与关系记录相连的表达节点",
+      "links": "连接",
+      "linksDetail": "圈层、人物、表达和模式之间的连接"
+    },
+    "signals": {
+      "connections": "显式人物关系",
+      "noConnections": "还没有显式人物关系。",
+      "connectedPeople": "图中相连",
+      "noConnectedPeople": "暂无相连人物",
+      "patterns": "匹配模式",
+      "noPatterns": "暂无共同模式",
+      "notes": "表达线索",
+      "noNotes": "暂无表达线索"
+    }
+  },
+  "labels": {
+    "depth": "深度",
+    "stage": "阶段",
+    "interaction": "互动频率",
+    "impact": "影响",
+    "currentState": "当前",
+    "boundary": "边界",
+    "unspoken": "没说出口",
+    "positiveImpact": "正面影响",
+    "ongoingShadow": "持续阴影",
+    "events": "关键互动事件",
+    "history": "变化历史",
+    "relatedNotes": "相关想说的话"
+  },
+  "empty": {
+    "distribution": "暂无分布数据。",
+    "events": "暂无关键互动事件。",
+    "history": "暂无深度或阶段变化。",
+    "relatedNotes": "暂无关联表达。",
+    "graph": "当前还没有可展示的关系连接。",
+    "directory": "当前筛选下没有关系。",
+    "selectRelationship": "从左侧选择一段关系。",
+    "selectNote": "从左侧选择一条表达。",
+    "selectPattern": "从左侧选择一个模式。"
+  },
+  "edit": {
+    "createRelationship": "新增关系",
+    "editRelationship": "编辑关系",
+    "relationshipDescription": "5 维用于归类关系世界，未完成重量只跟随单段关系和想说的话。",
+    "createNote": "新增想说的话",
+    "editNote": "编辑想说的话",
+    "noteDescription": "可以写给现有关系、独立对象，或未来的自己。",
+    "createPattern": "新增模式",
+    "editPattern": "编辑模式",
+    "patternDescription": "用于跨关系复盘重复出现的角色和路径。",
+    "name": "姓名",
+    "role": "角色",
+    "circle": "圈层",
+    "type": "类型",
+    "depth": "深度",
+    "stage": "阶段",
+    "impact": "影响",
+    "interaction": "互动",
+    "connections": "人物之间的关系",
+    "connectionsDescription": "为当前人物补充和其他人物之间的真实关系。对方打开编辑时，会自动看到互相翻转后的角色。",
+    "noConnections": "还没有人物连接。可以新增一条，例如“学生 / 老师”或“朋友 / 朋友”。",
+    "noEvents": "还没有互动事件，点击上方添加。",
+    "noHistory": "还没有变化历史，点击上方添加。",
+    "relatedPerson": "关联人物",
+    "selectRelatedPerson": "选择一个人物",
+    "connectionStrength": "连接强度",
+    "connectionNote": "连接备注",
+    "connectionRolesHint": "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
+    "connectionCardEmpty": "还没填写角色组合，点开卡片后补充具体关系。",
+    "connectionRoleCardTitle": "关系角色",
+    "connectionCardTitle": "和{{name}}的关系",
+    "addConnectionRole": "新增一行关系",
+    "eventCardTitle": "互动事件",
+    "eventKind": "事件类型",
+    "historyCardTitle": "变化记录",
+    "changeField": "变化字段",
+    "selfRole": "当前人物角色",
+    "otherRole": "对方角色",
+    "connectionRoleNote": "这条关系的补充说明",
+    "unfinishedWeight": "未完成重量",
+    "influence": "关系档案",
+    "currentState": "当前状态",
+    "emotionalTone": "情绪线索描述",
+    "unspokenLine": "没说出口",
+    "positiveImpact": "正面影响",
+    "ongoingShadow": "持续阴影",
+    "boundaryStatus": "边界状态",
+    "emotionCues": "情绪标签",
+    "tags": "标签",
+    "events": "关键互动事件",
+    "history": "深度 / 阶段变化历史",
+    "tabs": {
+      "connections": "人物关系",
+      "events": "互动事件",
+      "history": "变化历史"
+    },
+    "date": "日期",
+    "eventTitle": "事件标题",
+    "eventSummary": "事件摘要",
+    "from": "从",
+    "toValue": "到",
+    "historyNote": "变化说明",
+    "targetType": "目标类型",
+    "relatedRelationship": "关联关系",
+    "noRelationship": "不关联",
+    "unselectedRelatedPerson": "未选择关联人物",
+    "to": "对象",
+    "theme": "主题",
+    "excerpt": "内容",
+    "title": "标题",
+    "summary": "摘要",
+    "cues": "线索",
+    "saved": "关系已保存",
+    "noteSaved": "想说的话已保存",
+    "patternSaved": "模式已保存",
+    "saveFailed": "保存失败",
+    "validation": {
+      "relationshipRequired": "请填写姓名和角色",
+      "noteRequired": "请填写对象、主题和内容",
+      "patternRequired": "请填写标题和摘要"
+    }
+  },
+  "confirm": {
+    "deleteNote": "确定删除这条想说的话吗？",
+    "deletePattern": "确定删除这个关系模式吗？"
+  },
+  "toast": {
+    "deleteRelationshipPending": "已加入删除队列：{{name}}，5 秒内可撤销",
+    "deleteRelationshipSuccess": "已删除关系：{{name}}",
+    "deleteRelationshipFailed": "删除关系失败",
+    "deleteRelationshipUndone": "已撤销删除：{{name}}",
+    "deleteNotePending": "已加入删除队列，5 秒内可撤销",
+    "deleteNoteSuccess": "已删除想说的话",
+    "deleteNoteFailed": "删除想说的话失败",
+    "deleteNoteUndone": "已撤销删除",
+    "deletePatternPending": "已加入删除队列，5 秒内可撤销",
+    "deletePatternSuccess": "已删除关系模式",
+    "deletePatternFailed": "删除关系模式失败",
+    "deletePatternUndone": "已撤销删除"
+  },
+  "enumNames": {
+    "type": {
+      "家人": "家人",
+      "伴侣": "伴侣",
+      "朋友": "朋友",
+      "同事": "同事",
+      "过去重要的人": "过去重要的人",
+      "导师/榜样": "导师/榜样"
+    },
+    "depth": {
+      "亲密": "亲密",
+      "亲近": "亲近",
+      "熟人": "熟人",
+      "疏远": "疏远",
+      "断联": "断联"
+    },
+    "stage": {
+      "建立中": "建立中",
+      "稳定": "稳定",
+      "紧张": "紧张",
+      "修复中": "修复中",
+      "已结束": "已结束",
+      "等待中": "等待中"
+    },
+    "impact": {
+      "滋养": "滋养",
+      "消耗": "消耗",
+      "中性": "中性",
+      "混合": "混合"
+    },
+    "interaction": {
+      "每天": "每天",
+      "每周": "每周",
+      "每月": "每月",
+      "每年": "每年",
+      "几乎不": "几乎不",
+      "已无联系": "已无联系"
+    },
+    "unfinishedWeight": {
+      "很重": "很重",
+      "中等": "中等",
+      "轻微": "轻微",
+      "无": "无"
+    },
+    "eventKind": {
+      "认识": "认识",
+      "重要谈话": "重要谈话",
+      "冲突": "冲突",
+      "和好": "和好",
+      "疏远": "疏远",
+      "断联": "断联",
+      "重逢": "重逢"
+    },
+    "changeField": {
+      "depth": "深度",
+      "stage": "阶段"
+    },
+    "targetType": {
+      "关系条目": "关系条目",
+      "独立对象": "独立对象",
+      "未来的自己": "未来的自己"
+    },
+    "connectionStrength": {
+      "强": "强",
+      "中": "中",
+      "弱": "弱"
+    }
+  }
+}

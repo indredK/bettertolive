@@ -1,0 +1,73 @@
+{
+  "page": {
+    "eyebrow": "记事",
+    "title": "把生活片段接回时间线",
+    "description": "记录事件、经历、片段和念头，让回看时能知道当时具体发生了什么。"
+  },
+  "actions": {
+    "create": "新增事件",
+    "edit": "编辑事件"
+  },
+  "search": {
+    "active": "当前筛选：{{query}}"
+  },
+  "timeline": {
+    "title": "时间线",
+    "description": "按发生时间回看最近留下的事件片段。"
+  },
+  "capture": {
+    "title": "快速记事",
+    "description": "先留下发生时间、标题和简要说明。",
+    "latest": "最近一条"
+  },
+  "themes": {
+    "title": "最近主题",
+    "description": "重复出现的主题会让生活轨迹更容易被看见。"
+  },
+  "metrics": {
+    "events": "事件",
+    "days": "日期"
+  },
+  "empty": {
+    "latest": "还没有事件记录。",
+    "timeline": "当前筛选下还没有事件记录。",
+    "themes": "当前筛选下没有可展示的主题。",
+    "review": "当前还没有可回看的主题线索。"
+  },
+  "edit": {
+    "createTitle": "新增事件",
+    "editTitle": "编辑事件",
+    "description": "记事只保存必要线索：发生时间、标题、简要说明和主题。"
+  },
+  "fields": {
+    "date": "发生 / 记录时间",
+    "title": "标题",
+    "excerpt": "简要说明",
+    "theme": "主题",
+    "tags": "标签"
+  },
+  "placeholders": {
+    "date": "例如：2026-06-08 21:10",
+    "title": "例如：和朋友聊未来城市选择",
+    "excerpt": "这件事发生了什么？当时有什么值得以后回看的细节？",
+    "theme": "例如：生活方式",
+    "tags": "用逗号分隔，例如：城市，未来"
+  },
+  "defaults": {
+    "theme": "日常"
+  },
+  "validation": {
+    "required": "请填写时间、标题和简要说明"
+  },
+  "tabs": {
+    "overview": "总览",
+    "timeline": "事件流",
+    "themes": "标签视角",
+    "review": "回看线索"
+  },
+  "review": {
+    "title": "回看线索",
+    "description": "把高频主题变成下一次复盘时能直接追问的线索。",
+    "themeLine": "{{theme}} 已出现 {{count}} 次，适合回看它背后的生活模式。"
+  }
+}

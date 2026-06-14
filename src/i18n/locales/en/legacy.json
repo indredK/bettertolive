@@ -1,0 +1,205 @@
+{
+  "pageEyebrow": "Life Organizing",
+  "pageTitle": "Place the important words before they become urgent",
+  "pageDescription": "The item library is the only editing source; overview, delivery map, relationship expression, and trust boundaries are derived views.",
+  "tabs": {
+    "overview": "Overview",
+    "items": "Item Library",
+    "deliveryMap": "Delivery Map",
+    "relationshipExpression": "Relationship Expression",
+    "trustBoundaries": "Trust Boundaries"
+  },
+  "actions": {
+    "add": "Add",
+    "unlock": "Unlock to edit",
+    "revealContent": "Open content"
+  },
+  "undo": "Undo",
+  "toast": {
+    "deletePendingItem": "Queued for deletion: {{title}}. You can undo within 5 seconds.",
+    "deleteSuccessItem": "Deleted life organizing item: {{title}}",
+    "deleteFailedItem": "Failed to delete life organizing item",
+    "deleteUndoneItem": "Deletion undone: {{title}}"
+  },
+  "fields": {
+    "title": "Title",
+    "summary": "Summary",
+    "content": "Content",
+    "tags": "Tags",
+    "reviewCue": "Review cue",
+    "category": "Category",
+    "recipient": "Recipient",
+    "recipientName": "Named recipient",
+    "relatedRelationshipId": "Relationship reference",
+    "urgency": "Urgency",
+    "visibility": "Visibility",
+    "deliveryCondition": "Delivery condition",
+    "status": "Status",
+    "emotionalLoad": "Emotional load",
+    "isLocked": "Lock item",
+    "requiresSecondConfirm": "Second confirmation before opening",
+    "excludeFromAi": "Exclude from AI summaries",
+    "updatedAt": "Updated",
+    "createdAt": "Created",
+    "finalizedAt": "Finalized",
+    "aiBoundary": "AI boundary"
+  },
+  "labels": {
+    "locked": "Locked",
+    "aiExcluded": "Excluded from AI",
+    "aiAllowed": "Available for organizing",
+    "unrated": "Unrated",
+    "notFinalized": "Not finalized",
+    "unlinked": "Unlinked"
+  },
+  "filters": {
+    "all": "All",
+    "signal": "Protection signal",
+    "missingDelivery": "Missing delivery condition",
+    "locked": "Locked",
+    "aiExcluded": "AI excluded",
+    "secondConfirm": "Second confirm",
+    "clear": "Clear filters"
+  },
+  "warnings": {
+    "missingDelivery": "Delivery condition missing",
+    "missingRecipient": "Named recipient missing",
+    "criticalDraft": "Critical information unfinished",
+    "finalUnlocked": "Final version not locked"
+  },
+  "metrics": {
+    "total": "Items",
+    "totalDesc": "The item library is the only data source.",
+    "criticalDraft": "Critical unfinished",
+    "criticalDraftDesc": "Check what is still draft or continuously updated.",
+    "missingDelivery": "Delivery gaps",
+    "missingDeliveryDesc": "Future or conditional visibility needs a trigger description.",
+    "finalLocked": "Final or locked",
+    "finalLockedDesc": "Locked content needs deliberate confirmation before edits.",
+    "heavyLoad": "Heavy emotional load",
+    "heavyLoadDesc": "Best opened when there is enough steadiness.",
+    "aiExcluded": "AI excluded",
+    "aiExcludedDesc": "These items stay out of cross-module insight.",
+    "secondConfirm": "Second confirmation",
+    "secondConfirmDesc": "A gentle pause remains before opening."
+  },
+  "overview": {
+    "title": "Life Organizing Overview",
+    "description": "See coverage, gaps, and boundaries without turning heavy content into pressure.",
+    "coverage": "Category Coverage",
+    "coverageDesc": "Check whether the work is overly concentrated in one category.",
+    "boundaryTitle": "Boundaries to confirm",
+    "boundaryDesc": "Only counts and cues are shown here; private content is not auto-summarized.",
+    "recent": "Recently Updated",
+    "recentDesc": "Only summaries and boundaries are shown, not full content.",
+    "emotionalLoad": "Emotional Load",
+    "emotionalLoadDesc": "Emotional load is not a main category; it is an opening cue per item.",
+    "reviewPrompts": "Review Prompts",
+    "reviewPromptsDesc": "Organize slowly without turning this into completion pressure.",
+    "missingDeliveryCopy": "These can remain drafts, but final versions need clear trigger and verification wording."
+  },
+  "items": {
+    "title": "Item Library",
+    "search": "Search title, content, or tags",
+    "selectPrompt": "Select an item to view details.",
+    "warningTitle": "Boundaries to confirm",
+    "secondConfirmCopy": "This item requires a second confirmation, so only its summary is shown first."
+  },
+  "edit": {
+    "createTitle": "Add Life Organizing Item",
+    "editTitle": "Edit Life Organizing Item",
+    "lockedCopy": "This item is locked. Unlock it before editing.",
+    "contentSection": "Content",
+    "classifySection": "Classification and Protection",
+    "tagsPlaceholder": "Separate with commas"
+  },
+  "validation": {
+    "required": "Please fill in title, summary, and content",
+    "criticalFinalDelivery": "Critical final items need a delivery condition"
+  },
+  "deliveryMap": {
+    "title": "Delivery Map",
+    "description": "Check who sees what by recipient and visibility.",
+    "itemCount": "{{count}} items",
+    "groupDescription": "V1 records delivery intent and manual confirmation conditions only. It does not promise automatic delivery.",
+    "sectionCount": "{{count}} items",
+    "checklistTitle": "Delivery Checks",
+    "checklistDesc": "These checks come from item fields and do not create separate data."
+  },
+  "relationship": {
+    "title": "Relationship Expression",
+    "description": "Focus on words for someone and unfinished concerns tied to relationships.",
+    "now": "Words that can be said now",
+    "nowDesc": "These may move into the relationship module later, but nothing is pushed automatically.",
+    "future": "Words for future or after death",
+    "futureDesc": "Keep delivery intent, recipient, and condition beside the text.",
+    "private": "Private unfinished concerns",
+    "privateDesc": "These should not be pushed automatically or enter AI summaries by default.",
+    "unlinked": "Unlinked relationship items",
+    "unlinkedDesc": "You can decide later whether to reference a relationship record.",
+    "nowHintTitle": "Current expression cue",
+    "nowHint": "visibility=now is only a cue that expression is possible; it is not a nudge or automatic copy."
+  },
+  "boundaries": {
+    "title": "Trust Boundaries",
+    "description": "Make system boundaries explicit and gather item-level protection rules in one view.",
+    "rules": "Trust Boundary Notes",
+    "rulesDesc": "These notes come from backend configuration and are maintained separately from item rules.",
+    "aiExcludedItems": "Items excluded from AI",
+    "secondConfirmItems": "Items requiring second confirmation",
+    "lockedItems": "Final or locked items",
+    "missingDeliveryItems": "Items missing delivery conditions",
+    "itemCount": "{{count}} items",
+    "legalTitle": "Legal Boundary",
+    "legalCopy": "Life Organizing has no legal will effect and does not replace insurance, asset, medical, or legal document management."
+  },
+  "empty": {
+    "items": "No life organizing items yet.",
+    "filteredItems": "No life organizing items match the current filters.",
+    "prompts": "No review prompts yet.",
+    "bucket": "No matching content.",
+    "boundaries": "No boundary notes yet."
+  },
+  "enum": {
+    "category": {
+      "重要交代": "Important handoff",
+      "留给某人的话": "Words for someone",
+      "人生回顾": "Life review",
+      "未完成的事": "Unfinished matters",
+      "纪念偏好": "Memorial preferences"
+    },
+    "recipient": {
+      "特定的人": "Specific person",
+      "家人": "Family",
+      "朋友": "Friends",
+      "公开": "Public",
+      "仅自己": "Only me"
+    },
+    "urgency": {
+      "关键信息": "Critical information",
+      "重要": "Important",
+      "锦上添花": "Nice to have",
+      "可选": "Optional"
+    },
+    "visibility": {
+      "现在": "Now",
+      "某个时间后": "After a time",
+      "我离世后": "After my death",
+      "条件触发": "Condition-triggered",
+      "永不交付": "Never deliver"
+    },
+    "status": {
+      "草稿": "Draft",
+      "基本完成": "Mostly complete",
+      "已完成": "Complete",
+      "会持续更新": "Continuously updated",
+      "最终版": "Final"
+    },
+    "emotionalLoad": {
+      "很重": "Very heavy",
+      "中等": "Medium",
+      "轻微": "Light",
+      "平静": "Calm"
+    }
+  }
+}

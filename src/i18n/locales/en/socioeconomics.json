@@ -1,0 +1,224 @@
+{
+  "page": {
+    "eyebrow": "Socioeconomics",
+    "title": "Map how the external economy works",
+    "description": "Classify knowledge with five dimensions, read relevance as decision distance, and use the heatmap to spot blind spots."
+  },
+  "actions": {
+    "addEntry": "Add Entry",
+    "addGap": "Add Gap",
+    "addPrompt": "Add Prompt",
+    "editEntry": "Edit Entry",
+    "editGap": "Edit Gap",
+    "editPrompt": "Edit Prompt",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "classification": {
+    "title": "5-Dimensional Cognition Map",
+    "description": "Classify by five dimensions; relevance stays attached to each item instead of becoming a main filter.",
+    "domain": {
+      "title": "Domain",
+      "description": "Which part of economic operation this belongs to."
+    },
+    "layer": {
+      "title": "Layer",
+      "description": "Micro, meso, and macro perspectives."
+    },
+    "confidence": {
+      "title": "Confidence",
+      "description": "From recognizing the term to having your own framework."
+    },
+    "source": {
+      "title": "Source",
+      "description": "Where this understanding came from."
+    },
+    "discipline": {
+      "title": "Discipline",
+      "description": "Separate economics from sociology before drilling into details."
+    }
+  },
+  "relevance": {
+    "title": "Decision Distance",
+    "description": "Relevance is not a main filter; it shows whether this knowledge is useful for current decisions."
+  },
+  "heatmap": {
+    "title": "Domain × Confidence",
+    "description": "Darker color means stronger understanding.",
+    "stackedDescription": "See where a domain is genuinely understood and where it is only familiar as a term."
+  },
+  "tabs": {
+    "all": "All",
+    "entries": "Knowledge List",
+    "graph": "Concept Graph",
+    "gaps": "Knowledge Gaps",
+    "prompts": "Review Prompts",
+    "relevance": "Decision Distance",
+    "overview": "Overview",
+    "economics": "Economics",
+    "sociology": "Sociology",
+    "study": "Study Queue"
+  },
+  "entries": {
+    "title": "Knowledge List",
+    "description": "Each item always shows confidence and decision distance."
+  },
+  "gaps": {
+    "title": "Knowledge Gaps",
+    "description": "Name the areas that are still only familiar or not yet framed."
+  },
+  "prompts": {
+    "title": "Review Prompts",
+    "description": "Use these as a monthly check-in for the cognition map."
+  },
+  "review": {
+    "title": "Priority Repairs",
+    "description": "Short decision distance plus shallow confidence is the first place to study."
+  },
+  "empty": {
+    "entries": "No knowledge entries match the current filters.",
+    "topicArea": "No entries match {{topic}} under the current filters.",
+    "graph": "No concept links yet.",
+    "gaps": "No knowledge gaps match the current filters.",
+    "prompts": "No review prompts match the current filters.",
+    "review": "No priority study items match the current filters.",
+    "distribution": "No distribution data yet.",
+    "economics": "No economics entries match the current filters.",
+    "sociology": "No sociology entries match the current filters."
+  },
+  "fields": {
+    "title": "Title",
+    "topicArea": "Topic Area",
+    "domain": "Domain",
+    "layer": "Layer",
+    "confidence": "Confidence",
+    "source": "Source",
+    "relevance": "Decision Distance",
+    "summary": "Summary",
+    "understandingNote": "Understanding Note",
+    "relatedConcepts": "Related Concepts",
+    "sourceRefs": "Authoritative Sources",
+    "tags": "Tags",
+    "confidenceHistory": "Confidence Revision History",
+    "gapSummary": "Gap",
+    "nextStep": "Next Step",
+    "prompt": "Review Prompt",
+    "discipline": "Discipline"
+  },
+  "edit": {
+    "entryCreateTitle": "Add Knowledge Entry",
+    "entryEditTitle": "Edit Knowledge Entry",
+    "entryDescription": "Each entry needs domain, layer, confidence, source, and decision distance.",
+    "gapCreateTitle": "Add Knowledge Gap",
+    "gapEditTitle": "Edit Knowledge Gap",
+    "promptCreateTitle": "Add Review Prompt",
+    "promptEditTitle": "Edit Review Prompt",
+    "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | Finished a reading set",
+    "sourceRefsPlaceholder": "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
+    "validation": {
+      "entryRequired": "Please enter a title and summary",
+      "history": "Revision history must use: date | old level -> new level | trigger",
+      "sourceRefs": "Source format must be: source label | https://example.com",
+      "gapRequired": "Please enter the gap and next step",
+      "promptRequired": "Please enter a review prompt"
+    }
+  },
+  "confirm": {
+    "deleteGap": "Delete this gap?",
+    "deletePrompt": "Delete this review prompt?"
+  },
+  "enum": {
+    "domain": {
+      "货币与物价": "Money & Prices",
+      "个人财务": "Personal Finance",
+      "劳动力市场": "Labor Market",
+      "产业与公司": "Industries & Companies",
+      "财政与政策": "Fiscal Policy",
+      "金融市场": "Financial Markets",
+      "全球与宏观": "Global & Macro",
+      "社会结构": "Social Structure",
+      "社会流动": "Social Mobility",
+      "制度与组织": "Institutions & Organizations",
+      "城市与社区": "Cities & Communities",
+      "文化与规范": "Culture & Norms"
+    },
+    "layer": {
+      "微观": "Micro",
+      "中观": "Meso",
+      "宏观": "Macro"
+    },
+    "confidence": {
+      "听过名词": "Recognize the term",
+      "知道大致逻辑": "Know the basic logic",
+      "能预判常见情境": "Can anticipate common cases",
+      "有自己的判断框架": "Has a personal framework"
+    },
+    "source": {
+      "系统学习": "Systematic Study",
+      "新闻媒体": "News Media",
+      "亲身经历": "Lived Experience",
+      "他人叙述": "Others' Stories",
+      "专业讨论": "Professional Discussion"
+    },
+    "relevance": {
+      "直接影响当前决策": "Directly affects current decisions",
+      "影响中期规划": "Affects mid-term planning",
+      "影响长期方向": "Affects long-term direction",
+      "纯认知储备": "Cognitive reserve"
+    },
+    "topicArea": {
+      "经济学基础概念": "Economics Basics",
+      "微观经济学": "Microeconomics",
+      "宏观经济学": "Macroeconomics",
+      "著名经济学家": "Economists",
+      "经济原理与模型": "Principles & Models",
+      "经济政策": "Economic Policy"
+    },
+    "discipline": {
+      "经济学": "Economics",
+      "社会学": "Sociology"
+    }
+  },
+  "discipline": {
+    "economics": {
+      "title": "Economics",
+      "description": "Organize decision-relevant knowledge about prices, markets, policy, firms, and macro mechanisms."
+    },
+    "sociology": {
+      "title": "Sociology",
+      "description": "Understand how people act inside groups and institutions through structure, mobility, organizations, cities, and norms."
+    },
+    "mapTitle": "Domains and Confidence",
+    "mapDescription": "See where this discipline already has a framework and where it is still just a familiar term."
+  },
+  "graph": {
+    "title": "Knowledge Links",
+    "description": "Put economics and sociology on the same relationship map to see how concepts explain one another.",
+    "helper": "Drag nodes to re-read the structure, click a node for details, and click empty space to clear selection.",
+    "detailTitle": "Node Details",
+    "detailDescription": "The card on the right follows the selected node and translates the map position back into readable context.",
+    "emptySelection": "Select a node to see its details here.",
+    "connectedConcepts": "Connected Concepts",
+    "connectedEntries": "Connected Entries",
+    "connectedEntriesCount": "Linked to {{count}} entries",
+    "conceptDescription": "This concept works like a junction, pulling scattered knowledge entries back into one shared map.",
+    "controls": {
+      "fit": "Fit",
+      "recenter": "Relayout"
+    },
+    "legend": {
+      "entry": "Knowledge Entry",
+      "concept": "Concept Node",
+      "hub": "High-Connection Concept"
+    },
+    "metrics": {
+      "entries": "Entries",
+      "entriesDetail": "Knowledge entries that already point to related concepts",
+      "nodes": "Nodes",
+      "nodesDetail": "Knowledge nodes plus concept nodes together",
+      "links": "Links",
+      "linksDetail": "Connections that point from entries to concepts"
+    }
+  }
+}

@@ -1,0 +1,528 @@
+{
+  "brandSubtitle": "个人的人生工作台",
+  "expandSidebar": "展开菜单列",
+  "collapseSidebar": "收起菜单列",
+  "searchPlaceholder": "搜索记录、观念、关系或成长线索",
+  "searchAria": "搜索记录和页面内容",
+  "search": {
+    "activeFilter": "当前筛选：{{query}}"
+  },
+  "quickRecord": "快速记录",
+  "apiErrorFallback": "当前接口请求失败，页面已回退到本地 mock 数据。",
+  "apiErrorRetry": "重试",
+  "language": {
+    "switchToEnglish": "Switch to English",
+    "switchToChinese": "切换到中文",
+    "englishTitle": "English",
+    "chineseTitle": "中文"
+  },
+  "utilities": {
+    "theme": "主题切换",
+    "notifications": "通知中心",
+    "music": "播放音乐",
+    "managementMode": "管理模式",
+    "browseMode": "浏览模式",
+    "editMode": "编辑模式"
+  },
+  "themes": {
+    "title": "主题切换",
+    "description": "主题是一种工作氛围，不是昼夜模式。当前是 {{theme}}。",
+    "current": "当前",
+    "options": {
+      "morning": {
+        "label": "清晨",
+        "description": "冷静的蓝灰底色，适合整理和回看。"
+      },
+      "linen": {
+        "label": "纸感",
+        "description": "更温暖的纸面和陶土色，更像慢一点的工作台。"
+      },
+      "tide": {
+        "label": "潮汐",
+        "description": "更轻更凉一点，适合拉开距离看整体结构。"
+      }
+    }
+  },
+  "music": {
+    "title": "音乐控制",
+    "description": "常驻工具区的一部分。更像轻量陪伴，不抢页面注意力。",
+    "playing": "正在播放",
+    "paused": "已暂停",
+    "volume": "音量 {{volume}}",
+    "unsupported": "当前环境不支持实时音频，界面仍可保留，后续可替换成真实播放器。",
+    "volumeNudge": "音量微调",
+    "volumeHint": "让功能区保持轻量，不盖住主页面。",
+    "presets": {
+      "morning": {
+        "label": "晨间",
+        "description": "轻一点的明亮旋律，适合整理思路。"
+      },
+      "rain": {
+        "label": "雨幕",
+        "description": "更平缓、更低一点，适合长时间停留。"
+      },
+      "night": {
+        "label": "夜读",
+        "description": "更靠后的音色，适合晚上的沉静工作。"
+      }
+    }
+  },
+  "notifications": {
+    "messageChannel": "顶部消息",
+    "notificationChannel": "右下通知",
+    "messageTimed": "顶部消息 {{seconds}}s",
+    "notificationTimed": "右下通知 {{seconds}}s",
+    "persistent": "常驻",
+    "view": "查看",
+    "viewDetails": "查看详情",
+    "messageDetail": "消息详情",
+    "notificationDetail": "通知详情",
+    "source": "来源：{{source}}",
+    "defaultSource": "站内通知",
+    "display": "展示：{{channel}}",
+    "duration": "时效：{{duration}}",
+    "durationMs": "{{duration}}ms",
+    "close": "关闭",
+    "goTo": "前往{{view}}",
+    "defaultAction": "前往查看"
+  },
+  "notificationCenter": {
+    "title": "通知中心",
+    "description": "顶部消息和右下通知都会汇总到这里，适合回看和继续处理。",
+    "activeCount": "{{count}} 条正在显示",
+    "unread": "未读",
+    "empty": "暂时还没有通知。后面可以继续接保存结果、提醒和跨页面待处理事项。",
+    "demo": {
+      "title": "反馈测试",
+      "message": {
+        "button": "顶部消息 3s",
+        "title": "顶部消息已触发",
+        "message": "默认 3 秒后自动消失，适合保存成功这类轻反馈。",
+        "source": "顶部消息组件",
+        "detail": "顶部消息更适合短暂确认和轻量结果反馈，不应该承载太重的阅读压力。",
+        "lineDuration": "默认时长：3000ms",
+        "lineUse": "适合保存成功、完成确认、轻提醒",
+        "lineShape": "信息应短，动作应少"
+      },
+      "notification": {
+        "button": "右下通知 5s",
+        "title": "右下通知已触发",
+        "message": "默认 5 秒停留，适合更完整的信息提示。",
+        "source": "右下通知组件",
+        "detail": "右下通知更适合带上下文的提醒、建议和可操作的信息，也更适合多条堆叠。",
+        "lineDuration": "默认时长：5000ms",
+        "lineUse": "适合任务完成、提醒、建议等场景",
+        "lineShape": "可继续扩展优先级、来源和分类"
+      },
+      "persistent": {
+        "button": "常驻通知",
+        "title": "人生脉络待补充",
+        "message": "这条通知会常驻，直到你处理或手动关闭。",
+        "action": "前往成长记忆",
+        "source": "扩展通知示例",
+        "detail": "常驻通知适合真正需要处理的事项，比如待补充内容、待确认操作或跨页面提醒。",
+        "lineDuration": "不会自动消失",
+        "lineTarget": "支持前往指定页面",
+        "lineShape": "支持后续扩展成任务、待办或消息中心入口"
+      }
+    }
+  },
+  "views": {
+    "overview": "总览",
+    "reflection": "反思",
+    "events": "记事",
+    "finance": "记账",
+    "shopping": "生活物品",
+    "nutrition": "饮食",
+    "emotion": "情绪情感",
+    "beliefs": "观念",
+    "principles": "原则与底线",
+    "relationships": "关系深化",
+    "journey": "成长记忆",
+    "legacy": "生命整理",
+    "socioeconomics": "社会经济",
+    "future": "未来蓝图",
+    "worldhistory": "世界历史"
+  },
+  "nav": {
+    "ariaLabel": "页面导航",
+    "itemAria": "导航 {{label}}",
+    "groups": {
+      "workbench": "工作台",
+      "records": "记录",
+      "innerState": "内在状态",
+      "selfMap": "自我图谱",
+      "lifeOrganizing": "生命整理",
+      "externalWorld": "外部世界",
+      "direction": "方向",
+      "worldHistory": "世界历史"
+    },
+    "items": {
+      "overview": {
+        "label": "总览",
+        "hint": "先看整张桌子"
+      },
+      "reflection": {
+        "label": "反思",
+        "hint": "情绪和想法入口"
+      },
+      "events": {
+        "label": "记事",
+        "hint": "生活时间线"
+      },
+      "finance": {
+        "label": "记账",
+        "hint": "现实资源流向"
+      },
+      "shopping": {
+        "label": "购物",
+        "hint": "欲望和日常选择"
+      },
+      "nutrition": {
+        "label": "饮食",
+        "hint": "食谱、食品和每日计划"
+      },
+      "emotion": {
+        "label": "情绪情感",
+        "hint": "波动、触发和恢复方式"
+      },
+      "beliefs": {
+        "label": "观念",
+        "hint": "人生观世界观价值观"
+      },
+      "principles": {
+        "label": "原则",
+        "hint": "原则底线和边界"
+      },
+      "relationships": {
+        "label": "关系深化",
+        "hint": "重要人物、关系事件与模式"
+      },
+      "journey": {
+        "label": "成长记忆",
+        "hint": "人生阶段、节点与影响"
+      },
+      "legacy": {
+        "label": "生命整理",
+        "hint": "重要交代和留给未来的话"
+      },
+      "socioeconomics": {
+        "label": "社会经济",
+        "hint": "外部经济世界的认知地图"
+      },
+      "future": {
+        "label": "未来",
+        "hint": "理想自我和生活方向"
+      },
+      "worldhistory": {
+        "label": "世界历史",
+        "hint": "地缘文明因果星图"
+      }
+    }
+  },
+  "rhythm": {
+    "capture": {
+      "title": "先记录",
+      "body": "先记录，再整理，再理解自己为什么会这样想、这样活。"
+    },
+    "review": {
+      "title": "轻一点回看",
+      "body": "不急着得出答案，先看最近的情绪、选择和生活节奏。"
+    },
+    "future": {
+      "title": "给未来留位置",
+      "body": "把理想生活写具体一点，方向才会慢慢从模糊变成行动。"
+    }
+  },
+  "rhythmPopup": {
+    "eyebrow": "今日节奏",
+    "title": "慢一点，先看看今天",
+    "switchToNth": "切换到今日节奏第 {{n}} 条"
+  },
+  "sidebarCarousel": {
+    "switchToNth": "切换到说明第 {{n}} 条"
+  },
+  "sidebarNotes": {
+    "overview": {
+      "heading": "总览说明",
+      "lines": {
+        "look": {
+          "label": "先看",
+          "text": "这里先汇总最近记录、关系、成长和未来线索。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合还没决定从哪里开始，或只想先看全局的时候。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "帮你先判断此刻最值得进入的模块。"
+        }
+      }
+    },
+    "reflection": {
+      "heading": "反思说明",
+      "lines": {
+        "write": {
+          "label": "先写",
+          "text": "先写下情绪、念头和困惑，不急着整理。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合心里有点乱、刚经历完事情或想复盘时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "把模糊感受写清楚，留一个可回看的入口。"
+        }
+      }
+    },
+    "events": {
+      "heading": "记事说明",
+      "lines": {
+        "record": {
+          "label": "记录",
+          "text": "把事情、对话和转折留进自己的时间线。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合记住具体经历，或回头还原事情经过时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "让生活不只剩印象，而能被重新看见。"
+        }
+      }
+    },
+    "finance": {
+      "heading": "记账说明",
+      "lines": {
+        "record": {
+          "label": "记录",
+          "text": "收入、支出和分类能看出你最近把资源放在哪。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合看生活重心、消费习惯和阶段压力时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "把花钱和生活选择连起来，而不只看数字。"
+        }
+      }
+    },
+    "shopping": {
+      "heading": "生活物品说明",
+      "lines": {
+        "record": {
+          "label": "记录",
+          "text": "把 system、space、stage、necessity、lifecycle 放到同一张桌上看。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合整理生活缺口，判断什么该补、什么该等、什么只是想象中的好物时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "让物品真正服务生活系统，而不是只堆成更多待买项。"
+        }
+      }
+    },
+    "nutrition": {
+      "heading": "饮食说明",
+      "lines": {
+        "record": {
+          "label": "安排",
+          "text": "用食谱、食品和每日计划先搭出今天怎么吃。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合整理常吃食物、复用食谱、查看轻量营养和计划偏差时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "把饮食从零散选择变成可回看的生活系统。"
+        }
+      }
+    },
+    "emotion": {
+      "heading": "情绪说明",
+      "lines": {
+        "observe": {
+          "label": "观察",
+          "text": "把波动、触发因素和恢复方式放到一起看，不只记录心情。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合最近状态不稳、想知道自己为什么这样时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "让模糊的内在感受慢慢出现结构和节律。"
+        }
+      }
+    },
+    "beliefs": {
+      "heading": "观念说明",
+      "lines": {
+        "organize": {
+          "label": "整理",
+          "text": "把你对世界、关系和生活的看法放到一起。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合发现自己总在重复某种判断的时候。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "把隐性想法说清楚，才知道它在帮你还是限你。"
+        }
+      }
+    },
+    "principles": {
+      "heading": "原则说明",
+      "lines": {
+        "clarify": {
+          "label": "厘清",
+          "text": "这里放你的原则、边界、底线和不愿退让的部分。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合决定犹豫、反复退让或想校准标准时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "让重要决定不只靠情绪，而有稳定依据。"
+        }
+      }
+    },
+    "relationships": {
+      "heading": "关系深化说明",
+      "lines": {
+        "see": {
+          "label": "看见",
+          "text": "把重要的人、关系事件、未说出口的话和你的感受放回一张图里。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合梳理谁在影响你、支持你，或关系卡住时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "不只记得情绪，也看见关系模式和反复出现的反应。"
+        }
+      }
+    },
+    "journey": {
+      "heading": "成长记忆说明",
+      "lines": {
+        "trace": {
+          "label": "追溯",
+          "text": "把人生节点、经历背景和留下的影响放在同一条时间线上回看。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "你想理解自己怎么形成，或追溯某个反应、模式从哪里开始时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "把散落的过去整理成可理解的人生脉络，慢慢松开旧惯性。"
+        }
+      }
+    },
+    "legacy": {
+      "heading": "生命整理说明",
+      "lines": {
+        "place": {
+          "label": "安放",
+          "text": "把重要交代、留给某人的话和未完成的牵挂安放下来。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合想留下重要表达、整理托付或回看此生在意什么的时候。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "让重要的话不只留在脑子里，也不必被迫一次说完。"
+        }
+      }
+    },
+    "socioeconomics": {
+      "heading": "社会经济说明",
+      "lines": {
+        "sort": {
+          "label": "梳理",
+          "text": "按领域和层次梳理对外部经济世界的认知。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合想看清楚自己对宏观、行业、个人财务到底懂多少时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "认知地图覆盖到哪、缺口在哪，先让它显形。"
+        }
+      }
+    },
+    "future": {
+      "heading": "未来说明",
+      "lines": {
+        "draw": {
+          "label": "描画",
+          "text": "把理想自我、理想生活和下一步写得更具体。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合重新校准方向，或想知道该靠近什么时。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "未来蓝图不是预测，而是你愿意靠近的定义。"
+        }
+      }
+    },
+    "worldhistory": {
+      "heading": "世界历史说明",
+      "lines": {
+        "explore": {
+          "label": "探索",
+          "text": "地缘唯物主义视角下四大古文明的因果演化链路。"
+        },
+        "fit": {
+          "label": "适合",
+          "text": "适合从底层地缘逻辑理解文明选择和人类制度多样性。"
+        },
+        "purpose": {
+          "label": "目的",
+          "text": "不是学习历史，而是理解同一生存压力如何催生不同文明路径。"
+        }
+      }
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "button": "设置",
+    "tabs": {
+      "about": "关于",
+      "preferences": "偏好设置"
+    },
+    "about": {
+      "description": "本地优先的个人生活管理系统",
+      "version": "版本",
+      "license": "许可证",
+      "checkUpdates": "检查更新",
+      "checkingUpdates": "正在检查……",
+      "upToDate": "已是最新版本",
+      "github": "GitHub 仓库",
+      "copyright": "© 2024–2025 BetterToLive"
+    },
+    "preferences": {
+      "language": {
+        "title": "语言"
+      },
+      "appearance": {
+        "title": "外观"
+      }
+    }
+  }
+}

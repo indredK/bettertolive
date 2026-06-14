@@ -1,0 +1,73 @@
+{
+  "page": {
+    "eyebrow": "Events",
+    "title": "Reconnect life fragments to the timeline",
+    "description": "Capture events, experiences, fragments, and thoughts so later review can recover what actually happened."
+  },
+  "actions": {
+    "create": "New Event",
+    "edit": "Edit Event"
+  },
+  "search": {
+    "active": "Current filter: {{query}}"
+  },
+  "timeline": {
+    "title": "Timeline",
+    "description": "Review recent fragments by when they happened."
+  },
+  "capture": {
+    "title": "Quick Capture",
+    "description": "Keep the time, title, and short note first.",
+    "latest": "Latest"
+  },
+  "themes": {
+    "title": "Recent Themes",
+    "description": "Repeated themes make the shape of daily life easier to see."
+  },
+  "metrics": {
+    "events": "Events",
+    "days": "Dates"
+  },
+  "empty": {
+    "latest": "No event records yet.",
+    "timeline": "No events match the current filter.",
+    "themes": "No themes match the current filter.",
+    "review": "No theme cues to review yet."
+  },
+  "edit": {
+    "createTitle": "New Event",
+    "editTitle": "Edit Event",
+    "description": "Events keep only the necessary signals: time, title, short note, and theme."
+  },
+  "fields": {
+    "date": "Occurred / Recorded",
+    "title": "Title",
+    "excerpt": "Short Note",
+    "theme": "Theme",
+    "tags": "Tags"
+  },
+  "placeholders": {
+    "date": "For example: 2026-06-08 21:10",
+    "title": "For example: talked with a friend about future cities",
+    "excerpt": "What happened? Which detail would be useful to review later?",
+    "theme": "For example: Lifestyle",
+    "tags": "Separate with commas, for example: city, future"
+  },
+  "defaults": {
+    "theme": "Daily Life"
+  },
+  "validation": {
+    "required": "Enter a time, title, and short note"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "timeline": "Event Flow",
+    "themes": "Tag View",
+    "review": "Review Cues"
+  },
+  "review": {
+    "title": "Review Cues",
+    "description": "Turn recurring themes into questions for the next review.",
+    "themeLine": "{{theme}} has appeared {{count}} times; review the life pattern behind it."
+  }
+}

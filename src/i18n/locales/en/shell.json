@@ -1,0 +1,290 @@
+{
+  "brandSubtitle": "Personal Life Workbench",
+  "expandSidebar": "Expand menu column",
+  "collapseSidebar": "Collapse menu column",
+  "searchPlaceholder": "Search records, beliefs, relationships, or growth clues",
+  "searchAria": "Search records and page content",
+  "search": {
+    "activeFilter": "Current filter: {{query}}"
+  },
+  "quickRecord": "Quick Record",
+  "apiErrorFallback": "API request failed, page has fallen back to local mock data.",
+  "apiErrorRetry": "Retry",
+  "language": {
+    "switchToEnglish": "Switch to English",
+    "switchToChinese": "切换到中文",
+    "englishTitle": "English",
+    "chineseTitle": "中文"
+  },
+  "utilities": {
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "music": "Music",
+    "managementMode": "Management Mode",
+    "browseMode": "Browse Mode",
+    "editMode": "Edit Mode"
+  },
+  "themes": {
+    "title": "Theme",
+    "description": "A theme is a work atmosphere, not a day/night mode. Current theme: {{theme}}.",
+    "current": "Current",
+    "options": {
+      "morning": {
+        "label": "Morning",
+        "description": "A calm blue-gray base for organizing and reviewing."
+      },
+      "linen": {
+        "label": "Paper",
+        "description": "A warmer paper and clay palette for a slower workbench."
+      },
+      "tide": {
+        "label": "Tide",
+        "description": "A lighter, cooler palette for stepping back and seeing the structure."
+      }
+    }
+  },
+  "music": {
+    "title": "Music",
+    "description": "Part of the persistent utility area. It offers light company without taking over the page.",
+    "playing": "Playing",
+    "paused": "Paused",
+    "volume": "Volume {{volume}}",
+    "unsupported": "Realtime audio is not supported in this environment. The UI can stay and later be replaced with a real player.",
+    "volumeNudge": "Volume Nudge",
+    "volumeHint": "Keep the utility area light so it does not cover the main page.",
+    "presets": {
+      "morning": {
+        "label": "Morning",
+        "description": "A brighter, lighter melody for organizing thoughts."
+      },
+      "rain": {
+        "label": "Rain",
+        "description": "A slower, lower pattern for staying with the work longer."
+      },
+      "night": {
+        "label": "Night Reading",
+        "description": "A more distant tone for calm evening work."
+      }
+    }
+  },
+  "notifications": {
+    "messageChannel": "Top Message",
+    "notificationChannel": "Bottom Notification",
+    "messageTimed": "Top Message {{seconds}}s",
+    "notificationTimed": "Bottom Notification {{seconds}}s",
+    "persistent": "Persistent",
+    "view": "View",
+    "viewDetails": "View Details",
+    "messageDetail": "Message Detail",
+    "notificationDetail": "Notification Detail",
+    "source": "Source: {{source}}",
+    "defaultSource": "In-app notification",
+    "display": "Display: {{channel}}",
+    "duration": "Duration: {{duration}}",
+    "durationMs": "{{duration}}ms",
+    "close": "Close",
+    "goTo": "Go to {{view}}",
+    "defaultAction": "Open"
+  },
+  "notificationCenter": {
+    "title": "Notification Center",
+    "description": "Top messages and bottom notifications are collected here for review and follow-up.",
+    "activeCount": "{{count}} showing",
+    "unread": "Unread",
+    "empty": "No notifications yet. Save results, reminders, and cross-page follow-ups can be wired here later.",
+    "demo": {
+      "title": "Feedback Test",
+      "message": {
+        "button": "Top Message 3s",
+        "title": "Top message triggered",
+        "message": "It disappears after 3 seconds by default and suits lightweight feedback like save success.",
+        "source": "Top message component",
+        "detail": "Top messages work best for brief confirmations and lightweight result feedback, not heavy reading.",
+        "lineDuration": "Default duration: 3000ms",
+        "lineUse": "Best for save success, completion confirmations, and light reminders",
+        "lineShape": "Keep the message short and actions minimal"
+      },
+      "notification": {
+        "button": "Bottom Notification 5s",
+        "title": "Bottom notification triggered",
+        "message": "It stays for 5 seconds by default and suits fuller information prompts.",
+        "source": "Bottom notification component",
+        "detail": "Bottom notifications fit contextual reminders, suggestions, and actionable information, especially when stacked.",
+        "lineDuration": "Default duration: 5000ms",
+        "lineUse": "Best for task completion, reminders, and suggestions",
+        "lineShape": "Priority, source, and category can be extended later"
+      },
+      "persistent": {
+        "button": "Persistent Notification",
+        "title": "Life timeline needs more context",
+        "message": "This notification stays until you handle or close it.",
+        "action": "Open Growth Memory",
+        "source": "Extended notification demo",
+        "detail": "Persistent notifications suit items that truly need attention, such as missing content, confirmations, or cross-page reminders.",
+        "lineDuration": "Does not disappear automatically",
+        "lineTarget": "Can navigate to a specific page",
+        "lineShape": "Can later become a task, todo, or message-center entry"
+      }
+    }
+  },
+  "views": {
+    "overview": "Overview",
+    "reflection": "Reflection",
+    "events": "Events",
+    "finance": "Finance",
+    "shopping": "Living Items",
+    "nutrition": "Nutrition",
+    "emotion": "Emotions",
+    "beliefs": "Beliefs",
+    "principles": "Principles",
+    "relationships": "Relationships",
+    "journey": "Growth Memory",
+    "legacy": "Life Organizing",
+    "socioeconomics": "Socioeconomics",
+    "future": "Future Blueprint",
+    "worldhistory": "World History"
+  },
+  "nav": {
+    "ariaLabel": "Page Navigation",
+    "itemAria": "Navigate to {{label}}",
+    "groups": {
+      "workbench": "Workbench",
+      "records": "Records",
+      "innerState": "Inner State",
+      "selfMap": "Self Map",
+      "lifeOrganizing": "Life Organizing",
+      "externalWorld": "External World",
+      "direction": "Direction",
+      "worldHistory": "World History"
+    },
+    "items": {
+      "overview": {
+        "label": "Overview",
+        "hint": "See the whole desk first"
+      },
+      "reflection": {
+        "label": "Reflection",
+        "hint": "Entry for emotions and thoughts"
+      },
+      "events": {
+        "label": "Events",
+        "hint": "Life timeline"
+      },
+      "finance": {
+        "label": "Finance",
+        "hint": "Flow of real resources"
+      },
+      "shopping": {
+        "label": "Shopping",
+        "hint": "Desires and daily choices"
+      },
+      "nutrition": {
+        "label": "Nutrition",
+        "hint": "Recipes, foods, and daily plans"
+      },
+      "emotion": {
+        "label": "Emotions",
+        "hint": "Fluctuations, triggers, and recovery"
+      },
+      "beliefs": {
+        "label": "Beliefs",
+        "hint": "Worldview, life view, and values"
+      },
+      "principles": {
+        "label": "Principles",
+        "hint": "Principles, boundaries, and bottom lines"
+      },
+      "relationships": {
+        "label": "Relationships",
+        "hint": "Important people, events, and patterns"
+      },
+      "journey": {
+        "label": "Growth Memory",
+        "hint": "Life stages, nodes, and influences"
+      },
+      "legacy": {
+        "label": "Life Organizing",
+        "hint": "Important handoffs and words for the future"
+      },
+      "socioeconomics": {
+        "label": "Socioeconomics",
+        "hint": "A cognition map of the external economy"
+      },
+      "future": {
+        "label": "Future",
+        "hint": "Ideal self and life direction"
+      },
+      "worldhistory": {
+        "label": "World History",
+        "hint": "Geo-Civilization Causal Constellation"
+      }
+    }
+  },
+  "rhythm": {
+    "capture": {
+      "title": "Capture First",
+      "body": "Capture first, then organize, then understand why you think and live this way."
+    },
+    "review": {
+      "title": "Review Gently",
+      "body": "Do not rush to a conclusion. First look at recent emotions, choices, and rhythm."
+    },
+    "future": {
+      "title": "Leave Room for Future",
+      "body": "Make the ideal life more concrete, and direction can slowly become action."
+    }
+  },
+  "rhythmPopup": {
+    "eyebrow": "Today's Rhythm",
+    "title": "Slow down and look at today first",
+    "switchToNth": "Switch to rhythm slide {{n}}"
+  },
+  "sidebarCarousel": {
+    "switchToNth": "Switch to note {{n}}"
+  },
+  "sidebarNotes": {
+    "worldhistory": {
+      "heading": "World History Notes",
+      "lines": {
+        "explore": {
+          "label": "Explore",
+          "text": "Trace the causal evolution of four ancient civilizations through a geopolitical materialist lens."
+        },
+        "fit": {
+          "label": "Best For",
+          "text": "Useful when you want to understand civilizational choices and institutional diversity from first-layer geographic constraints."
+        },
+        "purpose": {
+          "label": "Purpose",
+          "text": "The goal is not to memorize history, but to see how the same survival pressure can produce different civilizational paths."
+        }
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "button": "Settings",
+    "tabs": {
+      "about": "About",
+      "preferences": "Preferences"
+    },
+    "about": {
+      "description": "A local-first personal life management system",
+      "version": "Version",
+      "license": "License",
+      "checkUpdates": "Check for Updates",
+      "checkingUpdates": "Checking…",
+      "upToDate": "You're up to date",
+      "github": "GitHub Repository",
+      "copyright": "© 2024–2025 BetterToLive"
+    },
+    "preferences": {
+      "language": {
+        "title": "Language"
+      },
+      "appearance": {
+        "title": "Appearance"
+      }
+    }
+  }
+}

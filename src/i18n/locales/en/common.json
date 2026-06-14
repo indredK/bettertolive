@@ -1,0 +1,64 @@
+{
+  "filter": {
+    "label": "Filter",
+    "clearAll": "Clear all"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "confirm": "Confirm",
+    "close": "Close",
+    "edit": "Edit",
+    "add": "Add",
+    "create": "Create",
+    "deleted": "Deleted",
+    "undo": "Undo",
+    "retry": "Retry"
+  },
+  "multiSelect": {
+    "placeholder": "Select options",
+    "searchPlaceholder": "Search…",
+    "emptyMessage": "No matching options"
+  },
+  "sortable": {
+    "dragHandle": "Drag to reorder",
+    "sortOrder": "Sort Order"
+  },
+  "ui": {
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "confirm": {
+    "deleteItem": "Delete {{name}}?",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to close?"
+  },
+  "toast": {
+    "saved": "Saved",
+    "saveFailed": "Failed to save",
+    "deleted": "Deleted",
+    "deleteFailed": "Failed to delete",
+    "deletePending": "{{name}} is queued for deletion. Undo available for 5 seconds.",
+    "deleteUndone": "Deletion undone: {{name}}"
+  },
+  "form": {
+    "tagsPlaceholder": "Separate with commas"
+  },
+  "empty": {
+    "noData": "No data to show."
+  },
+  "validation": {
+    "required": "Please enter {{field}}",
+    "maxLength": "{{field}} must be at most {{count}} characters",
+    "maxItems": "{{field}} can include at most {{count}} items",
+    "invalidOption": "{{field}} has an invalid option",
+    "nonNegative": "{{field}} cannot be negative",
+    "integer": "{{field}} must be an integer",
+    "maxNumber": "{{field}} cannot be greater than {{count}}",
+    "invalidJson": "{{field}} must be valid JSON",
+    "jsonArray": "{{field}} must be a JSON array",
+    "invalidForm": "The form has invalid values. Review the fields and try again."
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "page": {
+    "eyebrow": "Future Blueprint",
+    "title": "Name the person you want to become",
+    "description": "The future here is not a prediction. It is the direction you choose to write down: ideal self, ideal life, values, and stage paths."
+  },
+  "searching": "Current filter: {{query}}",
+  "refresh": "Refresh",
+  "addMilestone": "Add Path",
+  "addExperiment": "Add Experiment",
+  "sections": {
+    "definition": {
+      "title": "Ideal Definition",
+      "description": "Clarify the direction first, then make the path concrete."
+    },
+    "milestones": {
+      "title": "Stage Paths",
+      "description": "Break the future into ways to move closer, not a final answer."
+    },
+    "experiments": {
+      "title": "Current Experiments",
+      "description": "No need to arrive all at once. Let daily life become a little more like you."
+    }
+  },
+  "metrics": {
+    "values": "Values",
+    "valuesDetail": "Values are not slogans. They are ongoing filters.",
+    "milestones": "Stage Paths",
+    "milestonesDetail": "Turn distant direction into nearby steps.",
+    "experiments": "Experiments",
+    "experimentsDetail": "Let small changes appear in real life first."
+  },
+  "definition": {
+    "identity": "Ideal Self",
+    "lifestyle": "Ideal Life",
+    "values": "Important Values",
+    "valuesDesc": "These words decide where your time and money go."
+  },
+  "edit": {
+    "blueprint": "Edit Blueprint",
+    "blueprintTitle": "Edit Future Blueprint",
+    "blueprintDescription": "Save the core definition here: who you want to become, the life you want, and the values that matter.",
+    "identity": "Ideal Self",
+    "identityPlaceholder": "Write the self-state you want to move closer to.",
+    "lifestyle": "Ideal Life",
+    "lifestylePlaceholder": "Write about space, work rhythm, relationships, and recovery.",
+    "values": "Important Values",
+    "valuesHint": "One per line. Commas also work.",
+    "milestoneCreateTitle": "Add Stage Path",
+    "milestoneEditTitle": "Edit Stage Path",
+    "milestoneDescription": "Turn distant direction into a path you can approach.",
+    "horizon": "Horizon",
+    "horizonPlaceholder": "For example: next 3 months",
+    "summary": "Stage Summary",
+    "steps": "Ways to Move Closer",
+    "stepsHint": "One step per line.",
+    "experimentCreateTitle": "Add Current Experiment",
+    "experimentEditTitle": "Edit Current Experiment",
+    "experimentDescription": "Experiments do not need to be grand. They only need to move life closer to the blueprint.",
+    "experiment": "Experiment",
+    "clickToEdit": "Click to edit",
+    "validation": {
+      "blueprintRequired": "Please fill in ideal self and ideal life",
+      "milestoneRequired": "Please fill in horizon, summary, and at least one step",
+      "experimentRequired": "Please fill in the experiment"
+    }
+  },
+  "confirm": {
+    "deleteExperiment": "Delete this experiment?"
+  },
+  "empty": {
+    "values": "No value keywords yet.",
+    "milestones": "No future paths match the current filter.",
+    "experiments": "No experiments match the current filter.",
+    "identity": "No ideal self has been written yet."
+  },
+  "tabs": {
+    "blueprint": "Blueprint",
+    "milestones": "Milestones",
+    "experiments": "Current Experiments",
+    "alignment": "Alignment Check"
+  },
+  "alignment": {
+    "title": "Alignment Check",
+    "description": "Use four questions to check whether the blueprint returns to present action.",
+    "identity": {
+      "title": "Is the ideal self clear?"
+    },
+    "values": {
+      "title": "Can values filter choices?"
+    },
+    "path": {
+      "title": "Is the path close enough?",
+      "empty": "No milestone is ready to carry the current direction yet."
+    },
+    "experiment": {
+      "title": "Is there an experiment in daily life?",
+      "empty": "No current experiment yet."
+    }
+  }
+}

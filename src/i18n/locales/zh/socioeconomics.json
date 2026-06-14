@@ -1,0 +1,221 @@
+{
+  "page": {
+    "eyebrow": "社会经济",
+    "title": "看清外部经济世界怎么运转",
+    "description": "按 5 维分类、看 relevance 决策距离，再用热力图找认知盲区。"
+  },
+  "actions": {
+    "addEntry": "新增条目",
+    "addGap": "新增缺口",
+    "addPrompt": "新增提问",
+    "editEntry": "编辑条目",
+    "editGap": "编辑缺口",
+    "editPrompt": "编辑提问"
+  },
+  "classification": {
+    "title": "5 维认知分类",
+    "description": "按 5 维归类；relevance 跟着每条走，不进主筛选器。",
+    "domain": {
+      "title": "领域",
+      "description": "属于经济运行的哪一块。"
+    },
+    "layer": {
+      "title": "层次",
+      "description": "微观、中观、宏观三层视角。"
+    },
+    "confidence": {
+      "title": "掌握程度",
+      "description": "从听过名词到有自己的判断框架。"
+    },
+    "source": {
+      "title": "来源",
+      "description": "认知从哪里建立起来。"
+    },
+    "discipline": {
+      "title": "学科",
+      "description": "先区分经济学和社会学，再进入具体知识。"
+    }
+  },
+  "relevance": {
+    "title": "决策距离",
+    "description": "relevance 不进主筛选器，但是判断这条现在用不用得上的核心评估。"
+  },
+  "heatmap": {
+    "title": "领域 × 掌握程度",
+    "description": "颜色越深，掌握度越高。",
+    "stackedDescription": "一眼看清哪些领域我自以为懂、其实只到名词。"
+  },
+  "tabs": {
+    "all": "全部",
+    "entries": "认知清单",
+    "graph": "关联图谱",
+    "gaps": "认知缺口",
+    "prompts": "复习提问",
+    "relevance": "决策距离",
+    "overview": "总览",
+    "economics": "经济学",
+    "sociology": "社会学",
+    "study": "学习队列"
+  },
+  "entries": {
+    "title": "认知清单",
+    "description": "每条都显示掌握度和决策距离。"
+  },
+  "gaps": {
+    "title": "认知缺口",
+    "description": "先把哪里只是听过名词、哪里还没形成判断写出来。"
+  },
+  "prompts": {
+    "title": "复习提问",
+    "description": "把它当作每个月对认知地图的一次例行盘点。"
+  },
+  "review": {
+    "title": "该先补的几条",
+    "description": "决策距离近 + 掌握度浅，是优先补课的位置。"
+  },
+  "empty": {
+    "entries": "当前筛选下没有可展示的认知条目。",
+    "topicArea": "当前筛选下没有「{{topic}}」条目。",
+    "graph": "当前还没有概念关联。",
+    "gaps": "当前筛选下没有可展示的认知缺口。",
+    "prompts": "当前筛选下没有复习提问。",
+    "review": "当前筛选下没有需要优先补课的条目。",
+    "distribution": "暂无分布数据。",
+    "economics": "当前筛选下没有经济学条目。",
+    "sociology": "当前筛选下没有社会学条目。"
+  },
+  "fields": {
+    "title": "标题",
+    "topicArea": "主题子类",
+    "domain": "领域",
+    "layer": "层次",
+    "confidence": "掌握程度",
+    "source": "来源",
+    "relevance": "决策距离",
+    "summary": "摘要",
+    "understandingNote": "理解笔记",
+    "relatedConcepts": "相关概念",
+    "sourceRefs": "权威来源",
+    "tags": "标签",
+    "confidenceHistory": "掌握修订历史",
+    "gapSummary": "缺口",
+    "nextStep": "下一步",
+    "prompt": "复习提问",
+    "discipline": "学科"
+  },
+  "edit": {
+    "entryCreateTitle": "新增认知条目",
+    "entryEditTitle": "编辑认知条目",
+    "entryDescription": "每条认知都需要完整标注领域、层次、掌握程度、来源和决策距离。",
+    "gapCreateTitle": "新增认知缺口",
+    "gapEditTitle": "编辑认知缺口",
+    "promptCreateTitle": "新增复习提问",
+    "promptEditTitle": "编辑复习提问",
+    "historyPlaceholder": "2026-03-04 | 听过名词 -> 知道大致逻辑 | 看完一组材料",
+    "sourceRefsPlaceholder": "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
+    "validation": {
+      "entryRequired": "请填写标题和摘要",
+      "history": "掌握修订历史格式需要是：日期 | 原等级 -> 新等级 | 触发原因",
+      "sourceRefs": "来源格式需要是：来源名称 | https://example.com",
+      "gapRequired": "请填写缺口和下一步",
+      "promptRequired": "请填写复习提问"
+    }
+  },
+  "confirm": {
+    "deleteGap": "确定删除这条缺口吗？",
+    "deletePrompt": "确定删除这条复习提问吗？"
+  },
+  "enum": {
+    "domain": {
+      "货币与物价": "货币与物价",
+      "个人财务": "个人财务",
+      "劳动力市场": "劳动力市场",
+      "产业与公司": "产业与公司",
+      "财政与政策": "财政与政策",
+      "金融市场": "金融市场",
+      "全球与宏观": "全球与宏观",
+      "社会结构": "社会结构",
+      "社会流动": "社会流动",
+      "制度与组织": "制度与组织",
+      "城市与社区": "城市与社区",
+      "文化与规范": "文化与规范"
+    },
+    "layer": {
+      "微观": "微观",
+      "中观": "中观",
+      "宏观": "宏观"
+    },
+    "confidence": {
+      "听过名词": "听过名词",
+      "知道大致逻辑": "知道大致逻辑",
+      "能预判常见情境": "能预判常见情境",
+      "有自己的判断框架": "有自己的判断框架"
+    },
+    "source": {
+      "系统学习": "系统学习",
+      "新闻媒体": "新闻媒体",
+      "亲身经历": "亲身经历",
+      "他人叙述": "他人叙述",
+      "专业讨论": "专业讨论"
+    },
+    "relevance": {
+      "直接影响当前决策": "直接影响当前决策",
+      "影响中期规划": "影响中期规划",
+      "影响长期方向": "影响长期方向",
+      "纯认知储备": "纯认知储备"
+    },
+    "topicArea": {
+      "经济学基础概念": "经济学基础概念",
+      "微观经济学": "微观经济学",
+      "宏观经济学": "宏观经济学",
+      "著名经济学家": "著名经济学家",
+      "经济原理与模型": "经济原理与模型",
+      "经济政策": "经济政策"
+    },
+    "discipline": {
+      "经济学": "经济学",
+      "社会学": "社会学"
+    }
+  },
+  "discipline": {
+    "economics": {
+      "title": "经济学",
+      "description": "围绕价格、市场、政策、公司和宏观运行机制，整理可用于现实决策的经济学知识。"
+    },
+    "sociology": {
+      "title": "社会学",
+      "description": "围绕社会结构、流动、制度、城市社区和文化规范，理解人如何在群体与制度中行动。"
+    },
+    "mapTitle": "领域与掌握度",
+    "mapDescription": "看这门学科内部哪些领域已经形成框架，哪些还只是听过名词。"
+  },
+  "graph": {
+    "title": "知识关联",
+    "description": "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。",
+    "helper": "拖拽节点重看结构，点击节点查看说明，空白处点击可取消选择。",
+    "detailTitle": "节点说明",
+    "detailDescription": "右侧卡片会跟着当前选中的节点变化，帮你把图上的位置重新翻译成可读信息。",
+    "emptySelection": "选中一个节点后，这里会显示详细说明。",
+    "connectedConcepts": "连接到的概念",
+    "connectedEntries": "连接到的条目",
+    "connectedEntriesCount": "连接 {{count}} 个条目",
+    "conceptDescription": "这个概念像一个交汇点，把原本分散的知识条目重新拢到同一张图里。",
+    "controls": {
+      "fit": "铺满",
+      "recenter": "重排"
+    },
+    "legend": {
+      "entry": "知识条目",
+      "concept": "概念节点",
+      "hub": "高连接概念"
+    },
+    "metrics": {
+      "entries": "条目",
+      "entriesDetail": "带有关联概念的知识条目",
+      "nodes": "节点",
+      "nodesDetail": "概念节点和知识节点合计",
+      "links": "连接",
+      "linksDetail": "从条目指向概念的连接"
+    }
+  }
+}

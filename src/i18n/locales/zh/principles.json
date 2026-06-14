@@ -1,0 +1,191 @@
+{
+  "page": {
+    "eyebrow": "原则",
+    "title": "把原则、边界和底线整理成决策体系",
+    "description": "这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。"
+  },
+  "controlMode": {
+    "summary": "{{count}} 条原则 · {{relations}} 个关系",
+    "add": "新增原则"
+  },
+  "tabs": {
+    "entries": "原则清单",
+    "prompts": "决策校准",
+    "relations": "支撑冲突",
+    "practice": "实践回路",
+    "overview": "总览",
+    "personal": "个人原则",
+    "others": "他人原则",
+    "practiceWorkbench": "校准实践"
+  },
+  "classification": {
+    "domain": {
+      "title": "领域",
+      "description": "它最主要保护哪个生活面。"
+    },
+    "type": {
+      "title": "类型",
+      "description": "它是底线、边界，还是标准。"
+    },
+    "strength": {
+      "title": "强度",
+      "description": "它有多不可退让。"
+    },
+    "source": {
+      "title": "来源",
+      "description": "它从哪里长出来。"
+    },
+    "status": {
+      "title": "状态",
+      "description": "它现在是否仍在生效。"
+    }
+  },
+  "sections": {
+    "classification": {
+      "title": "5 维原则分类",
+      "description": "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。"
+    },
+    "entries": {
+      "title": "原则清单",
+      "description": "详情里始终显示 cost，让每条原则的真实代价浮上来。"
+    },
+    "boundaries": {
+      "title": "不想再退让的地方",
+      "description": "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。"
+    },
+    "prompts": {
+      "title": "决策校准",
+      "description": "面对具体选择时，先调出相关原则，再看强度和代价。"
+    },
+    "relations": {
+      "title": "支撑与冲突",
+      "description": "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。"
+    }
+  },
+  "cost": {
+    "title": "cost 标注",
+    "description": "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。"
+  },
+  "meta": {
+    "source": "来源",
+    "cost": "cost",
+    "protectedValue": "保护对象",
+    "decisionCue": "触发校准",
+    "boundary": "边界"
+  },
+  "empty": {
+    "entries": "当前筛选下还没有可展示的原则条目。",
+    "boundaries": "当前筛选下没有可展示的底线。",
+    "prompts": "当前筛选下没有决策校准问题。",
+    "relations": "当前筛选下没有原则关系。",
+    "priority": "当前筛选下没有高优先级原则。",
+    "evolving": "当前筛选下没有正在变化的原则。",
+    "distribution": "暂无分布数据。",
+    "personal": "当前筛选下没有个人原则。",
+    "others": "当前筛选下没有他人原则。"
+  },
+  "edit": {
+    "createTitle": "新增原则",
+    "editTitle": "编辑原则",
+    "description": "5 个分类维度用于组织决策体系，cost 只作为单条原则的代价评估。",
+    "title": "标题",
+    "titlePlaceholder": "例如：不在深夜做重要决定",
+    "cost": "代价",
+    "statement": "原则表达",
+    "statementPlaceholder": "把这条原则写成可以指导行动的一句话。",
+    "descriptionLabel": "说明",
+    "domain": "领域",
+    "domainPlaceholder": "例如：关系 / 工作 / 自定义类别",
+    "type": "类型",
+    "strength": "强度",
+    "source": "来源",
+    "status": "状态",
+    "boundary": "边界",
+    "protectedValue": "保护对象",
+    "decisionCue": "触发校准",
+    "tags": "标签",
+    "tagsPlaceholder": "用逗号分隔",
+    "confirmDelete": "确定删除这条原则吗？",
+    "saved": "原则已保存",
+    "saveFailed": "原则保存失败",
+    "deleted": "原则已删除",
+    "deleteFailed": "原则删除失败",
+    "validation": {
+      "required": "请填写标题、原则表达和边界"
+    },
+    "revision": {
+      "summary": "更新了{{fields}}。",
+      "separator": "、"
+    },
+    "perspective": "归属"
+  },
+  "enumNames": {
+    "domain": {
+      "关系": "关系",
+      "工作": "工作",
+      "金钱": "金钱",
+      "健康": "健康",
+      "时间": "时间",
+      "诚信": "诚信"
+    },
+    "type": {
+      "边界": "边界",
+      "标准": "标准",
+      "底线": "底线"
+    },
+    "strength": {
+      "不可退让": "不可退让",
+      "强烈偏好": "强烈偏好",
+      "参考指引": "参考指引"
+    },
+    "source": {
+      "受伤后确立": "受伤后确立",
+      "观察他人": "观察他人",
+      "主动推导": "主动推导",
+      "家庭继承": "家庭继承"
+    },
+    "status": {
+      "生效中": "生效中",
+      "正在测试": "正在测试",
+      "已修订": "已修订",
+      "已放弃": "已放弃"
+    },
+    "cost": {
+      "高代价": "高代价",
+      "中等代价": "中等代价",
+      "低代价": "低代价",
+      "零代价": "零代价"
+    },
+    "relation": {
+      "支撑": "支撑",
+      "冲突": "冲突"
+    },
+    "revisionField": {
+      "内容": "内容",
+      "强度": "强度",
+      "状态": "状态"
+    },
+    "perspective": {
+      "个人原则": "个人原则",
+      "他人原则": "他人原则"
+    }
+  },
+  "practice": {
+    "priority": "高代价优先校准",
+    "evolving": "正在测试或修订"
+  },
+  "personal": {
+    "title": "个人原则",
+    "description": "把自己主动推导、受伤后确认、已经决定长期持有的原则放在一起看。"
+  },
+  "others": {
+    "title": "他人原则",
+    "description": "把观察他人、家庭继承或暂时借来使用的原则单独放出来，方便分辨什么真正属于自己。"
+  },
+  "perspective": {
+    "summaryTitle": "来源与状态",
+    "summaryDescription": "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
+    "signalTitle": "先校准的几条",
+    "signalDescription": "优先看不可退让或代价高的原则，确认它们是不是还真属于你。"
+  }
+}

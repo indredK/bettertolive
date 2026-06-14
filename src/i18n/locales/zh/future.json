@@ -1,0 +1,101 @@
+{
+  "page": {
+    "eyebrow": "未来蓝图",
+    "title": "把想成为的人说清楚",
+    "description": "未来不是系统替你预测的结果，而是你主动写下的方向。这里承接理想自我、理想生活、重要价值和阶段路径。"
+  },
+  "searching": "当前筛选：{{query}}",
+  "refresh": "刷新",
+  "addMilestone": "新增路径",
+  "addExperiment": "新增实验",
+  "sections": {
+    "definition": {
+      "title": "理想定义",
+      "description": "先把方向说清楚，再把路径写具体。"
+    },
+    "milestones": {
+      "title": "阶段路径",
+      "description": "先把未来拆成靠近方式，而不是终局答案。"
+    },
+    "experiments": {
+      "title": "当前实验",
+      "description": "不用一步到位，先让生活里出现一点点更像自己的东西。"
+    }
+  },
+  "metrics": {
+    "values": "重要价值",
+    "valuesDetail": "价值不是口号，是持续筛选。",
+    "milestones": "阶段路径",
+    "milestonesDetail": "把远处的方向拆成近处步骤。",
+    "experiments": "当前实验",
+    "experimentsDetail": "先让生活里出现一点点变化。"
+  },
+  "definition": {
+    "identity": "理想自我",
+    "lifestyle": "理想生活",
+    "values": "重要价值",
+    "valuesDesc": "这些词决定你会把时间和钱投向哪里。"
+  },
+  "edit": {
+    "blueprint": "编辑蓝图",
+    "blueprintTitle": "编辑未来蓝图",
+    "blueprintDescription": "这里只保存核心定义：想成为的人、想过的生活和重要价值。",
+    "identity": "理想自我",
+    "identityPlaceholder": "写下你想更靠近的自我状态。",
+    "lifestyle": "理想生活",
+    "lifestylePlaceholder": "写下生活空间、工作节奏、关系和恢复方式。",
+    "values": "重要价值",
+    "valuesHint": "每行一个，也支持逗号分隔。",
+    "milestoneCreateTitle": "新增阶段路径",
+    "milestoneEditTitle": "编辑阶段路径",
+    "milestoneDescription": "把远处方向拆成可靠近的一段路径。",
+    "horizon": "阶段",
+    "horizonPlaceholder": "例如：未来 3 个月",
+    "summary": "阶段摘要",
+    "steps": "靠近方式",
+    "stepsHint": "每行一步。",
+    "experimentCreateTitle": "新增当前实验",
+    "experimentEditTitle": "编辑当前实验",
+    "experimentDescription": "实验不需要宏大，只要能让生活更靠近蓝图。",
+    "experiment": "实验内容",
+    "clickToEdit": "点击可编辑",
+    "validation": {
+      "blueprintRequired": "请填写理想自我和理想生活",
+      "milestoneRequired": "请填写阶段、摘要和至少一步行动",
+      "experimentRequired": "请填写实验内容"
+    }
+  },
+  "confirm": {
+    "deleteExperiment": "确定删除这个实验吗？"
+  },
+  "empty": {
+    "values": "当前还没有价值关键词。",
+    "milestones": "当前筛选下没有未来路径。",
+    "experiments": "当前筛选下没有实验内容。",
+    "identity": "还没有写下理想自我。"
+  },
+  "tabs": {
+    "blueprint": "蓝图",
+    "milestones": "阶段路径",
+    "experiments": "当前实验",
+    "alignment": "对齐检查"
+  },
+  "alignment": {
+    "title": "对齐检查",
+    "description": "用四个问题检查蓝图是否已经能回到当下行动。",
+    "identity": {
+      "title": "理想自我是否清楚"
+    },
+    "values": {
+      "title": "价值是否能筛选选择"
+    },
+    "path": {
+      "title": "路径是否已经拆近",
+      "empty": "还没有能承接当前方向的阶段路径。"
+    },
+    "experiment": {
+      "title": "生活里是否已有实验",
+      "empty": "还没有当前实验。"
+    }
+  }
+}

@@ -1,0 +1,288 @@
+{
+  "page": {
+    "eyebrow": "成长记忆",
+    "title": "把过去分类，再看见它如何继续塑造现在",
+    "description": "5 个分类维度负责归档、过滤和回看；塑造力只跟着单条记忆和成长节点走，不混进主筛选。"
+  },
+  "hero": {
+    "memories": "记忆",
+    "growthNodes": "成长节点",
+    "anchors": "锚点"
+  },
+  "actions": {
+    "addMemory": "新增记忆",
+    "addGrowth": "新增成长",
+    "addAnchor": "新增锚点",
+    "addPrompt": "新增问题",
+    "addThread": "新增线索",
+    "edit": "编辑"
+  },
+  "filters": {
+    "title": "五维过滤",
+    "type": "内容类型",
+    "era": "人生时期",
+    "emotionalWeight": "情感重量",
+    "processing": "整理状态",
+    "privacy": "隐私级别",
+    "allTypes": "全部类型",
+    "allEras": "全部时期",
+    "allEmotionalWeights": "全部重量",
+    "allProcessing": "全部状态",
+    "allPrivacy": "全部隐私",
+    "optionWithCount": "{{label}} · {{count}}",
+    "resultCount": "{{count}} / {{total}} 条记忆",
+    "reset": "清空过滤"
+  },
+  "classification": {
+    "type": {
+      "title": "内容类型",
+      "description": "先看这段记忆以什么形式被记住。"
+    },
+    "era": {
+      "title": "人生时期",
+      "description": "时期支持多选，主时期只负责时间线定位。"
+    },
+    "emotionalWeight": {
+      "title": "情感重量",
+      "description": "它现在碰起来轻不轻。"
+    },
+    "processing": {
+      "title": "整理状态",
+      "description": "不是所有过去都需要被整理完。"
+    },
+    "privacy": {
+      "title": "隐私级别",
+      "description": "敏感记忆要先有边界，再谈回看。"
+    }
+  },
+  "sections": {
+    "classification": {
+      "title": "5 维分类概览",
+      "description": "这些维度进入过滤和分组；塑造力只在时间线与详情里标注。"
+    },
+    "eraSuggestions": {
+      "title": "默认时期提示"
+    },
+    "formativePower": {
+      "title": "塑造力标注",
+      "description": "塑造力解释影响深度，不作为主筛选维度。"
+    },
+    "timeline": {
+      "title": "记忆时间线",
+      "description": "按主时期回看每条记忆，并始终显示塑造力。"
+    },
+    "growth": {
+      "title": "成长节点",
+      "description": "当多条记忆指向同一个变化方向，它们就形成一个成长节点。"
+    },
+    "anchors": {
+      "title": "感官锚点",
+      "description": "很多记忆不是从事件开始，而是被地点、物件或照片唤起来。"
+    },
+    "reviewPrompts": {
+      "title": "回看问题",
+      "description": "这些问题帮助你慢慢靠近过去，而不是逼自己一次讲完。"
+    },
+    "threads": {
+      "title": "当前还在生效的影响",
+      "description": "从成长节点里浮出来的线索，适合和观念、原则、关系页交叉回看。",
+      "compactTitle": "仍在生效"
+    }
+  },
+  "tabs": {
+    "timeline": "记忆时间线",
+    "growth": "成长节点",
+    "signals": "锚点与影响",
+    "library": "记忆库"
+  },
+  "memory": {
+    "formativePowerBadge": "塑造力 · {{value}}",
+    "unrated": "未评估",
+    "needsConfirm": "需确认",
+    "impactPrefix": "留下来的影响：{{value}}",
+    "emotionalWeight": "情感重量",
+    "processing": "整理状态",
+    "privacy": "隐私级别",
+    "formativePower": "塑造力",
+    "sensoryCuePrefix": "感官线索：{{value}}",
+    "sourcePrefix": "来源：{{value}}"
+  },
+  "growth": {
+    "before": "变化前",
+    "after": "变化后",
+    "beforeInline": "前：{{value}}",
+    "afterInline": "后：{{value}}",
+    "triggerInline": "触发：{{value}}",
+    "keyEventPrefix": "关键转折：{{value}}",
+    "beforeMemories": "变化前记忆",
+    "afterMemories": "变化后记忆",
+    "triggerMemory": "触发记忆"
+  },
+  "control": {
+    "title": "结构检查",
+    "description": "管理模式可维护记忆、成长节点、锚点、回看问题和影响线索，也帮助你找出待补字段和缺失关联。",
+    "metrics": {
+      "memories": "记忆",
+      "growthNodes": "成长节点",
+      "secondConfirm": "需二次确认",
+      "missingLinks": "缺失关联"
+    },
+    "missingPowerTitle": "还没评估塑造力的记忆",
+    "missingLinksTitle": "成长节点引用但当前未命中的记忆 ID"
+  },
+  "management": {
+    "memories": "记忆维护",
+    "growthNodes": "成长节点维护",
+    "anchors": "锚点维护",
+    "prompts": "回看问题维护",
+    "threads": "影响线索维护"
+  },
+  "fields": {
+    "title": "标题",
+    "type": "内容类型",
+    "emotionalWeight": "情感重量",
+    "processing": "整理状态",
+    "privacy": "隐私级别",
+    "primaryEra": "主时期",
+    "formativePower": "塑造力",
+    "eras": "时期标签",
+    "summary": "摘要",
+    "impact": "留下的影响",
+    "sensoryCue": "感官线索",
+    "sourceModules": "来源模块",
+    "tags": "标签",
+    "domain": "领域",
+    "stability": "稳固程度",
+    "before": "变化前",
+    "after": "变化后",
+    "keyEvent": "关键转折",
+    "triggerMemory": "触发记忆",
+    "beforeMemoryIds": "变化前记忆 ID",
+    "afterMemoryIds": "变化后记忆 ID",
+    "evidence": "证据",
+    "label": "名称",
+    "note": "说明",
+    "linkedMemoryIds": "关联记忆 ID",
+    "prompt": "回看问题",
+    "thread": "影响线索"
+  },
+  "edit": {
+    "none": "不设置",
+    "listHint": "每行一个，也支持逗号分隔。",
+    "sourceModulesHint": "只会保存当前系统认识的来源名称。",
+    "memoryIdsHint": "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
+    "memoryIdReference": "可用记忆 ID",
+    "memoryCreateTitle": "新增记忆",
+    "memoryEditTitle": "编辑记忆",
+    "memoryDescription": "维护一条记忆的分类、摘要、影响和可回看的线索。",
+    "growthCreateTitle": "新增成长节点",
+    "growthEditTitle": "编辑成长节点",
+    "growthDescription": "用记忆 ID 把变化前、变化后和触发记忆连接起来。",
+    "anchorCreateTitle": "新增锚点",
+    "anchorEditTitle": "编辑锚点",
+    "anchorDescription": "维护地点、物件、人物或照片与记忆之间的连接。",
+    "promptCreateTitle": "新增回看问题",
+    "promptEditTitle": "编辑回看问题",
+    "promptDescription": "记录一个适合慢慢回看的问题。",
+    "threadCreateTitle": "新增影响线索",
+    "threadEditTitle": "编辑影响线索",
+    "threadDescription": "记录当前仍在生效、适合跨模块回看的影响线索。",
+    "validation": {
+      "memoryRequired": "请填写标题、主时期、摘要和影响",
+      "growthRequired": "请填写标题、变化前后、关键事件，并选择有效触发记忆",
+      "anchorRequired": "请填写锚点名称和说明",
+      "textRequired": "请填写内容"
+    }
+  },
+  "confirm": {
+    "deleteMemory": "确定删除这条记忆吗？",
+    "deleteGrowth": "确定删除这个成长节点吗？",
+    "deleteAnchor": "确定删除这个记忆锚点吗？",
+    "deletePrompt": "确定删除这条回看问题吗？",
+    "deleteThread": "确定删除这条影响线索吗？"
+  },
+  "enum": {
+    "memoryType": {
+      "事件": "事件",
+      "地点": "地点",
+      "物件": "物件",
+      "人物": "人物",
+      "照片": "照片",
+      "领悟": "领悟"
+    },
+    "emotionalWeight": {
+      "轻": "轻",
+      "中性": "中性",
+      "重": "重",
+      "很重": "很重"
+    },
+    "processing": {
+      "已整理": "已整理",
+      "正在理解": "正在理解",
+      "暂不触碰": "暂不触碰",
+      "决定不再细究": "决定不再细究",
+      "开放问题": "开放问题",
+      "想留给某人": "想留给某人",
+      "记不清的裂缝": "记不清的裂缝"
+    },
+    "privacy": {
+      "仅自己": "仅自己",
+      "需二次确认": "需二次确认",
+      "指定的人": "指定的人",
+      "未来可公开": "未来可公开",
+      "离世后可看": "离世后可看"
+    },
+    "formativePower": {
+      "极深": "极深",
+      "较深": "较深",
+      "中等": "中等",
+      "轻微": "轻微",
+      "无": "无"
+    },
+    "sourceModule": {
+      "手动录入": "手动录入",
+      "反思": "反思",
+      "记事": "记事",
+      "记账": "记账",
+      "关系": "关系",
+      "情绪": "情绪",
+      "原则": "原则",
+      "未来": "未来",
+      "生命整理": "生命整理"
+    },
+    "growthDomain": {
+      "关系": "关系",
+      "自我": "自我",
+      "工作": "工作",
+      "情绪能力": "情绪能力",
+      "生活方式": "生活方式"
+    },
+    "growthStability": {
+      "偶尔还会退回去": "偶尔还会退回去",
+      "基本稳定": "基本稳定",
+      "已经完全内化": "已经完全内化"
+    }
+  },
+  "compact": {
+    "anchorTitle": "{{type}} · {{label}}",
+    "relatedMemoryCount": "{{note}} · {{count}} 条相关记忆"
+  },
+  "remaining": {
+    "memories": "还有 {{count}} 条记忆未展开",
+    "growth": "还有 {{count}} 个成长节点未展开"
+  },
+  "empty": {
+    "memories": "当前筛选下还没有可展示的记忆。",
+    "growthNodes": "当前筛选下还没有可展示的成长节点。",
+    "anchors": "当前筛选下还没有记忆锚点。",
+    "reviewPrompts": "当前筛选下没有回看问题。",
+    "threads": "当前筛选下没有可展示的影响线索。",
+    "signals": "当前筛选下没有辅助线索。",
+    "noData": "当前还没有成长记忆数据。",
+    "distribution": "暂无分布数据。",
+    "none": "暂无"
+  },
+  "library": {
+    "memoryDetail": "{{era}} · {{type}} · {{privacy}}"
+  }
+}

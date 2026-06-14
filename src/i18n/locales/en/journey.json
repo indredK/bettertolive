@@ -1,0 +1,288 @@
+{
+  "page": {
+    "eyebrow": "Growth Memory",
+    "title": "Classify the past, then see how it still shapes the present",
+    "description": "Five dimensions organize, filter, and review memory. Formative power stays attached to individual memories and growth nodes instead of becoming a primary filter."
+  },
+  "hero": {
+    "memories": "Memories",
+    "growthNodes": "Growth Nodes",
+    "anchors": "Anchors"
+  },
+  "actions": {
+    "addMemory": "Add Memory",
+    "addGrowth": "Add Growth",
+    "addAnchor": "Add Anchor",
+    "addPrompt": "Add Prompt",
+    "addThread": "Add Signal",
+    "edit": "Edit"
+  },
+  "filters": {
+    "title": "5-D Filters",
+    "type": "Type",
+    "era": "Era",
+    "emotionalWeight": "Emotional Weight",
+    "processing": "Processing",
+    "privacy": "Privacy",
+    "allTypes": "All Types",
+    "allEras": "All Eras",
+    "allEmotionalWeights": "All Weights",
+    "allProcessing": "All Statuses",
+    "allPrivacy": "All Privacy Levels",
+    "optionWithCount": "{{label}} · {{count}}",
+    "resultCount": "{{count}} / {{total}} memories",
+    "reset": "Reset"
+  },
+  "classification": {
+    "type": {
+      "title": "Type",
+      "description": "Start with the form this memory is carried by."
+    },
+    "era": {
+      "title": "Era",
+      "description": "Eras can be multi-select. Primary era is only for timeline placement."
+    },
+    "emotionalWeight": {
+      "title": "Emotional Weight",
+      "description": "How heavy does it feel to touch now?"
+    },
+    "processing": {
+      "title": "Processing",
+      "description": "Not every part of the past needs to be fully processed."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "description": "Sensitive memories need clear boundaries before review."
+    }
+  },
+  "sections": {
+    "classification": {
+      "title": "5-D Overview",
+      "description": "These dimensions belong in filtering and grouping. Formative power stays on the timeline and in detail."
+    },
+    "eraSuggestions": {
+      "title": "Default Era Hints"
+    },
+    "formativePower": {
+      "title": "Formative Power",
+      "description": "Formative power explains depth of influence and is not a primary filter."
+    },
+    "timeline": {
+      "title": "Memory Timeline",
+      "description": "Review memories by primary era while always keeping formative power visible."
+    },
+    "growth": {
+      "title": "Growth Nodes",
+      "description": "When multiple memories point in the same direction of change, they form a growth node."
+    },
+    "anchors": {
+      "title": "Sensory Anchors",
+      "description": "Many memories do not start with events. They begin with places, objects, or photos."
+    },
+    "reviewPrompts": {
+      "title": "Review Prompts",
+      "description": "These prompts help you approach the past gradually instead of forcing a full retelling."
+    },
+    "threads": {
+      "title": "Influences Still Active Now",
+      "description": "Signals surfacing from growth nodes that are worth cross-checking with beliefs, principles, and relationships.",
+      "compactTitle": "Still Active"
+    }
+  },
+  "tabs": {
+    "timeline": "Memory Timeline",
+    "growth": "Growth Nodes",
+    "signals": "Anchors & Signals",
+    "library": "Memory Library"
+  },
+  "memory": {
+    "formativePowerBadge": "Formative Power · {{value}}",
+    "unrated": "Unrated",
+    "needsConfirm": "Needs Confirm",
+    "impactPrefix": "Lasting impact: {{value}}",
+    "emotionalWeight": "Emotional Weight",
+    "processing": "Processing",
+    "privacy": "Privacy",
+    "formativePower": "Formative Power",
+    "sensoryCuePrefix": "Sensory cue: {{value}}",
+    "sourcePrefix": "Source: {{value}}"
+  },
+  "growth": {
+    "before": "Before",
+    "after": "After",
+    "beforeInline": "Before: {{value}}",
+    "afterInline": "After: {{value}}",
+    "triggerInline": "Trigger: {{value}}",
+    "keyEventPrefix": "Key turning point: {{value}}",
+    "beforeMemories": "Before memories",
+    "afterMemories": "After memories",
+    "triggerMemory": "Trigger memory"
+  },
+  "control": {
+    "title": "Structure Review",
+    "description": "Control mode can maintain memories, growth nodes, anchors, prompts, and active signals while also spotting missing fields and broken links.",
+    "metrics": {
+      "memories": "Memories",
+      "growthNodes": "Growth Nodes",
+      "secondConfirm": "Need Second Confirm",
+      "missingLinks": "Missing Links"
+    },
+    "missingPowerTitle": "Memories missing formative power",
+    "missingLinksTitle": "Memory IDs referenced by growth nodes but not found in the current dataset"
+  },
+  "management": {
+    "memories": "Memory Maintenance",
+    "growthNodes": "Growth Node Maintenance",
+    "anchors": "Anchor Maintenance",
+    "prompts": "Review Prompt Maintenance",
+    "threads": "Active Signal Maintenance"
+  },
+  "fields": {
+    "title": "Title",
+    "type": "Type",
+    "emotionalWeight": "Emotional Weight",
+    "processing": "Processing",
+    "privacy": "Privacy",
+    "primaryEra": "Primary Era",
+    "formativePower": "Formative Power",
+    "eras": "Era Tags",
+    "summary": "Summary",
+    "impact": "Lasting Impact",
+    "sensoryCue": "Sensory Cue",
+    "sourceModules": "Source Modules",
+    "tags": "Tags",
+    "domain": "Domain",
+    "stability": "Stability",
+    "before": "Before",
+    "after": "After",
+    "keyEvent": "Key Turning Point",
+    "triggerMemory": "Trigger Memory",
+    "beforeMemoryIds": "Before Memory IDs",
+    "afterMemoryIds": "After Memory IDs",
+    "evidence": "Evidence",
+    "label": "Name",
+    "note": "Note",
+    "linkedMemoryIds": "Linked Memory IDs",
+    "prompt": "Review Prompt",
+    "thread": "Active Signal"
+  },
+  "edit": {
+    "none": "None",
+    "listHint": "One per line, or separate with commas.",
+    "sourceModulesHint": "Only recognized source module names are saved.",
+    "memoryIdsHint": "One ID per line, or separate with commas; invalid IDs are ignored.",
+    "memoryIdReference": "Available Memory IDs",
+    "memoryCreateTitle": "Add Memory",
+    "memoryEditTitle": "Edit Memory",
+    "memoryDescription": "Maintain a memory's classification, summary, impact, and review signals.",
+    "growthCreateTitle": "Add Growth Node",
+    "growthEditTitle": "Edit Growth Node",
+    "growthDescription": "Use memory IDs to connect before, after, and trigger memories.",
+    "anchorCreateTitle": "Add Anchor",
+    "anchorEditTitle": "Edit Anchor",
+    "anchorDescription": "Connect places, objects, people, or photos with memories.",
+    "promptCreateTitle": "Add Review Prompt",
+    "promptEditTitle": "Edit Review Prompt",
+    "promptDescription": "Record a question that can be revisited slowly.",
+    "threadCreateTitle": "Add Active Signal",
+    "threadEditTitle": "Edit Active Signal",
+    "threadDescription": "Record an influence that is still active and worth reviewing across modules.",
+    "validation": {
+      "memoryRequired": "Enter a title, primary era, summary, and impact",
+      "growthRequired": "Enter title, before/after states, key event, and a valid trigger memory",
+      "anchorRequired": "Enter the anchor name and note",
+      "textRequired": "Enter content"
+    }
+  },
+  "confirm": {
+    "deleteMemory": "Delete this memory?",
+    "deleteGrowth": "Delete this growth node?",
+    "deleteAnchor": "Delete this memory anchor?",
+    "deletePrompt": "Delete this review prompt?",
+    "deleteThread": "Delete this active signal?"
+  },
+  "enum": {
+    "memoryType": {
+      "事件": "Event",
+      "地点": "Place",
+      "物件": "Object",
+      "人物": "Person",
+      "照片": "Photo",
+      "领悟": "Realization"
+    },
+    "emotionalWeight": {
+      "轻": "Light",
+      "中性": "Neutral",
+      "重": "Heavy",
+      "很重": "Very Heavy"
+    },
+    "processing": {
+      "已整理": "Organized",
+      "正在理解": "Making Sense",
+      "暂不触碰": "Not Touching Yet",
+      "决定不再细究": "Decided Not to Reopen",
+      "开放问题": "Open Question",
+      "想留给某人": "For Someone",
+      "记不清的裂缝": "Unclear Crack"
+    },
+    "privacy": {
+      "仅自己": "Only Me",
+      "需二次确认": "Needs Second Confirm",
+      "指定的人": "Specified People",
+      "未来可公开": "Future Public",
+      "离世后可看": "After Death"
+    },
+    "formativePower": {
+      "极深": "Extremely Deep",
+      "较深": "Deep",
+      "中等": "Moderate",
+      "轻微": "Slight",
+      "无": "None"
+    },
+    "sourceModule": {
+      "手动录入": "Manual Entry",
+      "反思": "Reflection",
+      "记事": "Events",
+      "记账": "Finance",
+      "关系": "Relationships",
+      "情绪": "Emotion",
+      "原则": "Principles",
+      "未来": "Future",
+      "生命整理": "Legacy"
+    },
+    "growthDomain": {
+      "关系": "Relationships",
+      "自我": "Self",
+      "工作": "Work",
+      "情绪能力": "Emotional Capacity",
+      "生活方式": "Lifestyle"
+    },
+    "growthStability": {
+      "偶尔还会退回去": "Still Slips Back Sometimes",
+      "基本稳定": "Mostly Stable",
+      "已经完全内化": "Fully Internalized"
+    }
+  },
+  "compact": {
+    "anchorTitle": "{{type}} · {{label}}",
+    "relatedMemoryCount": "{{note}} · {{count}} related memories"
+  },
+  "remaining": {
+    "memories": "{{count}} more memories not expanded",
+    "growth": "{{count}} more growth nodes not expanded"
+  },
+  "empty": {
+    "memories": "No memories match the current filters.",
+    "growthNodes": "No growth nodes match the current filters.",
+    "anchors": "No memory anchors match the current filters.",
+    "reviewPrompts": "No review prompts match the current filters.",
+    "threads": "No active influence signals match the current filters.",
+    "signals": "No supporting signals match the current filters.",
+    "noData": "No growth-memory data yet.",
+    "distribution": "No distribution data yet.",
+    "none": "None"
+  },
+  "library": {
+    "memoryDetail": "{{era}} · {{type}} · {{privacy}}"
+  }
+}

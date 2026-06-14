@@ -1,0 +1,67 @@
+{
+  "page": {
+    "eyebrow": "Reflection",
+    "title": "Write down this moment first",
+    "description": "The expression does not need to be complete. Honest is better than polished. This is the most natural place to start."
+  },
+  "sections": {
+    "draft": {
+      "title": "Writing Start",
+      "description": "Keep a concrete example nearby. Saved reflections live in the record list on the right."
+    },
+    "recent": {
+      "title": "Recent Reflections",
+      "description": "Review what you have written recently, then decide how to organize it later."
+    },
+    "themes": {
+      "title": "Theme Threads",
+      "description": "View tags and months together to see which topics keep returning.",
+      "tags": "Frequent Tags",
+      "months": "Month Distribution"
+    },
+    "writingPrompts": {
+      "title": "Review Questions",
+      "description": "You do not need complete answers before writing; use questions to return attention to yourself."
+    }
+  },
+  "actions": {
+    "create": "New Reflection",
+    "edit": "Edit Reflection"
+  },
+  "fields": {
+    "date": "Time",
+    "title": "Title",
+    "excerpt": "Reflection",
+    "tags": "Tags"
+  },
+  "placeholders": {
+    "date": "For example: 2026-06-08 21:10",
+    "title": "For example: what I really want to keep today",
+    "excerpt": "What happened today? What did I notice? What should future review remember?",
+    "tags": "Separate with commas, for example: rhythm, work"
+  },
+  "empty": {
+    "records": "No reflections match the current filter.",
+    "tags": "No tags under the current filter.",
+    "months": "No month distribution under the current filter."
+  },
+  "edit": {
+    "createTitle": "New Reflection",
+    "editTitle": "Edit Reflection",
+    "description": "Keep the time, title, short body, and a few tags."
+  },
+  "validation": {
+    "required": "Enter the time, title, and reflection"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "records": "Record Library",
+    "themes": "Theme Threads",
+    "writing": "Writing Scaffold"
+  },
+  "prompts": {
+    "keep": "What judgment from this moment do I want to keep long term?",
+    "pattern": "Has this appeared in recent reflections more than once?",
+    "next": "If I only make one small adjustment, what comes next?"
+  }
+}

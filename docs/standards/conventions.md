@@ -76,7 +76,7 @@
 ### F5. 国际化 i18n
 
 - **硬约定**：所有用户可见文案必须走 `t(...)`，禁止硬编码中/英文到 JSX（toast 文案同此）。
-- **现状结构**：单一 `translation` 命名空间，文案集中在 `src/i18n/locales/{zh,en}.json`，key 点分层级（`shopping.tabs.overview`），默认/兜底语言 `zh`。
+- **现状结构**：单一 `translation` 命名空间，文案按模块拆分为 `src/i18n/locales/{zh,en}/*.json`（19 个模块文件），`config.ts` 合并加载。key 点分层级（`shopping.tabs.overview`），默认/兜底语言 `zh`。
 - **硬约定（译文单一来源，禁止内联兜底）**：调用点只写 `t("模块.分类.具体")`，**不传第二个参数的内联默认文案**（`t("x", "可能限制我的观念")` / `t("x", { defaultValue: "..." })` 一律禁止）。译文**唯一存在于 `src/i18n/locales/zh.json`**。
   - 原因：内联默认值与 json 重复且会漂移——key 一旦在 json 里（现状 98% 都在），i18next 用的是 json 值，那句内联中文是被忽略的死代码，只会误导。
   - **缺 key 的统一处理**：不用每处写兜底。key 缺失时 i18next 默认返回 key 字符串本身（如 `beliefs.signals.limiting`），这是开发期"该补翻译了"的可见信号，比散落一堆内联中文更好。
@@ -88,6 +88,85 @@
   - **`<模块>.validation.*`**：该模块专属的、有具体业务语义的校验文案。例如 `finance.edit.validation.amountPositive`（"金额需要大于 0"）、`nutrition.recipes.validation.stepsRequired`（"请至少填写一个步骤"）。
   - **`<模块>.error.*`**（可选）**：更偏向系统级/格式错误的提示（如 `shopping.error.codeEmpty`、`shopping.error.rankInvalid`），与用户输入校验区分。
   - **禁止**：把通用模板放具体模块下（如曾将 `required`/`maxLength` 放在 `shopping.validation`）、把模块专属校验塞进 `common.validation`、在各模块重复定义同质通用校验 key。
+
+#### F5.1 模块 key 按业务层分离的层级结构
+
+> 以下是全项目 zh.json 提炼的**事实标准**——每个模块命名空间下的 key 按"业务职责"分到固定子层级。新增模块 key 时遵循此结构，不另造组织方式。
+
+每个模块 `Xxx` 的 key 结构如下（按出现频率从高到低）：
+
+| 子层级 | 职责 | 示例 |
+|--------|------|------|
+| `Xxx.page.*` | 页面级元信息（标题、描述、eyebrow） | `shopping.page.title`："生活物品分类工作台" |
+| `Xxx.tabs.*` | Tab 名称 | `beliefs.tabs.entries`："观念清单" |
+| `Xxx.actions.*` | **模块专属操作**（有别于通用 `common.actions.*`） | `journey.actions.addMemory`："新增记忆" |
+| `Xxx.fields.*` | 表单字段标签 | `finance.edit.fields.date`："日期" |
+| `Xxx.empty.*` | 空状态文案 | `emotion.empty.checkIns`："还没有情绪记录。" |
+| `Xxx.toast.*` | 操作反馈提示（toast） | `beliefs.toast.deletePending`："已加入删除队列..." |
+| `Xxx.edit.*` | 编辑弹窗专用文案（标题、描述、字段、校验） | `legacy.edit.createTitle`："新增生命整理条目" |
+| `Xxx.validation.*` | 模块专属校验文案 | `nutrition.recipes.validation.stepsRequired` |
+| `Xxx.error.*` | 模块专属错误/格式提示 | `shopping.error.codeEmpty`："代码不能为空" |
+| `Xxx.enum.*` / `Xxx.enumNames.*` | 枚举/选项的中文映射 | `finance.enum.direction.expense`："支出" |
+| `Xxx.classification.*` | 分类维度说明 | `beliefs.classification.domain.title`："领域" |
+| `Xxx.confirm.*` | 模块专属确认/删除确认弹窗文案 | `journey.confirm.deleteMemory`："确定删除..." |
+| `Xxx.overview.*` | 总览页面/区块文案 | `shopping.overview.currentFocus`："当前该先看什么" |
+| `Xxx.filter.*` | 筛选器文案 | `shopping.filter.all`："全部" |
+| `Xxx.sections.*` | 页面分区标题/描述 | `reflection.sections.draft.title`："写作起点" |
+| `Xxx.placeholders.*` | 输入占位提示 | `events.placeholders.title`："例如：和朋友聊未来城市选择" |
+| `Xxx.form.*` | 表单区域分组/辅助文案 | `beliefs.form.basic`："基本内容" |
+| `Xxx.search.*` | 搜索相关文案 | `events.search.active`："当前筛选：{{query}}" |
+| `Xxx.metrics.*` | 统计/度量指标标签 | `legacy.metrics.total`："条目总数" |
+
+**判断某文案放通用还是模块命名空间的决策树：**
+
+```
+该文案是否只服务于这一业务模块？
+├── 是 → 放 <模块>.<子层级>.<具体>
+├── 否 → 多个模块会用到吗？
+│   ├── 是 → 放 common.<子层级>.<具体>
+│   └── 否 → 放 <模块>.<子层级>.<具体>（仍是此模块专属）
+│       └── 但如果它是纯通用动作（保存/取消/删除/编辑…）→ common.actions.*
+```
+
+**通用（`common.*`）已覆盖的能力：**
+
+| 子层级 | 职责 | 已覆盖 |
+|--------|------|--------|
+| `common.actions.*` | 通用动作按钮文案 | save, saving, cancel, delete, deleting, confirm, close, edit, add, create, deleted, undo, retry |
+| `common.validation.*` | 通用校验模板 | required, maxLength, maxItems, invalidOption, nonNegative, integer, maxNumber, invalidJson, jsonArray, invalidForm |
+| `common.toast.*` | 通用 toast 文案 | saved, saveFailed, deleted, deleteFailed, deletePending, deleteUndone |
+| `common.confirm.*` | 通用确认弹窗 | deleteItem, unsavedChanges |
+| `common.filter.*` | 通用筛选 | label, clearAll |
+| `common.multiSelect.*` | 多选组件 | placeholder, searchPlaceholder, emptyMessage |
+| `common.sortable.*` | 排序控件 | dragHandle, sortOrder |
+| `common.ui.*` | 通用 UI 操作 | collapse, expand |
+| `common.controlMode.*` | 管理模式开关 | on, off |
+| `common.form.*` | 通用表单辅助 | tagsPlaceholder |
+| `common.empty.*` | 通用空状态 | noData |
+
+**各模块当前 key 结构（现状对照，2026-06-14 快照）：**
+
+| 模块 | 顶层 key 数 | 已使用标准子层级 | 待清理的通用 key |
+|------|------------|------------------|------------------|
+| `shopping` | ~50 | page, tabs, cardGrid, toast, overview, dimensions, lifecycle, priceSignal, attributes, error, validation, enumNames, systems, spaces, stages, planning, shared, shuttle, admin, item, filter, system, space, stage, saving, undo | `shopping.undo`, `shopping.saving` |
+| `beliefs` | ~25 | page, classification, filter, impact, tabs, entries, questions, relations, cards, signals, attachment, psych, field, form, actions, toast, error, revision, empty, enums, undo | `beliefs.undo` |
+| `relationships` | ~25 | page, tabs, actions, common, overview, directory, filter, unsent, patterns, graph, labels, empty, edit, confirm, toast, enumNames | `relationships.common.add`, `relationships.common.undo` |
+| `nutrition` | ~25 | page, tabs, status, units, enum, common, overview, profileEdit, dailyPlan, dailyPlanEdit, recipes, recipeFilters, recipeEdit, foods, categoryEdit, foodEdit, nutrients, logs, logEdit | `nutrition.common.*`（仅 `optional` 有业务语义，保留） |
+| `overview` | ~8 | page, sections, logic, quickActions, currentFocus, empty | ✅ |
+| `reflection` | ~12 | page, sections, actions, fields, placeholders, empty, edit, validation, tabs, prompts | ✅（`actions.create/edit` 含"反思"语境） |
+| `events` | ~15 | page, actions, search, timeline, capture, themes, metrics, empty, edit, fields, placeholders, defaults, validation, tabs, review | ✅（`actions.create/edit` 含"事件"语境） |
+| `finance` | ~15 | page, actions, summary, sections, target, empty, toast, edit, enum, tabs, rules | ✅（`actions.addEntry/editEntry/deleteEntry` 含"账目"语境） |
+| `journey` | ~20 | page, hero, actions, filters, classification, sections, tabs, memory, growth, control, management, fields, edit, confirm, enum, compact, remaining, empty, library | `journey.actions.edit`（纯"编辑"→应迁 `common.actions.edit`） |
+| `emotion` | ~18 | page, tabs, actions, overview, today, timeline, triggers, toolbox, common, empty, toast, editor, enum | `emotion.actions.add`（死 key） |
+| `socioeconomics` | ~18 | page, actions, classification, relevance, heatmap, tabs, entries, gaps, prompts, review, empty, fields, edit, confirm, enum, discipline, graph | ✅ |
+| `future` | ~12 | page, searching, refresh, addMilestone, addExperiment, sections, metrics, definition, edit, confirm, empty, tabs, alignment | ✅ |
+| `legacy` | ~22 | pageEyebrow/pageTitle/pageDescription, tabs, actions, undo, toast, fields, labels, filters, warnings, metrics, overview, items, edit, validation, deliveryMap, relationship, boundaries, empty, enum | `legacy.actions.add`（纯"新增"），`legacy.undo` |
+| `principles` | ~18 | page, controlMode, tabs, classification, sections, cost, meta, empty, edit, enumNames, practice, personal, others, perspective | ✅ |
+| `worldhistory` | ~15 | title, subtitle, tabs, actions, narrative, nodeKind, nodeGlyph, dimension, event, preset, star, gantt, arena, civilization | `worldhistory.actions.saving` |
+| `shell` | ~18 | brandSubtitle, search, quickRecord, apiError, language, utilities, themes, music, notifications, notificationCenter, views, nav, rhythm, rhythmPopup, sidebarCarousel, sidebarNotes, settings | ✅ |
+| `splash` | ~2 | tagline, nodes | ✅ |
+
+> **维护约定**：上表在每次 i18n 专项改造后更新。模块新增 key 时，先对上表确认子层级类别已存在再新增；如需新子层级类别，先在此表登记。
 
 ### F6. 用户反馈（sonner toast）
 
@@ -245,15 +324,16 @@
 
 待统一的存量项（20 个 `*-edit-dialog`）：
 
-1. **删除确认**：`window.confirm` → `confirmUndoableDelete`（emotion / finance / future / journey / principle / socioeconomics 等）。
+1. **删除确认**：`window.confirm` → `confirmUndoableDelete`（emotion / finance / future / journey / principle / socioeconomics / events / reflection 等，共 15 处，详见 `docs/bugs/bug-i18n.md`）。
 2. **回车提交**：全部弹窗补 `<form onSubmit>` + 保存 `type="submit"`。
 3. **自动聚焦首字段**：全部弹窗补打开时聚焦。
 4. **脏数据关闭确认**：全部弹窗补 dirty 检测 + 二次确认（仅在真的脏了时拦截）。
 5. **保存按钮 disabled/pending 文本**：补齐缺失的（legacy / shopping-space / shopping-system 无 `canSubmit`+isPending 绑定；emotion / future / legacy / socioeconomics / shopping 无"保存中"文本）。
 6. **删除按钮 variant**：`outline` → `destructive`（finance / legacy / nutrition-recipe / principle / shopping 全系等）。
 7. **疑似 bug**：`principle-edit-dialog.tsx` 保存成功只调 `onSaved()` 不调 `onClose()`，确认是否关不掉弹窗。
-8. **关闭按钮 i18n**：`components/ui/dialog.tsx` 的 `tooltip="Close"` 与 sr-only `"Close"` 硬编码英文 → 走 `t(...)`（违反 F5/F10）。
-9. **通用动作文案收口**：把散落的 `*.save / *.cancel / *.delete / *.saving / *.edit / *.add` 等模块私有通用 key（10+ 个"保存"、30+ 次"删除"，见 `relationships.common.*` / `nutrition.common.*` / `shopping.*` / `journey.actions.*` 等）统一迁到 `common.actions.*`，删除各模块的重复 key。这是一次性 i18n 重构，不逐个弹窗当新 bug 报。
+8. **~~关闭按钮 i18n~~** ✅ 已完成：`dialog.tsx` 已改为 `t("common.actions.close")`。
+9. **通用动作文案收口**（进行中，2026-06-14 排查状态见 `docs/bugs/bug-i18n.md`）：剩余待迁 key —— `relationships.common.{add,undo}`、`journey.actions.edit`、`legacy.{actions.add,undo}`、`beliefs.undo`、`worldhistory.actions.saving`、`emotion.actions.add`（死 key）。对应 JSX 调用点 9 处。另发现 `relationships.common.edit` 缺失 key（运行时显示原始字符串，已属 bug）。
 10. **清除内联默认文案**：全项目 ~1889 处 `t("key","中文")` / `t("key",{defaultValue})` 内联兜底，其中 1851 处 key 已在 zh.json，直接删第二参数即可；剩 ~38 处 key 只在内联兜底未进 json（如 `relationships.graph.markModes.*` / `nutrition.logs.filterTitle` / `principles.actions.edit` 等），**先把文案迁进 zh.json + en.json 再删**。一次性 i18n 重构，不逐处当新 bug 报。
+11. **`notification-layer.tsx` 关闭按钮**：`showCloseButton={false}` 违反 F9.1 三通道原则。
 
 > 完成后删除本节，相关项即并入常规 F9 硬约定按 diff 审查。

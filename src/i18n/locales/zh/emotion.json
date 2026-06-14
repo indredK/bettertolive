@@ -1,0 +1,300 @@
+{
+  "page": {
+    "eyebrow": "情绪情感",
+    "title": "看见最近的心理天气",
+    "description": "把波动、触发因素和对自己有效的恢复方式放在一起看。"
+  },
+  "tabs": {
+    "overview": "情绪总览",
+    "today": "今日记录",
+    "timeline": "波动时间线",
+    "triggers": "触发关联",
+    "toolbox": "恢复工具箱"
+  },
+  "actions": {
+    "add": "新增",
+    "addCheckIn": "新增记录",
+    "addTrendPoint": "新增趋势点",
+    "addSegment": "新增时间段",
+    "addLoop": "新增循环",
+    "addTrigger": "新增触发",
+    "addLifestyleLink": "新增关联",
+    "addEnvironmentCue": "新增环境",
+    "addRelationshipCue": "新增关系",
+    "addTool": "新增工具",
+    "addRecoveryNote": "新增经验",
+    "editCheckIn": "编辑情绪记录",
+    "editSegment": "编辑时间段",
+    "editLoop": "编辑循环",
+    "editTrigger": "编辑触发",
+    "editLifestyleLink": "编辑关联",
+    "editEnvironmentCue": "编辑环境",
+    "editRelationshipCue": "编辑关系",
+    "editTool": "编辑工具",
+    "editMinimalSteps": "编辑极简步骤",
+    "editIneffectiveActions": "编辑提醒",
+    "editRecoveryNote": "编辑恢复经验"
+  },
+  "overview": {
+    "title": "情绪总览",
+    "averageScore": "平均强度",
+    "bestWindow": "最好的时段",
+    "worstWindow": "最差的时段",
+    "window": "窗口",
+    "topTags": "高频情绪标签",
+    "conclusion": "一句话总结"
+  },
+  "today": {
+    "title": "今天的情绪记录",
+    "description": "此刻的强度、身体感觉和想做的反应。",
+    "longDescription": "把模糊情绪落成可回看的样本。",
+    "recent": "最近几条",
+    "promptTitle": "记录入口",
+    "promptDescription": "强度、标签、触发和需要会一起进入后续模式观察。",
+    "prompt": {
+      "feeling": "先命名感受",
+      "feelingBody": "不用准确，先选最接近的词。",
+      "body": "再看身体",
+      "bodyBody": "肩颈、胸口、胃口、困意常常比语言更早知道。",
+      "need": "最后确认需要",
+      "needBody": "不是立刻解决，而是先知道此刻怎样会更安全。"
+    }
+  },
+  "timeline": {
+    "title": "波动时间线",
+    "description": "按时间看波峰、波谷和恢复区段。",
+    "chartTitle": "7 天情绪强度",
+    "chartHint": "0–10 越高越紧绷",
+    "segments": "时间段总结",
+    "loopTitle": "反复出现的循环",
+    "loopDescription": "看见不是随机出现的节律。"
+  },
+  "triggers": {
+    "title": "触发因素",
+    "description": "把情绪和真实生活事件连起来。",
+    "lifestyle": "生活节律关联",
+    "lifestyleDesc": "睡眠、饮食、运动和屏幕时长。",
+    "environment": "环境提示",
+    "environmentDesc": "容易让状态变坏的场景。",
+    "relationships": "关系提示",
+    "relationshipsDesc": "哪些关系更容易带来波动。"
+  },
+  "toolbox": {
+    "title": "安抚与恢复工具箱",
+    "description": "状态差的时候，先有效，再分析。",
+    "minimalSteps": "如果已经很差，只做这三件事",
+    "ineffective": "反而会更糟的动作",
+    "ineffectiveDesc": "状态差时先避开这些路径。",
+    "recoveryNotes": "曾经把我接住的方式",
+    "recoveryNotesDesc": "过去有效的经验可以再次被调用。"
+  },
+  "common": {
+    "intensity": "强度",
+    "bodySignal": "身体感觉",
+    "triggerEvent": "触发事件",
+    "impulse": "此刻冲动",
+    "needRightNow": "现在最需要",
+    "bodyPrefix": "身体",
+    "impulsePrefix": "想",
+    "recent": "最近",
+    "when": "适用时机",
+    "effect": "效果"
+  },
+  "empty": {
+    "checkIns": "还没有情绪记录。",
+    "today": "今天还没有记录。",
+    "trend": "还没有可绘制的情绪样本。",
+    "timelineSegments": "还没有可总结的时间段。",
+    "loopPatterns": "还没有识别到循环模式。",
+    "triggers": "当前筛选下没有触发因素。",
+    "lifestyleLinks": "还没有生活节律关联。",
+    "environmentCues": "还没有环境提示。",
+    "relationshipCues": "还没有关系提示。",
+    "tools": "当前筛选下没有恢复工具。",
+    "minimalRecoverySteps": "还没有极简恢复步骤。",
+    "ineffectiveActions": "还没有无效动作提醒。",
+    "recoveryNotes": "还没有恢复经验。"
+  },
+  "toast": {
+    "saved": "情绪数据已保存",
+    "deleted": "情绪数据已删除"
+  },
+  "editor": {
+    "description": "这些内容会保存到后端情绪数据，不再依赖页面内的临时模拟内容。",
+    "none": "不设置",
+    "confirmDelete": "确定删除这条情绪数据吗？",
+    "validation": {
+      "required": "请补全必填内容"
+    },
+    "overview": {
+      "title": "编辑情绪总览",
+      "description": "维护最近窗口、强度和一句话总结。",
+      "tagsPlaceholder": "焦虑,4"
+    },
+    "textList": {
+      "minimalRecoverySteps": "编辑极简恢复步骤",
+      "ineffectiveActions": "编辑无效动作提醒",
+      "description": "一行一条，保存后会写回后端。"
+    },
+    "placeholders": {
+      "list": "一行一个，或用逗号分隔"
+    },
+    "fields": {
+      "date": "时间",
+      "state": "总体状态",
+      "summary": "此刻发生了什么",
+      "intensity": "强度",
+      "impulse": "此刻冲动",
+      "bodySignal": "身体感觉",
+      "emotionTags": "情绪标签",
+      "tags": "上下文标签",
+      "triggerEvent": "触发事件",
+      "needRightNow": "现在最需要",
+      "label": "标签",
+      "score": "强度分",
+      "primaryState": "主要状态",
+      "note": "备注",
+      "title": "标题",
+      "category": "分类",
+      "cues": "线索",
+      "recentExamples": "近期例子",
+      "kind": "类型",
+      "description": "说明",
+      "when": "适用时机",
+      "contactScript": "可直接说的话",
+      "range": "时间段",
+      "trend": "趋势",
+      "frequency": "频率",
+      "factor": "因素",
+      "direction": "方向",
+      "observation": "观察",
+      "context": "环境",
+      "who": "对象",
+      "pattern": "模式",
+      "what": "做了什么",
+      "effect": "效果",
+      "windowLabel": "观察窗口",
+      "averageScore": "平均强度",
+      "bestWindow": "较好时段",
+      "worstWindow": "较差时段",
+      "topEmotionTags": "高频情绪标签",
+      "conclusion": "一句话总结"
+    },
+    "checkIn": {
+      "createTitle": "新增情绪记录",
+      "editTitle": "编辑情绪记录"
+    },
+    "trendPoint": {
+      "createTitle": "新增趋势点",
+      "editTitle": "编辑趋势点"
+    },
+    "trigger": {
+      "createTitle": "新增触发因素",
+      "editTitle": "编辑触发因素"
+    },
+    "tool": {
+      "createTitle": "新增恢复工具",
+      "editTitle": "编辑恢复工具"
+    },
+    "timelineSegment": {
+      "createTitle": "新增时间段",
+      "editTitle": "编辑时间段"
+    },
+    "loopPattern": {
+      "createTitle": "新增循环模式",
+      "editTitle": "编辑循环模式"
+    },
+    "lifestyleLink": {
+      "createTitle": "新增生活关联",
+      "editTitle": "编辑生活关联"
+    },
+    "environmentCue": {
+      "createTitle": "新增环境提示",
+      "editTitle": "编辑环境提示"
+    },
+    "relationshipCue": {
+      "createTitle": "新增关系提示",
+      "editTitle": "编辑关系提示"
+    },
+    "recoveryNote": {
+      "createTitle": "新增恢复经验",
+      "editTitle": "编辑恢复经验"
+    }
+  },
+  "enum": {
+    "state": {
+      "平静": "平静",
+      "回稳": "回稳",
+      "低压焦虑": "低压焦虑",
+      "易怒": "易怒",
+      "麻木": "麻木",
+      "空": "空",
+      "委屈": "委屈",
+      "难过": "难过",
+      "高压后空掉": "高压后空掉",
+      "松弛": "松弛",
+      "期待": "期待"
+    },
+    "emotionTag": {
+      "难过": "难过",
+      "焦虑": "焦虑",
+      "空": "空",
+      "平静": "平静",
+      "委屈": "委屈",
+      "愤怒": "愤怒",
+      "松弛": "松弛",
+      "期待": "期待",
+      "羞愧": "羞愧",
+      "恐惧": "恐惧",
+      "孤独": "孤独",
+      "兴奋": "兴奋"
+    },
+    "impulse": {
+      "逃避": "逃避",
+      "倾诉": "倾诉",
+      "睡觉": "睡觉",
+      "吃东西": "吃东西",
+      "出门": "出门",
+      "沉默": "沉默",
+      "运动": "运动",
+      "刷手机": "刷手机"
+    },
+    "triggerCategory": {
+      "工作": "工作",
+      "家庭": "家庭",
+      "亲密关系": "亲密关系",
+      "金钱": "金钱",
+      "睡眠": "睡眠",
+      "社交": "社交",
+      "自我否定": "自我否定",
+      "环境": "环境"
+    },
+    "toolKind": {
+      "有效": "有效",
+      "无效": "无效",
+      "极简三步": "极简三步",
+      "可联系": "可联系"
+    },
+    "segmentTrend": {
+      "持续恶化": "持续恶化",
+      "逐渐恢复": "逐渐恢复",
+      "起伏波动": "起伏波动",
+      "平稳": "平稳"
+    },
+    "lifestyleFactor": {
+      "睡眠": "睡眠",
+      "饮食": "饮食",
+      "运动": "运动",
+      "经期": "经期",
+      "饮酒": "饮酒",
+      "屏幕时长": "屏幕时长",
+      "通勤": "通勤",
+      "独处": "独处"
+    },
+    "linkDirection": {
+      "正相关": "正相关",
+      "负相关": "负相关",
+      "混合": "混合"
+    }
+  }
+}
