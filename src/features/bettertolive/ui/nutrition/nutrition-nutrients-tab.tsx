@@ -293,7 +293,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                 variant="outline"
                 className="border-foreground/10 bg-muted text-muted-foreground"
               >
-                {t("nutrition.nutrients.resultCount", "{{count}} 条", { count: rows.length })}
+                {t("nutrition.nutrients.resultCount", { count: rows.length })}
               </Badge>
             </div>
           </div>
@@ -443,7 +443,7 @@ function NutrientDetailDrawer({
               </Badge>
             </div>
             <DialogTitle className="mt-2 text-xl">
-              {t("nutrition.nutrients.drawerTitle", "{{name}} 的营养详情", { name: row.name })}
+              {t("nutrition.nutrients.drawerTitle", { name: row.name })}
             </DialogTitle>
             <DialogDescription>
               {t(

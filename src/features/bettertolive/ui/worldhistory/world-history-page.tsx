@@ -130,7 +130,7 @@ export function WorldHistoryPage({
     if (!isEditing || !draft) return
     const timer = setTimeout(() => {
       saveRef.current.mutate(draft, {
-        onError: () => toast.error(t("worldhistory.actions.save")),
+        onError: () => toast.error(t("common.actions.save")),
       })
     }, 600)
     return () => clearTimeout(timer)
@@ -208,9 +208,9 @@ export function WorldHistoryPage({
     try {
       await saveMutation.mutateAsync(draft)
       setDraft(null)
-      toast.success(t("worldhistory.actions.save"))
+      toast.success(t("common.actions.save"))
     } catch {
-      toast.error(t("worldhistory.actions.save"))
+      toast.error(t("common.actions.save"))
     }
   }
 
@@ -322,7 +322,7 @@ export function WorldHistoryPage({
               show={!isEditing}
               variant="ghost"
               size="icon-sm"
-              label={t("worldhistory.actions.edit")}
+              label={t("common.actions.edit")}
               icon={<Pencil className="size-3.5" />}
               onClick={beginEdit}
             />
@@ -332,9 +332,7 @@ export function WorldHistoryPage({
               size="icon-sm"
               disabled={saveMutation.isPending}
               label={
-                saveMutation.isPending
-                  ? t("worldhistory.actions.saving")
-                  : t("worldhistory.actions.save")
+                saveMutation.isPending ? t("worldhistory.actions.saving") : t("common.actions.save")
               }
               icon={<Check className="size-3.5" />}
               onClick={saveEdit}
@@ -343,7 +341,7 @@ export function WorldHistoryPage({
               show={isEditing}
               variant="outline"
               size="icon-sm"
-              label={t("worldhistory.actions.cancel")}
+              label={t("common.actions.cancel")}
               icon={<X className="size-3.5" />}
               onClick={cancelEdit}
             />
@@ -427,7 +425,7 @@ export function WorldHistoryPage({
                   {t("worldhistory.narrative.prev")}
                 </button>
                 <span className="font-mono text-[11px] text-[color:var(--text-muted)]">
-                  {t("worldhistory.narrative.counter", "因果链 {{current}} / {{total}}", {
+                  {t("worldhistory.narrative.counter", {
                     current: Math.max(narrativeIndex, 0) + 1,
                     total: narrativeChain.length,
                   })}

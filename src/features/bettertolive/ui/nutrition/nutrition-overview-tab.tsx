@@ -316,7 +316,7 @@ export function NutritionOverviewTab({
                     </Badge>
                     {currentIntent.window ? (
                       <span className="text-muted-foreground text-xs">
-                        {t("nutrition.overview.intentWindow", "{{start}} 至 {{end}}", {
+                        {t("nutrition.overview.intentWindow", {
                           end: currentIntent.window.end ?? t("nutrition.overview.intentOpenEnded"),
                           start: currentIntent.window.start,
                         })}
@@ -405,7 +405,7 @@ export function NutritionOverviewTab({
                     variant="outline"
                     className="border-foreground/10 bg-muted text-muted-foreground"
                   >
-                    {t("nutrition.overview.missingNutrition", "{{count}} 项营养数据待补", {
+                    {t("nutrition.overview.missingNutrition", {
                       count: totals.missingCount,
                     })}
                   </Badge>

@@ -392,14 +392,14 @@ export function LegacyItemEditDialog({
           {!editing.isNew ? (
             <Button variant="outline" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-4" />
-              {t("legacy.actions.delete")}
+              {t("common.actions.delete")}
             </Button>
           ) : null}
           <Button variant="outline" onClick={onClose}>
-            {t("legacy.actions.cancel")}
+            {t("common.actions.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit || isReadOnly}>
-            {t("legacy.actions.save")}
+            {t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

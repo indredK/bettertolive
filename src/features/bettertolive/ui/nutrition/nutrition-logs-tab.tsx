@@ -280,7 +280,7 @@ function LogCard({
 
       {log.changeReason ? (
         <p className="text-muted-foreground mt-3 text-sm leading-6">
-          {t("nutrition.logs.changeReasonWithValue", "偏差原因：{{reason}}", {
+          {t("nutrition.logs.changeReasonWithValue", {
             reason: log.changeReason,
           })}
         </p>

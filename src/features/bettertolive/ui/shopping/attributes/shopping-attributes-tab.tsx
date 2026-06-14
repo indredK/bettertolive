@@ -536,7 +536,7 @@ export function ShoppingAttributesTab({
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDisableConfirm(null)}>
-                {t("shopping.cancel")}
+                {t("common.actions.cancel")}
               </Button>
               <Button
                 variant="destructive"

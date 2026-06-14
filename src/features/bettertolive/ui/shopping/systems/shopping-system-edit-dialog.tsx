@@ -290,14 +290,14 @@ export function ShoppingSystemEditDialog({
               disabled={isPending}
               className="mr-auto"
             >
-              {t("shopping.delete")}
+              {t("common.actions.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel")}
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={!form.formState.isValid || isPending}>
-            {isPending ? t("shopping.saving") : t("shopping.save")}
+            {isPending ? t("common.actions.saving") : t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

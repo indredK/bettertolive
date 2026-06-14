@@ -18,6 +18,11 @@
       "deleted": "已删除",
       "undo": "撤销",
       "retry": "重试"
+    },
+    "multiSelect": {
+      "placeholder": "请选择",
+      "searchPlaceholder": "搜索…",
+      "emptyMessage": "没有匹配的选项"
     }
   },
   "shopping": {
@@ -698,10 +703,7 @@
     "pageEyebrow": "Shopping",
     "pageTitle": "购物",
     "pageDescription": "物件库 + 物件系统 + 空间场景 + 阶段适用",
-    "save": "保存",
     "saving": "保存中",
-    "cancel": "取消",
-    "delete": "删除",
     "note": "备注",
     "search": "搜索...",
     "controlMode": {
@@ -845,11 +847,7 @@
     },
     "actions": {
       "create": "新增观念",
-      "edit": "编辑",
-      "editEntry": "编辑观念",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存"
+      "editEntry": "编辑观念"
     },
     "toast": {
       "saved": "已保存",
@@ -1951,10 +1949,7 @@
     },
     "actions": {
       "create": "新增反思",
-      "edit": "编辑反思",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存"
+      "edit": "编辑反思"
     },
     "fields": {
       "date": "时间",
@@ -2010,10 +2005,7 @@
     },
     "actions": {
       "create": "新增事件",
-      "edit": "编辑事件",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存"
+      "edit": "编辑事件"
     },
     "search": {
       "active": "当前筛选：{{query}}"
@@ -2773,7 +2765,6 @@
     },
     "actions": {
       "add": "新增",
-      "edit": "编辑",
       "addCheckIn": "新增记录",
       "addTrendPoint": "新增趋势点",
       "addSegment": "新增时间段",
@@ -3190,10 +3181,6 @@
     },
     "actions": {
       "add": "新增",
-      "edit": "编辑",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存",
       "unlock": "解锁编辑",
       "revealContent": "打开正文"
     },
@@ -4128,10 +4115,7 @@
       "arena": "对质"
     },
     "actions": {
-      "edit": "编辑",
-      "save": "保存",
-      "saving": "保存中…",
-      "cancel": "取消"
+      "saving": "保存中…"
     },
     "narrative": {
       "prev": "上一步",

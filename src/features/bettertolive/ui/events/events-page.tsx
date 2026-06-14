@@ -765,14 +765,14 @@ function EventEditDialog({
             {editing.event ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 data-icon="inline-start" />
-                {t("events.actions.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("events.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveEventsMutation.isPending}>
-              {t("events.actions.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

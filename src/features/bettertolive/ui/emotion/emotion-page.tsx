@@ -726,7 +726,7 @@ function CardHeaderActions({
           onClick={onEdit}
         >
           <Pencil className="size-3.5" />
-          {editLabel ?? t("emotion.actions.edit")}
+          {editLabel ?? t("common.actions.edit")}
         </AnimatedButton>
         <AnimatedButton
           show={isControlMode && Boolean(onAdd)}
@@ -736,7 +736,7 @@ function CardHeaderActions({
           onClick={onAdd}
         >
           <Plus className="size-3.5" />
-          {addLabel ?? t("emotion.actions.add")}
+          {addLabel ?? t("common.actions.add")}
         </AnimatedButton>
       </ActionGroup>
     </div>

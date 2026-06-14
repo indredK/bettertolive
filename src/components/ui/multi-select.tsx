@@ -3,6 +3,7 @@
 import { Check, ChevronDown, Search, X } from "lucide-react"
 import * as React from "react"
 import { Popover } from "@base-ui/react/popover"
+import { useTranslation } from "react-i18next"
 
 import { cn } from "@/lib/utils"
 import { UI_LAYERS } from "@/lib/ui-layers"
@@ -28,13 +29,17 @@ export function MultiSelect({
   options,
   value,
   onChange,
-  placeholder = "Select options",
-  searchPlaceholder = "Search...",
-  emptyMessage = "No matching options",
+  placeholder,
+  searchPlaceholder,
+  emptyMessage,
   maxItems,
   disabled = false,
   className,
 }: MultiSelectProps) {
+  const { t } = useTranslation()
+  const resolvedPlaceholder = placeholder ?? t("common.multiSelect.placeholder")
+  const resolvedSearchPlaceholder = searchPlaceholder ?? t("common.multiSelect.searchPlaceholder")
+  const resolvedEmptyMessage = emptyMessage ?? t("common.multiSelect.emptyMessage")
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState("")
   const searchInputRef = React.useRef<HTMLInputElement>(null)
@@ -97,7 +102,7 @@ export function MultiSelect({
       >
         <div className="flex min-w-0 flex-1 flex-wrap gap-1">
           {selectedOptions.length === 0 ? (
-            <span className="text-[color:var(--text-muted)]">{placeholder}</span>
+            <span className="text-[color:var(--text-muted)]">{resolvedPlaceholder}</span>
           ) : (
             selectedOptions.map((option) => {
               return (
@@ -142,7 +147,7 @@ export function MultiSelect({
                 ref={searchInputRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={searchPlaceholder}
+                placeholder={resolvedSearchPlaceholder}
                 className="flex-1 bg-transparent py-1.5 text-sm text-[color:var(--text-primary)] outline-none placeholder:text-[color:var(--text-muted)]"
               />
             </div>
@@ -150,7 +155,7 @@ export function MultiSelect({
             <div className="max-h-60 overflow-y-auto py-1">
               {filteredOptions.length === 0 ? (
                 <div className="px-3 py-4 text-center text-sm text-[color:var(--text-muted)]">
-                  {emptyMessage}
+                  {resolvedEmptyMessage}
                 </div>
               ) : (
                 filteredOptions.map((opt) => {

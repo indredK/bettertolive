@@ -529,7 +529,7 @@ function ReflectionEntryCard({
             type="button"
             variant="ghost"
             size="icon-sm"
-            label={t("reflection.actions.delete")}
+            label={t("common.actions.delete")}
             icon={<Trash2 className="size-4" />}
             disabled={isDeleting}
             onClick={onDelete}
@@ -651,10 +651,10 @@ function ReflectionEditDialog({
 
           <DialogFooter className="mt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("reflection.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveReflectionMutation.isPending}>
-              {t("reflection.actions.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

@@ -78,7 +78,7 @@ export function LegacyPage({
             onClick={() => handleEditItem(null)}
           >
             <Plus className="size-4" />
-            {t("legacy.actions.add")}
+            {t("common.actions.add")}
           </AnimatedButton>
         </ActionGroup>
 

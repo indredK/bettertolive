@@ -242,7 +242,7 @@ export function LegacyItemSummaryCard({
           size="icon-sm"
           variant="ghost"
           className="h-7 w-7 shrink-0"
-          label={t("legacy.actions.edit")}
+          label={t("common.actions.edit")}
           icon={<Pencil className="size-3.5" />}
           onClick={onEdit}
         />

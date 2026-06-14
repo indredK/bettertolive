@@ -469,10 +469,10 @@ export function ShoppingAttributeEditDialog({
 
         <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel")}
+            {t("common.actions.cancel")}
           </Button>
           <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("shopping.saving") : t("shopping.save")}
+            {isPending ? t("common.actions.saving") : t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

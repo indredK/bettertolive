@@ -704,7 +704,7 @@ function BeliefToolbar({
             variant="outline"
             className="border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] text-[color:var(--text-muted)]"
           >
-            {t("beliefs.filter.count", "{{count}} 条", { count: total })}
+            {t("beliefs.filter.count", { count: total })}
           </Badge>
           <AnimatedButton show={isControlMode} size="sm" onClick={onCreate}>
             <Plus className="size-3.5" />
@@ -951,7 +951,7 @@ function BeliefCard({
           show={isControlMode && Boolean(onEdit)}
           variant="ghost"
           size="icon-sm"
-          label={t("beliefs.actions.edit")}
+          label={t("common.actions.edit")}
           icon={<Edit3 className="size-3.5" />}
           onClick={onEdit}
         />
@@ -1488,14 +1488,14 @@ function BeliefEditDialog({
           {!editing.isNew ? (
             <Button variant="outline" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-3.5" />
-              {t("beliefs.actions.delete")}
+              {t("common.actions.delete")}
             </Button>
           ) : null}
           <Button variant="outline" onClick={onClose}>
-            {t("beliefs.actions.cancel")}
+            {t("common.actions.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit}>
-            {t("beliefs.actions.save")}
+            {t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

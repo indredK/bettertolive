@@ -279,17 +279,17 @@ function LegacyItemDetail({
               show={isControlMode}
               variant="outline"
               size="sm"
-              label={t("legacy.actions.edit")}
+              label={t("common.actions.edit")}
               icon={<Pencil className="size-4" />}
               onClick={onEdit}
             >
-              {t("legacy.actions.edit")}
+              {t("common.actions.edit")}
             </AnimatedIconButton>
             <AnimatedIconButton
               show={isControlMode}
               variant="outline"
               size="sm"
-              label={t("legacy.actions.delete")}
+              label={t("common.actions.delete")}
               icon={<Trash2 className="size-4" />}
               onClick={handleDelete}
             />

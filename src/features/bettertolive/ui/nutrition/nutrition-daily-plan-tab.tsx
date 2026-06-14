@@ -513,7 +513,7 @@ function DailyNutritionPanel({
                           variant="outline"
                           className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
                         >
-                          {t("nutrition.dailyPlan.missingShort", "待补 {{count}}", {
+                          {t("nutrition.dailyPlan.missingShort", {
                             count: entry.totals.missingCount,
                           })}
                         </Badge>

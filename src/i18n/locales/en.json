@@ -18,6 +18,11 @@
       "deleted": "Deleted",
       "undo": "Undo",
       "retry": "Retry"
+    },
+    "multiSelect": {
+      "placeholder": "Select options",
+      "searchPlaceholder": "Search…",
+      "emptyMessage": "No matching options"
     }
   },
   "shopping": {
@@ -698,10 +703,7 @@
     "pageEyebrow": "Shopping",
     "pageTitle": "Shopping",
     "pageDescription": "Item Library + Item Systems + Space Scenes + Stage Fit",
-    "save": "Save",
     "saving": "Saving...",
-    "cancel": "Cancel",
-    "delete": "Delete",
     "note": "Note",
     "search": "Search...",
     "controlMode": {
@@ -845,11 +847,7 @@
     },
     "actions": {
       "create": "Add Belief",
-      "edit": "Edit",
-      "editEntry": "Edit Belief",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save"
+      "editEntry": "Edit Belief"
     },
     "toast": {
       "saved": "Saved",
@@ -1951,10 +1949,7 @@
     },
     "actions": {
       "create": "New Reflection",
-      "edit": "Edit Reflection",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save"
+      "edit": "Edit Reflection"
     },
     "fields": {
       "date": "Time",
@@ -2010,10 +2005,7 @@
     },
     "actions": {
       "create": "New Event",
-      "edit": "Edit Event",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save"
+      "edit": "Edit Event"
     },
     "search": {
       "active": "Current filter: {{query}}"
@@ -2773,7 +2765,6 @@
     },
     "actions": {
       "add": "Add",
-      "edit": "Edit",
       "addCheckIn": "Add Entry",
       "addTrendPoint": "Add Trend Point",
       "addSegment": "Add Segment",
@@ -3190,10 +3181,6 @@
     },
     "actions": {
       "add": "Add",
-      "edit": "Edit",
-      "delete": "Delete",
-      "cancel": "Cancel",
-      "save": "Save",
       "unlock": "Unlock to edit",
       "revealContent": "Open content"
     },
@@ -3890,10 +3877,7 @@
       "arena": "Arena"
     },
     "actions": {
-      "edit": "Edit",
-      "save": "Save",
-      "saving": "Saving...",
-      "cancel": "Cancel"
+      "saving": "Saving..."
     },
     "narrative": {
       "prev": "Previous",
