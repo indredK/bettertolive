@@ -10,10 +10,7 @@
     "addPrompt": "Add Prompt",
     "editEntry": "Edit Entry",
     "editGap": "Edit Gap",
-    "editPrompt": "Edit Prompt",
-    "delete": "Delete",
-    "cancel": "Cancel",
-    "save": "Save"
+    "editPrompt": "Edit Prompt"
   },
   "classification": {
     "title": "5-Dimensional Cognition Map",
