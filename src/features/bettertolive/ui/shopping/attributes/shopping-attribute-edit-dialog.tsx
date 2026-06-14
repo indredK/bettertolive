@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod/v4"
 import { toast } from "sonner"
 
+import { useDirtyConfirm } from "@/features/bettertolive/hooks/use-dirty-confirm"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -244,125 +246,45 @@ export function ShoppingAttributeEditDialog({
     return t("shopping.attributes.hint.semantic")
   }, [kind, t])
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
-      if (!confirmed) return
-    }
-    if (!open) onClose()
-  }
+  const { handleOpenChange, dirtyConfirmDialog } = useDirtyConfirm({
+    isDirty: form.formState.isDirty,
+    confirmMessage: t("common.confirm.unsavedChanges"),
+    cancelLabel: t("common.actions.cancel"),
+    confirmLabel: t("common.actions.confirm"),
+  })
 
   return (
-    <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent
-        className={cn(
-          "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(980px,calc(100vw-3rem))]",
-          SHOPPING_DIALOG_CONTENT_CLASS,
-        )}
-      >
-        <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
-          <DialogTitle>
-            {editing.isNew ? t("shopping.attributes.create") : t("shopping.attributes.edit")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            void handleSubmit()
-          }}
+    <>
+      <Dialog open onOpenChange={handleOpenChange(onClose)}>
+        <DialogContent
+          className={cn(
+            "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(980px,calc(100vw-3rem))]",
+            SHOPPING_DIALOG_CONTENT_CLASS,
+          )}
         >
-          <div className="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
-            <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
-              {/* 分类 */}
-              <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.kind")}</FieldLabel>
-                <Select
-                  value={kind}
-                  onValueChange={(value) =>
-                    form.setValue("kind", value as ShoppingAttributeKind, { shouldValidate: true })
-                  }
-                >
-                  <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS} disabled={identityLocked}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ATTRIBUTE_KIND_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {shoppingAttributeKindDisplayName(option, t)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldHint>{t("shopping.attributes.hint.kind")}</FieldHint>
-              </div>
+          <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
+            <DialogTitle>
+              {editing.isNew ? t("shopping.attributes.create") : t("shopping.attributes.edit")}
+            </DialogTitle>
+          </DialogHeader>
 
-              {/* 代码 */}
-              <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.code")}</FieldLabel>
-                <Input
-                  autoFocus
-                  value={code}
-                  onChange={(event) =>
-                    form.setValue("code", event.target.value, { shouldValidate: true })
-                  }
-                  className={cn(
-                    SHOPPING_DIALOG_FIELD_CLASS,
-                    !codeLocked && codeError && code.trim() && "border-destructive",
-                  )}
-                  disabled={codeLocked}
-                />
-                {codeLocked ? (
-                  <FieldHint>{t("shopping.attributes.hint.codeLocked")}</FieldHint>
-                ) : codeError && code.trim() ? (
-                  <p className="text-destructive text-[11px]">{codeError}</p>
-                ) : (
-                  <FieldHint>{t("shopping.attributes.hint.code")}</FieldHint>
-                )}
-              </div>
-
-              {/* 中文名 */}
-              <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.label")}</FieldLabel>
-                <Input
-                  value={label}
-                  onChange={(event) =>
-                    form.setValue("label", event.target.value, { shouldValidate: true })
-                  }
-                  className={SHOPPING_DIALOG_FIELD_CLASS}
-                />
-                <FieldHint>{t("shopping.attributes.hint.label")}</FieldHint>
-              </div>
-
-              {/* 英文名 */}
-              <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.labelEn")}</FieldLabel>
-                <Input
-                  value={labelEn}
-                  onChange={(event) =>
-                    form.setValue("labelEn", event.target.value, { shouldValidate: true })
-                  }
-                  className={SHOPPING_DIALOG_FIELD_CLASS}
-                />
-                <FieldHint>{t("shopping.attributes.hint.labelEn")}</FieldHint>
-              </div>
-            </div>
-
-            <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
-              {/* 语义键 */}
-              <div className="space-y-1.5">
-                <FieldLabel required={semanticRequired}>
-                  {t("shopping.attributes.semanticKey")}
-                </FieldLabel>
-                {semanticOptions.length > 0 ? (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void handleSubmit()
+            }}
+          >
+            <div className="grid min-h-0 flex-1 gap-4 md:grid-cols-2">
+              <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
+                {/* 分类 */}
+                <div className="space-y-1.5">
+                  <FieldLabel required>{t("shopping.attributes.kind")}</FieldLabel>
                   <Select
-                    value={semanticKey || NONE_SEMANTIC_VALUE}
+                    value={kind}
                     onValueChange={(value) =>
-                      form.setValue(
-                        "semanticKey",
-                        value === NONE_SEMANTIC_VALUE ? "" : String(value),
-                        { shouldValidate: true },
-                      )
+                      form.setValue("kind", value as ShoppingAttributeKind, {
+                        shouldValidate: true,
+                      })
                     }
                   >
                     <SelectTrigger
@@ -372,106 +294,193 @@ export function ShoppingAttributeEditDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {!semanticRequired && (
-                        <SelectItem value={NONE_SEMANTIC_VALUE}>
-                          {t("shopping.attributes.noSemantic")}
-                        </SelectItem>
-                      )}
-                      {semanticOptions.map((option) => (
+                      {ATTRIBUTE_KIND_OPTIONS.map((option) => (
                         <SelectItem key={option} value={option}>
-                          {shoppingAttributeSemanticDisplayName(option, t)}
+                          {shoppingAttributeKindDisplayName(option, t)}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                ) : (
+                  <FieldHint>{t("shopping.attributes.hint.kind")}</FieldHint>
+                </div>
+
+                {/* 代码 */}
+                <div className="space-y-1.5">
+                  <FieldLabel required>{t("shopping.attributes.code")}</FieldLabel>
                   <Input
-                    value={semanticKey}
+                    autoFocus
+                    value={code}
                     onChange={(event) =>
-                      form.setValue("semanticKey", event.target.value, { shouldValidate: true })
+                      form.setValue("code", event.target.value, { shouldValidate: true })
+                    }
+                    className={cn(
+                      SHOPPING_DIALOG_FIELD_CLASS,
+                      !codeLocked && codeError && code.trim() && "border-destructive",
+                    )}
+                    disabled={codeLocked}
+                  />
+                  {codeLocked ? (
+                    <FieldHint>{t("shopping.attributes.hint.codeLocked")}</FieldHint>
+                  ) : codeError && code.trim() ? (
+                    <p className="text-destructive text-[11px]">{codeError}</p>
+                  ) : (
+                    <FieldHint>{t("shopping.attributes.hint.code")}</FieldHint>
+                  )}
+                </div>
+
+                {/* 中文名 */}
+                <div className="space-y-1.5">
+                  <FieldLabel required>{t("shopping.attributes.label")}</FieldLabel>
+                  <Input
+                    value={label}
+                    onChange={(event) =>
+                      form.setValue("label", event.target.value, { shouldValidate: true })
                     }
                     className={SHOPPING_DIALOG_FIELD_CLASS}
-                    disabled={identityLocked}
-                    placeholder={t("shopping.attributes.noSemantic")}
                   />
-                )}
-                <FieldHint>{semanticHint}</FieldHint>
+                  <FieldHint>{t("shopping.attributes.hint.label")}</FieldHint>
+                </div>
+
+                {/* 英文名 */}
+                <div className="space-y-1.5">
+                  <FieldLabel>{t("shopping.attributes.labelEn")}</FieldLabel>
+                  <Input
+                    value={labelEn}
+                    onChange={(event) =>
+                      form.setValue("labelEn", event.target.value, { shouldValidate: true })
+                    }
+                    className={SHOPPING_DIALOG_FIELD_CLASS}
+                  />
+                  <FieldHint>{t("shopping.attributes.hint.labelEn")}</FieldHint>
+                </div>
               </div>
 
-              {/* 样式 */}
-              <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.styleToken")}</FieldLabel>
-                <Select
-                  value={styleToken || NONE_STYLE_VALUE}
-                  onValueChange={(value) =>
-                    form.setValue(
-                      "styleToken",
-                      value === NONE_STYLE_VALUE ? "" : (value as ShoppingAttributeStyleToken),
-                      { shouldValidate: true },
-                    )
-                  }
-                >
-                  <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={NONE_STYLE_VALUE}>
-                      {t("shopping.attributes.noStyle")}
-                    </SelectItem>
-                    {STYLE_TOKEN_OPTIONS.map((option) => (
-                      <SelectItem key={option} value={option}>
-                        {shoppingAttributeStyleTokenDisplayName(option, t)}
+              <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
+                {/* 语义键 */}
+                <div className="space-y-1.5">
+                  <FieldLabel required={semanticRequired}>
+                    {t("shopping.attributes.semanticKey")}
+                  </FieldLabel>
+                  {semanticOptions.length > 0 ? (
+                    <Select
+                      value={semanticKey || NONE_SEMANTIC_VALUE}
+                      onValueChange={(value) =>
+                        form.setValue(
+                          "semanticKey",
+                          value === NONE_SEMANTIC_VALUE ? "" : String(value),
+                          { shouldValidate: true },
+                        )
+                      }
+                    >
+                      <SelectTrigger
+                        className={SHOPPING_DIALOG_FIELD_CLASS}
+                        disabled={identityLocked}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {!semanticRequired && (
+                          <SelectItem value={NONE_SEMANTIC_VALUE}>
+                            {t("shopping.attributes.noSemantic")}
+                          </SelectItem>
+                        )}
+                        {semanticOptions.map((option) => (
+                          <SelectItem key={option} value={option}>
+                            {shoppingAttributeSemanticDisplayName(option, t)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input
+                      value={semanticKey}
+                      onChange={(event) =>
+                        form.setValue("semanticKey", event.target.value, { shouldValidate: true })
+                      }
+                      className={SHOPPING_DIALOG_FIELD_CLASS}
+                      disabled={identityLocked}
+                      placeholder={t("shopping.attributes.noSemantic")}
+                    />
+                  )}
+                  <FieldHint>{semanticHint}</FieldHint>
+                </div>
+
+                {/* 样式 */}
+                <div className="space-y-1.5">
+                  <FieldLabel>{t("shopping.attributes.styleToken")}</FieldLabel>
+                  <Select
+                    value={styleToken || NONE_STYLE_VALUE}
+                    onValueChange={(value) =>
+                      form.setValue(
+                        "styleToken",
+                        value === NONE_STYLE_VALUE ? "" : (value as ShoppingAttributeStyleToken),
+                        { shouldValidate: true },
+                      )
+                    }
+                  >
+                    <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={NONE_STYLE_VALUE}>
+                        {t("shopping.attributes.noStyle")}
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FieldHint>{t("shopping.attributes.hint.styleToken")}</FieldHint>
-              </div>
+                      {STYLE_TOKEN_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {shoppingAttributeStyleTokenDisplayName(option, t)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FieldHint>{t("shopping.attributes.hint.styleToken")}</FieldHint>
+                </div>
 
-              {/* 等级/排序权重 */}
-              <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.rank")}</FieldLabel>
-                <Input
-                  type="number"
-                  value={rank}
-                  onChange={(event) =>
-                    form.setValue("rank", event.target.value, { shouldValidate: true })
-                  }
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, rankError && "border-destructive")}
-                />
-                {rankError ? (
-                  <p className="text-destructive text-[11px]">{rankError}</p>
-                ) : (
-                  <FieldHint>{t("shopping.attributes.hint.rank")}</FieldHint>
-                )}
-              </div>
+                {/* 等级/排序权重 */}
+                <div className="space-y-1.5">
+                  <FieldLabel>{t("shopping.attributes.rank")}</FieldLabel>
+                  <Input
+                    type="number"
+                    value={rank}
+                    onChange={(event) =>
+                      form.setValue("rank", event.target.value, { shouldValidate: true })
+                    }
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, rankError && "border-destructive")}
+                  />
+                  {rankError ? (
+                    <p className="text-destructive text-[11px]">{rankError}</p>
+                  ) : (
+                    <FieldHint>{t("shopping.attributes.hint.rank")}</FieldHint>
+                  )}
+                </div>
 
-              {/* 说明 */}
-              <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.description")}</FieldLabel>
-                <Textarea
-                  value={description}
-                  onChange={(event) =>
-                    form.setValue("description", event.target.value, { shouldValidate: true })
-                  }
-                  rows={6}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
-                />
-                <FieldHint>{t("shopping.attributes.hint.description")}</FieldHint>
+                {/* 说明 */}
+                <div className="space-y-1.5">
+                  <FieldLabel>{t("shopping.attributes.description")}</FieldLabel>
+                  <Textarea
+                    value={description}
+                    onChange={(event) =>
+                      form.setValue("description", event.target.value, { shouldValidate: true })
+                    }
+                    rows={6}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                  />
+                  <FieldHint>{t("shopping.attributes.hint.description")}</FieldHint>
+                </div>
               </div>
             </div>
-          </div>
-        </form>
+          </form>
 
-        <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("common.actions.cancel")}
-          </Button>
-          <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("common.actions.saving") : t("common.actions.save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
+            <Button variant="outline" onClick={onClose} disabled={isPending}>
+              {t("common.actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={!canSubmit || isPending}>
+              {isPending ? t("common.actions.saving") : t("common.actions.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {dirtyConfirmDialog}
+    </>
   )
 }

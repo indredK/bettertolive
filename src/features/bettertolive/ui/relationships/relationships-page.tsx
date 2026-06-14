@@ -1609,7 +1609,7 @@ function RelationshipDetailPanel({
             <Pencil className="h-4 w-4" />
             {t("common.actions.edit")}
           </AnimatedButton>
-          <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
+          <AnimatedButton show={isControlMode} size="sm" variant="destructive" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
             {t("common.actions.delete")}
           </AnimatedButton>
@@ -1959,7 +1959,7 @@ function DetailHeader({
           <Pencil className="h-4 w-4" />
           {t("common.actions.edit")}
         </AnimatedButton>
-        <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
+        <AnimatedButton show={isControlMode} size="sm" variant="destructive" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
           {t("common.actions.delete")}
         </AnimatedButton>

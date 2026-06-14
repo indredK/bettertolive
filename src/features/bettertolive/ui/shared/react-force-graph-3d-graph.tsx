@@ -27,6 +27,7 @@ import { createPortal } from "react-dom"
 
 import { Button } from "@/components/ui/button"
 import type { CytoscapeThemeTokens } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
+import { readGraphPaletteColor } from "@/lib/graph-tokens"
 import { cn } from "@/lib/utils"
 import { UI_LAYERS } from "@/lib/ui-layers"
 
@@ -669,7 +670,7 @@ export function ReactForceGraph3DGraph({
 
       {graphError ? (
         <div className="absolute inset-x-6 bottom-6 rounded-lg border border-amber-200 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm backdrop-blur">
-          图谱暂时无法显示：{graphError}
+          {graphError}
         </div>
       ) : null}
     </div>
@@ -1456,26 +1457,14 @@ function fallbackNodeColor(data: GraphElementData) {
   const impact = readString(data.impact)
   const discipline = readString(data.discipline)
 
-  if (kind === "relationship" && impact === "滋养") {
-    return "#86efac"
-  }
-  if (kind === "relationship" && impact === "消耗") {
-    return "#fde68a"
-  }
-  if (kind === "relationship" && impact === "混合") {
-    return "#fda4af"
-  }
-  if (kind === "entry" && discipline === "社会学") {
-    return "#bbf7d0"
-  }
-  if (kind === "entry") {
-    return "#bfdbfe"
-  }
-  if (kind === "concept") {
-    return "#f8fafc"
-  }
+  if (kind === "relationship" && impact === "滋养") return readGraphPaletteColor("green").bg
+  if (kind === "relationship" && impact === "消耗") return readGraphPaletteColor("amber").bg
+  if (kind === "relationship" && impact === "混合") return readGraphPaletteColor("red").bg
+  if (kind === "entry" && discipline === "社会学") return readGraphPaletteColor("green").bg
+  if (kind === "entry") return readGraphPaletteColor("blue").bg
+  if (kind === "concept") return readGraphPaletteColor("teal").bg
 
-  return "#e2e8f0"
+  return readGraphPaletteColor("blue").border
 }
 
 function fallbackLabelColor(data: GraphElementData) {
@@ -1485,13 +1474,13 @@ function fallbackLabelColor(data: GraphElementData) {
 function fallbackLinkColor(data: GraphElementData) {
   switch (readString(data.linkKind)) {
     case "contains":
-      return "#22c55e"
+      return readGraphPaletteColor("green").border
     case "expresses":
-      return "#60a5fa"
+      return readGraphPaletteColor("blue").border
     case "pattern":
-      return "#fb7185"
+      return readGraphPaletteColor("red").border
     default:
-      return "#94a3b8"
+      return readGraphPaletteColor("blue").border
   }
 }
 

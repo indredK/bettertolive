@@ -1,4 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useTranslation } from "react-i18next"
+import { toast } from "sonner"
 
 import { getBetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { workspaceQueryKeys } from "@/features/bettertolive/queries/workspace-query-keys"
@@ -11,6 +13,7 @@ export type SaveJourneyPayload = {
 
 export function useSaveJourneyMutation() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: async ({ growth, memory }: SaveJourneyPayload) => {
@@ -24,6 +27,9 @@ export function useSaveJourneyMutation() {
         queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.snapshot() }),
         queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.journey() }),
       ])
+    },
+    onError: (error) => {
+      toast.error(t("common.toast.saveFailed"), { description: String(error) })
     },
   })
 }

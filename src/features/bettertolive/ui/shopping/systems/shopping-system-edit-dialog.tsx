@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod/v4"
 import { toast } from "sonner"
 
+import { useDirtyConfirm } from "@/features/bettertolive/hooks/use-dirty-confirm"
+
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -157,140 +159,148 @@ export function ShoppingSystemEditDialog({
     }
   }
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
-      if (!confirmed) return
-    }
-    if (!open) onClose()
-  }
+  const { handleOpenChange, dirtyConfirmDialog } = useDirtyConfirm({
+    isDirty: form.formState.isDirty,
+    confirmMessage: t("common.confirm.unsavedChanges"),
+    cancelLabel: t("common.actions.cancel"),
+    confirmLabel: t("common.actions.confirm"),
+  })
 
   return (
-    <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent
-        className={cn(
-          "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1240px,calc(100vw-3rem))]",
-          SHOPPING_DIALOG_CONTENT_CLASS,
-        )}
-      >
-        <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
-          <DialogTitle>
-            {editing.isNew ? t("shopping.system.create") : t("shopping.system.edit")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            void handleSubmit()
-          }}
-        >
-          <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-            <div
-              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-            >
-              <div className="shrink-0 text-sm font-medium">
-                {t("shopping.systems.form.basicInfo")}
-              </div>
-              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.name")}</Label>
-                  <Input
-                    autoFocus
-                    value={name}
-                    onChange={(event) =>
-                      form.setValue("name", event.target.value, { shouldValidate: true })
-                    }
-                    className={SHOPPING_DIALOG_FIELD_CLASS}
-                  />
-                  {editing.isNew && name.trim() && (
-                    <div className="text-muted-foreground text-[11px]">
-                      {t("shopping.systems.form.autoId")}{" "}
-                      <code className="bg-muted rounded px-1">{slugifySystemId(name)}</code>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.summary")}</Label>
-                  <Textarea
-                    value={summary}
-                    onChange={(event) =>
-                      form.setValue("summary", event.target.value, { shouldValidate: true })
-                    }
-                    rows={5}
-                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.keyQuestion")}</Label>
-                  <Textarea
-                    value={keyQuestion}
-                    onChange={(event) =>
-                      form.setValue("keyQuestion", event.target.value, { shouldValidate: true })
-                    }
-                    rows={4}
-                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.secondaryGroups")}</Label>
-                  <Textarea
-                    value={secondaryGroups}
-                    onChange={(event) =>
-                      form.setValue("secondaryGroups", event.target.value, {
-                        shouldValidate: true,
-                      })
-                    }
-                    rows={4}
-                    placeholder={t("shopping.systems.form.secondaryGroupsPlaceholder")}
-                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div
-              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-            >
-              <div className="shrink-0 text-sm font-medium">
-                {t("shopping.systems.form.assignItems")}
-              </div>
-              <div className="mt-3 min-h-0 flex-1 overflow-hidden">
-                <ShoppingItemShuttle
-                  items={shopping.items}
-                  attributeDefinitions={shopping.attributeDefinitions}
-                  selectedIds={validSelectedItemIds}
-                  onChange={setSelectedItemIds}
-                  scope="system"
-                />
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
-          {!editing.isNew && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isPending}
-              className="mr-auto"
-            >
-              {t("common.actions.delete")}
-            </Button>
+    <>
+      <Dialog open onOpenChange={handleOpenChange(onClose)}>
+        <DialogContent
+          className={cn(
+            "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1240px,calc(100vw-3rem))]",
+            SHOPPING_DIALOG_CONTENT_CLASS,
           )}
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("common.actions.cancel")}
-          </Button>
-          <Button type="submit" disabled={!form.formState.isValid || isPending}>
-            {isPending ? t("common.actions.saving") : t("common.actions.save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        >
+          <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
+            <DialogTitle>
+              {editing.isNew ? t("shopping.system.create") : t("shopping.system.edit")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void handleSubmit()
+            }}
+          >
+            <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+              <div
+                className={cn(
+                  SHOPPING_DIALOG_SECTION_CLASS,
+                  "flex min-h-0 flex-col overflow-hidden",
+                )}
+              >
+                <div className="shrink-0 text-sm font-medium">
+                  {t("shopping.systems.form.basicInfo")}
+                </div>
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.systems.form.name")}</Label>
+                    <Input
+                      autoFocus
+                      value={name}
+                      onChange={(event) =>
+                        form.setValue("name", event.target.value, { shouldValidate: true })
+                      }
+                      className={SHOPPING_DIALOG_FIELD_CLASS}
+                    />
+                    {editing.isNew && name.trim() && (
+                      <div className="text-muted-foreground text-[11px]">
+                        {t("shopping.systems.form.autoId")}{" "}
+                        <code className="bg-muted rounded px-1">{slugifySystemId(name)}</code>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.systems.form.summary")}</Label>
+                    <Textarea
+                      value={summary}
+                      onChange={(event) =>
+                        form.setValue("summary", event.target.value, { shouldValidate: true })
+                      }
+                      rows={5}
+                      className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.systems.form.keyQuestion")}</Label>
+                    <Textarea
+                      value={keyQuestion}
+                      onChange={(event) =>
+                        form.setValue("keyQuestion", event.target.value, { shouldValidate: true })
+                      }
+                      rows={4}
+                      className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.systems.form.secondaryGroups")}</Label>
+                    <Textarea
+                      value={secondaryGroups}
+                      onChange={(event) =>
+                        form.setValue("secondaryGroups", event.target.value, {
+                          shouldValidate: true,
+                        })
+                      }
+                      rows={4}
+                      placeholder={t("shopping.systems.form.secondaryGroupsPlaceholder")}
+                      className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={cn(
+                  SHOPPING_DIALOG_SECTION_CLASS,
+                  "flex min-h-0 flex-col overflow-hidden",
+                )}
+              >
+                <div className="shrink-0 text-sm font-medium">
+                  {t("shopping.systems.form.assignItems")}
+                </div>
+                <div className="mt-3 min-h-0 flex-1 overflow-hidden">
+                  <ShoppingItemShuttle
+                    items={shopping.items}
+                    attributeDefinitions={shopping.attributeDefinitions}
+                    selectedIds={validSelectedItemIds}
+                    onChange={setSelectedItemIds}
+                    scope="system"
+                  />
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
+            {!editing.isNew && (
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isPending}
+                className="mr-auto"
+              >
+                {t("common.actions.delete")}
+              </Button>
+            )}
+            <Button variant="outline" onClick={onClose} disabled={isPending}>
+              {t("common.actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={!form.formState.isValid || isPending}>
+              {isPending ? t("common.actions.saving") : t("common.actions.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {dirtyConfirmDialog}
+    </>
   )
 }
 

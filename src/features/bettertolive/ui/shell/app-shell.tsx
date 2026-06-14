@@ -28,6 +28,7 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { Input } from "@/components/ui/input"
 import type { AppView } from "@/features/bettertolive/types"
 import {
@@ -880,7 +881,7 @@ export function BetterToLiveAppShell() {
                 transition={APP_FADE_TRANSITION}
                 className={cn(!isStackedLayout && "h-full min-h-0 flex-1")}
               >
-                {pageContent}
+                <ErrorBoundary>{pageContent}</ErrorBoundary>
               </m.div>
             </AnimatePresence>
           </div>

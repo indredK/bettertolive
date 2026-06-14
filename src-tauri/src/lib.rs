@@ -130,14 +130,15 @@ pub fn run() {
             let app_data_dir = app
                 .path()
                 .app_data_dir()
-                .expect("failed to resolve app data dir");
+                .map_err(|e| format!("failed to resolve app data dir: {}", e))?;
 
-            std::fs::create_dir_all(&app_data_dir).expect("failed to create app data dir");
+            std::fs::create_dir_all(&app_data_dir)
+                .map_err(|e| format!("failed to create app data dir: {}", e))?;
 
             let db_path = app_data_dir.join("bettertolive.db");
 
-            let conn =
-                shopping::db::initialize_database(&db_path).expect("failed to initialize database");
+            let conn = shopping::db::initialize_database(&db_path)
+                .map_err(|e| format!("failed to initialize database: {}", e))?;
 
             app.manage(AppState {
                 db: Mutex::new(conn),

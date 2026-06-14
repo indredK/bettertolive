@@ -10,6 +10,10 @@ import {
   Waypoints,
 } from "lucide-react"
 import { useMemo, useState } from "react"
+/* eslint-disable react-hooks/incompatible-library */
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 import { joinListText, splitListText, uniqueList } from "@/lib/list-utils"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -60,6 +64,7 @@ import type {
 } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
+import { useDirtyConfirm } from "@/features/bettertolive/hooks/use-dirty-confirm"
 import { cn } from "@/lib/utils"
 
 const BELIEF_DOMAINS = [
@@ -1199,6 +1204,25 @@ function BeliefSignalCard({ entry, subtle = false }: { entry: BeliefEntry; subtl
   )
 }
 
+const beliefFormSchema = z.object({
+  title: z.string().min(1, "beliefs.error.required"),
+  statement: z.string().min(1, "beliefs.error.required"),
+  description: z.string(),
+  domain: z.string(),
+  layer: z.string(),
+  stability: z.string(),
+  source: z.string(),
+  impact: z.string(),
+  secondaryDomains: z.array(z.string()),
+  cbtLayer: z.string().nullable(),
+  cognitiveDistortions: z.array(z.string()),
+  defenseMechanism: z.string().nullable(),
+  attachmentNote: z.string(),
+  tags: z.string(),
+})
+
+type BeliefFormValues = z.infer<typeof beliefFormSchema>
+
 function BeliefEditDialog({
   editing,
   onClose,
@@ -1212,65 +1236,76 @@ function BeliefEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.entry
-  const [title, setTitle] = useState(seed?.title ?? "")
-  const [statement, setStatement] = useState(seed?.statement ?? "")
-  const [description, setDescription] = useState(seed?.description ?? "")
-  const [domain, setDomain] = useState<BeliefDomain>(seed?.domain ?? BELIEF_DOMAINS[0])
-  const [layer, setLayer] = useState<BeliefLayer>(seed?.layer ?? BELIEF_LAYERS[0])
-  const [stability, setStability] = useState<BeliefStability>(
-    seed?.stability ?? BELIEF_STABILITIES[0],
-  )
-  const [source, setSource] = useState<BeliefSource>(seed?.source ?? BELIEF_SOURCES[0])
-  const [impact, setImpact] = useState<BeliefImpact>(seed?.impact ?? BELIEF_IMPACTS[0])
-  const [secondaryDomains, setSecondaryDomains] = useState<BeliefDomain[]>(
-    seed?.secondaryDomains ?? [],
-  )
-  const [cbtLayer, setCbtLayer] = useState<BeliefCbtLayer | null>(seed?.cbtLayer ?? null)
-  const [cognitiveDistortions, setCognitiveDistortions] = useState<CognitiveDistortion[]>(
-    seed?.cognitiveDistortions ?? [],
-  )
-  const [defenseMechanism, setDefenseMechanism] = useState<DefenseMechanism | null>(
-    seed?.defenseMechanism ?? null,
-  )
-  const [attachmentNote, setAttachmentNote] = useState(seed?.attachmentNote ?? "")
-  const [tags, setTags] = useState(joinListText(seed?.tags, "，"))
 
-  const canSubmit = title.trim().length > 0 && statement.trim().length > 0
+  const form = useForm<BeliefFormValues>({
+    resolver: zodResolver(beliefFormSchema),
+    defaultValues: {
+      title: seed?.title ?? "",
+      statement: seed?.statement ?? "",
+      description: seed?.description ?? "",
+      domain: seed?.domain ?? BELIEF_DOMAINS[0],
+      layer: seed?.layer ?? BELIEF_LAYERS[0],
+      stability: seed?.stability ?? BELIEF_STABILITIES[0],
+      source: seed?.source ?? BELIEF_SOURCES[0],
+      impact: seed?.impact ?? BELIEF_IMPACTS[0],
+      secondaryDomains: seed?.secondaryDomains ?? [],
+      cbtLayer: seed?.cbtLayer ?? null,
+      cognitiveDistortions: seed?.cognitiveDistortions ?? [],
+      defenseMechanism: seed?.defenseMechanism ?? null,
+      attachmentNote: seed?.attachmentNote ?? "",
+      tags: joinListText(seed?.tags, "，"),
+    },
+  })
+
+  const {
+    watch,
+    setValue,
+    formState: { isValid, isDirty },
+  } = form
+
+  const domain = watch("domain")
 
   const handleDomainChange = (nextDomain: BeliefDomain) => {
-    setDomain(nextDomain)
-    setSecondaryDomains((current) => current.filter((item) => item !== nextDomain))
+    setValue("domain", nextDomain, { shouldDirty: true })
+    const currentSecondary = form.getValues("secondaryDomains")
+    setValue(
+      "secondaryDomains",
+      currentSecondary.filter((item) => item !== nextDomain),
+      { shouldDirty: true },
+    )
   }
 
   const createAutoRevision = (): BeliefRevision | null => {
     if (!seed) return null
 
+    const values = form.getValues()
     const changedFields: BeliefRevision["changedFields"] = []
     if (
-      seed.title !== title.trim() ||
-      seed.statement !== statement.trim() ||
-      seed.description !== description.trim() ||
-      seed.domain !== domain ||
-      seed.layer !== layer ||
-      seed.source !== source ||
+      seed.title !== values.title.trim() ||
+      seed.statement !== values.statement.trim() ||
+      seed.description !== values.description.trim() ||
+      seed.domain !== values.domain ||
+      seed.layer !== values.layer ||
+      seed.source !== values.source ||
       joinListText(seed.secondaryDomains, "，") !==
         joinListText(
-          secondaryDomains.filter((item) => item !== domain),
+          values.secondaryDomains.filter((item) => item !== values.domain),
           "，",
         ) ||
-      (seed.cbtLayer ?? null) !== cbtLayer ||
-      joinListText(seed.cognitiveDistortions, "，") !== joinListText(cognitiveDistortions, "，") ||
-      (seed.defenseMechanism ?? null) !== defenseMechanism ||
-      (seed.attachmentNote ?? "") !== attachmentNote.trim() ||
+      (seed.cbtLayer ?? null) !== values.cbtLayer ||
+      joinListText(seed.cognitiveDistortions, "，") !==
+        joinListText(values.cognitiveDistortions, "，") ||
+      (seed.defenseMechanism ?? null) !== values.defenseMechanism ||
+      (seed.attachmentNote ?? "") !== values.attachmentNote.trim() ||
       joinListText(seed.tags, "，") !==
-        joinListText(uniqueList(splitListText(tags, /[,\n，]/)), "，")
+        joinListText(uniqueList(splitListText(values.tags, /[,\n，]/)), "，")
     ) {
       changedFields.push("内容")
     }
-    if (seed.stability !== stability) {
+    if (seed.stability !== values.stability) {
       changedFields.push("稳定性")
     }
-    if (seed.impact !== impact) {
+    if (seed.impact !== values.impact) {
       changedFields.push("影响")
     }
 
@@ -1284,45 +1319,42 @@ function BeliefEditDialog({
     }
   }
 
-  const handleSubmit = async () => {
-    if (!canSubmit) {
-      toast.error(t("beliefs.error.required"))
-      return
-    }
-
+  const handleFormSubmit = form.handleSubmit(async (values) => {
     const autoRevision = createAutoRevision()
-    const form: BeliefEntryForm = {
+    const payload: BeliefEntryForm = {
       id: seed?.id,
-      title: title.trim(),
-      statement: statement.trim(),
-      description: description.trim(),
-      domain,
-      layer,
-      stability,
-      source,
-      impact,
-      secondaryDomains: secondaryDomains.filter((item) => item !== domain),
-      cbtLayer: cbtLayer ?? undefined,
-      cognitiveDistortions,
-      defenseMechanism: defenseMechanism ?? undefined,
-      attachmentNote: attachmentNote.trim() || undefined,
+      title: values.title.trim(),
+      statement: values.statement.trim(),
+      description: values.description.trim(),
+      domain: values.domain as BeliefDomain,
+      layer: values.layer as BeliefLayer,
+      stability: values.stability as BeliefStability,
+      source: values.source as BeliefSource,
+      impact: values.impact as BeliefImpact,
+      secondaryDomains: values.secondaryDomains.filter(
+        (item) => item !== values.domain,
+      ) as BeliefDomain[],
+      cbtLayer: (values.cbtLayer as BeliefCbtLayer | null) ?? undefined,
+      cognitiveDistortions: values.cognitiveDistortions as CognitiveDistortion[],
+      defenseMechanism: (values.defenseMechanism as DefenseMechanism | null) ?? undefined,
+      attachmentNote: values.attachmentNote.trim() || undefined,
       revisionHistory: autoRevision
         ? [...(seed?.revisionHistory ?? []), autoRevision]
         : (seed?.revisionHistory ?? []),
-      tags: uniqueList(splitListText(tags, /[,\n，]/)),
+      tags: uniqueList(splitListText(values.tags, /[,\n，]/)),
     }
 
     try {
       if (editing.isNew) {
-        await createBeliefEntry(form)
+        await createBeliefEntry(payload)
       } else {
-        await updateBeliefEntry(form)
+        await updateBeliefEntry(payload)
       }
       onSaved()
     } catch (error) {
       toast.error(String(error))
     }
-  }
+  })
 
   const handleDelete = () => {
     if (!seed) return
@@ -1351,8 +1383,15 @@ function BeliefEditDialog({
     }
   }
 
+  const { handleOpenChange, dirtyConfirmDialog } = useDirtyConfirm({
+    isDirty,
+    confirmMessage: t("common.confirm.unsavedChanges"),
+    cancelLabel: t("common.actions.cancel"),
+    confirmLabel: t("common.actions.confirm"),
+  })
+
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={handleOpenChange(onClose)}>
       <DialogContent className="border-foreground/10 bg-background flex max-h-[90vh] flex-col overflow-hidden border shadow-lg sm:max-w-[min(1080px,calc(100vw-3rem))]">
         <DialogHeader className="border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 sticky top-0 z-10 -mx-4 -mt-4 border-b px-4 pt-4 pr-12 pb-3 supports-[backdrop-filter]:backdrop-blur-xs">
           <DialogTitle>
@@ -1360,34 +1399,44 @@ function BeliefEditDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto pr-1 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+        <form
+          onSubmit={handleFormSubmit}
+          className="grid min-h-0 flex-1 gap-4 overflow-y-auto pr-1 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+        >
           <div className="border-foreground/10 bg-card/70 space-y-4 rounded-lg border p-4">
             <div className="text-foreground text-sm font-medium">{t("beliefs.form.basic")}</div>
-            <FieldTextInput
-              label={t("beliefs.field.title")}
-              value={title}
-              onChange={setTitle}
-              required
-            />
-            <FieldTextarea
-              label={t("beliefs.field.statement")}
-              value={statement}
-              onChange={setStatement}
-              rows={4}
-              required
-            />
-            <FieldTextarea
-              label={t("beliefs.field.description")}
-              value={description}
-              onChange={setDescription}
-              rows={5}
-            />
-            <FieldTextInput
-              label={t("beliefs.field.tags")}
-              value={tags}
-              onChange={setTags}
-              placeholder={t("common.form.tagsPlaceholder")}
-            />
+            <div className="space-y-1.5">
+              <Label>{t("beliefs.field.title")} *</Label>
+              <Input
+                {...form.register("title")}
+                placeholder=""
+                className="border-foreground/15 bg-background w-full shadow-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("beliefs.field.statement")} *</Label>
+              <Textarea
+                {...form.register("statement")}
+                rows={4}
+                className="border-foreground/15 bg-background w-full resize-none shadow-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("beliefs.field.description")}</Label>
+              <Textarea
+                {...form.register("description")}
+                rows={5}
+                className="border-foreground/15 bg-background w-full resize-none shadow-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label>{t("beliefs.field.tags")}</Label>
+              <Input
+                {...form.register("tags")}
+                placeholder={t("common.form.tagsPlaceholder")}
+                className="border-foreground/15 bg-background w-full shadow-sm"
+              />
+            </div>
           </div>
 
           <div className="border-foreground/10 bg-card/70 space-y-4 rounded-lg border p-4">
@@ -1395,85 +1444,151 @@ function BeliefEditDialog({
               {t("beliefs.form.classification")}
             </div>
             <div className="grid gap-3 min-[720px]:grid-cols-2">
-              <EnumSelect
-                label={t("beliefs.classification.domain.title")}
-                value={domain}
-                options={BELIEF_DOMAINS}
-                enumGroup="domain"
-                onChange={handleDomainChange}
+              <Controller
+                name="domain"
+                control={form.control}
+                render={({ field }) => (
+                  <EnumSelect
+                    label={t("beliefs.classification.domain.title")}
+                    value={field.value as BeliefDomain}
+                    options={BELIEF_DOMAINS}
+                    enumGroup="domain"
+                    onChange={handleDomainChange}
+                  />
+                )}
               />
-              <EnumSelect
-                label={t("beliefs.classification.layer.title")}
-                value={layer}
-                options={BELIEF_LAYERS}
-                enumGroup="layer"
-                onChange={setLayer}
+              <Controller
+                name="layer"
+                control={form.control}
+                render={({ field }) => (
+                  <EnumSelect
+                    label={t("beliefs.classification.layer.title")}
+                    value={field.value as BeliefLayer}
+                    options={BELIEF_LAYERS}
+                    enumGroup="layer"
+                    onChange={(v) => setValue("layer", v, { shouldDirty: true })}
+                  />
+                )}
               />
-              <EnumSelect
-                label={t("beliefs.classification.stability.title")}
-                value={stability}
-                options={BELIEF_STABILITIES}
-                enumGroup="stability"
-                onChange={setStability}
+              <Controller
+                name="stability"
+                control={form.control}
+                render={({ field }) => (
+                  <EnumSelect
+                    label={t("beliefs.classification.stability.title")}
+                    value={field.value as BeliefStability}
+                    options={BELIEF_STABILITIES}
+                    enumGroup="stability"
+                    onChange={(v) => setValue("stability", v, { shouldDirty: true })}
+                  />
+                )}
               />
-              <EnumSelect
-                label={t("beliefs.classification.source.title")}
-                value={source}
-                options={BELIEF_SOURCES}
-                enumGroup="source"
-                onChange={setSource}
+              <Controller
+                name="source"
+                control={form.control}
+                render={({ field }) => (
+                  <EnumSelect
+                    label={t("beliefs.classification.source.title")}
+                    value={field.value as BeliefSource}
+                    options={BELIEF_SOURCES}
+                    enumGroup="source"
+                    onChange={(v) => setValue("source", v, { shouldDirty: true })}
+                  />
+                )}
               />
-              <EnumSelect
-                label={t("beliefs.field.impact")}
-                value={impact}
-                options={BELIEF_IMPACTS}
-                enumGroup="impact"
-                onChange={setImpact}
+              <Controller
+                name="impact"
+                control={form.control}
+                render={({ field }) => (
+                  <EnumSelect
+                    label={t("beliefs.field.impact")}
+                    value={field.value as BeliefImpact}
+                    options={BELIEF_IMPACTS}
+                    enumGroup="impact"
+                    onChange={(v) => setValue("impact", v, { shouldDirty: true })}
+                  />
+                )}
               />
-              <OptionalEnumSelect
-                label={t("beliefs.field.cbtLayer")}
-                value={cbtLayer}
-                options={BELIEF_CBT_LAYERS}
-                enumGroup="cbtLayer"
-                onChange={setCbtLayer}
+              <Controller
+                name="cbtLayer"
+                control={form.control}
+                render={({ field }) => (
+                  <OptionalEnumSelect
+                    label={t("beliefs.field.cbtLayer")}
+                    value={field.value as BeliefCbtLayer | null}
+                    options={BELIEF_CBT_LAYERS}
+                    enumGroup="cbtLayer"
+                    onChange={(v) => setValue("cbtLayer", v, { shouldDirty: true })}
+                  />
+                )}
               />
-              <OptionalEnumSelect
-                label={t("beliefs.field.defenseMechanism")}
-                value={defenseMechanism}
-                options={DEFENSE_MECHANISMS}
-                enumGroup="defenseMechanism"
-                onChange={setDefenseMechanism}
+              <Controller
+                name="defenseMechanism"
+                control={form.control}
+                render={({ field }) => (
+                  <OptionalEnumSelect
+                    label={t("beliefs.field.defenseMechanism")}
+                    value={field.value as DefenseMechanism | null}
+                    options={DEFENSE_MECHANISMS}
+                    enumGroup="defenseMechanism"
+                    onChange={(v) => setValue("defenseMechanism", v, { shouldDirty: true })}
+                  />
+                )}
               />
             </div>
 
-            <CheckboxGroup
-              label={t("beliefs.field.secondaryDomains")}
-              values={secondaryDomains}
-              options={BELIEF_DOMAINS.filter((item) => item !== domain)}
-              enumGroup="domain"
-              onToggle={(value) => setSecondaryDomains((current) => toggleValue(current, value))}
+            <Controller
+              name="secondaryDomains"
+              control={form.control}
+              render={({ field }) => (
+                <CheckboxGroup
+                  label={t("beliefs.field.secondaryDomains")}
+                  values={field.value as BeliefDomain[]}
+                  options={BELIEF_DOMAINS.filter((item) => item !== domain)}
+                  enumGroup="domain"
+                  onToggle={(value) =>
+                    setValue(
+                      "secondaryDomains",
+                      toggleValue(field.value as BeliefDomain[], value),
+                      { shouldDirty: true },
+                    )
+                  }
+                />
+              )}
             />
-            <CheckboxGroup
-              label={t("beliefs.field.cognitiveDistortions")}
-              values={cognitiveDistortions}
-              options={COGNITIVE_DISTORTIONS}
-              enumGroup="cognitiveDistortion"
-              onToggle={(value) =>
-                setCognitiveDistortions((current) => toggleValue(current, value))
-              }
+            <Controller
+              name="cognitiveDistortions"
+              control={form.control}
+              render={({ field }) => (
+                <CheckboxGroup
+                  label={t("beliefs.field.cognitiveDistortions")}
+                  values={field.value as CognitiveDistortion[]}
+                  options={COGNITIVE_DISTORTIONS}
+                  enumGroup="cognitiveDistortion"
+                  onToggle={(value) =>
+                    setValue(
+                      "cognitiveDistortions",
+                      toggleValue(field.value as CognitiveDistortion[], value),
+                      { shouldDirty: true },
+                    )
+                  }
+                />
+              )}
             />
-            <FieldTextarea
-              label={t("beliefs.field.attachmentNote")}
-              value={attachmentNote}
-              onChange={setAttachmentNote}
-              rows={4}
-            />
+            <div className="space-y-1.5">
+              <Label>{t("beliefs.field.attachmentNote")}</Label>
+              <Textarea
+                {...form.register("attachmentNote")}
+                rows={4}
+                className="border-foreground/15 bg-background w-full resize-none shadow-sm"
+              />
+            </div>
           </div>
-        </div>
+        </form>
 
         <DialogFooter className="border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 sticky bottom-0 z-10 gap-2 supports-[backdrop-filter]:backdrop-blur-xs">
           {!editing.isNew ? (
-            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+            <Button variant="destructive" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-3.5" />
               {t("common.actions.delete")}
             </Button>
@@ -1481,70 +1596,13 @@ function BeliefEditDialog({
           <Button variant="outline" onClick={onClose}>
             {t("common.actions.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit}>
+          <Button type="submit" disabled={!isValid}>
             {t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
+      {dirtyConfirmDialog}
     </Dialog>
-  )
-}
-
-function FieldTextInput({
-  label,
-  value,
-  onChange,
-  placeholder,
-  required = false,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  required?: boolean
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label>
-        {label}
-        {required ? " *" : ""}
-      </Label>
-      <Input
-        value={value}
-        placeholder={placeholder}
-        onChange={(event) => onChange(event.target.value)}
-        className="border-foreground/15 bg-background w-full shadow-sm"
-      />
-    </div>
-  )
-}
-
-function FieldTextarea({
-  label,
-  value,
-  onChange,
-  rows,
-  required = false,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-  rows: number
-  required?: boolean
-}) {
-  return (
-    <div className="space-y-1.5">
-      <Label>
-        {label}
-        {required ? " *" : ""}
-      </Label>
-      <Textarea
-        value={value}
-        rows={rows}
-        onChange={(event) => onChange(event.target.value)}
-        className="border-foreground/15 bg-background w-full resize-none shadow-sm"
-      />
-    </div>
   )
 }
 

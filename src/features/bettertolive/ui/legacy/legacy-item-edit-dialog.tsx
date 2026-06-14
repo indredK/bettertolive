@@ -386,7 +386,7 @@ export function LegacyItemEditDialog({
 
         <DialogFooter className={LEGACY_DIALOG_FOOTER_CLASS}>
           {!editing.isNew ? (
-            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+            <Button variant="destructive" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-4" />
               {t("common.actions.delete")}
             </Button>

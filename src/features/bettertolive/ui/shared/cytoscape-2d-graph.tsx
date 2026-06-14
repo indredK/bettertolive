@@ -585,7 +585,7 @@ export function Cytoscape2DGraph({
 
       {graphError ? (
         <div className="absolute inset-x-6 bottom-6 rounded-lg border border-amber-200 bg-amber-50/95 px-4 py-3 text-sm text-amber-900 shadow-sm backdrop-blur">
-          图谱暂时无法显示：{graphError}
+          {graphError}
         </div>
       ) : null}
     </div>

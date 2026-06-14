@@ -53,6 +53,9 @@
   "empty": {
     "noData": "暂无分布数据。"
   },
+  "graph": {
+    "renderError": "图谱暂时无法显示：{{error}}"
+  },
   "validation": {
     "required": "请填写{{field}}",
     "maxLength": "{{field}}最多 {{count}} 个字符",

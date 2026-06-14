@@ -77,8 +77,9 @@ fn create_schema(conn: &Connection) -> SqliteResult<()> {
 
 fn seed_tables(conn: &Connection) -> SqliteResult<()> {
     let seed_json = include_str!("seed.json");
-    let seed: serde_json::Value =
-        serde_json::from_str(seed_json).expect("Failed to parse legacy seed.json");
+    let seed: serde_json::Value = serde_json::from_str(seed_json).map_err(|e| {
+        rusqlite::Error::InvalidParameterName(format!("Failed to parse legacy seed.json: {}", e))
+    })?;
 
     if table_is_empty(conn, "legacy_items")? {
         if let Some(items) = seed["items"].as_array() {

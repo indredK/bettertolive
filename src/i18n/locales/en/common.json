@@ -49,6 +49,9 @@
   "empty": {
     "noData": "No data to show."
   },
+  "graph": {
+    "renderError": "Failed to render graph: {{error}}"
+  },
   "validation": {
     "required": "Please enter {{field}}",
     "maxLength": "{{field}} must be at most {{count}} characters",

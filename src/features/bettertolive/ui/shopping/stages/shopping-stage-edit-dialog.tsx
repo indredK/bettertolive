@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod/v4"
 import { toast } from "sonner"
 
+import { useDirtyConfirm } from "@/features/bettertolive/hooks/use-dirty-confirm"
+
 import { AnimatedIconButton, Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -224,142 +226,150 @@ export function ShoppingStageEditDialog({
     }
   }
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
-      if (!confirmed) return
-    }
-    if (!open) onClose()
-  }
+  const { handleOpenChange, dirtyConfirmDialog } = useDirtyConfirm({
+    isDirty: form.formState.isDirty,
+    confirmMessage: t("common.confirm.unsavedChanges"),
+    cancelLabel: t("common.actions.cancel"),
+    confirmLabel: t("common.actions.confirm"),
+  })
 
   return (
-    <Dialog open onOpenChange={handleOpenChange}>
-      <DialogContent
-        className={cn(
-          "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
-          SHOPPING_DIALOG_CONTENT_CLASS,
-        )}
-      >
-        <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
-          <DialogTitle>
-            {editing.isNew ? t("shopping.stage.create") : t("shopping.stage.edit")}
-          </DialogTitle>
-        </DialogHeader>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            void handleSubmit()
-          }}
-        >
-          <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-            <div
-              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-            >
-              <div className="shrink-0">
-                <div className="text-sm font-medium">{t("shopping.stage.basicInfo")}</div>
-              </div>
-              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.name")} *</Label>
-                  <Input
-                    autoFocus
-                    value={stageName}
-                    onChange={(event) =>
-                      form.setValue("name", event.target.value, { shouldValidate: true })
-                    }
-                    className={SHOPPING_DIALOG_FIELD_CLASS}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.description")}</Label>
-                  <Textarea
-                    value={stageDescription}
-                    onChange={(event) =>
-                      form.setValue("description", event.target.value, { shouldValidate: true })
-                    }
-                    rows={4}
-                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.focus")}</Label>
-                  <Textarea
-                    value={stageFocus}
-                    onChange={(event) =>
-                      form.setValue("focus", event.target.value, { shouldValidate: true })
-                    }
-                    rows={5}
-                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div
-              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-            >
-              <div className="flex shrink-0 items-center justify-between gap-3">
-                <div className="text-sm font-medium">{t("shopping.stage.items")}</div>
-              </div>
-
-              <ShoppingItemShuttle
-                items={shopping.items}
-                attributeDefinitions={shopping.attributeDefinitions}
-                selectedIds={selectedItemIds}
-                onChange={syncItemsFromIds}
-                scope="stage"
-                className="shrink-0"
-              />
-
-              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-                {draft.items.length === 0 ? (
-                  <EmptyStageHint
-                    title={t("shopping.stage.emptyDimensions")}
-                    description={t("shopping.stage.emptyShuttleHint")}
-                  />
-                ) : (
-                  <div className="grid gap-3 pt-4 xl:grid-cols-2">
-                    {draft.items.map((stageItem) => {
-                      const item = itemMap.get(stageItem.itemId)
-                      if (!item) return null
-                      return (
-                        <StageItemEditorCard
-                          key={stageItem.itemId}
-                          item={item}
-                          stageItem={stageItem}
-                          onRemoveItem={() => removeStageItem(stageItem.itemId)}
-                          onUpdateTier={updateTier}
-                        />
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </form>
-
-        <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
-          {!editing.isNew && (
-            <Button
-              variant="destructive"
-              onClick={handleDelete}
-              disabled={isPending}
-              className="mr-auto"
-            >
-              {t("common.actions.delete")}
-            </Button>
+    <>
+      <Dialog open onOpenChange={handleOpenChange(onClose)}>
+        <DialogContent
+          className={cn(
+            "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
+            SHOPPING_DIALOG_CONTENT_CLASS,
           )}
-          <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("common.actions.cancel")}
-          </Button>
-          <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("common.actions.saving") : t("common.actions.save")}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        >
+          <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
+            <DialogTitle>
+              {editing.isNew ? t("shopping.stage.create") : t("shopping.stage.edit")}
+            </DialogTitle>
+          </DialogHeader>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void handleSubmit()
+            }}
+          >
+            <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+              <div
+                className={cn(
+                  SHOPPING_DIALOG_SECTION_CLASS,
+                  "flex min-h-0 flex-col overflow-hidden",
+                )}
+              >
+                <div className="shrink-0">
+                  <div className="text-sm font-medium">{t("shopping.stage.basicInfo")}</div>
+                </div>
+                <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.stage.name")} *</Label>
+                    <Input
+                      autoFocus
+                      value={stageName}
+                      onChange={(event) =>
+                        form.setValue("name", event.target.value, { shouldValidate: true })
+                      }
+                      className={SHOPPING_DIALOG_FIELD_CLASS}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.stage.description")}</Label>
+                    <Textarea
+                      value={stageDescription}
+                      onChange={(event) =>
+                        form.setValue("description", event.target.value, { shouldValidate: true })
+                      }
+                      rows={4}
+                      className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label>{t("shopping.stage.focus")}</Label>
+                    <Textarea
+                      value={stageFocus}
+                      onChange={(event) =>
+                        form.setValue("focus", event.target.value, { shouldValidate: true })
+                      }
+                      rows={5}
+                      className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={cn(
+                  SHOPPING_DIALOG_SECTION_CLASS,
+                  "flex min-h-0 flex-col overflow-hidden",
+                )}
+              >
+                <div className="flex shrink-0 items-center justify-between gap-3">
+                  <div className="text-sm font-medium">{t("shopping.stage.items")}</div>
+                </div>
+
+                <ShoppingItemShuttle
+                  items={shopping.items}
+                  attributeDefinitions={shopping.attributeDefinitions}
+                  selectedIds={selectedItemIds}
+                  onChange={syncItemsFromIds}
+                  scope="stage"
+                  className="shrink-0"
+                />
+
+                <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                  {draft.items.length === 0 ? (
+                    <EmptyStageHint
+                      title={t("shopping.stage.emptyDimensions")}
+                      description={t("shopping.stage.emptyShuttleHint")}
+                    />
+                  ) : (
+                    <div className="grid gap-3 pt-4 xl:grid-cols-2">
+                      {draft.items.map((stageItem) => {
+                        const item = itemMap.get(stageItem.itemId)
+                        if (!item) return null
+                        return (
+                          <StageItemEditorCard
+                            key={stageItem.itemId}
+                            item={item}
+                            stageItem={stageItem}
+                            onRemoveItem={() => removeStageItem(stageItem.itemId)}
+                            onUpdateTier={updateTier}
+                          />
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </form>
+
+          <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
+            {!editing.isNew && (
+              <Button
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isPending}
+                className="mr-auto"
+              >
+                {t("common.actions.delete")}
+              </Button>
+            )}
+            <Button variant="outline" onClick={onClose} disabled={isPending}>
+              {t("common.actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={!canSubmit || isPending}>
+              {isPending ? t("common.actions.saving") : t("common.actions.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {dirtyConfirmDialog}
+    </>
   )
 }
 
