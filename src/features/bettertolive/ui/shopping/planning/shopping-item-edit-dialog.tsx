@@ -150,6 +150,20 @@ export function ShoppingItemEditDialog({
       return
     }
 
+    // 检查是否有子级名称为空，给出警告
+    const emptyNamedChildren = children
+      .map((child, index) => ({ child, index }))
+      .filter(({ child }) => child.name.trim().length === 0)
+    if (emptyNamedChildren.length > 0) {
+      const indices = emptyNamedChildren.map(({ index }) => index + 1).join(", ")
+      toast.warning(
+        t("shopping.warning.emptyChildren", {
+          defaultValue: `子级 ${indices} 名称为空，提交时将被自动移除`,
+          indices,
+        }),
+      )
+    }
+
     const form: ShoppingItemForm = {
       id: seed?.id,
       name: name.trim(),

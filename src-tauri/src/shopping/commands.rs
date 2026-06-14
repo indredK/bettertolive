@@ -164,9 +164,11 @@ pub fn reorder_system_definitions(
     state: State<AppState>,
     ordered_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
-    ShoppingRepository::reorder_system_definitions(&conn, &ordered_ids, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::reorder_system_definitions(tx, &ordered_ids, &now)
+    })
 }
 
 #[tauri::command]
@@ -176,8 +178,10 @@ pub fn assign_system_definition_items(
     system_id: String,
     item_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::replace_system_definition_items(&conn, &system_id, &item_ids)
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::replace_system_definition_items(tx, &system_id, &item_ids)
+    })
 }
 
 // =====================
@@ -397,9 +401,11 @@ pub fn reorder_space_definitions(
     state: State<AppState>,
     ordered_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
-    ShoppingRepository::reorder_space_definitions(&conn, &ordered_ids, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::reorder_space_definitions(tx, &ordered_ids, &now)
+    })
 }
 
 #[tauri::command]
@@ -409,8 +415,10 @@ pub fn assign_space_definition_items(
     space_id: String,
     item_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::replace_space_definition_items(&conn, &space_id, &item_ids)
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::replace_space_definition_items(tx, &space_id, &item_ids)
+    })
 }
 
 // =====================
@@ -600,8 +608,10 @@ pub struct StageTemplateFormDto {
     #[serde(default)]
     pub focus: String,
     #[serde(default)]
+    #[allow(dead_code)]
     pub system_dimension_ids: Vec<String>,
     #[serde(default)]
+    #[allow(dead_code)]
     pub space_dimension_ids: Vec<String>,
     pub items: Vec<StageItemFormDto>,
 }
@@ -652,8 +662,6 @@ pub fn create_shopping_stage_template(
             &form.name,
             &form.description,
             &form.focus,
-            &form.system_dimension_ids,
-            &form.space_dimension_ids,
             &items,
             false,
             &now,
@@ -682,8 +690,6 @@ pub fn update_shopping_stage_template(
             &form.name,
             &form.description,
             &form.focus,
-            &form.system_dimension_ids,
-            &form.space_dimension_ids,
             &items,
             true,
             &now,
@@ -709,9 +715,11 @@ pub fn reorder_stage_templates(
     state: State<AppState>,
     ordered_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
-    ShoppingRepository::reorder_stage_templates(&conn, &ordered_ids, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::reorder_stage_templates(tx, &ordered_ids, &now)
+    })
 }
 
 // =====================

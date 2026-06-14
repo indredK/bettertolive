@@ -146,11 +146,11 @@ export function formatPrice(amount: number) {
 }
 
 export function itemHasStatus(item: ShoppingItem, status: ShoppingStatus) {
-  return itemHasStatusSemantic(item, status === ShoppingStatus.Wanted ? "wanted" : "owned")
+  return itemPrimaryStatus(item) === status
 }
 
 export function itemPrimaryStatus(item: ShoppingItem) {
-  return itemHasStatus(item, ShoppingStatus.Wanted) ? ShoppingStatus.Wanted : ShoppingStatus.Owned
+  return itemHasStatusSemantic(item, "wanted") ? ShoppingStatus.Wanted : ShoppingStatus.Owned
 }
 
 export function itemHasStatusSemantic(
@@ -158,13 +158,18 @@ export function itemHasStatusSemantic(
   semanticKey: "owned" | "wanted",
   definitions?: ShoppingAttributeDefinition[],
 ) {
-  const statusCode =
-    findAttributeBySemanticKey(definitions, "status", semanticKey)?.code ??
-    (semanticKey === "wanted" ? ShoppingStatus.Wanted : ShoppingStatus.Owned)
+  // 统一语义：以"是否有子级为 Wanted"作为判断依据
+  // wanted → 任意子级是 Wanted；owned → 没有任何子级是 Wanted
+  const wantedCode =
+    findAttributeBySemanticKey(definitions, "status", "wanted")?.code ?? ShoppingStatus.Wanted
   if (item.children.length === 0) {
+    // 无子级：视为 owned
     return semanticKey === "owned"
   }
-  return item.children.some((child) => (child.status ?? ShoppingStatus.Owned) === statusCode)
+  const hasAnyWanted = item.children.some(
+    (child) => (child.status ?? ShoppingStatus.Owned) === wantedCode,
+  )
+  return semanticKey === "wanted" ? hasAnyWanted : !hasAnyWanted
 }
 
 export function itemPrimaryStatusCode(

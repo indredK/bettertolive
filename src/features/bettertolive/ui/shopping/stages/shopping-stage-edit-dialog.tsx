@@ -68,7 +68,18 @@ export function ShoppingStageEditDialog({
   const [draft, setDraft] = useState<StageEditorDraft>(() => createInitialDraft(seed, itemMap))
 
   const handleDraftChange = (updater: (current: StageEditorDraft) => StageEditorDraft) => {
-    setDraft((current) => normalizeStageDraft(updater(current), itemMap))
+    setDraft((current) => {
+      const result = normalizeStageDraft(updater(current), itemMap)
+      if (result.removedDuplicateIds.length > 0) {
+        toast.warning(
+          t("shopping.stage.duplicateItems", {
+            defaultValue: `已自动去除重复物品：${result.removedDuplicateIds.join(", ")}`,
+            ids: result.removedDuplicateIds.join(", "),
+          }),
+        )
+      }
+      return result.draft
+    })
   }
 
   const selectedItemIds = useMemo(() => draft.items.map((si) => si.itemId), [draft.items])
@@ -110,8 +121,10 @@ export function ShoppingStageEditDialog({
     }))
   }
 
+  const canSubmit = useMemo(() => draft.name.trim().length > 0, [draft.name])
+
   const handleSubmit = async () => {
-    if (!draft.name.trim()) {
+    if (!canSubmit) {
       toast.error(t("shopping.error.nameRequired", "请填写名称"))
       return
     }
@@ -304,7 +317,9 @@ export function ShoppingStageEditDialog({
           <Button variant="outline" onClick={onClose}>
             {t("shopping.cancel", "取消")}
           </Button>
-          <Button onClick={handleSubmit}>{t("shopping.save", "保存")}</Button>
+          <Button onClick={handleSubmit} disabled={!canSubmit}>
+            {t("shopping.save", "保存")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -431,18 +446,27 @@ function createInitialDraft(
       })),
     },
     itemMap,
-  )
+  ).draft
+}
+
+type NormalizeResult = {
+  draft: StageEditorDraft
+  removedDuplicateIds: string[]
 }
 
 function normalizeStageDraft(
   draft: StageEditorDraft,
   itemMap: Map<string, ShoppingItem>,
-): StageEditorDraft {
+): NormalizeResult {
   const seenItemIds = new Set<string>()
+  const removedDuplicateIds: string[] = []
 
   const items = draft.items
     .filter((stageItem) => {
-      if (seenItemIds.has(stageItem.itemId)) return false
+      if (seenItemIds.has(stageItem.itemId)) {
+        removedDuplicateIds.push(stageItem.itemId)
+        return false
+      }
       seenItemIds.add(stageItem.itemId)
       return true
     })
@@ -464,9 +488,12 @@ function normalizeStageDraft(
     .filter((stageItem): stageItem is ShoppingStageItem => Boolean(stageItem))
 
   return {
-    ...draft,
-    systemDimensionIds: [],
-    spaceDimensionIds: [],
-    items,
+    draft: {
+      ...draft,
+      systemDimensionIds: [],
+      spaceDimensionIds: [],
+      items,
+    },
+    removedDuplicateIds,
   }
 }

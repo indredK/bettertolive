@@ -388,6 +388,7 @@ impl ShoppingRepository {
             &spotlights,
             &boundary_entries,
             &lifestyle_collections,
+            &attribute_definitions,
         );
 
         Ok(ShoppingModuleDto {
@@ -411,16 +412,25 @@ impl ShoppingRepository {
         spotlights: &[ShoppingSpotlightDto],
         boundary_entries: &[ShoppingBoundaryEntryDto],
         lifestyle_collections: &[ShoppingLifestyleCollectionDto],
+        attribute_definitions: &[ShoppingAttributeDefinitionDto],
     ) -> ShoppingOverviewDto {
+        // 通过语义键动态解析代表 "wanted" 的 code，避免硬编码 "Wanted"
+        let wanted_code: String = attribute_definitions
+            .iter()
+            .find(|def| def.kind == "status" && def.semantic_key.as_deref() == Some("wanted"))
+            .map(|def| def.code.clone())
+            .unwrap_or_else(|| "Wanted".to_string());
+
         let owned_items = items
             .iter()
             .filter(|item| {
                 if item.children.is_empty() {
-                    true
+                    // 无子级的物品不计入 owned，也不计入 wanted（前端可自行计算 unclassified）
+                    false
                 } else {
                     item.children
                         .iter()
-                        .all(|child| child.status.as_deref() != Some("Wanted"))
+                        .all(|child| child.status.as_deref() != Some(&wanted_code))
                 }
             })
             .count();
@@ -429,7 +439,7 @@ impl ShoppingRepository {
             .filter(|item| {
                 item.children
                     .iter()
-                    .any(|child| child.status.as_deref() == Some("Wanted"))
+                    .any(|child| child.status.as_deref() == Some(&wanted_code))
             })
             .count();
         let total_children = items.iter().map(|item| item.children.len()).sum();
@@ -591,6 +601,23 @@ impl ShoppingRepository {
     }
 
     pub fn delete_system_definition(conn: &Connection, id: &str) -> Result<(), String> {
+        // 检查是否有物品仅依赖该系统标签
+        let orphan_count: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM shopping_items i
+                 WHERE i.is_archived = 0
+                   AND (SELECT COUNT(*) FROM shopping_item_systems WHERE item_id = i.id) = 1
+                   AND EXISTS(SELECT 1 FROM shopping_item_systems WHERE item_id = i.id AND system_id = ?1)",
+                params![id],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+        if orphan_count > 0 {
+            return Err(format!(
+                "cannot delete: {orphan_count} item(s) depend solely on this system tag; reassign them first"
+            ));
+        }
+
         conn.execute(
             "DELETE FROM shopping_item_systems WHERE system_id = ?1",
             params![id],
@@ -1026,6 +1053,14 @@ impl ShoppingRepository {
         expected_version: i32,
         now: &str,
     ) -> Result<ShoppingAttributeDefinitionDto, String> {
+        let existing_row = conn
+            .query_row(
+                "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
+                params![id],
+                row_to_attribute_definition,
+            )
+            .map_err(|e| format!("attribute definition not found: {}", e))?;
+
         let rows_affected = conn
             .execute(
                 "UPDATE shopping_attribute_definitions
@@ -1036,21 +1071,24 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
 
         if rows_affected == 0 {
-            // 可能是不存在，也可能是 version 不匹配（并发修改）；两者都让前端刷新后重试
-            return Err(
-                "conflict: attribute definition not found or modified elsewhere".to_string(),
-            );
+            return Err("conflict: attribute definition was modified elsewhere".to_string());
         }
 
-        let updated_row = conn
-            .query_row(
-                "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
-                params![id],
-                row_to_attribute_definition,
-            )
-            .map_err(|e| e.to_string())?;
-
-        Ok(Self::row_to_attribute_definition_dto(updated_row))
+        Ok(ShoppingAttributeDefinitionDto {
+            id: existing_row.id,
+            kind: existing_row.kind,
+            code: existing_row.code,
+            semantic_key: existing_row.semantic_key,
+            label: existing_row.label,
+            label_en: existing_row.label_en,
+            description: existing_row.description,
+            style_token: existing_row.style_token,
+            rank: existing_row.rank,
+            sort_order: existing_row.sort_order,
+            is_enabled: true,
+            is_system: existing_row.is_system,
+            version: expected_version + 1,
+        })
     }
 
     pub fn reorder_attribute_definitions(
@@ -1119,6 +1157,23 @@ impl ShoppingRepository {
     }
 
     pub fn delete_space_definition(conn: &Connection, id: &str) -> Result<(), String> {
+        // 检查是否有物品仅依赖该空间标签
+        let orphan_count: i32 = conn
+            .query_row(
+                "SELECT COUNT(*) FROM shopping_items i
+                 WHERE i.is_archived = 0
+                   AND (SELECT COUNT(*) FROM shopping_item_spaces WHERE item_id = i.id) = 1
+                   AND EXISTS(SELECT 1 FROM shopping_item_spaces WHERE item_id = i.id AND space_id = ?1)",
+                params![id],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+        if orphan_count > 0 {
+            return Err(format!(
+                "cannot delete: {orphan_count} item(s) depend solely on this space tag; reassign them first"
+            ));
+        }
+
         conn.execute(
             "DELETE FROM shopping_item_spaces WHERE space_id = ?1",
             params![id],
@@ -1370,7 +1425,6 @@ impl ShoppingRepository {
         Self::validate_item_children_attributes(conn, children, existing_codes.as_ref())?;
 
         if is_update {
-            Self::delete_stage_tiers_for_item_children(conn, id)?;
             conn.execute(
                 "UPDATE shopping_items SET
                     name = ?2, note = ?3, updated_at = ?4
@@ -1527,19 +1581,28 @@ impl ShoppingRepository {
                 existing.and_then(|e| e.depreciation_def_id.as_deref()),
             )?;
 
-            // 校验 channel_prices 中的 channel 代码
+            // 校验 channel_prices 中的 channel 代码（与 status/lifecycle/depreciation 一致的宽松验证）
             for ch in &child.channel_prices {
-                // compare resolved def_id against existing set of def_ids
                 let value = ch.channel.trim();
-                let new_def_id = Self::resolve_attribute_def_id(conn, "channel", Some(value))?;
-                let existing_matched = new_def_id.as_ref().is_some_and(|nid| {
-                    existing
-                        .map(|e| e.channel_def_ids.contains(nid))
-                        .unwrap_or(false)
-                });
-                if new_def_id.is_none() && !existing_matched {
-                    return Err(format!("invalid channel: {value} (disabled or not found)"));
+                if value.is_empty() {
+                    continue; // empty channel is skipped (will be filtered by caller)
                 }
+                // Try enabled attribute first, then fall back to existing (possibly disabled) def_id
+                let new_def_id = Self::resolve_attribute_def_id(conn, "channel", Some(value))?;
+                if new_def_id.is_some() {
+                    continue; // enabled channel, ok
+                }
+                // Check if it matches an existing (possibly disabled) definition
+                if let Some(existing) = existing {
+                    let any_def_id = Self::resolve_attribute_def_id_any(conn, "channel", value)?;
+                    if any_def_id
+                        .as_ref()
+                        .is_some_and(|id| existing.channel_def_ids.contains(id))
+                    {
+                        continue; // allowed: matching existing disabled channel
+                    }
+                }
+                return Err(format!("invalid channel: {value} (disabled or not found)"));
             }
         }
         Ok(())
@@ -1838,14 +1901,10 @@ impl ShoppingRepository {
         name: &str,
         description: &str,
         focus: &str,
-        system_dimension_ids: &[String],
-        space_dimension_ids: &[String],
         items: &[(String, Vec<String>, Vec<String>, Vec<String>)], // (item_id, low, base, up)
         is_update: bool,
         now: &str,
     ) -> Result<(), String> {
-        let _ = system_dimension_ids;
-        let _ = space_dimension_ids;
         let normalized_items = Self::normalize_stage_items(conn, items)?;
         let normalized_item_ids = normalized_items
             .iter()
