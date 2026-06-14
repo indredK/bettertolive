@@ -303,10 +303,10 @@ export function SocioeconomicsEntryEditDialog({
         ...socioeconomics,
         entries: nextEntries,
       })
-      toast.success(t("socioeconomics.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -314,9 +314,8 @@ export function SocioeconomicsEntryEditDialog({
     if (!editing.entry) return
 
     const confirmed = window.confirm(
-      t("socioeconomics.confirm.deleteEntry", {
-        title: editing.entry.title,
-        defaultValue: `确定删除「${editing.entry.title}」吗？`,
+      t("common.confirm.deleteItem", {
+        name: editing.entry.title,
       }),
     )
 
@@ -327,10 +326,10 @@ export function SocioeconomicsEntryEditDialog({
         ...socioeconomics,
         entries: socioeconomics.entries.filter((entry) => entry.id !== editing.entry?.id),
       })
-      toast.success(t("socioeconomics.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -493,14 +492,14 @@ export function SocioeconomicsEntryEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -549,10 +548,10 @@ export function SocioeconomicsGapEditDialog({
         ...socioeconomics,
         gaps: nextGaps,
       })
-      toast.success(t("socioeconomics.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -567,10 +566,10 @@ export function SocioeconomicsGapEditDialog({
         ...socioeconomics,
         gaps: socioeconomics.gaps.filter((gap) => gap.id !== editing.gap?.id),
       })
-      toast.success(t("socioeconomics.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -626,14 +625,14 @@ export function SocioeconomicsGapEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -674,10 +673,10 @@ export function SocioeconomicsPromptEditDialog({
         ...socioeconomics,
         reviewPrompts: nextPrompts,
       })
-      toast.success(t("socioeconomics.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -692,10 +691,10 @@ export function SocioeconomicsPromptEditDialog({
         ...socioeconomics,
         reviewPrompts: socioeconomics.reviewPrompts.filter((_, index) => index !== editing.index),
       })
-      toast.success(t("socioeconomics.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -733,14 +732,14 @@ export function SocioeconomicsPromptEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

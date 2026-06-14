@@ -177,10 +177,10 @@ export function NutritionFoodEditDialog({
           ? [...nextProfilesWithoutCurrent, nextProfile]
           : nextProfilesWithoutCurrent,
       })
-      toast.success(t("nutrition.foodEdit.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.foodEdit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -197,10 +197,10 @@ export function NutritionFoodEditDialog({
           (profile) => profile.foodId !== editing.food?.id,
         ),
       })
-      toast.success(t("nutrition.foodEdit.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.foodEdit.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -331,7 +331,7 @@ export function NutritionFoodEditDialog({
                     value={form.dietaryTagsText}
                     onChange={(event) => updateForm({ dietaryTagsText: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.foodEdit.tagsPlaceholder")}
+                    placeholder={t("common.form.tagsPlaceholder")}
                   />
                 </Field>
                 <Field label={t("nutrition.foodEdit.allergenTags")}>
@@ -339,7 +339,7 @@ export function NutritionFoodEditDialog({
                     value={form.allergenTagsText}
                     onChange={(event) => updateForm({ allergenTagsText: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.foodEdit.tagsPlaceholder")}
+                    placeholder={t("common.form.tagsPlaceholder")}
                   />
                 </Field>
               </div>
@@ -486,12 +486,12 @@ export function NutritionFoodEditDialog({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving")
-                : t("nutrition.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

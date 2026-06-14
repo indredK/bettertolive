@@ -501,7 +501,7 @@ export function ShoppingAttributesTab({
           onSaved={() => {
             setEditing(null)
             onRefresh()
-            toast.success(t("shopping.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
         />
       ) : null}

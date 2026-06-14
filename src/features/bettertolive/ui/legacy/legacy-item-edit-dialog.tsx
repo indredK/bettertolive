@@ -151,11 +151,10 @@ export function LegacyItemEditDialog({
     if (!seed) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("legacy.confirm.deleteItem", {
-        title: seed.title,
-        defaultValue: `确定删除 ${seed.title} 吗？`,
+      confirmMessage: t("common.confirm.deleteItem", {
+        name: seed.title,
       }),
-      pendingMessage: t("legacy.toast.deletePendingItem", {
+      pendingMessage: t("common.toast.deletePending", {
         title: seed.title,
         defaultValue: `已加入删除队列：${seed.title}，5 秒内可撤销`,
       }),
@@ -165,7 +164,7 @@ export function LegacyItemEditDialog({
       }),
       failureMessage: t("legacy.toast.deleteFailedItem"),
       undoLabel: t("legacy.undo"),
-      undoneMessage: t("legacy.toast.deleteUndoneItem", {
+      undoneMessage: t("common.toast.deleteUndone", {
         title: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,
       }),
@@ -253,7 +252,7 @@ export function LegacyItemEditDialog({
                   )
                 }
                 className={LEGACY_DIALOG_FIELD_CLASS}
-                placeholder={t("legacy.edit.tagsPlaceholder")}
+                placeholder={t("common.form.tagsPlaceholder")}
               />
             </Field>
 

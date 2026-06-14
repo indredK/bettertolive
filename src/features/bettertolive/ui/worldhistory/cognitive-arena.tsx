@@ -315,11 +315,11 @@ export function CognitiveArena({
                       onClick={() => {
                         confirmUndoableDelete({
                           confirmMessage: t("worldhistory.preset.deleteAria"),
-                          pendingMessage: t("worldhistory.preset.deletePending"),
+                          pendingMessage: t("common.toast.deletePending"),
                           successMessage: t("worldhistory.preset.deleteSuccess"),
                           failureMessage: t("worldhistory.preset.deleteFailed"),
                           undoLabel: t("common.actions.undo"),
-                          undoneMessage: t("worldhistory.preset.deleteUndone"),
+                          undoneMessage: t("common.toast.deleteUndone"),
                           onDelete: () => Promise.resolve(onDeletePreset(preset.id)),
                         })
                       }}

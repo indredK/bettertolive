@@ -487,10 +487,10 @@ function JourneyMemoryEditDialog({
           memories: replaceById(memory.memories, nextMemory, editing.isNew),
         },
       })
-      toast.success(t("journey.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -504,10 +504,10 @@ function JourneyMemoryEditDialog({
       await saveJourneyMutation.mutateAsync(
         cleanupMemoryReferences(growth, memory, editing.memory.id),
       )
-      toast.success(t("journey.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -521,7 +521,7 @@ function JourneyMemoryEditDialog({
         "维护一条记忆的分类、摘要、影响和可回看的线索。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
+      deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -691,10 +691,10 @@ function JourneyGrowthNodeEditDialog({
         },
         memory,
       })
-      toast.success(t("journey.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -712,10 +712,10 @@ function JourneyGrowthNodeEditDialog({
         },
         memory,
       })
-      toast.success(t("journey.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -729,7 +729,7 @@ function JourneyGrowthNodeEditDialog({
         "用记忆 ID 把变化前、变化后和触发记忆连接起来。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
+      deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -876,10 +876,10 @@ function JourneyAnchorEditDialog({
           anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
         },
       })
-      toast.success(t("journey.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -897,10 +897,10 @@ function JourneyAnchorEditDialog({
           anchors: removeById(memory.anchors, editing.anchor.id),
         },
       })
-      toast.success(t("journey.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -914,7 +914,7 @@ function JourneyAnchorEditDialog({
         "维护地点、物件、人物或照片与记忆之间的连接。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
+      deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -1001,10 +1001,10 @@ function JourneyTextEditDialog({
               ),
             },
       })
-      toast.success(t("journey.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -1031,10 +1031,10 @@ function JourneyTextEditDialog({
               reviewPrompts: removeAt(memory.reviewPrompts, editing.index),
             },
       })
-      toast.success(t("journey.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -1053,7 +1053,7 @@ function JourneyTextEditDialog({
         isThread ? t("journey.edit.threadDescription") : t("journey.edit.promptDescription")
       }
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
+      deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -1122,10 +1122,10 @@ function JourneyDialogFrame({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("journey.actions.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? t("journey.actions.saving") : t("journey.actions.save")}
+              {isPending ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

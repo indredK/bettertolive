@@ -246,7 +246,7 @@ export function BeliefsPage({
   const handleSaved = () => {
     setEditingBelief(null)
     onRefresh?.()
-    toast.success(t("beliefs.toast.saved"))
+    toast.success(t("common.toast.saved"))
   }
 
   const handleDeleted = () => {
@@ -767,7 +767,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("beliefs.empty.distribution")}
+            {t("common.empty.noData")}
           </div>
         )}
       </div>
@@ -1337,11 +1337,10 @@ function BeliefEditDialog({
     if (!seed) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("beliefs.confirm.deleteEntry", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: seed.title,
-        defaultValue: `确定删除 ${seed.title} 吗？`,
       }),
-      pendingMessage: t("beliefs.toast.deletePending", {
+      pendingMessage: t("common.toast.deletePending", {
         name: seed.title,
         defaultValue: `已加入删除队列：${seed.title}，5 秒内可撤销`,
       }),
@@ -1349,9 +1348,9 @@ function BeliefEditDialog({
         name: seed.title,
         defaultValue: `已删除观念：${seed.title}`,
       }),
-      failureMessage: t("beliefs.toast.deleteFailed"),
+      failureMessage: t("common.toast.deleteFailed"),
       undoLabel: t("beliefs.undo"),
-      undoneMessage: t("beliefs.toast.deleteUndone", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,
       }),
@@ -1399,7 +1398,7 @@ function BeliefEditDialog({
               label={t("beliefs.field.tags")}
               value={tags}
               onChange={setTags}
-              placeholder={t("beliefs.form.tagsPlaceholder")}
+              placeholder={t("common.form.tagsPlaceholder")}
             />
           </div>
 

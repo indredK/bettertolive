@@ -1533,9 +1533,7 @@ function RelevancePanel({
             />
           ))
         ) : (
-          <span className="text-xs text-[color:var(--text-muted)]">
-            {t("socioeconomics.empty.distribution")}
-          </span>
+          <span className="text-xs text-[color:var(--text-muted)]">{t("common.empty.noData")}</span>
         )}
       </div>
     </div>
@@ -1588,7 +1586,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("socioeconomics.empty.distribution")}
+            {t("common.empty.noData")}
           </div>
         )}
       </div>

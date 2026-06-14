@@ -403,11 +403,10 @@ export function ShoppingPlanningTab({
 
   const handleDelete = (id: string, name: string) => {
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteItem", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name,
-        defaultValue: `确定删除 ${name} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingItem", {
+      pendingMessage: t("common.toast.deletePending", {
         name,
         defaultValue: `已加入删除队列：${name}，5 秒内可撤销`,
       }),
@@ -417,7 +416,7 @@ export function ShoppingPlanningTab({
       }),
       failureMessage: t("shopping.toast.deleteFailedItem"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneItem", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name,
         defaultValue: `已撤销删除：${name}`,
       }),

@@ -246,7 +246,7 @@ export function ShoppingAttributeEditDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("shopping.confirm.unsavedChanges"))
+      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
       if (!confirmed) return
     }
     if (!open) onClose()

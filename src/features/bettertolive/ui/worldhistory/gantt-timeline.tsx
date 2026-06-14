@@ -178,15 +178,12 @@ export function GanttTimeline({
                         size="icon-sm"
                         onClick={() => {
                           confirmUndoableDelete({
-                            confirmMessage: t(
-                              "worldhistory.event.deleteAria",
-                              "确定删除这个事件吗？",
-                            ),
-                            pendingMessage: "已加入删除队列，5 秒内可撤销",
-                            successMessage: "已删除事件",
-                            failureMessage: "删除事件失败",
-                            undoLabel: "撤销",
-                            undoneMessage: "已撤销删除",
+                            confirmMessage: t("worldhistory.event.deleteAria"),
+                            pendingMessage: t("worldhistory.event.deletePending"),
+                            successMessage: t("worldhistory.event.deleteSuccess"),
+                            failureMessage: t("worldhistory.event.deleteFailed"),
+                            undoLabel: t("worldhistory.event.undoLabel"),
+                            undoneMessage: t("worldhistory.event.deleteUndone"),
                             onDelete: () => Promise.resolve(onDeleteEvent(event.id)),
                           })
                         }}

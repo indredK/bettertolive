@@ -180,7 +180,7 @@ export function StarMapCanvas({
                   className="shrink-0 font-mono text-[10px] text-[color:var(--hero-muted)] hover:text-[color:var(--hero-ink)]"
                   onClick={() => onSelectNode(tooltipNode.id)}
                 >
-                  {t("worldhistory.star.collapse")}
+                  {t("common.ui.collapse")}
                 </button>
               </div>
 

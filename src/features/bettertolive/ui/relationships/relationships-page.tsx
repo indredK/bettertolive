@@ -428,9 +428,8 @@ export function RelationshipsPage({
     const nextModule = removeRelationship(sourceRelationshipsModule, relationship.id)
 
     confirmUndoableDelete({
-      confirmMessage: t("relationships.confirm.deleteRelationship", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: relationship.name,
-        defaultValue: `确定删除 ${relationship.name} 吗？`,
       }),
       pendingMessage: t("relationships.toast.deleteRelationshipPending", {
         name: relationship.name,
@@ -747,7 +746,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("relationships.empty.distribution")}
+            {t("common.empty.noData")}
           </div>
         )}
       </div>
@@ -1657,7 +1656,7 @@ function RelationshipDetailPanel({
           </AnimatedButton>
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
-            {t("relationships.common.delete")}
+            {t("common.actions.delete")}
           </AnimatedButton>
         </ActionGroup>
       </div>
@@ -2008,7 +2007,7 @@ function DetailHeader({
         </AnimatedButton>
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
-          {t("relationships.common.delete")}
+          {t("common.actions.delete")}
         </AnimatedButton>
       </ActionGroup>
     </div>

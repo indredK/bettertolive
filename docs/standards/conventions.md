@@ -83,6 +83,11 @@
 - **写法**：新增 key 用 `模块名.` 前缀归类（通用动作走 `common.actions.*`，见下条），**同时补 `zh.json` 与 `en.json`**（en 缺失会 fallback 到 zh，但应补齐）。
 - **硬约定（通用动作文案全局收口）**：跨模块复用的通用动作/状态文案**统一用 `common.actions.*` 一处定义**，不再各模块各起 key。覆盖：`save`(保存) / `saving`(保存中) / `cancel`(取消) / `delete`(删除) / `deleting`(删除中) / `confirm`(确定) / `close`(关闭) / `edit`(编辑) / `add`(添加) / `create`(新建) / `deleted`(已删除) / `undo`(撤销) / `retry`(重试) 等。新代码一律 `t("common.actions.save")`，**禁止再写 `shopping.save` / `nutrition.common.save` / `xxx.editor.save` 这类模块私有的通用动作 key**。只有**带模块语境的特定文案**（如"保存这餐记录""删除该关系"）才放模块命名空间。
   - 现状：同一个"保存"散落成 10+ 个 key、"删除"30+ 次（`relationships.common.delete` / `shopping.delete` / `journey.actions.delete` …），属存量重复，待向 `common.actions.*` 收敛（见文末改造清单）。`common` 命名空间已存在（现有 `common.filter.*`）。
+- **硬约定（校验文案分层组织）**：校验/错误提示文案按以下三层放置，**不混放**：
+  - **`common.validation.*`**：带参数的通用校验模板，可跨模块复用。例如 `required`（"请填写{{field}}"）、`maxLength`（"{{field}}最多 {{count}} 个字符"）、`maxItems`、`invalidOption`、`nonNegative`、`integer`、`maxNumber`、`invalidJson`、`jsonArray`、`invalidForm` 等。调用方传参数渲染：`t("common.validation.required", { field: "标题" })`。
+  - **`<模块>.validation.*`**：该模块专属的、有具体业务语义的校验文案。例如 `finance.edit.validation.amountPositive`（"金额需要大于 0"）、`nutrition.recipes.validation.stepsRequired`（"请至少填写一个步骤"）。
+  - **`<模块>.error.*`**（可选）**：更偏向系统级/格式错误的提示（如 `shopping.error.codeEmpty`、`shopping.error.rankInvalid`），与用户输入校验区分。
+  - **禁止**：把通用模板放具体模块下（如曾将 `required`/`maxLength` 放在 `shopping.validation`）、把模块专属校验塞进 `common.validation`、在各模块重复定义同质通用校验 key。
 
 ### F6. 用户反馈（sonner toast）
 

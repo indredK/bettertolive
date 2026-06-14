@@ -107,10 +107,10 @@ export function FutureBlueprintEditDialog({
         lifestyle: lifestyle.trim(),
         values: textToDelimitedList(valuesText),
       })
-      toast.success(t("future.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -168,10 +168,10 @@ export function FutureBlueprintEditDialog({
 
           <DialogFooter className={FUTURE_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -219,10 +219,10 @@ export function FutureMilestoneEditDialog({
           editing.isNew,
         ),
       })
-      toast.success(t("future.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -230,9 +230,8 @@ export function FutureMilestoneEditDialog({
     if (editing.isNew) return
 
     const confirmed = window.confirm(
-      t("future.confirm.deleteMilestone", {
-        horizon: editing.milestone?.horizon,
-        defaultValue: `确定删除「${editing.milestone?.horizon ?? ""}」吗？`,
+      t("common.confirm.deleteItem", {
+        name: editing.milestone?.horizon,
       }),
     )
 
@@ -243,10 +242,10 @@ export function FutureMilestoneEditDialog({
         ...future,
         milestones: removeAt(future.milestones, editing.index),
       })
-      toast.success(t("future.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("future.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -301,14 +300,14 @@ export function FutureMilestoneEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("future.edit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -343,10 +342,10 @@ export function FutureExperimentEditDialog({
         ...future,
         experiments: replaceAt(future.experiments, editing.index, experiment.trim(), editing.isNew),
       })
-      toast.success(t("future.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -362,10 +361,10 @@ export function FutureExperimentEditDialog({
         ...future,
         experiments: removeAt(future.experiments, editing.index),
       })
-      toast.success(t("future.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("future.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -403,14 +402,14 @@ export function FutureExperimentEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("future.edit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

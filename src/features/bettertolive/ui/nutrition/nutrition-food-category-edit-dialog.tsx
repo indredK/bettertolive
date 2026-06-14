@@ -112,10 +112,10 @@ export function NutritionFoodCategoryEditDialog({
         ...nutrition,
         foodCategories: nextCategories,
       })
-      toast.success(t("nutrition.categoryEdit.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.categoryEdit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -131,10 +131,10 @@ export function NutritionFoodCategoryEditDialog({
           (category) => category.id !== editing.category?.id,
         ),
       })
-      toast.success(t("nutrition.categoryEdit.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.categoryEdit.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -173,7 +173,7 @@ export function NutritionFoodCategoryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("nutrition.categoryEdit.sortOrder")}>
+                <Field label={t("common.sortable.sortOrder")}>
                   <Input
                     type="number"
                     min={0}
@@ -246,12 +246,12 @@ export function NutritionFoodCategoryEditDialog({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving")
-                : t("nutrition.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

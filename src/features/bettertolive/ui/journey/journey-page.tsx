@@ -1409,7 +1409,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("journey.empty.distribution")}
+            {t("common.empty.noData")}
           </div>
         )}
       </div>

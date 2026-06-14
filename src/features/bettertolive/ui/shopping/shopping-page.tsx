@@ -199,7 +199,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingItem(null)
             refresh()
-            toast.success(t("shopping.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
           onDeleted={() => {
             setEditingItem(null)
@@ -217,7 +217,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingStage(null)
             refresh()
-            toast.success(t("shopping.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
           onDeleted={() => {
             setEditingStage(null)
@@ -235,7 +235,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingSystem(null)
             refresh()
-            toast.success(t("shopping.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
           onDeleted={() => {
             setEditingSystem(null)
@@ -253,7 +253,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingSpace(null)
             refresh()
-            toast.success(t("shopping.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
           onDeleted={() => {
             setEditingSpace(null)

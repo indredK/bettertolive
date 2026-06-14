@@ -112,11 +112,10 @@ export function ShoppingStagesTab({
 
   const handleDelete = (id: string, name: string) => {
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteStage", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name,
-        defaultValue: `确定删除 ${name} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingStage", {
+      pendingMessage: t("common.toast.deletePending", {
         name,
         defaultValue: `已加入删除队列：${name}，5 秒内可撤销`,
       }),
@@ -126,7 +125,7 @@ export function ShoppingStagesTab({
       }),
       failureMessage: t("shopping.toast.deleteFailedStage"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneStage", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name,
         defaultValue: `已撤销删除：${name}`,
       }),

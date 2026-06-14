@@ -202,11 +202,10 @@ export function ShoppingStageEditDialog({
     if (!seed) return
 
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteStage", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: seed.name,
-        defaultValue: `确定删除 ${seed.name} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingStage", {
+      pendingMessage: t("common.toast.deletePending", {
         name: seed.name,
         defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,
       }),
@@ -216,7 +215,7 @@ export function ShoppingStageEditDialog({
       }),
       failureMessage: t("shopping.toast.deleteFailedStage"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneStage", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name: seed.name,
         defaultValue: `已撤销删除：${seed.name}`,
       }),
@@ -231,7 +230,7 @@ export function ShoppingStageEditDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("shopping.confirm.unsavedChanges"))
+      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
       if (!confirmed) return
     }
     if (!open) onClose()

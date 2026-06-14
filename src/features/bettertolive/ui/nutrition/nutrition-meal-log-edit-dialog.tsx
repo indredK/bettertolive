@@ -227,10 +227,10 @@ export function NutritionMealLogEditDialog({
         ...nutrition,
         mealLogs: nextLogs,
       })
-      toast.success(t("nutrition.logEdit.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.logEdit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -244,10 +244,10 @@ export function NutritionMealLogEditDialog({
         ...nutrition,
         mealLogs: nutrition.mealLogs.filter((log) => log.id !== editing.log?.id),
       })
-      toast.success(t("nutrition.logEdit.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.logEdit.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -445,12 +445,12 @@ export function NutritionMealLogEditDialog({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving")
-                : t("nutrition.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

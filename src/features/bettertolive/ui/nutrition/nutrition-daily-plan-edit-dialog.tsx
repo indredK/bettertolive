@@ -242,10 +242,10 @@ export function NutritionDailyPlanEditDialog({
         ...nutrition,
         dailyPlans: nextPlans,
       })
-      toast.success(t("nutrition.dailyPlanEdit.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.dailyPlanEdit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -259,10 +259,10 @@ export function NutritionDailyPlanEditDialog({
         ...nutrition,
         dailyPlans: nutrition.dailyPlans.filter((plan) => plan.id !== editing.plan?.id),
       })
-      toast.success(t("nutrition.dailyPlanEdit.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.dailyPlanEdit.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -458,12 +458,12 @@ export function NutritionDailyPlanEditDialog({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving")
-                : t("nutrition.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

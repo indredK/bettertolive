@@ -130,7 +130,7 @@ export function LegacyPage({
           onSaved={() => {
             setEditingItem(null)
             refresh()
-            toast.success(t("legacy.toast.saved"))
+            toast.success(t("common.toast.saved"))
           }}
           onDeleted={() => {
             setEditingItem(null)

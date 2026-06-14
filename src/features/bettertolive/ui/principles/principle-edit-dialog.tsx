@@ -330,7 +330,7 @@ export function PrincipleEditDialog({
                   value={form.tagsText}
                   onChange={(event) => updateForm({ tagsText: event.target.value })}
                   className={PRINCIPLES_DIALOG_FIELD_CLASS}
-                  placeholder={t("principles.edit.tagsPlaceholder")}
+                  placeholder={t("common.form.tagsPlaceholder")}
                 />
               </Field>
             </section>
@@ -346,16 +346,16 @@ export function PrincipleEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("principles.edit.delete")}
+                {t("common.actions.delete")}
               </Button>
             )}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("principles.edit.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={savePrinciplesMutation.isPending}>
               {savePrinciplesMutation.isPending
-                ? t("principles.edit.saving")
-                : t("principles.edit.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

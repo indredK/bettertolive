@@ -23,6 +23,48 @@
       "placeholder": "请选择",
       "searchPlaceholder": "搜索…",
       "emptyMessage": "没有匹配的选项"
+    },
+    "sortable": {
+      "dragHandle": "拖动排序",
+      "sortOrder": "排序"
+    },
+    "ui": {
+      "collapse": "收起",
+      "expand": "展开"
+    },
+    "confirm": {
+      "deleteItem": "确定删除 {{name}} 吗？",
+      "unsavedChanges": "当前有未保存的修改，确定要关闭吗？"
+    },
+    "toast": {
+      "saved": "已保存",
+      "saveFailed": "保存失败",
+      "deleted": "已删除",
+      "deleteFailed": "删除失败",
+      "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
+      "deleteUndone": "已撤销删除：{{name}}"
+    },
+    "controlMode": {
+      "on": "控制模式",
+      "off": "浏览模式"
+    },
+    "form": {
+      "tagsPlaceholder": "用逗号分隔"
+    },
+    "empty": {
+      "noData": "暂无分布数据。"
+    },
+    "validation": {
+      "required": "请填写{{field}}",
+      "maxLength": "{{field}}最多 {{count}} 个字符",
+      "maxItems": "{{field}}最多 {{count}} 项",
+      "invalidOption": "{{field}}的选项无效",
+      "nonNegative": "{{field}}不能小于 0",
+      "integer": "{{field}}必须是整数",
+      "maxNumber": "{{field}}不能大于 {{count}}",
+      "invalidJson": "{{field}}必须是有效 JSON",
+      "jsonArray": "{{field}}必须是 JSON 数组",
+      "invalidForm": "表单内容不符合要求，请检查后再保存"
     }
   },
   "shopping": {
@@ -61,8 +103,7 @@
       "deleteUndoneItem": "已撤销删除：{{name}}",
       "deleteUndoneSystem": "已撤销删除：{{name}}",
       "deleteUndoneSpace": "已撤销删除：{{name}}",
-      "deleteUndoneStage": "已撤销删除：{{name}}",
-      "saved": "已保存"
+      "deleteUndoneStage": "已撤销删除：{{name}}"
     },
     "undo": "撤销",
     "overview": {
@@ -249,17 +290,7 @@
       "rankInvalid": "请输入有效数字"
     },
     "validation": {
-      "required": "请填写{{field}}",
-      "maxLength": "{{field}}最多 {{count}} 个字符",
-      "maxItems": "{{field}}最多 {{count}} 项",
-      "invalidOption": "{{field}}的选项无效",
-      "nonNegative": "{{field}}不能小于 0",
-      "integer": "{{field}}必须是整数",
-      "maxNumber": "{{field}}不能大于 {{count}}",
-      "invalidJson": "{{field}}必须是有效 JSON",
-      "jsonArray": "{{field}}必须是 JSON 数组",
       "priceOrder": "购入价格不能高于超付价格",
-      "invalidForm": "表单内容不符合要求，请检查后再保存",
       "duplicateSystem": "同一个阶段适用里不能重复选择系统",
       "emptySection": "每个系统分组至少要填写一项内容",
       "duplicateName": "名称已存在，请换一个"
@@ -344,8 +375,6 @@
         "secondaryGroupsHelp": "使用逗号分隔多个二级分组",
         "assignItems": "本系统下的物品",
         "assignItemsHelp": "将属于此系统的物品移至右侧，保存后生效",
-        "cancel": "取消",
-        "save": "保存",
         "autoId": "自动生成 ID:",
         "basicInfo": "基本信息",
         "name": "名称",
@@ -379,8 +408,6 @@
         "name": "空间名称",
         "assignItems": "本空间下的物品",
         "assignItemsHelp": "将属于此空间的物品移至右侧，保存后生效",
-        "cancel": "取消",
-        "save": "保存",
         "basicInfo": "基本信息",
         "note": "备注",
         "notePlaceholder": "描述这个空间的特点、用途等"
@@ -435,9 +462,7 @@
         "addSection": "新增系统",
         "addItem": "新增项",
         "itemPlaceholder": "填写一项内容",
-        "confirmSystemReset": "切换系统会清空该系统下已选的物品,确认继续?",
-        "cancel": "取消",
-        "save": "保存"
+        "confirmSystemReset": "切换系统会清空该系统下已选的物品,确认继续?"
       },
       "itemPicker": {
         "search": "搜索...",
@@ -537,8 +562,6 @@
         "editTitle": "编辑物件：{{name}}",
         "saveInstructions": "填写物件信息后点击保存。",
         "editInstructions": "修改物件信息后点击保存。",
-        "cancel": "取消",
-        "save": "保存",
         "table": {
           "name": "名称",
           "classification": "分类",
@@ -623,8 +646,6 @@
         "saveInstructions": "填写内容信息后点击保存。",
         "editInstructions": "修改内容信息后点击保存。",
         "confirmDelete": "确定删除这条内容？",
-        "cancel": "取消",
-        "save": "保存",
         "loading": "加载中...",
         "table": {
           "title": "标题",
@@ -706,17 +727,6 @@
     "saving": "保存中",
     "note": "备注",
     "search": "搜索...",
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
-    },
-    "confirm": {
-      "deleteItem": "确定删除 {{name}} 吗？",
-      "deleteSystem": "确定删除 {{name}} 吗？",
-      "deleteSpace": "确定删除 {{name}} 吗？",
-      "deleteStage": "确定删除 {{name}} 吗？",
-      "unsavedChanges": "当前有未保存的修改，确定要关闭吗？"
-    },
     "filter": {
       "all": "全部",
       "allChannels": "全部渠道",
@@ -731,9 +741,6 @@
       "space": "空间",
       "status": "状态",
       "system": "系统"
-    },
-    "sortable": {
-      "dragHandle": "拖动排序"
     },
     "system": {
       "create": "新增系统",
@@ -851,14 +858,10 @@
       "editEntry": "编辑观念"
     },
     "toast": {
-      "saved": "已保存",
       "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
       "deleteSuccess": "已删除观念：{{name}}",
       "deleteFailed": "删除观念失败",
       "deleteUndone": "已撤销删除：{{name}}"
-    },
-    "confirm": {
-      "deleteEntry": "确定删除 {{name}} 吗？"
     },
     "undo": "撤销",
     "error": {
@@ -962,21 +965,12 @@
       "unsent": "想说的话",
       "patterns": "跨关系模式"
     },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
-    },
     "actions": {
       "addRelationship": "新增关系",
       "addNote": "新增表达"
     },
     "common": {
       "add": "添加",
-      "cancel": "取消",
-      "delete": "删除",
-      "edit": "编辑",
-      "save": "保存",
-      "saving": "保存中",
       "undo": "撤销"
     },
     "overview": {
@@ -1182,7 +1176,6 @@
       }
     },
     "confirm": {
-      "deleteRelationship": "确定删除 {{name}} 吗？",
       "deleteNote": "确定删除这条想说的话吗？",
       "deletePattern": "确定删除这个关系模式吗？"
     },
@@ -1419,14 +1412,7 @@
       }
     },
     "common": {
-      "cancel": "取消",
-      "save": "保存",
-      "saving": "保存中",
       "optional": "可选"
-    },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
     },
     "overview": {
       "eyebrow": "今日饮食总览",
@@ -1668,7 +1654,6 @@
       "name": "分类名",
       "namePlaceholder": "例如：常备蛋白",
       "dimension": "分类维度",
-      "sortOrder": "排序",
       "descriptionLabel": "说明",
       "descriptionPlaceholder": "这个分类帮助你怎样选择食品？",
       "delete": "删除",
@@ -1924,10 +1909,6 @@
       "title": "先把此刻写下来",
       "description": "表达不需要完整，真实比完整更重要。这里会成为你最自然的输入入口。"
     },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
-    },
     "sections": {
       "draft": {
         "title": "写作起点",
@@ -1976,15 +1957,6 @@
     },
     "validation": {
       "required": "请填写时间、标题和反思内容"
-    },
-    "confirm": {
-      "delete": "确定删除「{{title}}」吗？"
-    },
-    "toast": {
-      "saved": "已保存",
-      "saveFailed": "保存失败",
-      "deleted": "已删除",
-      "deleteFailed": "删除失败"
     },
     "tabs": {
       "overview": "总览",
@@ -2059,15 +2031,6 @@
     "validation": {
       "required": "请填写时间、标题和简要说明"
     },
-    "confirm": {
-      "delete": "确定删除「{{title}}」吗？"
-    },
-    "toast": {
-      "saved": "已保存",
-      "saveFailed": "保存失败",
-      "deleted": "已删除",
-      "deleteFailed": "删除失败"
-    },
     "tabs": {
       "overview": "总览",
       "timeline": "事件流",
@@ -2123,18 +2086,11 @@
       "deleted": "已删除账目",
       "deleteFailed": "删除失败"
     },
-    "confirm": {
-      "deleteEntry": "确定删除「{{title}}」吗？"
-    },
     "edit": {
       "createTitle": "新增账目",
       "editTitle": "编辑账目",
       "description": "记录金额，也保留这笔钱背后的生活语境。",
       "tagsPlaceholder": "每行一个标签",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存",
-      "saving": "保存中",
       "validation": {
         "required": "请填写日期、标题、类别和有效金额",
         "amountPositive": "金额需要大于 0"
@@ -2231,11 +2187,7 @@
       "addAnchor": "新增锚点",
       "addPrompt": "新增问题",
       "addThread": "新增线索",
-      "edit": "编辑",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存",
-      "saving": "保存中"
+      "edit": "编辑"
     },
     "filters": {
       "title": "五维过滤",
@@ -2414,12 +2366,6 @@
         "textRequired": "请填写内容"
       }
     },
-    "toast": {
-      "saved": "已保存",
-      "saveFailed": "保存失败",
-      "deleted": "已删除",
-      "deleteFailed": "删除失败"
-    },
     "confirm": {
       "deleteMemory": "确定删除这条记忆吗？",
       "deleteGrowth": "确定删除这个成长节点吗？",
@@ -2518,20 +2464,13 @@
       "title": "看清外部经济世界怎么运转",
       "description": "按 5 维分类、看 relevance 决策距离，再用热力图找认知盲区。"
     },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
-    },
     "actions": {
       "addEntry": "新增条目",
       "addGap": "新增缺口",
       "addPrompt": "新增提问",
       "editEntry": "编辑条目",
       "editGap": "编辑缺口",
-      "editPrompt": "编辑提问",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存"
+      "editPrompt": "编辑提问"
     },
     "classification": {
       "title": "5 维认知分类",
@@ -2642,14 +2581,7 @@
         "promptRequired": "请填写复习提问"
       }
     },
-    "toast": {
-      "saved": "已保存",
-      "saveFailed": "保存失败",
-      "deleted": "已删除",
-      "deleteFailed": "删除失败"
-    },
     "confirm": {
-      "deleteEntry": "确定删除「{{title}}」吗？",
       "deleteGap": "确定删除这条缺口吗？",
       "deletePrompt": "确定删除这条复习提问吗？"
     },
@@ -2759,10 +2691,6 @@
       "timeline": "波动时间线",
       "triggers": "触发关联",
       "toolbox": "恢复工具箱"
-    },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
     },
     "actions": {
       "add": "新增",
@@ -2874,9 +2802,6 @@
     },
     "editor": {
       "description": "这些内容会保存到后端情绪数据，不再依赖页面内的临时模拟内容。",
-      "save": "保存",
-      "cancel": "取消",
-      "delete": "删除",
       "none": "不设置",
       "confirmDelete": "确定删除这条情绪数据吗？",
       "validation": {
@@ -3060,10 +2985,6 @@
       "title": "把想成为的人说清楚",
       "description": "未来不是系统替你预测的结果，而是你主动写下的方向。这里承接理想自我、理想生活、重要价值和阶段路径。"
     },
-    "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式"
-    },
     "searching": "当前筛选：{{query}}",
     "refresh": "刷新",
     "addMilestone": "新增路径",
@@ -3119,23 +3040,13 @@
       "experimentDescription": "实验不需要宏大，只要能让生活更靠近蓝图。",
       "experiment": "实验内容",
       "clickToEdit": "点击可编辑",
-      "cancel": "取消",
-      "save": "保存",
-      "delete": "删除",
       "validation": {
         "blueprintRequired": "请填写理想自我和理想生活",
         "milestoneRequired": "请填写阶段、摘要和至少一步行动",
         "experimentRequired": "请填写实验内容"
       }
     },
-    "toast": {
-      "saved": "已保存",
-      "saveFailed": "保存失败",
-      "deleted": "已删除",
-      "deleteFailed": "删除失败"
-    },
     "confirm": {
-      "deleteMilestone": "确定删除「{{horizon}}」吗？",
       "deleteExperiment": "确定删除这个实验吗？"
     },
     "empty": {
@@ -3187,14 +3098,10 @@
     },
     "undo": "撤销",
     "toast": {
-      "saved": "已保存",
       "deletePendingItem": "已加入删除队列：{{title}}，5 秒内可撤销",
       "deleteSuccessItem": "已删除生命整理条目：{{title}}",
       "deleteFailedItem": "删除生命整理条目失败",
       "deleteUndoneItem": "已撤销删除：{{title}}"
-    },
-    "confirm": {
-      "deleteItem": "确定删除 {{title}} 吗？"
     },
     "fields": {
       "title": "标题",
@@ -3917,8 +3824,6 @@
       "description": "这页不只是列出原则，而是看清它保护什么、从哪来、稳不稳、守住它要付出什么。"
     },
     "controlMode": {
-      "on": "控制模式",
-      "off": "浏览模式",
       "summary": "{{count}} 条原则 · {{relations}} 个关系",
       "add": "新增原则"
     },
@@ -4019,10 +3924,6 @@
       "decisionCue": "触发校准",
       "tags": "标签",
       "tagsPlaceholder": "用逗号分隔",
-      "delete": "删除",
-      "cancel": "取消",
-      "save": "保存",
-      "saving": "保存中",
       "confirmDelete": "确定删除这条原则吗？",
       "saved": "原则已保存",
       "saveFailed": "原则保存失败",
@@ -4153,7 +4054,12 @@
       "newLabel": "新事件",
       "namePlaceholder": "事件名称",
       "summaryPlaceholder": "事件摘要",
-      "deleteAria": "删除事件"
+      "deleteAria": "删除事件",
+      "deletePending": "已加入删除队列，5 秒内可撤销",
+      "deleteSuccess": "已删除事件",
+      "deleteFailed": "删除事件失败",
+      "undoLabel": "撤销",
+      "deleteUndone": "已撤销删除"
     },
     "preset": {
       "newLabel": "新判词",
@@ -4171,7 +4077,6 @@
     },
     "star": {
       "suffix": "因果链路星图",
-      "collapse": "收起",
       "nodeNamePlaceholder": "节点名称",
       "descriptionPlaceholder": "现象描述",
       "causalPlaceholder": "因果链解释",

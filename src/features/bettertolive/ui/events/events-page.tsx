@@ -675,10 +675,10 @@ function EventEditDialog({
         ...eventsModule,
         entries: sortEvents(nextEntries),
       })
-      toast.success(t("events.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("events.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -686,8 +686,8 @@ function EventEditDialog({
     if (!editing.event) return
 
     const confirmed = window.confirm(
-      t("events.confirm.delete", {
-        title: editing.event.title,
+      t("common.confirm.deleteItem", {
+        name: editing.event.title,
       }),
     )
 
@@ -698,10 +698,10 @@ function EventEditDialog({
         ...eventsModule,
         entries: eventsModule.entries.filter((entry) => entry.id !== editing.event?.id),
       })
-      toast.success(t("events.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("events.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 

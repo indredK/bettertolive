@@ -513,7 +513,7 @@ export function EmotionEntityEditDialog({
 
     try {
       await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, form))
-      toast.success(t("emotion.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -530,7 +530,7 @@ export function EmotionEntityEditDialog({
 
     try {
       await saveEmotionMutation.mutateAsync(removeEntity(emotion, editing))
-      toast.success(t("emotion.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -559,14 +559,14 @@ export function EmotionEntityEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("emotion.editor.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -962,7 +962,7 @@ export function EmotionOverviewEditDialog({
         ...cloneEmotion(emotion),
         overview,
       })
-      toast.success(t("emotion.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -1019,10 +1019,10 @@ export function EmotionOverviewEditDialog({
           </div>
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -1056,7 +1056,7 @@ export function EmotionTextListEditDialog({
         ...cloneEmotion(emotion),
         [listKey]: splitList(value),
       })
-      toast.success(t("emotion.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -1081,10 +1081,10 @@ export function EmotionTextListEditDialog({
           </div>
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save")}
+              {t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

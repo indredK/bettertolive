@@ -241,11 +241,10 @@ function LegacyItemDetail({
 
   const handleDelete = () => {
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("legacy.confirm.deleteItem", {
-        title: item.title,
-        defaultValue: `确定删除 ${item.title} 吗？`,
+      confirmMessage: t("common.confirm.deleteItem", {
+        name: item.title,
       }),
-      pendingMessage: t("legacy.toast.deletePendingItem", {
+      pendingMessage: t("common.toast.deletePending", {
         title: item.title,
         defaultValue: `已加入删除队列：${item.title}，5 秒内可撤销`,
       }),
@@ -255,7 +254,7 @@ function LegacyItemDetail({
       }),
       failureMessage: t("legacy.toast.deleteFailedItem"),
       undoLabel: t("legacy.undo"),
-      undoneMessage: t("legacy.toast.deleteUndoneItem", {
+      undoneMessage: t("common.toast.deleteUndone", {
         title: item.title,
         defaultValue: `已撤销删除：${item.title}`,
       }),

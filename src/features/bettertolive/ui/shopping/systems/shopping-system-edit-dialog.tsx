@@ -134,11 +134,10 @@ export function ShoppingSystemEditDialog({
 
     const displayName = editing.system.name || editing.system.id
     const scheduled = confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSystem", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: displayName,
-        defaultValue: `确定删除 ${displayName} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingSystem", {
+      pendingMessage: t("common.toast.deletePending", {
         name: displayName,
         defaultValue: `已加入删除队列：${displayName}，5 秒内可撤销`,
       }),
@@ -148,7 +147,7 @@ export function ShoppingSystemEditDialog({
       }),
       failureMessage: t("shopping.toast.deleteFailedSystem"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneSystem", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name: displayName,
         defaultValue: `已撤销删除：${displayName}`,
       }),
@@ -163,7 +162,7 @@ export function ShoppingSystemEditDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(t("shopping.confirm.unsavedChanges"))
+      const confirmed = window.confirm(t("common.confirm.unsavedChanges"))
       if (!confirmed) return
     }
     if (!open) onClose()

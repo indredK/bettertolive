@@ -32,7 +32,7 @@ export function SortableShoppingCard({ id, children, disabled }: SortableShoppin
       {!disabled ? (
         <button
           type="button"
-          aria-label={t("shopping.sortable.dragHandle")}
+          aria-label={t("common.sortable.dragHandle")}
           {...attributes}
           {...listeners}
           className="focus-visible:ring-ring absolute top-1/2 left-3 z-10 flex -translate-y-1/2 cursor-grab flex-col items-center gap-[1.5px] rounded-sm px-1 py-2 outline-none focus-visible:ring-2 active:cursor-grabbing"

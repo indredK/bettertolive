@@ -247,11 +247,10 @@ export function ShoppingSpacesTab({
 
   const handleDeleteSpace = (space: ShoppingSpaceDefinition) => {
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSpace", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: space.name,
-        defaultValue: `确定删除 ${space.name} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingSpace", {
+      pendingMessage: t("common.toast.deletePending", {
         name: space.name,
         defaultValue: `已加入删除队列：${space.name}，5 秒内可撤销`,
       }),
@@ -261,7 +260,7 @@ export function ShoppingSpacesTab({
       }),
       failureMessage: t("shopping.toast.deleteFailedSpace"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneSpace", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name: space.name,
         defaultValue: `已撤销删除：${space.name}`,
       }),

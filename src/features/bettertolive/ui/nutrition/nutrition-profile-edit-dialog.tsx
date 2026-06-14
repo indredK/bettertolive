@@ -150,10 +150,10 @@ export function NutritionProfileEditDialog({
           })),
         },
       })
-      toast.success(t("nutrition.profileEdit.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.profileEdit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -373,12 +373,12 @@ export function NutritionProfileEditDialog({
 
           <DialogFooter className={NUTRITION_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving")
-                : t("nutrition.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

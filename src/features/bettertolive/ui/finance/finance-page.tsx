@@ -104,9 +104,8 @@ export function FinancePage({
 
   const handleDeleteEntry = async (entry: TransactionEntry) => {
     const confirmed = window.confirm(
-      t("finance.confirm.deleteEntry", {
-        title: entry.label,
-        defaultValue: `确定删除「${entry.label}」吗？`,
+      t("common.confirm.deleteItem", {
+        name: entry.label,
       }),
     )
 
@@ -117,9 +116,9 @@ export function FinancePage({
         ...editableFinance,
         entries: editableFinance.entries.filter((item) => item.id !== entry.id),
       })
-      toast.success(t("finance.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
     } catch {
-      toast.error(t("finance.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -731,7 +730,7 @@ function DistributionList({
   const { t } = useTranslation()
 
   if (rows.length === 0) {
-    return <EmptyState message={t("finance.empty.distribution")} compact />
+    return <EmptyState message={t("common.empty.noData")} compact />
   }
 
   return (

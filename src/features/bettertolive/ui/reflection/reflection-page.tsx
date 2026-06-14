@@ -149,9 +149,8 @@ export function ReflectionPage({
 
   const handleDelete = async (entry: ReflectionEntry) => {
     const confirmed = window.confirm(
-      t("reflection.confirm.delete", {
-        title: entry.title,
-        defaultValue: `确定删除「${entry.title}」吗？`,
+      t("common.confirm.deleteItem", {
+        name: entry.title,
       }),
     )
 
@@ -162,9 +161,9 @@ export function ReflectionPage({
         ...editableReflectionModule,
         entries: editableReflectionModule.entries.filter((item) => item.id !== entry.id),
       })
-      toast.success(t("reflection.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
     } catch {
-      toast.error(t("reflection.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -592,10 +591,10 @@ function ReflectionEditDialog({
         ...reflectionModule,
         entries: sortReflections(entries),
       })
-      toast.success(t("reflection.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("reflection.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 

@@ -140,10 +140,10 @@ export function FinanceEntryEditDialog({
         ...finance,
         entries: sortEntriesByDate(nextEntries),
       })
-      toast.success(t("finance.toast.saved"))
+      toast.success(t("common.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("finance.toast.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -151,9 +151,8 @@ export function FinanceEntryEditDialog({
     if (!editing.entry) return
 
     const confirmed = window.confirm(
-      t("finance.confirm.deleteEntry", {
-        title: editing.entry.label,
-        defaultValue: `确定删除「${editing.entry.label}」吗？`,
+      t("common.confirm.deleteItem", {
+        name: editing.entry.label,
       }),
     )
 
@@ -164,10 +163,10 @@ export function FinanceEntryEditDialog({
         ...finance,
         entries: finance.entries.filter((entry) => entry.id !== editing.entry?.id),
       })
-      toast.success(t("finance.toast.deleted"))
+      toast.success(t("common.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("finance.toast.deleteFailed"))
+      toast.error(t("common.toast.deleteFailed"))
     }
   }
 
@@ -375,14 +374,16 @@ export function FinanceEntryEditDialog({
                 onClick={handleDelete}
               >
                 <Trash2 className="size-4" />
-                {t("finance.edit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("finance.edit.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveFinanceMutation.isPending}>
-              {saveFinanceMutation.isPending ? t("finance.edit.saving") : t("finance.edit.save")}
+              {saveFinanceMutation.isPending
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

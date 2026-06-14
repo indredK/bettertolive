@@ -181,11 +181,11 @@ export function RelationshipEditDialog({
 
     try {
       await saveRelationshipsMutation.mutateAsync(nextModule)
-      toast.success(t("relationships.edit.saved"))
+      toast.success(t("common.toast.saved"))
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -389,12 +389,12 @@ export function RelationshipEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving")
-                : t("relationships.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -464,7 +464,7 @@ export function UnsentNoteEditDialog({
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -565,12 +565,12 @@ export function UnsentNoteEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving")
-                : t("relationships.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -630,7 +630,7 @@ export function RelationshipPatternEditDialog({
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -680,12 +680,12 @@ export function RelationshipPatternEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel")}
+              {t("common.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving")
-                : t("relationships.common.save")}
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -1046,8 +1046,8 @@ function EventEditor({
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete")}
-          tooltip={t("relationships.common.delete")}
+          aria-label={t("common.actions.delete")}
+          tooltip={t("common.actions.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1136,8 +1136,8 @@ function HistoryEditor({
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete")}
-          tooltip={t("relationships.common.delete")}
+          aria-label={t("common.actions.delete")}
+          tooltip={t("common.actions.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1277,8 +1277,8 @@ function ConnectionEditor({
             size="icon-sm"
             variant="ghost"
             onClick={onRemove}
-            aria-label={t("relationships.common.delete")}
-            tooltip={t("relationships.common.delete")}
+            aria-label={t("common.actions.delete")}
+            tooltip={t("common.actions.delete")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -1423,8 +1423,8 @@ function ConnectionRoleEditor({
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete")}
-          tooltip={t("relationships.common.delete")}
+          aria-label={t("common.actions.delete")}
+          tooltip={t("common.actions.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>

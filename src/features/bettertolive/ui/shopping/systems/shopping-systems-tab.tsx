@@ -260,11 +260,10 @@ export function ShoppingSystemsTab({
   const handleDeleteSystem = (system: ShoppingSystemDefinition) => {
     const displayName = system.name || system.id
     confirmUndoableDelete({
-      confirmMessage: t("shopping.confirm.deleteSystem", {
+      confirmMessage: t("common.confirm.deleteItem", {
         name: displayName,
-        defaultValue: `确定删除 ${displayName} 吗？`,
       }),
-      pendingMessage: t("shopping.toast.deletePendingSystem", {
+      pendingMessage: t("common.toast.deletePending", {
         name: displayName,
         defaultValue: `已加入删除队列：${displayName}，5 秒内可撤销`,
       }),
@@ -274,7 +273,7 @@ export function ShoppingSystemsTab({
       }),
       failureMessage: t("shopping.toast.deleteFailedSystem"),
       undoLabel: t("shopping.undo"),
-      undoneMessage: t("shopping.toast.deleteUndoneSystem", {
+      undoneMessage: t("common.toast.deleteUndone", {
         name: displayName,
         defaultValue: `已撤销删除：${displayName}`,
       }),
