@@ -72,7 +72,7 @@ type AttributeMutationAction =
       kind: AttributeMutationKind
       patch?: Partial<ShoppingAttributeDefinition>
     }
-  | { type: "settle"; target: string }
+  | { type: "settle"; target: string; patch?: Partial<ShoppingAttributeDefinition> }
 
 const REORDER_TARGET = "__reorder__"
 
@@ -94,10 +94,13 @@ function attributeMutationReducer(
         inFlight: { ...state.inFlight, [action.target]: action.kind },
       }
     case "settle": {
-      // commit 与 rollback 共用：丢弃该目标的乐观补丁与 in-flight 标记
-      // 成功时由 onRefresh 拉回服务端真值，失败时回退到 server snapshot
+      // 成功时可附带服务端返回的 patch（含新 version），失败时 patch 为空回退 snapshot
       const patches = { ...state.patches }
-      delete patches[action.target]
+      if (action.patch) {
+        patches[action.target] = { ...patches[action.target], ...action.patch }
+      } else {
+        delete patches[action.target]
+      }
       const inFlight = { ...state.inFlight }
       delete inFlight[action.target]
       return { patches, inFlight }
@@ -228,13 +231,14 @@ export function ShoppingAttributesTab({
     mutationInFlight.current = true
     dispatch({ type: "begin", target: attribute.id, kind: "disable", patch: { isEnabled: false } })
     try {
-      await disableAttributeDefinition(attribute.id, attribute.version)
+      const updated = await disableAttributeDefinition(attribute.id, attribute.version)
+      dispatch({ type: "settle", target: attribute.id, patch: { version: updated.version } })
       toast.success(t("shopping.attributes.disableSuccess", "属性已停用"))
       onRefresh()
     } catch (error) {
+      dispatch({ type: "settle", target: attribute.id })
       handleMutationError(error)
     } finally {
-      dispatch({ type: "settle", target: attribute.id })
       mutationInFlight.current = false
     }
   }
@@ -245,13 +249,14 @@ export function ShoppingAttributesTab({
       mutationInFlight.current = true
       dispatch({ type: "begin", target: attribute.id, kind: "enable", patch: { isEnabled: true } })
       try {
-        await enableAttributeDefinition(attribute.id, attribute.version)
+        const updated = await enableAttributeDefinition(attribute.id, attribute.version)
+        dispatch({ type: "settle", target: attribute.id, patch: { version: updated.version } })
         toast.success(t("shopping.attributes.enableSuccess", "属性已启用"))
         onRefresh()
       } catch (error) {
+        dispatch({ type: "settle", target: attribute.id })
         handleMutationError(error)
       } finally {
-        dispatch({ type: "settle", target: attribute.id })
         mutationInFlight.current = false
       }
       return

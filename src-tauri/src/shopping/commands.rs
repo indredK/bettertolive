@@ -311,7 +311,7 @@ pub fn disable_shopping_attribute_definition(
     state: State<AppState>,
     id: String,
     version: i32,
-) -> Result<(), String> {
+) -> Result<ShoppingAttributeDefinitionDto, String> {
     let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
     write_tx(&mut conn, |tx| {
@@ -325,7 +325,7 @@ pub fn enable_shopping_attribute_definition(
     state: State<AppState>,
     id: String,
     version: i32,
-) -> Result<(), String> {
+) -> Result<ShoppingAttributeDefinitionDto, String> {
     let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
     write_tx(&mut conn, |tx| {

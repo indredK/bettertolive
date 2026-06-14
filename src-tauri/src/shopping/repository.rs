@@ -950,7 +950,7 @@ impl ShoppingRepository {
         id: &str,
         expected_version: i32,
         now: &str,
-    ) -> Result<(), String> {
+    ) -> Result<ShoppingAttributeDefinitionDto, String> {
         let existing_row = conn
             .query_row(
                 "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
@@ -1003,7 +1003,21 @@ impl ShoppingRepository {
             return Err("conflict: attribute definition was modified elsewhere".to_string());
         }
 
-        Ok(())
+        Ok(ShoppingAttributeDefinitionDto {
+            id: existing_row.id,
+            kind: existing_row.kind,
+            code: existing_row.code,
+            semantic_key: existing_row.semantic_key,
+            label: existing_row.label,
+            label_en: existing_row.label_en,
+            description: existing_row.description,
+            style_token: existing_row.style_token,
+            rank: existing_row.rank,
+            sort_order: existing_row.sort_order,
+            is_enabled: false,
+            is_system: existing_row.is_system,
+            version: expected_version + 1,
+        })
     }
 
     pub fn enable_attribute_definition(
@@ -1011,7 +1025,7 @@ impl ShoppingRepository {
         id: &str,
         expected_version: i32,
         now: &str,
-    ) -> Result<(), String> {
+    ) -> Result<ShoppingAttributeDefinitionDto, String> {
         let rows_affected = conn
             .execute(
                 "UPDATE shopping_attribute_definitions
@@ -1027,7 +1041,16 @@ impl ShoppingRepository {
                 "conflict: attribute definition not found or modified elsewhere".to_string(),
             );
         }
-        Ok(())
+
+        let updated_row = conn
+            .query_row(
+                "SELECT * FROM shopping_attribute_definitions WHERE id = ?1",
+                params![id],
+                row_to_attribute_definition,
+            )
+            .map_err(|e| e.to_string())?;
+
+        Ok(Self::row_to_attribute_definition_dto(updated_row))
     }
 
     pub fn reorder_attribute_definitions(

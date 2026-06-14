@@ -460,44 +460,43 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
     }
 
     // ---- Attribute definitions ----
-    let mut attr_lookup: std::collections::HashMap<(String, String), String> =
-        std::collections::HashMap::new();
-    if table_is_empty(conn, "shopping_attribute_definitions")? {
-        if let Some(definitions) = seed["attributeDefinitions"].as_array() {
-            for (i, definition) in definitions.iter().enumerate() {
-                let def_id = definition["id"].as_str().unwrap_or("");
-                let kind = definition["kind"].as_str().unwrap_or("");
-                let code = definition["code"].as_str().unwrap_or("");
-                attr_lookup.insert((kind.to_string(), code.to_string()), def_id.to_string());
-                conn.execute(
-                    "INSERT INTO shopping_attribute_definitions (
-                        id, kind, code, semantic_key, label, label_en, description, style_token,
-                        rank, sort_order, is_enabled, is_system, created_at, updated_at
-                    ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, 1, ?11, ?12)",
-                    rusqlite::params![
-                        def_id,
-                        kind,
-                        code,
-                        definition["semanticKey"].as_str(),
-                        definition["label"].as_str().unwrap_or(""),
-                        definition["labelEn"].as_str(),
-                        definition["description"].as_str().unwrap_or(""),
-                        definition["styleToken"].as_str(),
-                        definition["rank"].as_i64().map(|v| v as i32),
-                        definition["sortOrder"]
-                            .as_i64()
-                            .map(|v| v as i32)
-                            .unwrap_or(i as i32),
-                        now,
-                        now,
-                    ],
-                )?;
-            }
+    // 无论表是否为空，都把 seed 中缺失的定义补入（INSERT OR IGNORE 幂等），
+    // 再从库中重建 lookup，保证升级场景下新增属性也能参与 children 播种。
+    let mut attr_lookup: HashMap<(String, String), String> = HashMap::new();
+    if let Some(definitions) = seed["attributeDefinitions"].as_array() {
+        for (i, definition) in definitions.iter().enumerate() {
+            let def_id = definition["id"].as_str().unwrap_or("");
+            let kind = definition["kind"].as_str().unwrap_or("");
+            let code = definition["code"].as_str().unwrap_or("");
+            // INSERT OR IGNORE：已存在的行保持不变（用户修改的标签/启停状态不覆盖）
+            conn.execute(
+                "INSERT OR IGNORE INTO shopping_attribute_definitions (
+                    id, kind, code, semantic_key, label, label_en, description, style_token,
+                    rank, sort_order, is_enabled, is_system, created_at, updated_at
+                ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, 1, ?11, ?12)",
+                rusqlite::params![
+                    def_id,
+                    kind,
+                    code,
+                    definition["semanticKey"].as_str(),
+                    definition["label"].as_str().unwrap_or(""),
+                    definition["labelEn"].as_str(),
+                    definition["description"].as_str().unwrap_or(""),
+                    definition["styleToken"].as_str(),
+                    definition["rank"].as_i64().map(|v| v as i32),
+                    definition["sortOrder"]
+                        .as_i64()
+                        .map(|v| v as i32)
+                        .unwrap_or(i as i32),
+                    now,
+                    now,
+                ],
+            )?;
+            attr_lookup.insert((kind.to_string(), code.to_string()), def_id.to_string());
         }
-    } else {
-        // 若属性定义表非空则构造查找表，供后续 children 播种使用
-        build_attr_lookup_from_db(conn, &mut attr_lookup)?;
     }
+    // 用库中实际数据覆盖 lookup（含用户自建的属性，以及 id 与 seed 相同但 code 已改的行）
+    build_attr_lookup_from_db(conn, &mut attr_lookup)?;
 
     // ---- Items ----
     if table_is_empty(conn, "shopping_items")? {
