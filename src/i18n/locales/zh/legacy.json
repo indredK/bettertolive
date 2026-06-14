@@ -10,11 +10,9 @@
     "trustBoundaries": "边界与信任"
   },
   "actions": {
-    "add": "新增",
     "unlock": "解锁编辑",
     "revealContent": "打开正文"
   },
-  "undo": "撤销",
   "toast": {
     "deletePendingItem": "已加入删除队列：{{title}}，5 秒内可撤销",
     "deleteSuccessItem": "已删除生命整理条目：{{title}}",
@@ -110,8 +108,7 @@
     "editTitle": "编辑生命整理条目",
     "lockedCopy": "这份条目已锁定，解锁后才能编辑。",
     "contentSection": "内容",
-    "classifySection": "分类与保护",
-    "tagsPlaceholder": "用逗号分隔"
+    "classifySection": "分类与保护"
   },
   "validation": {
     "required": "请填写标题、摘要和正文",

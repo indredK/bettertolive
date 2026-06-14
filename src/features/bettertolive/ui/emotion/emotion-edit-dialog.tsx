@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveEmotionMutation } from "@/features/bettertolive/queries/use-save-emotion-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   EmotionCheckIn,
   EmotionEmotionTag,
@@ -520,21 +521,19 @@ export function EmotionEntityEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (editing.isNew || !editing.item) return
 
-    const confirmed =
-      typeof window === "undefined" || window.confirm(t("emotion.editor.confirmDelete"))
-
-    if (!confirmed) return
-
-    try {
-      await saveEmotionMutation.mutateAsync(removeEntity(emotion, editing))
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch (error) {
-      toast.error(String(error))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("emotion.editor.confirmDelete"),
+      pendingMessage: t("common.toast.deletePending", { name: "" }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: "" }),
+      onDelete: () => saveEmotionMutation.mutateAsync(removeEntity(emotion, editing)),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

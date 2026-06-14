@@ -399,7 +399,7 @@ export function NutritionDailyPlanEditDialog({
                           size="icon-sm"
                           onClick={() => removeSlot(slotIndex)}
                           disabled={form.slots.length <= 1 || referencedSlotIds.has(slot.id)}
-                          tooltip={t("nutrition.dailyPlanEdit.delete")}
+                          tooltip={t("common.actions.delete")}
                         >
                           <Trash2 className="size-4" />
                         </Button>
@@ -454,7 +454,7 @@ export function NutritionDailyPlanEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.dailyPlanEdit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>

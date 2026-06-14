@@ -82,7 +82,6 @@
     "relations": "No principle relations match the current filter.",
     "priority": "No high-priority principles match the current filter.",
     "evolving": "No changing principles match the current filter.",
-    "distribution": "No distribution data yet.",
     "personal": "No personal principles match the current filter.",
     "others": "No borrowed or inherited principles match the current filter."
   },
@@ -106,10 +105,8 @@
     "protectedValue": "Protected Value",
     "decisionCue": "Calibration Cue",
     "tags": "Tags",
-    "tagsPlaceholder": "Separate with commas",
     "confirmDelete": "Delete this principle?",
     "saved": "Principle saved",
-    "saveFailed": "Failed to save principle",
     "deleted": "Principle deleted",
     "deleteFailed": "Failed to delete principle",
     "validation": {

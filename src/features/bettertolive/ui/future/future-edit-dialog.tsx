@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveFutureMutation } from "@/features/bettertolive/queries/use-save-future-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type { FutureBlueprint, FutureMilestone } from "@/features/bettertolive/types"
 import { cn } from "@/lib/utils"
 
@@ -226,27 +227,29 @@ export function FutureMilestoneEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (editing.isNew) return
 
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: editing.milestone?.horizon,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveFutureMutation.mutateAsync({
-        ...future,
-        milestones: removeAt(future.milestones, editing.index),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", {
+        name: editing.milestone?.horizon ?? "",
+      }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", {
+        name: editing.milestone?.horizon ?? "",
+      }),
+      onDelete: () =>
+        saveFutureMutation.mutateAsync({
+          ...future,
+          milestones: removeAt(future.milestones, editing.index),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -349,23 +352,27 @@ export function FutureExperimentEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (editing.isNew) return
 
-    const confirmed = window.confirm(t("future.confirm.deleteExperiment"))
-
-    if (!confirmed) return
-
-    try {
-      await saveFutureMutation.mutateAsync({
-        ...future,
-        experiments: removeAt(future.experiments, editing.index),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("future.confirm.deleteExperiment"),
+      pendingMessage: t("common.toast.deletePending", {
+        name: editing.experiment ?? "",
+      }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", {
+        name: editing.experiment ?? "",
+      }),
+      onDelete: () =>
+        saveFutureMutation.mutateAsync({
+          ...future,
+          experiments: removeAt(future.experiments, editing.index),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

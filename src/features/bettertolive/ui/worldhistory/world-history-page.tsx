@@ -331,9 +331,7 @@ export function WorldHistoryPage({
               variant="default"
               size="icon-sm"
               disabled={saveMutation.isPending}
-              label={
-                saveMutation.isPending ? t("worldhistory.actions.saving") : t("common.actions.save")
-              }
+              label={saveMutation.isPending ? t("common.actions.saving") : t("common.actions.save")}
               icon={<Check className="size-3.5" />}
               onClick={saveEdit}
             />

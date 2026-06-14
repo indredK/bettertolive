@@ -82,20 +82,15 @@
   "form": {
     "basic": "Basic Content",
     "classification": "Classification and Lens",
-    "optional": "Optional",
-    "tagsPlaceholder": "Separate with commas"
+    "optional": "Optional"
   },
   "actions": {
     "create": "Add Belief",
     "editEntry": "Edit Belief"
   },
   "toast": {
-    "deletePending": "{{name}} is queued for deletion. Undo is available for 5 seconds.",
-    "deleteSuccess": "Deleted belief: {{name}}",
-    "deleteFailed": "Failed to delete belief",
-    "deleteUndone": "Deletion undone: {{name}}"
+    "deleteSuccess": "Deleted belief: {{name}}"
   },
-  "undo": "Undo",
   "error": {
     "required": "Enter a title and belief statement"
   },
@@ -109,7 +104,6 @@
     "cards": "No three-layer frame under the current filter.",
     "conflicts": "No conflicting beliefs under the current filter.",
     "changing": "No changing beliefs under the current filter.",
-    "distribution": "No distribution data yet.",
     "limiting": "No limiting beliefs under the current filter."
   },
   "enums": {

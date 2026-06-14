@@ -194,11 +194,11 @@ export function NutritionDailyPlanTab({
                       type="button"
                       variant="outline"
                       size="sm"
-                      label={t("nutrition.dailyPlanEdit.editAction")}
+                      label={t("common.actions.edit")}
                       icon={<Pencil className="size-3.5" />}
                       onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
                     >
-                      {t("nutrition.dailyPlanEdit.editAction")}
+                      {t("common.actions.edit")}
                     </AnimatedIconButton>
                   </div>
                 </div>

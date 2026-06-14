@@ -163,7 +163,7 @@ export function LegacyItemEditDialog({
         defaultValue: `已删除生命整理条目：${seed.title}`,
       }),
       failureMessage: t("legacy.toast.deleteFailedItem"),
-      undoLabel: t("legacy.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         title: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,

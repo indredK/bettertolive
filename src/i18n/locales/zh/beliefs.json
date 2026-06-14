@@ -82,20 +82,15 @@
   "form": {
     "basic": "基本内容",
     "classification": "分类与解读",
-    "optional": "可选",
-    "tagsPlaceholder": "用逗号分隔"
+    "optional": "可选"
   },
   "actions": {
     "create": "新增观念",
     "editEntry": "编辑观念"
   },
   "toast": {
-    "deletePending": "已加入删除队列：{{name}}，5 秒内可撤销",
-    "deleteSuccess": "已删除观念：{{name}}",
-    "deleteFailed": "删除观念失败",
-    "deleteUndone": "已撤销删除：{{name}}"
+    "deleteSuccess": "已删除观念：{{name}}"
   },
-  "undo": "撤销",
   "error": {
     "required": "请填写标题和观念表述"
   },
@@ -109,7 +104,6 @@
     "cards": "当前筛选下没有三层骨架。",
     "conflicts": "当前筛选下没有冲突中的观念。",
     "changing": "当前筛选下没有正在变化的观念。",
-    "distribution": "暂无分布数据。",
     "limiting": "当前筛选下没有限制性观念。"
   },
   "enums": {

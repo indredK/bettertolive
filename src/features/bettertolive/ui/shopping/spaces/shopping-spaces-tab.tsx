@@ -259,7 +259,7 @@ export function ShoppingSpacesTab({
         defaultValue: `已删除空间：${space.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSpace"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: space.name,
         defaultValue: `已撤销删除：${space.name}`,

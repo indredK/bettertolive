@@ -146,7 +146,7 @@ export function ShoppingSystemEditDialog({
         defaultValue: `已删除系统：${displayName}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSystem"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: displayName,
         defaultValue: `已撤销删除：${displayName}`,

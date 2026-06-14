@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveSocioeconomicsMutation } from "@/features/bettertolive/queries/use-save-socioeconomics-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   EconConfidence,
   EconConfidenceRevision,
@@ -310,27 +311,25 @@ export function SocioeconomicsEntryEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.entry) return
 
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: editing.entry.title,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveSocioeconomicsMutation.mutateAsync({
-        ...socioeconomics,
-        entries: socioeconomics.entries.filter((entry) => entry.id !== editing.entry?.id),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", { name: editing.entry.title }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.entry.title }),
+      onDelete: () =>
+        saveSocioeconomicsMutation.mutateAsync({
+          ...socioeconomics,
+          entries: socioeconomics.entries.filter((entry) => entry.id !== editing.entry?.id),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -555,22 +554,23 @@ export function SocioeconomicsGapEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.gap) return
 
-    const confirmed = window.confirm(t("socioeconomics.confirm.deleteGap"))
-    if (!confirmed) return
-
-    try {
-      await saveSocioeconomicsMutation.mutateAsync({
-        ...socioeconomics,
-        gaps: socioeconomics.gaps.filter((gap) => gap.id !== editing.gap?.id),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("socioeconomics.confirm.deleteGap"),
+      pendingMessage: t("common.toast.deletePending", { name: editing.gap.summary }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.gap.summary }),
+      onDelete: () =>
+        saveSocioeconomicsMutation.mutateAsync({
+          ...socioeconomics,
+          gaps: socioeconomics.gaps.filter((gap) => gap.id !== editing.gap?.id),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -680,22 +680,23 @@ export function SocioeconomicsPromptEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (editing.index === null) return
 
-    const confirmed = window.confirm(t("socioeconomics.confirm.deletePrompt"))
-    if (!confirmed) return
-
-    try {
-      await saveSocioeconomicsMutation.mutateAsync({
-        ...socioeconomics,
-        reviewPrompts: socioeconomics.reviewPrompts.filter((_, index) => index !== editing.index),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("socioeconomics.confirm.deletePrompt"),
+      pendingMessage: t("common.toast.deletePending", { name: "" }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: "" }),
+      onDelete: () =>
+        saveSocioeconomicsMutation.mutateAsync({
+          ...socioeconomics,
+          reviewPrompts: socioeconomics.reviewPrompts.filter((_, index) => index !== editing.index),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

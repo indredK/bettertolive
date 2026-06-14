@@ -31,21 +31,17 @@
   },
   "empty": {
     "entries": "当前筛选下还没有账目记录。",
-    "distribution": "当前筛选下没有可展示的分布。",
     "reviewEntries": "当前没有需要优先复盘的账目。",
     "rules": "当前还没有预算规则。"
   },
   "toast": {
     "saved": "已保存账目",
-    "saveFailed": "保存失败",
-    "deleted": "已删除账目",
-    "deleteFailed": "删除失败"
+    "deleted": "已删除账目"
   },
   "edit": {
     "createTitle": "新增账目",
     "editTitle": "编辑账目",
     "description": "记录金额，也保留这笔钱背后的生活语境。",
-    "tagsPlaceholder": "每行一个标签",
     "validation": {
       "required": "请填写日期、标题、类别和有效金额",
       "amountPositive": "金额需要大于 0"

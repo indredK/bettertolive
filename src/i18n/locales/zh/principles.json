@@ -80,7 +80,6 @@
     "relations": "当前筛选下没有原则关系。",
     "priority": "当前筛选下没有高优先级原则。",
     "evolving": "当前筛选下没有正在变化的原则。",
-    "distribution": "暂无分布数据。",
     "personal": "当前筛选下没有个人原则。",
     "others": "当前筛选下没有他人原则。"
   },
@@ -104,10 +103,8 @@
     "protectedValue": "保护对象",
     "decisionCue": "触发校准",
     "tags": "标签",
-    "tagsPlaceholder": "用逗号分隔",
     "confirmDelete": "确定删除这条原则吗？",
     "saved": "原则已保存",
-    "saveFailed": "原则保存失败",
     "deleted": "原则已删除",
     "deleteFailed": "原则删除失败",
     "validation": {

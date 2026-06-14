@@ -110,7 +110,7 @@ export function NotificationCenterPanel({
                       className="text-[11px] text-[color:var(--text-muted)]"
                       onClick={() => onDismissNotification(notification.id)}
                     >
-                      {t("shell.notifications.close")}
+                      {t("common.actions.close")}
                     </button>
                   ) : null}
                 </div>

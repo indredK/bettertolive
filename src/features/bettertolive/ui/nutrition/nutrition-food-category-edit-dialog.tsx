@@ -242,7 +242,7 @@ export function NutritionFoodCategoryEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.categoryEdit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>

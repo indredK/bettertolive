@@ -14,8 +14,7 @@
     "addGrowth": "Add Growth",
     "addAnchor": "Add Anchor",
     "addPrompt": "Add Prompt",
-    "addThread": "Add Signal",
-    "edit": "Edit"
+    "addThread": "Add Signal"
   },
   "filters": {
     "title": "5-D Filters",
@@ -279,7 +278,6 @@
     "threads": "No active influence signals match the current filters.",
     "signals": "No supporting signals match the current filters.",
     "noData": "No growth-memory data yet.",
-    "distribution": "No distribution data yet.",
     "none": "None"
   },
   "library": {

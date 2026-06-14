@@ -10,11 +10,9 @@
     "trustBoundaries": "Trust Boundaries"
   },
   "actions": {
-    "add": "Add",
     "unlock": "Unlock to edit",
     "revealContent": "Open content"
   },
-  "undo": "Undo",
   "toast": {
     "deletePendingItem": "Queued for deletion: {{title}}. You can undo within 5 seconds.",
     "deleteSuccessItem": "Deleted life organizing item: {{title}}",
@@ -110,8 +108,7 @@
     "editTitle": "Edit Life Organizing Item",
     "lockedCopy": "This item is locked. Unlock it before editing.",
     "contentSection": "Content",
-    "classifySection": "Classification and Protection",
-    "tagsPlaceholder": "Separate with commas"
+    "classifySection": "Classification and Protection"
   },
   "validation": {
     "required": "Please fill in title, summary, and content",

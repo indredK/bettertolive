@@ -257,7 +257,7 @@ export function ShoppingItemEditDialog({
         defaultValue: `已删除物件：${seed.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedItem"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: seed.name,
         defaultValue: `已撤销删除：${seed.name}`,

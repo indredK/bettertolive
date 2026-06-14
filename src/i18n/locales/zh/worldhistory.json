@@ -6,9 +6,6 @@
     "gantt": "演进",
     "arena": "对质"
   },
-  "actions": {
-    "saving": "保存中…"
-  },
   "narrative": {
     "prev": "上一步",
     "next": "下一步",
@@ -48,7 +45,6 @@
     "deletePending": "已加入删除队列，5 秒内可撤销",
     "deleteSuccess": "已删除事件",
     "deleteFailed": "删除事件失败",
-    "undoLabel": "撤销",
     "deleteUndone": "已撤销删除"
   },
   "preset": {

@@ -18,10 +18,6 @@
     "addRelationship": "Add Relationship",
     "addNote": "Add Note"
   },
-  "common": {
-    "add": "Add",
-    "undo": "Undo"
-  },
   "overview": {
     "classificationHeading": "Five-Dimension Relationship Map",
     "classificationDescription": "These dimensions group and observe the relationship world; unfinished weight stays in details and unsent words.",
@@ -52,8 +48,6 @@
   "filter": {
     "all": "All",
     "clear": "Clear filters",
-    "clearAll": "Clear",
-    "more": "Filters",
     "type": "Type",
     "depth": "Depth",
     "stage": "Stage",
@@ -80,7 +74,6 @@
     "clearFocus": "Clear Focus",
     "center": "Center on This Person",
     "exitCenter": "Cancel Centering",
-    "editConnections": "Edit",
     "centeredMode": "Centered View",
     "globalMode": "Global View",
     "centerDepth": "{{count}} hops expanded",
@@ -132,7 +125,6 @@
     "relatedNotes": "Related Unsent Words"
   },
   "empty": {
-    "distribution": "No distribution data yet.",
     "events": "No key events yet.",
     "history": "No depth or stage changes yet.",
     "relatedNotes": "No related notes yet.",
@@ -217,7 +209,6 @@
     "saved": "Relationship saved",
     "noteSaved": "Unsent words saved",
     "patternSaved": "Pattern saved",
-    "saveFailed": "Save failed",
     "validation": {
       "relationshipRequired": "Enter a name and role",
       "noteRequired": "Enter target, theme, and content",

@@ -36,7 +36,6 @@
     "deleteUndoneSpace": "已撤销删除：{{name}}",
     "deleteUndoneStage": "已撤销删除：{{name}}"
   },
-  "undo": "撤销",
   "overview": {
     "currentFocus": "当前该先看什么",
     "currentFocusDesc": "这些不是随机想法，而是从系统缺口、动作节奏和购买判断里冒出来的提醒。",
@@ -419,7 +418,6 @@
     "removeItem": "移除物品"
   },
   "planning": {
-    "filter": "筛选",
     "clear": "清除",
     "depreciation": "折旧率",
     "system": "系统",
@@ -542,7 +540,6 @@
         "stagesPlaceholder": "选择适用阶段",
         "statusPlaceholder": "选择状态",
         "cuePlaceholder": "e.g. 舒适度下降或塌陷",
-        "tagsPlaceholder": "e.g. 高频, 刚需",
         "keywordsPlaceholder": "e.g. 床垫, 睡眠",
         "reasonPlaceholder": "为什么要购买",
         "lifestylePlaceholder": "e.g. 舒服",
@@ -664,8 +661,6 @@
     "allSpaces": "全部空间",
     "allSystems": "全部系统",
     "channel": "渠道",
-    "clearAll": "清空",
-    "more": "筛选",
     "noChannel": "无渠道",
     "noSpace": "未分配空间",
     "noSystem": "未分配系统",

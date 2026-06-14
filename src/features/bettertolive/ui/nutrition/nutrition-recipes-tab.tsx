@@ -298,11 +298,11 @@ function RecipeDetail({
               type="button"
               variant="outline"
               size="sm"
-              label={t("nutrition.recipeEdit.editAction")}
+              label={t("common.actions.edit")}
               icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
             >
-              {t("nutrition.recipeEdit.editAction")}
+              {t("common.actions.edit")}
             </AnimatedIconButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{recipe.name}</h3>

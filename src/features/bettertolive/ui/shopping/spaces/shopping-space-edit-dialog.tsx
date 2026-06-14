@@ -125,7 +125,7 @@ export function ShoppingSpaceEditDialog({
         defaultValue: `已删除空间：${editing.space.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSpace"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: editing.space.name,
         defaultValue: `已撤销删除：${editing.space.name}`,

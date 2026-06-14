@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveJourneyMutation } from "@/features/bettertolive/queries/use-save-journey-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   EmotionalWeight,
   FormativePower,
@@ -494,21 +495,22 @@ function JourneyMemoryEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.memory) return
-    if (!window.confirm(t("journey.confirm.deleteMemory"))) {
-      return
-    }
 
-    try {
-      await saveJourneyMutation.mutateAsync(
-        cleanupMemoryReferences(growth, memory, editing.memory.id),
-      )
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("journey.confirm.deleteMemory"),
+      pendingMessage: t("common.toast.deletePending", { name: editing.memory.title }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.memory.title }),
+      onDelete: () =>
+        saveJourneyMutation.mutateAsync(
+          cleanupMemoryReferences(growth, memory, editing.memory!.id),
+        ),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -698,25 +700,26 @@ function JourneyGrowthNodeEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.node) return
-    if (!window.confirm(t("journey.confirm.deleteGrowth"))) {
-      return
-    }
 
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth: {
-          ...growth,
-          growthNodes: removeById(growth.growthNodes, editing.node.id),
-        },
-        memory,
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("journey.confirm.deleteGrowth"),
+      pendingMessage: t("common.toast.deletePending", { name: editing.node.title }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.node.title }),
+      onDelete: () =>
+        saveJourneyMutation.mutateAsync({
+          growth: {
+            ...growth,
+            growthNodes: removeById(growth.growthNodes, editing.node!.id),
+          },
+          memory,
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -883,25 +886,26 @@ function JourneyAnchorEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.anchor) return
-    if (!window.confirm(t("journey.confirm.deleteAnchor"))) {
-      return
-    }
 
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth,
-        memory: {
-          ...memory,
-          anchors: removeById(memory.anchors, editing.anchor.id),
-        },
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("journey.confirm.deleteAnchor"),
+      pendingMessage: t("common.toast.deletePending", { name: editing.anchor.label }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.anchor.label }),
+      onDelete: () =>
+        saveJourneyMutation.mutateAsync({
+          growth,
+          memory: {
+            ...memory,
+            anchors: removeById(memory.anchors, editing.anchor!.id),
+          },
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (
@@ -1008,34 +1012,34 @@ function JourneyTextEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (editing.isNew) return
     const confirmKey = isThread ? "journey.confirm.deleteThread" : "journey.confirm.deletePrompt"
 
-    if (!window.confirm(t(confirmKey))) {
-      return
-    }
-
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth: isThread
-          ? {
-              ...growth,
-              threads: removeAt(growth.threads, editing.index),
-            }
-          : growth,
-        memory: isThread
-          ? memory
-          : {
-              ...memory,
-              reviewPrompts: removeAt(memory.reviewPrompts, editing.index),
-            },
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t(confirmKey),
+      pendingMessage: t("common.toast.deletePending", { name: "" }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: "" }),
+      onDelete: () =>
+        saveJourneyMutation.mutateAsync({
+          growth: isThread
+            ? {
+                ...growth,
+                threads: removeAt(growth.threads, editing.index),
+              }
+            : growth,
+          memory: isThread
+            ? memory
+            : {
+                ...memory,
+                reviewPrompts: removeAt(memory.reviewPrompts, editing.index),
+              },
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

@@ -124,7 +124,7 @@ export function ShoppingStagesTab({
         defaultValue: `已删除阶段：${name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedStage"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name,
         defaultValue: `已撤销删除：${name}`,

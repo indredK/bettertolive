@@ -1147,7 +1147,7 @@ function JourneyManagementList({
                 type="button"
                 variant="ghost"
                 size="icon-xs"
-                label={t("journey.actions.edit")}
+                label={t("common.actions.edit")}
                 icon={<Pencil className="size-3.5" />}
                 onClick={row.onEdit}
               />

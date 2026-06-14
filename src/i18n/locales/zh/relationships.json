@@ -18,10 +18,6 @@
     "addRelationship": "新增关系",
     "addNote": "新增表达"
   },
-  "common": {
-    "add": "添加",
-    "undo": "撤销"
-  },
   "overview": {
     "classificationHeading": "5 维关系分类",
     "classificationDescription": "这些维度负责分组和观察关系世界；未完成重量留在详情和想说的话里。",
@@ -52,8 +48,6 @@
   "filter": {
     "all": "全部",
     "clear": "清空筛选",
-    "clearAll": "清空",
-    "more": "筛选",
     "type": "类型",
     "depth": "深度",
     "stage": "阶段",
@@ -80,7 +74,6 @@
     "clearFocus": "取消焦点",
     "center": "以它为中心",
     "exitCenter": "取消以它为中心",
-    "editConnections": "编辑",
     "centeredMode": "中心视图",
     "globalMode": "全局视图",
     "centerDepth": "展开 {{count}} 跳",
@@ -132,7 +125,6 @@
     "relatedNotes": "相关想说的话"
   },
   "empty": {
-    "distribution": "暂无分布数据。",
     "events": "暂无关键互动事件。",
     "history": "暂无深度或阶段变化。",
     "relatedNotes": "暂无关联表达。",
@@ -217,7 +209,6 @@
     "saved": "关系已保存",
     "noteSaved": "想说的话已保存",
     "patternSaved": "模式已保存",
-    "saveFailed": "保存失败",
     "validation": {
       "relationshipRequired": "请填写姓名和角色",
       "noteRequired": "请填写对象、主题和内容",

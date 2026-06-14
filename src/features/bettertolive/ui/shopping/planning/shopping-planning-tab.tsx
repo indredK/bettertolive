@@ -415,7 +415,7 @@ export function ShoppingPlanningTab({
         defaultValue: `已删除物件：${name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedItem"),
-      undoLabel: t("shopping.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name,
         defaultValue: `已撤销删除：${name}`,

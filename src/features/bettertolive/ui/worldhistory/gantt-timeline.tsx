@@ -182,7 +182,7 @@ export function GanttTimeline({
                             pendingMessage: t("worldhistory.event.deletePending"),
                             successMessage: t("worldhistory.event.deleteSuccess"),
                             failureMessage: t("worldhistory.event.deleteFailed"),
-                            undoLabel: t("worldhistory.event.undoLabel"),
+                            undoLabel: t("common.actions.undo"),
                             undoneMessage: t("worldhistory.event.deleteUndone"),
                             onDelete: () => Promise.resolve(onDeleteEvent(event.id)),
                           })

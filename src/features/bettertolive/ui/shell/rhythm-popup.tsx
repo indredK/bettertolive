@@ -40,7 +40,7 @@ export function RhythmPopup({ slides }: RhythmPopupProps) {
         icon={CalendarDays}
         eyebrow={t("shell.rhythmPopup.eyebrow")}
         title={t("shell.rhythmPopup.title")}
-        closeLabel={t("shell.notifications.close")}
+        closeLabel={t("common.actions.close")}
         onClose={() => setOpen(false)}
       />
       <PopupNotificationBody>

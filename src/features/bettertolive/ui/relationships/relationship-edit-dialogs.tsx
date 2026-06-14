@@ -1011,7 +1011,7 @@ function EditableListHeader({
         onClick={onAdd}
       >
         <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-        {t("relationships.common.add")}
+        {t("common.actions.add")}
       </Button>
     </div>
   )

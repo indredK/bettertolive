@@ -1349,7 +1349,7 @@ function BeliefEditDialog({
         defaultValue: `已删除观念：${seed.title}`,
       }),
       failureMessage: t("common.toast.deleteFailed"),
-      undoLabel: t("beliefs.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,

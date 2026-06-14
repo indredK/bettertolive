@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSavePrinciplesMutation } from "@/features/bettertolive/queries/use-save-principles-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   PrincipleCost,
   PrincipleDomain,
@@ -136,30 +137,30 @@ export function PrincipleEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     const seed = editing.principle
     if (!seed) return
 
-    if (!window.confirm(t("principles.edit.confirmDelete"))) {
-      return
-    }
-
-    try {
-      const nextEntries = principlesModule.entries.filter((entry) => entry.id !== seed.id)
-
-      await savePrinciplesMutation.mutateAsync({
-        ...principlesModule,
-        entries: nextEntries,
-        boundaries: deriveBoundaryList(nextEntries),
-        relations: principlesModule.relations.filter(
-          (relation) => relation.fromId !== seed.id && relation.toId !== seed.id,
-        ),
-      })
-      toast.success(t("principles.edit.deleted"))
-      onSaved?.()
-    } catch {
-      toast.error(t("principles.edit.deleteFailed"))
-    }
+    confirmUndoableDelete({
+      confirmMessage: t("principles.edit.confirmDelete"),
+      pendingMessage: t("common.toast.deletePending", { name: seed.title }),
+      successMessage: t("principles.edit.deleted"),
+      failureMessage: t("principles.edit.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: seed.title }),
+      onDelete: async () => {
+        const nextEntries = principlesModule.entries.filter((entry) => entry.id !== seed.id)
+        await savePrinciplesMutation.mutateAsync({
+          ...principlesModule,
+          entries: nextEntries,
+          boundaries: deriveBoundaryList(nextEntries),
+          relations: principlesModule.relations.filter(
+            (relation) => relation.fromId !== seed.id && relation.toId !== seed.id,
+          ),
+        })
+      },
+      onDeleted: () => onSaved?.(),
+    })
   }
 
   return (

@@ -12,7 +12,6 @@
     "toolbox": "恢复工具箱"
   },
   "actions": {
-    "add": "新增",
     "addCheckIn": "新增记录",
     "addTrendPoint": "新增趋势点",
     "addSegment": "新增时间段",

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   FinanceLifeSystem,
   FinanceLinkedModule,
@@ -147,27 +148,25 @@ export function FinanceEntryEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.entry) return
 
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: editing.entry.label,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveFinanceMutation.mutateAsync({
-        ...finance,
-        entries: finance.entries.filter((entry) => entry.id !== editing.entry?.id),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", { name: editing.entry.label }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.entry.label }),
+      onDelete: () =>
+        saveFinanceMutation.mutateAsync({
+          ...finance,
+          entries: finance.entries.filter((entry) => entry.id !== editing.entry?.id),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

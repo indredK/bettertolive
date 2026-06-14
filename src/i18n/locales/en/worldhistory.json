@@ -6,9 +6,6 @@
     "gantt": "Evolution",
     "arena": "Arena"
   },
-  "actions": {
-    "saving": "Saving..."
-  },
   "narrative": {
     "prev": "Previous",
     "next": "Next",
@@ -48,7 +45,6 @@
     "deletePending": "Queued for deletion. Undo is available for 5 seconds.",
     "deleteSuccess": "Deleted event",
     "deleteFailed": "Failed to delete event",
-    "undoLabel": "Undo",
     "deleteUndone": "Deletion undone"
   },
   "preset": {

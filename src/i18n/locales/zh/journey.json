@@ -14,8 +14,7 @@
     "addGrowth": "新增成长",
     "addAnchor": "新增锚点",
     "addPrompt": "新增问题",
-    "addThread": "新增线索",
-    "edit": "编辑"
+    "addThread": "新增线索"
   },
   "filters": {
     "title": "五维过滤",
@@ -279,7 +278,6 @@
     "threads": "当前筛选下没有可展示的影响线索。",
     "signals": "当前筛选下没有辅助线索。",
     "noData": "当前还没有成长记忆数据。",
-    "distribution": "暂无分布数据。",
     "none": "暂无"
   },
   "library": {

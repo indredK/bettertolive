@@ -82,7 +82,6 @@
     "display": "Display: {{channel}}",
     "duration": "Duration: {{duration}}",
     "durationMs": "{{duration}}ms",
-    "close": "Close",
     "goTo": "Go to {{view}}",
     "defaultAction": "Open"
   },

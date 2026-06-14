@@ -12,12 +12,11 @@ import {
 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { toast } from "sonner"
-
 import { Badge } from "@/components/ui/badge"
 import { ActionGroup, AnimatedButton, AnimatedIconButton } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   FinanceCategoryRule,
   FinanceModuleData,
@@ -102,24 +101,22 @@ export function FinancePage({
     setEditingEntry({ isNew: false, entry })
   }
 
-  const handleDeleteEntry = async (entry: TransactionEntry) => {
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+  const handleDeleteEntry = (entry: TransactionEntry) => {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: entry.label,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveFinanceMutation.mutateAsync({
-        ...editableFinance,
-        entries: editableFinance.entries.filter((item) => item.id !== entry.id),
-      })
-      toast.success(t("common.toast.deleted"))
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", { name: entry.label }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: entry.label }),
+      onDelete: () =>
+        saveFinanceMutation.mutateAsync({
+          ...editableFinance,
+          entries: editableFinance.entries.filter((item) => item.id !== entry.id),
+        }),
+    })
   }
 
   return (

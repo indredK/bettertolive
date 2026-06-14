@@ -253,7 +253,7 @@ function LegacyItemDetail({
         defaultValue: `已删除生命整理条目：${item.title}`,
       }),
       failureMessage: t("legacy.toast.deleteFailedItem"),
-      undoLabel: t("legacy.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         title: item.title,
         defaultValue: `已撤销删除：${item.title}`,

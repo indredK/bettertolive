@@ -239,10 +239,10 @@ function MessageCard({
           <Button
             variant="ghost"
             size="icon-sm"
-            aria-label={t("shell.notifications.close")}
+            aria-label={t("common.actions.close")}
             className="text-slate-500 hover:bg-slate-100 hover:text-slate-700"
             onClick={() => onDismiss(notification.id)}
-            tooltip={t("shell.notifications.close")}
+            tooltip={t("common.actions.close")}
           >
             <X className="size-4" />
           </Button>
@@ -336,10 +336,10 @@ function NotificationCard({
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={t("shell.notifications.close")}
+          aria-label={t("common.actions.close")}
           className="shrink-0 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
           onClick={() => onDismiss(notification.id)}
-          tooltip={t("shell.notifications.close")}
+          tooltip={t("common.actions.close")}
         >
           <X className="size-4" />
         </Button>
@@ -362,7 +362,7 @@ function NotificationDetailDialog({
   return (
     <Dialog open={notification !== null} onOpenChange={(open) => !open && onClose()}>
       {notification ? (
-        <DialogContent className="max-w-[560px] p-0" showCloseButton={false}>
+        <DialogContent className="max-w-[560px] p-0">
           <DialogHeader className="px-5 pt-5">
             <div className="flex items-center gap-2 text-xs tracking-[0.18em] text-slate-500 uppercase">
               <BellRing className="size-3.5" />
@@ -420,7 +420,7 @@ function NotificationDetailDialog({
 
           <DialogFooter className="bg-slate-50/80">
             <Button variant="outline" onClick={onClose}>
-              {t("shell.notifications.close")}
+              {t("common.actions.close")}
             </Button>
             {notification.targetView ? (
               <Button onClick={() => onActivateTarget(notification)}>

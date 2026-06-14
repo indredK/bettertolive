@@ -518,7 +518,7 @@ export function NutritionRecipeEditDialog({
                         size="icon-sm"
                         onClick={() => removeIngredient(index)}
                         disabled={form.ingredients.length <= 1}
-                        tooltip={t("nutrition.recipeEdit.delete")}
+                        tooltip={t("common.actions.delete")}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -560,7 +560,7 @@ export function NutritionRecipeEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.recipeEdit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>

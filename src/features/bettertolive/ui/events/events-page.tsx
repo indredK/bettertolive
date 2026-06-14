@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveEventsMutation } from "@/features/bettertolive/queries/use-save-events-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type { EventEntry, EventsModuleData } from "@/features/bettertolive/types"
 import { EmptyState, SectionHeading, Surface } from "@/features/bettertolive/ui/shared/shared"
 import { cn } from "@/lib/utils"
@@ -682,27 +683,25 @@ function EventEditDialog({
     }
   }
 
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.event) return
 
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: editing.event.title,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveEventsMutation.mutateAsync({
-        ...eventsModule,
-        entries: eventsModule.entries.filter((entry) => entry.id !== editing.event?.id),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", { name: editing.event.title }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.event.title }),
+      onDelete: () =>
+        saveEventsMutation.mutateAsync({
+          ...eventsModule,
+          entries: eventsModule.entries.filter((entry) => entry.id !== editing.event?.id),
+        }),
+      onDeleted: () => onClose(),
+    })
   }
 
   return (

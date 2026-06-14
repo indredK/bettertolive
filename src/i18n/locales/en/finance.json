@@ -31,21 +31,17 @@
   },
   "empty": {
     "entries": "No finance entries under the current filter.",
-    "distribution": "No distribution data under the current filter.",
     "reviewEntries": "There are no priority entries to review right now.",
     "rules": "No budget rules yet."
   },
   "toast": {
     "saved": "Entry saved",
-    "saveFailed": "Save failed",
-    "deleted": "Entry deleted",
-    "deleteFailed": "Delete failed"
+    "deleted": "Entry deleted"
   },
   "edit": {
     "createTitle": "Create Entry",
     "editTitle": "Edit Entry",
     "description": "Capture the amount, and also the life context behind it.",
-    "tagsPlaceholder": "One tag per line",
     "validation": {
       "required": "Please fill in date, title, category, and a valid amount",
       "amountPositive": "Amount must be greater than 0"

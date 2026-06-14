@@ -36,7 +36,6 @@
     "deleteUndoneSpace": "Deletion undone: {{name}}",
     "deleteUndoneStage": "Deletion undone: {{name}}"
   },
-  "undo": "Undo",
   "overview": {
     "currentFocus": "What to Focus On Now",
     "currentFocusDesc": "These aren't random thoughts, but reminders emerging from system gaps, action rhythm, and purchase judgment.",
@@ -419,7 +418,6 @@
     "removeItem": "Remove item"
   },
   "planning": {
-    "filter": "Filter",
     "clear": "Clear",
     "depreciation": "Depreciation",
     "system": "System",
@@ -542,7 +540,6 @@
         "stagesPlaceholder": "Select applicable stages",
         "statusPlaceholder": "Select status",
         "cuePlaceholder": "e.g. comfort declining or sagging",
-        "tagsPlaceholder": "e.g. frequent, essential",
         "keywordsPlaceholder": "e.g. mattress, sleep",
         "reasonPlaceholder": "Why to buy",
         "lifestylePlaceholder": "e.g. comfort",
@@ -664,8 +661,6 @@
     "allSpaces": "All spaces",
     "allSystems": "All systems",
     "channel": "Channel",
-    "clearAll": "Clear all",
-    "more": "Filters",
     "noChannel": "No channel",
     "noSpace": "No space",
     "noSystem": "No system",

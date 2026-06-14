@@ -12,7 +12,6 @@
     "toolbox": "Recovery Toolkit"
   },
   "actions": {
-    "add": "Add",
     "addCheckIn": "Add Entry",
     "addTrendPoint": "Add Trend Point",
     "addSegment": "Add Segment",

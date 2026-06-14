@@ -441,7 +441,7 @@ export function NutritionMealLogEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.logEdit.delete")}
+                {t("common.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>

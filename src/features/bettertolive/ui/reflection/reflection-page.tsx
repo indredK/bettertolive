@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveReflectionMutation } from "@/features/bettertolive/queries/use-save-reflection-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   ReflectionDraftExample,
   ReflectionEntry,
@@ -147,24 +148,23 @@ export function ReflectionPage({
     t("reflection.prompts.next"),
   ]
 
-  const handleDelete = async (entry: ReflectionEntry) => {
-    const confirmed = window.confirm(
-      t("common.confirm.deleteItem", {
+  const handleDelete = (entry: ReflectionEntry) => {
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", {
         name: entry.title,
       }),
-    )
-
-    if (!confirmed) return
-
-    try {
-      await saveReflectionMutation.mutateAsync({
-        ...editableReflectionModule,
-        entries: editableReflectionModule.entries.filter((item) => item.id !== entry.id),
-      })
-      toast.success(t("common.toast.deleted"))
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
-    }
+      pendingMessage: t("common.toast.deletePending", { name: entry.title }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: entry.title }),
+      onDelete: () =>
+        saveReflectionMutation.mutateAsync({
+          ...editableReflectionModule,
+          entries: editableReflectionModule.entries.filter((item) => item.id !== entry.id),
+        }),
+    })
+    return Promise.resolve()
   }
 
   return (

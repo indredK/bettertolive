@@ -440,7 +440,7 @@ export function RelationshipsPage({
         defaultValue: `已删除关系：${relationship.name}`,
       }),
       failureMessage: t("relationships.toast.deleteRelationshipFailed"),
-      undoLabel: t("relationships.common.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("relationships.toast.deleteRelationshipUndone", {
         name: relationship.name,
         defaultValue: `已撤销删除：${relationship.name}`,
@@ -464,7 +464,7 @@ export function RelationshipsPage({
       pendingMessage: t("relationships.toast.deleteNotePending"),
       successMessage: t("relationships.toast.deleteNoteSuccess"),
       failureMessage: t("relationships.toast.deleteNoteFailed"),
-      undoLabel: t("relationships.common.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("relationships.toast.deleteNoteUndone"),
       onDelete: () => saveRelationshipsMutation.mutateAsync(nextModule),
       onDeleted: () => {
@@ -485,7 +485,7 @@ export function RelationshipsPage({
       pendingMessage: t("relationships.toast.deletePatternPending"),
       successMessage: t("relationships.toast.deletePatternSuccess"),
       failureMessage: t("relationships.toast.deletePatternFailed"),
-      undoLabel: t("relationships.common.undo"),
+      undoLabel: t("common.actions.undo"),
       undoneMessage: t("relationships.toast.deletePatternUndone"),
       onDelete: () => saveRelationshipsMutation.mutateAsync(nextModule),
       onDeleted: () => {
@@ -1204,7 +1204,7 @@ function RelationshipGraphRelationshipDetail({
               onClick={() => onEdit(relationship, circle?.id ?? "")}
             >
               <Pencil className="h-4 w-4" />
-              {t("relationships.graph.editConnections")}
+              {t("common.actions.edit")}
             </Button>
           </ActionGroup>
         </div>
@@ -1652,7 +1652,7 @@ function RelationshipDetailPanel({
         <ActionGroup justify="end">
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
             <Pencil className="h-4 w-4" />
-            {t("relationships.common.edit")}
+            {t("common.actions.edit")}
           </AnimatedButton>
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
@@ -2003,7 +2003,7 @@ function DetailHeader({
       <ActionGroup justify="end">
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
           <Pencil className="h-4 w-4" />
-          {t("relationships.common.edit")}
+          {t("common.actions.edit")}
         </AnimatedButton>
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
