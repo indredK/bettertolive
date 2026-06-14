@@ -10,7 +10,7 @@ import {
   Waypoints,
 } from "lucide-react"
 import { useMemo, useState } from "react"
-import { joinListText } from "@/lib/list-utils"
+import { joinListText, splitListText, uniqueList } from "@/lib/list-utils"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
@@ -150,13 +150,6 @@ function createDistribution<T extends string>(
 
 function createBeliefLookup(entries: BeliefEntry[]) {
   return new Map(entries.map((entry) => [entry.id, entry]))
-}
-
-function textToList(value: string) {
-  return value
-    .split(/[,\n，]/)
-    .map((item) => item.trim())
-    .filter((item, index, items) => item.length > 0 && items.indexOf(item) === index)
 }
 
 function todayText() {
@@ -525,10 +518,7 @@ function BeliefsStackedView({
         <SectionHeading
           icon={Waypoints}
           title={t("beliefs.classification.title")}
-          description={t(
-            "beliefs.classification.description",
-            "按 4 维分组、过滤、看认知地图；impact 跟着每条走，不进主筛选器。",
-          )}
+          description={t("beliefs.classification.description")}
         />
 
         <div className="mt-5">
@@ -1272,7 +1262,8 @@ function BeliefEditDialog({
       joinListText(seed.cognitiveDistortions, "，") !== joinListText(cognitiveDistortions, "，") ||
       (seed.defenseMechanism ?? null) !== defenseMechanism ||
       (seed.attachmentNote ?? "") !== attachmentNote.trim() ||
-      joinListText(seed.tags, "，") !== joinListText(textToList(tags), "，")
+      joinListText(seed.tags, "，") !==
+        joinListText(uniqueList(splitListText(tags, /[,\n，]/)), "，")
     ) {
       changedFields.push("内容")
     }
@@ -1318,7 +1309,7 @@ function BeliefEditDialog({
       revisionHistory: autoRevision
         ? [...(seed?.revisionHistory ?? []), autoRevision]
         : (seed?.revisionHistory ?? []),
-      tags: textToList(tags),
+      tags: uniqueList(splitListText(tags, /[,\n，]/)),
     }
 
     try {

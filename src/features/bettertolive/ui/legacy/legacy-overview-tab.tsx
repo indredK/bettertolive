@@ -44,10 +44,7 @@ export function LegacyOverviewTab({
         <SectionHeading
           icon={ShieldCheck}
           title={t("legacy.overview.title")}
-          description={t(
-            "legacy.overview.description",
-            "看覆盖、缺口和边界是否清楚，不把沉重内容做成催促。",
-          )}
+          description={t("legacy.overview.description")}
         />
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

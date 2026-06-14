@@ -176,12 +176,7 @@ export function PrincipleEditDialog({
           <DialogTitle>
             {editing.isNew ? t("principles.edit.createTitle") : t("principles.edit.editTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t(
-              "principles.edit.description",
-              "5 个分类维度用于组织决策体系，cost 只作为单条原则的代价评估。",
-            )}
-          </DialogDescription>
+          <DialogDescription>{t("principles.edit.description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">

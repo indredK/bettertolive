@@ -12,8 +12,6 @@ import type {
   UnfinishedWeight,
   UnsentNoteTargetType,
 } from "@/features/bettertolive/types"
-import { generateId } from "@/lib/id-utils"
-import { joinListText, splitListText } from "@/lib/list-utils"
 
 export const RELATIONSHIP_TYPES = [
   "家人",
@@ -118,7 +116,3 @@ export function translateRelationshipEnum(
 
   return t(`relationships.enumNames.${group}.${value}`, value)
 }
-
-export const createRelationshipId = (prefix: string) => generateId(prefix)
-
-export { joinListText, splitListText }

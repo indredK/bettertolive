@@ -7,8 +7,6 @@ import type {
   FinanceReviewStatus,
   TransactionDirection,
 } from "@/features/bettertolive/types"
-import { generateId } from "@/lib/id-utils"
-import { joinListText, splitListText } from "@/lib/list-utils"
 
 export const FINANCE_CATEGORIES = [
   "餐饮",
@@ -59,12 +57,6 @@ export const FINANCE_LINKED_MODULES = [
 ] satisfies FinanceLinkedModule[]
 
 export const FINANCE_DIRECTIONS = ["expense", "income"] satisfies TransactionDirection[]
-
-export const createFinanceId = (prefix = "finance-entry") => generateId(prefix)
-
-export const joinFinanceListText = (values?: string[]) => joinListText(values, "\n")
-
-export const splitFinanceListText = (text: string) => splitListText(text, /\n|,|，/)
 
 export function getEntryMonth(date: string) {
   return dayjs(date).format("YYYY-MM")

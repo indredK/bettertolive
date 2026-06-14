@@ -108,6 +108,17 @@
       "noPatterns": "No shared patterns yet.",
       "notes": "Unsent Signals",
       "noNotes": "No expression signals yet."
+    },
+    "markModes": {
+      "circle": "Circle",
+      "circleDescription": "Color by circle membership to see which relationship circles people belong to.",
+      "weight": "Unfinished Weight",
+      "weightDescription": "Color by unfinished weight to identify the relationships that need attention now.",
+      "impact": "Impact",
+      "impactDescription": "Color by nourishing/draining to see the actual impact on you at a glance.",
+      "stage": "Stage",
+      "stageDescription": "Color by relationship stage to see who is moving closer or further away.",
+      "defaultDescription": "Node colors change when you switch dimensions."
     }
   },
   "labels": {

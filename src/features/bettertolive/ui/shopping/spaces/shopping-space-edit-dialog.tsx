@@ -191,10 +191,7 @@ export function ShoppingSpaceEditDialog({
                       form.setValue("note", event.target.value, { shouldValidate: true })
                     }
                     rows={4}
-                    placeholder={t(
-                      "shopping.spaces.form.notePlaceholder",
-                      "描述这个空间的特点、用途等",
-                    )}
+                    placeholder={t("shopping.spaces.form.notePlaceholder")}
                     className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
                   />
                 </div>

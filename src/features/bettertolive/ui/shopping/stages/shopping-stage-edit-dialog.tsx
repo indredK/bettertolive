@@ -316,10 +316,7 @@ export function ShoppingStageEditDialog({
                 {draft.items.length === 0 ? (
                   <EmptyStageHint
                     title={t("shopping.stage.emptyDimensions")}
-                    description={t(
-                      "shopping.stage.emptyShuttleHint",
-                      "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
-                    )}
+                    description={t("shopping.stage.emptyShuttleHint")}
                   />
                 ) : (
                   <div className="grid gap-3 pt-4 xl:grid-cols-2">

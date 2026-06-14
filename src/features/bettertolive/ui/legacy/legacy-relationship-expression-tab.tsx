@@ -32,10 +32,7 @@ export function LegacyRelationshipExpressionTab({
         <SectionHeading
           icon={MessageSquareHeart}
           title={t("legacy.relationship.title")}
-          description={t(
-            "legacy.relationship.description",
-            "聚焦留给某人的话，以及和关系有关的未完成牵挂。",
-          )}
+          description={t("legacy.relationship.description")}
         />
       </Surface>
 

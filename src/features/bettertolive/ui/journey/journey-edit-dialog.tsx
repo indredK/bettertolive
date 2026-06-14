@@ -501,10 +501,7 @@ function JourneyMemoryEditDialog({
       title={
         editing.isNew ? t("journey.edit.memoryCreateTitle") : t("journey.edit.memoryEditTitle")
       }
-      description={t(
-        "journey.edit.memoryDescription",
-        "维护一条记忆的分类、摘要、影响和可回看的线索。",
-      )}
+      description={t("journey.edit.memoryDescription")}
       isPending={saveJourneyMutation.isPending}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
@@ -657,12 +654,7 @@ function JourneyGrowthNodeEditDialog({
       !form.keyEvent.trim() ||
       !validMemoryIds.has(form.triggerMemoryId)
     ) {
-      toast.error(
-        t(
-          "journey.edit.validation.growthRequired",
-          "请填写标题、变化前后、关键事件，并选择有效触发记忆",
-        ),
-      )
+      toast.error(t("journey.edit.validation.growthRequired"))
       return
     }
 
@@ -710,10 +702,7 @@ function JourneyGrowthNodeEditDialog({
       title={
         editing.isNew ? t("journey.edit.growthCreateTitle") : t("journey.edit.growthEditTitle")
       }
-      description={t(
-        "journey.edit.growthDescription",
-        "用记忆 ID 把变化前、变化后和触发记忆连接起来。",
-      )}
+      description={t("journey.edit.growthDescription")}
       isPending={saveJourneyMutation.isPending}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
@@ -786,10 +775,7 @@ function JourneyGrowthNodeEditDialog({
         <div className="grid gap-3 min-[760px]:grid-cols-2">
           <JourneyField
             label={t("journey.fields.beforeMemoryIds")}
-            hint={t(
-              "journey.edit.memoryIdsHint",
-              "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
-            )}
+            hint={t("journey.edit.memoryIdsHint")}
           >
             <Textarea
               value={form.beforeMemoryIdsText}
@@ -799,10 +785,7 @@ function JourneyGrowthNodeEditDialog({
           </JourneyField>
           <JourneyField
             label={t("journey.fields.afterMemoryIds")}
-            hint={t(
-              "journey.edit.memoryIdsHint",
-              "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
-            )}
+            hint={t("journey.edit.memoryIdsHint")}
           >
             <Textarea
               value={form.afterMemoryIdsText}
@@ -896,10 +879,7 @@ function JourneyAnchorEditDialog({
       title={
         editing.isNew ? t("journey.edit.anchorCreateTitle") : t("journey.edit.anchorEditTitle")
       }
-      description={t(
-        "journey.edit.anchorDescription",
-        "维护地点、物件、人物或照片与记忆之间的连接。",
-      )}
+      description={t("journey.edit.anchorDescription")}
       isPending={saveJourneyMutation.isPending}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}

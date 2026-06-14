@@ -7,8 +7,6 @@ import type {
   EconTopicArea,
   SocioeconomicsDiscipline,
 } from "@/features/bettertolive/types"
-import { generateId } from "@/lib/id-utils"
-import { joinListText, splitListText } from "@/lib/list-utils"
 
 export const ECON_DOMAINS = [
   "货币与物价",
@@ -66,7 +64,3 @@ export const ECON_CONFIDENCE_ORDER: Record<EconConfidence, number> = {
   能预判常见情境: 2,
   有自己的判断框架: 3,
 }
-
-export const createSocioeconomicsId = (prefix: string) => generateId(prefix)
-
-export { joinListText, splitListText }

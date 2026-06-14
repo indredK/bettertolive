@@ -40,10 +40,7 @@ export function LegacyTrustBoundariesTab({
         <SectionHeading
           icon={ShieldCheck}
           title={t("legacy.boundaries.title")}
-          description={t(
-            "legacy.boundaries.description",
-            "说明系统不会偷偷越界，并把条目级保护策略集中到一页里看。",
-          )}
+          description={t("legacy.boundaries.description")}
         />
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

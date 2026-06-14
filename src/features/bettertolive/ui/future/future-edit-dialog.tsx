@@ -122,12 +122,7 @@ export function FutureBlueprintEditDialog({
       >
         <DialogHeader className={FUTURE_DIALOG_HEADER_CLASS}>
           <DialogTitle>{t("future.edit.blueprintTitle")}</DialogTitle>
-          <DialogDescription>
-            {t(
-              "future.edit.blueprintDescription",
-              "这里只保存核心定义：想成为的人、想过的生活和重要价值。",
-            )}
-          </DialogDescription>
+          <DialogDescription>{t("future.edit.blueprintDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
@@ -147,10 +142,7 @@ export function FutureBlueprintEditDialog({
                   value={lifestyle}
                   onChange={(event) => setLifestyle(event.target.value)}
                   className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
-                  placeholder={t(
-                    "future.edit.lifestylePlaceholder",
-                    "写下生活空间、工作节奏、关系和恢复方式。",
-                  )}
+                  placeholder={t("future.edit.lifestylePlaceholder")}
                 />
               </FutureField>
 

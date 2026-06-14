@@ -203,10 +203,7 @@ export function PrinciplesPage({
                 <SectionHeading
                   icon={Waypoints}
                   title={t("principles.sections.classification.title")}
-                  description={t(
-                    "principles.sections.classification.description",
-                    "这些维度负责分组和观察决策体系；cost 留在详情和校准区里。",
-                  )}
+                  description={t("principles.sections.classification.description")}
                 />
 
                 <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
@@ -227,10 +224,7 @@ export function PrinciplesPage({
                     {t("principles.cost.title")}
                   </div>
                   <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                    {t(
-                      "principles.cost.description",
-                      "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
-                    )}
+                    {t("principles.cost.description")}
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {costRows
@@ -253,10 +247,7 @@ export function PrinciplesPage({
                   <SectionHeading
                     icon={Scale}
                     title={t("principles.sections.entries.title")}
-                    description={t(
-                      "principles.sections.entries.description",
-                      "详情里始终显示 cost，让每条原则的真实代价浮上来。",
-                    )}
+                    description={t("principles.sections.entries.description")}
                   />
 
                   <div className="mt-5 space-y-4">
@@ -270,13 +261,7 @@ export function PrinciplesPage({
                         />
                       ))
                     ) : (
-                      <EmptyState
-                        message={t(
-                          "principles.empty.entries",
-                          "当前筛选下还没有可展示的原则条目。",
-                        )}
-                        compact
-                      />
+                      <EmptyState message={t("principles.empty.entries")} compact />
                     )}
                   </div>
                 </Surface>
@@ -286,10 +271,7 @@ export function PrinciplesPage({
                     <SectionHeading
                       icon={Shield}
                       title={t("principles.sections.boundaries.title")}
-                      description={t(
-                        "principles.sections.boundaries.description",
-                        "底线不是用来表演坚定，而是提前说明哪里真的不能再被突破。",
-                      )}
+                      description={t("principles.sections.boundaries.description")}
                     />
 
                     <div className="mt-5 space-y-3">
@@ -307,10 +289,7 @@ export function PrinciplesPage({
                     <SectionHeading
                       icon={Activity}
                       title={t("principles.sections.prompts.title")}
-                      description={t(
-                        "principles.sections.prompts.description",
-                        "面对具体选择时，先调出相关原则，再看强度和代价。",
-                      )}
+                      description={t("principles.sections.prompts.description")}
                     />
 
                     <div className="mt-5 space-y-3">
@@ -330,10 +309,7 @@ export function PrinciplesPage({
                 <SectionHeading
                   icon={Waypoints}
                   title={t("principles.sections.relations.title")}
-                  description={t(
-                    "principles.sections.relations.description",
-                    "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
-                  )}
+                  description={t("principles.sections.relations.description")}
                 />
 
                 <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
@@ -360,10 +336,7 @@ export function PrinciplesPage({
         >
           <PrinciplesPerspectiveTab
             title={t("principles.personal.title")}
-            description={t(
-              "principles.personal.description",
-              "把自己主动推导、受伤后确认、已经决定长期持有的原则放在一起看。",
-            )}
+            description={t("principles.personal.description")}
             emptyMessage={t("principles.empty.personal")}
             isFixedLayout={isFixedLayout}
             isControlMode={isControlMode}
@@ -378,10 +351,7 @@ export function PrinciplesPage({
         >
           <PrinciplesPerspectiveTab
             title={t("principles.others.title")}
-            description={t(
-              "principles.others.description",
-              "把观察他人、家庭继承或暂时借来使用的原则单独放出来，方便分辨什么真正属于自己。",
-            )}
+            description={t("principles.others.description")}
             emptyMessage={t("principles.empty.others")}
             isFixedLayout={isFixedLayout}
             isControlMode={isControlMode}
@@ -481,10 +451,7 @@ function PrinciplesPerspectiveTab({
             <SectionHeading
               icon={CheckCheck}
               title={t("principles.perspective.summaryTitle")}
-              description={t(
-                "principles.perspective.summaryDescription",
-                "看这组原则更多是正在内化、已经稳定，还是还在借用别人留下的判断。",
-              )}
+              description={t("principles.perspective.summaryDescription")}
               compact
             />
             <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
@@ -498,10 +465,7 @@ function PrinciplesPerspectiveTab({
               <ClassificationPanel
                 enumGroup="status"
                 title={t("principles.classification.status.title")}
-                description={t(
-                  "principles.classification.status.description",
-                  "它现在是否仍在生效。",
-                )}
+                description={t("principles.classification.status.description")}
                 rows={statusRows}
                 total={principles.length}
               />
@@ -512,10 +476,7 @@ function PrinciplesPerspectiveTab({
             <SectionHeading
               icon={Activity}
               title={t("principles.perspective.signalTitle")}
-              description={t(
-                "principles.perspective.signalDescription",
-                "优先看不可退让或代价高的原则，确认它们是不是还真属于你。",
-              )}
+              description={t("principles.perspective.signalDescription")}
               compact
             />
             <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -609,10 +570,7 @@ function PrinciplesPracticeWorkbench({
           <SectionHeading
             icon={Activity}
             title={t("principles.sections.prompts.title")}
-            description={t(
-              "principles.sections.prompts.description",
-              "面对具体选择时，先调出相关原则，再看强度和代价。",
-            )}
+            description={t("principles.sections.prompts.description")}
             compact
           />
           <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -630,10 +588,7 @@ function PrinciplesPracticeWorkbench({
           <SectionHeading
             icon={Waypoints}
             title={t("principles.sections.relations.title")}
-            description={t(
-              "principles.sections.relations.description",
-              "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
-            )}
+            description={t("principles.sections.relations.description")}
             compact
           />
           <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -690,10 +645,7 @@ function PrinciplesPracticeWorkbench({
         <SectionHeading
           icon={Activity}
           title={t("principles.sections.prompts.title")}
-          description={t(
-            "principles.sections.prompts.description",
-            "面对具体选择时，先调出相关原则，再看强度和代价。",
-          )}
+          description={t("principles.sections.prompts.description")}
         />
         <div className="mt-5 space-y-3">
           {principlesModule.decisionPrompts.length > 0 ? (
@@ -710,10 +662,7 @@ function PrinciplesPracticeWorkbench({
         <SectionHeading
           icon={Waypoints}
           title={t("principles.sections.relations.title")}
-          description={t(
-            "principles.sections.relations.description",
-            "原则体系不是散点，很多原则会互相支撑，也可能在真实生活里互相拉扯。",
-          )}
+          description={t("principles.sections.relations.description")}
         />
         <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2">
           {principlesModule.relations.length > 0 ? (
@@ -782,10 +731,7 @@ function PrinciplesFixedDashboard({
               {t("principles.cost.title")}
             </div>
             <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              {t(
-                "principles.cost.description",
-                "代价是单条原则的评估属性，用来判断守住它需要准备什么，不放进主筛选器。",
-              )}
+              {t("principles.cost.description")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {costRows

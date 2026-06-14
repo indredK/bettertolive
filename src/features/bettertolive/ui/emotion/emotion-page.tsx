@@ -363,10 +363,7 @@ function TodayTab({
         <SectionHeading
           icon={Sparkles}
           title={t("emotion.today.promptTitle")}
-          description={t(
-            "emotion.today.promptDescription",
-            "强度、标签、触发和需要会一起进入后续模式观察。",
-          )}
+          description={t("emotion.today.promptDescription")}
         />
         <div className="mt-5 space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
           <InfoBlock

@@ -258,10 +258,7 @@ function ReflectionDraftPanel({
       <SectionHeading
         icon={NotebookPen}
         title={t("reflection.sections.draft.title")}
-        description={t(
-          "reflection.sections.draft.description",
-          "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。",
-        )}
+        description={t("reflection.sections.draft.description")}
       />
 
       <div className={cn("mt-5 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -310,10 +307,7 @@ function ReflectionRecordsPanel({
         <SectionHeading
           icon={Sparkles}
           title={t("reflection.sections.recent.title")}
-          description={t(
-            "reflection.sections.recent.description",
-            "先展示最近写过的内容，再决定之后如何组织回看。",
-          )}
+          description={t("reflection.sections.recent.description")}
         />
         <AnimatedButton show={isControlMode} type="button" size="sm" onClick={onCreate}>
           <Plus className="size-4" />
@@ -357,10 +351,7 @@ function ReflectionThemesPanel({
       <SectionHeading
         icon={Hash}
         title={t("reflection.sections.themes.title")}
-        description={t(
-          "reflection.sections.themes.description",
-          "把标签和月份放在一起看，哪些话题正在反复出现会更清楚。",
-        )}
+        description={t("reflection.sections.themes.description")}
       />
       <div
         className={cn(
@@ -408,10 +399,7 @@ function ReflectionWritingPanel({
         <SectionHeading
           icon={Sparkles}
           title={t("reflection.sections.writingPrompts.title")}
-          description={t(
-            "reflection.sections.writingPrompts.description",
-            "写之前不必完整回答，先用问题把注意力放回自己身上。",
-          )}
+          description={t("reflection.sections.writingPrompts.description")}
         />
         <div
           className={cn("mt-5 space-y-3", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}
@@ -617,10 +605,7 @@ function ReflectionEditDialog({
               <Textarea
                 value={form.excerpt}
                 onChange={(event) => updateForm({ excerpt: event.target.value })}
-                placeholder={t(
-                  "reflection.placeholders.excerpt",
-                  "今天发生了什么？我看见了什么？以后回看时需要记住什么？",
-                )}
+                placeholder={t("reflection.placeholders.excerpt")}
                 className="min-h-36"
               />
             </Field>

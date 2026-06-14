@@ -40,11 +40,10 @@ import {
   FINANCE_LINKED_MODULES,
   FINANCE_NECESSITIES,
   FINANCE_REVIEW_STATUSES,
-  createFinanceId,
-  joinFinanceListText,
-  splitFinanceListText,
 } from "@/features/bettertolive/ui/finance/finance-page-data"
 import { translateFinanceEnum } from "@/features/bettertolive/ui/finance/finance-i18n"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 import { cn } from "@/lib/utils"
 
 export type EditingFinanceEntry = {
@@ -80,7 +79,7 @@ function createInitialEntryForm(entry: TransactionEntry | null): EntryFormState 
     necessity: entry?.necessity ?? FINANCE_NECESSITIES[1],
     reviewStatus: entry?.reviewStatus ?? FINANCE_REVIEW_STATUSES[0],
     linkedModule: entry?.linkedModule ?? FINANCE_LINKED_MODULES[0],
-    tagsText: joinFinanceListText(entry?.tags),
+    tagsText: joinListText(entry?.tags, "\n"),
   }
 }
 
@@ -117,7 +116,7 @@ export function FinanceEntryEditDialog({
     }
 
     const nextEntry: TransactionEntry = {
-      id: editing.entry?.id ?? createFinanceId(),
+      id: editing.entry?.id ?? generateId("finance-entry"),
       date: form.date,
       label: form.label.trim(),
       category: form.category.trim(),
@@ -129,7 +128,7 @@ export function FinanceEntryEditDialog({
       necessity: form.necessity,
       reviewStatus: form.reviewStatus,
       linkedModule: form.linkedModule,
-      tags: splitFinanceListText(form.tagsText),
+      tags: splitListText(form.tagsText, /\n|,|，/),
     }
 
     const nextEntries = editing.isNew

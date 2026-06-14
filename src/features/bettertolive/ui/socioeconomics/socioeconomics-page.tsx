@@ -327,10 +327,7 @@ export function SocioeconomicsPage({
   const classificationSections: ClassificationSection[] = [
     {
       title: t("socioeconomics.classification.discipline.title"),
-      description: t(
-        "socioeconomics.classification.discipline.description",
-        "先区分经济学和社会学，再进入具体知识。",
-      ),
+      description: t("socioeconomics.classification.discipline.description"),
       group: "discipline",
       rows: createDistribution(SOCIO_DISCIPLINES, entries, getEntryDiscipline),
     },
@@ -342,19 +339,13 @@ export function SocioeconomicsPage({
     },
     {
       title: t("socioeconomics.classification.layer.title"),
-      description: t(
-        "socioeconomics.classification.layer.description",
-        "微观、中观、宏观三层视角。",
-      ),
+      description: t("socioeconomics.classification.layer.description"),
       group: "layer",
       rows: createDistribution(ECON_LAYERS, entries, (entry) => entry.layer),
     },
     {
       title: t("socioeconomics.classification.confidence.title"),
-      description: t(
-        "socioeconomics.classification.confidence.description",
-        "从听过名词到有自己的判断框架。",
-      ),
+      description: t("socioeconomics.classification.confidence.description"),
       group: "confidence",
       rows: createDistribution(ECON_CONFIDENCES, entries, (entry) => entry.confidence),
     },
@@ -448,10 +439,7 @@ export function SocioeconomicsPage({
         >
           <SocioeconomicsDisciplineTab
             actions={actions}
-            description={t(
-              "socioeconomics.discipline.economics.description",
-              "围绕价格、市场、政策、公司和宏观运行机制，整理可用于现实决策的经济学知识。",
-            )}
+            description={t("socioeconomics.discipline.economics.description")}
             discipline="经济学"
             emptyMessage={t("socioeconomics.empty.economics")}
             entries={economicsEntries}
@@ -466,10 +454,7 @@ export function SocioeconomicsPage({
         >
           <SocioeconomicsDisciplineTab
             actions={actions}
-            description={t(
-              "socioeconomics.discipline.sociology.description",
-              "围绕社会结构、流动、制度、城市社区和文化规范，理解人如何在群体与制度中行动。",
-            )}
+            description={t("socioeconomics.discipline.sociology.description")}
             discipline="社会学"
             emptyMessage={t("socioeconomics.empty.sociology")}
             entries={sociologyEntries}
@@ -486,10 +471,7 @@ export function SocioeconomicsPage({
             <SectionHeading
               icon={Network}
               title={t("socioeconomics.graph.title")}
-              description={t(
-                "socioeconomics.graph.description",
-                "把经济学和社会学条目放到同一张关联表里，看概念之间如何互相解释。",
-              )}
+              description={t("socioeconomics.graph.description")}
             />
             <div className="mt-5">
               <ConceptGraph entries={entries} />
@@ -639,10 +621,7 @@ function SocioeconomicsFixedDashboard({
         <SectionHeading
           icon={NotebookPen}
           title={t("socioeconomics.review.title")}
-          description={t(
-            "socioeconomics.review.description",
-            "决策距离近 + 掌握度浅，是优先补课的位置。",
-          )}
+          description={t("socioeconomics.review.description")}
           compact
         />
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -684,10 +663,7 @@ function SocioeconomicsStackedView({
         <SectionHeading
           icon={Landmark}
           title={t("socioeconomics.classification.title")}
-          description={t(
-            "socioeconomics.classification.description",
-            "按 5 维归类；relevance 跟着每条走，不进主筛选器。",
-          )}
+          description={t("socioeconomics.classification.description")}
         />
         <div className="mt-5 grid gap-3 min-[960px]:grid-cols-2 min-[1240px]:grid-cols-5">
           {classificationSections.map((section) => (
@@ -708,10 +684,7 @@ function SocioeconomicsStackedView({
         <SectionHeading
           icon={Grid3x3}
           title={t("socioeconomics.heatmap.title")}
-          description={t(
-            "socioeconomics.heatmap.stackedDescription",
-            "一眼看清哪些领域我自以为懂、其实只到名词。",
-          )}
+          description={t("socioeconomics.heatmap.stackedDescription")}
         />
         <div className="mt-5 overflow-x-auto">
           <Heatmap heatmap={heatmap} />
@@ -923,30 +896,21 @@ function SocioeconomicsDisciplineTab({
             <SectionHeading
               icon={Grid3x3}
               title={t("socioeconomics.discipline.mapTitle")}
-              description={t(
-                "socioeconomics.discipline.mapDescription",
-                "看这门学科内部哪些领域已经形成框架，哪些还只是听过名词。",
-              )}
+              description={t("socioeconomics.discipline.mapDescription")}
               compact
             />
             <div className="mt-4 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
               <ClassificationPanel
                 group="domain"
                 title={t("socioeconomics.classification.domain.title")}
-                description={t(
-                  "socioeconomics.classification.domain.description",
-                  "属于经济运行的哪一块。",
-                )}
+                description={t("socioeconomics.classification.domain.description")}
                 rows={domainRows}
                 total={entries.length}
               />
               <ClassificationPanel
                 group="confidence"
                 title={t("socioeconomics.classification.confidence.title")}
-                description={t(
-                  "socioeconomics.classification.confidence.description",
-                  "从听过名词到有自己的判断框架。",
-                )}
+                description={t("socioeconomics.classification.confidence.description")}
                 rows={confidenceRows}
                 total={entries.length}
               />
@@ -957,10 +921,7 @@ function SocioeconomicsDisciplineTab({
             <SectionHeading
               icon={NotebookPen}
               title={t("socioeconomics.review.title")}
-              description={t(
-                "socioeconomics.review.description",
-                "决策距离近 + 掌握度浅，是优先补课的位置。",
-              )}
+              description={t("socioeconomics.review.description")}
               compact
             />
             <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -1010,10 +971,7 @@ function SocioeconomicsDisciplineTab({
           <ClassificationPanel
             group="domain"
             title={t("socioeconomics.classification.domain.title")}
-            description={t(
-              "socioeconomics.classification.domain.description",
-              "属于经济运行的哪一块。",
-            )}
+            description={t("socioeconomics.classification.domain.description")}
             rows={domainRows}
             total={entries.length}
           />
@@ -1022,10 +980,7 @@ function SocioeconomicsDisciplineTab({
           <ClassificationPanel
             group="confidence"
             title={t("socioeconomics.classification.confidence.title")}
-            description={t(
-              "socioeconomics.classification.confidence.description",
-              "从听过名词到有自己的判断框架。",
-            )}
+            description={t("socioeconomics.classification.confidence.description")}
             rows={confidenceRows}
             total={entries.length}
           />
@@ -1264,10 +1219,7 @@ function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
                 </Badge>
               </div>
               <p className="text-xs leading-5 text-[color:var(--text-muted)]">
-                {t(
-                  "socioeconomics.graph.helper",
-                  "缩放或拖动画布重看结构，点击节点查看说明，空白处点击可取消选择。",
-                )}
+                {t("socioeconomics.graph.helper")}
               </p>
             </div>
           }
@@ -1281,10 +1233,7 @@ function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
         <SectionHeading
           icon={Sparkles}
           title={t("socioeconomics.graph.detailTitle")}
-          description={t(
-            "socioeconomics.graph.detailDescription",
-            "右侧卡片会跟着当前选中的节点变化，帮你把图上的位置重新翻译成可读信息。",
-          )}
+          description={t("socioeconomics.graph.detailDescription")}
           compact
         />
 
@@ -1296,13 +1245,7 @@ function ConceptGraph({ entries }: { entries: SocioeconomicsEntry[] }) {
               <ConceptGraphDetail concept={selectedNode.concept} entries={selectedNode.entries} />
             )
           ) : (
-            <EmptyState
-              message={t(
-                "socioeconomics.graph.emptySelection",
-                "选中一个节点后，这里会显示详细说明。",
-              )}
-              compact
-            />
+            <EmptyState message={t("socioeconomics.graph.emptySelection")} compact />
           )}
         </div>
       </Surface>
@@ -1451,10 +1394,7 @@ function ConceptGraphDetail({
       <div>
         <h4 className="text-lg font-semibold text-[color:var(--text-primary)]">{concept}</h4>
         <p className="mt-2 text-sm leading-6 text-[color:var(--text-muted)]">
-          {t(
-            "socioeconomics.graph.conceptDescription",
-            "这个概念像一个交汇点，把原本分散的知识条目重新拢到同一张图里。",
-          )}
+          {t("socioeconomics.graph.conceptDescription")}
         </p>
       </div>
 
@@ -1517,10 +1457,7 @@ function RelevancePanel({
         {t("socioeconomics.relevance.title")}
       </div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-        {t(
-          "socioeconomics.relevance.description",
-          "relevance 不进主筛选器，但是判断这条现在用不用得上的核心评估。",
-        )}
+        {t("socioeconomics.relevance.description")}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {visibleRows.length > 0 ? (

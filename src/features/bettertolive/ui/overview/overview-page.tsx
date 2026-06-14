@@ -42,31 +42,19 @@ export function OverviewPage({
   const pageLogicItems = [
     {
       title: t("overview.logic.record.title"),
-      detail: t(
-        "overview.logic.record.detail",
-        "反思、记事、记账、购物，负责承接你现在到底在怎么生活。",
-      ),
+      detail: t("overview.logic.record.detail"),
     },
     {
       title: t("overview.logic.inner.title"),
-      detail: t(
-        "overview.logic.inner.detail",
-        "情绪情感页负责承接最近的心理波动、触发因素，以及对自己有效的恢复方式。",
-      ),
+      detail: t("overview.logic.inner.detail"),
     },
     {
       title: t("overview.logic.selfMap.title"),
-      detail: t(
-        "overview.logic.selfMap.detail",
-        "观念、原则、关系深化、成长、记忆节点，负责解释你为什么会变成现在这样的人。",
-      ),
+      detail: t("overview.logic.selfMap.detail"),
     },
     {
       title: t("overview.logic.legacyFuture.title"),
-      detail: t(
-        "overview.logic.legacyFuture.detail",
-        "生命整理负责安放重要的话和托付，未来蓝图负责把理想自我和阶段路径放到前面。",
-      ),
+      detail: t("overview.logic.legacyFuture.detail"),
     },
   ]
   const quickActions = [
@@ -168,10 +156,7 @@ export function OverviewPage({
             <SectionHeading
               icon={CalendarDays}
               title={t("overview.sections.recent.title")}
-              description={t(
-                "overview.sections.recent.description",
-                "从最近发生的事和最近写下的话里，先看见当下的自己。",
-              )}
+              description={t("overview.sections.recent.description")}
             />
 
             <div className={cn("mt-5", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
@@ -189,10 +174,7 @@ export function OverviewPage({
             <SectionHeading
               icon={Waypoints}
               title={t("overview.sections.logic.title")}
-              description={t(
-                "overview.sections.logic.description",
-                "先把这个产品为什么有这些页面说清楚。",
-              )}
+              description={t("overview.sections.logic.description")}
             />
 
             <div className="mt-5 space-y-3">
@@ -231,10 +213,7 @@ export function OverviewPage({
             <SectionHeading
               icon={Sparkles}
               title={t("overview.sections.quick.title")}
-              description={t(
-                "overview.sections.quick.description",
-                "先动手，再决定要不要继续展开。",
-              )}
+              description={t("overview.sections.quick.description")}
             />
 
             <div className="mt-5 grid gap-2 min-[960px]:grid-cols-2">

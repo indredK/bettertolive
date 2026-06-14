@@ -172,10 +172,7 @@ export function NutritionLogsTab({
                 </div>
               ))}
               <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed p-3 text-xs leading-5">
-                {t(
-                  "nutrition.logs.boundary",
-                  "这里保留观察线索：为什么吃、吃完怎样、计划为什么偏离。它服务计划校准，不用来评判。",
-                )}
+                {t("nutrition.logs.boundary")}
               </div>
             </div>
           </CardContent>

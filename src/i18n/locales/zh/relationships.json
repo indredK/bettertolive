@@ -108,6 +108,17 @@
       "noPatterns": "暂无共同模式",
       "notes": "表达线索",
       "noNotes": "暂无表达线索"
+    },
+    "markModes": {
+      "circle": "圈层",
+      "circleDescription": "按圈层分类着色，看人与人归属于哪些关系圈。",
+      "weight": "未说完分量",
+      "weightDescription": "按未说完分量着色，定位现在最需要面对的关系。",
+      "impact": "影响",
+      "impactDescription": "按滋养/消耗着色，一眼看清关系对你的实际影响。",
+      "stage": "阶段",
+      "stageDescription": "按关系阶段着色，看谁在靠近、谁在疏远。",
+      "defaultDescription": "切换维度后，节点颜色会跟着变化。"
     }
   },
   "labels": {

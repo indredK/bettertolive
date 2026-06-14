@@ -634,10 +634,7 @@ function RelationshipsOverviewTab({
           <SectionHeading
             icon={Waypoints}
             title={t("relationships.overview.classificationHeading")}
-            description={t(
-              "relationships.overview.classificationDescription",
-              "这些维度负责分组和观察关系世界；未完成重量留在详情和想说的话里。",
-            )}
+            description={t("relationships.overview.classificationDescription")}
           />
 
           <div className="mt-5 grid gap-3 min-[760px]:grid-cols-2 min-[1280px]:grid-cols-5">
@@ -655,10 +652,7 @@ function RelationshipsOverviewTab({
               {t("relationships.overview.unfinishedHeading")}
             </div>
             <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-              {t(
-                "relationships.overview.unfinishedDescription",
-                "未完成重量是单段关系的评估属性，用来判断还有多少没说完的话，不进入主筛选器。",
-              )}
+              {t("relationships.overview.unfinishedDescription")}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {unfinishedRows
@@ -1082,13 +1076,7 @@ function RelationshipsGraphTab({
                 onEditRelationship={onEditRelationship}
               />
             ) : (
-              <EmptyState
-                message={t(
-                  "relationships.graph.emptySelection",
-                  "选中一个节点后，这里会显示详细说明。",
-                )}
-                compact
-              />
+              <EmptyState message={t("relationships.graph.emptySelection")} compact />
             )}
           </div>
         </Surface>

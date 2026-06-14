@@ -282,10 +282,7 @@ function FutureBlueprintPanel({
         <SectionHeading
           icon={Sparkles}
           title={t("future.sections.definition.title")}
-          description={t(
-            "future.sections.definition.description",
-            "先把方向说清楚，再把路径写具体。",
-          )}
+          description={t("future.sections.definition.description")}
           compact
         />
         <AnimatedButton
@@ -403,10 +400,7 @@ function FutureMilestonesPanel({
         <SectionHeading
           icon={Target}
           title={t("future.sections.milestones.title")}
-          description={t(
-            "future.sections.milestones.description",
-            "先把未来拆成靠近方式，而不是终局答案。",
-          )}
+          description={t("future.sections.milestones.description")}
           compact
         />
         <AnimatedButton
@@ -464,10 +458,7 @@ function FutureExperimentsPanel({
         <SectionHeading
           icon={Compass}
           title={t("future.sections.experiments.title")}
-          description={t(
-            "future.sections.experiments.description",
-            "不用一步到位，先让生活里出现一点点更像自己的东西。",
-          )}
+          description={t("future.sections.experiments.description")}
           compact
         />
         <AnimatedButton
@@ -538,10 +529,7 @@ function FutureAlignmentPanel({
       <SectionHeading
         icon={CheckCheck}
         title={t("future.alignment.title")}
-        description={t(
-          "future.alignment.description",
-          "用四个问题检查蓝图是否已经能回到当下行动。",
-        )}
+        description={t("future.alignment.description")}
         compact
       />
       <div

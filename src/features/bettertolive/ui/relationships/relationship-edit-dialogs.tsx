@@ -67,13 +67,11 @@ import {
   RELATIONSHIP_TYPES,
   UNFINISHED_WEIGHTS,
   UNSENT_NOTE_TARGET_TYPES,
-  createRelationshipId,
-  joinListText,
-  splitListText,
   translateRelationshipEnum,
   type RelationshipEnumGroup,
 } from "@/features/bettertolive/ui/relationships/relationships-page-data"
 import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 import { cn } from "@/lib/utils"
 
 export type EditingRelationship = {
@@ -203,12 +201,7 @@ export function RelationshipEditDialog({
               ? t("relationships.edit.createRelationship")
               : t("relationships.edit.editRelationship")}
           </DialogTitle>
-          <DialogDescription>
-            {t(
-              "relationships.edit.relationshipDescription",
-              "5 维用于归类关系世界，未完成重量只跟随单段关系和想说的话。",
-            )}
-          </DialogDescription>
+          <DialogDescription>{t("relationships.edit.relationshipDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
@@ -436,7 +429,7 @@ export function UnsentNoteEditDialog({
       return
     }
 
-    const id = editing.note?.id ?? createRelationshipId("unsent")
+    const id = editing.note?.id ?? generateId("unsent")
     const nextNote: RelationshipUnsentNote = {
       id,
       targetType: form.targetType,
@@ -610,7 +603,7 @@ export function RelationshipPatternEditDialog({
       return
     }
 
-    const id = editing.pattern?.id ?? createRelationshipId("relationship-pattern")
+    const id = editing.pattern?.id ?? generateId("relationship-pattern")
     const nextPattern: RelationshipPattern = {
       id,
       title: form.title.trim(),
@@ -773,10 +766,7 @@ function RelationshipCollectionTabs({
             }}
           />
           <p className="mt-1.5 text-[11px] leading-4 text-[color:var(--text-muted)]">
-            {t(
-              "relationships.edit.connectionsDescription",
-              "为当前人物补充和其他人物之间的真实关系。对方打开编辑时，会自动看到互相翻转后的角色。",
-            )}
+            {t("relationships.edit.connectionsDescription")}
           </p>
           <div className="mt-2.5 space-y-2">
             {form.connections.length > 0 ? (
@@ -820,10 +810,7 @@ function RelationshipCollectionTabs({
               ))
             ) : (
               <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] px-3 py-4 text-xs text-[color:var(--text-muted)]">
-                {t(
-                  "relationships.edit.noConnections",
-                  "还没有人物连接。可以新增一条，例如“学生 / 老师”或“朋友 / 朋友”。",
-                )}
+                {t("relationships.edit.noConnections")}
               </div>
             )}
           </div>
@@ -838,7 +825,7 @@ function RelationshipCollectionTabs({
                 events: [
                   ...form.events,
                   {
-                    id: createRelationshipId("relationship-event"),
+                    id: generateId("relationship-event"),
                     date: "",
                     kind: "重要谈话",
                     title: "",
@@ -886,7 +873,7 @@ function RelationshipCollectionTabs({
                 history: [
                   ...form.history,
                   {
-                    id: createRelationshipId("relationship-history"),
+                    id: generateId("relationship-history"),
                     date: "",
                     field: "stage",
                     from: "",
@@ -1347,10 +1334,7 @@ function ConnectionEditor({
           </Field>
 
           <div className="text-[11px] leading-4 text-[color:var(--text-muted)]">
-            {t(
-              "relationships.edit.connectionRolesHint",
-              "每一行都是一组自定义互相关系，例如当前人物填“学生”，对方填“老师”；从对方视角打开时会自动反过来显示。",
-            )}
+            {t("relationships.edit.connectionRolesHint")}
           </div>
 
           <div className="space-y-2">

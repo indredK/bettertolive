@@ -46,10 +46,9 @@ import {
   ECON_SOURCES,
   ECON_TOPIC_AREAS,
   SOCIO_DISCIPLINES,
-  createSocioeconomicsId,
-  joinListText,
-  splitListText,
 } from "@/features/bettertolive/ui/socioeconomics/socioeconomics-page-data"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 import {
   SOCIO_DIALOG_CONTENT_CLASS,
   SOCIO_DIALOG_FIELD_CLASS,
@@ -195,7 +194,7 @@ function parseSourceRefs(text: string): SocioeconomicsSourceRef[] {
       }
 
       return {
-        id: createSocioeconomicsId(`socio-source-${index + 1}`),
+        id: generateId(`socio-source-${index + 1}`),
         label,
         url,
       }
@@ -227,7 +226,7 @@ function parseConfidenceHistory(text: string): EconConfidenceRevision[] {
       }
 
       return {
-        id: createSocioeconomicsId(`socio-history-${index + 1}`),
+        id: generateId(`socio-history-${index + 1}`),
         date,
         from: from as EconConfidence,
         to: to as EconConfidence,
@@ -279,7 +278,7 @@ export function SocioeconomicsEntryEditDialog({
     }
 
     const nextEntry: SocioeconomicsEntry = {
-      id: editing.entry?.id ?? createSocioeconomicsId("socio-knowledge"),
+      id: editing.entry?.id ?? generateId("socio-knowledge"),
       title: form.title.trim(),
       discipline: form.discipline,
       topicArea: form.discipline === "经济学" ? form.topicArea : undefined,
@@ -533,7 +532,7 @@ export function SocioeconomicsGapEditDialog({
     }
 
     const nextGap: SocioeconomicsGap = {
-      id: editing.gap?.id ?? createSocioeconomicsId("socio-gap"),
+      id: editing.gap?.id ?? generateId("socio-gap"),
       domain: form.domain,
       summary: form.summary.trim(),
       nextStep: form.nextStep.trim(),

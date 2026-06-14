@@ -196,10 +196,7 @@ export function FinancePage({
             <SectionHeading
               icon={Wallet}
               title={t("finance.sections.entriesTitle")}
-              description={t(
-                "finance.sections.entriesDescription",
-                "收入和支出都放在同一条现实时间线上。",
-              )}
+              description={t("finance.sections.entriesDescription")}
               compact
             />
             <TransactionList
@@ -228,10 +225,7 @@ export function FinancePage({
               <SectionHeading
                 icon={PieChart}
                 title={t("finance.sections.distributionTitle")}
-                description={t(
-                  "finance.sections.distributionDescription",
-                  "先看钱流向哪里，再看它支撑了什么。",
-                )}
+                description={t("finance.sections.distributionDescription")}
                 compact
               />
               <div
@@ -250,10 +244,7 @@ export function FinancePage({
               <SectionHeading
                 icon={Target}
                 title={t("finance.rules.title")}
-                description={t(
-                  "finance.rules.description",
-                  "把每类支出的意图和上限放在同一处校准。",
-                )}
+                description={t("finance.rules.description")}
                 compact
               />
               <div
@@ -282,10 +273,7 @@ export function FinancePage({
             <SectionHeading
               icon={Target}
               title={t("finance.sections.reviewTitle")}
-              description={t(
-                "finance.sections.reviewDescription",
-                "目标不是压迫，而是给钱一个方向。",
-              )}
+              description={t("finance.sections.reviewDescription")}
               compact
             />
             <div
@@ -354,10 +342,7 @@ function FinanceFixedDashboard({
         <SectionHeading
           icon={Wallet}
           title={t("finance.sections.entriesTitle")}
-          description={t(
-            "finance.sections.entriesDescription",
-            "收入和支出都放在同一条现实时间线上。",
-          )}
+          description={t("finance.sections.entriesDescription")}
           compact
         />
         <TransactionList
@@ -374,10 +359,7 @@ function FinanceFixedDashboard({
           <SectionHeading
             icon={PieChart}
             title={t("finance.sections.distributionTitle")}
-            description={t(
-              "finance.sections.distributionDescription",
-              "先看钱流向哪里，再看它支撑了什么。",
-            )}
+            description={t("finance.sections.distributionDescription")}
             compact
           />
           <div className="mt-3 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
@@ -390,10 +372,7 @@ function FinanceFixedDashboard({
           <SectionHeading
             icon={Target}
             title={t("finance.sections.reviewTitle")}
-            description={t(
-              "finance.sections.reviewDescription",
-              "目标不是压迫，而是给钱一个方向。",
-            )}
+            description={t("finance.sections.reviewDescription")}
             compact
           />
           <div className="mt-3 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
@@ -448,10 +427,7 @@ function FinanceStackedView({
         <SectionHeading
           icon={Wallet}
           title={t("finance.sections.entriesTitle")}
-          description={t(
-            "finance.sections.entriesDescription",
-            "收入和支出都放在同一条现实时间线上。",
-          )}
+          description={t("finance.sections.entriesDescription")}
         />
         <TransactionList
           entries={entries}
@@ -467,10 +443,7 @@ function FinanceStackedView({
           <SectionHeading
             icon={PieChart}
             title={t("finance.sections.distributionTitle")}
-            description={t(
-              "finance.sections.distributionDescription",
-              "先看钱流向哪里，再看它支撑了什么。",
-            )}
+            description={t("finance.sections.distributionDescription")}
           />
           <div className="mt-4 space-y-4">
             <DistributionList rows={categoryRows} group="category" locale={locale} />
@@ -482,10 +455,7 @@ function FinanceStackedView({
           <SectionHeading
             icon={Target}
             title={t("finance.sections.reviewTitle")}
-            description={t(
-              "finance.sections.reviewDescription",
-              "目标不是压迫，而是给钱一个方向。",
-            )}
+            description={t("finance.sections.reviewDescription")}
           />
           <div className="mt-4 space-y-3">
             <TargetCard locale={locale} summary={summary} target={target} />

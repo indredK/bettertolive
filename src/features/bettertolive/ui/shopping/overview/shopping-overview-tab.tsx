@@ -175,10 +175,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
               <OverviewPanel
                 icon={Sparkles}
                 title={t("shopping.overview.curationTitle")}
-                subtitle={t(
-                  "shopping.overview.curatedSubtitle",
-                  "把正在支撑生活的物件、焦点与集合放在同一视野里。",
-                )}
+                subtitle={t("shopping.overview.curatedSubtitle")}
                 className="h-full min-h-0"
               >
                 <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[repeat(2,minmax(0,1fr))] gap-3">
@@ -214,10 +211,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
               <OverviewPanel
                 icon={Layers3}
                 title={t("shopping.overview.structureTitle")}
-                subtitle={t(
-                  "shopping.overview.structureSubtitle",
-                  "物品不是越多越好，关键是它们是否形成清晰层次。",
-                )}
+                subtitle={t("shopping.overview.structureSubtitle")}
                 className="h-full min-h-0"
               >
                 <div className="grid h-full min-h-0 grid-rows-[minmax(0,1fr)_auto]">

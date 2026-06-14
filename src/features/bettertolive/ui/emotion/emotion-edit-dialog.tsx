@@ -529,12 +529,7 @@ export function EmotionEntityEditDialog({
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader className="shrink-0 border-b border-[color:var(--surface-border)] px-5 py-4 pr-12">
             <DialogTitle>{t(getTargetTitle(editing), getTargetFallbackTitle(editing))}</DialogTitle>
-            <DialogDescription>
-              {t(
-                "emotion.editor.description",
-                "这些内容会保存到后端情绪数据，不再依赖页面内的临时模拟内容。",
-              )}
-            </DialogDescription>
+            <DialogDescription>{t("emotion.editor.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">

@@ -245,10 +245,7 @@ export function ShoppingSystemEditDialog({
                       })
                     }
                     rows={4}
-                    placeholder={t(
-                      "shopping.systems.form.secondaryGroupsPlaceholder",
-                      "日常打扫, 洗衣, ...",
-                    )}
+                    placeholder={t("shopping.systems.form.secondaryGroupsPlaceholder")}
                     className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
                   />
                 </div>
