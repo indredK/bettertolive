@@ -714,7 +714,8 @@
       "deleteItem": "确定删除 {{name}} 吗？",
       "deleteSystem": "确定删除 {{name}} 吗？",
       "deleteSpace": "确定删除 {{name}} 吗？",
-      "deleteStage": "确定删除 {{name}} 吗？"
+      "deleteStage": "确定删除 {{name}} 吗？",
+      "unsavedChanges": "当前有未保存的修改，确定要关闭吗？"
     },
     "filter": {
       "all": "全部",

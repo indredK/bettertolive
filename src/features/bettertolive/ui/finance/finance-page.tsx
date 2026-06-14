@@ -543,7 +543,6 @@ function SummaryStrip({
         value={formatCurrency(summary.weeklyExpense, locale)}
         detail={t("finance.summary.dailyAverage", {
           value: formatCurrency(summary.dailyAverageExpense, locale),
-          defaultValue: "日均 {{value}}",
         })}
         tone="neutral"
       />

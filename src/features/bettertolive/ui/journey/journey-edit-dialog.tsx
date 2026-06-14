@@ -1011,9 +1011,8 @@ function JourneyTextEditDialog({
   const handleDelete = async () => {
     if (editing.isNew) return
     const confirmKey = isThread ? "journey.confirm.deleteThread" : "journey.confirm.deletePrompt"
-    const confirmFallback = isThread ? "确定删除这条影响线索吗？" : "确定删除这条回看问题吗？"
 
-    if (!window.confirm(t(confirmKey, confirmFallback))) {
+    if (!window.confirm(t(confirmKey))) {
       return
     }
 

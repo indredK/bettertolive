@@ -60,7 +60,6 @@ export function LegacyDeliveryMapTab({
                 <div className="text-muted-foreground mt-1 text-xs">
                   {t("legacy.deliveryMap.itemCount", {
                     count: group.items.length,
-                    defaultValue: "{{count}} 份内容",
                   })}
                 </div>
               </button>
@@ -95,7 +94,6 @@ export function LegacyDeliveryMapTab({
                 title={translateLegacyEnum(t, "visibility", section.visibility)}
                 description={t("legacy.deliveryMap.sectionCount", {
                   count: section.items.length,
-                  defaultValue: "{{count}} 份内容",
                 })}
               >
                 <div className="space-y-3">

@@ -207,7 +207,6 @@ export function ShoppingStagesTab({
                           <span className="text-muted-foreground text-xs">
                             {t("shopping.stages.itemInlineCount", {
                               count: stage.items.length,
-                              defaultValue: "{{count}} 个物品",
                             })}
                           </span>
                         </button>

@@ -266,24 +266,14 @@ export function SocioeconomicsEntryEditDialog({
     try {
       confidenceHistory = parseConfidenceHistory(form.confidenceHistoryText)
     } catch {
-      toast.error(
-        t(
-          "socioeconomics.edit.validation.history",
-          "掌握修订历史格式需要是：日期 | 原等级 -> 新等级 | 触发原因",
-        ),
-      )
+      toast.error(t("socioeconomics.edit.validation.history"))
       return
     }
 
     try {
       sourceRefs = parseSourceRefs(form.sourceRefsText)
     } catch {
-      toast.error(
-        t(
-          "socioeconomics.edit.validation.sourceRefs",
-          "来源格式需要是：来源名称 | https://example.com",
-        ),
-      )
+      toast.error(t("socioeconomics.edit.validation.sourceRefs"))
       return
     }
 
@@ -358,12 +348,7 @@ export function SocioeconomicsEntryEditDialog({
               ? t("socioeconomics.edit.entryCreateTitle")
               : t("socioeconomics.edit.entryEditTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t(
-              "socioeconomics.edit.entryDescription",
-              "每条认知都需要完整标注领域、层次、掌握程度、来源和决策距离。",
-            )}
-          </DialogDescription>
+          <DialogDescription>{t("socioeconomics.edit.entryDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
@@ -478,10 +463,7 @@ export function SocioeconomicsEntryEditDialog({
                     value={form.sourceRefsText}
                     onChange={(event) => updateForm({ sourceRefsText: event.target.value })}
                     className={SOCIO_DIALOG_FIELD_CLASS}
-                    placeholder={t(
-                      "socioeconomics.edit.sourceRefsPlaceholder",
-                      "OpenStax: Principles of Economics | https://openstax.org/details/books/principles-economics-3e",
-                    )}
+                    placeholder={t("socioeconomics.edit.sourceRefsPlaceholder")}
                     rows={3}
                   />
                 </Field>
@@ -500,10 +482,7 @@ export function SocioeconomicsEntryEditDialog({
                   value={form.confidenceHistoryText}
                   onChange={(event) => updateForm({ confidenceHistoryText: event.target.value })}
                   className={SOCIO_DIALOG_FIELD_CLASS}
-                  placeholder={t(
-                    "socioeconomics.edit.historyPlaceholder",
-                    "2026-03-04 | 听过名词 -> 知道大致逻辑 | 看完一组材料",
-                  )}
+                  placeholder={t("socioeconomics.edit.historyPlaceholder")}
                   rows={4}
                 />
               </Field>

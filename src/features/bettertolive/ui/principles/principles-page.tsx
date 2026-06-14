@@ -1003,7 +1003,6 @@ function PrinciplesControlStrip({
     <ActionGroup justify="end" className="items-center">
       <span className="text-xs text-[color:var(--text-muted)]">
         {t("principles.controlMode.summary", {
-          defaultValue: "{{count}} 条原则 · {{relations}} 个关系",
           count: principlesCount,
           relations: relationsCount,
         })}

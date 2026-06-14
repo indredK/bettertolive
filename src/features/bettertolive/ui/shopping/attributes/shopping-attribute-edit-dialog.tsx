@@ -246,11 +246,7 @@ export function ShoppingAttributeEditDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(
-        t("shopping.confirm.unsavedChanges", {
-          defaultValue: "当前有未保存的修改，确定要关闭吗？",
-        }),
-      )
+      const confirmed = window.confirm(t("shopping.confirm.unsavedChanges"))
       if (!confirmed) return
     }
     if (!open) onClose()

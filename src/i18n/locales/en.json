@@ -714,7 +714,8 @@
       "deleteItem": "Delete {{name}}?",
       "deleteSystem": "Delete {{name}}?",
       "deleteSpace": "Delete {{name}}?",
-      "deleteStage": "Delete {{name}}?"
+      "deleteStage": "Delete {{name}}?",
+      "unsavedChanges": "You have unsaved changes. Are you sure you want to close?"
     },
     "filter": {
       "all": "All",

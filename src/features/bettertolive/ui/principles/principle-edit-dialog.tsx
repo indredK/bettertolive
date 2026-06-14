@@ -506,7 +506,6 @@ function createRevision(
     id: createId("revision"),
     date: new Date().toISOString().slice(0, 10),
     summary: t("principles.edit.revision.summary", {
-      defaultValue: "更新了{{fields}}。",
       fields: changedFields
         .map((field) => translatePrincipleEnum(t, "revisionField", field))
         .join(t("principles.edit.revision.separator")),

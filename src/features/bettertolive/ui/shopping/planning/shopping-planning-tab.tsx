@@ -84,7 +84,6 @@ function PlanItemCard({
             <Badge variant="outline" className="text-muted-foreground px-1.5 py-0 text-[10px]">
               {t("shopping.item.childCount", {
                 count: item.children.length,
-                defaultValue: "{{count}} 个子级",
               })}
             </Badge>
           </div>

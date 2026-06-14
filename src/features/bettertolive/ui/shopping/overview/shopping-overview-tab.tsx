@@ -473,7 +473,6 @@ function NarrativeCard({
                   : "shopping.overview.moreRelatedItems",
                 {
                   count: lines.length - 3,
-                  defaultValue: "+{{count}} 条",
                 },
               )}
             </div>

@@ -274,11 +274,7 @@ export function ShoppingItemEditDialog({
 
   const handleOpenChange = (open: boolean) => {
     if (!open && form.formState.isDirty) {
-      const confirmed = window.confirm(
-        t("shopping.confirm.unsavedChanges", {
-          defaultValue: "当前有未保存的修改，确定要关闭吗？",
-        }),
-      )
+      const confirmed = window.confirm(t("shopping.confirm.unsavedChanges"))
       if (!confirmed) return
     }
     if (!open) onClose()
@@ -535,7 +531,7 @@ function ChildEditorCard({
     <div className={cn(SHOPPING_DIALOG_PANEL_CLASS, "space-y-4 p-4")}>
       <div className="flex items-center justify-between gap-3">
         <div className="text-sm font-medium">
-          {t("shopping.item.childLabel", { defaultValue: "子级 {{index}}", index: childIndex + 1 })}
+          {t("shopping.item.childLabel", { index: childIndex + 1 })}
         </div>
         <AnimatedIconButton
           show

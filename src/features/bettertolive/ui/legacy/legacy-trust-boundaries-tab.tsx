@@ -152,7 +152,6 @@ function ProtectedItemPanel({
       title={title}
       description={t("legacy.boundaries.itemCount", {
         count: items.length,
-        defaultValue: "{{count}} 份内容",
       })}
     >
       <div className="space-y-2">

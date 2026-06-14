@@ -73,13 +73,11 @@ function SpaceMapCard({
             <span>
               {t("shopping.spaces.ownedInlineCount", {
                 count: owned.length,
-                defaultValue: "{{count}} 已有",
               })}
             </span>
             <span>
               {t("shopping.spaces.wantedInlineCount", {
                 count: wanted.length,
-                defaultValue: "{{count}} 待购",
               })}
             </span>
           </div>

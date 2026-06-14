@@ -71,13 +71,11 @@ function SystemMapCard({
             <span>
               {t("shopping.systems.ownedInlineCount", {
                 count: owned.length,
-                defaultValue: "{{count}} 已有",
               })}
             </span>
             <span>
               {t("shopping.systems.wantedInlineCount", {
                 count: wanted.length,
-                defaultValue: "{{count}} 待购",
               })}
             </span>
           </div>
@@ -126,7 +124,6 @@ function SystemDetailPanel({
               ? system.summary
               : t("shopping.systems.itemCount", {
                   count: items.length,
-                  defaultValue: "{{count}} 个物品",
                 })}
           </div>
         </div>
