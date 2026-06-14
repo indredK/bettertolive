@@ -167,7 +167,8 @@ export function ShoppingAttributeEditDialog({
       styleToken: styleToken || null,
       rank: rank.trim() ? Number(rank) : null,
       isEnabled: seed?.isEnabled ?? true,
-      isSystem: seed?.isSystem ?? false,
+      // 乐观锁版本号：编辑时回传当前版本，创建时后端忽略
+      version: seed?.version,
     }
 
     try {

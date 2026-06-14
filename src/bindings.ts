@@ -29,7 +29,8 @@ export const commands = {
 	listShoppingAttributeDefinitionsForManagement: () => typedError<ShoppingAttributeDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_attribute_definitions_for_management")),
 	createShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("create_shopping_attribute_definition", { form })),
 	updateShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("update_shopping_attribute_definition", { form })),
-	disableShoppingAttributeDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("disable_shopping_attribute_definition", { id })),
+	disableShoppingAttributeDefinition: (id: string, version: number) => typedError<null, string>(__TAURI_INVOKE("disable_shopping_attribute_definition", { id, version })),
+	enableShoppingAttributeDefinition: (id: string, version: number) => typedError<null, string>(__TAURI_INVOKE("enable_shopping_attribute_definition", { id, version })),
 	reorderShoppingAttributeDefinitions: (kind: string, orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_attribute_definitions", { kind, orderedIds })),
 	createShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("create_shopping_space_definition", { form })),
 	updateShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("update_shopping_space_definition", { form })),
@@ -61,7 +62,8 @@ export type AttributeDefinitionFormDto = {
 	styleToken?: string | null,
 	rank?: number | null,
 	isEnabled?: boolean,
-	isSystem?: boolean,
+	/**  乐观锁版本号；更新/启停时回传读到的版本，创建时忽略 */
+	version?: number,
 };
 
 export type BeliefCardDto = {
@@ -324,6 +326,8 @@ export type ShoppingAttributeDefinitionDto_Deserialize = {
 	sortOrder: number,
 	isEnabled: boolean,
 	isSystem: boolean,
+	/**  乐观锁版本号，前端写回时回传，用于并发冲突检测 */
+	version: number,
 };
 
 export type ShoppingAttributeDefinitionDto_Serialize = {
@@ -339,6 +343,8 @@ export type ShoppingAttributeDefinitionDto_Serialize = {
 	sortOrder: number,
 	isEnabled: boolean,
 	isSystem: boolean,
+	/**  乐观锁版本号，前端写回时回传，用于并发冲突检测 */
+	version: number,
 };
 
 export type ShoppingBoundaryEntryDto = {

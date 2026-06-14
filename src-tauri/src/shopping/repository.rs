@@ -11,15 +11,16 @@ use crate::shopping::models::{
     AttributeDefinitionRow, ItemChildWriteModel, ItemRow, PageContentRow, SpaceDefinitionRow,
     StageItemRow, StageTemplateRow, SystemDefinitionRow,
 };
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 use std::collections::{HashMap, HashSet};
 
 pub struct ShoppingRepository;
 
 struct ExistingChildCodes {
-    status: Option<String>,
-    lifecycle: Option<String>,
-    depreciation: Option<String>,
+    status_def_id: Option<String>,
+    lifecycle_def_id: Option<String>,
+    depreciation_def_id: Option<String>,
+    channel_def_ids: Vec<String>,
 }
 
 // ===== 行→struct 映射 =====
@@ -63,6 +64,7 @@ fn row_to_attribute_definition(row: &rusqlite::Row) -> rusqlite::Result<Attribut
         sort_order: row.get("sort_order")?,
         is_enabled: row.get("is_enabled")?,
         is_system: row.get("is_system")?,
+        version: row.get("version")?,
         created_at: row.get("created_at")?,
         updated_at: row.get("updated_at")?,
     })
@@ -185,8 +187,14 @@ impl ShoppingRepository {
             sort_order: row.sort_order,
             is_enabled: row.is_enabled,
             is_system: row.is_system,
+            version: row.version,
         }
     }
+
+    const LIFECYCLE_SEMANTICS: &'static [&'static str] =
+        &["consumable", "durable", "tool", "emotional"];
+    const DEPRECIATION_SEMANTICS: &'static [&'static str] =
+        &["very_fast", "fast", "medium", "slow", "no_depreciation"];
 
     fn validate_attribute_semantic(kind: &str, semantic_key: Option<&str>) -> Result<(), String> {
         let normalized_semantic = semantic_key
@@ -203,21 +211,18 @@ impl ShoppingRepository {
                     Err(format!("invalid status semanticKey: {key}"))
                 }
             }
+            "lifecycle" => match normalized_semantic {
+                None => Ok(()),
+                Some(key) if Self::LIFECYCLE_SEMANTICS.contains(&key) => Ok(()),
+                Some(key) => Err(format!("invalid lifecycle semanticKey: {key}")),
+            },
+            "depreciation" => match normalized_semantic {
+                None => Ok(()),
+                Some(key) if Self::DEPRECIATION_SEMANTICS.contains(&key) => Ok(()),
+                Some(key) => Err(format!("invalid depreciation semanticKey: {key}")),
+            },
             _ => Ok(()),
         }
-    }
-
-    fn attribute_code_exists(conn: &Connection, kind: &str, code: &str) -> Result<bool, String> {
-        conn.query_row(
-            "SELECT EXISTS(
-                SELECT 1
-                FROM shopping_attribute_definitions
-                WHERE kind = ?1 AND code = ?2 AND is_enabled = 1
-            )",
-            params![kind, code],
-            |row| row.get::<_, bool>(0),
-        )
-        .map_err(|e| e.to_string())
     }
 
     fn ensure_required_semantic_keys(conn: &Connection, kind: &str) -> Result<(), String> {
@@ -729,7 +734,6 @@ impl ShoppingRepository {
         style_token: Option<&str>,
         rank: Option<i32>,
         is_enabled: bool,
-        is_system: bool,
         now: &str,
     ) -> Result<ShoppingAttributeDefinitionDto, String> {
         let normalized_kind = Self::normalize_attribute_kind(kind)?;
@@ -770,8 +774,8 @@ impl ShoppingRepository {
         conn.execute(
             "INSERT INTO shopping_attribute_definitions (
                 id, kind, code, semantic_key, label, label_en, description, style_token,
-                rank, sort_order, is_enabled, is_system, created_at, updated_at
-            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
+                rank, sort_order, is_enabled, is_system, version, created_at, updated_at
+            ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, 0, ?13, ?14)",
             params![
                 id,
                 &normalized_kind,
@@ -786,7 +790,7 @@ impl ShoppingRepository {
                 rank,
                 next_order,
                 is_enabled,
-                is_system,
+                false, // is_system: only seed/migration may set true
                 now,
                 now,
             ],
@@ -816,7 +820,8 @@ impl ShoppingRepository {
             rank,
             sort_order: next_order,
             is_enabled,
-            is_system,
+            is_system: false,
+            version: 0,
         })
     }
 
@@ -833,7 +838,7 @@ impl ShoppingRepository {
         style_token: Option<&str>,
         rank: Option<i32>,
         is_enabled: bool,
-        is_system: bool,
+        expected_version: i32,
         now: &str,
     ) -> Result<ShoppingAttributeDefinitionDto, String> {
         let normalized_kind = Self::normalize_attribute_kind(kind)?;
@@ -874,8 +879,8 @@ impl ShoppingRepository {
             "UPDATE shopping_attribute_definitions
              SET kind = ?2, code = ?3, semantic_key = ?4, label = ?5, label_en = ?6,
                  description = ?7, style_token = ?8, rank = ?9, is_enabled = ?10,
-                 is_system = ?11, updated_at = ?12
-             WHERE id = ?1",
+                 is_system = ?11, version = version + 1, updated_at = ?12
+             WHERE id = ?1 AND version = ?13",
             params![
                 id,
                 &normalized_kind,
@@ -889,11 +894,20 @@ impl ShoppingRepository {
                 style_token.map(str::trim).filter(|value| !value.is_empty()),
                 rank,
                 is_enabled,
-                is_system,
+                existing_row.is_system, // preserve original is_system
                 now,
+                expected_version,
             ],
         )
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| e.to_string())
+        .and_then(|rows| {
+            if rows == 0 {
+                // 行存在（上面已读到 existing_row）却没更新，说明 version 不匹配 → 并发冲突
+                Err("conflict: attribute definition was modified elsewhere".to_string())
+            } else {
+                Ok(())
+            }
+        })?;
 
         Self::ensure_required_semantic_keys(conn, &normalized_kind)?;
 
@@ -926,13 +940,15 @@ impl ShoppingRepository {
             rank,
             sort_order,
             is_enabled,
-            is_system,
+            is_system: existing_row.is_system,
+            version: expected_version + 1,
         })
     }
 
     pub fn disable_attribute_definition(
         conn: &Connection,
         id: &str,
+        expected_version: i32,
         now: &str,
     ) -> Result<(), String> {
         let existing_row = conn
@@ -974,14 +990,43 @@ impl ShoppingRepository {
             }
         }
 
-        conn.execute(
-            "UPDATE shopping_attribute_definitions
-             SET is_enabled = 0, updated_at = ?2
-             WHERE id = ?1",
-            params![id, now],
-        )
-        .map_err(|e| e.to_string())?;
+        let rows_affected = conn
+            .execute(
+                "UPDATE shopping_attribute_definitions
+                 SET is_enabled = 0, version = version + 1, updated_at = ?2
+                 WHERE id = ?1 AND version = ?3",
+                params![id, now, expected_version],
+            )
+            .map_err(|e| e.to_string())?;
+        if rows_affected == 0 {
+            // 行存在（上面已读到 existing_row）却没更新 → version 不匹配
+            return Err("conflict: attribute definition was modified elsewhere".to_string());
+        }
 
+        Ok(())
+    }
+
+    pub fn enable_attribute_definition(
+        conn: &Connection,
+        id: &str,
+        expected_version: i32,
+        now: &str,
+    ) -> Result<(), String> {
+        let rows_affected = conn
+            .execute(
+                "UPDATE shopping_attribute_definitions
+                 SET is_enabled = 1, version = version + 1, updated_at = ?2
+                 WHERE id = ?1 AND version = ?3",
+                params![id, now, expected_version],
+            )
+            .map_err(|e| e.to_string())?;
+
+        if rows_affected == 0 {
+            // 可能是不存在，也可能是 version 不匹配（并发修改）；两者都让前端刷新后重试
+            return Err(
+                "conflict: attribute definition not found or modified elsewhere".to_string(),
+            );
+        }
         Ok(())
     }
 
@@ -1149,10 +1194,16 @@ impl ShoppingRepository {
     ) -> Result<Vec<ShoppingItemChildDto>, String> {
         let mut stmt = conn
             .prepare(
-                "SELECT id, name, status, lifecycle, depreciation
-                 FROM shopping_item_children
-                 WHERE item_id = ?1
-                 ORDER BY sort_order, id",
+                "SELECT c.id, c.name,
+                        s.code AS status_code,
+                        l.code AS lifecycle_code,
+                        d.code AS depreciation_code
+                 FROM shopping_item_children c
+                 LEFT JOIN shopping_attribute_definitions s ON c.status_def_id = s.id
+                 LEFT JOIN shopping_attribute_definitions l ON c.lifecycle_def_id = l.id
+                 LEFT JOIN shopping_attribute_definitions d ON c.depreciation_def_id = d.id
+                 WHERE c.item_id = ?1
+                 ORDER BY c.sort_order, c.id",
             )
             .map_err(|e| e.to_string())?;
         let rows = stmt
@@ -1183,10 +1234,11 @@ impl ShoppingRepository {
     ) -> Result<Vec<ShoppingItemChildChannelDto>, String> {
         let mut stmt = conn
             .prepare(
-                "SELECT id, channel, entry_price, sweet_spot_price, overpay_price
-                 FROM shopping_item_child_channels
-                 WHERE item_child_id = ?1
-                 ORDER BY sort_order, id",
+                "SELECT cc.id, a.code AS channel_code, cc.entry_price, cc.sweet_spot_price, cc.overpay_price
+                 FROM shopping_item_child_channels cc
+                 LEFT JOIN shopping_attribute_definitions a ON cc.channel_def_id = a.id
+                 WHERE cc.item_child_id = ?1
+                 ORDER BY cc.sort_order, cc.id",
             )
             .map_err(|e| e.to_string())?;
         let rows = stmt
@@ -1350,38 +1402,53 @@ impl ShoppingRepository {
 
         // 子级
         for (i, child) in children.iter().enumerate() {
+            let status_def_id =
+                Self::resolve_attribute_def_id(conn, "status", child.status.as_deref())?;
+            let lifecycle_def_id =
+                Self::resolve_attribute_def_id(conn, "lifecycle", child.lifecycle.as_deref())?;
+            let depreciation_def_id = Self::resolve_attribute_def_id(
+                conn,
+                "depreciation",
+                child.depreciation.as_deref(),
+            )?;
+
             conn.execute(
                 "INSERT INTO shopping_item_children (
-                    id, item_id, name, status, lifecycle, depreciation, sort_order
+                    id, item_id, name, status_def_id, lifecycle_def_id, depreciation_def_id, sort_order
                  ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
                 params![
                     &child.id,
                     id,
                     &child.name,
-                    child.status.as_deref(),
-                    child.lifecycle.as_deref(),
-                    child.depreciation.as_deref(),
+                    status_def_id.as_deref(),
+                    lifecycle_def_id.as_deref(),
+                    depreciation_def_id.as_deref(),
                     i as i32
                 ],
             )
             .map_err(|e| e.to_string())?;
 
             for (channel_index, channel) in child.channel_prices.iter().enumerate() {
-                conn.execute(
-                    "INSERT INTO shopping_item_child_channels (
-                        id, item_child_id, channel, entry_price, sweet_spot_price, overpay_price, sort_order
-                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-                    params![
-                        &channel.id,
-                        &child.id,
-                        &channel.channel,
-                        channel.entry_price,
-                        channel.sweet_spot_price,
-                        channel.overpay_price,
-                        channel_index as i32
-                    ],
-                )
-                .map_err(|e| e.to_string())?;
+                let channel_def_id =
+                    Self::resolve_attribute_def_id(conn, "channel", Some(&channel.channel))?;
+                // channel_def_id should not be None for channel kind (required field), skip if missing
+                if let Some(def_id) = channel_def_id {
+                    conn.execute(
+                        "INSERT INTO shopping_item_child_channels (
+                            id, item_child_id, channel_def_id, entry_price, sweet_spot_price, overpay_price, sort_order
+                         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                        params![
+                            &channel.id,
+                            &child.id,
+                            &def_id,
+                            channel.entry_price,
+                            channel.sweet_spot_price,
+                            channel.overpay_price,
+                            channel_index as i32
+                        ],
+                    )
+                    .map_err(|e| e.to_string())?;
+                }
             }
         }
 
@@ -1420,49 +1487,107 @@ impl ShoppingRepository {
                 "status",
                 child.status.as_deref(),
                 true,
-                existing.and_then(|e| e.status.as_deref()),
+                existing.and_then(|e| e.status_def_id.as_deref()),
             )?;
             Self::require_attribute_code_for_write(
                 conn,
                 "lifecycle",
                 child.lifecycle.as_deref(),
                 true,
-                existing.and_then(|e| e.lifecycle.as_deref()),
+                existing.and_then(|e| e.lifecycle_def_id.as_deref()),
             )?;
             Self::require_attribute_code_for_write(
                 conn,
                 "depreciation",
                 child.depreciation.as_deref(),
                 false,
-                existing.and_then(|e| e.depreciation.as_deref()),
+                existing.and_then(|e| e.depreciation_def_id.as_deref()),
             )?;
+
+            // 校验 channel_prices 中的 channel 代码
+            for ch in &child.channel_prices {
+                // compare resolved def_id against existing set of def_ids
+                let value = ch.channel.trim();
+                let new_def_id = Self::resolve_attribute_def_id(conn, "channel", Some(value))?;
+                let existing_matched = new_def_id.as_ref().is_some_and(|nid| {
+                    existing
+                        .map(|e| e.channel_def_ids.contains(nid))
+                        .unwrap_or(false)
+                });
+                if new_def_id.is_none() && !existing_matched {
+                    return Err(format!("invalid channel: {value} (disabled or not found)"));
+                }
+            }
         }
         Ok(())
     }
 
-    /// UPDATE 时允许保留原值（即使已禁用），只拒绝「新赋一个禁用值」；
-    /// CREATE 时 existing_code 为 None，走严格校验。
+    /// Resolve a (kind, code) pair to its enabled definition_id for validation.
+    /// On create (existing_def_id=None): strict — code must be enabled.
+    /// On update (existing_def_id=Some): if code matches existing def_id, allow even if disabled.
     fn require_attribute_code_for_write(
         conn: &Connection,
         kind: &str,
         code: Option<&str>,
         required: bool,
-        existing_code: Option<&str>,
+        existing_def_id: Option<&str>,
     ) -> Result<Option<String>, String> {
         let normalized = code.map(str::trim).filter(|v| !v.is_empty());
         match normalized {
             None if required => Err(format!("{kind} is required")),
             None => Ok(None),
             Some(value) => {
-                if Self::attribute_code_exists(conn, kind, value)? {
-                    return Ok(Some(value.to_string()));
+                // Try enabled attribute first
+                let def_id = Self::resolve_attribute_def_id(conn, kind, Some(value))?;
+                if let Some(ref id) = def_id {
+                    return Ok(Some(id.clone()));
                 }
-                if existing_code.map(str::trim) == Some(value) {
-                    return Ok(Some(value.to_string()));
+                // Not found as enabled — check if it matches an existing (possibly disabled) definition
+                if let Some(existing_id) = existing_def_id {
+                    let disabled_def_id = Self::resolve_attribute_def_id_any(conn, kind, value)?;
+                    if disabled_def_id.as_deref() == Some(existing_id) {
+                        return Ok(disabled_def_id);
+                    }
                 }
                 Err(format!("invalid {kind}: {value} (disabled or not found)"))
             }
         }
+    }
+
+    /// Resolve (kind, code) to the definition id among enabled attributes.
+    fn resolve_attribute_def_id(
+        conn: &Connection,
+        kind: &str,
+        code: Option<&str>,
+    ) -> Result<Option<String>, String> {
+        let code = match code.map(str::trim).filter(|v| !v.is_empty()) {
+            Some(c) => c,
+            None => return Ok(None),
+        };
+        conn.query_row(
+            "SELECT id FROM shopping_attribute_definitions
+             WHERE kind = ?1 AND code = ?2 AND is_enabled = 1",
+            params![kind, code],
+            |row| row.get::<_, String>(0),
+        )
+        .optional()
+        .map_err(|e| e.to_string())
+    }
+
+    /// Resolve (kind, code) to the definition id (including disabled attributes).
+    fn resolve_attribute_def_id_any(
+        conn: &Connection,
+        kind: &str,
+        code: &str,
+    ) -> Result<Option<String>, String> {
+        conn.query_row(
+            "SELECT id FROM shopping_attribute_definitions
+             WHERE kind = ?1 AND code = ?2",
+            params![kind, code],
+            |row| row.get::<_, String>(0),
+        )
+        .optional()
+        .map_err(|e| e.to_string())
     }
 
     fn load_existing_child_codes(
@@ -1471,7 +1596,7 @@ impl ShoppingRepository {
     ) -> Result<HashMap<String, ExistingChildCodes>, String> {
         let mut stmt = conn
             .prepare(
-                "SELECT id, status, lifecycle, depreciation
+                "SELECT id, status_def_id, lifecycle_def_id, depreciation_def_id
                  FROM shopping_item_children
                  WHERE item_id = ?1",
             )
@@ -1481,9 +1606,10 @@ impl ShoppingRepository {
                 Ok((
                     row.get::<_, String>("id")?,
                     ExistingChildCodes {
-                        status: row.get("status")?,
-                        lifecycle: row.get("lifecycle")?,
-                        depreciation: row.get("depreciation")?,
+                        status_def_id: row.get("status_def_id")?,
+                        lifecycle_def_id: row.get("lifecycle_def_id")?,
+                        depreciation_def_id: row.get("depreciation_def_id")?,
+                        channel_def_ids: Vec::new(),
                     },
                 ))
             })
@@ -1493,6 +1619,41 @@ impl ShoppingRepository {
             let (id, codes) = row.map_err(|e| e.to_string())?;
             map.insert(id, codes);
         }
+
+        // 加载每个 child 的已有 channel def_ids
+        if !map.is_empty() {
+            let child_ids: Vec<&String> = map.keys().collect();
+            let placeholders: Vec<String> = child_ids
+                .iter()
+                .enumerate()
+                .map(|(i, _)| format!("?{}", i + 1))
+                .collect();
+            let query = format!(
+                "SELECT item_child_id, channel_def_id FROM shopping_item_child_channels
+                 WHERE item_child_id IN ({})
+                 ORDER BY sort_order, id",
+                placeholders.join(",")
+            );
+            let mut channel_stmt = conn.prepare(&query).map_err(|e| e.to_string())?;
+            let channel_rows = channel_stmt
+                .query_map(
+                    rusqlite::params_from_iter(child_ids.iter().map(|id| id.as_str())),
+                    |row| {
+                        Ok((
+                            row.get::<_, String>("item_child_id")?,
+                            row.get::<_, String>("channel_def_id")?,
+                        ))
+                    },
+                )
+                .map_err(|e| e.to_string())?;
+            for row in channel_rows {
+                let (child_id, def_id) = row.map_err(|e| e.to_string())?;
+                if let Some(codes) = map.get_mut(&child_id) {
+                    codes.channel_def_ids.push(def_id);
+                }
+            }
+        }
+
         Ok(map)
     }
 
@@ -1501,14 +1662,25 @@ impl ShoppingRepository {
         kind: &str,
         code: &str,
     ) -> Result<i32, String> {
+        // Resolve code → definition_id first
+        let def_id = Self::resolve_attribute_def_id_any(conn, kind, code)?;
+        let Some(def_id) = def_id else {
+            return Ok(0);
+        };
         let sql = match kind {
-            "status" => "SELECT COUNT(*) FROM shopping_item_children WHERE status = ?1",
-            "lifecycle" => "SELECT COUNT(*) FROM shopping_item_children WHERE lifecycle = ?1",
-            "depreciation" => "SELECT COUNT(*) FROM shopping_item_children WHERE depreciation = ?1",
-            "channel" => "SELECT COUNT(*) FROM shopping_item_child_channels WHERE channel = ?1",
+            "status" => "SELECT COUNT(*) FROM shopping_item_children WHERE status_def_id = ?1",
+            "lifecycle" => {
+                "SELECT COUNT(*) FROM shopping_item_children WHERE lifecycle_def_id = ?1"
+            }
+            "depreciation" => {
+                "SELECT COUNT(*) FROM shopping_item_children WHERE depreciation_def_id = ?1"
+            }
+            "channel" => {
+                "SELECT COUNT(*) FROM shopping_item_child_channels WHERE channel_def_id = ?1"
+            }
             _ => return Ok(0),
         };
-        conn.query_row(sql, params![code], |row| row.get::<_, i32>(0))
+        conn.query_row(sql, params![def_id], |row| row.get::<_, i32>(0))
             .map_err(|e| e.to_string())
     }
 

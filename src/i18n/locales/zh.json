@@ -208,7 +208,16 @@
         "styleToken": "accent=主色调 · secondary=次要色 · muted=柔和灰 · card=卡片色",
         "rank": "给有序属性（如折旧率）赋值，数值越小表示等级越低。普通属性可留空。",
         "description": "对该属性含义的解释，仅在属性管理页展示，不影响物品显示。"
-      }
+      },
+      "disableTitle": "停用属性「{{name}}」",
+      "disableDescription": "有物品正在引用该属性。",
+      "disableKeepLegacy": "已有物品仍可正常保存（旧值透传）",
+      "disableShowWarning": "停用属性在编辑界面会显示警告标记",
+      "disableBlockNew": "停用属性不可再被新物品选用",
+      "disableConfirmButton": "确认停用",
+      "disabledBadge": "已停用",
+      "disabledWarning": "当前状态已停用，建议重新选择",
+      "conflict": "该属性已被其他操作修改，已刷新最新状态，请重试"
     },
     "error": {
       "idNameRequired": "缺少系统 ID",
@@ -658,7 +667,13 @@
         "douyin": "抖音"
       },
       "removeChild": "移除子级",
-      "removeChannel": "移除渠道"
+      "removeChannel": "移除渠道",
+      "lifecycleDisabledBadge": "（已停用）",
+      "lifecycleDisabledWarning": "当前生命周期已停用，建议重新选择",
+      "depreciationDisabledBadge": "（已停用）",
+      "depreciationDisabledWarning": "当前折旧已停用，建议重新选择",
+      "channelDisabledBadge": "（已停用）",
+      "channelDisabledWarning": "当前渠道已停用，建议重新选择"
     },
     "priceRef": {
       "entry": "入门价",

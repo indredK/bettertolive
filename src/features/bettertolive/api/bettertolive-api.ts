@@ -120,7 +120,8 @@ export type ShoppingAttributeDefinitionForm = {
   styleToken?: string | null
   rank?: number | null
   isEnabled?: boolean
-  isSystem?: boolean
+  /** 乐观锁版本号；更新/启停时回传，创建时可省略 */
+  version?: number
 }
 
 export type ShoppingPageContentRow = {

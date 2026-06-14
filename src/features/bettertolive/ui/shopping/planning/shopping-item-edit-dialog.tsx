@@ -489,7 +489,9 @@ function ChildEditorCard({
                 <SelectItem key={option} value={option}>
                   {statusDisplayName(option, t, attributeDefinitions)}
                   {disabledStatusCodes.has(option) && (
-                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                    <span className="text-muted-foreground ml-1 text-xs">
+                      ({t("shopping.attributes.disabledBadge")})
+                    </span>
                   )}
                 </SelectItem>
               ))}
@@ -498,7 +500,7 @@ function ChildEditorCard({
           {isStatusDisabled && (
             <p className="flex items-center gap-1 text-[11px] text-amber-500">
               <TriangleAlert className="h-3 w-3 shrink-0" />
-              当前状态已停用，建议重新选择
+              {t("shopping.attributes.disabledWarning")}
             </p>
           )}
         </div>
@@ -519,7 +521,9 @@ function ChildEditorCard({
                 <SelectItem key={option} value={option}>
                   {lifecycleDisplayName(option, t, attributeDefinitions)}
                   {disabledLifecycleCodes.has(option) && (
-                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                    <span className="text-muted-foreground ml-1 text-xs">
+                      {t("shopping.item.lifecycleDisabledBadge")}
+                    </span>
                   )}
                 </SelectItem>
               ))}
@@ -528,7 +532,7 @@ function ChildEditorCard({
           {isLifecycleDisabled && (
             <p className="flex items-center gap-1 text-[11px] text-amber-500">
               <TriangleAlert className="h-3 w-3 shrink-0" />
-              当前生命周期已停用，建议重新选择
+              {t("shopping.item.lifecycleDisabledWarning")}
             </p>
           )}
         </div>
@@ -556,7 +560,9 @@ function ChildEditorCard({
                 <SelectItem key={option} value={option}>
                   {depreciationDisplayName(option, t, attributeDefinitions)}
                   {disabledDepreciationCodes.has(option) && (
-                    <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                    <span className="text-muted-foreground ml-1 text-xs">
+                      {t("shopping.item.depreciationDisabledBadge")}
+                    </span>
                   )}
                 </SelectItem>
               ))}
@@ -565,7 +571,7 @@ function ChildEditorCard({
           {isDepreciationDisabled && (
             <p className="flex items-center gap-1 text-[11px] text-amber-500">
               <TriangleAlert className="h-3 w-3 shrink-0" />
-              当前折旧已停用，建议重新选择
+              {t("shopping.item.depreciationDisabledWarning")}
             </p>
           )}
         </div>
@@ -655,7 +661,9 @@ function ChildChannelEditorRow({
               <SelectItem key={option} value={option}>
                 {channelDisplayName(option, attributeDefinitions)}
                 {!channelOptions.includes(option) && (
-                  <span className="text-muted-foreground ml-1 text-xs">(已停用)</span>
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    {t("shopping.item.channelDisabledBadge")}
+                  </span>
                 )}
               </SelectItem>
             ))}
@@ -664,7 +672,7 @@ function ChildChannelEditorRow({
         {isChannelDisabled && (
           <p className="flex items-center gap-1 text-[11px] text-amber-500">
             <TriangleAlert className="h-3 w-3 shrink-0" />
-            当前渠道已停用，建议重新选择
+            {t("shopping.item.channelDisabledWarning")}
           </p>
         )}
       </div>

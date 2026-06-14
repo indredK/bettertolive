@@ -214,8 +214,9 @@ pub struct AttributeDefinitionFormDto {
     pub rank: Option<i32>,
     #[serde(default = "default_true")]
     pub is_enabled: bool,
-    #[serde(default = "default_true")]
-    pub is_system: bool,
+    /// 乐观锁版本号；更新/启停时回传读到的版本，创建时忽略
+    #[serde(default)]
+    pub version: i32,
 }
 
 fn default_true() -> bool {
@@ -271,7 +272,6 @@ pub fn create_shopping_attribute_definition(
             form.style_token.as_deref(),
             form.rank,
             form.is_enabled,
-            form.is_system,
             &now,
         )
     })
@@ -299,7 +299,7 @@ pub fn update_shopping_attribute_definition(
             form.style_token.as_deref(),
             form.rank,
             form.is_enabled,
-            form.is_system,
+            form.version,
             &now,
         )
     })
@@ -310,11 +310,26 @@ pub fn update_shopping_attribute_definition(
 pub fn disable_shopping_attribute_definition(
     state: State<AppState>,
     id: String,
+    version: i32,
 ) -> Result<(), String> {
     let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
     write_tx(&mut conn, |tx| {
-        ShoppingRepository::disable_attribute_definition(tx, &id, &now)
+        ShoppingRepository::disable_attribute_definition(tx, &id, version, &now)
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn enable_shopping_attribute_definition(
+    state: State<AppState>,
+    id: String,
+    version: i32,
+) -> Result<(), String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::enable_attribute_definition(tx, &id, version, &now)
     })
 }
 

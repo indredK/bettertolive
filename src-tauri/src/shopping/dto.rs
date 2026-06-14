@@ -60,6 +60,8 @@ pub struct ShoppingAttributeDefinitionDto {
     pub sort_order: i32,
     pub is_enabled: bool,
     pub is_system: bool,
+    /// 乐观锁版本号，前端写回时回传，用于并发冲突检测
+    pub version: i32,
 }
 
 // ---- 物品(统一,跨 Tab 共享) ----

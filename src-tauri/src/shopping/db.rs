@@ -1,4 +1,5 @@
 use rusqlite::{Connection, Result as SqliteResult};
+use std::collections::HashMap;
 use std::path::Path;
 use std::time::Duration;
 
@@ -41,7 +42,7 @@ pub fn initialize_database(db_path: &Path) -> SqliteResult<Connection> {
 }
 
 fn apply_migrations(tx: &rusqlite::Transaction<'_>) -> SqliteResult<()> {
-    let already_applied: i64 = tx
+    let v2_applied: i64 = tx
         .query_row(
             "SELECT COUNT(*) FROM schema_migrations WHERE version = 2",
             [],
@@ -49,7 +50,7 @@ fn apply_migrations(tx: &rusqlite::Transaction<'_>) -> SqliteResult<()> {
         )
         .unwrap_or(0);
 
-    if already_applied == 0 {
+    if v2_applied == 0 {
         tx.execute_batch(
             "CREATE TABLE IF NOT EXISTS shopping_items (
                 id TEXT PRIMARY KEY,
@@ -78,6 +79,38 @@ fn apply_migrations(tx: &rusqlite::Transaction<'_>) -> SqliteResult<()> {
             "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES(2, datetime('now'))",
             [],
         )?;
+    }
+
+    let v3_applied: i64 = tx
+        .query_row(
+            "SELECT COUNT(*) FROM schema_migrations WHERE version = 3",
+            [],
+            |row| row.get(0),
+        )
+        .unwrap_or(0);
+
+    if v3_applied == 0 {
+        // 仅当属性定义表已存在时建索引并标记 v3；
+        // 全新库此时该表尚未由 create_new_schema 创建，跳过，由 create_new_schema 内的
+        // CREATE INDEX IF NOT EXISTS 兜底，避免在空库上索引不存在的表而报错。
+        let attr_table_exists: i64 = tx
+            .query_row(
+                "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'shopping_attribute_definitions'",
+                [],
+                |row| row.get(0),
+            )
+            .unwrap_or(0);
+        if attr_table_exists > 0 {
+            tx.execute_batch(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_attribute_semantic
+                 ON shopping_attribute_definitions(kind, semantic_key)
+                 WHERE semantic_key IS NOT NULL;",
+            )?;
+            tx.execute(
+                "INSERT OR IGNORE INTO schema_migrations(version, applied_at) VALUES(3, datetime('now'))",
+                [],
+            )?;
+        }
     }
     Ok(())
 }
@@ -141,10 +174,27 @@ fn create_new_schema(conn: &Connection) -> SqliteResult<()> {
             sort_order INTEGER NOT NULL DEFAULT 0,
             is_enabled INTEGER NOT NULL DEFAULT 1,
             is_system INTEGER NOT NULL DEFAULT 1,
+            version INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             UNIQUE(kind, code)
         )",
+        [],
+    )?;
+
+    // 兼容：旧表补乐观锁 version 列
+    add_column_if_missing(
+        conn,
+        "shopping_attribute_definitions",
+        "version",
+        "INTEGER NOT NULL DEFAULT 0",
+    )?;
+
+    // 语义键唯一索引（全新库由此创建；旧库已由 apply_migrations v3 创建，IF NOT EXISTS 幂等）
+    conn.execute(
+        "CREATE UNIQUE INDEX IF NOT EXISTS idx_attribute_semantic
+         ON shopping_attribute_definitions(kind, semantic_key)
+         WHERE semantic_key IS NOT NULL",
         [],
     )?;
 
@@ -183,35 +233,36 @@ fn create_new_schema(conn: &Connection) -> SqliteResult<()> {
         [],
     )?;
 
-    // 物品子级
+    // 物品子级：status/lifecycle/depreciation 以 definition_id 外键引用属性字典
     conn.execute(
         "CREATE TABLE IF NOT EXISTS shopping_item_children (
             id TEXT PRIMARY KEY,
             item_id TEXT NOT NULL,
             name TEXT NOT NULL,
-            status TEXT,
-            lifecycle TEXT,
-            depreciation TEXT,
+            status_def_id TEXT,
+            lifecycle_def_id TEXT,
+            depreciation_def_id TEXT,
             sort_order INTEGER NOT NULL DEFAULT 0,
-            FOREIGN KEY (item_id) REFERENCES shopping_items(id) ON DELETE CASCADE
+            FOREIGN KEY (item_id) REFERENCES shopping_items(id) ON DELETE CASCADE,
+            FOREIGN KEY (status_def_id) REFERENCES shopping_attribute_definitions(id),
+            FOREIGN KEY (lifecycle_def_id) REFERENCES shopping_attribute_definitions(id),
+            FOREIGN KEY (depreciation_def_id) REFERENCES shopping_attribute_definitions(id)
         )",
         [],
     )?;
 
-    add_column_if_missing(conn, "shopping_item_children", "status", "TEXT")?;
-    add_column_if_missing(conn, "shopping_item_children", "lifecycle", "TEXT")?;
-    add_column_if_missing(conn, "shopping_item_children", "depreciation", "TEXT")?;
-
+    // 物品子级渠道价：channel 以 definition_id 外键引用属性字典（kind=channel）
     conn.execute(
         "CREATE TABLE IF NOT EXISTS shopping_item_child_channels (
             id TEXT PRIMARY KEY,
             item_child_id TEXT NOT NULL,
-            channel TEXT NOT NULL,
+            channel_def_id TEXT NOT NULL,
             entry_price REAL,
             sweet_spot_price REAL,
             overpay_price REAL,
             sort_order INTEGER NOT NULL DEFAULT 0,
-            FOREIGN KEY (item_child_id) REFERENCES shopping_item_children(id) ON DELETE CASCADE
+            FOREIGN KEY (item_child_id) REFERENCES shopping_item_children(id) ON DELETE CASCADE,
+            FOREIGN KEY (channel_def_id) REFERENCES shopping_attribute_definitions(id)
         )",
         [],
     )?;
@@ -409,18 +460,24 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
     }
 
     // ---- Attribute definitions ----
+    let mut attr_lookup: std::collections::HashMap<(String, String), String> =
+        std::collections::HashMap::new();
     if table_is_empty(conn, "shopping_attribute_definitions")? {
         if let Some(definitions) = seed["attributeDefinitions"].as_array() {
             for (i, definition) in definitions.iter().enumerate() {
+                let def_id = definition["id"].as_str().unwrap_or("");
+                let kind = definition["kind"].as_str().unwrap_or("");
+                let code = definition["code"].as_str().unwrap_or("");
+                attr_lookup.insert((kind.to_string(), code.to_string()), def_id.to_string());
                 conn.execute(
                     "INSERT INTO shopping_attribute_definitions (
                         id, kind, code, semantic_key, label, label_en, description, style_token,
                         rank, sort_order, is_enabled, is_system, created_at, updated_at
                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, 1, 1, ?11, ?12)",
                     rusqlite::params![
-                        definition["id"].as_str().unwrap_or(""),
-                        definition["kind"].as_str().unwrap_or(""),
-                        definition["code"].as_str().unwrap_or(""),
+                        def_id,
+                        kind,
+                        code,
                         definition["semanticKey"].as_str(),
                         definition["label"].as_str().unwrap_or(""),
                         definition["labelEn"].as_str(),
@@ -437,6 +494,9 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
                 )?;
             }
         }
+    } else {
+        // 若属性定义表非空则构造查找表，供后续 children 播种使用
+        build_attr_lookup_from_db(conn, &mut attr_lookup)?;
     }
 
     // ---- Items ----
@@ -482,40 +542,65 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
                             .as_str()
                             .map(ToOwned::to_owned)
                             .unwrap_or_else(|| format!("{}_child_{}", item_id, j));
+                        // Resolve string codes to definition IDs via the lookup map
+                        let status_def_id = child["status"].as_str().and_then(|code| {
+                            attr_lookup
+                                .get(&("status".to_string(), code.to_string()))
+                                .cloned()
+                        });
+                        let lifecycle_def_id = child["lifecycle"].as_str().and_then(|code| {
+                            attr_lookup
+                                .get(&("lifecycle".to_string(), code.to_string()))
+                                .cloned()
+                        });
+                        let depreciation_def_id = child["depreciation"].as_str().and_then(|code| {
+                            attr_lookup
+                                .get(&("depreciation".to_string(), code.to_string()))
+                                .cloned()
+                        });
+
                         conn.execute(
                             "INSERT INTO shopping_item_children (
-                                id, item_id, name, status, lifecycle, depreciation, sort_order
+                                id, item_id, name, status_def_id, lifecycle_def_id, depreciation_def_id, sort_order
                              ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
                             rusqlite::params![
                                 &child_id,
                                 item_id,
                                 child["name"].as_str().unwrap_or(""),
-                                child["status"].as_str(),
-                                child["lifecycle"].as_str(),
-                                child["depreciation"].as_str(),
+                                status_def_id.as_deref(),
+                                lifecycle_def_id.as_deref(),
+                                depreciation_def_id.as_deref(),
                                 j as i32
                             ],
                         )?;
 
                         if let Some(channel_prices) = child["channelPrices"].as_array() {
                             for (channel_index, channel) in channel_prices.iter().enumerate() {
-                                conn.execute(
-                                    "INSERT INTO shopping_item_child_channels (
-                                        id, item_child_id, channel, entry_price, sweet_spot_price, overpay_price, sort_order
-                                     ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-                                    rusqlite::params![
-                                        channel["id"]
-                                            .as_str()
-                                            .map(ToOwned::to_owned)
-                                            .unwrap_or_else(|| format!("{}_channel_{}", child_id, channel_index)),
-                                        &child_id,
-                                        channel["channel"].as_str().unwrap_or(""),
-                                        channel["entryPrice"].as_f64(),
-                                        channel["sweetSpotPrice"].as_f64(),
-                                        channel["overpayPrice"].as_f64(),
-                                        channel_index as i32,
-                                    ],
-                                )?;
+                                let channel_def_id = channel["channel"].as_str().and_then(|code| {
+                                    attr_lookup
+                                        .get(&("channel".to_string(), code.to_string()))
+                                        .cloned()
+                                });
+                                // channel_def_id is NOT NULL in schema; skip if code not found
+                                if let Some(def_id) = channel_def_id {
+                                    conn.execute(
+                                        "INSERT INTO shopping_item_child_channels (
+                                            id, item_child_id, channel_def_id, entry_price, sweet_spot_price, overpay_price, sort_order
+                                         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                                        rusqlite::params![
+                                            channel["id"]
+                                                .as_str()
+                                                .map(ToOwned::to_owned)
+                                                .unwrap_or_else(|| format!("{}_channel_{}", child_id, channel_index)),
+                                            &child_id,
+                                            &def_id,
+                                            channel["entryPrice"].as_f64(),
+                                            channel["sweetSpotPrice"].as_f64(),
+                                            channel["overpayPrice"].as_f64(),
+                                            channel_index as i32,
+                                        ],
+                                    )?;
+                                }
                             }
                         }
                     }
@@ -690,6 +775,26 @@ fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
         }
     }
 
+    Ok(())
+}
+
+/// Build a (kind, code) → id lookup map from the already-seeded attribute definitions table.
+fn build_attr_lookup_from_db(
+    conn: &Connection,
+    map: &mut HashMap<(String, String), String>,
+) -> SqliteResult<()> {
+    let mut stmt = conn.prepare("SELECT id, kind, code FROM shopping_attribute_definitions")?;
+    let rows = stmt.query_map([], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, String>(2)?,
+        ))
+    })?;
+    for row in rows {
+        let (id, kind, code) = row?;
+        map.insert((kind, code), id);
+    }
     Ok(())
 }
 

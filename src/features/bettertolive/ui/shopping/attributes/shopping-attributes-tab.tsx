@@ -1,7 +1,7 @@
 import { DndContext, type DragEndEvent } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Pencil, Plus, Power, PowerOff, TriangleAlert } from "lucide-react"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useReducer, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
@@ -22,8 +22,8 @@ import type {
 import {
   countItemsUsingAttribute,
   disableAttributeDefinition,
+  enableAttributeDefinition,
   reorderAttributeDefinitions,
-  updateAttributeDefinition,
 } from "@/features/bettertolive/api/shopping-crud-api"
 import { ShoppingAttributeEditDialog } from "@/features/bettertolive/ui/shopping/attributes/shopping-attribute-edit-dialog"
 import {
@@ -54,6 +54,59 @@ const ATTRIBUTE_KIND_META: ShoppingAttributeKind[] = [
   "channel",
 ]
 
+// ===== 属性 mutation 的显式动作与状态分层 =====
+// - server snapshot：来自 props（shopping.attributeDefinitions），唯一真值
+// - optimistic patch：未提交的本地覆盖，commit/rollback 后丢弃
+// - inFlight：记录每个目标正在进行的 mutation 种类（reorder 用专用 key）
+type AttributeMutationKind = "reorder" | "enable" | "disable"
+
+type AttributeMutationState = {
+  patches: Record<string, Partial<ShoppingAttributeDefinition>>
+  inFlight: Record<string, AttributeMutationKind>
+}
+
+type AttributeMutationAction =
+  | {
+      type: "begin"
+      target: string
+      kind: AttributeMutationKind
+      patch?: Partial<ShoppingAttributeDefinition>
+    }
+  | { type: "settle"; target: string }
+
+const REORDER_TARGET = "__reorder__"
+
+const INITIAL_MUTATION_STATE: AttributeMutationState = { patches: {}, inFlight: {} }
+
+function attributeMutationReducer(
+  state: AttributeMutationState,
+  action: AttributeMutationAction,
+): AttributeMutationState {
+  switch (action.type) {
+    case "begin":
+      return {
+        patches: action.patch
+          ? {
+              ...state.patches,
+              [action.target]: { ...state.patches[action.target], ...action.patch },
+            }
+          : state.patches,
+        inFlight: { ...state.inFlight, [action.target]: action.kind },
+      }
+    case "settle": {
+      // commit 与 rollback 共用：丢弃该目标的乐观补丁与 in-flight 标记
+      // 成功时由 onRefresh 拉回服务端真值，失败时回退到 server snapshot
+      const patches = { ...state.patches }
+      delete patches[action.target]
+      const inFlight = { ...state.inFlight }
+      delete inFlight[action.target]
+      return { patches, inFlight }
+    }
+    default:
+      return state
+  }
+}
+
 export function ShoppingAttributesTab({
   shopping,
   isControlMode,
@@ -64,12 +117,16 @@ export function ShoppingAttributesTab({
   onRefresh: () => void
 }) {
   const { t } = useTranslation()
-  // 乐观更新补丁层：prop 是服务端真值，patches 是未 commit 的本地覆盖
-  const [patches, setPatches] = useState<Record<string, Partial<ShoppingAttributeDefinition>>>({})
+  // 乐观更新补丁层 + mutation 边界：reducer 管理 optimistic patch 与 inFlight 显式状态
+  const [mutation, dispatch] = useReducer(attributeMutationReducer, INITIAL_MUTATION_STATE)
+  // 同步并发锁：reducer 状态要到下一次渲染才生效，无法用于同一 tick 内的重入判断
+  const mutationInFlight = useRef(false)
   const definitions = useMemo(
     () =>
-      shopping.attributeDefinitions.map((d) => (patches[d.id] ? { ...d, ...patches[d.id] } : d)),
-    [shopping.attributeDefinitions, patches],
+      shopping.attributeDefinitions.map((d) =>
+        mutation.patches[d.id] ? { ...d, ...mutation.patches[d.id] } : d,
+      ),
+    [shopping.attributeDefinitions, mutation.patches],
   )
   const [selectedKind, setSelectedKind] = useState<ShoppingAttributeKind>("depreciation")
   const [selectedAttributeId, setSelectedAttributeId] = useState<string | null>(null)
@@ -82,15 +139,18 @@ export function ShoppingAttributesTab({
     attribute: ShoppingAttributeDefinition
   } | null>(null)
 
-  const patchDefinition = (id: string, patch: Partial<ShoppingAttributeDefinition>) =>
-    setPatches((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }))
-
-  const clearPatch = (id: string) =>
-    setPatches((prev) => {
-      const next = { ...prev }
-      delete next[id]
-      return next
-    })
+  // 并发冲突（乐观锁版本不匹配）：刷新最新状态并提示重试
+  const handleMutationError = (error: unknown) => {
+    const message = String(error)
+    if (message.includes("conflict")) {
+      toast.error(
+        t("shopping.attributes.conflict", "该属性已被其他操作修改，已刷新最新状态，请重试"),
+      )
+      onRefresh()
+    } else {
+      toast.error(message)
+    }
+  }
 
   const grouped = useMemo(() => {
     return ATTRIBUTE_KIND_META.map((kind) => ({
@@ -136,7 +196,7 @@ export function ShoppingAttributesTab({
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
-    if (!selectedGroup || !over || active.id === over.id) return
+    if (!selectedGroup || !over || active.id === over.id || mutationInFlight.current) return
 
     const oldOrder = [...orderedIds]
     const fromIndex = oldOrder.indexOf(String(active.id))
@@ -148,48 +208,51 @@ export function ShoppingAttributesTab({
     nextOrder.splice(toIndex, 0, String(active.id))
     setOrderedIds(nextOrder)
 
+    mutationInFlight.current = true
+    dispatch({ type: "begin", target: REORDER_TARGET, kind: "reorder" })
     try {
       await reorderAttributeDefinitions(selectedGroup.kind, nextOrder)
       toast.success(t("shopping.attributes.reordered", "属性顺序已更新"))
       onRefresh()
     } catch (error) {
-      toast.error(String(error))
       setOrderedIds(oldOrder)
+      toast.error(String(error))
+    } finally {
+      dispatch({ type: "settle", target: REORDER_TARGET })
+      mutationInFlight.current = false
     }
   }
 
   const executeDisable = async (attribute: ShoppingAttributeDefinition) => {
-    patchDefinition(attribute.id, { isEnabled: false })
+    if (mutationInFlight.current) return
+    mutationInFlight.current = true
+    dispatch({ type: "begin", target: attribute.id, kind: "disable", patch: { isEnabled: false } })
     try {
-      await disableAttributeDefinition(attribute.id)
+      await disableAttributeDefinition(attribute.id, attribute.version)
       toast.success(t("shopping.attributes.disableSuccess", "属性已停用"))
-      clearPatch(attribute.id)
       onRefresh()
     } catch (error) {
-      clearPatch(attribute.id)
-      toast.error(String(error))
+      handleMutationError(error)
+    } finally {
+      dispatch({ type: "settle", target: attribute.id })
+      mutationInFlight.current = false
     }
   }
 
   const handleToggleEnabled = async (attribute: ShoppingAttributeDefinition) => {
+    if (mutationInFlight.current) return
     if (!attribute.isEnabled) {
-      patchDefinition(attribute.id, { isEnabled: true })
+      mutationInFlight.current = true
+      dispatch({ type: "begin", target: attribute.id, kind: "enable", patch: { isEnabled: true } })
       try {
-        await updateAttributeDefinition({
-          ...attribute,
-          labelEn: attribute.labelEn ?? null,
-          semanticKey: attribute.semanticKey ?? null,
-          styleToken: attribute.styleToken ?? null,
-          description: attribute.description ?? "",
-          rank: attribute.rank ?? null,
-          isEnabled: true,
-        })
+        await enableAttributeDefinition(attribute.id, attribute.version)
         toast.success(t("shopping.attributes.enableSuccess", "属性已启用"))
-        clearPatch(attribute.id)
         onRefresh()
       } catch (error) {
-        clearPatch(attribute.id)
-        toast.error(String(error))
+        handleMutationError(error)
+      } finally {
+        dispatch({ type: "settle", target: attribute.id })
+        mutationInFlight.current = false
       }
       return
     }
@@ -350,7 +413,9 @@ export function ShoppingAttributesTab({
                     >
                       {shoppingAttributeDisplayName(selectedAttribute)}
                       {!selectedAttribute.isEnabled && (
-                        <span className="ml-2 text-sm font-normal text-amber-500">(已停用)</span>
+                        <span className="ml-2 text-sm font-normal text-amber-500">
+                          ({t("shopping.attributes.disabledBadge", "已停用")})
+                        </span>
                       )}
                     </CardTitle>
                     <div className="text-muted-foreground mt-0.5 text-xs">
@@ -446,29 +511,31 @@ export function ShoppingAttributesTab({
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <TriangleAlert className="h-5 w-5 text-amber-500" />
-                停用属性「{shoppingAttributeDisplayName(disableConfirm.attribute)}」
+                {t("shopping.attributes.disableTitle", {
+                  name: shoppingAttributeDisplayName(disableConfirm.attribute),
+                })}
               </DialogTitle>
             </DialogHeader>
             <div className="text-muted-foreground space-y-3 text-sm">
-              <p>有物品正在引用该属性。</p>
+              <p>{t("shopping.attributes.disableDescription")}</p>
               <ul className="space-y-1 text-xs">
                 <li className="flex items-center gap-1.5">
                   <span className="text-green-600">✓</span>
-                  已有物品仍可正常保存（旧值透传）
+                  {t("shopping.attributes.disableKeepLegacy")}
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="text-green-600">✓</span>
-                  停用属性在编辑界面会显示警告标记
+                  {t("shopping.attributes.disableShowWarning")}
                 </li>
                 <li className="flex items-center gap-1.5">
                   <span className="text-amber-500">✗</span>
-                  停用属性不可再被新物品选用
+                  {t("shopping.attributes.disableBlockNew")}
                 </li>
               </ul>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDisableConfirm(null)}>
-                取消
+                {t("shopping.cancel", "取消")}
               </Button>
               <Button
                 variant="destructive"
@@ -478,7 +545,7 @@ export function ShoppingAttributesTab({
                   await executeDisable(attr)
                 }}
               >
-                确认停用
+                {t("shopping.attributes.disableConfirmButton")}
               </Button>
             </DialogFooter>
           </DialogContent>

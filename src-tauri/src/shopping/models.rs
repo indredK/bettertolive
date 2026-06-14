@@ -42,6 +42,8 @@ pub struct AttributeDefinitionRow {
     pub sort_order: i32,
     pub is_enabled: bool,
     pub is_system: bool,
+    /// 乐观锁版本号，每次行级写入自增
+    pub version: i32,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -77,9 +79,9 @@ pub struct ItemChildRow {
     pub id: String,
     pub item_id: String,
     pub name: String,
-    pub status: Option<String>,
-    pub lifecycle: Option<String>,
-    pub depreciation: Option<String>,
+    pub status_def_id: Option<String>,
+    pub lifecycle_def_id: Option<String>,
+    pub depreciation_def_id: Option<String>,
     pub sort_order: i32,
 }
 
@@ -87,7 +89,7 @@ pub struct ItemChildRow {
 pub struct ItemChildChannelRow {
     pub id: String,
     pub item_child_id: String,
-    pub channel: String,
+    pub channel_def_id: String,
     pub entry_price: Option<f64>,
     pub sweet_spot_price: Option<f64>,
     pub overpay_price: Option<f64>,

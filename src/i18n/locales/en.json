@@ -208,7 +208,16 @@
         "styleToken": "Badge background: accent=primary · secondary=secondary · muted=muted grey · card=card",
         "rank": "Assign an order weight for ranked attributes (e.g. depreciation rate). Lower = lower rank. Leave empty for unordered attributes.",
         "description": "Explains the meaning of this attribute. Only shown in the attribute management panel."
-      }
+      },
+      "disableTitle": "Disable attribute \"{{name}}\"",
+      "disableDescription": "Some items are currently using this attribute.",
+      "disableKeepLegacy": "Existing items will still be saved (old value passed through)",
+      "disableShowWarning": "Disabled attributes will show a warning in the edit UI",
+      "disableBlockNew": "Disabled attributes cannot be selected for new items",
+      "disableConfirmButton": "Confirm disable",
+      "disabledBadge": "Disabled",
+      "disabledWarning": "This status is disabled. Consider selecting a different one.",
+      "conflict": "This attribute was changed elsewhere — refreshed to the latest state, please retry."
     },
     "error": {
       "idNameRequired": "Missing system ID",
@@ -658,7 +667,13 @@
         "douyin": "Douyin"
       },
       "removeChild": "Remove child",
-      "removeChannel": "Remove channel"
+      "removeChannel": "Remove channel",
+      "lifecycleDisabledBadge": "(Disabled)",
+      "lifecycleDisabledWarning": "This lifecycle is disabled. Consider selecting a different one.",
+      "depreciationDisabledBadge": "(Disabled)",
+      "depreciationDisabledWarning": "This depreciation is disabled. Consider selecting a different one.",
+      "channelDisabledBadge": "(Disabled)",
+      "channelDisabledWarning": "This channel is disabled. Consider selecting a different one."
     },
     "priceRef": {
       "entry": "Entry price",

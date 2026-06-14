@@ -149,9 +149,14 @@ export async function updateAttributeDefinition(
   return invoke("update_shopping_attribute_definition", { form })
 }
 
-export async function disableAttributeDefinition(id: string): Promise<void> {
+export async function enableAttributeDefinition(id: string, version: number): Promise<void> {
   if (isMock()) throw new Error("Shopping CRUD is not available in mock mode")
-  return invoke("disable_shopping_attribute_definition", { id })
+  return invoke("enable_shopping_attribute_definition", { id, version })
+}
+
+export async function disableAttributeDefinition(id: string, version: number): Promise<void> {
+  if (isMock()) throw new Error("Shopping CRUD is not available in mock mode")
+  return invoke("disable_shopping_attribute_definition", { id, version })
 }
 
 export async function countItemsUsingAttribute(kind: string, code: string): Promise<number> {

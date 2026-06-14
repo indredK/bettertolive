@@ -137,6 +137,8 @@ export type ShoppingAttributeDefinition = {
   sortOrder: number
   isEnabled: boolean
   isSystem: boolean
+  /** 乐观锁版本号，启停/编辑时回传用于并发冲突检测 */
+  version: number
 }
 
 // ===== 物品属性枚举 =====
