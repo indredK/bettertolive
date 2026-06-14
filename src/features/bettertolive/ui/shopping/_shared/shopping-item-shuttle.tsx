@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { Badge } from "@/components/ui/badge"
 import { TransferList, type TransferListItem } from "@/components/ui/transfer-list"
+import { cn } from "@/lib/utils"
 import type { ShoppingAttributeDefinition, ShoppingItem } from "@/features/bettertolive/types"
 import {
   itemPrimaryStatusCode,
@@ -53,7 +54,10 @@ export function ShoppingItemShuttle({
           meta: (
             <Badge
               variant="outline"
-              className={`h-4.5 px-1.5 text-[10px] leading-none ${statusStyle(status, attributeDefinitions)}`}
+              className={cn(
+                "h-4.5 px-1.5 text-[10px] leading-none",
+                statusStyle(status, attributeDefinitions),
+              )}
             >
               {statusDisplayName(status, t, attributeDefinitions)}
             </Badge>

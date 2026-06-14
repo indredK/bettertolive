@@ -298,7 +298,9 @@ export function statusStyle(
   definitions?: ShoppingAttributeDefinition[],
 ): string {
   return (
-    resolveAttributeStyle(definitions, "status", status) ?? STATUS_STYLES[status as ShoppingStatus]
+    resolveAttributeStyle(definitions, "status", status) ??
+    STATUS_STYLES[status as ShoppingStatus] ??
+    "border-foreground/10 bg-muted text-muted-foreground"
   )
 }
 
@@ -308,7 +310,8 @@ export function lifecycleStyle(
 ): string {
   return (
     resolveAttributeStyle(definitions, "lifecycle", lifecycle) ??
-    LIFECYCLE_STYLES[lifecycle as ShoppingLifecycle]
+    LIFECYCLE_STYLES[lifecycle as ShoppingLifecycle] ??
+    "border-foreground/10 bg-muted text-muted-foreground"
   )
 }
 
@@ -318,7 +321,8 @@ export function depreciationStyle(
 ): string {
   return (
     resolveAttributeStyle(definitions, "depreciation", depreciation) ??
-    DEPRECIATION_STYLES[depreciation as ShoppingDepreciation]
+    DEPRECIATION_STYLES[depreciation as ShoppingDepreciation] ??
+    "border-foreground/10 bg-muted text-muted-foreground"
   )
 }
 

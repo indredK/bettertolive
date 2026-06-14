@@ -817,7 +817,9 @@ pub fn reorder_shopping_page_contents(
     state: State<AppState>,
     ordered_ids: Vec<String>,
 ) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let now = chrono_now();
-    ShoppingRepository::reorder_page_contents(&conn, &ordered_ids, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::reorder_page_contents(tx, &ordered_ids, &now)
+    })
 }
