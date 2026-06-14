@@ -31,7 +31,7 @@ export function LegacyRelationshipExpressionTab({
       <Surface className="p-5">
         <SectionHeading
           icon={MessageSquareHeart}
-          title={t("legacy.relationship.title", "关系表达")}
+          title={t("legacy.relationship.title")}
           description={t(
             "legacy.relationship.description",
             "聚焦留给某人的话，以及和关系有关的未完成牵挂。",
@@ -41,7 +41,7 @@ export function LegacyRelationshipExpressionTab({
 
       <div className="grid gap-4 xl:grid-cols-2">
         <ExpressionBucket
-          title={t("legacy.relationship.now", "现在可以说的话")}
+          title={t("legacy.relationship.now")}
           description={t(
             "legacy.relationship.nowDesc",
             "这些内容也许适合转入关系模块继续打磨，但这里不自动推动。",
@@ -50,7 +50,7 @@ export function LegacyRelationshipExpressionTab({
           onEditItem={onEditItem}
         />
         <ExpressionBucket
-          title={t("legacy.relationship.future", "未来或离世后交付的话")}
+          title={t("legacy.relationship.future")}
           description={t(
             "legacy.relationship.futureDesc",
             "保留交付意图、对象和条件，避免只剩一段孤立文字。",
@@ -59,7 +59,7 @@ export function LegacyRelationshipExpressionTab({
           onEditItem={onEditItem}
         />
         <ExpressionBucket
-          title={t("legacy.relationship.private", "仅自己整理的牵挂")}
+          title={t("legacy.relationship.private")}
           description={t(
             "legacy.relationship.privateDesc",
             "这些内容不应该被自动推送或默认进入 AI 汇总。",
@@ -68,7 +68,7 @@ export function LegacyRelationshipExpressionTab({
           onEditItem={onEditItem}
         />
         <ExpressionBucket
-          title={t("legacy.relationship.unlinked", "未关联关系条目")}
+          title={t("legacy.relationship.unlinked")}
           description={t(
             "legacy.relationship.unlinkedDesc",
             "后续可以再决定是否引用关系模块对象。",
@@ -79,7 +79,7 @@ export function LegacyRelationshipExpressionTab({
       </div>
 
       {buckets.now.length > 0 ? (
-        <LegacyWarningCallout title={t("legacy.relationship.nowHintTitle", "当下表达提醒")}>
+        <LegacyWarningCallout title={t("legacy.relationship.nowHintTitle")}>
           {t(
             "legacy.relationship.nowHint",
             "visibility=现在 的内容只提示可表达窗口，不做催促，也不会自动复制到关系模块。",
@@ -122,13 +122,13 @@ function ExpressionBucket({
                   {translateLegacyEnum(t, "category", item.category)}
                 </Badge>
                 <Badge variant="outline" className="border-foreground/10 text-[10px]">
-                  {item.relatedRelationshipId ?? t("legacy.labels.unlinked", "未关联")}
+                  {item.relatedRelationshipId ?? t("legacy.labels.unlinked")}
                 </Badge>
               </div>
             </div>
           ))
         ) : (
-          <EmptyState message={t("legacy.empty.bucket", "当前没有匹配内容。")} compact />
+          <EmptyState message={t("legacy.empty.bucket")} compact />
         )}
       </div>
     </LegacyPanel>

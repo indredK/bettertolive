@@ -94,7 +94,7 @@ function PlanItemCard({
           size="icon-sm"
           variant="ghost"
           className="h-6 w-6 shrink-0"
-          label={t("shopping.planning.edit", "编辑物品")}
+          label={t("shopping.planning.edit")}
           icon={<Pencil className="size-3" />}
           onClick={onEdit}
         />
@@ -184,7 +184,7 @@ function PlanItemDetail({
           show={isControlMode && Boolean(onDelete)}
           variant="outline"
           size="sm"
-          label={t("shopping.planning.delete", "删除物品")}
+          label={t("shopping.planning.delete")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
         />
@@ -193,7 +193,7 @@ function PlanItemDetail({
         {/* 标签区：系统 + 空间 合并到一行 */}
         <div className="space-y-2">
           {systemNames.length > 0 && (
-            <DetailTextValue label={t("shopping.item.systemTags", "系统标签")}>
+            <DetailTextValue label={t("shopping.item.systemTags")}>
               <div className="flex flex-wrap gap-1">
                 {systemNames.map((name) => (
                   <Badge key={`sys-${name}`} variant="outline" className={SYSTEM_CHIP_STYLE}>
@@ -204,7 +204,7 @@ function PlanItemDetail({
             </DetailTextValue>
           )}
           {spaceNames.length > 0 && (
-            <DetailTextValue label={t("shopping.item.spaceTags", "空间标签")}>
+            <DetailTextValue label={t("shopping.item.spaceTags")}>
               <div className="flex flex-wrap gap-1">
                 {spaceNames.map((name) => (
                   <Badge key={`spc-${name}`} variant="outline" className={SPACE_CHIP_STYLE}>
@@ -218,7 +218,7 @@ function PlanItemDetail({
 
         {/* 子级 */}
         {item.children.length > 0 ? (
-          <DetailPanelSection title={t("shopping.item.children", "子级")}>
+          <DetailPanelSection title={t("shopping.item.children")}>
             <div className="space-y-2.5">
               {item.children.map((child) => (
                 <ItemChildDetailCard
@@ -230,14 +230,12 @@ function PlanItemDetail({
             </div>
           </DetailPanelSection>
         ) : (
-          <div className="text-muted-foreground text-sm">
-            {t("shopping.item.noChildren", "暂无子级")}
-          </div>
+          <div className="text-muted-foreground text-sm">{t("shopping.item.noChildren")}</div>
         )}
 
         {/* 备注 */}
         {item.note && (
-          <DetailPanelSection title={t("shopping.note", "备注")}>
+          <DetailPanelSection title={t("shopping.note")}>
             <p className="text-sm leading-6">{item.note}</p>
           </DetailPanelSection>
         )}
@@ -272,8 +270,8 @@ export function ShoppingPlanningTab({
     () => [
       {
         key: "status",
-        label: t("shopping.filter.status", "状态"),
-        allLabel: t("shopping.filter.all", "全部"),
+        label: t("shopping.filter.status"),
+        allLabel: t("shopping.filter.all"),
         value: statusFilter,
         options: [
           {
@@ -296,11 +294,11 @@ export function ShoppingPlanningTab({
       },
       {
         key: "system",
-        label: t("shopping.filter.system", "系统"),
-        allLabel: t("shopping.filter.allSystems", "全部系统"),
+        label: t("shopping.filter.system"),
+        allLabel: t("shopping.filter.allSystems"),
         value: systemFilter,
         options: [
-          { value: "none", label: t("shopping.filter.noSystem", "未分配系统") },
+          { value: "none", label: t("shopping.filter.noSystem") },
           ...shopping.systemDefinitions.map((system) => ({
             value: system.id,
             label: system.name || system.id,
@@ -309,11 +307,11 @@ export function ShoppingPlanningTab({
       },
       {
         key: "space",
-        label: t("shopping.filter.space", "空间"),
-        allLabel: t("shopping.filter.allSpaces", "全部空间"),
+        label: t("shopping.filter.space"),
+        allLabel: t("shopping.filter.allSpaces"),
         value: spaceFilter,
         options: [
-          { value: "none", label: t("shopping.filter.noSpace", "未分配空间") },
+          { value: "none", label: t("shopping.filter.noSpace") },
           ...shopping.spaceDefinitions.map((space) => ({
             value: space.id,
             label: space.name,
@@ -418,8 +416,8 @@ export function ShoppingPlanningTab({
         name,
         defaultValue: `已删除物件：${name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedItem", "删除物件失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedItem"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneItem", {
         name,
         defaultValue: `已撤销删除：${name}`,
@@ -444,7 +442,7 @@ export function ShoppingPlanningTab({
                 <Input
                   value={localQuery}
                   onChange={(event) => setLocalQuery(event.target.value)}
-                  placeholder={t("shopping.planning.searchPlaceholder", "搜索物品 / 子级 / 渠道")}
+                  placeholder={t("shopping.planning.searchPlaceholder")}
                   className="pl-8"
                 />
               </div>
@@ -481,7 +479,7 @@ export function ShoppingPlanningTab({
               ))}
               {filteredItems.length === 0 && (
                 <div className="text-muted-foreground py-4 text-center text-xs">
-                  {t("shopping.planning.noMatchingItems", "无匹配物品")}
+                  {t("shopping.planning.noMatchingItems")}
                 </div>
               )}
             </div>
@@ -501,9 +499,7 @@ export function ShoppingPlanningTab({
               }
             />
           ) : (
-            <ShoppingEmptyDetailCard
-              message={t("shopping.planning.selectPrompt", "从左侧选择一个物品查看详情")}
-            />
+            <ShoppingEmptyDetailCard message={t("shopping.planning.selectPrompt")} />
           )}
         </ShoppingDetailPane>
       </ShoppingTabBody>
@@ -572,14 +568,14 @@ function ItemChildDetailCard({
               </span>
               <div className="flex flex-1 flex-wrap gap-x-4 gap-y-1 text-xs">
                 <DetailMetric
-                  label={t("shopping.priceRef.entry", "入门")}
+                  label={t("shopping.priceRef.entry")}
                   value={
                     channelPrice.entryPrice != null ? formatPrice(channelPrice.entryPrice) : "-"
                   }
                   className="min-w-0 flex-1"
                 />
                 <DetailMetric
-                  label={t("shopping.priceRef.sweet", "甜蜜")}
+                  label={t("shopping.priceRef.sweet")}
                   value={
                     channelPrice.sweetSpotPrice != null
                       ? formatPrice(channelPrice.sweetSpotPrice)
@@ -588,7 +584,7 @@ function ItemChildDetailCard({
                   className="min-w-0 flex-1"
                 />
                 <DetailMetric
-                  label={t("shopping.priceRef.overpay", "虚高")}
+                  label={t("shopping.priceRef.overpay")}
                   value={
                     channelPrice.overpayPrice != null ? formatPrice(channelPrice.overpayPrice) : "-"
                   }
@@ -600,7 +596,7 @@ function ItemChildDetailCard({
         </div>
       ) : (
         <div className="text-muted-foreground mt-2.5 text-xs">
-          {t("shopping.item.noChildChannels", "暂未添加渠道价格")}
+          {t("shopping.item.noChildChannels")}
         </div>
       )}
     </div>

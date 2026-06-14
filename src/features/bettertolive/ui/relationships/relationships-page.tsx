@@ -355,8 +355,8 @@ export function RelationshipsPage({
       [
         {
           key: "type",
-          title: t("relationships.overview.typeTitle", "类型"),
-          description: t("relationships.overview.typeDescription", "这个人的纽带本质是什么。"),
+          title: t("relationships.overview.typeTitle"),
+          description: t("relationships.overview.typeDescription"),
           rows: createDistribution(
             RELATIONSHIP_TYPES,
             relationships,
@@ -365,8 +365,8 @@ export function RelationshipsPage({
         },
         {
           key: "depth",
-          title: t("relationships.overview.depthTitle", "深度"),
-          description: t("relationships.overview.depthDescription", "我在这段关系里有多敞开。"),
+          title: t("relationships.overview.depthTitle"),
+          description: t("relationships.overview.depthDescription"),
           rows: createDistribution(
             RELATIONSHIP_DEPTHS,
             relationships,
@@ -375,8 +375,8 @@ export function RelationshipsPage({
         },
         {
           key: "stage",
-          title: t("relationships.overview.stageTitle", "阶段"),
-          description: t("relationships.overview.stageDescription", "这段关系现在在往哪里走。"),
+          title: t("relationships.overview.stageTitle"),
+          description: t("relationships.overview.stageDescription"),
           rows: createDistribution(
             RELATIONSHIP_STAGES,
             relationships,
@@ -385,8 +385,8 @@ export function RelationshipsPage({
         },
         {
           key: "impact",
-          title: t("relationships.overview.impactTitle", "影响"),
-          description: t("relationships.overview.impactDescription", "它滋养、消耗，还是混合。"),
+          title: t("relationships.overview.impactTitle"),
+          description: t("relationships.overview.impactDescription"),
           rows: createDistribution(
             RELATIONSHIP_IMPACTS,
             relationships,
@@ -395,8 +395,8 @@ export function RelationshipsPage({
         },
         {
           key: "interaction",
-          title: t("relationships.overview.interactionTitle", "互动频率"),
-          description: t("relationships.overview.interactionDescription", "多久会联系一次。"),
+          title: t("relationships.overview.interactionTitle"),
+          description: t("relationships.overview.interactionDescription"),
           rows: createDistribution(
             INTERACTION_FREQUENCIES,
             relationships,
@@ -440,8 +440,8 @@ export function RelationshipsPage({
         name: relationship.name,
         defaultValue: `已删除关系：${relationship.name}`,
       }),
-      failureMessage: t("relationships.toast.deleteRelationshipFailed", "删除关系失败"),
-      undoLabel: t("relationships.common.undo", "撤销"),
+      failureMessage: t("relationships.toast.deleteRelationshipFailed"),
+      undoLabel: t("relationships.common.undo"),
       undoneMessage: t("relationships.toast.deleteRelationshipUndone", {
         name: relationship.name,
         defaultValue: `已撤销删除：${relationship.name}`,
@@ -461,12 +461,12 @@ export function RelationshipsPage({
     })
 
     confirmUndoableDelete({
-      confirmMessage: t("relationships.confirm.deleteNote", "确定删除这条想说的话吗？"),
-      pendingMessage: t("relationships.toast.deleteNotePending", "已加入删除队列，5 秒内可撤销"),
-      successMessage: t("relationships.toast.deleteNoteSuccess", "已删除想说的话"),
-      failureMessage: t("relationships.toast.deleteNoteFailed", "删除想说的话失败"),
-      undoLabel: t("relationships.common.undo", "撤销"),
-      undoneMessage: t("relationships.toast.deleteNoteUndone", "已撤销删除"),
+      confirmMessage: t("relationships.confirm.deleteNote"),
+      pendingMessage: t("relationships.toast.deleteNotePending"),
+      successMessage: t("relationships.toast.deleteNoteSuccess"),
+      failureMessage: t("relationships.toast.deleteNoteFailed"),
+      undoLabel: t("relationships.common.undo"),
+      undoneMessage: t("relationships.toast.deleteNoteUndone"),
       onDelete: () => saveRelationshipsMutation.mutateAsync(nextModule),
       onDeleted: () => {
         setSelectedNoteId(null)
@@ -482,12 +482,12 @@ export function RelationshipsPage({
     }
 
     confirmUndoableDelete({
-      confirmMessage: t("relationships.confirm.deletePattern", "确定删除这个关系模式吗？"),
-      pendingMessage: t("relationships.toast.deletePatternPending", "已加入删除队列，5 秒内可撤销"),
-      successMessage: t("relationships.toast.deletePatternSuccess", "已删除关系模式"),
-      failureMessage: t("relationships.toast.deletePatternFailed", "删除关系模式失败"),
-      undoLabel: t("relationships.common.undo", "撤销"),
-      undoneMessage: t("relationships.toast.deletePatternUndone", "已撤销删除"),
+      confirmMessage: t("relationships.confirm.deletePattern"),
+      pendingMessage: t("relationships.toast.deletePatternPending"),
+      successMessage: t("relationships.toast.deletePatternSuccess"),
+      failureMessage: t("relationships.toast.deletePatternFailed"),
+      undoLabel: t("relationships.common.undo"),
+      undoneMessage: t("relationships.toast.deletePatternUndone"),
       onDelete: () => saveRelationshipsMutation.mutateAsync(nextModule),
       onDeleted: () => {
         setSelectedPatternId(null)
@@ -509,15 +509,11 @@ export function RelationshipsPage({
         className={cn("min-h-0 flex-1", !isStackedLayout && "flex flex-col overflow-hidden")}
       >
         <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("relationships.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="graph">{t("relationships.tabs.graph", "关系图谱")}</TabsTrigger>
-          <TabsTrigger value="directory">
-            {t("relationships.tabs.directory", "关系档案")}
-          </TabsTrigger>
-          <TabsTrigger value="unsent">{t("relationships.tabs.unsent", "想说的话")}</TabsTrigger>
-          <TabsTrigger value="patterns">
-            {t("relationships.tabs.patterns", "跨关系模式")}
-          </TabsTrigger>
+          <TabsTrigger value="overview">{t("relationships.tabs.overview")}</TabsTrigger>
+          <TabsTrigger value="graph">{t("relationships.tabs.graph")}</TabsTrigger>
+          <TabsTrigger value="directory">{t("relationships.tabs.directory")}</TabsTrigger>
+          <TabsTrigger value="unsent">{t("relationships.tabs.unsent")}</TabsTrigger>
+          <TabsTrigger value="patterns">{t("relationships.tabs.patterns")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className={tabContentClassName(isStackedLayout)}>
@@ -641,7 +637,7 @@ function RelationshipsOverviewTab({
         <Surface className="p-5">
           <SectionHeading
             icon={Waypoints}
-            title={t("relationships.overview.classificationHeading", "5 维关系分类")}
+            title={t("relationships.overview.classificationHeading")}
             description={t(
               "relationships.overview.classificationDescription",
               "这些维度负责分组和观察关系世界；未完成重量留在详情和想说的话里。",
@@ -660,7 +656,7 @@ function RelationshipsOverviewTab({
 
           <div className="mt-4 rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
             <div className="text-sm font-medium text-[color:var(--text-primary)]">
-              {t("relationships.overview.unfinishedHeading", "未完成重量")}
+              {t("relationships.overview.unfinishedHeading")}
             </div>
             <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
               {t(
@@ -686,24 +682,24 @@ function RelationshipsOverviewTab({
 
         <div className="grid gap-3 min-[760px]:grid-cols-4 xl:grid-cols-1">
           <InsightMetric
-            label={t("relationships.overview.nourishing", "滋养")}
+            label={t("relationships.overview.nourishing")}
             value={nourishingCount}
-            detail={t("relationships.overview.nourishingDetail", "让人恢复或更有力量的关系")}
+            detail={t("relationships.overview.nourishingDetail")}
           />
           <InsightMetric
-            label={t("relationships.overview.draining", "消耗")}
+            label={t("relationships.overview.draining")}
             value={drainingCount}
-            detail={t("relationships.overview.drainingDetail", "需要边界或重新判断的关系")}
+            detail={t("relationships.overview.drainingDetail")}
           />
           <InsightMetric
-            label={t("relationships.overview.repairing", "紧张 / 修复")}
+            label={t("relationships.overview.repairing")}
             value={repairCount}
-            detail={t("relationships.overview.repairingDetail", "当前最适合被温和检查的关系")}
+            detail={t("relationships.overview.repairingDetail")}
           />
           <InsightMetric
-            label={t("relationships.overview.heavy", "很重")}
+            label={t("relationships.overview.heavy")}
             value={highWeightCount}
-            detail={t("relationships.overview.heavyDetail", "优先写下或处理的未完成表达")}
+            detail={t("relationships.overview.heavyDetail")}
           />
         </div>
       </div>
@@ -751,7 +747,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("relationships.empty.distribution", "暂无分布数据。")}
+            {t("relationships.empty.distribution")}
           </div>
         )}
       </div>
@@ -862,23 +858,23 @@ function RelationshipsGraphTab({
     () =>
       [
         {
-          description: t("relationships.graph.markModes.circleDescription", "同一圈层同色"),
-          label: t("relationships.graph.markModes.circle", "按圈层"),
+          description: t("relationships.graph.markModes.circleDescription"),
+          label: t("relationships.graph.markModes.circle"),
           mode: "circle",
         },
         {
-          description: t("relationships.graph.markModes.weightDescription", "未完成越重越醒目"),
-          label: t("relationships.graph.markModes.weight", "按重量"),
+          description: t("relationships.graph.markModes.weightDescription"),
+          label: t("relationships.graph.markModes.weight"),
           mode: "weight",
         },
         {
-          description: t("relationships.graph.markModes.impactDescription", "滋养/消耗一眼分开"),
-          label: t("relationships.graph.markModes.impact", "按影响"),
+          description: t("relationships.graph.markModes.impactDescription"),
+          label: t("relationships.graph.markModes.impact"),
           mode: "impact",
         },
         {
-          description: t("relationships.graph.markModes.stageDescription", "稳定、紧张、修复分区"),
-          label: t("relationships.graph.markModes.stage", "按阶段"),
+          description: t("relationships.graph.markModes.stageDescription"),
+          label: t("relationships.graph.markModes.stage"),
           mode: "stage",
         },
       ] satisfies Array<{
@@ -911,12 +907,7 @@ function RelationshipsGraphTab({
   }
 
   if (graphModel.nodeCount === 0) {
-    return (
-      <EmptyState
-        message={t("relationships.empty.graph", "当前还没有可展示的关系连接。")}
-        compact
-      />
-    )
+    return <EmptyState message={t("relationships.empty.graph")} compact />
   }
 
   return (
@@ -932,8 +923,8 @@ function RelationshipsGraphTab({
                     className="border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] text-[color:var(--text-secondary)]"
                   >
                     {effectiveGraphScope.mode === "centered"
-                      ? t("relationships.graph.centeredMode", "中心视图")
-                      : t("relationships.graph.globalMode", "全局视图")}
+                      ? t("relationships.graph.centeredMode")
+                      : t("relationships.graph.globalMode")}
                   </Badge>
                   {effectiveGraphScope.mode === "centered" ? (
                     <Badge
@@ -970,7 +961,7 @@ function RelationshipsGraphTab({
                     disabled={!canClearGraphFocus}
                     onClick={handleClearGraphFocus}
                   >
-                    {t("relationships.graph.clearFocus", "取消焦点")}
+                    {t("relationships.graph.clearFocus")}
                   </Button>
                   {isCenteredGraphScope ? (
                     <Button
@@ -980,7 +971,7 @@ function RelationshipsGraphTab({
                       className="h-7 px-2.5"
                       onClick={handleExitCenterView}
                     >
-                      {t("relationships.graph.exitCenter", "取消以它为中心")}
+                      {t("relationships.graph.exitCenter")}
                     </Button>
                   ) : (
                     <Button
@@ -991,7 +982,7 @@ function RelationshipsGraphTab({
                       disabled={!canCenterSelectedRelationship}
                       onClick={handleCenterSelectedRelationship}
                     >
-                      {t("relationships.graph.center", "以它为中心")}
+                      {t("relationships.graph.center")}
                     </Button>
                   )}
                   <Button
@@ -1041,16 +1032,13 @@ function RelationshipsGraphTab({
               canvasClassName="h-full min-h-[520px] xl:min-h-0"
               className="min-h-0 flex-1"
               elements={graphModel.elements}
-              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
-              fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
+              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen")}
+              fullscreenLabel={t("relationships.graph.controls.fullscreen")}
               layout={graphModel.layout2d}
               legend={
                 <RelationshipGraphLegend
                   items={graphModel.legendItems}
-                  title={
-                    currentGraphMarkOption?.label ??
-                    t("relationships.graph.markModes.circle", "按圈层")
-                  }
+                  title={currentGraphMarkOption?.label ?? t("relationships.graph.markModes.circle")}
                 />
               }
               legendPosition="bottom-left"
@@ -1065,16 +1053,13 @@ function RelationshipsGraphTab({
               className="min-h-0 flex-1"
               enableNodeDrag={effectiveGraphScope.mode === "global"}
               elements={graphModel.elements}
-              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen", "退出全屏")}
-              fullscreenLabel={t("relationships.graph.controls.fullscreen", "全屏")}
+              exitFullscreenLabel={t("relationships.graph.controls.exitFullscreen")}
+              fullscreenLabel={t("relationships.graph.controls.fullscreen")}
               layout={RELATIONSHIP_GRAPH_LAYOUT}
               legend={
                 <RelationshipGraphLegend
                   items={graphModel.legendItems}
-                  title={
-                    currentGraphMarkOption?.label ??
-                    t("relationships.graph.markModes.circle", "按圈层")
-                  }
+                  title={currentGraphMarkOption?.label ?? t("relationships.graph.markModes.circle")}
                 />
               }
               legendPosition="bottom-left"
@@ -1090,7 +1075,7 @@ function RelationshipsGraphTab({
             <div className="flex items-center gap-2 text-[color:var(--text-primary)]">
               <Network className="size-4" />
               <h4 className="text-sm font-semibold tracking-tight">
-                {t("relationships.graph.detailTitle", "节点说明")}
+                {t("relationships.graph.detailTitle")}
               </h4>
             </div>
           </div>
@@ -1192,7 +1177,7 @@ function RelationshipGraphRelationshipDetail({
       <div className="shrink-0 space-y-4 border-b border-[color:var(--muted-surface-border)] bg-[color:var(--surface-bg)]/95 px-4 py-4 supports-[backdrop-filter]:backdrop-blur-xs">
         <div className="flex flex-wrap gap-2">
           <Badge className="bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]">
-            {t("relationships.graph.legend.relationship", "关系人物")}
+            {t("relationships.graph.legend.relationship")}
           </Badge>
           {circle ? (
             <Badge
@@ -1220,7 +1205,7 @@ function RelationshipGraphRelationshipDetail({
               onClick={() => onEdit(relationship, circle?.id ?? "")}
             >
               <Pencil className="h-4 w-4" />
-              {t("relationships.graph.editConnections", "编辑")}
+              {t("relationships.graph.editConnections")}
             </Button>
           </ActionGroup>
         </div>
@@ -1233,47 +1218,47 @@ function RelationshipGraphRelationshipDetail({
 
         <div className="grid gap-3 min-[640px]:grid-cols-2">
           <RelationshipMeta
-            label={t("relationships.labels.depth", "深度")}
+            label={t("relationships.labels.depth")}
             value={translateRelationshipEnum(t, "depth", relationship.depth)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.stage", "阶段")}
+            label={t("relationships.labels.stage")}
             value={translateRelationshipEnum(t, "stage", relationship.stage)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.interaction", "互动频率")}
+            label={t("relationships.labels.interaction")}
             value={translateRelationshipEnum(t, "interaction", relationship.interaction)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.impact", "影响")}
+            label={t("relationships.labels.impact")}
             value={translateRelationshipEnum(t, "impact", relationship.impact)}
           />
         </div>
 
         <DetailTextBlock
-          title={t("relationships.labels.currentState", "当前")}
+          title={t("relationships.labels.currentState")}
           body={relationship.currentState}
         />
         <DetailTextBlock
-          title={t("relationships.labels.unspoken", "没说出口")}
+          title={t("relationships.labels.unspoken")}
           body={relationship.unspokenLine}
         />
         <div className="grid gap-3">
           <RelationshipGraphConnectionList connections={connections} />
           <RelationshipGraphSignalList
-            emptyLabel={t("relationships.graph.signals.noConnectedPeople", "暂无相连人物")}
+            emptyLabel={t("relationships.graph.signals.noConnectedPeople")}
             items={connectedRelationships.map((item) => item.name)}
-            title={t("relationships.graph.signals.connectedPeople", "图中相连")}
+            title={t("relationships.graph.signals.connectedPeople")}
           />
           <RelationshipGraphSignalList
-            emptyLabel={t("relationships.graph.signals.noPatterns", "暂无共同模式")}
+            emptyLabel={t("relationships.graph.signals.noPatterns")}
             items={matchedPatterns.map((pattern) => pattern.title)}
-            title={t("relationships.graph.signals.patterns", "匹配模式")}
+            title={t("relationships.graph.signals.patterns")}
           />
           <RelationshipGraphSignalList
-            emptyLabel={t("relationships.graph.signals.noNotes", "暂无表达线索")}
+            emptyLabel={t("relationships.graph.signals.noNotes")}
             items={relatedNotes.map((note) => note.theme)}
-            title={t("relationships.graph.signals.notes", "表达线索")}
+            title={t("relationships.graph.signals.notes")}
           />
         </div>
         <BadgeRow items={relationship.emotionCues} />
@@ -1293,7 +1278,7 @@ function RelationshipGraphConnectionList({
   return (
     <div className="rounded-2xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
       <div className="text-xs font-medium text-[color:var(--text-primary)]">
-        {t("relationships.graph.signals.connections", "显式人物关系")}
+        {t("relationships.graph.signals.connections")}
       </div>
       {connections.length > 0 ? (
         <div className="mt-2 space-y-2">
@@ -1336,7 +1321,7 @@ function RelationshipGraphConnectionList({
         </div>
       ) : (
         <p className="mt-2 text-xs text-[color:var(--text-muted)]">
-          {t("relationships.graph.signals.noConnections", "还没有显式人物关系。")}
+          {t("relationships.graph.signals.noConnections")}
         </p>
       )}
     </div>
@@ -1482,7 +1467,7 @@ function RelationshipsDirectoryTab({
       RELATIONSHIP_DIRECTORY_FILTER_DIMENSIONS.map((dimension) => ({
         key: dimension.key,
         label: t(dimension.labelKey, dimension.defaultLabel),
-        allLabel: t("relationships.filter.all", "全部"),
+        allLabel: t("relationships.filter.all"),
         value: filters[dimension.key],
         options: dimension.options.map((option) => ({
           value: option,
@@ -1500,14 +1485,14 @@ function RelationshipsDirectoryTab({
           <div className="flex items-center justify-between gap-2">
             <ListHeader
               icon={Users2}
-              title={t("relationships.directory.title", "关系档案")}
+              title={t("relationships.directory.title")}
               count={filteredRelationshipCount}
             />
             <AnimatedIconButton
               show={isControlMode}
               size="icon-sm"
               variant="outline"
-              label={t("relationships.directory.add", "新增关系")}
+              label={t("relationships.directory.add")}
               icon={<Plus className="size-3.5" />}
               onClick={onCreate}
             />
@@ -1552,10 +1537,7 @@ function RelationshipsDirectoryTab({
           </div>
         ))}
         {filteredRelationshipCount === 0 ? (
-          <EmptyState
-            message={t("relationships.empty.directory", "当前筛选下没有关系。")}
-            compact
-          />
+          <EmptyState message={t("relationships.empty.directory")} compact />
         ) : null}
       </FilterablePanel>
 
@@ -1576,9 +1558,7 @@ function RelationshipsDirectoryTab({
             }
           />
         ) : (
-          <EmptyDetail
-            message={t("relationships.empty.selectRelationship", "从左侧选择一段关系。")}
-          />
+          <EmptyDetail message={t("relationships.empty.selectRelationship")} />
         )}
       </div>
     </TwoPaneLayout>
@@ -1673,11 +1653,11 @@ function RelationshipDetailPanel({
         <ActionGroup justify="end">
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
             <Pencil className="h-4 w-4" />
-            {t("relationships.common.edit", "编辑")}
+            {t("relationships.common.edit")}
           </AnimatedButton>
           <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
             <Trash2 className="h-4 w-4" />
-            {t("relationships.common.delete", "删除")}
+            {t("relationships.common.delete")}
           </AnimatedButton>
         </ActionGroup>
       </div>
@@ -1689,43 +1669,43 @@ function RelationshipDetailPanel({
 
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           <RelationshipMeta
-            label={t("relationships.labels.depth", "深度")}
+            label={t("relationships.labels.depth")}
             value={translateRelationshipEnum(t, "depth", relationship.depth)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.stage", "阶段")}
+            label={t("relationships.labels.stage")}
             value={translateRelationshipEnum(t, "stage", relationship.stage)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.interaction", "互动频率")}
+            label={t("relationships.labels.interaction")}
             value={translateRelationshipEnum(t, "interaction", relationship.interaction)}
           />
           <RelationshipMeta
-            label={t("relationships.labels.impact", "影响")}
+            label={t("relationships.labels.impact")}
             value={translateRelationshipEnum(t, "impact", relationship.impact)}
           />
         </div>
 
         <DetailTextBlock
-          title={t("relationships.labels.currentState", "当前")}
+          title={t("relationships.labels.currentState")}
           body={relationship.currentState}
         />
         <DetailTextBlock
-          title={t("relationships.labels.boundary", "边界")}
+          title={t("relationships.labels.boundary")}
           body={relationship.boundaryStatus}
         />
         <DetailTextBlock
-          title={t("relationships.labels.unspoken", "没说出口")}
+          title={t("relationships.labels.unspoken")}
           body={relationship.unspokenLine}
         />
 
         <div className="grid gap-3 lg:grid-cols-2">
           <DetailTextBlock
-            title={t("relationships.labels.positiveImpact", "正面影响")}
+            title={t("relationships.labels.positiveImpact")}
             body={relationship.positiveImpact}
           />
           <DetailTextBlock
-            title={t("relationships.labels.ongoingShadow", "持续阴影")}
+            title={t("relationships.labels.ongoingShadow")}
             body={relationship.ongoingShadow}
           />
         </div>
@@ -1734,8 +1714,8 @@ function RelationshipDetailPanel({
         <BadgeRow items={relationship.tags} muted />
 
         <TimelineSection
-          title={t("relationships.labels.events", "关键互动事件")}
-          emptyMessage={t("relationships.empty.events", "暂无关键互动事件。")}
+          title={t("relationships.labels.events")}
+          emptyMessage={t("relationships.empty.events")}
           items={relationship.events.map((event) => ({
             id: event.id,
             title: `${event.date} · ${translateRelationshipEnum(t, "eventKind", event.kind)}`,
@@ -1743,8 +1723,8 @@ function RelationshipDetailPanel({
           }))}
         />
         <TimelineSection
-          title={t("relationships.labels.history", "变化历史")}
-          emptyMessage={t("relationships.empty.history", "暂无深度或阶段变化。")}
+          title={t("relationships.labels.history")}
+          emptyMessage={t("relationships.empty.history")}
           items={relationship.history.map((history) => ({
             id: history.id,
             title: `${history.date} · ${translateRelationshipEnum(t, "changeField", history.field)}`,
@@ -1752,8 +1732,8 @@ function RelationshipDetailPanel({
           }))}
         />
         <TimelineSection
-          title={t("relationships.labels.relatedNotes", "相关想说的话")}
-          emptyMessage={t("relationships.empty.relatedNotes", "暂无关联表达。")}
+          title={t("relationships.labels.relatedNotes")}
+          emptyMessage={t("relationships.empty.relatedNotes")}
           items={relatedNotes.map((note) => ({
             id: note.id,
             title: `${note.to} · ${note.theme}`,
@@ -1801,14 +1781,14 @@ function UnsentNotesTab({
         <div className="flex items-center justify-between gap-2">
           <ListHeader
             icon={MessageCircleMore}
-            title={t("relationships.unsent.title", "想说的话")}
+            title={t("relationships.unsent.title")}
             count={notes.length}
           />
           <AnimatedIconButton
             show={isControlMode}
             size="icon-sm"
             variant="outline"
-            label={t("relationships.unsent.add", "新增想说的话")}
+            label={t("relationships.unsent.add")}
             icon={<Plus className="size-3.5" />}
             onClick={onCreate}
           />
@@ -1877,7 +1857,7 @@ function UnsentNotesTab({
             </div>
           </Surface>
         ) : (
-          <EmptyDetail message={t("relationships.empty.selectNote", "从左侧选择一条表达。")} />
+          <EmptyDetail message={t("relationships.empty.selectNote")} />
         )}
       </div>
     </TwoPaneLayout>
@@ -1909,14 +1889,14 @@ function PatternsTab({
         <div className="flex items-center justify-between gap-2">
           <ListHeader
             icon={Activity}
-            title={t("relationships.patterns.title", "跨关系模式")}
+            title={t("relationships.patterns.title")}
             count={patterns.length}
           />
           <AnimatedIconButton
             show={isControlMode}
             size="icon-sm"
             variant="outline"
-            label={t("relationships.patterns.add", "新增模式")}
+            label={t("relationships.patterns.add")}
             icon={<Plus className="size-3.5" />}
             onClick={onCreate}
           />
@@ -1950,7 +1930,7 @@ function PatternsTab({
           <Surface className="flex min-h-0 flex-col overflow-visible p-4 lg:h-full lg:overflow-hidden">
             <DetailHeader
               isControlMode={isControlMode}
-              kicker={t("relationships.patterns.kicker", "关系模式")}
+              kicker={t("relationships.patterns.kicker")}
               title={selectedPattern.title}
               onDelete={() => onDelete(selectedPattern)}
               onEdit={() => onEdit(selectedPattern)}
@@ -1963,7 +1943,7 @@ function PatternsTab({
             </div>
           </Surface>
         ) : (
-          <EmptyDetail message={t("relationships.empty.selectPattern", "从左侧选择一个模式。")} />
+          <EmptyDetail message={t("relationships.empty.selectPattern")} />
         )}
       </div>
     </TwoPaneLayout>
@@ -2024,11 +2004,11 @@ function DetailHeader({
       <ActionGroup justify="end">
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onEdit}>
           <Pencil className="h-4 w-4" />
-          {t("relationships.common.edit", "编辑")}
+          {t("relationships.common.edit")}
         </AnimatedButton>
         <AnimatedButton show={isControlMode} size="sm" variant="outline" onClick={onDelete}>
           <Trash2 className="h-4 w-4" />
-          {t("relationships.common.delete", "删除")}
+          {t("relationships.common.delete")}
         </AnimatedButton>
       </ActionGroup>
     </div>

@@ -98,7 +98,7 @@ export function CognitiveArena({
   if (!civA || !civB) {
     return (
       <div className="flex h-full items-center justify-center font-sans text-xs text-[color:var(--text-muted)]">
-        {t("worldhistory.arena.needsTwo", "至少需要两个文明才能进行对质")}
+        {t("worldhistory.arena.needsTwo")}
       </div>
     )
   }
@@ -113,7 +113,7 @@ export function CognitiveArena({
     <div className="flex h-full flex-col">
       <div className="mb-3 flex shrink-0 items-center justify-between gap-2">
         <h3 className="font-serif text-base font-semibold tracking-wide text-[color:var(--text-primary)]">
-          {t("worldhistory.arena.title", "跨文明辩证对质场")}
+          {t("worldhistory.arena.title")}
         </h3>
         <select
           value={selectedCivB}
@@ -229,7 +229,7 @@ export function CognitiveArena({
             <thead>
               <tr className="border-b border-[color:var(--surface-border)]">
                 <th className="py-1 pr-2 text-left text-[color:var(--text-muted)]">
-                  {t("worldhistory.arena.dimension", "维度")}
+                  {t("worldhistory.arena.dimension")}
                 </th>
                 <th className="px-2 py-1 text-center" style={{ color: civA.color }}>
                   {civA.icon} {civA.name}
@@ -238,7 +238,7 @@ export function CognitiveArena({
                   {civB.icon} {civB.name}
                 </th>
                 <th className="py-1 pl-2 text-center text-[color:var(--text-muted)]">
-                  {t("worldhistory.arena.diff", "差")}
+                  {t("worldhistory.arena.diff")}
                 </th>
               </tr>
             </thead>
@@ -280,19 +280,19 @@ export function CognitiveArena({
         <div>
           <div className="mb-2 flex items-center justify-between">
             <h4 className="font-serif text-xs font-semibold text-[color:var(--text-secondary)]">
-              {t("worldhistory.arena.classicVerdicts", "经典古判词")}
+              {t("worldhistory.arena.classicVerdicts")}
             </h4>
             {isEditing && onAddPreset && (
               <Button size="sm" onClick={() => onAddPreset(activeCivilizationId, selectedCivB)}>
                 <Plus className="size-3" />
-                {t("worldhistory.arena.addPreset", "新增判词")}
+                {t("worldhistory.arena.addPreset")}
               </Button>
             )}
           </div>
 
           {presets.length === 0 ? (
             <EmptyState
-              message={`这对文明暂无判词${isEditing ? "，点击「新增判词」添加" : ""}`}
+              message={`${t("worldhistory.preset.noPresets")}${isEditing ? t("worldhistory.preset.noPresetsHint") : ""}`}
               compact
             />
           ) : isEditing && onUpdatePreset && onDeletePreset ? (
@@ -306,7 +306,7 @@ export function CognitiveArena({
                     <Input
                       value={preset.title}
                       onChange={(e) => onUpdatePreset(preset.id, { title: e.target.value })}
-                      placeholder="判词标题"
+                      placeholder={t("worldhistory.preset.titlePlaceholder")}
                       className="flex-1 font-serif text-xs font-semibold"
                     />
                     <Button
@@ -314,20 +314,17 @@ export function CognitiveArena({
                       size="icon-sm"
                       onClick={() => {
                         confirmUndoableDelete({
-                          confirmMessage: t(
-                            "worldhistory.preset.deleteAria",
-                            "确定删除这个判词吗？",
-                          ),
-                          pendingMessage: "已加入删除队列，5 秒内可撤销",
-                          successMessage: "已删除判词",
-                          failureMessage: "删除判词失败",
-                          undoLabel: "撤销",
-                          undoneMessage: "已撤销删除",
+                          confirmMessage: t("worldhistory.preset.deleteAria"),
+                          pendingMessage: t("worldhistory.preset.deletePending"),
+                          successMessage: t("worldhistory.preset.deleteSuccess"),
+                          failureMessage: t("worldhistory.preset.deleteFailed"),
+                          undoLabel: t("common.actions.undo"),
+                          undoneMessage: t("worldhistory.preset.deleteUndone"),
                           onDelete: () => Promise.resolve(onDeletePreset(preset.id)),
                         })
                       }}
                       className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--destructive)]"
-                      aria-label={t("worldhistory.preset.deleteAria", "删除判词")}
+                      aria-label={t("worldhistory.preset.deleteAria")}
                     >
                       <Trash2 className="size-3.5" />
                     </Button>
@@ -335,21 +332,21 @@ export function CognitiveArena({
                   <Textarea
                     value={preset.thesis}
                     onChange={(e) => onUpdatePreset(preset.id, { thesis: e.target.value })}
-                    placeholder={t("worldhistory.preset.thesisPlaceholder", "论题")}
+                    placeholder={t("worldhistory.preset.thesisPlaceholder")}
                     rows={2}
                     className="font-sans text-[11px]"
                   />
                   <Textarea
                     value={preset.analysis}
                     onChange={(e) => onUpdatePreset(preset.id, { analysis: e.target.value })}
-                    placeholder={t("worldhistory.preset.analysisPlaceholder", "分析")}
+                    placeholder={t("worldhistory.preset.analysisPlaceholder")}
                     rows={4}
                     className="font-sans text-[11px]"
                   />
                   <Textarea
                     value={preset.conclusion}
                     onChange={(e) => onUpdatePreset(preset.id, { conclusion: e.target.value })}
-                    placeholder={t("worldhistory.preset.conclusionPlaceholder", "结论")}
+                    placeholder={t("worldhistory.preset.conclusionPlaceholder")}
                     rows={2}
                     className="font-sans text-[11px]"
                   />
@@ -398,19 +395,19 @@ export function CognitiveArena({
                 <div className="space-y-3 font-sans text-xs leading-relaxed text-[color:var(--text-secondary)]">
                   <div>
                     <span className="font-semibold text-[color:var(--text-muted)]">
-                      {t("worldhistory.preset.thesisPlaceholder", "论题")}：
+                      {t("worldhistory.preset.thesisPlaceholder")}：
                     </span>
                     {activePreset.thesis}
                   </div>
                   <div>
                     <span className="font-semibold text-[color:var(--text-muted)]">
-                      {t("worldhistory.preset.analysisPlaceholder", "分析")}：
+                      {t("worldhistory.preset.analysisPlaceholder")}：
                     </span>
                     {activePreset.analysis}
                   </div>
                   <div className="border-t border-[color:var(--surface-border)] pt-3">
                     <span className="font-semibold text-[color:var(--primary)]">
-                      {t("worldhistory.preset.conclusionPlaceholder", "结论")}：
+                      {t("worldhistory.preset.conclusionPlaceholder")}：
                     </span>
                     {activePreset.conclusion}
                   </div>

@@ -39,7 +39,7 @@ export function LegacyTrustBoundariesTab({
       <Surface className="p-5">
         <SectionHeading
           icon={ShieldCheck}
-          title={t("legacy.boundaries.title", "边界与信任")}
+          title={t("legacy.boundaries.title")}
           description={t(
             "legacy.boundaries.description",
             "说明系统不会偷偷越界，并把条目级保护策略集中到一页里看。",
@@ -48,25 +48,25 @@ export function LegacyTrustBoundariesTab({
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <LegacyMetricCard
-            label={t("legacy.metrics.aiExcluded", "排除 AI 汇总")}
+            label={t("legacy.metrics.aiExcluded")}
             value={String(stats.aiExcludedCount)}
-            detail={t("legacy.metrics.aiExcludedDesc", "这些条目不会进入跨模块洞察。")}
+            detail={t("legacy.metrics.aiExcludedDesc")}
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.secondConfirm", "需要二次确认")}
+            label={t("legacy.metrics.secondConfirm")}
             value={String(stats.secondConfirmCount)}
-            detail={t("legacy.metrics.secondConfirmDesc", "打开前保留一道温和确认。")}
+            detail={t("legacy.metrics.secondConfirmDesc")}
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.finalLocked", "最终版或锁定")}
+            label={t("legacy.metrics.finalLocked")}
             value={String(stats.finalLockedCount)}
-            detail={t("legacy.metrics.finalLockedDesc", "锁定内容修改前需要主动确认。")}
+            detail={t("legacy.metrics.finalLockedDesc")}
             tone="locked"
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.missingDelivery", "交付条件待补")}
+            label={t("legacy.metrics.missingDelivery")}
             value={String(stats.missingDeliveryConditionCount)}
-            detail={t("legacy.metrics.missingDeliveryDesc", "未来或条件可见内容需要说明触发方式。")}
+            detail={t("legacy.metrics.missingDeliveryDesc")}
             tone={stats.missingDeliveryConditionCount > 0 ? "warning" : "quiet"}
           />
         </div>
@@ -74,7 +74,7 @@ export function LegacyTrustBoundariesTab({
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
         <LegacyPanel
-          title={t("legacy.boundaries.rules", "信任边界说明")}
+          title={t("legacy.boundaries.rules")}
           description={t(
             "legacy.boundaries.rulesDesc",
             "这些说明来自后端配置，可与条目策略分开维护。",
@@ -92,36 +92,36 @@ export function LegacyTrustBoundariesTab({
                 </div>
               ))
             ) : (
-              <EmptyState message={t("legacy.empty.boundaries", "当前没有边界说明。")} compact />
+              <EmptyState message={t("legacy.empty.boundaries")} compact />
             )}
           </div>
         </LegacyPanel>
 
         <div className="space-y-4">
           <ProtectedItemPanel
-            title={t("legacy.boundaries.aiExcludedItems", "排除 AI 的条目")}
+            title={t("legacy.boundaries.aiExcludedItems")}
             items={aiExcluded}
             onEditItem={onEditItem}
           />
           <ProtectedItemPanel
-            title={t("legacy.boundaries.secondConfirmItems", "需要二次确认的条目")}
+            title={t("legacy.boundaries.secondConfirmItems")}
             items={secondConfirm}
             onEditItem={onEditItem}
           />
           <ProtectedItemPanel
-            title={t("legacy.boundaries.lockedItems", "最终版或锁定条目")}
+            title={t("legacy.boundaries.lockedItems")}
             items={locked}
             onEditItem={onEditItem}
           />
           <ProtectedItemPanel
-            title={t("legacy.boundaries.missingDeliveryItems", "缺少交付条件的条目")}
+            title={t("legacy.boundaries.missingDeliveryItems")}
             items={missingDelivery}
             onEditItem={onEditItem}
           />
         </div>
       </div>
 
-      <LegacyWarningCallout title={t("legacy.boundaries.legalTitle", "法律边界")}>
+      <LegacyWarningCallout title={t("legacy.boundaries.legalTitle")}>
         <div className="flex items-start gap-2">
           <Scale className="mt-0.5 size-4 shrink-0" />
           <span>
@@ -168,7 +168,7 @@ function ProtectedItemPanel({
               />
             ))
         ) : (
-          <EmptyState message={t("legacy.empty.bucket", "当前没有匹配内容。")} compact />
+          <EmptyState message={t("legacy.empty.bucket")} compact />
         )}
       </div>
     </LegacyPanel>

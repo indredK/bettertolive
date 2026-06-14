@@ -80,8 +80,8 @@ export function NutritionRecipesTab({
     const dims: FilterPopoverDimension[] = [
       {
         key: "filter",
-        label: t("nutrition.recipeFilters.title", "食谱类型"),
-        allLabel: t("nutrition.recipeFilters.all", "全部"),
+        label: t("nutrition.recipeFilters.title"),
+        allLabel: t("nutrition.recipeFilters.all"),
         value: filter,
         options: RECIPE_FILTERS.slice(1).map((f) => ({
           value: f.id,
@@ -92,8 +92,8 @@ export function NutritionRecipesTab({
     if (recipeTags.length > 0) {
       dims.push({
         key: "tag",
-        label: t("nutrition.recipes.tagFilter", "标签筛选"),
-        allLabel: t("nutrition.recipes.allTags", "全部标签"),
+        label: t("nutrition.recipes.tagFilter"),
+        allLabel: t("nutrition.recipes.allTags"),
         value: effectiveActiveTag,
         options: recipeTags.map((tag) => ({ value: tag, label: tag })),
       })
@@ -147,7 +147,7 @@ export function NutritionRecipesTab({
               <Input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder={t("nutrition.recipes.search", "搜索食谱、标签或餐次")}
+                placeholder={t("nutrition.recipes.search")}
                 className="border-foreground/15 bg-background min-w-0 flex-1"
               />
               <FilterPopoverButton
@@ -198,7 +198,7 @@ export function NutritionRecipesTab({
               }
             />
           ) : (
-            <NutritionEmptyDetailCard message={t("nutrition.recipes.empty", "没有匹配的食谱。")} />
+            <NutritionEmptyDetailCard message={t("nutrition.recipes.empty")} />
           )}
         </NutritionDetailPane>
       </NutritionTabBody>
@@ -291,18 +291,18 @@ function RecipeDetail({
         <div className="shrink-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
-              {t("nutrition.recipes.personalLibrary", "个人食谱库")}
+              {t("nutrition.recipes.personalLibrary")}
             </Badge>
             <AnimatedIconButton
               show={Boolean(onEdit)}
               type="button"
               variant="outline"
               size="sm"
-              label={t("nutrition.recipeEdit.editAction", "编辑")}
+              label={t("nutrition.recipeEdit.editAction")}
               icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
             >
-              {t("nutrition.recipeEdit.editAction", "编辑")}
+              {t("nutrition.recipeEdit.editAction")}
             </AnimatedIconButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{recipe.name}</h3>
@@ -344,26 +344,26 @@ function RecipeDetail({
         <div className="mt-4 grid shrink-0 gap-2 sm:grid-cols-4">
           <NutritionMetricCard
             icon={Clock}
-            label={t("nutrition.recipes.totalTime", "总时间")}
+            label={t("nutrition.recipes.totalTime")}
             value={totalMinutes}
-            detail={t("nutrition.units.minutes", "min")}
+            detail={t("nutrition.units.minutes")}
           />
           <NutritionMetricCard
             icon={ChefHat}
-            label={t("nutrition.recipes.servings", "份数")}
+            label={t("nutrition.recipes.servings")}
             value={recipe.servings}
           />
           <NutritionMetricCard
             icon={Flame}
-            label={t("nutrition.nutrients.energyKcal", "能量")}
+            label={t("nutrition.nutrients.energyKcal")}
             value={formatNutrientValue(totals.energyKcal)}
             detail="kcal"
           />
           <NutritionMetricCard
             icon={ListChecks}
-            label={t("nutrition.recipes.missing", "待补")}
+            label={t("nutrition.recipes.missing")}
             value={totals.missingCount}
-            detail={t("nutrition.recipes.missingHint", "营养缺口")}
+            detail={t("nutrition.recipes.missingHint")}
           />
         </div>
 
@@ -372,7 +372,7 @@ function RecipeDetail({
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <MessageCircleHeart className="size-4" />
-                {t("nutrition.recipes.recentFeedback", "最近进食反馈")}
+                {t("nutrition.recipes.recentFeedback")}
               </div>
               {recentLog ? (
                 <>
@@ -382,7 +382,7 @@ function RecipeDetail({
                   <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
                     {recentLog.note ||
                       recentLog.changeReason ||
-                      t("nutrition.recipes.recentFeedbackNoNote", "这次记录没有额外备注。")}
+                      t("nutrition.recipes.recentFeedbackNoNote")}
                   </p>
                 </>
               ) : (
@@ -431,7 +431,7 @@ function RecipeDetail({
               <div className="min-w-0">
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <Heart className="size-4" />
-                  {t("nutrition.recipes.foodMemory", "关联食物记忆")}
+                  {t("nutrition.recipes.foodMemory")}
                 </div>
                 <div className="mt-2 font-medium">{linkedFoodMemory.name}</div>
                 <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
@@ -472,7 +472,7 @@ function RecipeDetail({
 
         <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-hidden lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
           <div className="min-h-0 overflow-y-auto pr-1">
-            <h4 className="text-sm font-semibold">{t("nutrition.recipes.ingredients", "食材")}</h4>
+            <h4 className="text-sm font-semibold">{t("nutrition.recipes.ingredients")}</h4>
             <div className="mt-3 space-y-2">
               {recipe.ingredients.map((ingredient) => {
                 const food = lookups.foodById.get(ingredient.foodId)
@@ -500,7 +500,7 @@ function RecipeDetail({
           </div>
 
           <div className="min-h-0 overflow-y-auto pr-1">
-            <h4 className="text-sm font-semibold">{t("nutrition.recipes.steps", "步骤")}</h4>
+            <h4 className="text-sm font-semibold">{t("nutrition.recipes.steps")}</h4>
             <div className="mt-3 space-y-2">
               {recipe.steps.map((step, index) => (
                 <div

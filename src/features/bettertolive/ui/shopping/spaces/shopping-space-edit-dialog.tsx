@@ -81,7 +81,7 @@ export function ShoppingSpaceEditDialog({
   const handleSubmit = async () => {
     const values = form.getValues()
     if (!form.formState.isValid) {
-      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      toast.error(t("shopping.error.nameRequired"))
       return
     }
 
@@ -125,8 +125,8 @@ export function ShoppingSpaceEditDialog({
         name: editing.space.name,
         defaultValue: `已删除空间：${editing.space.name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedSpace", "删除空间失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedSpace"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneSpace", {
         name: editing.space.name,
         defaultValue: `已撤销删除：${editing.space.name}`,
@@ -162,9 +162,7 @@ export function ShoppingSpaceEditDialog({
       >
         <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("shopping.space.create", "新增空间")
-              : t("shopping.space.edit", "编辑空间")}
+            {editing.isNew ? t("shopping.space.create") : t("shopping.space.edit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -179,11 +177,11 @@ export function ShoppingSpaceEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0 text-sm font-medium">
-                {t("shopping.spaces.form.basicInfo", "基本信息")}
+                {t("shopping.spaces.form.basicInfo")}
               </div>
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.spaces.form.name", "名称")}</Label>
+                  <Label>{t("shopping.spaces.form.name")}</Label>
                   <Input
                     autoFocus
                     value={name}
@@ -194,7 +192,7 @@ export function ShoppingSpaceEditDialog({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.spaces.form.note", "备注")}</Label>
+                  <Label>{t("shopping.spaces.form.note")}</Label>
                   <Textarea
                     value={note}
                     onChange={(event) =>
@@ -215,7 +213,7 @@ export function ShoppingSpaceEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0 text-sm font-medium">
-                {t("shopping.spaces.form.assignItems", "本空间下的物品")}
+                {t("shopping.spaces.form.assignItems")}
               </div>
               <div className="mt-2 min-h-0 flex-1 overflow-hidden">
                 <ShoppingItemShuttle
@@ -238,14 +236,14 @@ export function ShoppingSpaceEditDialog({
               disabled={isPending}
               className="mr-auto"
             >
-              {t("shopping.delete", "删除")}
+              {t("shopping.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel", "取消")}
+            {t("shopping.cancel")}
           </Button>
           <Button type="submit" disabled={!form.formState.isValid || isPending}>
-            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+            {isPending ? t("shopping.saving") : t("shopping.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

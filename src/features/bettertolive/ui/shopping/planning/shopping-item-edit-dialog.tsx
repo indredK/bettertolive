@@ -172,7 +172,7 @@ export function ShoppingItemEditDialog({
   const handleSubmit = async () => {
     const values = form.getValues()
     if (!canSubmit) {
-      toast.error(t("shopping.error.itemRequired", "请填写名称,并至少各选一个系统和空间"))
+      toast.error(t("shopping.error.itemRequired"))
       return
     }
 
@@ -257,8 +257,8 @@ export function ShoppingItemEditDialog({
         name: seed.name,
         defaultValue: `已删除物件：${seed.name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedItem", "删除物件失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedItem"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneItem", {
         name: seed.name,
         defaultValue: `已撤销删除：${seed.name}`,
@@ -294,9 +294,7 @@ export function ShoppingItemEditDialog({
       >
         <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("shopping.item.create", "新增物品")
-              : t("shopping.item.edit", "编辑物品")}
+            {editing.isNew ? t("shopping.item.create") : t("shopping.item.edit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -311,11 +309,11 @@ export function ShoppingItemEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0 text-sm font-medium">
-                {t("shopping.item.basicAttributes", "基础属性")}
+                {t("shopping.item.basicAttributes")}
               </div>
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.item.name", "名称")} *</Label>
+                  <Label>{t("shopping.item.name")} *</Label>
                   <Input
                     autoFocus
                     value={name}
@@ -328,7 +326,7 @@ export function ShoppingItemEditDialog({
 
                 <div className="grid gap-4">
                   <TagSelectorPanel
-                    label={t("shopping.item.systemTags", "系统标签(至少 1 个)")}
+                    label={t("shopping.item.systemTags")}
                     options={shopping.systemDefinitions.map((system) => ({
                       id: system.id,
                       label: system.name || system.id,
@@ -337,7 +335,7 @@ export function ShoppingItemEditDialog({
                     onToggle={(id) => toggleTag("systemTags", id)}
                   />
                   <TagSelectorPanel
-                    label={t("shopping.item.spaceTags", "空间标签(至少 1 个)")}
+                    label={t("shopping.item.spaceTags")}
                     options={shopping.spaceDefinitions.map((space) => ({
                       id: space.id,
                       label: space.name,
@@ -348,7 +346,7 @@ export function ShoppingItemEditDialog({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.item.note", "备注")}</Label>
+                  <Label>{t("shopping.item.note")}</Label>
                   <Textarea
                     value={note}
                     onChange={(event) =>
@@ -366,19 +364,17 @@ export function ShoppingItemEditDialog({
             >
               <div className="shrink-0">
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-sm font-medium">
-                    {t("shopping.item.childSettings", "子级设置")}
-                  </div>
+                  <div className="text-sm font-medium">{t("shopping.item.childSettings")}</div>
                   <Button type="button" variant="outline" size="sm" onClick={addChild}>
                     <Plus className="mr-1 h-4 w-4" />
-                    {t("shopping.item.addChild", "添加子级")}
+                    {t("shopping.item.addChild")}
                   </Button>
                 </div>
               </div>
               <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
                 {children.length === 0 ? (
                   <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
-                    {t("shopping.item.noChildren", "暂未添加子级")}
+                    {t("shopping.item.noChildren")}
                   </div>
                 ) : (
                   children.map((child, index) => (
@@ -410,14 +406,14 @@ export function ShoppingItemEditDialog({
               disabled={isPending}
               className="mr-auto"
             >
-              {t("shopping.delete", "删除")}
+              {t("shopping.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel", "取消")}
+            {t("shopping.cancel")}
           </Button>
           <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+            {isPending ? t("shopping.saving") : t("shopping.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -546,25 +542,25 @@ function ChildEditorCard({
           type="button"
           variant="ghost"
           size="icon-sm"
-          label={t("shopping.item.removeChild", "移除子级")}
+          label={t("shopping.item.removeChild")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onRemove}
         />
       </div>
 
       <div className="space-y-1.5">
-        <Label>{t("shopping.item.childName", "子级名称")}</Label>
+        <Label>{t("shopping.item.childName")}</Label>
         <Input
           value={child.name}
           onChange={(event) => onChange((current) => ({ ...current, name: event.target.value }))}
-          placeholder={t("shopping.item.childName", "子级名称")}
+          placeholder={t("shopping.item.childName")}
           className={SHOPPING_DIALOG_FIELD_CLASS}
         />
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="space-y-1.5">
-          <Label>{t("shopping.item.status", "状态")}</Label>
+          <Label>{t("shopping.item.status")}</Label>
           <Select
             value={child.status ?? ShoppingStatus.Owned}
             onValueChange={(value) =>
@@ -596,7 +592,7 @@ function ChildEditorCard({
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t("shopping.item.lifecycle", "生命周期")}</Label>
+          <Label>{t("shopping.item.lifecycle")}</Label>
           <Select
             value={child.lifecycle ?? ShoppingLifecycle.Durable}
             onValueChange={(value) =>
@@ -628,7 +624,7 @@ function ChildEditorCard({
         </div>
 
         <div className="space-y-1.5">
-          <Label>{t("shopping.item.depreciation", "折旧")}</Label>
+          <Label>{t("shopping.item.depreciation")}</Label>
           <Select
             value={child.depreciation ?? NONE_SELECT_VALUE}
             onValueChange={(value) =>
@@ -640,12 +636,10 @@ function ChildEditorCard({
             }
           >
             <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS}>
-              <SelectValue placeholder={t("shopping.item.depPlaceholder", "可选")} />
+              <SelectValue placeholder={t("shopping.item.depPlaceholder")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={NONE_SELECT_VALUE}>
-                {t("shopping.item.depPlaceholder", "可选")}
-              </SelectItem>
+              <SelectItem value={NONE_SELECT_VALUE}>{t("shopping.item.depPlaceholder")}</SelectItem>
               {depreciationOptions.map((option) => (
                 <SelectItem key={option} value={option}>
                   {depreciationDisplayName(option, t, attributeDefinitions)}
@@ -669,18 +663,16 @@ function ChildEditorCard({
 
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
-          <div className="text-sm font-medium">
-            {t("shopping.item.childChannels", "渠道价格参考")}
-          </div>
+          <div className="text-sm font-medium">{t("shopping.item.childChannels")}</div>
           <Button type="button" variant="outline" size="sm" onClick={onAddChannel}>
             <Plus className="mr-1 h-4 w-4" />
-            {t("shopping.item.addChannel", "添加渠道")}
+            {t("shopping.item.addChannel")}
           </Button>
         </div>
 
         {(child.channelPrices ?? []).length === 0 ? (
           <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-6 text-center text-xs">
-            {t("shopping.item.noChildChannels", "暂未添加渠道价格")}
+            {t("shopping.item.noChildChannels")}
           </div>
         ) : (
           <div className="space-y-2">
@@ -736,7 +728,7 @@ function ChildChannelEditorRow({
   return (
     <div className="border-foreground/10 bg-background/85 grid gap-3 rounded-lg border p-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_minmax(0,0.78fr)_auto]">
       <div className="space-y-1.5">
-        <Label>{t("shopping.item.channelName", "渠道")}</Label>
+        <Label>{t("shopping.item.channelName")}</Label>
         <Select
           value={channelPrice.channel ?? ""}
           onValueChange={(value) =>
@@ -744,7 +736,7 @@ function ChildChannelEditorRow({
           }
         >
           <SelectTrigger className={SHOPPING_DIALOG_FIELD_CLASS}>
-            <SelectValue placeholder={t("shopping.item.channelName", "渠道")} />
+            <SelectValue placeholder={t("shopping.item.channelName")} />
           </SelectTrigger>
           <SelectContent>
             {combinedOptions.map((option) => (
@@ -767,7 +759,7 @@ function ChildChannelEditorRow({
         )}
       </div>
       <div className="space-y-1.5">
-        <Label>{t("shopping.priceRef.entry", "入门价")}</Label>
+        <Label>{t("shopping.priceRef.entry")}</Label>
         <Input
           type="number"
           value={channelPrice.entryPrice != null ? String(channelPrice.entryPrice) : ""}
@@ -781,7 +773,7 @@ function ChildChannelEditorRow({
         />
       </div>
       <div className="space-y-1.5">
-        <Label>{t("shopping.priceRef.sweet", "甜蜜价")}</Label>
+        <Label>{t("shopping.priceRef.sweet")}</Label>
         <Input
           type="number"
           value={channelPrice.sweetSpotPrice != null ? String(channelPrice.sweetSpotPrice) : ""}
@@ -795,7 +787,7 @@ function ChildChannelEditorRow({
         />
       </div>
       <div className="space-y-1.5">
-        <Label>{t("shopping.priceRef.overpay", "虚高价")}</Label>
+        <Label>{t("shopping.priceRef.overpay")}</Label>
         <Input
           type="number"
           value={channelPrice.overpayPrice != null ? String(channelPrice.overpayPrice) : ""}
@@ -814,7 +806,7 @@ function ChildChannelEditorRow({
           type="button"
           variant="ghost"
           size="icon-sm"
-          label={t("shopping.item.removeChannel", "移除渠道")}
+          label={t("shopping.item.removeChannel")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onRemove}
         />

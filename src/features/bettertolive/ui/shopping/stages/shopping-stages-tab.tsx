@@ -124,8 +124,8 @@ export function ShoppingStagesTab({
         name,
         defaultValue: `已删除阶段：${name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedStage", "删除阶段失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedStage"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneStage", {
         name,
         defaultValue: `已撤销删除：${name}`,
@@ -160,7 +160,7 @@ export function ShoppingStagesTab({
 
     try {
       await reorderStageTemplates(nextOrder)
-      toast.success(t("shopping.stages.reordered", "阶段顺序已更新"))
+      toast.success(t("shopping.stages.reordered"))
       onDeleted()
     } catch (err) {
       toast.error(String(err))
@@ -177,9 +177,7 @@ export function ShoppingStagesTab({
             "text-muted-foreground rounded-xl border p-6 text-center text-sm",
           )}
         >
-          {normalizedQuery
-            ? t("shopping.stages.noMatchingStages", "没有匹配的阶段适用")
-            : t("shopping.stages.empty", "还没有阶段适用,点击「新增阶段」开始")}
+          {normalizedQuery ? t("shopping.stages.noMatchingStages") : t("shopping.stages.empty")}
         </div>
       ) : (
         <ShoppingTabBody>
@@ -218,7 +216,7 @@ export function ShoppingStagesTab({
                           size="icon-sm"
                           variant="ghost"
                           className="h-6 w-6 shrink-0"
-                          label={t("shopping.stages.edit", "编辑阶段")}
+                          label={t("shopping.stages.edit")}
                           icon={<Pencil className="size-3" />}
                           onClick={() => onEditStage(stage)}
                         />
@@ -248,7 +246,7 @@ export function ShoppingStagesTab({
                     show={isControlMode}
                     variant="outline"
                     size="sm"
-                    label={t("shopping.stages.delete", "删除阶段")}
+                    label={t("shopping.stages.delete")}
                     icon={<Trash2 className="h-4 w-4" />}
                     onClick={() => handleDelete(activeStage.id, activeStage.name)}
                   />
@@ -260,12 +258,8 @@ export function ShoppingStagesTab({
                     className="min-h-0 flex-1 overflow-hidden"
                   >
                     <TabsList className="mb-3 shrink-0">
-                      <TabsTrigger value="system">
-                        {t("shopping.stages.systemView", "系统视图")}
-                      </TabsTrigger>
-                      <TabsTrigger value="space">
-                        {t("shopping.stages.spaceView", "空间视图")}
-                      </TabsTrigger>
+                      <TabsTrigger value="system">{t("shopping.stages.systemView")}</TabsTrigger>
+                      <TabsTrigger value="space">{t("shopping.stages.spaceView")}</TabsTrigger>
                     </TabsList>
 
                     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -283,9 +277,7 @@ export function ShoppingStagesTab({
           )}
           {!activeStage && (
             <ShoppingDetailPane>
-              <ShoppingEmptyDetailCard
-                message={t("shopping.stages.selectPrompt", "从左侧选择一个阶段查看详情")}
-              />
+              <ShoppingEmptyDetailCard message={t("shopping.stages.selectPrompt")} />
             </ShoppingDetailPane>
           )}
         </ShoppingTabBody>
@@ -313,18 +305,12 @@ function StageItemsView({
   const hasAnyEntries = groups.some((group) => group.entries.length > 0)
 
   if (stage.items.length === 0) {
-    return (
-      <div className="text-muted-foreground text-xs">
-        {t("shopping.stages.noItems", "该阶段还没有物品,在「编辑」里添加")}
-      </div>
-    )
+    return <div className="text-muted-foreground text-xs">{t("shopping.stages.noItems")}</div>
   }
 
   if (!hasAnyEntries) {
     return (
-      <div className="text-muted-foreground text-xs">
-        {t("shopping.stages.noVisibleGroups", "当前视角下还没有可展示的维度")}
-      </div>
+      <div className="text-muted-foreground text-xs">{t("shopping.stages.noVisibleGroups")}</div>
     )
   }
 
@@ -363,9 +349,9 @@ function StageItemCard({ item, stageItem }: { item: ShoppingItem; stageItem: Sho
     <div className={cn(SHOPPING_SELECTABLE_CARD_CLASS, "p-3")}>
       <div className="font-medium">{item.name}</div>
       <div className="mt-1 space-y-0.5">
-        {renderTier(t("shopping.stages.tier.low", "最低"), stageItem.tiers.low)}
-        {renderTier(t("shopping.stages.tier.base", "基础"), stageItem.tiers.base)}
-        {renderTier(t("shopping.stages.tier.up", "升级"), stageItem.tiers.up)}
+        {renderTier(t("shopping.stages.tier.low"), stageItem.tiers.low)}
+        {renderTier(t("shopping.stages.tier.base"), stageItem.tiers.base)}
+        {renderTier(t("shopping.stages.tier.up"), stageItem.tiers.up)}
       </div>
     </div>
   )

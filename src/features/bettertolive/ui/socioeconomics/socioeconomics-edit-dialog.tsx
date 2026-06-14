@@ -256,7 +256,7 @@ export function SocioeconomicsEntryEditDialog({
     event.preventDefault()
 
     if (!form.title.trim() || !form.summary.trim()) {
-      toast.error(t("socioeconomics.edit.validation.entryRequired", "请填写标题和摘要"))
+      toast.error(t("socioeconomics.edit.validation.entryRequired"))
       return
     }
 
@@ -313,10 +313,10 @@ export function SocioeconomicsEntryEditDialog({
         ...socioeconomics,
         entries: nextEntries,
       })
-      toast.success(t("socioeconomics.toast.saved", "已保存"))
+      toast.success(t("socioeconomics.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed", "保存失败"))
+      toast.error(t("socioeconomics.toast.saveFailed"))
     }
   }
 
@@ -337,10 +337,10 @@ export function SocioeconomicsEntryEditDialog({
         ...socioeconomics,
         entries: socioeconomics.entries.filter((entry) => entry.id !== editing.entry?.id),
       })
-      toast.success(t("socioeconomics.toast.deleted", "已删除"))
+      toast.success(t("socioeconomics.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed", "删除失败"))
+      toast.error(t("socioeconomics.toast.deleteFailed"))
     }
   }
 
@@ -355,8 +355,8 @@ export function SocioeconomicsEntryEditDialog({
         <DialogHeader className={SOCIO_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("socioeconomics.edit.entryCreateTitle", "新增认知条目")
-              : t("socioeconomics.edit.entryEditTitle", "编辑认知条目")}
+              ? t("socioeconomics.edit.entryCreateTitle")
+              : t("socioeconomics.edit.entryEditTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -370,7 +370,7 @@ export function SocioeconomicsEntryEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={SOCIO_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 lg:grid-cols-2">
-                <Field label={t("socioeconomics.fields.title", "标题")}>
+                <Field label={t("socioeconomics.fields.title")}>
                   <Input
                     value={form.title}
                     onChange={(event) => updateForm({ title: event.target.value })}
@@ -378,7 +378,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.domain", "领域")}>
+                <Field label={t("socioeconomics.fields.domain")}>
                   <EnumSelect
                     group="domain"
                     value={form.domain}
@@ -387,7 +387,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.discipline", "学科")}>
+                <Field label={t("socioeconomics.fields.discipline")}>
                   <EnumSelect
                     group="discipline"
                     value={form.discipline}
@@ -397,7 +397,7 @@ export function SocioeconomicsEntryEditDialog({
                 </Field>
 
                 {form.discipline === "经济学" ? (
-                  <Field label={t("socioeconomics.fields.topicArea", "主题子类")}>
+                  <Field label={t("socioeconomics.fields.topicArea")}>
                     <EnumSelect
                       group="topicArea"
                       value={form.topicArea}
@@ -407,7 +407,7 @@ export function SocioeconomicsEntryEditDialog({
                   </Field>
                 ) : null}
 
-                <Field label={t("socioeconomics.fields.layer", "层次")}>
+                <Field label={t("socioeconomics.fields.layer")}>
                   <EnumSelect
                     group="layer"
                     value={form.layer}
@@ -416,7 +416,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.confidence", "掌握程度")}>
+                <Field label={t("socioeconomics.fields.confidence")}>
                   <EnumSelect
                     group="confidence"
                     value={form.confidence}
@@ -425,7 +425,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.source", "来源")}>
+                <Field label={t("socioeconomics.fields.source")}>
                   <EnumSelect
                     group="source"
                     value={form.source}
@@ -434,7 +434,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.relevance", "决策距离")}>
+                <Field label={t("socioeconomics.fields.relevance")}>
                   <EnumSelect
                     group="relevance"
                     value={form.relevance}
@@ -446,7 +446,7 @@ export function SocioeconomicsEntryEditDialog({
             </section>
 
             <section className={SOCIO_DIALOG_SECTION_CLASS}>
-              <Field label={t("socioeconomics.fields.summary", "摘要")}>
+              <Field label={t("socioeconomics.fields.summary")}>
                 <Textarea
                   value={form.summary}
                   onChange={(event) => updateForm({ summary: event.target.value })}
@@ -455,7 +455,7 @@ export function SocioeconomicsEntryEditDialog({
                 />
               </Field>
 
-              <Field label={t("socioeconomics.fields.understandingNote", "理解笔记")}>
+              <Field label={t("socioeconomics.fields.understandingNote")}>
                 <Textarea
                   value={form.understandingNote}
                   onChange={(event) => updateForm({ understandingNote: event.target.value })}
@@ -465,7 +465,7 @@ export function SocioeconomicsEntryEditDialog({
               </Field>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <Field label={t("socioeconomics.fields.relatedConcepts", "相关概念")}>
+                <Field label={t("socioeconomics.fields.relatedConcepts")}>
                   <Input
                     value={form.relatedConceptsText}
                     onChange={(event) => updateForm({ relatedConceptsText: event.target.value })}
@@ -473,7 +473,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.sourceRefs", "权威来源")}>
+                <Field label={t("socioeconomics.fields.sourceRefs")}>
                   <Textarea
                     value={form.sourceRefsText}
                     onChange={(event) => updateForm({ sourceRefsText: event.target.value })}
@@ -486,7 +486,7 @@ export function SocioeconomicsEntryEditDialog({
                   />
                 </Field>
 
-                <Field label={t("socioeconomics.fields.tags", "标签")}>
+                <Field label={t("socioeconomics.fields.tags")}>
                   <Input
                     value={form.tagsText}
                     onChange={(event) => updateForm({ tagsText: event.target.value })}
@@ -495,7 +495,7 @@ export function SocioeconomicsEntryEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("socioeconomics.fields.confidenceHistory", "掌握修订历史")}>
+              <Field label={t("socioeconomics.fields.confidenceHistory")}>
                 <Textarea
                   value={form.confidenceHistoryText}
                   onChange={(event) => updateForm({ confidenceHistoryText: event.target.value })}
@@ -514,14 +514,14 @@ export function SocioeconomicsEntryEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete", "删除")}
+                {t("socioeconomics.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel", "取消")}
+              {t("socioeconomics.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save", "保存")}
+              {t("socioeconomics.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -551,7 +551,7 @@ export function SocioeconomicsGapEditDialog({
     event.preventDefault()
 
     if (!form.summary.trim() || !form.nextStep.trim()) {
-      toast.error(t("socioeconomics.edit.validation.gapRequired", "请填写缺口和下一步"))
+      toast.error(t("socioeconomics.edit.validation.gapRequired"))
       return
     }
 
@@ -570,17 +570,17 @@ export function SocioeconomicsGapEditDialog({
         ...socioeconomics,
         gaps: nextGaps,
       })
-      toast.success(t("socioeconomics.toast.saved", "已保存"))
+      toast.success(t("socioeconomics.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed", "保存失败"))
+      toast.error(t("socioeconomics.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (!editing.gap) return
 
-    const confirmed = window.confirm(t("socioeconomics.confirm.deleteGap", "确定删除这条缺口吗？"))
+    const confirmed = window.confirm(t("socioeconomics.confirm.deleteGap"))
     if (!confirmed) return
 
     try {
@@ -588,10 +588,10 @@ export function SocioeconomicsGapEditDialog({
         ...socioeconomics,
         gaps: socioeconomics.gaps.filter((gap) => gap.id !== editing.gap?.id),
       })
-      toast.success(t("socioeconomics.toast.deleted", "已删除"))
+      toast.success(t("socioeconomics.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed", "删除失败"))
+      toast.error(t("socioeconomics.toast.deleteFailed"))
     }
   }
 
@@ -606,15 +606,15 @@ export function SocioeconomicsGapEditDialog({
         <DialogHeader className={SOCIO_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("socioeconomics.edit.gapCreateTitle", "新增认知缺口")
-              : t("socioeconomics.edit.gapEditTitle", "编辑认知缺口")}
+              ? t("socioeconomics.edit.gapCreateTitle")
+              : t("socioeconomics.edit.gapEditTitle")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={SOCIO_DIALOG_SECTION_CLASS}>
-              <Field label={t("socioeconomics.fields.domain", "领域")}>
+              <Field label={t("socioeconomics.fields.domain")}>
                 <EnumSelect
                   group="domain"
                   value={form.domain}
@@ -623,7 +623,7 @@ export function SocioeconomicsGapEditDialog({
                 />
               </Field>
 
-              <Field label={t("socioeconomics.fields.gapSummary", "缺口")}>
+              <Field label={t("socioeconomics.fields.gapSummary")}>
                 <Textarea
                   value={form.summary}
                   onChange={(event) => updateForm({ summary: event.target.value })}
@@ -632,7 +632,7 @@ export function SocioeconomicsGapEditDialog({
                 />
               </Field>
 
-              <Field label={t("socioeconomics.fields.nextStep", "下一步")}>
+              <Field label={t("socioeconomics.fields.nextStep")}>
                 <Textarea
                   value={form.nextStep}
                   onChange={(event) => updateForm({ nextStep: event.target.value })}
@@ -647,14 +647,14 @@ export function SocioeconomicsGapEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete", "删除")}
+                {t("socioeconomics.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel", "取消")}
+              {t("socioeconomics.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save", "保存")}
+              {t("socioeconomics.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -680,7 +680,7 @@ export function SocioeconomicsPromptEditDialog({
     event.preventDefault()
 
     if (!prompt.trim()) {
-      toast.error(t("socioeconomics.edit.validation.promptRequired", "请填写复习提问"))
+      toast.error(t("socioeconomics.edit.validation.promptRequired"))
       return
     }
 
@@ -695,19 +695,17 @@ export function SocioeconomicsPromptEditDialog({
         ...socioeconomics,
         reviewPrompts: nextPrompts,
       })
-      toast.success(t("socioeconomics.toast.saved", "已保存"))
+      toast.success(t("socioeconomics.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.saveFailed", "保存失败"))
+      toast.error(t("socioeconomics.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (editing.index === null) return
 
-    const confirmed = window.confirm(
-      t("socioeconomics.confirm.deletePrompt", "确定删除这条复习提问吗？"),
-    )
+    const confirmed = window.confirm(t("socioeconomics.confirm.deletePrompt"))
     if (!confirmed) return
 
     try {
@@ -715,10 +713,10 @@ export function SocioeconomicsPromptEditDialog({
         ...socioeconomics,
         reviewPrompts: socioeconomics.reviewPrompts.filter((_, index) => index !== editing.index),
       })
-      toast.success(t("socioeconomics.toast.deleted", "已删除"))
+      toast.success(t("socioeconomics.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("socioeconomics.toast.deleteFailed", "删除失败"))
+      toast.error(t("socioeconomics.toast.deleteFailed"))
     }
   }
 
@@ -733,15 +731,15 @@ export function SocioeconomicsPromptEditDialog({
         <DialogHeader className={SOCIO_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("socioeconomics.edit.promptCreateTitle", "新增复习提问")
-              : t("socioeconomics.edit.promptEditTitle", "编辑复习提问")}
+              ? t("socioeconomics.edit.promptCreateTitle")
+              : t("socioeconomics.edit.promptEditTitle")}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto px-1 py-1 pr-2">
             <section className={SOCIO_DIALOG_SECTION_CLASS}>
-              <Field label={t("socioeconomics.fields.prompt", "复习提问")}>
+              <Field label={t("socioeconomics.fields.prompt")}>
                 <Textarea
                   value={prompt}
                   onChange={(event) => setPrompt(event.target.value)}
@@ -756,14 +754,14 @@ export function SocioeconomicsPromptEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("socioeconomics.actions.delete", "删除")}
+                {t("socioeconomics.actions.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("socioeconomics.actions.cancel", "取消")}
+              {t("socioeconomics.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("socioeconomics.actions.save", "保存")}
+              {t("socioeconomics.actions.save")}
             </Button>
           </DialogFooter>
         </form>

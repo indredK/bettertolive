@@ -70,16 +70,12 @@ export function NutritionPage({
         <ActionGroup>
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-              <TabsTrigger value="overview">{t("nutrition.tabs.overview", "总览")}</TabsTrigger>
-              <TabsTrigger value="dailyPlan">
-                {t("nutrition.tabs.dailyPlan", "每日计划")}
-              </TabsTrigger>
-              <TabsTrigger value="recipes">{t("nutrition.tabs.recipes", "食谱库")}</TabsTrigger>
-              <TabsTrigger value="foods">{t("nutrition.tabs.foods", "食品分类")}</TabsTrigger>
-              <TabsTrigger value="nutrients">
-                {t("nutrition.tabs.nutrients", "营养成分表")}
-              </TabsTrigger>
-              <TabsTrigger value="logs">{t("nutrition.tabs.logs", "进食记录")}</TabsTrigger>
+              <TabsTrigger value="overview">{t("nutrition.tabs.overview")}</TabsTrigger>
+              <TabsTrigger value="dailyPlan">{t("nutrition.tabs.dailyPlan")}</TabsTrigger>
+              <TabsTrigger value="recipes">{t("nutrition.tabs.recipes")}</TabsTrigger>
+              <TabsTrigger value="foods">{t("nutrition.tabs.foods")}</TabsTrigger>
+              <TabsTrigger value="nutrients">{t("nutrition.tabs.nutrients")}</TabsTrigger>
+              <TabsTrigger value="logs">{t("nutrition.tabs.logs")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -91,7 +87,7 @@ export function NutritionPage({
                 onClick={() => setPendingCreateAction("dailyPlan")}
               >
                 <Plus className="size-4" />
-                {t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")}
+                {t("nutrition.dailyPlanEdit.createTitle")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "recipes"}
@@ -99,7 +95,7 @@ export function NutritionPage({
                 onClick={() => setPendingCreateAction("recipe")}
               >
                 <Plus className="size-4" />
-                {t("nutrition.recipeEdit.createTitle", "新增食谱")}
+                {t("nutrition.recipeEdit.createTitle")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "foods"}
@@ -108,7 +104,7 @@ export function NutritionPage({
                 onClick={() => setPendingCreateAction("foodCategory")}
               >
                 <Boxes className="size-4" />
-                {t("nutrition.categoryEdit.createTitle", "新增食品分类")}
+                {t("nutrition.categoryEdit.createTitle")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "foods"}
@@ -116,7 +112,7 @@ export function NutritionPage({
                 onClick={() => setPendingCreateAction("food")}
               >
                 <Plus className="size-4" />
-                {t("nutrition.foodEdit.createTitle", "新增食品")}
+                {t("nutrition.foodEdit.createTitle")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "logs"}
@@ -124,7 +120,7 @@ export function NutritionPage({
                 onClick={() => setPendingCreateAction("mealLog")}
               >
                 <Plus className="size-4" />
-                {t("nutrition.logEdit.createTitle", "新增进食记录")}
+                {t("nutrition.logEdit.createTitle")}
               </AnimatedButton>
             </ActionGroup>
           </AnimatedVisibility>

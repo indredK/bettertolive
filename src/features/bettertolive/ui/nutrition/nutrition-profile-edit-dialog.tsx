@@ -118,7 +118,7 @@ export function NutritionProfileEditDialog({
       form.hardConstraints.some((constraint) => !constraint.label.trim()) ||
       form.softStances.some((stance) => !stance.label.trim())
     ) {
-      toast.error(t("nutrition.profileEdit.validation.labelRequired", "请补全约束或立场名称"))
+      toast.error(t("nutrition.profileEdit.validation.labelRequired"))
       return
     }
 
@@ -150,10 +150,10 @@ export function NutritionProfileEditDialog({
           })),
         },
       })
-      toast.success(t("nutrition.profileEdit.saved", "饮食档案已保存"))
+      toast.success(t("nutrition.profileEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.profileEdit.saveFailed", "饮食档案保存失败"))
+      toast.error(t("nutrition.profileEdit.saveFailed"))
     }
   }
 
@@ -166,7 +166,7 @@ export function NutritionProfileEditDialog({
         )}
       >
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
-          <DialogTitle>{t("nutrition.profileEdit.title", "编辑饮食档案")}</DialogTitle>
+          <DialogTitle>{t("nutrition.profileEdit.title")}</DialogTitle>
           <DialogDescription>
             {t(
               "nutrition.profileEdit.description",
@@ -179,7 +179,7 @@ export function NutritionProfileEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_160px_160px]">
-                <Field label={t("nutrition.profileEdit.intentMode", "当前意图")}>
+                <Field label={t("nutrition.profileEdit.intentMode")}>
                   <Select
                     value={form.mode}
                     onValueChange={(mode) =>
@@ -201,7 +201,7 @@ export function NutritionProfileEditDialog({
                   </Select>
                 </Field>
 
-                <Field label={t("nutrition.profileEdit.windowStart", "开始日期")}>
+                <Field label={t("nutrition.profileEdit.windowStart")}>
                   <Input
                     type="date"
                     value={form.windowStart}
@@ -210,7 +210,7 @@ export function NutritionProfileEditDialog({
                   />
                 </Field>
 
-                <Field label={t("nutrition.profileEdit.windowEnd", "结束日期")}>
+                <Field label={t("nutrition.profileEdit.windowEnd")}>
                   <Input
                     type="date"
                     value={form.windowEnd}
@@ -220,7 +220,7 @@ export function NutritionProfileEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("nutrition.profileEdit.intentNote", "意图说明")}>
+              <Field label={t("nutrition.profileEdit.intentNote")}>
                 <Textarea
                   value={form.note}
                   onChange={(event) => updateForm({ note: event.target.value })}
@@ -234,13 +234,13 @@ export function NutritionProfileEditDialog({
             </section>
 
             <ProfileListSection
-              addLabel={t("nutrition.profileEdit.addConstraint", "新增硬约束")}
+              addLabel={t("nutrition.profileEdit.addConstraint")}
               description={t(
                 "nutrition.profileEdit.constraintsDescription",
                 "硬约束用于记录过敏、医学限制或宗教文化边界，后续计划与建议应优先避开。",
               )}
-              emptyLabel={t("nutrition.profileEdit.emptyConstraints", "暂无硬约束")}
-              title={t("nutrition.profileEdit.hardConstraints", "硬约束")}
+              emptyLabel={t("nutrition.profileEdit.emptyConstraints")}
+              title={t("nutrition.profileEdit.hardConstraints")}
               onAdd={() =>
                 updateForm({
                   hardConstraints: [
@@ -304,13 +304,13 @@ export function NutritionProfileEditDialog({
             </ProfileListSection>
 
             <ProfileListSection
-              addLabel={t("nutrition.profileEdit.addStance", "新增软立场")}
+              addLabel={t("nutrition.profileEdit.addStance")}
               description={t(
                 "nutrition.profileEdit.stancesDescription",
                 "软立场不是禁止项，而是当前阶段希望计划多照顾一点的方向。",
               )}
-              emptyLabel={t("nutrition.profileEdit.emptyStances", "暂无软立场")}
-              title={t("nutrition.profileEdit.softStances", "软立场")}
+              emptyLabel={t("nutrition.profileEdit.emptyStances")}
+              title={t("nutrition.profileEdit.softStances")}
               onAdd={() =>
                 updateForm({
                   softStances: [
@@ -373,12 +373,12 @@ export function NutritionProfileEditDialog({
 
           <DialogFooter className={NUTRITION_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -472,7 +472,7 @@ function ProfileRow({
         type="button"
         variant="ghost"
         size="icon-sm"
-        label={t("nutrition.profileEdit.removeGoal", "移除目标")}
+        label={t("nutrition.profileEdit.removeGoal")}
         icon={<Trash2 className="size-3.5" />}
         onClick={onRemove}
       />

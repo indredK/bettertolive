@@ -142,9 +142,9 @@ export function ReflectionPage({
     [sortedReflections],
   )
   const reflectionPrompts = [
-    t("reflection.prompts.keep", "这件事里，我想长期保留的判断是什么？"),
-    t("reflection.prompts.pattern", "它是否重复出现在最近几次记录中？"),
-    t("reflection.prompts.next", "如果只做一个小调整，下一步是什么？"),
+    t("reflection.prompts.keep"),
+    t("reflection.prompts.pattern"),
+    t("reflection.prompts.next"),
   ]
 
   const handleDelete = async (entry: ReflectionEntry) => {
@@ -162,9 +162,9 @@ export function ReflectionPage({
         ...editableReflectionModule,
         entries: editableReflectionModule.entries.filter((item) => item.id !== entry.id),
       })
-      toast.success(t("reflection.toast.deleted", "已删除"))
+      toast.success(t("reflection.toast.deleted"))
     } catch {
-      toast.error(t("reflection.toast.deleteFailed", "删除失败"))
+      toast.error(t("reflection.toast.deleteFailed"))
     }
   }
 
@@ -180,10 +180,10 @@ export function ReflectionPage({
         className={cn("min-h-0 flex-1 flex-col", isFixedLayout && "overflow-hidden")}
       >
         <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-          <TabsTrigger value="overview">{t("reflection.tabs.overview", "总览")}</TabsTrigger>
-          <TabsTrigger value="records">{t("reflection.tabs.records", "记录库")}</TabsTrigger>
-          <TabsTrigger value="themes">{t("reflection.tabs.themes", "主题脉络")}</TabsTrigger>
-          <TabsTrigger value="writing">{t("reflection.tabs.writing", "写作支架")}</TabsTrigger>
+          <TabsTrigger value="overview">{t("reflection.tabs.overview")}</TabsTrigger>
+          <TabsTrigger value="records">{t("reflection.tabs.records")}</TabsTrigger>
+          <TabsTrigger value="themes">{t("reflection.tabs.themes")}</TabsTrigger>
+          <TabsTrigger value="writing">{t("reflection.tabs.writing")}</TabsTrigger>
         </TabsList>
 
         <TabsContent
@@ -272,7 +272,7 @@ function ReflectionDraftPanel({
     <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col")}>
       <SectionHeading
         icon={NotebookPen}
-        title={t("reflection.sections.draft.title", "写作起点")}
+        title={t("reflection.sections.draft.title")}
         description={t(
           "reflection.sections.draft.description",
           "先保留一个足够具体的表达样子，真正保存的是右侧反思记录。",
@@ -324,7 +324,7 @@ function ReflectionRecordsPanel({
       <div className="flex items-start justify-between gap-3">
         <SectionHeading
           icon={Sparkles}
-          title={t("reflection.sections.recent.title", "最近反思")}
+          title={t("reflection.sections.recent.title")}
           description={t(
             "reflection.sections.recent.description",
             "先展示最近写过的内容，再决定之后如何组织回看。",
@@ -332,7 +332,7 @@ function ReflectionRecordsPanel({
         />
         <AnimatedButton show={isControlMode} type="button" size="sm" onClick={onCreate}>
           <Plus className="size-4" />
-          {t("reflection.actions.create", "新增反思")}
+          {t("reflection.actions.create")}
         </AnimatedButton>
       </div>
 
@@ -349,7 +349,7 @@ function ReflectionRecordsPanel({
             />
           ))
         ) : (
-          <EmptyState message={t("reflection.empty.records", "当前筛选下还没有反思记录。")} />
+          <EmptyState message={t("reflection.empty.records")} />
         )}
       </div>
     </Surface>
@@ -371,7 +371,7 @@ function ReflectionThemesPanel({
     <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
       <SectionHeading
         icon={Hash}
-        title={t("reflection.sections.themes.title", "主题脉络")}
+        title={t("reflection.sections.themes.title")}
         description={t(
           "reflection.sections.themes.description",
           "把标签和月份放在一起看，哪些话题正在反复出现会更清楚。",
@@ -384,16 +384,16 @@ function ReflectionThemesPanel({
         )}
       >
         <CountRowsCard
-          emptyMessage={t("reflection.empty.tags", "当前筛选下还没有标签。")}
+          emptyMessage={t("reflection.empty.tags")}
           icon={Hash}
           rows={tagRows}
-          title={t("reflection.sections.themes.tags", "高频标签")}
+          title={t("reflection.sections.themes.tags")}
         />
         <CountRowsCard
-          emptyMessage={t("reflection.empty.months", "当前筛选下还没有月份分布。")}
+          emptyMessage={t("reflection.empty.months")}
           icon={CalendarDays}
           rows={monthRows}
-          title={t("reflection.sections.themes.months", "月份分布")}
+          title={t("reflection.sections.themes.months")}
         />
       </div>
     </Surface>
@@ -422,7 +422,7 @@ function ReflectionWritingPanel({
       <Surface className={cn("p-5", isFixedLayout && "flex min-h-0 flex-col overflow-hidden")}>
         <SectionHeading
           icon={Sparkles}
-          title={t("reflection.sections.writingPrompts.title", "回看问题")}
+          title={t("reflection.sections.writingPrompts.title")}
           description={t(
             "reflection.sections.writingPrompts.description",
             "写之前不必完整回答，先用问题把注意力放回自己身上。",
@@ -520,7 +520,7 @@ function ReflectionEntryCard({
             type="button"
             variant="ghost"
             size="icon-sm"
-            label={t("reflection.actions.edit", "编辑反思")}
+            label={t("reflection.actions.edit")}
             icon={<Pencil className="size-4" />}
             onClick={onEdit}
           />
@@ -529,7 +529,7 @@ function ReflectionEntryCard({
             type="button"
             variant="ghost"
             size="icon-sm"
-            label={t("reflection.actions.delete", "删除")}
+            label={t("reflection.actions.delete")}
             icon={<Trash2 className="size-4" />}
             disabled={isDeleting}
             onClick={onDelete}
@@ -577,7 +577,7 @@ function ReflectionEditDialog({
     event.preventDefault()
 
     if (!form.date.trim() || !form.title.trim() || !form.excerpt.trim()) {
-      toast.error(t("reflection.validation.required", "请填写时间、标题和反思内容"))
+      toast.error(t("reflection.validation.required"))
       return
     }
 
@@ -592,10 +592,10 @@ function ReflectionEditDialog({
         ...reflectionModule,
         entries: sortReflections(entries),
       })
-      toast.success(t("reflection.toast.saved", "已保存"))
+      toast.success(t("reflection.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("reflection.toast.saveFailed", "保存失败"))
+      toast.error(t("reflection.toast.saveFailed"))
     }
   }
 
@@ -604,35 +604,31 @@ function ReflectionEditDialog({
       <DialogContent className="flex max-h-[min(720px,calc(100dvh-2rem))] max-w-2xl flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle>
-            {editing.isNew
-              ? t("reflection.edit.createTitle", "新增反思")
-              : t("reflection.edit.editTitle", "编辑反思")}
+            {editing.isNew ? t("reflection.edit.createTitle") : t("reflection.edit.editTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t("reflection.edit.description", "保留时间、标题、正文摘要和少量标签即可。")}
-          </DialogDescription>
+          <DialogDescription>{t("reflection.edit.description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <div className="grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
-              <Field label={t("reflection.fields.date", "时间")}>
+              <Field label={t("reflection.fields.date")}>
                 <Input
                   value={form.date}
                   onChange={(event) => updateForm({ date: event.target.value })}
-                  placeholder={t("reflection.placeholders.date", "例如：2026-06-08 21:10")}
+                  placeholder={t("reflection.placeholders.date")}
                 />
               </Field>
-              <Field label={t("reflection.fields.title", "标题")}>
+              <Field label={t("reflection.fields.title")}>
                 <Input
                   value={form.title}
                   onChange={(event) => updateForm({ title: event.target.value })}
-                  placeholder={t("reflection.placeholders.title", "例如：今天真正想保留的东西")}
+                  placeholder={t("reflection.placeholders.title")}
                 />
               </Field>
             </div>
 
-            <Field label={t("reflection.fields.excerpt", "反思内容")}>
+            <Field label={t("reflection.fields.excerpt")}>
               <Textarea
                 value={form.excerpt}
                 onChange={(event) => updateForm({ excerpt: event.target.value })}
@@ -644,21 +640,21 @@ function ReflectionEditDialog({
               />
             </Field>
 
-            <Field label={t("reflection.fields.tags", "标签")}>
+            <Field label={t("reflection.fields.tags")}>
               <Input
                 value={form.tagsText}
                 onChange={(event) => updateForm({ tagsText: event.target.value })}
-                placeholder={t("reflection.placeholders.tags", "用逗号分隔，例如：节奏，工作")}
+                placeholder={t("reflection.placeholders.tags")}
               />
             </Field>
           </div>
 
           <DialogFooter className="mt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("reflection.actions.cancel", "取消")}
+              {t("reflection.actions.cancel")}
             </Button>
             <Button type="submit" disabled={saveReflectionMutation.isPending}>
-              {t("reflection.actions.save", "保存")}
+              {t("reflection.actions.save")}
             </Button>
           </DialogFooter>
         </form>

@@ -507,13 +507,13 @@ export function EmotionEntityEditDialog({
     event.preventDefault()
 
     if (!getRequiredField(editing, form)) {
-      toast.error(t("emotion.editor.validation.required", "请补全必填内容"))
+      toast.error(t("emotion.editor.validation.required"))
       return
     }
 
     try {
       await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, form))
-      toast.success(t("emotion.toast.saved", "情绪数据已保存"))
+      toast.success(t("emotion.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -524,14 +524,13 @@ export function EmotionEntityEditDialog({
     if (editing.isNew || !editing.item) return
 
     const confirmed =
-      typeof window === "undefined" ||
-      window.confirm(t("emotion.editor.confirmDelete", "确定删除这条情绪数据吗？"))
+      typeof window === "undefined" || window.confirm(t("emotion.editor.confirmDelete"))
 
     if (!confirmed) return
 
     try {
       await saveEmotionMutation.mutateAsync(removeEntity(emotion, editing))
-      toast.success(t("emotion.toast.deleted", "情绪数据已删除"))
+      toast.success(t("emotion.toast.deleted"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -560,14 +559,14 @@ export function EmotionEntityEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("emotion.editor.delete", "删除")}
+                {t("emotion.editor.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel", "取消")}
+              {t("emotion.editor.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save", "保存")}
+              {t("emotion.editor.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -592,13 +591,13 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.date", "时间")}
+            label={t("emotion.editor.fields.date")}
             value={form.date}
             onChange={(date) => onChange({ date })}
             placeholder="06-03 08:20"
           />
           <SelectField
-            label={t("emotion.editor.fields.state", "总体状态")}
+            label={t("emotion.editor.fields.state")}
             value={form.state}
             options={EMOTION_STATES}
             enumGroup="state"
@@ -606,19 +605,19 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.summary", "此刻发生了什么")}
+            label={t("emotion.editor.fields.summary")}
             value={form.summary}
             onChange={(summary) => onChange({ summary })}
             multiline
           />
           <TextField
-            label={t("emotion.editor.fields.intensity", "强度")}
+            label={t("emotion.editor.fields.intensity")}
             value={form.intensity}
             onChange={(intensity) => onChange({ intensity })}
             placeholder="6/10"
           />
           <SelectField
-            label={t("emotion.editor.fields.impulse", "此刻冲动")}
+            label={t("emotion.editor.fields.impulse")}
             value={form.impulse || NONE_VALUE}
             options={EMOTION_IMPULSES}
             enumGroup="impulse"
@@ -627,13 +626,13 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.bodySignal", "身体感觉")}
+            label={t("emotion.editor.fields.bodySignal")}
             value={form.bodySignal}
             onChange={(bodySignal) => onChange({ bodySignal })}
           />
           <ChipToggleField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.emotionTags", "情绪标签")}
+            label={t("emotion.editor.fields.emotionTags")}
             values={EMOTION_TAGS}
             selectedText={form.emotionTags}
             enumGroup="emotionTag"
@@ -641,22 +640,22 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.tags", "上下文标签")}
+            label={t("emotion.editor.fields.tags")}
             value={form.tags}
             onChange={(tags) => onChange({ tags })}
             multiline
-            placeholder={t("emotion.editor.placeholders.list", "一行一个，或用逗号分隔")}
+            placeholder={t("emotion.editor.placeholders.list")}
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.triggerEvent", "触发事件")}
+            label={t("emotion.editor.fields.triggerEvent")}
             value={form.triggerEvent}
             onChange={(triggerEvent) => onChange({ triggerEvent })}
             multiline
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.needRightNow", "现在最需要")}
+            label={t("emotion.editor.fields.needRightNow")}
             value={form.needRightNow}
             onChange={(needRightNow) => onChange({ needRightNow })}
             multiline
@@ -667,13 +666,13 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.label", "标签")}
+            label={t("emotion.editor.fields.label")}
             value={form.label}
             onChange={(label) => onChange({ label })}
             placeholder="06-03"
           />
           <TextField
-            label={t("emotion.editor.fields.score", "强度分")}
+            label={t("emotion.editor.fields.score")}
             value={form.score}
             onChange={(score) => onChange({ score })}
             type="number"
@@ -681,7 +680,7 @@ function EntityFields({
             max={10}
           />
           <SelectField
-            label={t("emotion.editor.fields.primaryState", "主要状态")}
+            label={t("emotion.editor.fields.primaryState")}
             value={form.primaryState || NONE_VALUE}
             options={EMOTION_STATES}
             enumGroup="state"
@@ -692,7 +691,7 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.note", "备注")}
+            label={t("emotion.editor.fields.note")}
             value={form.note}
             onChange={(note) => onChange({ note })}
             multiline
@@ -703,12 +702,12 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.title", "标题")}
+            label={t("emotion.editor.fields.title")}
             value={form.title}
             onChange={(title) => onChange({ title })}
           />
           <SelectField
-            label={t("emotion.editor.fields.category", "分类")}
+            label={t("emotion.editor.fields.category")}
             value={form.category || NONE_VALUE}
             options={TRIGGER_CATEGORIES}
             enumGroup="triggerCategory"
@@ -717,26 +716,26 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.summary", "说明")}
+            label={t("emotion.editor.fields.summary")}
             value={form.summary}
             onChange={(summary) => onChange({ summary })}
             multiline
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.cues", "线索")}
+            label={t("emotion.editor.fields.cues")}
             value={form.cues}
             onChange={(cues) => onChange({ cues })}
             multiline
-            placeholder={t("emotion.editor.placeholders.list", "一行一个，或用逗号分隔")}
+            placeholder={t("emotion.editor.placeholders.list")}
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.recentExamples", "近期例子")}
+            label={t("emotion.editor.fields.recentExamples")}
             value={form.recentExamples}
             onChange={(recentExamples) => onChange({ recentExamples })}
             multiline
-            placeholder={t("emotion.editor.placeholders.list", "一行一个，或用逗号分隔")}
+            placeholder={t("emotion.editor.placeholders.list")}
           />
         </div>
       )
@@ -744,12 +743,12 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.title", "标题")}
+            label={t("emotion.editor.fields.title")}
             value={form.title}
             onChange={(title) => onChange({ title })}
           />
           <SelectField
-            label={t("emotion.editor.fields.kind", "类型")}
+            label={t("emotion.editor.fields.kind")}
             value={form.kind || NONE_VALUE}
             options={TOOL_KINDS}
             enumGroup="toolKind"
@@ -758,21 +757,21 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.description", "说明")}
+            label={t("emotion.editor.fields.description")}
             value={form.description}
             onChange={(description) => onChange({ description })}
             multiline
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.when", "适用时机")}
+            label={t("emotion.editor.fields.when")}
             value={form.when}
             onChange={(when) => onChange({ when })}
             multiline
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.contactScript", "可直接说的话")}
+            label={t("emotion.editor.fields.contactScript")}
             value={form.contactScript}
             onChange={(contactScript) => onChange({ contactScript })}
             multiline
@@ -783,12 +782,12 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.range", "时间段")}
+            label={t("emotion.editor.fields.range")}
             value={form.range}
             onChange={(range) => onChange({ range })}
           />
           <SelectField
-            label={t("emotion.editor.fields.trend", "趋势")}
+            label={t("emotion.editor.fields.trend")}
             value={form.trend}
             options={SEGMENT_TRENDS}
             enumGroup="segmentTrend"
@@ -796,7 +795,7 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.summary", "总结")}
+            label={t("emotion.editor.fields.summary")}
             value={form.summary}
             onChange={(summary) => onChange({ summary })}
             multiline
@@ -807,18 +806,18 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.title", "标题")}
+            label={t("emotion.editor.fields.title")}
             value={form.title}
             onChange={(title) => onChange({ title })}
           />
           <TextField
-            label={t("emotion.editor.fields.frequency", "频率")}
+            label={t("emotion.editor.fields.frequency")}
             value={form.frequency}
             onChange={(frequency) => onChange({ frequency })}
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.description", "说明")}
+            label={t("emotion.editor.fields.description")}
             value={form.description}
             onChange={(description) => onChange({ description })}
             multiline
@@ -829,14 +828,14 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <SelectField
-            label={t("emotion.editor.fields.factor", "因素")}
+            label={t("emotion.editor.fields.factor")}
             value={form.factor}
             options={LIFESTYLE_FACTORS}
             enumGroup="lifestyleFactor"
             onChange={(factor) => onChange({ factor })}
           />
           <SelectField
-            label={t("emotion.editor.fields.direction", "方向")}
+            label={t("emotion.editor.fields.direction")}
             value={form.direction}
             options={LINK_DIRECTIONS}
             enumGroup="linkDirection"
@@ -844,7 +843,7 @@ function EntityFields({
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.observation", "观察")}
+            label={t("emotion.editor.fields.observation")}
             value={form.observation}
             onChange={(observation) => onChange({ observation })}
             multiline
@@ -855,12 +854,12 @@ function EntityFields({
       return (
         <div className="grid gap-4">
           <TextField
-            label={t("emotion.editor.fields.context", "环境")}
+            label={t("emotion.editor.fields.context")}
             value={form.context}
             onChange={(context) => onChange({ context })}
           />
           <TextField
-            label={t("emotion.editor.fields.description", "说明")}
+            label={t("emotion.editor.fields.description")}
             value={form.description}
             onChange={(description) => onChange({ description })}
             multiline
@@ -871,12 +870,12 @@ function EntityFields({
       return (
         <div className="grid gap-4">
           <TextField
-            label={t("emotion.editor.fields.who", "对象")}
+            label={t("emotion.editor.fields.who")}
             value={form.who}
             onChange={(who) => onChange({ who })}
           />
           <TextField
-            label={t("emotion.editor.fields.pattern", "模式")}
+            label={t("emotion.editor.fields.pattern")}
             value={form.pattern}
             onChange={(pattern) => onChange({ pattern })}
             multiline
@@ -887,18 +886,18 @@ function EntityFields({
       return (
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField
-            label={t("emotion.editor.fields.date", "日期")}
+            label={t("emotion.editor.fields.date")}
             value={form.date}
             onChange={(date) => onChange({ date })}
           />
           <TextField
-            label={t("emotion.editor.fields.what", "做了什么")}
+            label={t("emotion.editor.fields.what")}
             value={form.what}
             onChange={(what) => onChange({ what })}
           />
           <TextField
             className="sm:col-span-2"
-            label={t("emotion.editor.fields.effect", "效果")}
+            label={t("emotion.editor.fields.effect")}
             value={form.effect}
             onChange={(effect) => onChange({ effect })}
             multiline
@@ -936,7 +935,7 @@ export function EmotionOverviewEditDialog({
     event.preventDefault()
 
     if (!form.windowLabel.trim() || !form.conclusion.trim()) {
-      toast.error(t("emotion.editor.validation.required", "请补全必填内容"))
+      toast.error(t("emotion.editor.validation.required"))
       return
     }
 
@@ -963,7 +962,7 @@ export function EmotionOverviewEditDialog({
         ...cloneEmotion(emotion),
         overview,
       })
-      toast.success(t("emotion.toast.saved", "情绪数据已保存"))
+      toast.success(t("emotion.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -975,20 +974,18 @@ export function EmotionOverviewEditDialog({
       <DialogContent className="flex max-h-[min(760px,calc(100dvh-2rem))] max-w-2xl grid-rows-none flex-col gap-0 overflow-hidden border border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)] p-0">
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader className="shrink-0 border-b border-[color:var(--surface-border)] px-5 py-4 pr-12">
-            <DialogTitle>{t("emotion.editor.overview.title", "编辑情绪总览")}</DialogTitle>
-            <DialogDescription>
-              {t("emotion.editor.overview.description", "维护最近窗口、强度和一句话总结。")}
-            </DialogDescription>
+            <DialogTitle>{t("emotion.editor.overview.title")}</DialogTitle>
+            <DialogDescription>{t("emotion.editor.overview.description")}</DialogDescription>
           </DialogHeader>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <TextField
-                label={t("emotion.editor.fields.windowLabel", "观察窗口")}
+                label={t("emotion.editor.fields.windowLabel")}
                 value={form.windowLabel}
                 onChange={(windowLabel) => updateForm({ windowLabel })}
               />
               <TextField
-                label={t("emotion.editor.fields.averageScore", "平均强度")}
+                label={t("emotion.editor.fields.averageScore")}
                 value={form.averageScore}
                 onChange={(averageScore) => updateForm({ averageScore })}
                 type="number"
@@ -996,25 +993,25 @@ export function EmotionOverviewEditDialog({
                 max={10}
               />
               <TextField
-                label={t("emotion.editor.fields.bestWindow", "较好时段")}
+                label={t("emotion.editor.fields.bestWindow")}
                 value={form.bestWindow}
                 onChange={(bestWindow) => updateForm({ bestWindow })}
               />
               <TextField
-                label={t("emotion.editor.fields.worstWindow", "较差时段")}
+                label={t("emotion.editor.fields.worstWindow")}
                 value={form.worstWindow}
                 onChange={(worstWindow) => updateForm({ worstWindow })}
               />
             </div>
             <TextField
-              label={t("emotion.editor.fields.topEmotionTags", "高频情绪标签")}
+              label={t("emotion.editor.fields.topEmotionTags")}
               value={form.topEmotionTags}
               onChange={(topEmotionTags) => updateForm({ topEmotionTags })}
               multiline
-              placeholder={t("emotion.editor.overview.tagsPlaceholder", "焦虑,4")}
+              placeholder={t("emotion.editor.overview.tagsPlaceholder")}
             />
             <TextField
-              label={t("emotion.editor.fields.conclusion", "一句话总结")}
+              label={t("emotion.editor.fields.conclusion")}
               value={form.conclusion}
               onChange={(conclusion) => updateForm({ conclusion })}
               multiline
@@ -1022,10 +1019,10 @@ export function EmotionOverviewEditDialog({
           </div>
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel", "取消")}
+              {t("emotion.editor.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save", "保存")}
+              {t("emotion.editor.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -1048,8 +1045,8 @@ export function EmotionTextListEditDialog({
   const [value, setValue] = useState(listToText(emotion[listKey]))
   const title =
     listKey === "minimalRecoverySteps"
-      ? t("emotion.editor.textList.minimalRecoverySteps", "编辑极简恢复步骤")
-      : t("emotion.editor.textList.ineffectiveActions", "编辑无效动作提醒")
+      ? t("emotion.editor.textList.minimalRecoverySteps")
+      : t("emotion.editor.textList.ineffectiveActions")
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -1059,7 +1056,7 @@ export function EmotionTextListEditDialog({
         ...cloneEmotion(emotion),
         [listKey]: splitList(value),
       })
-      toast.success(t("emotion.toast.saved", "情绪数据已保存"))
+      toast.success(t("emotion.toast.saved"))
       onClose()
     } catch (error) {
       toast.error(String(error))
@@ -1072,24 +1069,22 @@ export function EmotionTextListEditDialog({
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader className="shrink-0 border-b border-[color:var(--surface-border)] px-5 py-4 pr-12">
             <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>
-              {t("emotion.editor.textList.description", "一行一条，保存后会写回后端。")}
-            </DialogDescription>
+            <DialogDescription>{t("emotion.editor.textList.description")}</DialogDescription>
           </DialogHeader>
           <div className="min-h-0 flex-1 px-5 py-4">
             <Textarea
               value={value}
               onChange={(event) => setValue(event.target.value)}
               className="min-h-[260px] border-[color:var(--chip-border)] bg-[color:var(--surface-bg)]"
-              placeholder={t("emotion.editor.placeholders.list", "一行一个，或用逗号分隔")}
+              placeholder={t("emotion.editor.placeholders.list")}
             />
           </div>
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("emotion.editor.cancel", "取消")}
+              {t("emotion.editor.cancel")}
             </Button>
             <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("emotion.editor.save", "保存")}
+              {t("emotion.editor.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -1183,7 +1178,7 @@ function SelectField<T extends string>({
         </SelectTrigger>
         <SelectContent>
           {includeNone ? (
-            <SelectItem value={NONE_VALUE}>{t("emotion.editor.none", "不设置")}</SelectItem>
+            <SelectItem value={NONE_VALUE}>{t("emotion.editor.none")}</SelectItem>
           ) : null}
           {options.map((option) => (
             <SelectItem key={option} value={option}>

@@ -117,9 +117,9 @@ export function FinancePage({
         ...editableFinance,
         entries: editableFinance.entries.filter((item) => item.id !== entry.id),
       })
-      toast.success(t("finance.toast.deleted", "已删除账目"))
+      toast.success(t("finance.toast.deleted"))
     } catch {
-      toast.error(t("finance.toast.deleteFailed", "删除失败"))
+      toast.error(t("finance.toast.deleteFailed"))
     }
   }
 
@@ -137,10 +137,10 @@ export function FinancePage({
         <div className="flex shrink-0 items-center gap-2 overflow-hidden">
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-              <TabsTrigger value="overview">{t("finance.tabs.overview", "总览")}</TabsTrigger>
-              <TabsTrigger value="entries">{t("finance.tabs.entries", "明细")}</TabsTrigger>
-              <TabsTrigger value="rules">{t("finance.tabs.rules", "预算规则")}</TabsTrigger>
-              <TabsTrigger value="review">{t("finance.tabs.review", "复盘线索")}</TabsTrigger>
+              <TabsTrigger value="overview">{t("finance.tabs.overview")}</TabsTrigger>
+              <TabsTrigger value="entries">{t("finance.tabs.entries")}</TabsTrigger>
+              <TabsTrigger value="rules">{t("finance.tabs.rules")}</TabsTrigger>
+              <TabsTrigger value="review">{t("finance.tabs.review")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -151,7 +151,7 @@ export function FinancePage({
             onClick={handleCreateEntry}
           >
             <Plus className="size-4" />
-            {t("finance.actions.addEntry", "记一笔")}
+            {t("finance.actions.addEntry")}
           </AnimatedButton>
         </div>
 
@@ -199,7 +199,7 @@ export function FinancePage({
           <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
             <SectionHeading
               icon={Wallet}
-              title={t("finance.sections.entriesTitle", "最近账目")}
+              title={t("finance.sections.entriesTitle")}
               description={t(
                 "finance.sections.entriesDescription",
                 "收入和支出都放在同一条现实时间线上。",
@@ -231,7 +231,7 @@ export function FinancePage({
             >
               <SectionHeading
                 icon={PieChart}
-                title={t("finance.sections.distributionTitle", "类别和生活系统")}
+                title={t("finance.sections.distributionTitle")}
                 description={t(
                   "finance.sections.distributionDescription",
                   "先看钱流向哪里，再看它支撑了什么。",
@@ -253,7 +253,7 @@ export function FinancePage({
             >
               <SectionHeading
                 icon={Target}
-                title={t("finance.rules.title", "预算规则")}
+                title={t("finance.rules.title")}
                 description={t(
                   "finance.rules.description",
                   "把每类支出的意图和上限放在同一处校准。",
@@ -271,7 +271,7 @@ export function FinancePage({
                     <CategoryRuleCard key={rule.id} rule={rule} />
                   ))
                 ) : (
-                  <EmptyState message={t("finance.empty.rules", "当前还没有预算规则。")} compact />
+                  <EmptyState message={t("finance.empty.rules")} compact />
                 )}
               </div>
             </Surface>
@@ -285,7 +285,7 @@ export function FinancePage({
           <Surface className={cn("p-4", isFixedLayout && "flex h-full min-h-0 flex-col")}>
             <SectionHeading
               icon={Target}
-              title={t("finance.sections.reviewTitle", "目标和复盘")}
+              title={t("finance.sections.reviewTitle")}
               description={t(
                 "finance.sections.reviewDescription",
                 "目标不是压迫，而是给钱一个方向。",
@@ -357,7 +357,7 @@ function FinanceFixedDashboard({
       <Surface className="col-span-2 flex min-h-0 flex-col overflow-hidden p-4">
         <SectionHeading
           icon={Wallet}
-          title={t("finance.sections.entriesTitle", "最近账目")}
+          title={t("finance.sections.entriesTitle")}
           description={t(
             "finance.sections.entriesDescription",
             "收入和支出都放在同一条现实时间线上。",
@@ -377,7 +377,7 @@ function FinanceFixedDashboard({
         <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
           <SectionHeading
             icon={PieChart}
-            title={t("finance.sections.distributionTitle", "类别和生活系统")}
+            title={t("finance.sections.distributionTitle")}
             description={t(
               "finance.sections.distributionDescription",
               "先看钱流向哪里，再看它支撑了什么。",
@@ -393,7 +393,7 @@ function FinanceFixedDashboard({
         <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
           <SectionHeading
             icon={Target}
-            title={t("finance.sections.reviewTitle", "目标和复盘")}
+            title={t("finance.sections.reviewTitle")}
             description={t(
               "finance.sections.reviewDescription",
               "目标不是压迫，而是给钱一个方向。",
@@ -451,7 +451,7 @@ function FinanceStackedView({
       <Surface className="p-5">
         <SectionHeading
           icon={Wallet}
-          title={t("finance.sections.entriesTitle", "最近账目")}
+          title={t("finance.sections.entriesTitle")}
           description={t(
             "finance.sections.entriesDescription",
             "收入和支出都放在同一条现实时间线上。",
@@ -470,7 +470,7 @@ function FinanceStackedView({
         <Surface className="p-5">
           <SectionHeading
             icon={PieChart}
-            title={t("finance.sections.distributionTitle", "类别和生活系统")}
+            title={t("finance.sections.distributionTitle")}
             description={t(
               "finance.sections.distributionDescription",
               "先看钱流向哪里，再看它支撑了什么。",
@@ -485,7 +485,7 @@ function FinanceStackedView({
         <Surface className="p-5">
           <SectionHeading
             icon={Target}
-            title={t("finance.sections.reviewTitle", "目标和复盘")}
+            title={t("finance.sections.reviewTitle")}
             description={t(
               "finance.sections.reviewDescription",
               "目标不是压迫，而是给钱一个方向。",
@@ -521,25 +521,25 @@ function SummaryStrip({
     <Surface className={cn("grid gap-2 p-3 min-[900px]:grid-cols-4", className)}>
       <MetricCell
         icon={ArrowUpRight}
-        label={t("finance.summary.income", "本月收入")}
+        label={t("finance.summary.income")}
         value={formatCurrency(summary.income, locale)}
         tone="income"
       />
       <MetricCell
         icon={ArrowDownLeft}
-        label={t("finance.summary.expense", "本月支出")}
+        label={t("finance.summary.expense")}
         value={formatCurrency(summary.expense, locale)}
         tone="expense"
       />
       <MetricCell
         icon={Landmark}
-        label={t("finance.summary.net", "本月结余")}
+        label={t("finance.summary.net")}
         value={formatCurrency(summary.net, locale)}
         tone={summary.net >= 0 ? "income" : "expense"}
       />
       <MetricCell
         icon={CalendarDays}
-        label={t("finance.summary.weeklyExpense", "近 7 日支出")}
+        label={t("finance.summary.weeklyExpense")}
         value={formatCurrency(summary.weeklyExpense, locale)}
         detail={t("finance.summary.dailyAverage", {
           value: formatCurrency(summary.dailyAverageExpense, locale),
@@ -617,7 +617,7 @@ function TransactionList({
           />
         ))
       ) : (
-        <EmptyState message={t("finance.empty.entries", "当前筛选下还没有账目记录。")} compact />
+        <EmptyState message={t("finance.empty.entries")} compact />
       )}
     </div>
   )
@@ -699,7 +699,7 @@ function TransactionCard({
               show={isControlMode}
               variant="outline"
               size="icon-sm"
-              label={t("finance.actions.editEntry", "编辑账目")}
+              label={t("finance.actions.editEntry")}
               icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
             />
@@ -707,7 +707,7 @@ function TransactionCard({
               show={isControlMode}
               variant="outline"
               size="icon-sm"
-              label={t("finance.actions.deleteEntry", "删除账目")}
+              label={t("finance.actions.deleteEntry")}
               icon={<Trash2 className="size-3.5" />}
               onClick={onDelete}
             />
@@ -732,12 +732,7 @@ function DistributionList({
   const { t } = useTranslation()
 
   if (rows.length === 0) {
-    return (
-      <EmptyState
-        message={t("finance.empty.distribution", "当前筛选下没有可展示的分布。")}
-        compact
-      />
-    )
+    return <EmptyState message={t("finance.empty.distribution")} compact />
   }
 
   return (
@@ -810,7 +805,7 @@ function TargetCard({
   const { t } = useTranslation()
 
   if (!target) {
-    return <EmptyState message={t("finance.target.empty", "当前月份还没有目标。")} compact />
+    return <EmptyState message={t("finance.target.empty")} compact />
   }
 
   const expenseProgress =
@@ -831,7 +826,7 @@ function TargetCard({
       <div className="mt-3 space-y-2">
         {target.expenseLimit ? (
           <ProgressLine
-            label={t("finance.target.expenseLimit", "支出上限")}
+            label={t("finance.target.expenseLimit")}
             progress={expenseProgress}
             value={`${formatCurrency(summary.expense, locale)} / ${formatCurrency(
               target.expenseLimit,
@@ -841,7 +836,7 @@ function TargetCard({
         ) : null}
         {target.savingTarget ? (
           <ProgressLine
-            label={t("finance.target.savingTarget", "储蓄目标")}
+            label={t("finance.target.savingTarget")}
             progress={savingProgress}
             value={`${formatCurrency(Math.max(summary.net, 0), locale)} / ${formatCurrency(
               target.savingTarget,
@@ -913,10 +908,7 @@ function ReviewPanel({
             </div>
           ))
         ) : (
-          <EmptyState
-            message={t("finance.empty.reviewEntries", "当前没有需要优先复盘的账目。")}
-            compact
-          />
+          <EmptyState message={t("finance.empty.reviewEntries")} compact />
         )}
       </div>
 

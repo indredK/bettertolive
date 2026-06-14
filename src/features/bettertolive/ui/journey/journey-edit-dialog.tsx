@@ -473,7 +473,7 @@ function JourneyMemoryEditDialog({
       !form.summary.trim() ||
       !form.impact.trim()
     ) {
-      toast.error(t("journey.edit.validation.memoryRequired", "请填写标题、主时期、摘要和影响"))
+      toast.error(t("journey.edit.validation.memoryRequired"))
       return
     }
 
@@ -487,16 +487,16 @@ function JourneyMemoryEditDialog({
           memories: replaceById(memory.memories, nextMemory, editing.isNew),
         },
       })
-      toast.success(t("journey.toast.saved", "已保存"))
+      toast.success(t("journey.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed", "保存失败"))
+      toast.error(t("journey.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (!editing.memory) return
-    if (!window.confirm(t("journey.confirm.deleteMemory", "确定删除这条记忆吗？"))) {
+    if (!window.confirm(t("journey.confirm.deleteMemory"))) {
       return
     }
 
@@ -504,32 +504,30 @@ function JourneyMemoryEditDialog({
       await saveJourneyMutation.mutateAsync(
         cleanupMemoryReferences(growth, memory, editing.memory.id),
       )
-      toast.success(t("journey.toast.deleted", "已删除"))
+      toast.success(t("journey.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed", "删除失败"))
+      toast.error(t("journey.toast.deleteFailed"))
     }
   }
 
   return (
     <JourneyDialogFrame
       title={
-        editing.isNew
-          ? t("journey.edit.memoryCreateTitle", "新增记忆")
-          : t("journey.edit.memoryEditTitle", "编辑记忆")
+        editing.isNew ? t("journey.edit.memoryCreateTitle") : t("journey.edit.memoryEditTitle")
       }
       description={t(
         "journey.edit.memoryDescription",
         "维护一条记忆的分类、摘要、影响和可回看的线索。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete", "删除")}
+      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
-        <JourneyField label={t("journey.fields.title", "标题")}>
+        <JourneyField label={t("journey.fields.title")}>
           <Input
             value={form.title}
             onChange={(event) => updateForm({ title: event.target.value })}
@@ -540,28 +538,28 @@ function JourneyMemoryEditDialog({
         <div className="grid gap-3 min-[760px]:grid-cols-2">
           <JourneySelectField
             enumGroup="memoryType"
-            label={t("journey.fields.type", "内容类型")}
+            label={t("journey.fields.type")}
             options={MEMORY_TYPES}
             value={form.type}
             onChange={(value) => updateForm({ type: value as MemoryType })}
           />
           <JourneySelectField
             enumGroup="emotionalWeight"
-            label={t("journey.fields.emotionalWeight", "情感重量")}
+            label={t("journey.fields.emotionalWeight")}
             options={EMOTIONAL_WEIGHTS}
             value={form.emotionalWeight}
             onChange={(value) => updateForm({ emotionalWeight: value as EmotionalWeight })}
           />
           <JourneySelectField
             enumGroup="processing"
-            label={t("journey.fields.processing", "整理状态")}
+            label={t("journey.fields.processing")}
             options={PROCESSING_STATUSES}
             value={form.processing}
             onChange={(value) => updateForm({ processing: value as ProcessingStatus })}
           />
           <JourneySelectField
             enumGroup="privacy"
-            label={t("journey.fields.privacy", "隐私级别")}
+            label={t("journey.fields.privacy")}
             options={PRIVACY_LEVELS}
             value={form.privacy}
             onChange={(value) => updateForm({ privacy: value as PrivacyLevel })}
@@ -569,7 +567,7 @@ function JourneyMemoryEditDialog({
         </div>
 
         <div className="grid gap-3 min-[760px]:grid-cols-2">
-          <JourneyField label={t("journey.fields.primaryEra", "主时期")}>
+          <JourneyField label={t("journey.fields.primaryEra")}>
             <Input
               value={form.primaryEra}
               onChange={(event) => updateForm({ primaryEra: event.target.value })}
@@ -578,18 +576,15 @@ function JourneyMemoryEditDialog({
           </JourneyField>
           <JourneySelectField
             enumGroup="formativePower"
-            label={t("journey.fields.formativePower", "塑造力")}
+            label={t("journey.fields.formativePower")}
             options={FORMATIVE_POWERS}
             value={form.formativePower}
-            noneLabel={t("journey.edit.none", "不设置")}
+            noneLabel={t("journey.edit.none")}
             onChange={(value) => updateForm({ formativePower: value })}
           />
         </div>
 
-        <JourneyField
-          label={t("journey.fields.eras", "时期标签")}
-          hint={t("journey.edit.listHint", "每行一个，也支持逗号分隔。")}
-        >
+        <JourneyField label={t("journey.fields.eras")} hint={t("journey.edit.listHint")}>
           <Textarea
             value={form.eraText}
             onChange={(event) => updateForm({ eraText: event.target.value })}
@@ -597,7 +592,7 @@ function JourneyMemoryEditDialog({
           />
         </JourneyField>
 
-        <JourneyField label={t("journey.fields.summary", "摘要")}>
+        <JourneyField label={t("journey.fields.summary")}>
           <Textarea
             value={form.summary}
             onChange={(event) => updateForm({ summary: event.target.value })}
@@ -605,7 +600,7 @@ function JourneyMemoryEditDialog({
           />
         </JourneyField>
 
-        <JourneyField label={t("journey.fields.impact", "留下的影响")}>
+        <JourneyField label={t("journey.fields.impact")}>
           <Textarea
             value={form.impact}
             onChange={(event) => updateForm({ impact: event.target.value })}
@@ -613,7 +608,7 @@ function JourneyMemoryEditDialog({
           />
         </JourneyField>
 
-        <JourneyField label={t("journey.fields.sensoryCue", "感官线索")}>
+        <JourneyField label={t("journey.fields.sensoryCue")}>
           <Input
             value={form.sensoryCue}
             onChange={(event) => updateForm({ sensoryCue: event.target.value })}
@@ -623,8 +618,8 @@ function JourneyMemoryEditDialog({
 
         <div className="grid gap-3 min-[760px]:grid-cols-2">
           <JourneyField
-            label={t("journey.fields.sourceModules", "来源模块")}
-            hint={t("journey.edit.sourceModulesHint", "只会保存当前系统认识的来源名称。")}
+            label={t("journey.fields.sourceModules")}
+            hint={t("journey.edit.sourceModulesHint")}
           >
             <Textarea
               value={form.sourceModulesText}
@@ -632,10 +627,7 @@ function JourneyMemoryEditDialog({
               className={cn(JOURNEY_DIALOG_FIELD_CLASS, "min-h-24")}
             />
           </JourneyField>
-          <JourneyField
-            label={t("journey.fields.tags", "标签")}
-            hint={t("journey.edit.listHint", "每行一个，也支持逗号分隔。")}
-          >
+          <JourneyField label={t("journey.fields.tags")} hint={t("journey.edit.listHint")}>
             <Textarea
               value={form.tagsText}
               onChange={(event) => updateForm({ tagsText: event.target.value })}
@@ -699,16 +691,16 @@ function JourneyGrowthNodeEditDialog({
         },
         memory,
       })
-      toast.success(t("journey.toast.saved", "已保存"))
+      toast.success(t("journey.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed", "保存失败"))
+      toast.error(t("journey.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (!editing.node) return
-    if (!window.confirm(t("journey.confirm.deleteGrowth", "确定删除这个成长节点吗？"))) {
+    if (!window.confirm(t("journey.confirm.deleteGrowth"))) {
       return
     }
 
@@ -720,32 +712,30 @@ function JourneyGrowthNodeEditDialog({
         },
         memory,
       })
-      toast.success(t("journey.toast.deleted", "已删除"))
+      toast.success(t("journey.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed", "删除失败"))
+      toast.error(t("journey.toast.deleteFailed"))
     }
   }
 
   return (
     <JourneyDialogFrame
       title={
-        editing.isNew
-          ? t("journey.edit.growthCreateTitle", "新增成长节点")
-          : t("journey.edit.growthEditTitle", "编辑成长节点")
+        editing.isNew ? t("journey.edit.growthCreateTitle") : t("journey.edit.growthEditTitle")
       }
       description={t(
         "journey.edit.growthDescription",
         "用记忆 ID 把变化前、变化后和触发记忆连接起来。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete", "删除")}
+      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
-        <JourneyField label={t("journey.fields.title", "标题")}>
+        <JourneyField label={t("journey.fields.title")}>
           <Input
             value={form.title}
             onChange={(event) => updateForm({ title: event.target.value })}
@@ -756,14 +746,14 @@ function JourneyGrowthNodeEditDialog({
         <div className="grid gap-3 min-[760px]:grid-cols-2">
           <JourneySelectField
             enumGroup="growthDomain"
-            label={t("journey.fields.domain", "领域")}
+            label={t("journey.fields.domain")}
             options={GROWTH_DOMAINS}
             value={form.domain}
             onChange={(value) => updateForm({ domain: value as GrowthDomain })}
           />
           <JourneySelectField
             enumGroup="growthStability"
-            label={t("journey.fields.stability", "稳固程度")}
+            label={t("journey.fields.stability")}
             options={GROWTH_STABILITIES}
             value={form.stability}
             onChange={(value) => updateForm({ stability: value as GrowthStability })}
@@ -771,14 +761,14 @@ function JourneyGrowthNodeEditDialog({
         </div>
 
         <div className="grid gap-3 min-[760px]:grid-cols-2">
-          <JourneyField label={t("journey.fields.before", "变化前")}>
+          <JourneyField label={t("journey.fields.before")}>
             <Textarea
               value={form.before}
               onChange={(event) => updateForm({ before: event.target.value })}
               className={cn(JOURNEY_DIALOG_FIELD_CLASS, "min-h-24")}
             />
           </JourneyField>
-          <JourneyField label={t("journey.fields.after", "变化后")}>
+          <JourneyField label={t("journey.fields.after")}>
             <Textarea
               value={form.after}
               onChange={(event) => updateForm({ after: event.target.value })}
@@ -787,7 +777,7 @@ function JourneyGrowthNodeEditDialog({
           </JourneyField>
         </div>
 
-        <JourneyField label={t("journey.fields.keyEvent", "关键转折")}>
+        <JourneyField label={t("journey.fields.keyEvent")}>
           <Textarea
             value={form.keyEvent}
             onChange={(event) => updateForm({ keyEvent: event.target.value })}
@@ -796,7 +786,7 @@ function JourneyGrowthNodeEditDialog({
         </JourneyField>
 
         <JourneySelectField
-          label={t("journey.fields.triggerMemory", "触发记忆")}
+          label={t("journey.fields.triggerMemory")}
           options={memory.memories.map((entry) => entry.id)}
           renderOption={(value) =>
             memory.memories.find((entry) => entry.id === value)?.title ?? value
@@ -809,7 +799,7 @@ function JourneyGrowthNodeEditDialog({
 
         <div className="grid gap-3 min-[760px]:grid-cols-2">
           <JourneyField
-            label={t("journey.fields.beforeMemoryIds", "变化前记忆 ID")}
+            label={t("journey.fields.beforeMemoryIds")}
             hint={t(
               "journey.edit.memoryIdsHint",
               "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
@@ -822,7 +812,7 @@ function JourneyGrowthNodeEditDialog({
             />
           </JourneyField>
           <JourneyField
-            label={t("journey.fields.afterMemoryIds", "变化后记忆 ID")}
+            label={t("journey.fields.afterMemoryIds")}
             hint={t(
               "journey.edit.memoryIdsHint",
               "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。",
@@ -836,10 +826,7 @@ function JourneyGrowthNodeEditDialog({
           </JourneyField>
         </div>
 
-        <JourneyField
-          label={t("journey.fields.evidence", "证据")}
-          hint={t("journey.edit.listHint", "每行一个，也支持逗号分隔。")}
-        >
+        <JourneyField label={t("journey.fields.evidence")} hint={t("journey.edit.listHint")}>
           <Textarea
             value={form.evidenceText}
             onChange={(event) => updateForm({ evidenceText: event.target.value })}
@@ -875,7 +862,7 @@ function JourneyAnchorEditDialog({
     event.preventDefault()
 
     if (!form.label.trim() || !form.note.trim()) {
-      toast.error(t("journey.edit.validation.anchorRequired", "请填写锚点名称和说明"))
+      toast.error(t("journey.edit.validation.anchorRequired"))
       return
     }
 
@@ -889,16 +876,16 @@ function JourneyAnchorEditDialog({
           anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
         },
       })
-      toast.success(t("journey.toast.saved", "已保存"))
+      toast.success(t("journey.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed", "保存失败"))
+      toast.error(t("journey.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (!editing.anchor) return
-    if (!window.confirm(t("journey.confirm.deleteAnchor", "确定删除这个记忆锚点吗？"))) {
+    if (!window.confirm(t("journey.confirm.deleteAnchor"))) {
       return
     }
 
@@ -910,26 +897,24 @@ function JourneyAnchorEditDialog({
           anchors: removeById(memory.anchors, editing.anchor.id),
         },
       })
-      toast.success(t("journey.toast.deleted", "已删除"))
+      toast.success(t("journey.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed", "删除失败"))
+      toast.error(t("journey.toast.deleteFailed"))
     }
   }
 
   return (
     <JourneyDialogFrame
       title={
-        editing.isNew
-          ? t("journey.edit.anchorCreateTitle", "新增锚点")
-          : t("journey.edit.anchorEditTitle", "编辑锚点")
+        editing.isNew ? t("journey.edit.anchorCreateTitle") : t("journey.edit.anchorEditTitle")
       }
       description={t(
         "journey.edit.anchorDescription",
         "维护地点、物件、人物或照片与记忆之间的连接。",
       )}
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete", "删除")}
+      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
@@ -937,19 +922,19 @@ function JourneyAnchorEditDialog({
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
         <JourneySelectField
           enumGroup="memoryType"
-          label={t("journey.fields.type", "内容类型")}
+          label={t("journey.fields.type")}
           options={ANCHOR_TYPES}
           value={form.type}
           onChange={(value) => updateForm({ type: value as AnchorType })}
         />
-        <JourneyField label={t("journey.fields.label", "名称")}>
+        <JourneyField label={t("journey.fields.label")}>
           <Input
             value={form.label}
             onChange={(event) => updateForm({ label: event.target.value })}
             className={JOURNEY_DIALOG_FIELD_CLASS}
           />
         </JourneyField>
-        <JourneyField label={t("journey.fields.note", "说明")}>
+        <JourneyField label={t("journey.fields.note")}>
           <Textarea
             value={form.note}
             onChange={(event) => updateForm({ note: event.target.value })}
@@ -958,8 +943,8 @@ function JourneyAnchorEditDialog({
         </JourneyField>
         <MemoryIdReference memories={memory.memories} />
         <JourneyField
-          label={t("journey.fields.linkedMemoryIds", "关联记忆 ID")}
-          hint={t("journey.edit.memoryIdsHint", "每行一个 ID，也支持逗号分隔；无效 ID 会被忽略。")}
+          label={t("journey.fields.linkedMemoryIds")}
+          hint={t("journey.edit.memoryIdsHint")}
         >
           <Textarea
             value={form.linkedMemoryIdsText}
@@ -992,7 +977,7 @@ function JourneyTextEditDialog({
     event.preventDefault()
 
     if (!value.trim()) {
-      toast.error(t("journey.edit.validation.textRequired", "请填写内容"))
+      toast.error(t("journey.edit.validation.textRequired"))
       return
     }
 
@@ -1016,10 +1001,10 @@ function JourneyTextEditDialog({
               ),
             },
       })
-      toast.success(t("journey.toast.saved", "已保存"))
+      toast.success(t("journey.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.saveFailed", "保存失败"))
+      toast.error(t("journey.toast.saveFailed"))
     }
   }
 
@@ -1047,10 +1032,10 @@ function JourneyTextEditDialog({
               reviewPrompts: removeAt(memory.reviewPrompts, editing.index),
             },
       })
-      toast.success(t("journey.toast.deleted", "已删除"))
+      toast.success(t("journey.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("journey.toast.deleteFailed", "删除失败"))
+      toast.error(t("journey.toast.deleteFailed"))
     }
   }
 
@@ -1059,31 +1044,23 @@ function JourneyTextEditDialog({
       title={
         isThread
           ? editing.isNew
-            ? t("journey.edit.threadCreateTitle", "新增影响线索")
-            : t("journey.edit.threadEditTitle", "编辑影响线索")
+            ? t("journey.edit.threadCreateTitle")
+            : t("journey.edit.threadEditTitle")
           : editing.isNew
-            ? t("journey.edit.promptCreateTitle", "新增回看问题")
-            : t("journey.edit.promptEditTitle", "编辑回看问题")
+            ? t("journey.edit.promptCreateTitle")
+            : t("journey.edit.promptEditTitle")
       }
       description={
-        isThread
-          ? t("journey.edit.threadDescription", "记录当前仍在生效、适合跨模块回看的影响线索。")
-          : t("journey.edit.promptDescription", "记录一个适合慢慢回看的问题。")
+        isThread ? t("journey.edit.threadDescription") : t("journey.edit.promptDescription")
       }
       isPending={saveJourneyMutation.isPending}
-      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete", "删除")}
+      deleteLabel={editing.isNew ? undefined : t("journey.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
       onSubmit={handleSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
-        <JourneyField
-          label={
-            isThread
-              ? t("journey.fields.thread", "影响线索")
-              : t("journey.fields.prompt", "回看问题")
-          }
-        >
+        <JourneyField label={isThread ? t("journey.fields.thread") : t("journey.fields.prompt")}>
           <Textarea
             value={value}
             onChange={(event) => setValue(event.target.value)}
@@ -1146,12 +1123,10 @@ function JourneyDialogFrame({
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("journey.actions.cancel", "取消")}
+              {t("journey.actions.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending
-                ? t("journey.actions.saving", "保存中")
-                : t("journey.actions.save", "保存")}
+              {isPending ? t("journey.actions.saving") : t("journey.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -1236,7 +1211,7 @@ function MemoryIdReference({ memories }: { memories: MemoryEntry[] }) {
   return (
     <div className="rounded-xl border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-3 py-3">
       <div className="text-xs font-medium text-[color:var(--text-primary)]">
-        {t("journey.edit.memoryIdReference", "可用记忆 ID")}
+        {t("journey.edit.memoryIdReference")}
       </div>
       <div className="mt-2 grid gap-1.5 text-[11px] text-[color:var(--text-muted)]">
         {memories.map((entry) => (

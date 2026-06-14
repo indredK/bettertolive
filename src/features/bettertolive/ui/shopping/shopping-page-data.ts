@@ -275,7 +275,7 @@ export function shoppingAttributeSemanticDisplayName(
   semanticKey: string | null | undefined,
   t: TFunction,
 ): string {
-  if (!semanticKey) return t("shopping.attributes.none", "未设置")
+  if (!semanticKey) return t("shopping.attributes.none")
   return t(`shopping.attributes.semanticOptions.${semanticKey}`, semanticKey)
 }
 
@@ -283,14 +283,12 @@ export function shoppingAttributeStyleTokenDisplayName(
   styleToken: string | null | undefined,
   t: TFunction,
 ): string {
-  if (!styleToken) return t("shopping.attributes.none", "未设置")
+  if (!styleToken) return t("shopping.attributes.none")
   return t(`shopping.attributes.styleOptions.${styleToken}`, styleToken)
 }
 
 export function shoppingAttributeEnabledDisplayName(isEnabled: boolean, t: TFunction): string {
-  return isEnabled
-    ? t("shopping.attributes.enabled", "已启用")
-    : t("shopping.attributes.disabled", "已停用")
+  return isEnabled ? t("shopping.attributes.enabled") : t("shopping.attributes.disabled")
 }
 
 export function statusStyle(
@@ -361,18 +359,18 @@ export function getPriceSignal(
   }
   if (item.currentPrice <= item.buyBelowPrice) {
     return {
-      label: t("shopping.priceSignal.inBuyZone", "在买点"),
+      label: t("shopping.priceSignal.inBuyZone"),
       className: "border-foreground/10 bg-accent text-accent-foreground",
     }
   }
   if (item.overpayPrice != null && item.currentPrice >= item.overpayPrice) {
     return {
-      label: t("shopping.priceSignal.overpriced", "偏贵"),
+      label: t("shopping.priceSignal.overpriced"),
       className: "border-foreground/10 bg-secondary text-secondary-foreground",
     }
   }
   return {
-    label: t("shopping.priceSignal.watchOnly", "观望"),
+    label: t("shopping.priceSignal.watchOnly"),
     className: "border-foreground/10 bg-muted text-muted-foreground",
   }
 }

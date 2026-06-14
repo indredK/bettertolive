@@ -83,7 +83,7 @@ export function NutritionLogsTab({
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-muted-foreground text-xs leading-5">
-                {t("nutrition.logs.description", "记录真实发生的进食，用来校准计划。")}
+                {t("nutrition.logs.description")}
               </p>
               <Badge
                 variant="outline"
@@ -97,7 +97,7 @@ export function NutritionLogsTab({
                 <Input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder={t("nutrition.logs.search", "搜索进食、场景、反馈或食物记忆")}
+                  placeholder={t("nutrition.logs.search")}
                   className="border-foreground/15 bg-background min-w-0 flex-1"
                 />
                 <FilterPopoverButton
@@ -106,8 +106,8 @@ export function NutritionLogsTab({
                   dimensions={[
                     {
                       key: "filter",
-                      label: t("nutrition.logs.filterTitle", "进食类型"),
-                      allLabel: t("nutrition.logs.filters.all", "全部"),
+                      label: t("nutrition.logs.filterTitle"),
+                      allLabel: t("nutrition.logs.filters.all"),
                       value: filter,
                       options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
                         value: f,
@@ -123,8 +123,8 @@ export function NutritionLogsTab({
                 dimensions={[
                   {
                     key: "filter",
-                    label: t("nutrition.logs.filterTitle", "进食类型"),
-                    allLabel: t("nutrition.logs.filters.all", "全部"),
+                    label: t("nutrition.logs.filterTitle"),
+                    allLabel: t("nutrition.logs.filters.all"),
                     value: filter,
                     options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
                       value: f,
@@ -148,7 +148,7 @@ export function NutritionLogsTab({
             ))
           ) : (
             <div className="border-foreground/15 bg-muted/20 text-muted-foreground flex min-h-[180px] items-center justify-center rounded-2xl border border-dashed p-6 text-center text-sm">
-              {t("nutrition.logs.empty", "没有匹配的进食记录。")}
+              {t("nutrition.logs.empty")}
             </div>
           )}
         </NutritionPanel>
@@ -157,7 +157,7 @@ export function NutritionLogsTab({
           <CardContent className="flex min-h-0 flex-1 flex-col p-4">
             <div className="flex items-center gap-2">
               <MessageCircleHeart className="size-4" />
-              <h3 className="text-sm font-semibold">{t("nutrition.logs.review", "回顾线索")}</h3>
+              <h3 className="text-sm font-semibold">{t("nutrition.logs.review")}</h3>
             </div>
             <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
               {nutrition.weeklyReview.highlights.map((highlight) => (
@@ -226,7 +226,7 @@ function LogCard({
                   entry,
                   foodById: lookups.foodById,
                   recipeById: lookups.recipeById,
-                  servingLabel: t("nutrition.units.serving", "份"),
+                  servingLabel: t("nutrition.units.serving"),
                   unitLabel: (unit) => translateNutritionEnum(t, "unit", unit),
                 })}
               </div>
@@ -271,7 +271,7 @@ function LogCard({
             type="button"
             variant="ghost"
             size="icon-sm"
-            label={t("nutrition.logs.edit", "编辑进食记录")}
+            label={t("nutrition.logs.edit")}
             icon={<Pencil className="size-3.5" />}
             onClick={onEdit}
           />
@@ -313,7 +313,7 @@ function LogCard({
           variant="outline"
           className="border-foreground/10 bg-muted text-muted-foreground mt-3"
         >
-          {t("nutrition.logs.valueDensity", "价值密度")} ·{" "}
+          {t("nutrition.logs.valueDensity")} ·{" "}
           {translateNutritionEnum(t, "valueDensity", log.valueDensity)}
         </Badge>
       ) : null}

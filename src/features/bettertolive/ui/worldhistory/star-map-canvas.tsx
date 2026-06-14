@@ -69,7 +69,7 @@ export function StarMapCanvas({
     <div className="flex h-full flex-col">
       <div className="mb-3 flex shrink-0 items-center justify-between gap-2">
         <h3 className="font-serif text-base font-semibold tracking-wide text-[color:var(--text-primary)]">
-          {civilization?.icon} {civilization?.name} {t("worldhistory.star.suffix", "因果链路星图")}
+          {civilization?.icon} {civilization?.name} {t("worldhistory.star.suffix")}
         </h3>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           {NODE_KIND_ORDER.map((kind) => (
@@ -180,7 +180,7 @@ export function StarMapCanvas({
                   className="shrink-0 font-mono text-[10px] text-[color:var(--hero-muted)] hover:text-[color:var(--hero-ink)]"
                   onClick={() => onSelectNode(tooltipNode.id)}
                 >
-                  {t("worldhistory.star.collapse", "收起")}
+                  {t("worldhistory.star.collapse")}
                 </button>
               </div>
 
@@ -189,13 +189,13 @@ export function StarMapCanvas({
                   <Input
                     value={tooltipNode.label}
                     onChange={(e) => onUpdateNode(tooltipNode.id, { label: e.target.value })}
-                    placeholder={t("worldhistory.star.nodeNamePlaceholder", "节点名称")}
+                    placeholder={t("worldhistory.star.nodeNamePlaceholder")}
                     className="font-serif text-xs"
                   />
                   <Textarea
                     value={tooltipNode.description}
                     onChange={(e) => onUpdateNode(tooltipNode.id, { description: e.target.value })}
-                    placeholder={t("worldhistory.star.descriptionPlaceholder", "现象描述")}
+                    placeholder={t("worldhistory.star.descriptionPlaceholder")}
                     rows={2}
                     className="font-sans text-[11px]"
                   />
@@ -204,7 +204,7 @@ export function StarMapCanvas({
                     onChange={(e) =>
                       onUpdateNode(tooltipNode.id, { causalExplanation: e.target.value })
                     }
-                    placeholder={t("worldhistory.star.causalPlaceholder", "因果链解释")}
+                    placeholder={t("worldhistory.star.causalPlaceholder")}
                     rows={3}
                     className="font-sans text-[11px]"
                   />
@@ -225,7 +225,7 @@ export function StarMapCanvas({
                     }}
                   >
                     <span className="font-semibold" style={{ color: "var(--hero-ink)" }}>
-                      {t("worldhistory.star.causalLabel", "因果链：")}
+                      {t("worldhistory.star.causalLabel")}
                     </span>
                     {tooltipNode.causalExplanation}
                   </div>

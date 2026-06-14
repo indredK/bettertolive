@@ -41,8 +41,8 @@ export function GanttTimeline({
 
   function formatYear(year: number): string {
     return year < 0
-      ? `${t("worldhistory.gantt.bc", "公元前")}${Math.abs(year)}`
-      : `${t("worldhistory.gantt.ad", "公元")}${year}`
+      ? `${t("worldhistory.gantt.bc")}${Math.abs(year)}`
+      : `${t("worldhistory.gantt.ad")}${year}`
   }
   const [tooltipEvent, setTooltipEvent] = useState<WorldHistoryTimelineEvent | null>(null)
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 })
@@ -76,20 +76,18 @@ export function GanttTimeline({
     <div className="flex h-full flex-col">
       <div className="mb-3 flex shrink-0 items-center justify-between gap-2">
         <h3 className="font-serif text-base font-semibold tracking-wide text-[color:var(--text-primary)]">
-          {civilization?.icon} {civilization?.name} {t("worldhistory.gantt.suffix", "演进时间轴")}
+          {civilization?.icon} {civilization?.name} {t("worldhistory.gantt.suffix")}
         </h3>
         {isEditing ? (
           <Button size="sm" onClick={onAddEvent}>
             <Plus className="size-3" />
-            {t("worldhistory.gantt.addEvent", "新增事件")}
+            {t("worldhistory.gantt.addEvent")}
           </Button>
         ) : (
           <Tabs value={mode} onValueChange={(v) => setMode(v as TimelineMode)}>
             <TabsList>
-              <TabsTrigger value="gantt">
-                {t("worldhistory.gantt.ganttMode", "甘特横轴")}
-              </TabsTrigger>
-              <TabsTrigger value="tree">{t("worldhistory.gantt.treeMode", "因果树")}</TabsTrigger>
+              <TabsTrigger value="gantt">{t("worldhistory.gantt.ganttMode")}</TabsTrigger>
+              <TabsTrigger value="tree">{t("worldhistory.gantt.treeMode")}</TabsTrigger>
             </TabsList>
           </Tabs>
         )}
@@ -172,7 +170,7 @@ export function GanttTimeline({
                       <Input
                         value={event.label}
                         onChange={(e) => onUpdateEvent(event.id, { label: e.target.value })}
-                        placeholder={t("worldhistory.event.namePlaceholder", "事件名称")}
+                        placeholder={t("worldhistory.event.namePlaceholder")}
                         className="flex-1 font-serif text-xs"
                       />
                       <Button
@@ -193,7 +191,7 @@ export function GanttTimeline({
                           })
                         }}
                         className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--destructive)]"
-                        aria-label={t("worldhistory.event.deleteAria", "删除事件")}
+                        aria-label={t("worldhistory.event.deleteAria")}
                       >
                         <Trash2 className="size-3.5" />
                       </Button>
@@ -201,7 +199,7 @@ export function GanttTimeline({
                     <Textarea
                       value={event.summary}
                       onChange={(e) => onUpdateEvent(event.id, { summary: e.target.value })}
-                      placeholder={t("worldhistory.event.summaryPlaceholder", "事件摘要")}
+                      placeholder={t("worldhistory.event.summaryPlaceholder")}
                       rows={2}
                       className="font-sans text-[11px]"
                     />
@@ -222,7 +220,7 @@ export function GanttTimeline({
               </div>
             ))}
             {sortedEvents.length === 0 && (
-              <EmptyState message={t("worldhistory.gantt.noEvents", "暂无事件")} compact />
+              <EmptyState message={t("worldhistory.gantt.noEvents")} compact />
             )}
           </div>
         )}

@@ -418,7 +418,7 @@ export function JourneyPage({
         return {
           key: group.id,
           label: group.label,
-          allLabel: group.options[0]?.label ?? t("journey.filters.all", "全部"),
+          allLabel: group.options[0]?.label ?? t("journey.filters.all"),
           value: filters[group.id],
           options: group.options.slice(1).map((option) => ({
             value: option.value,

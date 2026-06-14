@@ -96,7 +96,7 @@ export function FutureBlueprintEditDialog({
     event.preventDefault()
 
     if (!identity.trim() || !lifestyle.trim()) {
-      toast.error(t("future.edit.validation.blueprintRequired", "请填写理想自我和理想生活"))
+      toast.error(t("future.edit.validation.blueprintRequired"))
       return
     }
 
@@ -107,10 +107,10 @@ export function FutureBlueprintEditDialog({
         lifestyle: lifestyle.trim(),
         values: textToDelimitedList(valuesText),
       })
-      toast.success(t("future.toast.saved", "已保存"))
+      toast.success(t("future.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed", "保存失败"))
+      toast.error(t("future.toast.saveFailed"))
     }
   }
 
@@ -123,7 +123,7 @@ export function FutureBlueprintEditDialog({
         )}
       >
         <DialogHeader className={FUTURE_DIALOG_HEADER_CLASS}>
-          <DialogTitle>{t("future.edit.blueprintTitle", "编辑未来蓝图")}</DialogTitle>
+          <DialogTitle>{t("future.edit.blueprintTitle")}</DialogTitle>
           <DialogDescription>
             {t(
               "future.edit.blueprintDescription",
@@ -135,16 +135,16 @@ export function FutureBlueprintEditDialog({
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
-              <FutureField label={t("future.edit.identity", "理想自我")}>
+              <FutureField label={t("future.edit.identity")}>
                 <Textarea
                   value={identity}
                   onChange={(event) => setIdentity(event.target.value)}
                   className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
-                  placeholder={t("future.edit.identityPlaceholder", "写下你想更靠近的自我状态。")}
+                  placeholder={t("future.edit.identityPlaceholder")}
                 />
               </FutureField>
 
-              <FutureField label={t("future.edit.lifestyle", "理想生活")}>
+              <FutureField label={t("future.edit.lifestyle")}>
                 <Textarea
                   value={lifestyle}
                   onChange={(event) => setLifestyle(event.target.value)}
@@ -156,10 +156,7 @@ export function FutureBlueprintEditDialog({
                 />
               </FutureField>
 
-              <FutureField
-                label={t("future.edit.values", "重要价值")}
-                hint={t("future.edit.valuesHint", "每行一个，也支持逗号分隔。")}
-              >
+              <FutureField label={t("future.edit.values")} hint={t("future.edit.valuesHint")}>
                 <Textarea
                   value={valuesText}
                   onChange={(event) => setValuesText(event.target.value)}
@@ -171,10 +168,10 @@ export function FutureBlueprintEditDialog({
 
           <DialogFooter className={FUTURE_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel", "取消")}
+              {t("future.edit.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save", "保存")}
+              {t("future.edit.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -204,7 +201,7 @@ export function FutureMilestoneEditDialog({
     const steps = textToLines(stepsText)
 
     if (!horizon.trim() || !summary.trim() || steps.length === 0) {
-      toast.error(t("future.edit.validation.milestoneRequired", "请填写阶段、摘要和至少一步行动"))
+      toast.error(t("future.edit.validation.milestoneRequired"))
       return
     }
 
@@ -222,10 +219,10 @@ export function FutureMilestoneEditDialog({
           editing.isNew,
         ),
       })
-      toast.success(t("future.toast.saved", "已保存"))
+      toast.success(t("future.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed", "保存失败"))
+      toast.error(t("future.toast.saveFailed"))
     }
   }
 
@@ -246,10 +243,10 @@ export function FutureMilestoneEditDialog({
         ...future,
         milestones: removeAt(future.milestones, editing.index),
       })
-      toast.success(t("future.toast.deleted", "已删除"))
+      toast.success(t("future.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("future.toast.deleteFailed", "删除失败"))
+      toast.error(t("future.toast.deleteFailed"))
     }
   }
 
@@ -264,27 +261,25 @@ export function FutureMilestoneEditDialog({
         <DialogHeader className={FUTURE_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("future.edit.milestoneCreateTitle", "新增阶段路径")
-              : t("future.edit.milestoneEditTitle", "编辑阶段路径")}
+              ? t("future.edit.milestoneCreateTitle")
+              : t("future.edit.milestoneEditTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t("future.edit.milestoneDescription", "把远处方向拆成可靠近的一段路径。")}
-          </DialogDescription>
+          <DialogDescription>{t("future.edit.milestoneDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
-              <FutureField label={t("future.edit.horizon", "阶段")}>
+              <FutureField label={t("future.edit.horizon")}>
                 <Input
                   value={horizon}
                   onChange={(event) => setHorizon(event.target.value)}
                   className={FUTURE_DIALOG_FIELD_CLASS}
-                  placeholder={t("future.edit.horizonPlaceholder", "例如：未来 3 个月")}
+                  placeholder={t("future.edit.horizonPlaceholder")}
                 />
               </FutureField>
 
-              <FutureField label={t("future.edit.summary", "阶段摘要")}>
+              <FutureField label={t("future.edit.summary")}>
                 <Textarea
                   value={summary}
                   onChange={(event) => setSummary(event.target.value)}
@@ -292,10 +287,7 @@ export function FutureMilestoneEditDialog({
                 />
               </FutureField>
 
-              <FutureField
-                label={t("future.edit.steps", "靠近方式")}
-                hint={t("future.edit.stepsHint", "每行一步。")}
-              >
+              <FutureField label={t("future.edit.steps")} hint={t("future.edit.stepsHint")}>
                 <Textarea
                   value={stepsText}
                   onChange={(event) => setStepsText(event.target.value)}
@@ -309,14 +301,14 @@ export function FutureMilestoneEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("future.edit.delete", "删除")}
+                {t("future.edit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel", "取消")}
+              {t("future.edit.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save", "保存")}
+              {t("future.edit.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -342,7 +334,7 @@ export function FutureExperimentEditDialog({
     event.preventDefault()
 
     if (!experiment.trim()) {
-      toast.error(t("future.edit.validation.experimentRequired", "请填写实验内容"))
+      toast.error(t("future.edit.validation.experimentRequired"))
       return
     }
 
@@ -351,17 +343,17 @@ export function FutureExperimentEditDialog({
         ...future,
         experiments: replaceAt(future.experiments, editing.index, experiment.trim(), editing.isNew),
       })
-      toast.success(t("future.toast.saved", "已保存"))
+      toast.success(t("future.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("future.toast.saveFailed", "保存失败"))
+      toast.error(t("future.toast.saveFailed"))
     }
   }
 
   const handleDelete = async () => {
     if (editing.isNew) return
 
-    const confirmed = window.confirm(t("future.confirm.deleteExperiment", "确定删除这个实验吗？"))
+    const confirmed = window.confirm(t("future.confirm.deleteExperiment"))
 
     if (!confirmed) return
 
@@ -370,10 +362,10 @@ export function FutureExperimentEditDialog({
         ...future,
         experiments: removeAt(future.experiments, editing.index),
       })
-      toast.success(t("future.toast.deleted", "已删除"))
+      toast.success(t("future.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("future.toast.deleteFailed", "删除失败"))
+      toast.error(t("future.toast.deleteFailed"))
     }
   }
 
@@ -388,18 +380,16 @@ export function FutureExperimentEditDialog({
         <DialogHeader className={FUTURE_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("future.edit.experimentCreateTitle", "新增当前实验")
-              : t("future.edit.experimentEditTitle", "编辑当前实验")}
+              ? t("future.edit.experimentCreateTitle")
+              : t("future.edit.experimentEditTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t("future.edit.experimentDescription", "实验不需要宏大，只要能让生活更靠近蓝图。")}
-          </DialogDescription>
+          <DialogDescription>{t("future.edit.experimentDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
-              <FutureField label={t("future.edit.experiment", "实验内容")}>
+              <FutureField label={t("future.edit.experiment")}>
                 <Textarea
                   value={experiment}
                   onChange={(event) => setExperiment(event.target.value)}
@@ -413,14 +403,14 @@ export function FutureExperimentEditDialog({
             {!editing.isNew ? (
               <Button type="button" variant="destructive" onClick={handleDelete}>
                 <Trash2 className="size-4" />
-                {t("future.edit.delete", "删除")}
+                {t("future.edit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("future.edit.cancel", "取消")}
+              {t("future.edit.cancel")}
             </Button>
             <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("future.edit.save", "保存")}
+              {t("future.edit.save")}
             </Button>
           </DialogFooter>
         </form>

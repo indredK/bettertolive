@@ -86,11 +86,11 @@ export function FilterPopoverButton({
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <SlidersHorizontal className="size-3.5" />
-        {t("common.filter.label", "筛选")}
+        {t("common.filter.label")}
         {activeFilterCount > 0 ? (
           <span
             role="button"
-            aria-label={t("common.filter.clearAll", "清空")}
+            aria-label={t("common.filter.clearAll")}
             className="group/clear relative inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-white/20 px-0.5"
             onClick={(e) => {
               e.stopPropagation()

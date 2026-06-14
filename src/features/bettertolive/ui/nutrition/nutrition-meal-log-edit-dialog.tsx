@@ -134,7 +134,7 @@ export function NutritionMealLogEditDialog({
   ) {
     plannedSlotOptions.push({
       id: form.plannedSlotId,
-      label: t("nutrition.logEdit.missingPlannedSlot", "已关联的计划餐次不存在"),
+      label: t("nutrition.logEdit.missingPlannedSlot"),
     })
   }
   const foodMemoryOptions = (nutrition.foodMemories ?? []).map((memory) => ({
@@ -148,7 +148,7 @@ export function NutritionMealLogEditDialog({
   ) {
     foodMemoryOptions.push({
       id: form.relatedFoodMemoryId,
-      label: t("nutrition.logEdit.missingFoodMemory", "已关联的食物记忆不存在"),
+      label: t("nutrition.logEdit.missingFoodMemory"),
     })
   }
 
@@ -183,7 +183,7 @@ export function NutritionMealLogEditDialog({
     event.preventDefault()
 
     if (!form.dateTime.trim()) {
-      toast.error(t("nutrition.logEdit.validation.dateTimeRequired", "请填写进食时间"))
+      toast.error(t("nutrition.logEdit.validation.dateTimeRequired"))
       return
     }
 
@@ -193,7 +193,7 @@ export function NutritionMealLogEditDialog({
       const nextEntry = normalizeEntry(entry)
 
       if (!nextEntry) {
-        toast.error(t("nutrition.logEdit.validation.entryInvalid", "请补全进食条目"))
+        toast.error(t("nutrition.logEdit.validation.entryInvalid"))
         return
       }
 
@@ -201,7 +201,7 @@ export function NutritionMealLogEditDialog({
     }
 
     if (entries.length === 0) {
-      toast.error(t("nutrition.logEdit.validation.entryRequired", "请至少添加一个进食条目"))
+      toast.error(t("nutrition.logEdit.validation.entryRequired"))
       return
     }
 
@@ -227,10 +227,10 @@ export function NutritionMealLogEditDialog({
         ...nutrition,
         mealLogs: nextLogs,
       })
-      toast.success(t("nutrition.logEdit.saved", "进食记录已保存"))
+      toast.success(t("nutrition.logEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.logEdit.saveFailed", "进食记录保存失败"))
+      toast.error(t("nutrition.logEdit.saveFailed"))
     }
   }
 
@@ -244,10 +244,10 @@ export function NutritionMealLogEditDialog({
         ...nutrition,
         mealLogs: nutrition.mealLogs.filter((log) => log.id !== editing.log?.id),
       })
-      toast.success(t("nutrition.logEdit.deleted", "进食记录已删除"))
+      toast.success(t("nutrition.logEdit.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.logEdit.deleteFailed", "进食记录删除失败"))
+      toast.error(t("nutrition.logEdit.deleteFailed"))
     }
   }
 
@@ -261,9 +261,7 @@ export function NutritionMealLogEditDialog({
       >
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("nutrition.logEdit.createTitle", "新增进食记录")
-              : t("nutrition.logEdit.editTitle", "编辑进食记录")}
+            {editing.isNew ? t("nutrition.logEdit.createTitle") : t("nutrition.logEdit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -277,7 +275,7 @@ export function NutritionMealLogEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
-                <Field label={t("nutrition.logEdit.dateTime", "进食时间")}>
+                <Field label={t("nutrition.logEdit.dateTime")}>
                   <Input
                     type="datetime-local"
                     value={form.dateTime}
@@ -285,7 +283,7 @@ export function NutritionMealLogEditDialog({
                     className={NUTRITION_DIALOG_FIELD_CLASS}
                   />
                 </Field>
-                <Field label={t("nutrition.logEdit.plannedSlot", "关联计划餐次")}>
+                <Field label={t("nutrition.logEdit.plannedSlot")}>
                   <Select
                     value={form.plannedSlotId || NONE_VALUE}
                     onValueChange={(plannedSlotId) =>
@@ -299,7 +297,7 @@ export function NutritionMealLogEditDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>
-                        {t("nutrition.logEdit.noPlannedSlot", "不关联计划")}
+                        {t("nutrition.logEdit.noPlannedSlot")}
                       </SelectItem>
                       {plannedSlotOptions.map((option) => (
                         <SelectItem key={option.id} value={option.id}>
@@ -312,7 +310,7 @@ export function NutritionMealLogEditDialog({
               </div>
 
               {foodMemoryOptions.length > 0 ? (
-                <Field label={t("nutrition.logEdit.relatedFoodMemory", "关联食物记忆")}>
+                <Field label={t("nutrition.logEdit.relatedFoodMemory")}>
                   <Select
                     value={form.relatedFoodMemoryId || NONE_VALUE}
                     onValueChange={(relatedFoodMemoryId) =>
@@ -326,7 +324,7 @@ export function NutritionMealLogEditDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>
-                        {t("nutrition.logEdit.noFoodMemory", "不关联食物记忆")}
+                        {t("nutrition.logEdit.noFoodMemory")}
                       </SelectItem>
                       {foodMemoryOptions.map((option) => (
                         <SelectItem key={option.id} value={option.id}>
@@ -341,21 +339,21 @@ export function NutritionMealLogEditDialog({
               <div className="grid gap-4 md:grid-cols-4">
                 <OptionalEnumField
                   group="scene"
-                  label={t("nutrition.logEdit.scene", "场景")}
+                  label={t("nutrition.logEdit.scene")}
                   onChange={(scene) => updateForm({ scene: scene as MealScene | "" })}
                   options={SCENE_OPTIONS}
                   value={form.scene}
                 />
                 <OptionalEnumField
                   group="trigger"
-                  label={t("nutrition.logEdit.trigger", "触发")}
+                  label={t("nutrition.logEdit.trigger")}
                   onChange={(trigger) => updateForm({ trigger: trigger as MealTrigger | "" })}
                   options={TRIGGER_OPTIONS}
                   value={form.trigger}
                 />
                 <OptionalEnumField
                   group="valueDensity"
-                  label={t("nutrition.logEdit.valueDensity", "价值密度")}
+                  label={t("nutrition.logEdit.valueDensity")}
                   onChange={(valueDensity) =>
                     updateForm({ valueDensity: valueDensity as ValueDensity | "" })
                   }
@@ -364,7 +362,7 @@ export function NutritionMealLogEditDialog({
                 />
                 <OptionalEnumField
                   group="bodyFeedback"
-                  label={t("nutrition.logEdit.bodyFeedback", "身体反馈")}
+                  label={t("nutrition.logEdit.bodyFeedback")}
                   onChange={(bodyFeedback) =>
                     updateForm({ bodyFeedback: bodyFeedback as BodyFeedback | "" })
                   }
@@ -377,9 +375,7 @@ export function NutritionMealLogEditDialog({
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold">
-                    {t("nutrition.logEdit.entries", "进食条目")}
-                  </h3>
+                  <h3 className="text-sm font-semibold">{t("nutrition.logEdit.entries")}</h3>
                   <p className="text-muted-foreground mt-1 text-xs leading-5">
                     {t(
                       "nutrition.logEdit.entriesHint",
@@ -389,7 +385,7 @@ export function NutritionMealLogEditDialog({
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={addEntry}>
                   <Plus className="size-3.5" />
-                  {t("nutrition.logEdit.addEntry", "添加条目")}
+                  {t("nutrition.logEdit.addEntry")}
                 </Button>
               </div>
 
@@ -409,7 +405,7 @@ export function NutritionMealLogEditDialog({
 
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.logEdit.changeReason", "偏差原因")}>
+                <Field label={t("nutrition.logEdit.changeReason")}>
                   <Textarea
                     value={form.changeReason}
                     onChange={(event) => updateForm({ changeReason: event.target.value })}
@@ -420,7 +416,7 @@ export function NutritionMealLogEditDialog({
                     )}
                   />
                 </Field>
-                <Field label={t("nutrition.logEdit.note", "备注")}>
+                <Field label={t("nutrition.logEdit.note")}>
                   <Textarea
                     value={form.note}
                     onChange={(event) => updateForm({ note: event.target.value })}
@@ -445,16 +441,16 @@ export function NutritionMealLogEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.logEdit.delete", "删除")}
+                {t("nutrition.logEdit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -480,7 +476,7 @@ function LogEntryRow({
 
   return (
     <div className="border-foreground/10 bg-background/70 grid gap-3 rounded-xl border p-3 lg:grid-cols-[130px_minmax(0,1fr)_auto]">
-      <Field label={t("nutrition.logEdit.entryType", "类型")}>
+      <Field label={t("nutrition.logEdit.entryType")}>
         <Select
           value={entry.type}
           onValueChange={(type) =>
@@ -507,7 +503,7 @@ function LogEntryRow({
 
       {entry.type === "recipe" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px]">
-          <Field label={t("nutrition.logEdit.recipe", "食谱")}>
+          <Field label={t("nutrition.logEdit.recipe")}>
             <Select
               value={entry.recipeId || NONE_VALUE}
               onValueChange={(recipeId) => onChange({ recipeId: normalizeSelectValue(recipeId) })}
@@ -516,13 +512,11 @@ function LogEntryRow({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE_VALUE}>
-                  {t("nutrition.logEdit.selectRecipe", "选择食谱")}
-                </SelectItem>
+                <SelectItem value={NONE_VALUE}>{t("nutrition.logEdit.selectRecipe")}</SelectItem>
                 {entry.recipeId &&
                 !nutrition.recipes.some((recipe) => recipe.id === entry.recipeId) ? (
                   <SelectItem value={entry.recipeId}>
-                    {t("nutrition.logEdit.missingRecipe", "已关联的食谱不存在")}
+                    {t("nutrition.logEdit.missingRecipe")}
                   </SelectItem>
                 ) : null}
                 {nutrition.recipes.map((recipe) => (
@@ -534,7 +528,7 @@ function LogEntryRow({
             </Select>
           </Field>
           <NumberField
-            label={t("nutrition.logEdit.servings", "份数")}
+            label={t("nutrition.logEdit.servings")}
             value={entry.servings}
             onChange={(servings) => onChange({ servings })}
           />
@@ -543,7 +537,7 @@ function LogEntryRow({
 
       {entry.type === "food" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_100px]">
-          <Field label={t("nutrition.logEdit.food", "食品")}>
+          <Field label={t("nutrition.logEdit.food")}>
             <Select
               value={entry.foodId || NONE_VALUE}
               onValueChange={(foodId) => onChange({ foodId: normalizeSelectValue(foodId) })}
@@ -552,13 +546,9 @@ function LogEntryRow({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={NONE_VALUE}>
-                  {t("nutrition.logEdit.selectFood", "选择食品")}
-                </SelectItem>
+                <SelectItem value={NONE_VALUE}>{t("nutrition.logEdit.selectFood")}</SelectItem>
                 {entry.foodId && !nutrition.foods.some((food) => food.id === entry.foodId) ? (
-                  <SelectItem value={entry.foodId}>
-                    {t("nutrition.logEdit.missingFood", "已关联的食品不存在")}
-                  </SelectItem>
+                  <SelectItem value={entry.foodId}>{t("nutrition.logEdit.missingFood")}</SelectItem>
                 ) : null}
                 {nutrition.foods.map((food) => (
                   <SelectItem key={food.id} value={food.id}>
@@ -569,11 +559,11 @@ function LogEntryRow({
             </Select>
           </Field>
           <NumberField
-            label={t("nutrition.logEdit.amount", "用量")}
+            label={t("nutrition.logEdit.amount")}
             value={entry.amount}
             onChange={(amount) => onChange({ amount })}
           />
-          <Field label={t("nutrition.logEdit.unit", "单位")}>
+          <Field label={t("nutrition.logEdit.unit")}>
             <Select
               value={entry.unit}
               onValueChange={(unit) => onChange({ unit: normalizeSelectValue(unit) })}
@@ -595,15 +585,15 @@ function LogEntryRow({
 
       {entry.type === "text" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <Field label={t("nutrition.logEdit.textTitle", "文本条目")}>
+          <Field label={t("nutrition.logEdit.textTitle")}>
             <Input
               value={entry.title}
               onChange={(event) => onChange({ title: event.target.value })}
               className={NUTRITION_DIALOG_FIELD_CLASS}
-              placeholder={t("nutrition.logEdit.textTitlePlaceholder", "例如：一份外卖套餐")}
+              placeholder={t("nutrition.logEdit.textTitlePlaceholder")}
             />
           </Field>
-          <Field label={t("nutrition.logEdit.entryNote", "备注")}>
+          <Field label={t("nutrition.logEdit.entryNote")}>
             <Input
               value={entry.note}
               onChange={(event) => onChange({ note: event.target.value })}
@@ -620,7 +610,7 @@ function LogEntryRow({
           size="icon-sm"
           onClick={onRemove}
           disabled={removeDisabled}
-          tooltip={t("nutrition.mealLogEdit.delete", "删除")}
+          tooltip={t("nutrition.mealLogEdit.delete")}
         >
           <Trash2 className="size-4" />
         </Button>
@@ -654,7 +644,7 @@ function OptionalEnumField({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional", "可选")}</SelectItem>
+          <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional")}</SelectItem>
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {translateNutritionEnum(t, group, option)}

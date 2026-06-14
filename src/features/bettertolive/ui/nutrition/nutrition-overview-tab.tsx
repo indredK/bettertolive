@@ -79,16 +79,16 @@ export function NutritionOverviewTab({
 
   const nutrientBars = totals
     ? [
-        { name: t("nutrition.nutrients.energyKcal", "能量"), value: totals.energyKcal },
-        { name: t("nutrition.nutrients.proteinG", "蛋白质"), value: totals.proteinG * 8 },
-        { name: t("nutrition.nutrients.fiberG", "膳食纤维"), value: totals.fiberG * 18 },
-        { name: t("nutrition.nutrients.sugarG", "糖"), value: totals.sugarG * 8 },
+        { name: t("nutrition.nutrients.energyKcal"), value: totals.energyKcal },
+        { name: t("nutrition.nutrients.proteinG"), value: totals.proteinG * 8 },
+        { name: t("nutrition.nutrients.fiberG"), value: totals.fiberG * 18 },
+        { name: t("nutrition.nutrients.sugarG"), value: totals.sugarG * 8 },
       ]
     : []
 
   const pulseData = [
     {
-      name: t("nutrition.overview.planCompletion", "计划度"),
+      name: t("nutrition.overview.planCompletion"),
       value: completionRatio,
       fill: "var(--color-chart-1)",
     },
@@ -105,12 +105,12 @@ export function NutritionOverviewTab({
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline" className={NUTRITION_CONTROL_BADGE_CLASS}>
-                      {t("nutrition.overview.eyebrow", "今日饮食总览")}
+                      {t("nutrition.overview.eyebrow")}
                     </Badge>
                   </div>
                   <div className="max-w-2xl space-y-2">
                     <h2 className="text-[1.45rem] font-semibold tracking-tight sm:text-[1.7rem]">
-                      {t("nutrition.overview.heroTitle", "今天不是要完美，而是要能被照顾到")}
+                      {t("nutrition.overview.heroTitle")}
                     </h2>
                     <p className="text-muted-foreground line-clamp-3 max-w-xl text-sm leading-6">
                       {t(
@@ -124,13 +124,13 @@ export function NutritionOverviewTab({
                 <div className="grid w-full shrink-0 grid-cols-2 gap-2 sm:grid-cols-4 xl:w-auto xl:grid-cols-2">
                   <NutritionMetricCard
                     icon={CalendarDays}
-                    label={t("nutrition.overview.todaySlots", "今日餐次")}
+                    label={t("nutrition.overview.todaySlots")}
                     value={plan?.slots.length ?? 0}
-                    detail={t("nutrition.overview.todaySlotsHint", "含早餐、午餐、晚餐和饮品")}
+                    detail={t("nutrition.overview.todaySlotsHint")}
                   />
                   <NutritionMetricCard
                     icon={ListChecks}
-                    label={t("nutrition.overview.arrangedSlots", "已安排")}
+                    label={t("nutrition.overview.arrangedSlots")}
                     value={`${plannedSlotCount}/${plan?.slots.length ?? 0}`}
                     detail={t(
                       "nutrition.overview.arrangedSlotsHint",
@@ -139,15 +139,15 @@ export function NutritionOverviewTab({
                   />
                   <NutritionMetricCard
                     icon={Leaf}
-                    label={t("nutrition.overview.foods", "食品")}
+                    label={t("nutrition.overview.foods")}
                     value={nutrition.foods.length}
-                    detail={t("nutrition.overview.foodsHint", "食品库是营养与食谱的底层")}
+                    detail={t("nutrition.overview.foodsHint")}
                   />
                   <NutritionMetricCard
                     icon={CookingPot}
-                    label={t("nutrition.overview.recipes", "食谱")}
+                    label={t("nutrition.overview.recipes")}
                     value={nutrition.recipes.length}
-                    detail={t("nutrition.overview.recipesHint", "只放真的会做或想复刻的")}
+                    detail={t("nutrition.overview.recipesHint")}
                   />
                 </div>
               </div>
@@ -156,8 +156,8 @@ export function NutritionOverviewTab({
             <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(300px,1fr)_minmax(360px,1fr)] gap-3 p-3 xl:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] xl:grid-rows-1">
               <OverviewPanel
                 icon={CalendarDays}
-                title={t("nutrition.overview.todayPlate", "今日餐盘")}
-                subtitle={t("nutrition.overview.todayPlateDesc", "把计划按餐次排成能执行的一天。")}
+                title={t("nutrition.overview.todayPlate")}
+                subtitle={t("nutrition.overview.todayPlateDesc")}
               >
                 <div className="grid h-full min-h-0 grid-cols-1 gap-3 overflow-y-auto pr-1">
                   {plan?.slots.map((slot) => (
@@ -187,14 +187,14 @@ export function NutritionOverviewTab({
                                 entry,
                                 foodById: lookups.foodById,
                                 recipeById: lookups.recipeById,
-                                servingLabel: t("nutrition.units.serving", "份"),
+                                servingLabel: t("nutrition.units.serving"),
                                 unitLabel: (unit) => translateNutritionEnum(t, "unit", unit),
                               })}
                             </div>
                           ))
                         ) : (
                           <div className="text-muted-foreground text-sm">
-                            {t("nutrition.overview.emptySlot", "还没安排，允许留白")}
+                            {t("nutrition.overview.emptySlot")}
                           </div>
                         )}
                       </div>
@@ -208,7 +208,7 @@ export function NutritionOverviewTab({
 
               <OverviewPanel
                 icon={Droplets}
-                title={t("nutrition.overview.nutritionPulse", "营养脉冲")}
+                title={t("nutrition.overview.nutritionPulse")}
                 subtitle={t(
                   "nutrition.overview.nutritionPulseDesc",
                   "轻量估算，不把缺失数据算成 0。",
@@ -289,16 +289,14 @@ export function NutritionOverviewTab({
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="size-4" />
-                  <h3 className="text-sm font-semibold">
-                    {t("nutrition.overview.profile", "饮食意图")}
-                  </h3>
+                  <h3 className="text-sm font-semibold">{t("nutrition.overview.profile")}</h3>
                 </div>
                 <AnimatedIconButton
                   show={isControlMode}
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  label={t("nutrition.profileEdit.title", "编辑饮食档案")}
+                  label={t("nutrition.profileEdit.title")}
                   icon={<Pencil className="size-3.5" />}
                   onClick={() => setIsEditingProfile(true)}
                 />
@@ -319,9 +317,7 @@ export function NutritionOverviewTab({
                     {currentIntent.window ? (
                       <span className="text-muted-foreground text-xs">
                         {t("nutrition.overview.intentWindow", "{{start}} 至 {{end}}", {
-                          end:
-                            currentIntent.window.end ??
-                            t("nutrition.overview.intentOpenEnded", "持续中"),
+                          end: currentIntent.window.end ?? t("nutrition.overview.intentOpenEnded"),
                           start: currentIntent.window.start,
                         })}
                       </span>
@@ -335,8 +331,8 @@ export function NutritionOverviewTab({
                 </div>
 
                 <ProfileChipGroup
-                  emptyLabel={t("nutrition.overview.noConstraints", "暂无硬约束")}
-                  label={t("nutrition.overview.hardConstraints", "硬约束")}
+                  emptyLabel={t("nutrition.overview.noConstraints")}
+                  label={t("nutrition.overview.hardConstraints")}
                   values={nutrition.profile.hardConstraints.map((constraint) => ({
                     id: constraint.id,
                     name: constraint.label,
@@ -344,8 +340,8 @@ export function NutritionOverviewTab({
                   }))}
                 />
                 <ProfileChipGroup
-                  emptyLabel={t("nutrition.overview.noStances", "暂无软立场")}
-                  label={t("nutrition.overview.softStances", "软立场")}
+                  emptyLabel={t("nutrition.overview.noStances")}
+                  label={t("nutrition.overview.softStances")}
                   values={nutrition.profile.softStances.map((stance) => ({
                     id: stance.id,
                     name: stance.label,
@@ -360,9 +356,7 @@ export function NutritionOverviewTab({
             <CardContent className="flex h-full min-h-0 flex-col p-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="size-4" />
-                <h3 className="text-sm font-semibold">
-                  {t("nutrition.overview.actions", "可执行建议")}
-                </h3>
+                <h3 className="text-sm font-semibold">{t("nutrition.overview.actions")}</h3>
               </div>
               <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {recipesReady.map((recipe) => (
@@ -393,9 +387,7 @@ export function NutritionOverviewTab({
 
           <Card className={cn(NUTRITION_DETAIL_CARD_CLASS, "overflow-hidden")}>
             <CardContent className="flex h-full min-h-0 flex-col p-4">
-              <h3 className="text-sm font-semibold">
-                {t("nutrition.overview.review", "近期校准")}
-              </h3>
+              <h3 className="text-sm font-semibold">{t("nutrition.overview.review")}</h3>
               <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {nutrition.weeklyReview.highlights.slice(0, 3).map((highlight) => (
                   <div

@@ -62,17 +62,13 @@ export function LegacyPage({
         <ActionGroup>
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-              <TabsTrigger value="overview">{t("legacy.tabs.overview", "总览")}</TabsTrigger>
-              <TabsTrigger value="items">{t("legacy.tabs.items", "条目库")}</TabsTrigger>
-              <TabsTrigger value="deliveryMap">
-                {t("legacy.tabs.deliveryMap", "交付地图")}
-              </TabsTrigger>
+              <TabsTrigger value="overview">{t("legacy.tabs.overview")}</TabsTrigger>
+              <TabsTrigger value="items">{t("legacy.tabs.items")}</TabsTrigger>
+              <TabsTrigger value="deliveryMap">{t("legacy.tabs.deliveryMap")}</TabsTrigger>
               <TabsTrigger value="relationshipExpression">
-                {t("legacy.tabs.relationshipExpression", "关系表达")}
+                {t("legacy.tabs.relationshipExpression")}
               </TabsTrigger>
-              <TabsTrigger value="trustBoundaries">
-                {t("legacy.tabs.trustBoundaries", "边界与信任")}
-              </TabsTrigger>
+              <TabsTrigger value="trustBoundaries">{t("legacy.tabs.trustBoundaries")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -82,7 +78,7 @@ export function LegacyPage({
             onClick={() => handleEditItem(null)}
           >
             <Plus className="size-4" />
-            {t("legacy.actions.add", "新增")}
+            {t("legacy.actions.add")}
           </AnimatedButton>
         </ActionGroup>
 
@@ -134,7 +130,7 @@ export function LegacyPage({
           onSaved={() => {
             setEditingItem(null)
             refresh()
-            toast.success(t("legacy.toast.saved", "已保存"))
+            toast.success(t("legacy.toast.saved"))
           }}
           onDeleted={() => {
             setEditingItem(null)

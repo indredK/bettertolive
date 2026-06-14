@@ -151,7 +151,7 @@ export function ShoppingStageEditDialog({
   const handleSubmit = async () => {
     const values = form.getValues()
     if (!canSubmit) {
-      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      toast.error(t("shopping.error.nameRequired"))
       return
     }
 
@@ -214,8 +214,8 @@ export function ShoppingStageEditDialog({
         name: seed.name,
         defaultValue: `已删除阶段：${seed.name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedStage", "删除阶段失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedStage"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneStage", {
         name: seed.name,
         defaultValue: `已撤销删除：${seed.name}`,
@@ -251,9 +251,7 @@ export function ShoppingStageEditDialog({
       >
         <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("shopping.stage.create", "新增阶段")
-              : t("shopping.stage.edit", "编辑阶段")}
+            {editing.isNew ? t("shopping.stage.create") : t("shopping.stage.edit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -268,13 +266,11 @@ export function ShoppingStageEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0">
-                <div className="text-sm font-medium">
-                  {t("shopping.stage.basicInfo", "基本属性")}
-                </div>
+                <div className="text-sm font-medium">{t("shopping.stage.basicInfo")}</div>
               </div>
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.name", "名称")} *</Label>
+                  <Label>{t("shopping.stage.name")} *</Label>
                   <Input
                     autoFocus
                     value={stageName}
@@ -285,7 +281,7 @@ export function ShoppingStageEditDialog({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.description", "描述")}</Label>
+                  <Label>{t("shopping.stage.description")}</Label>
                   <Textarea
                     value={stageDescription}
                     onChange={(event) =>
@@ -296,7 +292,7 @@ export function ShoppingStageEditDialog({
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.stage.focus", "重点")}</Label>
+                  <Label>{t("shopping.stage.focus")}</Label>
                   <Textarea
                     value={stageFocus}
                     onChange={(event) =>
@@ -313,7 +309,7 @@ export function ShoppingStageEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="flex shrink-0 items-center justify-between gap-3">
-                <div className="text-sm font-medium">{t("shopping.stage.items", "阶段物品")}</div>
+                <div className="text-sm font-medium">{t("shopping.stage.items")}</div>
               </div>
 
               <ShoppingItemShuttle
@@ -328,7 +324,7 @@ export function ShoppingStageEditDialog({
               <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                 {draft.items.length === 0 ? (
                   <EmptyStageHint
-                    title={t("shopping.stage.emptyDimensions", "先添加物品")}
+                    title={t("shopping.stage.emptyDimensions")}
                     description={t(
                       "shopping.stage.emptyShuttleHint",
                       "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
@@ -364,14 +360,14 @@ export function ShoppingStageEditDialog({
               disabled={isPending}
               className="mr-auto"
             >
-              {t("shopping.delete", "删除")}
+              {t("shopping.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel", "取消")}
+            {t("shopping.cancel")}
           </Button>
           <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+            {isPending ? t("shopping.saving") : t("shopping.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -412,7 +408,7 @@ function StageItemEditorCard({
             </div>
           ) : (
             <div className="text-muted-foreground mt-1 text-xs">
-              {t("shopping.stage.noChildren", "该物品暂无子级")}
+              {t("shopping.stage.noChildren")}
             </div>
           )}
         </div>
@@ -421,7 +417,7 @@ function StageItemEditorCard({
           type="button"
           variant="ghost"
           size="icon-sm"
-          label={t("shopping.stages.removeItem", "移除物品")}
+          label={t("shopping.stages.removeItem")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onRemoveItem}
         />
@@ -430,9 +426,9 @@ function StageItemEditorCard({
       <div className="grid gap-3">
         {(
           [
-            ["low", t("shopping.stages.tier.low", "最低")],
-            ["base", t("shopping.stages.tier.base", "基础")],
-            ["up", t("shopping.stages.tier.up", "升级")],
+            ["low", t("shopping.stages.tier.low")],
+            ["base", t("shopping.stages.tier.base")],
+            ["up", t("shopping.stages.tier.up")],
           ] as Array<[Tier, string]>
         ).map(([tier, label]) => (
           <div key={tier} className="space-y-1.5">
@@ -443,11 +439,11 @@ function StageItemEditorCard({
               onChange={(value) => onUpdateTier(item.id, tier, value)}
               placeholder={
                 item.children.length > 0
-                  ? t("shopping.stage.selectTierChildren", "选择子级")
-                  : t("shopping.stage.noChildren", "该物品暂无子级")
+                  ? t("shopping.stage.selectTierChildren")
+                  : t("shopping.stage.noChildren")
               }
-              searchPlaceholder={t("shopping.search", "搜索...")}
-              emptyMessage={t("shopping.stage.noMatchingChildren", "没有匹配的子级")}
+              searchPlaceholder={t("shopping.search")}
+              emptyMessage={t("shopping.stage.noMatchingChildren")}
               disabled={childOptions.length === 0}
             />
           </div>

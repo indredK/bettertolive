@@ -97,11 +97,11 @@ export function EmotionPage({
       >
         <div className="flex shrink-0 flex-wrap items-center justify-between gap-2">
           <TabsList className="hide-scrollbar max-w-full justify-start overflow-x-auto">
-            <TabsTrigger value="overview">{t("emotion.tabs.overview", "情绪总览")}</TabsTrigger>
-            <TabsTrigger value="today">{t("emotion.tabs.today", "今日记录")}</TabsTrigger>
-            <TabsTrigger value="timeline">{t("emotion.tabs.timeline", "波动时间线")}</TabsTrigger>
-            <TabsTrigger value="triggers">{t("emotion.tabs.triggers", "触发关联")}</TabsTrigger>
-            <TabsTrigger value="toolbox">{t("emotion.tabs.toolbox", "恢复工具箱")}</TabsTrigger>
+            <TabsTrigger value="overview">{t("emotion.tabs.overview")}</TabsTrigger>
+            <TabsTrigger value="today">{t("emotion.tabs.today")}</TabsTrigger>
+            <TabsTrigger value="timeline">{t("emotion.tabs.timeline")}</TabsTrigger>
+            <TabsTrigger value="triggers">{t("emotion.tabs.triggers")}</TabsTrigger>
+            <TabsTrigger value="toolbox">{t("emotion.tabs.toolbox")}</TabsTrigger>
           </TabsList>
         </div>
 
@@ -264,11 +264,11 @@ function OverviewTab({
       <Surface className="flex min-h-[520px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={Sun}
-          title={t("emotion.overview.title", "情绪总览")}
+          title={t("emotion.overview.title")}
           description={emotionModule.overview.windowLabel}
           isControlMode={isControlMode}
           onEdit={onEditOverview}
-          editLabel={t("emotion.editor.overview.title", "编辑情绪总览")}
+          editLabel={t("emotion.editor.overview.title")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           <OverviewSnapshot emotionModule={emotionModule} />
@@ -278,11 +278,11 @@ function OverviewTab({
       <Surface className="flex min-h-[520px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={HeartPulse}
-          title={t("emotion.today.title", "今天的情绪记录")}
-          description={t("emotion.today.description", "此刻的强度、身体感觉和想做的反应。")}
+          title={t("emotion.today.title")}
+          description={t("emotion.today.description")}
           isControlMode={isControlMode}
           onAdd={onAddCheckIn}
-          addLabel={t("emotion.actions.addCheckIn", "新增记录")}
+          addLabel={t("emotion.actions.addCheckIn")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           {emotionModule.checkIns.length > 0 ? (
@@ -297,7 +297,7 @@ function OverviewTab({
                 />
               ))
           ) : (
-            <EmptyState message={t("emotion.empty.checkIns", "还没有情绪记录。")} compact />
+            <EmptyState message={t("emotion.empty.checkIns")} compact />
           )}
         </div>
       </Surface>
@@ -325,11 +325,11 @@ function TodayTab({
       <Surface className="flex min-h-[620px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={HeartPulse}
-          title={t("emotion.today.title", "今天的情绪记录")}
-          description={t("emotion.today.longDescription", "把模糊情绪落成可回看的样本。")}
+          title={t("emotion.today.title")}
+          description={t("emotion.today.longDescription")}
           isControlMode={isControlMode}
           onAdd={onAddCheckIn}
-          addLabel={t("emotion.actions.addCheckIn", "新增记录")}
+          addLabel={t("emotion.actions.addCheckIn")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           {latestCheckIn ? (
@@ -339,12 +339,12 @@ function TodayTab({
               onEdit={isControlMode ? () => onEditCheckIn(latestCheckIn) : undefined}
             />
           ) : (
-            <EmptyState message={t("emotion.empty.today", "今天还没有记录。")} compact />
+            <EmptyState message={t("emotion.empty.today")} compact />
           )}
           {previousCheckIns.length > 0 ? (
             <div className="space-y-3 border-t border-[color:var(--muted-surface-border)] pt-4">
               <div className="text-xs tracking-wide text-[color:var(--text-muted)] uppercase">
-                {t("emotion.today.recent", "最近几条")}
+                {t("emotion.today.recent")}
               </div>
               {previousCheckIns.map((checkIn) => (
                 <CheckInDetailedCard
@@ -362,7 +362,7 @@ function TodayTab({
       <Surface className="flex min-h-[620px] flex-col overflow-hidden p-5">
         <SectionHeading
           icon={Sparkles}
-          title={t("emotion.today.promptTitle", "记录入口")}
+          title={t("emotion.today.promptTitle")}
           description={t(
             "emotion.today.promptDescription",
             "强度、标签、触发和需要会一起进入后续模式观察。",
@@ -370,16 +370,16 @@ function TodayTab({
         />
         <div className="mt-5 space-y-3 text-sm leading-6 text-[color:var(--text-secondary)]">
           <InfoBlock
-            title={t("emotion.today.prompt.feeling", "先命名感受")}
-            body={t("emotion.today.prompt.feelingBody", "不用准确，先选最接近的词。")}
+            title={t("emotion.today.prompt.feeling")}
+            body={t("emotion.today.prompt.feelingBody")}
           />
           <InfoBlock
-            title={t("emotion.today.prompt.body", "再看身体")}
-            body={t("emotion.today.prompt.bodyBody", "肩颈、胸口、胃口、困意常常比语言更早知道。")}
+            title={t("emotion.today.prompt.body")}
+            body={t("emotion.today.prompt.bodyBody")}
           />
           <InfoBlock
-            title={t("emotion.today.prompt.need", "最后确认需要")}
-            body={t("emotion.today.prompt.needBody", "不是立刻解决，而是先知道此刻怎样会更安全。")}
+            title={t("emotion.today.prompt.need")}
+            body={t("emotion.today.prompt.needBody")}
           />
         </div>
       </Surface>
@@ -413,11 +413,11 @@ function TimelineTab({
       <Surface className="flex min-h-[640px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={WavesLadder}
-          title={t("emotion.timeline.title", "波动时间线")}
-          description={t("emotion.timeline.description", "按时间看波峰、波谷和恢复区段。")}
+          title={t("emotion.timeline.title")}
+          description={t("emotion.timeline.description")}
           isControlMode={isControlMode}
           onAdd={onAddTrendPoint}
-          addLabel={t("emotion.actions.addTrendPoint", "新增趋势点")}
+          addLabel={t("emotion.actions.addTrendPoint")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
           <TrendChart
@@ -425,10 +425,10 @@ function TimelineTab({
             onEditPoint={isControlMode ? onEditTrendPoint : undefined}
           />
           <PanelListHeader
-            title={t("emotion.timeline.segments", "时间段总结")}
+            title={t("emotion.timeline.segments")}
             isControlMode={isControlMode}
             onAdd={onAddSegment}
-            addLabel={t("emotion.actions.addSegment", "新增时间段")}
+            addLabel={t("emotion.actions.addSegment")}
           />
           {emotionModule.timelineSegments.length > 0 ? (
             <div className="grid gap-3 min-[900px]:grid-cols-2">
@@ -441,7 +441,7 @@ function TimelineTab({
               ))}
             </div>
           ) : (
-            <EmptyState message={t("emotion.empty.timelineSegments", "还没有可总结的时间段。")} />
+            <EmptyState message={t("emotion.empty.timelineSegments")} />
           )}
         </div>
       </Surface>
@@ -449,11 +449,11 @@ function TimelineTab({
       <Surface className="flex min-h-[640px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={Activity}
-          title={t("emotion.timeline.loopTitle", "反复出现的循环")}
-          description={t("emotion.timeline.loopDescription", "看见不是随机出现的节律。")}
+          title={t("emotion.timeline.loopTitle")}
+          description={t("emotion.timeline.loopDescription")}
           isControlMode={isControlMode}
           onAdd={onAddLoop}
-          addLabel={t("emotion.actions.addLoop", "新增循环")}
+          addLabel={t("emotion.actions.addLoop")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           {emotionModule.loopPatterns.length > 0 ? (
@@ -465,7 +465,7 @@ function TimelineTab({
               />
             ))
           ) : (
-            <EmptyState message={t("emotion.empty.loopPatterns", "还没有识别到循环模式。")} />
+            <EmptyState message={t("emotion.empty.loopPatterns")} />
           )}
         </div>
       </Surface>
@@ -503,11 +503,11 @@ function TriggersTab({
       <Surface className="flex min-h-0 flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={Activity}
-          title={t("emotion.triggers.title", "触发因素")}
-          description={t("emotion.triggers.description", "把情绪和真实生活事件连起来。")}
+          title={t("emotion.triggers.title")}
+          description={t("emotion.triggers.description")}
           isControlMode={isControlMode}
           onAdd={onAddTrigger}
-          addLabel={t("emotion.actions.addTrigger", "新增触发")}
+          addLabel={t("emotion.actions.addTrigger")}
         />
         <div className="mt-5 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 lg:grid-cols-2">
           {emotionModule.triggers.length > 0 ? (
@@ -519,7 +519,7 @@ function TriggersTab({
               />
             ))
           ) : (
-            <EmptyState message={t("emotion.empty.triggers", "当前筛选下没有触发因素。")} />
+            <EmptyState message={t("emotion.empty.triggers")} />
           )}
         </div>
       </Surface>
@@ -528,11 +528,11 @@ function TriggersTab({
         <Surface className="flex min-h-[360px] flex-col overflow-hidden p-5">
           <CardHeaderActions
             icon={Battery}
-            title={t("emotion.triggers.lifestyle", "生活节律关联")}
-            description={t("emotion.triggers.lifestyleDesc", "睡眠、饮食、运动和屏幕时长。")}
+            title={t("emotion.triggers.lifestyle")}
+            description={t("emotion.triggers.lifestyleDesc")}
             isControlMode={isControlMode}
             onAdd={onAddLifestyleLink}
-            addLabel={t("emotion.actions.addLifestyleLink", "新增关联")}
+            addLabel={t("emotion.actions.addLifestyleLink")}
           />
           <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {emotionModule.lifestyleLinks.length > 0 ? (
@@ -544,10 +544,7 @@ function TriggersTab({
                 />
               ))
             ) : (
-              <EmptyState
-                message={t("emotion.empty.lifestyleLinks", "还没有生活节律关联。")}
-                compact
-              />
+              <EmptyState message={t("emotion.empty.lifestyleLinks")} compact />
             )}
           </div>
         </Surface>
@@ -555,11 +552,11 @@ function TriggersTab({
         <Surface className="flex min-h-[360px] flex-col overflow-hidden p-5">
           <CardHeaderActions
             icon={AlertTriangle}
-            title={t("emotion.triggers.environment", "环境提示")}
-            description={t("emotion.triggers.environmentDesc", "容易让状态变坏的场景。")}
+            title={t("emotion.triggers.environment")}
+            description={t("emotion.triggers.environmentDesc")}
             isControlMode={isControlMode}
             onAdd={onAddEnvironmentCue}
-            addLabel={t("emotion.actions.addEnvironmentCue", "新增环境")}
+            addLabel={t("emotion.actions.addEnvironmentCue")}
           />
           <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {emotionModule.environmentCues.length > 0 ? (
@@ -571,10 +568,7 @@ function TriggersTab({
                 />
               ))
             ) : (
-              <EmptyState
-                message={t("emotion.empty.environmentCues", "还没有环境提示。")}
-                compact
-              />
+              <EmptyState message={t("emotion.empty.environmentCues")} compact />
             )}
           </div>
         </Surface>
@@ -582,11 +576,11 @@ function TriggersTab({
         <Surface className="flex min-h-[360px] flex-col overflow-hidden p-5">
           <CardHeaderActions
             icon={HeartPulse}
-            title={t("emotion.triggers.relationships", "关系提示")}
-            description={t("emotion.triggers.relationshipsDesc", "哪些关系更容易带来波动。")}
+            title={t("emotion.triggers.relationships")}
+            description={t("emotion.triggers.relationshipsDesc")}
             isControlMode={isControlMode}
             onAdd={onAddRelationshipCue}
-            addLabel={t("emotion.actions.addRelationshipCue", "新增关系")}
+            addLabel={t("emotion.actions.addRelationshipCue")}
           />
           <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {emotionModule.relationshipCues.length > 0 ? (
@@ -598,10 +592,7 @@ function TriggersTab({
                 />
               ))
             ) : (
-              <EmptyState
-                message={t("emotion.empty.relationshipCues", "还没有关系提示。")}
-                compact
-              />
+              <EmptyState message={t("emotion.empty.relationshipCues")} compact />
             )}
           </div>
         </Surface>
@@ -634,11 +625,11 @@ function ToolboxTab({
       <Surface className="flex min-h-[640px] flex-col overflow-hidden p-5">
         <CardHeaderActions
           icon={ShieldAlert}
-          title={t("emotion.toolbox.title", "安抚与恢复工具箱")}
-          description={t("emotion.toolbox.description", "状态差的时候，先有效，再分析。")}
+          title={t("emotion.toolbox.title")}
+          description={t("emotion.toolbox.description")}
           isControlMode={isControlMode}
           onAdd={onAddTool}
-          addLabel={t("emotion.actions.addTool", "新增工具")}
+          addLabel={t("emotion.actions.addTool")}
         />
         <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           <MinimalStepsCard
@@ -654,7 +645,7 @@ function ToolboxTab({
               />
             ))
           ) : (
-            <EmptyState message={t("emotion.empty.tools", "当前筛选下没有恢复工具。")} />
+            <EmptyState message={t("emotion.empty.tools")} />
           )}
         </div>
       </Surface>
@@ -663,11 +654,11 @@ function ToolboxTab({
         <Surface className="flex min-h-[260px] flex-col overflow-hidden p-5">
           <CardHeaderActions
             icon={AlertTriangle}
-            title={t("emotion.toolbox.ineffective", "反而会更糟的动作")}
-            description={t("emotion.toolbox.ineffectiveDesc", "状态差时先避开这些路径。")}
+            title={t("emotion.toolbox.ineffective")}
+            description={t("emotion.toolbox.ineffectiveDesc")}
             isControlMode={isControlMode}
             onEdit={isControlMode ? () => onEditTextList("ineffectiveActions") : undefined}
-            editLabel={t("emotion.actions.editIneffectiveActions", "编辑提醒")}
+            editLabel={t("emotion.actions.editIneffectiveActions")}
           />
           <div className="mt-5 min-h-0 flex-1 overflow-y-auto pr-1">
             <IneffectiveActionsCard actions={emotionModule.ineffectiveActions} />
@@ -677,11 +668,11 @@ function ToolboxTab({
         <Surface className="flex min-h-[360px] flex-col overflow-hidden p-5">
           <CardHeaderActions
             icon={Sparkles}
-            title={t("emotion.toolbox.recoveryNotes", "曾经把我接住的方式")}
-            description={t("emotion.toolbox.recoveryNotesDesc", "过去有效的经验可以再次被调用。")}
+            title={t("emotion.toolbox.recoveryNotes")}
+            description={t("emotion.toolbox.recoveryNotesDesc")}
             isControlMode={isControlMode}
             onAdd={onAddRecoveryNote}
-            addLabel={t("emotion.actions.addRecoveryNote", "新增经验")}
+            addLabel={t("emotion.actions.addRecoveryNote")}
           />
           <div className="mt-5 min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
             {emotionModule.recoveryNotes.length > 0 ? (
@@ -693,7 +684,7 @@ function ToolboxTab({
                 />
               ))
             ) : (
-              <EmptyState message={t("emotion.empty.recoveryNotes", "还没有恢复经验。")} compact />
+              <EmptyState message={t("emotion.empty.recoveryNotes")} compact />
             )}
           </div>
         </Surface>
@@ -735,7 +726,7 @@ function CardHeaderActions({
           onClick={onEdit}
         >
           <Pencil className="size-3.5" />
-          {editLabel ?? t("emotion.actions.edit", "编辑")}
+          {editLabel ?? t("emotion.actions.edit")}
         </AnimatedButton>
         <AnimatedButton
           show={isControlMode && Boolean(onAdd)}
@@ -745,7 +736,7 @@ function CardHeaderActions({
           onClick={onAdd}
         >
           <Plus className="size-3.5" />
-          {addLabel ?? t("emotion.actions.add", "新增")}
+          {addLabel ?? t("emotion.actions.add")}
         </AnimatedButton>
       </ActionGroup>
     </div>
@@ -809,29 +800,29 @@ function OverviewSnapshot({ emotionModule }: { emotionModule: EmotionModuleData 
       <div className="grid gap-2 min-[640px]:grid-cols-2">
         <SummaryTile
           icon={Battery}
-          label={t("emotion.overview.averageScore", "平均强度")}
+          label={t("emotion.overview.averageScore")}
           value={`${overview.averageScore.toFixed(1)} / 10`}
         />
         <SummaryTile
           icon={Sparkles}
-          label={t("emotion.overview.bestWindow", "最好的时段")}
+          label={t("emotion.overview.bestWindow")}
           value={overview.bestWindow}
         />
         <SummaryTile
           icon={AlertTriangle}
-          label={t("emotion.overview.worstWindow", "最差的时段")}
+          label={t("emotion.overview.worstWindow")}
           value={overview.worstWindow}
         />
         <SummaryTile
           icon={Activity}
-          label={t("emotion.overview.window", "窗口")}
+          label={t("emotion.overview.window")}
           value={overview.windowLabel}
         />
       </div>
 
       <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3">
         <div className="text-xs font-medium text-[color:var(--text-primary)]">
-          {t("emotion.overview.topTags", "高频情绪标签")}
+          {t("emotion.overview.topTags")}
         </div>
         <div className="mt-3 space-y-2">
           {overview.topEmotionTags.map((tag) => {
@@ -857,7 +848,7 @@ function OverviewSnapshot({ emotionModule }: { emotionModule: EmotionModuleData 
       </div>
 
       <div className="rounded-lg border border-[color:var(--emotion-accent-border)] bg-[color:var(--emotion-accent-bg)] px-4 py-3 text-xs leading-5 text-[color:var(--emotion-accent-ink)]">
-        <span className="font-medium">{t("emotion.overview.conclusion", "一句话总结")}：</span>
+        <span className="font-medium">{t("emotion.overview.conclusion")}：</span>
         {overview.conclusion}
       </div>
     </>
@@ -908,14 +899,14 @@ function CheckInDetailedCard({
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editCheckIn", "编辑情绪记录")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editCheckIn")} onClick={onEdit} />
       <div className="flex flex-wrap items-center gap-2">
         <Badge className="bg-[color:var(--tone-present-bg)] text-[color:var(--tone-present-ink)]">
           {translateEmotionEnum(t, "state", checkIn.state)}
         </Badge>
         <span className="text-xs text-[color:var(--text-muted)]">{checkIn.date}</span>
         <span className="text-xs text-[color:var(--text-muted)]">
-          {t("emotion.common.intensity", "强度")} {checkIn.intensity}
+          {t("emotion.common.intensity")} {checkIn.intensity}
         </span>
       </div>
       <p
@@ -943,34 +934,25 @@ function CheckInDetailedCard({
 
       {!compact ? (
         <div className="mt-3 grid gap-2 min-[640px]:grid-cols-2">
-          <DetailRow
-            label={t("emotion.common.bodySignal", "身体感觉")}
-            value={checkIn.bodySignal}
-          />
+          <DetailRow label={t("emotion.common.bodySignal")} value={checkIn.bodySignal} />
           {checkIn.triggerEvent ? (
-            <DetailRow
-              label={t("emotion.common.triggerEvent", "触发事件")}
-              value={checkIn.triggerEvent}
-            />
+            <DetailRow label={t("emotion.common.triggerEvent")} value={checkIn.triggerEvent} />
           ) : null}
           {checkIn.impulse ? (
             <DetailRow
-              label={t("emotion.common.impulse", "此刻冲动")}
+              label={t("emotion.common.impulse")}
               value={translateEmotionEnum(t, "impulse", checkIn.impulse)}
             />
           ) : null}
           {checkIn.needRightNow ? (
-            <DetailRow
-              label={t("emotion.common.needRightNow", "现在最需要")}
-              value={checkIn.needRightNow}
-            />
+            <DetailRow label={t("emotion.common.needRightNow")} value={checkIn.needRightNow} />
           ) : null}
         </div>
       ) : (
         <p className="mt-2 text-[11px] text-[color:var(--text-muted)]">
-          {t("emotion.common.bodyPrefix", "身体")}：{checkIn.bodySignal}
+          {t("emotion.common.bodyPrefix")}：{checkIn.bodySignal}
           {checkIn.impulse
-            ? ` · ${t("emotion.common.impulsePrefix", "想")}${translateEmotionEnum(t, "impulse", checkIn.impulse)}`
+            ? ` · ${t("emotion.common.impulsePrefix")}${translateEmotionEnum(t, "impulse", checkIn.impulse)}`
             : ""}
         </p>
       )}
@@ -1011,7 +993,7 @@ function TrendChart({
   const { t } = useTranslation()
 
   if (trend.length === 0) {
-    return <EmptyState message={t("emotion.empty.trend", "还没有可绘制的情绪样本。")} compact />
+    return <EmptyState message={t("emotion.empty.trend")} compact />
   }
 
   const points = trend.map((entry, index) => {
@@ -1027,10 +1009,10 @@ function TrendChart({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs text-[color:var(--text-secondary)]">
           <CalendarRange className="size-3.5" />
-          {t("emotion.timeline.chartTitle", "7 天情绪强度")}
+          {t("emotion.timeline.chartTitle")}
         </div>
         <div className="text-[11px] text-[color:var(--text-muted)]">
-          {t("emotion.timeline.chartHint", "0–10 越高越紧绷")}
+          {t("emotion.timeline.chartHint")}
         </div>
       </div>
       <svg
@@ -1108,7 +1090,7 @@ function TimelineSegmentCard({
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editSegment", "编辑时间段")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editSegment")} onClick={onEdit} />
       <div className="flex flex-wrap items-center gap-2">
         <Badge className={trendStyle}>
           {translateEmotionEnum(t, "segmentTrend", segment.trend)}
@@ -1132,7 +1114,7 @@ function LoopPatternCard({ loop, onEdit }: { loop: EmotionLoopPattern; onEdit?: 
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editLoop", "编辑循环")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editLoop")} onClick={onEdit} />
       <div className="text-xs font-medium text-[color:var(--text-primary)]">{loop.title}</div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
         {loop.description}
@@ -1152,7 +1134,7 @@ function TriggerCard({ onEdit, trigger }: { onEdit?: () => void; trigger: Emotio
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editTrigger", "编辑触发")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editTrigger")} onClick={onEdit} />
       <div className="flex flex-wrap items-center gap-2">
         <div className="font-medium text-[color:var(--text-primary)]">{trigger.title}</div>
         {trigger.category ? (
@@ -1178,7 +1160,7 @@ function TriggerCard({ onEdit, trigger }: { onEdit?: () => void; trigger: Emotio
       </div>
       {trigger.recentExamples && trigger.recentExamples.length > 0 ? (
         <p className="mt-2 text-[11px] text-[color:var(--text-muted)]">
-          {t("emotion.common.recent", "最近")}：{trigger.recentExamples.join(" · ")}
+          {t("emotion.common.recent")}：{trigger.recentExamples.join(" · ")}
         </p>
       ) : null}
     </div>
@@ -1201,7 +1183,7 @@ function LifestyleLinkCard({ link, onEdit }: { link: EmotionLifestyleLink; onEdi
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editLifestyleLink", "编辑关联")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editLifestyleLink")} onClick={onEdit} />
       <div className="flex flex-wrap items-center gap-2">
         <Badge
           variant="outline"
@@ -1230,7 +1212,7 @@ function EnvCueCard({ cue, onEdit }: { cue: EmotionEnvironmentCue; onEdit?: () =
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editEnvironmentCue", "编辑环境")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editEnvironmentCue")} onClick={onEdit} />
       <div className="text-xs font-medium text-[color:var(--text-primary)]">{cue.context}</div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{cue.description}</p>
     </div>
@@ -1253,7 +1235,7 @@ function RelationshipCueCard({
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editRelationshipCue", "编辑关系")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editRelationshipCue")} onClick={onEdit} />
       <div className="text-xs font-medium text-[color:var(--text-primary)]">{cue.who}</div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">{cue.pattern}</p>
     </div>
@@ -1278,7 +1260,7 @@ function SupportToolCard({ onEdit, tool }: { onEdit?: () => void; tool: EmotionS
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editTool", "编辑工具")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editTool")} onClick={onEdit} />
       <div className="flex flex-wrap items-center gap-2">
         <div className="text-sm font-medium text-[color:var(--text-primary)]">{tool.title}</div>
         {tool.kind ? (
@@ -1289,7 +1271,7 @@ function SupportToolCard({ onEdit, tool }: { onEdit?: () => void; tool: EmotionS
         {tool.description}
       </p>
       <p className="mt-1.5 text-[11px] text-[color:var(--text-muted)]">
-        {t("emotion.common.when", "适用时机")}：{tool.when}
+        {t("emotion.common.when")}：{tool.when}
       </p>
       {tool.contactScript ? (
         <div className="mt-2 inline-flex items-center gap-1.5 rounded-md border border-[color:var(--chip-border)] bg-[color:var(--chip-bg)] px-2 py-1 text-[11px] text-[color:var(--text-secondary)]">
@@ -1311,10 +1293,10 @@ function MinimalStepsCard({ onEdit, steps }: { onEdit?: () => void; steps: strin
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editMinimalSteps", "编辑极简步骤")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editMinimalSteps")} onClick={onEdit} />
       <div className="flex items-center gap-2 text-xs font-medium text-[color:var(--emotion-accent-ink)]">
         <Sparkles className="size-3.5" />
-        {t("emotion.toolbox.minimalSteps", "如果已经很差，只做这三件事")}
+        {t("emotion.toolbox.minimalSteps")}
       </div>
       {steps.length > 0 ? (
         <ol className="mt-2 space-y-1.5">
@@ -1332,10 +1314,7 @@ function MinimalStepsCard({ onEdit, steps }: { onEdit?: () => void; steps: strin
         </ol>
       ) : (
         <div className="mt-3">
-          <EmptyState
-            message={t("emotion.empty.minimalRecoverySteps", "还没有极简恢复步骤。")}
-            compact
-          />
+          <EmptyState message={t("emotion.empty.minimalRecoverySteps")} compact />
         </div>
       )}
     </div>
@@ -1354,10 +1333,7 @@ function IneffectiveActionsCard({ actions }: { actions: string[] }) {
           ))}
         </ul>
       ) : (
-        <EmptyState
-          message={t("emotion.empty.ineffectiveActions", "还没有无效动作提醒。")}
-          compact
-        />
+        <EmptyState message={t("emotion.empty.ineffectiveActions")} compact />
       )}
     </div>
   )
@@ -1373,11 +1349,11 @@ function RecoveryNoteCard({ note, onEdit }: { note: EmotionRecoveryNote; onEdit?
         onEdit && "pr-11",
       )}
     >
-      <EditButton label={t("emotion.actions.editRecoveryNote", "编辑恢复经验")} onClick={onEdit} />
+      <EditButton label={t("emotion.actions.editRecoveryNote")} onClick={onEdit} />
       <div className="text-[11px] text-[color:var(--text-muted)]">{note.date}</div>
       <div className="mt-1 text-xs font-medium text-[color:var(--text-primary)]">{note.what}</div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-secondary)]">
-        {t("emotion.common.effect", "效果")}：{note.effect}
+        {t("emotion.common.effect")}：{note.effect}
       </p>
     </div>
   )

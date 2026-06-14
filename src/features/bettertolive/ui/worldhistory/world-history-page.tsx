@@ -130,7 +130,7 @@ export function WorldHistoryPage({
     if (!isEditing || !draft) return
     const timer = setTimeout(() => {
       saveRef.current.mutate(draft, {
-        onError: () => toast.error(t("worldhistory.actions.save", "保存失败，请重试")),
+        onError: () => toast.error(t("worldhistory.actions.save")),
       })
     }, 600)
     return () => clearTimeout(timer)
@@ -208,9 +208,9 @@ export function WorldHistoryPage({
     try {
       await saveMutation.mutateAsync(draft)
       setDraft(null)
-      toast.success(t("worldhistory.actions.save", "已保存"))
+      toast.success(t("worldhistory.actions.save"))
     } catch {
-      toast.error(t("worldhistory.actions.save", "保存失败，请重试"))
+      toast.error(t("worldhistory.actions.save"))
     }
   }
 
@@ -242,7 +242,7 @@ export function WorldHistoryPage({
       id: genId("t"),
       civilizationId: activeCivilizationId,
       year: 0,
-      label: t("worldhistory.event.newLabel", "新事件"),
+      label: t("worldhistory.event.newLabel"),
       summary: "",
     }
     patchDraft((d) => ({ ...d, timelineEvents: [...d.timelineEvents, event] }))
@@ -265,7 +265,7 @@ export function WorldHistoryPage({
   function addPreset(civA: CivilizationId, civB: CivilizationId) {
     const preset: ComparisonPreset = {
       id: genId("preset"),
-      title: t("worldhistory.preset.newLabel", "新判词"),
+      title: t("worldhistory.preset.newLabel"),
       civA,
       civB,
       thesis: "",
@@ -305,10 +305,10 @@ export function WorldHistoryPage({
       >
         <div>
           <h2 className="font-serif text-xl font-semibold tracking-tight text-[color:var(--text-primary)]">
-            {t("worldhistory.title", "人类文明地缘因果星图")}
+            {t("worldhistory.title")}
           </h2>
           <p className="mt-1 font-sans text-xs text-[color:var(--text-muted)]">
-            {t("worldhistory.subtitle", "地缘唯物主义视角下的跨文化比较")}
+            {t("worldhistory.subtitle")}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -322,7 +322,7 @@ export function WorldHistoryPage({
               show={!isEditing}
               variant="ghost"
               size="icon-sm"
-              label={t("worldhistory.actions.edit", "编辑")}
+              label={t("worldhistory.actions.edit")}
               icon={<Pencil className="size-3.5" />}
               onClick={beginEdit}
             />
@@ -333,8 +333,8 @@ export function WorldHistoryPage({
               disabled={saveMutation.isPending}
               label={
                 saveMutation.isPending
-                  ? t("worldhistory.actions.saving", "保存中…")
-                  : t("worldhistory.actions.save", "保存")
+                  ? t("worldhistory.actions.saving")
+                  : t("worldhistory.actions.save")
               }
               icon={<Check className="size-3.5" />}
               onClick={saveEdit}
@@ -343,7 +343,7 @@ export function WorldHistoryPage({
               show={isEditing}
               variant="outline"
               size="icon-sm"
-              label={t("worldhistory.actions.cancel", "取消")}
+              label={t("worldhistory.actions.cancel")}
               icon={<X className="size-3.5" />}
               onClick={cancelEdit}
             />
@@ -424,7 +424,7 @@ export function WorldHistoryPage({
                   className="flex items-center gap-1 font-mono text-[11px] text-[color:var(--text-secondary)] disabled:opacity-40"
                 >
                   <ChevronLeft className="size-3.5" />
-                  {t("worldhistory.narrative.prev", "上一步")}
+                  {t("worldhistory.narrative.prev")}
                 </button>
                 <span className="font-mono text-[11px] text-[color:var(--text-muted)]">
                   {t("worldhistory.narrative.counter", "因果链 {{current}} / {{total}}", {
@@ -439,7 +439,7 @@ export function WorldHistoryPage({
                     disabled={narrativeIndex >= narrativeChain.length - 1}
                     className="flex items-center gap-1 font-mono text-[11px] text-[color:var(--text-secondary)] disabled:opacity-40"
                   >
-                    {t("worldhistory.narrative.next", "下一步")}
+                    {t("worldhistory.narrative.next")}
                     <ChevronRight className="size-3.5" />
                   </button>
                   <button
@@ -448,7 +448,7 @@ export function WorldHistoryPage({
                     className="flex items-center gap-1 font-mono text-[11px] text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
                   >
                     <Square className="size-3" />
-                    {t("worldhistory.narrative.stop", "结束")}
+                    {t("worldhistory.narrative.stop")}
                   </button>
                 </div>
               </>
@@ -459,7 +459,7 @@ export function WorldHistoryPage({
                 className="flex items-center gap-1.5 font-mono text-[11px] text-[color:var(--primary)]"
               >
                 <Play className="size-3" />
-                {t("worldhistory.narrative.start", "沿因果链逐步导览")}
+                {t("worldhistory.narrative.start")}
               </button>
             )}
           </Surface>

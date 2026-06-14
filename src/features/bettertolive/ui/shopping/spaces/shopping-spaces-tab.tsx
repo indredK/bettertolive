@@ -89,7 +89,7 @@ function SpaceMapCard({
           size="icon-sm"
           variant="ghost"
           className="h-6 w-6 shrink-0"
-          label={t("shopping.spaces.edit", "编辑空间")}
+          label={t("shopping.spaces.edit")}
           icon={<Pencil className="size-3" />}
           onClick={() => onEditSpace(space)}
         />
@@ -134,7 +134,7 @@ function SpaceDetailPanel({
           show={isControlMode && Boolean(onDelete)}
           variant="outline"
           size="sm"
-          label={t("shopping.spaces.delete", "删除空间")}
+          label={t("shopping.spaces.delete")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
         />
@@ -154,7 +154,7 @@ function SpaceDetailPanel({
           </div>
         ) : (
           <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
-            {t("shopping.spaces.emptySpace", "当前空间下暂无物品")}
+            {t("shopping.spaces.emptySpace")}
           </div>
         )}
       </CardContent>
@@ -239,7 +239,7 @@ export function ShoppingSpacesTab({
 
     try {
       await reorderSpaceDefinitions(newOrder)
-      toast.success(t("shopping.spaces.reordered", "空间顺序已更新"))
+      toast.success(t("shopping.spaces.reordered"))
       onDeleted()
     } catch (err) {
       toast.error(String(err))
@@ -261,8 +261,8 @@ export function ShoppingSpacesTab({
         name: space.name,
         defaultValue: `已删除空间：${space.name}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedSpace", "删除空间失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedSpace"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneSpace", {
         name: space.name,
         defaultValue: `已撤销删除：${space.name}`,
@@ -284,7 +284,7 @@ export function ShoppingSpacesTab({
             "text-muted-foreground rounded-xl border p-6 text-center text-sm",
           )}
         >
-          {t("shopping.spaces.emptyHint", "还没有空间定义,点击「新增空间」开始")}
+          {t("shopping.spaces.emptyHint")}
         </div>
       ) : (
         <ShoppingTabBody>
@@ -329,9 +329,7 @@ export function ShoppingSpacesTab({
                 onDelete={isControlMode ? () => handleDeleteSpace(selectedSpace) : undefined}
               />
             ) : (
-              <ShoppingEmptyDetailCard
-                message={t("shopping.spaces.selectPrompt", "从左侧选择一个空间查看详情")}
-              />
+              <ShoppingEmptyDetailCard message={t("shopping.spaces.selectPrompt")} />
             )}
           </ShoppingDetailPane>
         </ShoppingTabBody>

@@ -193,12 +193,12 @@ export function NutritionDailyPlanEditDialog({
     event.preventDefault()
 
     if (!form.date.trim()) {
-      toast.error(t("nutrition.dailyPlanEdit.validation.dateRequired", "请填写日期"))
+      toast.error(t("nutrition.dailyPlanEdit.validation.dateRequired"))
       return
     }
 
     if (form.slots.length === 0) {
-      toast.error(t("nutrition.dailyPlanEdit.validation.slotRequired", "请至少保留一个餐次"))
+      toast.error(t("nutrition.dailyPlanEdit.validation.slotRequired"))
       return
     }
 
@@ -211,7 +211,7 @@ export function NutritionDailyPlanEditDialog({
         const nextEntry = normalizeEntry(entry)
 
         if (!nextEntry) {
-          toast.error(t("nutrition.dailyPlanEdit.validation.entryInvalid", "请补全计划条目"))
+          toast.error(t("nutrition.dailyPlanEdit.validation.entryInvalid"))
           return
         }
 
@@ -242,10 +242,10 @@ export function NutritionDailyPlanEditDialog({
         ...nutrition,
         dailyPlans: nextPlans,
       })
-      toast.success(t("nutrition.dailyPlanEdit.saved", "每日计划已保存"))
+      toast.success(t("nutrition.dailyPlanEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.dailyPlanEdit.saveFailed", "每日计划保存失败"))
+      toast.error(t("nutrition.dailyPlanEdit.saveFailed"))
     }
   }
 
@@ -259,10 +259,10 @@ export function NutritionDailyPlanEditDialog({
         ...nutrition,
         dailyPlans: nutrition.dailyPlans.filter((plan) => plan.id !== editing.plan?.id),
       })
-      toast.success(t("nutrition.dailyPlanEdit.deleted", "每日计划已删除"))
+      toast.success(t("nutrition.dailyPlanEdit.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.dailyPlanEdit.deleteFailed", "每日计划删除失败"))
+      toast.error(t("nutrition.dailyPlanEdit.deleteFailed"))
     }
   }
 
@@ -277,8 +277,8 @@ export function NutritionDailyPlanEditDialog({
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("nutrition.dailyPlanEdit.createTitle", "新增每日计划")
-              : t("nutrition.dailyPlanEdit.editTitle", "编辑每日计划")}
+              ? t("nutrition.dailyPlanEdit.createTitle")
+              : t("nutrition.dailyPlanEdit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -292,7 +292,7 @@ export function NutritionDailyPlanEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[180px_minmax(0,1fr)]">
-                <Field label={t("nutrition.dailyPlanEdit.date", "日期")}>
+                <Field label={t("nutrition.dailyPlanEdit.date")}>
                   <Input
                     type="date"
                     value={form.date}
@@ -300,7 +300,7 @@ export function NutritionDailyPlanEditDialog({
                     className={NUTRITION_DIALOG_FIELD_CLASS}
                   />
                 </Field>
-                <Field label={t("nutrition.dailyPlanEdit.note", "整日备注")}>
+                <Field label={t("nutrition.dailyPlanEdit.note")}>
                   <Input
                     value={form.note}
                     onChange={(event) => updateForm({ note: event.target.value })}
@@ -317,9 +317,7 @@ export function NutritionDailyPlanEditDialog({
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold">
-                    {t("nutrition.dailyPlanEdit.slots", "餐次")}
-                  </h3>
+                  <h3 className="text-sm font-semibold">{t("nutrition.dailyPlanEdit.slots")}</h3>
                   <p className="text-muted-foreground mt-1 text-xs leading-5">
                     {t(
                       "nutrition.dailyPlanEdit.slotsHint",
@@ -329,7 +327,7 @@ export function NutritionDailyPlanEditDialog({
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={addSlot}>
                   <Plus className="size-3.5" />
-                  {t("nutrition.dailyPlanEdit.addSlot", "添加餐次")}
+                  {t("nutrition.dailyPlanEdit.addSlot")}
                 </Button>
               </div>
 
@@ -340,7 +338,7 @@ export function NutritionDailyPlanEditDialog({
                     className="border-foreground/10 bg-background/70 rounded-2xl border p-3"
                   >
                     <div className="grid gap-3 lg:grid-cols-[160px_150px_minmax(0,1fr)_auto]">
-                      <Field label={t("nutrition.dailyPlanEdit.mealRole", "餐次")}>
+                      <Field label={t("nutrition.dailyPlanEdit.mealRole")}>
                         <Select
                           value={slot.structure}
                           onValueChange={(structure) =>
@@ -363,7 +361,7 @@ export function NutritionDailyPlanEditDialog({
                         </Select>
                       </Field>
 
-                      <Field label={t("nutrition.dailyPlanEdit.status", "状态")}>
+                      <Field label={t("nutrition.dailyPlanEdit.status")}>
                         <Select
                           value={slot.status}
                           onValueChange={(status) =>
@@ -386,7 +384,7 @@ export function NutritionDailyPlanEditDialog({
                         </Select>
                       </Field>
 
-                      <Field label={t("nutrition.dailyPlanEdit.slotNote", "餐次备注")}>
+                      <Field label={t("nutrition.dailyPlanEdit.slotNote")}>
                         <Input
                           value={slot.note}
                           onChange={(event) => updateSlot(slotIndex, { note: event.target.value })}
@@ -401,7 +399,7 @@ export function NutritionDailyPlanEditDialog({
                           size="icon-sm"
                           onClick={() => removeSlot(slotIndex)}
                           disabled={form.slots.length <= 1 || referencedSlotIds.has(slot.id)}
-                          tooltip={t("nutrition.dailyPlanEdit.delete", "删除")}
+                          tooltip={t("nutrition.dailyPlanEdit.delete")}
                         >
                           <Trash2 className="size-4" />
                         </Button>
@@ -428,7 +426,7 @@ export function NutritionDailyPlanEditDialog({
                       className="mt-3"
                     >
                       <Plus className="size-3.5" />
-                      {t("nutrition.dailyPlanEdit.addEntry", "添加条目")}
+                      {t("nutrition.dailyPlanEdit.addEntry")}
                     </Button>
                   </div>
                 ))}
@@ -456,16 +454,16 @@ export function NutritionDailyPlanEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.dailyPlanEdit.delete", "删除")}
+                {t("nutrition.dailyPlanEdit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -489,7 +487,7 @@ function PlanEntryRow({
 
   return (
     <div className="border-foreground/10 bg-muted/20 grid gap-3 rounded-xl border p-3 lg:grid-cols-[130px_minmax(0,1fr)_auto]">
-      <Field label={t("nutrition.dailyPlanEdit.entryType", "类型")}>
+      <Field label={t("nutrition.dailyPlanEdit.entryType")}>
         <Select
           value={entry.type}
           onValueChange={(type) =>
@@ -516,7 +514,7 @@ function PlanEntryRow({
 
       {entry.type === "recipe" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px]">
-          <Field label={t("nutrition.dailyPlanEdit.recipe", "食谱")}>
+          <Field label={t("nutrition.dailyPlanEdit.recipe")}>
             <Select
               value={entry.recipeId || NONE_VALUE}
               onValueChange={(recipeId) => onChange({ recipeId: normalizeSelectValue(recipeId) })}
@@ -526,12 +524,12 @@ function PlanEntryRow({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={NONE_VALUE}>
-                  {t("nutrition.dailyPlanEdit.selectRecipe", "选择食谱")}
+                  {t("nutrition.dailyPlanEdit.selectRecipe")}
                 </SelectItem>
                 {entry.recipeId &&
                 !nutrition.recipes.some((recipe) => recipe.id === entry.recipeId) ? (
                   <SelectItem value={entry.recipeId}>
-                    {t("nutrition.dailyPlanEdit.missingRecipe", "已关联的食谱不存在")}
+                    {t("nutrition.dailyPlanEdit.missingRecipe")}
                   </SelectItem>
                 ) : null}
                 {nutrition.recipes.map((recipe) => (
@@ -543,7 +541,7 @@ function PlanEntryRow({
             </Select>
           </Field>
           <NumberField
-            label={t("nutrition.dailyPlanEdit.servings", "份数")}
+            label={t("nutrition.dailyPlanEdit.servings")}
             value={entry.servings}
             onChange={(servings) => onChange({ servings })}
           />
@@ -552,7 +550,7 @@ function PlanEntryRow({
 
       {entry.type === "food" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_120px_100px]">
-          <Field label={t("nutrition.dailyPlanEdit.food", "食品")}>
+          <Field label={t("nutrition.dailyPlanEdit.food")}>
             <Select
               value={entry.foodId || NONE_VALUE}
               onValueChange={(foodId) => onChange({ foodId: normalizeSelectValue(foodId) })}
@@ -562,11 +560,11 @@ function PlanEntryRow({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={NONE_VALUE}>
-                  {t("nutrition.dailyPlanEdit.selectFood", "选择食品")}
+                  {t("nutrition.dailyPlanEdit.selectFood")}
                 </SelectItem>
                 {entry.foodId && !nutrition.foods.some((food) => food.id === entry.foodId) ? (
                   <SelectItem value={entry.foodId}>
-                    {t("nutrition.dailyPlanEdit.missingFood", "已关联的食品不存在")}
+                    {t("nutrition.dailyPlanEdit.missingFood")}
                   </SelectItem>
                 ) : null}
                 {nutrition.foods.map((food) => (
@@ -578,11 +576,11 @@ function PlanEntryRow({
             </Select>
           </Field>
           <NumberField
-            label={t("nutrition.dailyPlanEdit.amount", "用量")}
+            label={t("nutrition.dailyPlanEdit.amount")}
             value={entry.amount}
             onChange={(amount) => onChange({ amount })}
           />
-          <Field label={t("nutrition.dailyPlanEdit.unit", "单位")}>
+          <Field label={t("nutrition.dailyPlanEdit.unit")}>
             <Select
               value={entry.unit}
               onValueChange={(unit) => onChange({ unit: normalizeSelectValue(unit) })}
@@ -604,15 +602,15 @@ function PlanEntryRow({
 
       {entry.type === "text" ? (
         <div className="grid gap-3 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <Field label={t("nutrition.dailyPlanEdit.textTitle", "文本条目")}>
+          <Field label={t("nutrition.dailyPlanEdit.textTitle")}>
             <Input
               value={entry.title}
               onChange={(event) => onChange({ title: event.target.value })}
               className={NUTRITION_DIALOG_FIELD_CLASS}
-              placeholder={t("nutrition.dailyPlanEdit.textTitlePlaceholder", "例如：临时外食")}
+              placeholder={t("nutrition.dailyPlanEdit.textTitlePlaceholder")}
             />
           </Field>
-          <Field label={t("nutrition.dailyPlanEdit.entryNote", "备注")}>
+          <Field label={t("nutrition.dailyPlanEdit.entryNote")}>
             <Input
               value={entry.note}
               onChange={(event) => onChange({ note: event.target.value })}
@@ -628,7 +626,7 @@ function PlanEntryRow({
           type="button"
           variant="ghost"
           size="icon-sm"
-          label={t("nutrition.dailyPlanEdit.removeEntry", "移除条目")}
+          label={t("nutrition.dailyPlanEdit.removeEntry")}
           icon={<Trash2 className="size-4" />}
           onClick={onRemove}
         />

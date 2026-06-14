@@ -209,29 +209,29 @@ export function BeliefsPage({
   const classificationSections = [
     {
       key: "domain",
-      title: t("beliefs.classification.domain.title", "领域"),
-      description: t("beliefs.classification.domain.description", "它主要作用于哪个生活面。"),
+      title: t("beliefs.classification.domain.title"),
+      description: t("beliefs.classification.domain.description"),
       rows: createDistribution(BELIEF_DOMAINS, entries, (entry) => entry.domain),
       enumGroup: "domain",
     },
     {
       key: "layer",
-      title: t("beliefs.classification.layer.title", "层次"),
-      description: t("beliefs.classification.layer.description", "它在认知的哪一层。"),
+      title: t("beliefs.classification.layer.title"),
+      description: t("beliefs.classification.layer.description"),
       rows: createDistribution(BELIEF_LAYERS, entries, (entry) => entry.layer),
       enumGroup: "layer",
     },
     {
       key: "stability",
-      title: t("beliefs.classification.stability.title", "稳定性"),
-      description: t("beliefs.classification.stability.description", "它现在是否还在变化。"),
+      title: t("beliefs.classification.stability.title"),
+      description: t("beliefs.classification.stability.description"),
       rows: createDistribution(BELIEF_STABILITIES, entries, (entry) => entry.stability),
       enumGroup: "stability",
     },
     {
       key: "source",
-      title: t("beliefs.classification.source.title", "来源"),
-      description: t("beliefs.classification.source.description", "它从哪里长出来。"),
+      title: t("beliefs.classification.source.title"),
+      description: t("beliefs.classification.source.description"),
       rows: createDistribution(BELIEF_SOURCES, entries, (entry) => entry.source),
       enumGroup: "source",
     },
@@ -246,7 +246,7 @@ export function BeliefsPage({
   const handleSaved = () => {
     setEditingBelief(null)
     onRefresh?.()
-    toast.success(t("beliefs.toast.saved", "已保存"))
+    toast.success(t("beliefs.toast.saved"))
   }
 
   const handleDeleted = () => {
@@ -375,7 +375,7 @@ function BeliefsFixedDashboard({
 
           <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--muted-surface-bg)] px-4 py-3 text-xs leading-5 text-[color:var(--text-muted)]">
             <span className="font-medium text-[color:var(--text-primary)]">
-              {t("beliefs.attachment.title", "依恋观察")}：
+              {t("beliefs.attachment.title")}：
             </span>
             {beliefsModule.attachmentReflection}
           </div>
@@ -385,8 +385,8 @@ function BeliefsFixedDashboard({
       <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
         <SectionHeading
           icon={MessagesSquare}
-          title={t("beliefs.questions.title", "反复出现的问题")}
-          description={t("beliefs.questions.description", "把会反复追问自己的问题先收进来。")}
+          title={t("beliefs.questions.title")}
+          description={t("beliefs.questions.description")}
           compact
         />
         <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -400,10 +400,7 @@ function BeliefsFixedDashboard({
               </div>
             ))
           ) : (
-            <EmptyState
-              message={t("beliefs.empty.questions", "当前筛选下没有可展示的问题。")}
-              compact
-            />
+            <EmptyState message={t("beliefs.empty.questions")} compact />
           )}
         </div>
       </Surface>
@@ -411,10 +408,10 @@ function BeliefsFixedDashboard({
       <Surface className="flex min-h-0 flex-col overflow-hidden p-4 min-[1180px]:col-span-2">
         <Tabs defaultValue="entries" className="min-h-0 flex-1">
           <TabsList className="hide-scrollbar w-full justify-start gap-1 overflow-x-auto rounded-lg bg-[color:var(--chip-bg)] p-1">
-            <TabsTrigger value="entries">{t("beliefs.tabs.entries", "观念清单")}</TabsTrigger>
-            <TabsTrigger value="cards">{t("beliefs.tabs.cards", "三层骨架")}</TabsTrigger>
-            <TabsTrigger value="relations">{t("beliefs.tabs.relations", "相互关系")}</TabsTrigger>
-            <TabsTrigger value="blindspots">{t("beliefs.tabs.blindspots", "盲区问题")}</TabsTrigger>
+            <TabsTrigger value="entries">{t("beliefs.tabs.entries")}</TabsTrigger>
+            <TabsTrigger value="cards">{t("beliefs.tabs.cards")}</TabsTrigger>
+            <TabsTrigger value="relations">{t("beliefs.tabs.relations")}</TabsTrigger>
+            <TabsTrigger value="blindspots">{t("beliefs.tabs.blindspots")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="entries" className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
@@ -430,10 +427,7 @@ function BeliefsFixedDashboard({
                   />
                 ))
               ) : (
-                <EmptyState
-                  message={t("beliefs.empty.entries", "当前筛选下没有可展示的观念条目。")}
-                  compact
-                />
+                <EmptyState message={t("beliefs.empty.entries")} compact />
               )}
             </div>
           </TabsContent>
@@ -450,7 +444,7 @@ function BeliefsFixedDashboard({
             <div className="grid gap-3 min-[960px]:grid-cols-2">
               <div className="space-y-2">
                 <div className="text-xs font-medium tracking-wide text-[color:var(--text-primary)]">
-                  {t("beliefs.questions.title", "反复出现的问题")}
+                  {t("beliefs.questions.title")}
                 </div>
                 {beliefsModule.questions.length > 0 ? (
                   beliefsModule.questions.map((question) => (
@@ -462,16 +456,13 @@ function BeliefsFixedDashboard({
                     </div>
                   ))
                 ) : (
-                  <EmptyState
-                    message={t("beliefs.empty.questions", "当前筛选下没有可展示的问题。")}
-                    compact
-                  />
+                  <EmptyState message={t("beliefs.empty.questions")} compact />
                 )}
               </div>
               <SignalSection
-                title={t("beliefs.signals.limiting", "可能限制我的观念")}
+                title={t("beliefs.signals.limiting")}
                 entries={limitingBeliefs}
-                emptyMessage={t("beliefs.empty.limiting", "当前筛选下没有限制性观念。")}
+                emptyMessage={t("beliefs.empty.limiting")}
               />
             </div>
           </TabsContent>
@@ -481,15 +472,15 @@ function BeliefsFixedDashboard({
       <Surface className="flex min-h-0 flex-col overflow-hidden p-4">
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
           <SignalSection
-            title={t("beliefs.signals.conflict", "正在张力中")}
+            title={t("beliefs.signals.conflict")}
             entries={conflictingBeliefs}
-            emptyMessage={t("beliefs.empty.conflicts", "当前筛选下没有冲突中的观念。")}
+            emptyMessage={t("beliefs.empty.conflicts")}
           />
 
           <SignalSection
-            title={t("beliefs.signals.changing", "正在变化")}
+            title={t("beliefs.signals.changing")}
             entries={changingBeliefs.slice(0, 4)}
-            emptyMessage={t("beliefs.empty.changing", "当前筛选下没有正在变化的观念。")}
+            emptyMessage={t("beliefs.empty.changing")}
             subtle
           />
         </div>
@@ -536,7 +527,7 @@ function BeliefsStackedView({
       <Surface className="p-5">
         <SectionHeading
           icon={Waypoints}
-          title={t("beliefs.classification.title", "4 维观念分类")}
+          title={t("beliefs.classification.title")}
           description={t(
             "beliefs.classification.description",
             "按 4 维分组、过滤、看认知地图；impact 跟着每条走，不进主筛选器。",
@@ -575,8 +566,8 @@ function BeliefsStackedView({
         <Surface className="p-5">
           <SectionHeading
             icon={Lightbulb}
-            title={t("beliefs.entries.title", "观念清单")}
-            description={t("beliefs.entries.description", "详情里始终显示 impact 与心理学解读。")}
+            title={t("beliefs.entries.title")}
+            description={t("beliefs.entries.description")}
           />
           <div className="mt-5 space-y-4">
             {entries.length > 0 ? (
@@ -589,10 +580,7 @@ function BeliefsStackedView({
                 />
               ))
             ) : (
-              <EmptyState
-                message={t("beliefs.empty.entries", "当前筛选下没有可展示的观念条目。")}
-                compact
-              />
+              <EmptyState message={t("beliefs.empty.entries")} compact />
             )}
           </div>
         </Surface>
@@ -601,8 +589,8 @@ function BeliefsStackedView({
           <Surface className="p-5">
             <SectionHeading
               icon={MessagesSquare}
-              title={t("beliefs.questions.title", "反复出现的问题")}
-              description={t("beliefs.questions.description", "先把会反复追问自己的问题收进来。")}
+              title={t("beliefs.questions.title")}
+              description={t("beliefs.questions.description")}
             />
             <div className="mt-5 space-y-3">
               {beliefsModule.questions.length > 0 ? (
@@ -615,10 +603,7 @@ function BeliefsStackedView({
                   </div>
                 ))
               ) : (
-                <EmptyState
-                  message={t("beliefs.empty.questions", "当前筛选下没有可展示的问题。")}
-                  compact
-                />
+                <EmptyState message={t("beliefs.empty.questions")} compact />
               )}
             </div>
           </Surface>
@@ -626,8 +611,8 @@ function BeliefsStackedView({
           <Surface className="p-5">
             <SectionHeading
               icon={Link2}
-              title={t("beliefs.relations.title", "相互关系")}
-              description={t("beliefs.relations.description", "观念之间会相似、对立或派生。")}
+              title={t("beliefs.relations.title")}
+              description={t("beliefs.relations.description")}
             />
             <div className="mt-5">
               <BeliefRelationsList relations={relations} beliefById={beliefById} />
@@ -639,8 +624,8 @@ function BeliefsStackedView({
       <Surface className="p-5">
         <SectionHeading
           icon={Brain}
-          title={t("beliefs.cards.title", "三层骨架")}
-          description={t("beliefs.cards.description", "世界观、人生观和价值观的摘要骨架。")}
+          title={t("beliefs.cards.title")}
+          description={t("beliefs.cards.description")}
         />
         <div className="mt-5">
           <BeliefSkeletonCards beliefsModule={beliefsModule} />
@@ -670,8 +655,8 @@ function BeliefToolbar({
   const filterDimensions: FilterPopoverDimension[] = [
     {
       key: "domain",
-      label: t("beliefs.classification.domain.title", "领域"),
-      allLabel: t("beliefs.filter.all", "全部"),
+      label: t("beliefs.classification.domain.title"),
+      allLabel: t("beliefs.filter.all"),
       value: filters.domain,
       options: BELIEF_DOMAINS.map((option) => ({
         value: option,
@@ -680,8 +665,8 @@ function BeliefToolbar({
     },
     {
       key: "layer",
-      label: t("beliefs.classification.layer.title", "层次"),
-      allLabel: t("beliefs.filter.all", "全部"),
+      label: t("beliefs.classification.layer.title"),
+      allLabel: t("beliefs.filter.all"),
       value: filters.layer,
       options: BELIEF_LAYERS.map((option) => ({
         value: option,
@@ -690,8 +675,8 @@ function BeliefToolbar({
     },
     {
       key: "stability",
-      label: t("beliefs.classification.stability.title", "稳定性"),
-      allLabel: t("beliefs.filter.all", "全部"),
+      label: t("beliefs.classification.stability.title"),
+      allLabel: t("beliefs.filter.all"),
       value: filters.stability,
       options: BELIEF_STABILITIES.map((option) => ({
         value: option,
@@ -700,8 +685,8 @@ function BeliefToolbar({
     },
     {
       key: "source",
-      label: t("beliefs.classification.source.title", "来源"),
-      allLabel: t("beliefs.filter.all", "全部"),
+      label: t("beliefs.classification.source.title"),
+      allLabel: t("beliefs.filter.all"),
       value: filters.source,
       options: BELIEF_SOURCES.map((option) => ({
         value: option,
@@ -723,7 +708,7 @@ function BeliefToolbar({
           </Badge>
           <AnimatedButton show={isControlMode} size="sm" onClick={onCreate}>
             <Plus className="size-3.5" />
-            {t("beliefs.actions.create", "新增观念")}
+            {t("beliefs.actions.create")}
           </AnimatedButton>
         </ActionGroup>
       }
@@ -782,7 +767,7 @@ function ClassificationPanel({
           })
         ) : (
           <div className="text-xs leading-5 text-[color:var(--text-muted)]">
-            {t("beliefs.empty.distribution", "暂无分布数据。")}
+            {t("beliefs.empty.distribution")}
           </div>
         )}
       </div>
@@ -796,10 +781,10 @@ function ImpactDistribution({ rows }: { rows: DistributionRow[] }) {
   return (
     <div className="rounded-lg border border-[color:var(--muted-surface-border)] bg-[color:var(--chip-bg)] px-4 py-4">
       <div className="text-sm font-medium text-[color:var(--text-primary)]">
-        {t("beliefs.impact.title", "影响方向 (impact)")}
+        {t("beliefs.impact.title")}
       </div>
       <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-        {t("beliefs.impact.description", "影响方向不是第 5 维分类，而是每条观念的内禀属性。")}
+        {t("beliefs.impact.description")}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
         {rows
@@ -853,7 +838,7 @@ function BeliefSkeletonCards({
           </div>
         ))
       ) : (
-        <EmptyState message={t("beliefs.empty.cards", "当前筛选下没有三层骨架。")} compact />
+        <EmptyState message={t("beliefs.empty.cards")} compact />
       )}
     </div>
   )
@@ -882,7 +867,7 @@ function BeliefRelationsList({
           />
         ))
       ) : (
-        <EmptyState message={t("beliefs.empty.relations", "当前筛选下没有观念关系。")} compact />
+        <EmptyState message={t("beliefs.empty.relations")} compact />
       )}
     </div>
   )
@@ -966,7 +951,7 @@ function BeliefCard({
           show={isControlMode && Boolean(onEdit)}
           variant="ghost"
           size="icon-sm"
-          label={t("beliefs.actions.edit", "编辑")}
+          label={t("beliefs.actions.edit")}
           icon={<Edit3 className="size-3.5" />}
           onClick={onEdit}
         />
@@ -998,18 +983,15 @@ function BeliefCard({
       </p>
 
       <div className="mt-4 grid gap-2 min-[640px]:grid-cols-2">
+        <BeliefMeta label={t("beliefs.field.source")} value={labelFor(t, "source", entry.source)} />
         <BeliefMeta
-          label={t("beliefs.field.source", "来源")}
-          value={labelFor(t, "source", entry.source)}
-        />
-        <BeliefMeta
-          label={t("beliefs.field.impact", "影响方向")}
+          label={t("beliefs.field.impact")}
           value={labelFor(t, "impact", entry.impact)}
           accent
         />
         {entry.secondaryDomains && entry.secondaryDomains.length > 0 ? (
           <BeliefMeta
-            label={t("beliefs.field.secondaryDomains", "次要领域")}
+            label={t("beliefs.field.secondaryDomains")}
             value={entry.secondaryDomains
               .map((domain) => labelFor(t, "domain", domain))
               .join(" / ")}
@@ -1017,7 +999,7 @@ function BeliefCard({
         ) : null}
         {entry.cbtLayer ? (
           <BeliefMeta
-            label={t("beliefs.field.cbtLayer", "CBT 层次")}
+            label={t("beliefs.field.cbtLayer")}
             value={labelFor(t, "cbtLayer", entry.cbtLayer)}
           />
         ) : null}
@@ -1032,13 +1014,13 @@ function BeliefCard({
         >
           <summary className="flex cursor-pointer items-center gap-2 text-xs font-medium text-[color:var(--text-primary)]">
             <Brain className="size-3.5" />
-            {t("beliefs.psych.title", "心理学解读 (可选)")}
+            {t("beliefs.psych.title")}
           </summary>
           <div className="mt-3 space-y-2 text-xs leading-5 text-[color:var(--text-secondary)]">
             {entry.cognitiveDistortions && entry.cognitiveDistortions.length > 0 ? (
               <div>
                 <span className="font-medium text-[color:var(--text-primary)]">
-                  {t("beliefs.field.cognitiveDistortions", "认知扭曲")}：
+                  {t("beliefs.field.cognitiveDistortions")}：
                 </span>
                 <span className="ml-1 inline-flex flex-wrap gap-1.5">
                   {entry.cognitiveDistortions.map((distortion) => (
@@ -1056,7 +1038,7 @@ function BeliefCard({
             {entry.defenseMechanism ? (
               <div>
                 <span className="font-medium text-[color:var(--text-primary)]">
-                  {t("beliefs.field.defenseMechanism", "防御机制")}：
+                  {t("beliefs.field.defenseMechanism")}：
                 </span>
                 <span className="ml-1 text-[color:var(--text-muted)]">
                   {labelFor(t, "defenseMechanism", entry.defenseMechanism)}
@@ -1066,7 +1048,7 @@ function BeliefCard({
             {entry.attachmentNote ? (
               <div>
                 <span className="font-medium text-[color:var(--text-primary)]">
-                  {t("beliefs.attachment.title", "依恋观察")}：
+                  {t("beliefs.attachment.title")}：
                 </span>
                 <span className="ml-1 text-[color:var(--text-muted)]">{entry.attachmentNote}</span>
               </div>
@@ -1306,14 +1288,14 @@ function BeliefEditDialog({
     return {
       id: `${seed.id}-rev-${Date.now()}`,
       date: todayText(),
-      summary: t("beliefs.revision.autoSummary", "管理模式更新了这条观念。"),
+      summary: t("beliefs.revision.autoSummary"),
       changedFields,
     }
   }
 
   const handleSubmit = async () => {
     if (!canSubmit) {
-      toast.error(t("beliefs.error.required", "请填写标题和观念表述"))
+      toast.error(t("beliefs.error.required"))
       return
     }
 
@@ -1367,8 +1349,8 @@ function BeliefEditDialog({
         name: seed.title,
         defaultValue: `已删除观念：${seed.title}`,
       }),
-      failureMessage: t("beliefs.toast.deleteFailed", "删除观念失败"),
-      undoLabel: t("beliefs.undo", "撤销"),
+      failureMessage: t("beliefs.toast.deleteFailed"),
+      undoLabel: t("beliefs.undo"),
       undoneMessage: t("beliefs.toast.deleteUndone", {
         name: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,
@@ -1387,93 +1369,89 @@ function BeliefEditDialog({
       <DialogContent className="border-foreground/10 bg-background flex max-h-[90vh] flex-col overflow-hidden border shadow-lg sm:max-w-[min(1080px,calc(100vw-3rem))]">
         <DialogHeader className="border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 sticky top-0 z-10 -mx-4 -mt-4 border-b px-4 pt-4 pr-12 pb-3 supports-[backdrop-filter]:backdrop-blur-xs">
           <DialogTitle>
-            {editing.isNew
-              ? t("beliefs.actions.create", "新增观念")
-              : t("beliefs.actions.editEntry", "编辑观念")}
+            {editing.isNew ? t("beliefs.actions.create") : t("beliefs.actions.editEntry")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="grid min-h-0 flex-1 gap-4 overflow-y-auto pr-1 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
           <div className="border-foreground/10 bg-card/70 space-y-4 rounded-lg border p-4">
-            <div className="text-foreground text-sm font-medium">
-              {t("beliefs.form.basic", "基本内容")}
-            </div>
+            <div className="text-foreground text-sm font-medium">{t("beliefs.form.basic")}</div>
             <FieldTextInput
-              label={t("beliefs.field.title", "标题")}
+              label={t("beliefs.field.title")}
               value={title}
               onChange={setTitle}
               required
             />
             <FieldTextarea
-              label={t("beliefs.field.statement", "观念表述")}
+              label={t("beliefs.field.statement")}
               value={statement}
               onChange={setStatement}
               rows={4}
               required
             />
             <FieldTextarea
-              label={t("beliefs.field.description", "说明")}
+              label={t("beliefs.field.description")}
               value={description}
               onChange={setDescription}
               rows={5}
             />
             <FieldTextInput
-              label={t("beliefs.field.tags", "标签")}
+              label={t("beliefs.field.tags")}
               value={tags}
               onChange={setTags}
-              placeholder={t("beliefs.form.tagsPlaceholder", "用逗号分隔")}
+              placeholder={t("beliefs.form.tagsPlaceholder")}
             />
           </div>
 
           <div className="border-foreground/10 bg-card/70 space-y-4 rounded-lg border p-4">
             <div className="text-foreground text-sm font-medium">
-              {t("beliefs.form.classification", "分类与解读")}
+              {t("beliefs.form.classification")}
             </div>
             <div className="grid gap-3 min-[720px]:grid-cols-2">
               <EnumSelect
-                label={t("beliefs.classification.domain.title", "领域")}
+                label={t("beliefs.classification.domain.title")}
                 value={domain}
                 options={BELIEF_DOMAINS}
                 enumGroup="domain"
                 onChange={handleDomainChange}
               />
               <EnumSelect
-                label={t("beliefs.classification.layer.title", "层次")}
+                label={t("beliefs.classification.layer.title")}
                 value={layer}
                 options={BELIEF_LAYERS}
                 enumGroup="layer"
                 onChange={setLayer}
               />
               <EnumSelect
-                label={t("beliefs.classification.stability.title", "稳定性")}
+                label={t("beliefs.classification.stability.title")}
                 value={stability}
                 options={BELIEF_STABILITIES}
                 enumGroup="stability"
                 onChange={setStability}
               />
               <EnumSelect
-                label={t("beliefs.classification.source.title", "来源")}
+                label={t("beliefs.classification.source.title")}
                 value={source}
                 options={BELIEF_SOURCES}
                 enumGroup="source"
                 onChange={setSource}
               />
               <EnumSelect
-                label={t("beliefs.field.impact", "影响方向")}
+                label={t("beliefs.field.impact")}
                 value={impact}
                 options={BELIEF_IMPACTS}
                 enumGroup="impact"
                 onChange={setImpact}
               />
               <OptionalEnumSelect
-                label={t("beliefs.field.cbtLayer", "CBT 层次")}
+                label={t("beliefs.field.cbtLayer")}
                 value={cbtLayer}
                 options={BELIEF_CBT_LAYERS}
                 enumGroup="cbtLayer"
                 onChange={setCbtLayer}
               />
               <OptionalEnumSelect
-                label={t("beliefs.field.defenseMechanism", "防御机制")}
+                label={t("beliefs.field.defenseMechanism")}
                 value={defenseMechanism}
                 options={DEFENSE_MECHANISMS}
                 enumGroup="defenseMechanism"
@@ -1482,14 +1460,14 @@ function BeliefEditDialog({
             </div>
 
             <CheckboxGroup
-              label={t("beliefs.field.secondaryDomains", "次要领域")}
+              label={t("beliefs.field.secondaryDomains")}
               values={secondaryDomains}
               options={BELIEF_DOMAINS.filter((item) => item !== domain)}
               enumGroup="domain"
               onToggle={(value) => setSecondaryDomains((current) => toggleValue(current, value))}
             />
             <CheckboxGroup
-              label={t("beliefs.field.cognitiveDistortions", "认知扭曲")}
+              label={t("beliefs.field.cognitiveDistortions")}
               values={cognitiveDistortions}
               options={COGNITIVE_DISTORTIONS}
               enumGroup="cognitiveDistortion"
@@ -1498,7 +1476,7 @@ function BeliefEditDialog({
               }
             />
             <FieldTextarea
-              label={t("beliefs.field.attachmentNote", "依恋观察")}
+              label={t("beliefs.field.attachmentNote")}
               value={attachmentNote}
               onChange={setAttachmentNote}
               rows={4}
@@ -1510,14 +1488,14 @@ function BeliefEditDialog({
           {!editing.isNew ? (
             <Button variant="outline" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-3.5" />
-              {t("beliefs.actions.delete", "删除")}
+              {t("beliefs.actions.delete")}
             </Button>
           ) : null}
           <Button variant="outline" onClick={onClose}>
-            {t("beliefs.actions.cancel", "取消")}
+            {t("beliefs.actions.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit}>
-            {t("beliefs.actions.save", "保存")}
+            {t("beliefs.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1645,7 +1623,7 @@ function OptionalEnumSelect<T extends string>({
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={NONE_SELECT_VALUE}>{t("beliefs.form.optional", "可选")}</SelectItem>
+          <SelectItem value={NONE_SELECT_VALUE}>{t("beliefs.form.optional")}</SelectItem>
           {options.map((option) => (
             <SelectItem key={option} value={option}>
               {labelFor(t, enumGroup, option)}

@@ -126,14 +126,12 @@ export function LegacyItemEditDialog({
 
   const handleSubmit = async () => {
     if (!canSubmit) {
-      toast.error(t("legacy.validation.required", "请填写标题、摘要和正文"))
+      toast.error(t("legacy.validation.required"))
       return
     }
 
     if (criticalFinalMissingDelivery) {
-      toast.error(
-        t("legacy.validation.criticalFinalDelivery", "关键信息进入最终版前需要填写交付条件"),
-      )
+      toast.error(t("legacy.validation.criticalFinalDelivery"))
       return
     }
 
@@ -165,8 +163,8 @@ export function LegacyItemEditDialog({
         title: seed.title,
         defaultValue: `已删除生命整理条目：${seed.title}`,
       }),
-      failureMessage: t("legacy.toast.deleteFailedItem", "删除生命整理条目失败"),
-      undoLabel: t("legacy.undo", "撤销"),
+      failureMessage: t("legacy.toast.deleteFailedItem"),
+      undoLabel: t("legacy.undo"),
       undoneMessage: t("legacy.toast.deleteUndoneItem", {
         title: seed.title,
         defaultValue: `已撤销删除：${seed.title}`,
@@ -190,9 +188,7 @@ export function LegacyItemEditDialog({
       >
         <DialogHeader className="border-foreground/10 shrink-0 border-b pr-10 pb-3">
           <DialogTitle>
-            {editing.isNew
-              ? t("legacy.edit.createTitle", "新增生命整理条目")
-              : t("legacy.edit.editTitle", "编辑生命整理条目")}
+            {editing.isNew ? t("legacy.edit.createTitle") : t("legacy.edit.editTitle")}
           </DialogTitle>
         </DialogHeader>
 
@@ -201,10 +197,10 @@ export function LegacyItemEditDialog({
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <LockKeyhole className="size-4" />
-                {t("legacy.edit.lockedCopy", "这份条目已锁定，解锁后才能编辑。")}
+                {t("legacy.edit.lockedCopy")}
               </div>
               <Button variant="outline" size="sm" onClick={handleUnlock}>
-                {t("legacy.actions.unlock", "解锁编辑")}
+                {t("legacy.actions.unlock")}
               </Button>
             </div>
           </div>
@@ -212,9 +208,9 @@ export function LegacyItemEditDialog({
 
         <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.05fr)_minmax(360px,0.95fr)]">
           <div className={cn(LEGACY_DIALOG_SECTION_CLASS, "min-h-0 overflow-y-auto")}>
-            <div className="text-sm font-medium">{t("legacy.edit.contentSection", "内容")}</div>
+            <div className="text-sm font-medium">{t("legacy.edit.contentSection")}</div>
 
-            <Field label={t("legacy.fields.title", "标题")} required>
+            <Field label={t("legacy.fields.title")} required>
               <Input
                 value={form.title}
                 disabled={isReadOnly}
@@ -223,7 +219,7 @@ export function LegacyItemEditDialog({
               />
             </Field>
 
-            <Field label={t("legacy.fields.summary", "摘要")} required>
+            <Field label={t("legacy.fields.summary")} required>
               <Textarea
                 value={form.summary}
                 disabled={isReadOnly}
@@ -233,7 +229,7 @@ export function LegacyItemEditDialog({
               />
             </Field>
 
-            <Field label={t("legacy.fields.content", "正文")} required>
+            <Field label={t("legacy.fields.content")} required>
               <Textarea
                 value={form.content}
                 disabled={isReadOnly}
@@ -243,7 +239,7 @@ export function LegacyItemEditDialog({
               />
             </Field>
 
-            <Field label={t("legacy.fields.tags", "标签")}>
+            <Field label={t("legacy.fields.tags")}>
               <Input
                 value={tagsText}
                 disabled={isReadOnly}
@@ -257,11 +253,11 @@ export function LegacyItemEditDialog({
                   )
                 }
                 className={LEGACY_DIALOG_FIELD_CLASS}
-                placeholder={t("legacy.edit.tagsPlaceholder", "用逗号分隔")}
+                placeholder={t("legacy.edit.tagsPlaceholder")}
               />
             </Field>
 
-            <Field label={t("legacy.fields.reviewCue", "回看提示")}>
+            <Field label={t("legacy.fields.reviewCue")}>
               <Input
                 value={form.reviewCue}
                 disabled={isReadOnly}
@@ -272,13 +268,11 @@ export function LegacyItemEditDialog({
           </div>
 
           <div className={cn(LEGACY_DIALOG_SECTION_CLASS, "min-h-0 overflow-y-auto")}>
-            <div className="text-sm font-medium">
-              {t("legacy.edit.classifySection", "分类与保护")}
-            </div>
+            <div className="text-sm font-medium">{t("legacy.edit.classifySection")}</div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <SelectField
-                label={t("legacy.fields.category", "内容类别")}
+                label={t("legacy.fields.category")}
                 value={form.category}
                 disabled={isReadOnly}
                 options={LEGACY_CATEGORIES}
@@ -286,7 +280,7 @@ export function LegacyItemEditDialog({
                 onChange={(value) => patchForm("category", value)}
               />
               <SelectField
-                label={t("legacy.fields.recipient", "接收者")}
+                label={t("legacy.fields.recipient")}
                 value={form.recipient}
                 disabled={isReadOnly}
                 options={LEGACY_RECIPIENTS}
@@ -294,7 +288,7 @@ export function LegacyItemEditDialog({
                 onChange={(value) => patchForm("recipient", value)}
               />
               <SelectField
-                label={t("legacy.fields.urgency", "紧急度")}
+                label={t("legacy.fields.urgency")}
                 value={form.urgency}
                 disabled={isReadOnly}
                 options={LEGACY_URGENCIES}
@@ -302,7 +296,7 @@ export function LegacyItemEditDialog({
                 onChange={(value) => patchForm("urgency", value)}
               />
               <SelectField
-                label={t("legacy.fields.visibility", "可见时机")}
+                label={t("legacy.fields.visibility")}
                 value={form.visibility}
                 disabled={isReadOnly}
                 options={LEGACY_VISIBILITIES}
@@ -310,7 +304,7 @@ export function LegacyItemEditDialog({
                 onChange={(value) => patchForm("visibility", value)}
               />
               <SelectField
-                label={t("legacy.fields.status", "完成状态")}
+                label={t("legacy.fields.status")}
                 value={form.status}
                 disabled={isReadOnly}
                 options={LEGACY_STATUSES}
@@ -318,7 +312,7 @@ export function LegacyItemEditDialog({
                 onChange={(value) => patchForm("status", value)}
               />
               <SelectField
-                label={t("legacy.fields.emotionalLoad", "情感负荷")}
+                label={t("legacy.fields.emotionalLoad")}
                 value={form.emotionalLoad ?? "平静"}
                 disabled={isReadOnly}
                 options={EMOTIONAL_LOADS}
@@ -327,7 +321,7 @@ export function LegacyItemEditDialog({
               />
             </div>
 
-            <Field label={t("legacy.fields.recipientName", "具体接收者")}>
+            <Field label={t("legacy.fields.recipientName")}>
               <Input
                 value={form.recipientName ?? ""}
                 disabled={isReadOnly || form.recipient === LEGACY_RECIPIENT_SELF}
@@ -336,7 +330,7 @@ export function LegacyItemEditDialog({
               />
             </Field>
 
-            <Field label={t("legacy.fields.relatedRelationshipId", "关系引用")}>
+            <Field label={t("legacy.fields.relatedRelationshipId")}>
               <Input
                 value={form.relatedRelationshipId ?? ""}
                 disabled={isReadOnly}
@@ -347,7 +341,7 @@ export function LegacyItemEditDialog({
 
             {showDeliveryCondition ? (
               <Field
-                label={t("legacy.fields.deliveryCondition", "交付条件")}
+                label={t("legacy.fields.deliveryCondition")}
                 required={
                   form.urgency === LEGACY_URGENCY_CRITICAL && form.status === LEGACY_STATUS_FINAL
                 }
@@ -373,19 +367,19 @@ export function LegacyItemEditDialog({
 
             <div className="grid gap-3">
               <CheckboxLine
-                label={t("legacy.fields.isLocked", "锁定条目")}
+                label={t("legacy.fields.isLocked")}
                 checked={form.isLocked}
                 disabled={isReadOnly || form.status === LEGACY_STATUS_FINAL}
                 onChange={(checked) => patchForm("isLocked", checked)}
               />
               <CheckboxLine
-                label={t("legacy.fields.requiresSecondConfirm", "打开前二次确认")}
+                label={t("legacy.fields.requiresSecondConfirm")}
                 checked={form.requiresSecondConfirm}
                 disabled={isReadOnly}
                 onChange={(checked) => patchForm("requiresSecondConfirm", checked)}
               />
               <CheckboxLine
-                label={t("legacy.fields.excludeFromAi", "不参与 AI 汇总")}
+                label={t("legacy.fields.excludeFromAi")}
                 checked={form.excludeFromAi}
                 disabled={isReadOnly}
                 onChange={(checked) => patchForm("excludeFromAi", checked)}
@@ -398,14 +392,14 @@ export function LegacyItemEditDialog({
           {!editing.isNew ? (
             <Button variant="outline" onClick={handleDelete} className="mr-auto">
               <Trash2 className="size-4" />
-              {t("legacy.actions.delete", "删除")}
+              {t("legacy.actions.delete")}
             </Button>
           ) : null}
           <Button variant="outline" onClick={onClose}>
-            {t("legacy.actions.cancel", "取消")}
+            {t("legacy.actions.cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!canSubmit || isReadOnly}>
-            {t("legacy.actions.save", "保存")}
+            {t("legacy.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -3,6 +3,21 @@
     "filter": {
       "label": "筛选",
       "clearAll": "清空"
+    },
+    "actions": {
+      "save": "保存",
+      "saving": "保存中…",
+      "cancel": "取消",
+      "delete": "删除",
+      "deleting": "删除中…",
+      "confirm": "确定",
+      "close": "关闭",
+      "edit": "编辑",
+      "add": "添加",
+      "create": "新建",
+      "deleted": "已删除",
+      "undo": "撤销",
+      "retry": "重试"
     }
   },
   "shopping": {
@@ -4163,7 +4178,11 @@
       "conclusionPlaceholder": "结论",
       "deleteAria": "删除判词",
       "noPresets": "这对文明暂无判词",
-      "noPresetsHint": "，点击「新增判词」添加"
+      "noPresetsHint": "，点击「新增判词」添加",
+      "deletePending": "已加入删除队列，5 秒内可撤销",
+      "deleteSuccess": "已删除判词",
+      "deleteFailed": "删除判词失败",
+      "deleteUndone": "已撤销删除"
     },
     "star": {
       "suffix": "因果链路星图",

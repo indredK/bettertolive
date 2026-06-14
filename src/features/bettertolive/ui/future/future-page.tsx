@@ -85,14 +85,10 @@ export function FuturePage({
         <div className="flex shrink-0 items-center gap-2 overflow-hidden">
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-              <TabsTrigger value="blueprint">{t("future.tabs.blueprint", "蓝图")}</TabsTrigger>
-              <TabsTrigger value="milestones">
-                {t("future.tabs.milestones", "阶段路径")}
-              </TabsTrigger>
-              <TabsTrigger value="experiments">
-                {t("future.tabs.experiments", "当前实验")}
-              </TabsTrigger>
-              <TabsTrigger value="alignment">{t("future.tabs.alignment", "对齐检查")}</TabsTrigger>
+              <TabsTrigger value="blueprint">{t("future.tabs.blueprint")}</TabsTrigger>
+              <TabsTrigger value="milestones">{t("future.tabs.milestones")}</TabsTrigger>
+              <TabsTrigger value="experiments">{t("future.tabs.experiments")}</TabsTrigger>
+              <TabsTrigger value="alignment">{t("future.tabs.alignment")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -105,7 +101,7 @@ export function FuturePage({
                 onClick={onRefresh}
               >
                 <RefreshCcw className="size-4" />
-                {t("future.refresh", "刷新")}
+                {t("future.refresh")}
               </Button>
             ) : null}
             <AnimatedButton
@@ -115,7 +111,7 @@ export function FuturePage({
               onClick={() => setIsEditingBlueprint(true)}
             >
               <PencilLine className="size-4" />
-              {t("future.edit.blueprint", "编辑蓝图")}
+              {t("future.edit.blueprint")}
             </AnimatedButton>
           </ActionGroup>
         </div>
@@ -285,7 +281,7 @@ function FutureBlueprintPanel({
       <div className="flex items-start justify-between gap-3">
         <SectionHeading
           icon={Sparkles}
-          title={t("future.sections.definition.title", "理想定义")}
+          title={t("future.sections.definition.title")}
           description={t(
             "future.sections.definition.description",
             "先把方向说清楚，再把路径写具体。",
@@ -301,38 +297,38 @@ function FutureBlueprintPanel({
           onClick={onEditBlueprint}
         >
           <PencilLine className="size-3.5" />
-          {t("future.edit.blueprint", "编辑蓝图")}
+          {t("future.edit.blueprint")}
         </AnimatedButton>
       </div>
 
       <div className={cn("mt-4 space-y-4", isFixedLayout && "min-h-0 flex-1 overflow-y-auto pr-1")}>
         <div className="grid gap-3 sm:grid-cols-3">
           <MetricCard
-            label={t("future.metrics.values", "重要价值")}
+            label={t("future.metrics.values")}
             value={futureBlueprint.values.length}
-            detail={t("future.metrics.valuesDetail", "价值不是口号，是持续筛选。")}
+            detail={t("future.metrics.valuesDetail")}
           />
           <MetricCard
-            label={t("future.metrics.milestones", "阶段路径")}
+            label={t("future.metrics.milestones")}
             value={futureBlueprint.milestones.length}
-            detail={t("future.metrics.milestonesDetail", "把远处的方向拆成近处步骤。")}
+            detail={t("future.metrics.milestonesDetail")}
           />
           <MetricCard
-            label={t("future.metrics.experiments", "当前实验")}
+            label={t("future.metrics.experiments")}
             value={futureBlueprint.experiments.length}
-            detail={t("future.metrics.experimentsDetail", "先让生活里出现一点点变化。")}
+            detail={t("future.metrics.experimentsDetail")}
           />
         </div>
 
         <DefinitionBlock
-          label={t("future.definition.identity", "理想自我")}
+          label={t("future.definition.identity")}
           value={futureBlueprint.identity}
           icon={Target}
           highlighted={blueprintMatches}
           onEdit={isControlMode ? onEditBlueprint : undefined}
         />
         <DefinitionBlock
-          label={t("future.definition.lifestyle", "理想生活")}
+          label={t("future.definition.lifestyle")}
           value={futureBlueprint.lifestyle}
           icon={Compass}
           highlighted={blueprintMatches}
@@ -343,10 +339,10 @@ function FutureBlueprintPanel({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="text-sm font-medium text-[color:var(--text-primary)]">
-                {t("future.definition.values", "重要价值")}
+                {t("future.definition.values")}
               </div>
               <p className="mt-1 text-xs leading-5 text-[color:var(--text-muted)]">
-                {t("future.definition.valuesDesc", "这些词决定你会把时间和钱投向哪里。")}
+                {t("future.definition.valuesDesc")}
               </p>
             </div>
             <AnimatedButton
@@ -358,7 +354,7 @@ function FutureBlueprintPanel({
               onClick={onEditBlueprint}
             >
               <PencilLine className="size-3.5" />
-              {t("future.edit.blueprint", "编辑蓝图")}
+              {t("future.edit.blueprint")}
             </AnimatedButton>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -374,7 +370,7 @@ function FutureBlueprintPanel({
               ))
             ) : (
               <span className="text-sm text-[color:var(--text-muted)]">
-                {t("future.empty.values", "当前还没有价值关键词。")}
+                {t("future.empty.values")}
               </span>
             )}
           </div>
@@ -406,7 +402,7 @@ function FutureMilestonesPanel({
       <div className="flex items-start justify-between gap-3">
         <SectionHeading
           icon={Target}
-          title={t("future.sections.milestones.title", "阶段路径")}
+          title={t("future.sections.milestones.title")}
           description={t(
             "future.sections.milestones.description",
             "先把未来拆成靠近方式，而不是终局答案。",
@@ -422,7 +418,7 @@ function FutureMilestonesPanel({
           onClick={onCreate}
         >
           <Plus className="size-3.5" />
-          {t("future.addMilestone", "新增路径")}
+          {t("future.addMilestone")}
         </AnimatedButton>
       </div>
 
@@ -440,7 +436,7 @@ function FutureMilestonesPanel({
             )
           })
         ) : (
-          <EmptyState message={t("future.empty.milestones", "当前筛选下没有未来路径。")} />
+          <EmptyState message={t("future.empty.milestones")} />
         )}
       </div>
     </Surface>
@@ -467,7 +463,7 @@ function FutureExperimentsPanel({
       <div className="flex items-start justify-between gap-3">
         <SectionHeading
           icon={Compass}
-          title={t("future.sections.experiments.title", "当前实验")}
+          title={t("future.sections.experiments.title")}
           description={t(
             "future.sections.experiments.description",
             "不用一步到位，先让生活里出现一点点更像自己的东西。",
@@ -483,7 +479,7 @@ function FutureExperimentsPanel({
           onClick={onCreate}
         >
           <Plus className="size-3.5" />
-          {t("future.addExperiment", "新增实验")}
+          {t("future.addExperiment")}
         </AnimatedButton>
       </div>
 
@@ -493,12 +489,12 @@ function FutureExperimentsPanel({
             <ExperimentCard
               key={`${entry}-${index}`}
               entry={entry}
-              editHint={t("future.edit.clickToEdit", "点击可编辑")}
+              editHint={t("future.edit.clickToEdit")}
               onEdit={isControlMode ? () => onEdit(entry, index) : undefined}
             />
           ))
         ) : (
-          <EmptyState message={t("future.empty.experiments", "当前筛选下没有实验内容。")} />
+          <EmptyState message={t("future.empty.experiments")} />
         )}
       </div>
     </Surface>
@@ -517,27 +513,23 @@ function FutureAlignmentPanel({
   const { t } = useTranslation()
   const checks = [
     {
-      title: t("future.alignment.identity.title", "理想自我是否清楚"),
-      detail: futureBlueprint.identity || t("future.empty.identity", "还没有写下理想自我。"),
+      title: t("future.alignment.identity.title"),
+      detail: futureBlueprint.identity || t("future.empty.identity"),
     },
     {
-      title: t("future.alignment.values.title", "价值是否能筛选选择"),
+      title: t("future.alignment.values.title"),
       detail:
         futureBlueprint.values.length > 0
           ? futureBlueprint.values.join(" · ")
-          : t("future.empty.values", "当前还没有价值关键词。"),
+          : t("future.empty.values"),
     },
     {
-      title: t("future.alignment.path.title", "路径是否已经拆近"),
-      detail:
-        milestones[0]?.summary ??
-        t("future.alignment.path.empty", "还没有能承接当前方向的阶段路径。"),
+      title: t("future.alignment.path.title"),
+      detail: milestones[0]?.summary ?? t("future.alignment.path.empty"),
     },
     {
-      title: t("future.alignment.experiment.title", "生活里是否已有实验"),
-      detail:
-        futureBlueprint.experiments[0] ??
-        t("future.alignment.experiment.empty", "还没有当前实验。"),
+      title: t("future.alignment.experiment.title"),
+      detail: futureBlueprint.experiments[0] ?? t("future.alignment.experiment.empty"),
     },
   ]
 
@@ -545,7 +537,7 @@ function FutureAlignmentPanel({
     <Surface className={cn("p-5", isFixedLayout && "flex h-full min-h-0 flex-col overflow-hidden")}>
       <SectionHeading
         icon={CheckCheck}
-        title={t("future.alignment.title", "对齐检查")}
+        title={t("future.alignment.title")}
         description={t(
           "future.alignment.description",
           "用四个问题检查蓝图是否已经能回到当下行动。",
@@ -623,7 +615,7 @@ function DefinitionBlock({
           variant="ghost"
           size="sm"
           className="text-[color:var(--text-secondary)]"
-          label={t("future.edit.blueprint", "编辑蓝图")}
+          label={t("future.edit.blueprint")}
           icon={<PencilLine className="size-3.5" />}
           onClick={onEdit}
         />
@@ -656,7 +648,7 @@ function MilestoneCard({ entry, onEdit }: { entry: FutureMilestone; onEdit?: () 
           type="button"
           variant="ghost"
           size="sm"
-          label={t("future.edit.milestone", "编辑路径")}
+          label={t("future.edit.milestone")}
           icon={<PencilLine className="size-3.5" />}
           onClick={onEdit}
         />

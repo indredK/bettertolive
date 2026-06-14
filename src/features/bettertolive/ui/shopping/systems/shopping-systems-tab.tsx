@@ -90,7 +90,7 @@ function SystemMapCard({
           size="icon-sm"
           variant="ghost"
           className="h-6 w-6 shrink-0"
-          label={t("shopping.systems.edit", "编辑系统")}
+          label={t("shopping.systems.edit")}
           icon={<Pencil className="size-3" />}
           onClick={() => onEditSystem(system)}
         />
@@ -134,7 +134,7 @@ function SystemDetailPanel({
           show={isControlMode && Boolean(onDelete)}
           variant="outline"
           size="sm"
-          label={t("shopping.systems.delete", "删除系统")}
+          label={t("shopping.systems.delete")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
         />
@@ -166,7 +166,7 @@ function SystemDetailPanel({
           </div>
         ) : (
           <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
-            {t("shopping.systems.emptySystem", "当前系统下暂无物品")}
+            {t("shopping.systems.emptySystem")}
           </div>
         )}
       </CardContent>
@@ -252,7 +252,7 @@ export function ShoppingSystemsTab({
 
     try {
       await reorderSystemDefinitions(newOrder)
-      toast.success(t("shopping.systems.reordered", "系统顺序已更新"))
+      toast.success(t("shopping.systems.reordered"))
       onDeleted()
     } catch (err) {
       toast.error(String(err))
@@ -275,8 +275,8 @@ export function ShoppingSystemsTab({
         name: displayName,
         defaultValue: `已删除系统：${displayName}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedSystem", "删除系统失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedSystem"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneSystem", {
         name: displayName,
         defaultValue: `已撤销删除：${displayName}`,
@@ -298,7 +298,7 @@ export function ShoppingSystemsTab({
             "text-muted-foreground rounded-xl border p-6 text-center text-sm",
           )}
         >
-          {t("shopping.systems.emptyHint", "还没有系统定义,点击「新增系统」开始")}
+          {t("shopping.systems.emptyHint")}
         </div>
       ) : (
         <ShoppingTabBody>
@@ -343,9 +343,7 @@ export function ShoppingSystemsTab({
                 onDelete={isControlMode ? () => handleDeleteSystem(selectedSystem) : undefined}
               />
             ) : (
-              <ShoppingEmptyDetailCard
-                message={t("shopping.systems.selectPrompt", "从左侧选择一个系统查看详情")}
-              />
+              <ShoppingEmptyDetailCard message={t("shopping.systems.selectPrompt")} />
             )}
           </ShoppingDetailPane>
         </ShoppingTabBody>

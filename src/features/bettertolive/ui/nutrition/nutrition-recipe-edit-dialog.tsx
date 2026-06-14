@@ -127,7 +127,7 @@ export function NutritionRecipeEditDialog({
   ) {
     linkedFoodMemoryOptions.push({
       value: form.linkedFoodMemoryId,
-      label: t("nutrition.recipeEdit.missingFoodMemory", "已关联的食物记忆不存在"),
+      label: t("nutrition.recipeEdit.missingFoodMemory"),
     })
   }
   const referencedByPlans = editing.recipe
@@ -179,12 +179,12 @@ export function NutritionRecipeEditDialog({
     event.preventDefault()
 
     if (!form.name.trim()) {
-      toast.error(t("nutrition.recipeEdit.validation.nameRequired", "请填写食谱名"))
+      toast.error(t("nutrition.recipeEdit.validation.nameRequired"))
       return
     }
 
     if (form.mealRoles.length === 0) {
-      toast.error(t("nutrition.recipeEdit.validation.mealRoleRequired", "请至少选择一个适用餐次"))
+      toast.error(t("nutrition.recipeEdit.validation.mealRoleRequired"))
       return
     }
 
@@ -201,9 +201,7 @@ export function NutritionRecipeEditDialog({
       )
 
     if (nextIngredients.length === 0) {
-      toast.error(
-        t("nutrition.recipeEdit.validation.ingredientsRequired", "请至少添加一个有效食材"),
-      )
+      toast.error(t("nutrition.recipeEdit.validation.ingredientsRequired"))
       return
     }
 
@@ -213,7 +211,7 @@ export function NutritionRecipeEditDialog({
       .filter(Boolean)
 
     if (steps.length === 0) {
-      toast.error(t("nutrition.recipeEdit.validation.stepsRequired", "请至少填写一个步骤"))
+      toast.error(t("nutrition.recipeEdit.validation.stepsRequired"))
       return
     }
 
@@ -242,10 +240,10 @@ export function NutritionRecipeEditDialog({
         ...nutrition,
         recipes: nextRecipes,
       })
-      toast.success(t("nutrition.recipeEdit.saved", "食谱已保存"))
+      toast.success(t("nutrition.recipeEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.recipeEdit.saveFailed", "食谱保存失败"))
+      toast.error(t("nutrition.recipeEdit.saveFailed"))
     }
   }
 
@@ -259,10 +257,10 @@ export function NutritionRecipeEditDialog({
         ...nutrition,
         recipes: nutrition.recipes.filter((recipe) => recipe.id !== editing.recipe?.id),
       })
-      toast.success(t("nutrition.recipeEdit.deleted", "食谱已删除"))
+      toast.success(t("nutrition.recipeEdit.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.recipeEdit.deleteFailed", "食谱删除失败"))
+      toast.error(t("nutrition.recipeEdit.deleteFailed"))
     }
   }
 
@@ -277,8 +275,8 @@ export function NutritionRecipeEditDialog({
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("nutrition.recipeEdit.createTitle", "新增食谱")
-              : t("nutrition.recipeEdit.editTitle", "编辑食谱")}
+              ? t("nutrition.recipeEdit.createTitle")
+              : t("nutrition.recipeEdit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -292,22 +290,22 @@ export function NutritionRecipeEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_160px]">
-                <Field label={t("nutrition.recipeEdit.name", "食谱名")}>
+                <Field label={t("nutrition.recipeEdit.name")}>
                   <Input
                     value={form.name}
                     onChange={(event) => updateForm({ name: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.recipeEdit.namePlaceholder", "例如：番茄鸡蛋面")}
+                    placeholder={t("nutrition.recipeEdit.namePlaceholder")}
                   />
                 </Field>
                 <NumberField
-                  label={t("nutrition.recipeEdit.servings", "份数")}
+                  label={t("nutrition.recipeEdit.servings")}
                   value={form.servings}
                   onChange={(servings) => updateForm({ servings })}
                 />
               </div>
 
-              <Field label={t("nutrition.recipeEdit.summary", "简介")}>
+              <Field label={t("nutrition.recipeEdit.summary")}>
                 <Textarea
                   value={form.summary}
                   onChange={(event) => updateForm({ summary: event.target.value })}
@@ -320,31 +318,31 @@ export function NutritionRecipeEditDialog({
               </Field>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.recipeEdit.mealRoles", "适用餐次")}>
+                <Field label={t("nutrition.recipeEdit.mealRoles")}>
                   <MultiSelect
                     options={mealRoleOptions}
                     value={form.mealRoles}
                     onChange={(mealRoles) =>
                       updateForm({ mealRoles: mealRoles as MealStructure[] })
                     }
-                    placeholder={t("nutrition.recipeEdit.mealRolesPlaceholder", "选择餐次")}
-                    searchPlaceholder={t("nutrition.recipeEdit.mealRolesSearch", "搜索餐次")}
-                    emptyMessage={t("nutrition.recipeEdit.mealRolesEmpty", "没有匹配餐次")}
+                    placeholder={t("nutrition.recipeEdit.mealRolesPlaceholder")}
+                    searchPlaceholder={t("nutrition.recipeEdit.mealRolesSearch")}
+                    emptyMessage={t("nutrition.recipeEdit.mealRolesEmpty")}
                   />
                 </Field>
 
-                <Field label={t("nutrition.recipeEdit.tags", "标签")}>
+                <Field label={t("nutrition.recipeEdit.tags")}>
                   <Input
                     value={form.tagsText}
                     onChange={(event) => updateForm({ tagsText: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.recipeEdit.tagsPlaceholder", "用逗号分隔")}
+                    placeholder={t("nutrition.recipeEdit.tagsPlaceholder")}
                   />
                 </Field>
               </div>
 
               {linkedFoodMemoryOptions.length > 0 ? (
-                <Field label={t("nutrition.recipeEdit.linkedFoodMemory", "关联食物记忆")}>
+                <Field label={t("nutrition.recipeEdit.linkedFoodMemory")}>
                   <Select
                     value={form.linkedFoodMemoryId || NONE_VALUE}
                     onValueChange={(linkedFoodMemoryId) =>
@@ -358,7 +356,7 @@ export function NutritionRecipeEditDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={NONE_VALUE}>
-                        {t("nutrition.recipeEdit.noFoodMemory", "不关联食物记忆")}
+                        {t("nutrition.recipeEdit.noFoodMemory")}
                       </SelectItem>
                       {linkedFoodMemoryOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
@@ -372,16 +370,16 @@ export function NutritionRecipeEditDialog({
 
               <div className="grid gap-4 md:grid-cols-4">
                 <NumberField
-                  label={t("nutrition.recipeEdit.prepMinutes", "准备分钟")}
+                  label={t("nutrition.recipeEdit.prepMinutes")}
                   value={form.prepMinutes}
                   onChange={(prepMinutes) => updateForm({ prepMinutes })}
                 />
                 <NumberField
-                  label={t("nutrition.recipeEdit.cookMinutes", "烹饪分钟")}
+                  label={t("nutrition.recipeEdit.cookMinutes")}
                   value={form.cookMinutes}
                   onChange={(cookMinutes) => updateForm({ cookMinutes })}
                 />
-                <Field label={t("nutrition.recipeEdit.difficulty", "难度")}>
+                <Field label={t("nutrition.recipeEdit.difficulty")}>
                   <Select
                     value={form.difficulty}
                     onValueChange={(difficulty) =>
@@ -403,7 +401,7 @@ export function NutritionRecipeEditDialog({
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label={t("nutrition.recipeEdit.repeatability", "复用频率")}>
+                <Field label={t("nutrition.recipeEdit.repeatability")}>
                   <Select
                     value={form.repeatability}
                     onValueChange={(repeatability) =>
@@ -431,9 +429,7 @@ export function NutritionRecipeEditDialog({
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold">
-                    {t("nutrition.recipeEdit.ingredients", "食材")}
-                  </h3>
+                  <h3 className="text-sm font-semibold">{t("nutrition.recipeEdit.ingredients")}</h3>
                   <p className="text-muted-foreground mt-1 text-xs leading-5">
                     {t(
                       "nutrition.recipeEdit.ingredientsHint",
@@ -443,7 +439,7 @@ export function NutritionRecipeEditDialog({
                 </div>
                 <Button type="button" variant="outline" size="sm" onClick={addIngredient}>
                   <Plus className="size-3.5" />
-                  {t("nutrition.recipeEdit.addIngredient", "添加食材")}
+                  {t("nutrition.recipeEdit.addIngredient")}
                 </Button>
               </div>
 
@@ -453,7 +449,7 @@ export function NutritionRecipeEditDialog({
                     key={`${index}-${ingredient.foodId}`}
                     className="border-foreground/10 bg-background/70 grid gap-3 rounded-xl border p-3 lg:grid-cols-[minmax(180px,1fr)_120px_100px_minmax(160px,0.8fr)_auto]"
                   >
-                    <Field label={t("nutrition.recipeEdit.food", "食品")}>
+                    <Field label={t("nutrition.recipeEdit.food")}>
                       <Select
                         value={ingredient.foodId || NONE_VALUE}
                         onValueChange={(foodId) =>
@@ -465,12 +461,12 @@ export function NutritionRecipeEditDialog({
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value={NONE_VALUE}>
-                            {t("nutrition.recipeEdit.selectFood", "选择食品")}
+                            {t("nutrition.recipeEdit.selectFood")}
                           </SelectItem>
                           {ingredient.foodId &&
                           !foodOptions.some((option) => option.value === ingredient.foodId) ? (
                             <SelectItem value={ingredient.foodId}>
-                              {t("nutrition.recipeEdit.missingFood", "已关联的食品不存在")}
+                              {t("nutrition.recipeEdit.missingFood")}
                             </SelectItem>
                           ) : null}
                           {foodOptions.map((option) => (
@@ -482,11 +478,11 @@ export function NutritionRecipeEditDialog({
                       </Select>
                     </Field>
                     <NumberField
-                      label={t("nutrition.recipeEdit.amount", "用量")}
+                      label={t("nutrition.recipeEdit.amount")}
                       value={ingredient.amount}
                       onChange={(amount) => updateIngredient(index, { amount })}
                     />
-                    <Field label={t("nutrition.recipeEdit.unit", "单位")}>
+                    <Field label={t("nutrition.recipeEdit.unit")}>
                       <Select
                         value={ingredient.unit}
                         onValueChange={(unit) =>
@@ -508,7 +504,7 @@ export function NutritionRecipeEditDialog({
                         </SelectContent>
                       </Select>
                     </Field>
-                    <Field label={t("nutrition.recipeEdit.ingredientNote", "备注")}>
+                    <Field label={t("nutrition.recipeEdit.ingredientNote")}>
                       <Input
                         value={ingredient.note}
                         onChange={(event) => updateIngredient(index, { note: event.target.value })}
@@ -522,7 +518,7 @@ export function NutritionRecipeEditDialog({
                         size="icon-sm"
                         onClick={() => removeIngredient(index)}
                         disabled={form.ingredients.length <= 1}
-                        tooltip={t("nutrition.recipeEdit.delete", "删除")}
+                        tooltip={t("nutrition.recipeEdit.delete")}
                       >
                         <Trash2 className="size-4" />
                       </Button>
@@ -533,12 +529,12 @@ export function NutritionRecipeEditDialog({
             </section>
 
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
-              <Field label={t("nutrition.recipeEdit.steps", "步骤")}>
+              <Field label={t("nutrition.recipeEdit.steps")}>
                 <Textarea
                   value={form.stepsText}
                   onChange={(event) => updateForm({ stepsText: event.target.value })}
                   className={cn(NUTRITION_DIALOG_FIELD_CLASS, "min-h-36")}
-                  placeholder={t("nutrition.recipeEdit.stepsPlaceholder", "每行一个步骤")}
+                  placeholder={t("nutrition.recipeEdit.stepsPlaceholder")}
                 />
               </Field>
             </section>
@@ -564,16 +560,16 @@ export function NutritionRecipeEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.recipeEdit.delete", "删除")}
+                {t("nutrition.recipeEdit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>

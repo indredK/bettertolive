@@ -117,9 +117,9 @@ export function NutritionDailyPlanTab({
         dailyPlans: nextDailyPlans,
         mealLogs: [nextLog, ...sourceNutrition.mealLogs],
       })
-      toast.success(t("nutrition.dailyPlan.logGenerated", "已从计划生成进食记录"))
+      toast.success(t("nutrition.dailyPlan.logGenerated"))
     } catch {
-      toast.error(t("nutrition.dailyPlan.logGenerateFailed", "进食记录生成失败"))
+      toast.error(t("nutrition.dailyPlan.logGenerateFailed"))
     }
   }
 
@@ -133,9 +133,7 @@ export function NutritionDailyPlanTab({
           )}
         >
           <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-            <p className="text-muted-foreground text-sm">
-              {t("nutrition.dailyPlan.emptyPlan", "暂无每日计划。")}
-            </p>
+            <p className="text-muted-foreground text-sm">{t("nutrition.dailyPlan.emptyPlan")}</p>
           </CardContent>
         </Card>
         {isControlMode && editingPlan ? (
@@ -156,7 +154,7 @@ export function NutritionDailyPlanTab({
           <div className="mb-3 flex items-center justify-between gap-2 px-1">
             <div className="flex items-center gap-2 text-sm font-semibold">
               <CalendarRange className="size-4" />
-              {t("nutrition.dailyPlan.week", "一周计划")}
+              {t("nutrition.dailyPlan.week")}
             </div>
           </div>
           <div className="space-y-2">
@@ -180,7 +178,7 @@ export function NutritionDailyPlanTab({
                 <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="text-muted-foreground text-xs">
-                      {t("nutrition.dailyPlan.selectedDate", "当前日期")}
+                      {t("nutrition.dailyPlan.selectedDate")}
                     </div>
                     <h3 className="mt-1 text-lg font-semibold tracking-tight">{activePlan.date}</h3>
                   </div>
@@ -189,18 +187,18 @@ export function NutritionDailyPlanTab({
                       variant="outline"
                       className="border-foreground/10 bg-muted text-muted-foreground"
                     >
-                      {t("nutrition.dailyPlan.planNote", "计划是预案，不是打卡压力")}
+                      {t("nutrition.dailyPlan.planNote")}
                     </Badge>
                     <AnimatedIconButton
                       show={isControlMode}
                       type="button"
                       variant="outline"
                       size="sm"
-                      label={t("nutrition.dailyPlanEdit.editAction", "编辑")}
+                      label={t("nutrition.dailyPlanEdit.editAction")}
                       icon={<Pencil className="size-3.5" />}
                       onClick={() => setEditingPlan({ isNew: false, plan: activePlan })}
                     >
-                      {t("nutrition.dailyPlanEdit.editAction", "编辑")}
+                      {t("nutrition.dailyPlanEdit.editAction")}
                     </AnimatedIconButton>
                   </div>
                 </div>
@@ -240,8 +238,8 @@ export function NutritionDailyPlanTab({
                         >
                           <ClipboardCheck className="size-3.5" />
                           {generatedSourceLogBySlotId.has(slot.id)
-                            ? t("nutrition.dailyPlan.logGeneratedAction", "已生成记录")
-                            : t("nutrition.dailyPlan.generateLog", "生成进食记录")}
+                            ? t("nutrition.dailyPlan.logGeneratedAction")
+                            : t("nutrition.dailyPlan.generateLog")}
                         </AnimatedButton>
                       </div>
 
@@ -256,14 +254,14 @@ export function NutritionDailyPlanTab({
                                 entry,
                                 foodById: lookups.foodById,
                                 recipeById: lookups.recipeById,
-                                servingLabel: t("nutrition.units.serving", "份"),
+                                servingLabel: t("nutrition.units.serving"),
                                 unitLabel: (unit) => translateNutritionEnum(t, "unit", unit),
                               })}
                             </div>
                           ))
                         ) : (
                           <div className="border-foreground/15 text-muted-foreground rounded-xl border border-dashed px-3 py-6 text-center text-sm">
-                            {t("nutrition.dailyPlan.emptySlot", "这一餐先留白")}
+                            {t("nutrition.dailyPlan.emptySlot")}
                           </div>
                         )}
                       </div>
@@ -373,7 +371,7 @@ function PlanListCard({
         </Badge>
       </div>
       <p className="text-muted-foreground mt-2 line-clamp-2 text-xs leading-5">
-        {plan.note || t("nutrition.dailyPlan.noNote", "暂无当日备注")}
+        {plan.note || t("nutrition.dailyPlan.noNote")}
       </p>
     </NutritionSelectableCard>
   )
@@ -407,19 +405,17 @@ function DailyNutritionPanel({
       <CardContent className="flex min-h-0 flex-1 flex-col p-4">
         <div className="flex shrink-0 items-center gap-2">
           <CircleCheck className="size-4" />
-          <h3 className="text-sm font-semibold">
-            {t("nutrition.dailyPlan.nutritionSummary", "营养摘要")}
-          </h3>
+          <h3 className="text-sm font-semibold">{t("nutrition.dailyPlan.nutritionSummary")}</h3>
         </div>
 
         <div className="mt-4 grid shrink-0 grid-cols-2 gap-2 xl:grid-cols-1 2xl:grid-cols-2">
           <NutritionMetricCard
-            label={t("nutrition.nutrients.energyKcal", "能量")}
+            label={t("nutrition.nutrients.energyKcal")}
             value={formatNutrientValue(totals.energyKcal)}
             detail="kcal"
           />
           <NutritionMetricCard
-            label={t("nutrition.nutrients.proteinG", "蛋白质")}
+            label={t("nutrition.nutrients.proteinG")}
             value={formatNutrientValue(totals.proteinG, 1)}
             detail="g"
           />
@@ -427,10 +423,10 @@ function DailyNutritionPanel({
 
         <div className="mt-4 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
           <section className="border-foreground/10 bg-background/70 rounded-2xl border p-3">
-            <h4 className="text-sm font-semibold">{t("nutrition.dailyPlan.gaps", "今日缺口")}</h4>
+            <h4 className="text-sm font-semibold">{t("nutrition.dailyPlan.gaps")}</h4>
             <div className="mt-3 grid gap-2">
               <GapLine
-                label={t("nutrition.dailyPlan.emptySlots", "留白餐次")}
+                label={t("nutrition.dailyPlan.emptySlots")}
                 value={emptySlotCount}
                 detail={t(
                   "nutrition.dailyPlan.emptySlotsHint",
@@ -438,9 +434,9 @@ function DailyNutritionPanel({
                 )}
               />
               <GapLine
-                label={t("nutrition.dailyPlan.pendingNutrition", "待补营养")}
+                label={t("nutrition.dailyPlan.pendingNutrition")}
                 value={totals.missingCount}
-                detail={t("nutrition.dailyPlan.pendingNutritionHint", "缺失数据不会被当成 0")}
+                detail={t("nutrition.dailyPlan.pendingNutritionHint")}
               />
             </div>
           </section>
@@ -473,10 +469,10 @@ function DailyNutritionPanel({
           ) : null}
           <section className="border-foreground/10 bg-background/70 rounded-2xl border p-3">
             <h4 className="text-sm font-semibold">
-              {t("nutrition.dailyPlan.replacementSuggestions", "可替换建议")}
+              {t("nutrition.dailyPlan.replacementSuggestions")}
             </h4>
             <p className="text-muted-foreground mt-1 text-xs leading-5">
-              {t("nutrition.dailyPlan.replacementHint", "从未安排且营养数据更完整的食谱里挑选。")}
+              {t("nutrition.dailyPlan.replacementHint")}
             </p>
             <div className="mt-3 space-y-2">
               {replacementRecipes.length > 0 ? (

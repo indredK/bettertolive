@@ -108,7 +108,7 @@ export function PrincipleEditDialog({
       !form.domain.trim() ||
       !form.boundary.trim()
     ) {
-      toast.error(t("principles.edit.validation.required", "请填写标题、原则表达、领域和边界"))
+      toast.error(t("principles.edit.validation.required"))
       return
     }
 
@@ -129,10 +129,10 @@ export function PrincipleEditDialog({
         entries: nextEntries,
         boundaries: deriveBoundaryList(nextEntries),
       })
-      toast.success(t("principles.edit.saved", "原则已保存"))
+      toast.success(t("principles.edit.saved"))
       onSaved?.()
     } catch {
-      toast.error(t("principles.edit.saveFailed", "原则保存失败"))
+      toast.error(t("principles.edit.saveFailed"))
     }
   }
 
@@ -140,7 +140,7 @@ export function PrincipleEditDialog({
     const seed = editing.principle
     if (!seed) return
 
-    if (!window.confirm(t("principles.edit.confirmDelete", "确定删除这条原则吗？"))) {
+    if (!window.confirm(t("principles.edit.confirmDelete"))) {
       return
     }
 
@@ -155,10 +155,10 @@ export function PrincipleEditDialog({
           (relation) => relation.fromId !== seed.id && relation.toId !== seed.id,
         ),
       })
-      toast.success(t("principles.edit.deleted", "原则已删除"))
+      toast.success(t("principles.edit.deleted"))
       onSaved?.()
     } catch {
-      toast.error(t("principles.edit.deleteFailed", "原则删除失败"))
+      toast.error(t("principles.edit.deleteFailed"))
     }
   }
 
@@ -172,9 +172,7 @@ export function PrincipleEditDialog({
       >
         <DialogHeader className={PRINCIPLES_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("principles.edit.createTitle", "新增原则")
-              : t("principles.edit.editTitle", "编辑原则")}
+            {editing.isNew ? t("principles.edit.createTitle") : t("principles.edit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -188,16 +186,16 @@ export function PrincipleEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={PRINCIPLES_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px]">
-                <Field label={t("principles.edit.title", "标题")}>
+                <Field label={t("principles.edit.title")}>
                   <Input
                     value={form.title}
                     onChange={(event) => updateForm({ title: event.target.value })}
                     className={PRINCIPLES_DIALOG_FIELD_CLASS}
-                    placeholder={t("principles.edit.titlePlaceholder", "例如：不在深夜做重要决定")}
+                    placeholder={t("principles.edit.titlePlaceholder")}
                   />
                 </Field>
 
-                <Field label={t("principles.edit.cost", "代价")}>
+                <Field label={t("principles.edit.cost")}>
                   <Select
                     value={form.cost}
                     onValueChange={(cost) =>
@@ -220,7 +218,7 @@ export function PrincipleEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("principles.edit.statement", "原则表达")}>
+              <Field label={t("principles.edit.statement")}>
                 <Textarea
                   value={form.statement}
                   onChange={(event) => updateForm({ statement: event.target.value })}
@@ -232,7 +230,7 @@ export function PrincipleEditDialog({
                 />
               </Field>
 
-              <Field label={t("principles.edit.descriptionLabel", "说明")}>
+              <Field label={t("principles.edit.descriptionLabel")}>
                 <Textarea
                   value={form.description}
                   onChange={(event) => updateForm({ description: event.target.value })}
@@ -244,7 +242,7 @@ export function PrincipleEditDialog({
             <section className={PRINCIPLES_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-6">
                 <EnumField
-                  label={t("principles.edit.perspective", "归属")}
+                  label={t("principles.edit.perspective")}
                   group="perspective"
                   options={PRINCIPLE_PERSPECTIVES}
                   value={form.perspective}
@@ -252,7 +250,7 @@ export function PrincipleEditDialog({
                     updateForm({ perspective: perspective as PrinciplePerspective })
                   }
                 />
-                <Field label={t("principles.edit.domain", "领域")}>
+                <Field label={t("principles.edit.domain")}>
                   <Input
                     value={form.domain}
                     onChange={(event) => updateForm({ domain: event.target.value })}
@@ -270,14 +268,14 @@ export function PrincipleEditDialog({
                   </datalist>
                 </Field>
                 <EnumField
-                  label={t("principles.edit.type", "类型")}
+                  label={t("principles.edit.type")}
                   group="type"
                   options={PRINCIPLE_TYPES}
                   value={form.type}
                   onValueChange={(type) => updateForm({ type: type as PrincipleType })}
                 />
                 <EnumField
-                  label={t("principles.edit.strength", "强度")}
+                  label={t("principles.edit.strength")}
                   group="strength"
                   options={PRINCIPLE_STRENGTHS}
                   value={form.strength}
@@ -286,14 +284,14 @@ export function PrincipleEditDialog({
                   }
                 />
                 <EnumField
-                  label={t("principles.edit.source", "来源")}
+                  label={t("principles.edit.source")}
                   group="source"
                   options={PRINCIPLE_SOURCES}
                   value={form.source}
                   onValueChange={(source) => updateForm({ source: source as PrincipleSource })}
                 />
                 <EnumField
-                  label={t("principles.edit.status", "状态")}
+                  label={t("principles.edit.status")}
                   group="status"
                   options={PRINCIPLE_STATUSES}
                   value={form.status}
@@ -304,21 +302,21 @@ export function PrincipleEditDialog({
 
             <section className={PRINCIPLES_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 lg:grid-cols-3">
-                <Field label={t("principles.edit.boundary", "边界")}>
+                <Field label={t("principles.edit.boundary")}>
                   <Textarea
                     value={form.boundary}
                     onChange={(event) => updateForm({ boundary: event.target.value })}
                     className={cn(PRINCIPLES_DIALOG_FIELD_CLASS, "min-h-24")}
                   />
                 </Field>
-                <Field label={t("principles.edit.protectedValue", "保护对象")}>
+                <Field label={t("principles.edit.protectedValue")}>
                   <Textarea
                     value={form.protectedValue}
                     onChange={(event) => updateForm({ protectedValue: event.target.value })}
                     className={cn(PRINCIPLES_DIALOG_FIELD_CLASS, "min-h-24")}
                   />
                 </Field>
-                <Field label={t("principles.edit.decisionCue", "触发校准")}>
+                <Field label={t("principles.edit.decisionCue")}>
                   <Textarea
                     value={form.decisionCue}
                     onChange={(event) => updateForm({ decisionCue: event.target.value })}
@@ -327,12 +325,12 @@ export function PrincipleEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("principles.edit.tags", "标签")}>
+              <Field label={t("principles.edit.tags")}>
                 <Input
                   value={form.tagsText}
                   onChange={(event) => updateForm({ tagsText: event.target.value })}
                   className={PRINCIPLES_DIALOG_FIELD_CLASS}
-                  placeholder={t("principles.edit.tagsPlaceholder", "用逗号分隔")}
+                  placeholder={t("principles.edit.tagsPlaceholder")}
                 />
               </Field>
             </section>
@@ -348,16 +346,16 @@ export function PrincipleEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("principles.edit.delete", "删除")}
+                {t("principles.edit.delete")}
               </Button>
             )}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("principles.edit.cancel", "取消")}
+              {t("principles.edit.cancel")}
             </Button>
             <Button type="submit" disabled={savePrinciplesMutation.isPending}>
               {savePrinciplesMutation.isPending
-                ? t("principles.edit.saving", "保存中")
-                : t("principles.edit.save", "保存")}
+                ? t("principles.edit.saving")
+                : t("principles.edit.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -511,7 +509,7 @@ function createRevision(
       defaultValue: "更新了{{fields}}。",
       fields: changedFields
         .map((field) => translatePrincipleEnum(t, "revisionField", field))
-        .join(t("principles.edit.revision.separator", "、")),
+        .join(t("principles.edit.revision.separator")),
     }),
     changedFields,
   }

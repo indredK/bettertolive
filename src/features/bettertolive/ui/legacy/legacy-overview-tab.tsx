@@ -43,7 +43,7 @@ export function LegacyOverviewTab({
       <Surface className="p-5">
         <SectionHeading
           icon={ShieldCheck}
-          title={t("legacy.overview.title", "生命整理总览")}
+          title={t("legacy.overview.title")}
           description={t(
             "legacy.overview.description",
             "看覆盖、缺口和边界是否清楚，不把沉重内容做成催促。",
@@ -52,26 +52,26 @@ export function LegacyOverviewTab({
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <LegacyMetricCard
-            label={t("legacy.metrics.total", "条目总数")}
+            label={t("legacy.metrics.total")}
             value={String(stats.totalCount)}
-            detail={t("legacy.metrics.totalDesc", "条目库是唯一数据源。")}
+            detail={t("legacy.metrics.totalDesc")}
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.criticalDraft", "关键信息未完成")}
+            label={t("legacy.metrics.criticalDraft")}
             value={String(stats.criticalDraftCount)}
-            detail={t("legacy.metrics.criticalDraftDesc", "优先看是否仍停在草稿或持续更新。")}
+            detail={t("legacy.metrics.criticalDraftDesc")}
             tone={stats.criticalDraftCount > 0 ? "warning" : "quiet"}
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.missingDelivery", "交付条件待补")}
+            label={t("legacy.metrics.missingDelivery")}
             value={String(stats.missingDeliveryConditionCount)}
-            detail={t("legacy.metrics.missingDeliveryDesc", "未来或条件可见内容需要说明触发方式。")}
+            detail={t("legacy.metrics.missingDeliveryDesc")}
             tone={stats.missingDeliveryConditionCount > 0 ? "warning" : "quiet"}
           />
           <LegacyMetricCard
-            label={t("legacy.metrics.finalLocked", "最终版或锁定")}
+            label={t("legacy.metrics.finalLocked")}
             value={String(stats.finalLockedCount)}
-            detail={t("legacy.metrics.finalLockedDesc", "锁定内容修改前需要主动确认。")}
+            detail={t("legacy.metrics.finalLockedDesc")}
             tone="locked"
           />
         </div>
@@ -81,7 +81,7 @@ export function LegacyOverviewTab({
         <Surface className="p-5">
           <SectionHeading
             icon={Layers3}
-            title={t("legacy.overview.coverage", "分类覆盖")}
+            title={t("legacy.overview.coverage")}
             description={t(
               "legacy.overview.coverageDesc",
               "按内容本质看整理是否过度集中在某一类。",
@@ -102,7 +102,7 @@ export function LegacyOverviewTab({
         <Surface className="p-5">
           <SectionHeading
             icon={ShieldCheck}
-            title={t("legacy.overview.boundaryTitle", "需要确认的边界")}
+            title={t("legacy.overview.boundaryTitle")}
             description={t(
               "legacy.overview.boundaryDesc",
               "只显示数量和线索，避免把私密内容自动汇总。",
@@ -110,19 +110,19 @@ export function LegacyOverviewTab({
           />
           <div className="mt-5 grid gap-3">
             <BoundaryLine
-              label={t("legacy.metrics.heavyLoad", "情感负荷很重")}
+              label={t("legacy.metrics.heavyLoad")}
               value={stats.heavyLoadCount}
-              detail={t("legacy.metrics.heavyLoadDesc", "适合在状态稳定时再打开。")}
+              detail={t("legacy.metrics.heavyLoadDesc")}
             />
             <BoundaryLine
-              label={t("legacy.metrics.aiExcluded", "排除 AI 汇总")}
+              label={t("legacy.metrics.aiExcluded")}
               value={stats.aiExcludedCount}
-              detail={t("legacy.metrics.aiExcludedDesc", "这些条目不会进入跨模块洞察。")}
+              detail={t("legacy.metrics.aiExcludedDesc")}
             />
             <BoundaryLine
-              label={t("legacy.metrics.secondConfirm", "需要二次确认")}
+              label={t("legacy.metrics.secondConfirm")}
               value={stats.secondConfirmCount}
-              detail={t("legacy.metrics.secondConfirmDesc", "打开前保留一道温和确认。")}
+              detail={t("legacy.metrics.secondConfirmDesc")}
             />
           </div>
         </Surface>
@@ -132,8 +132,8 @@ export function LegacyOverviewTab({
         <Surface className="p-5">
           <SectionHeading
             icon={CheckCheck}
-            title={t("legacy.overview.recent", "最近更新")}
-            description={t("legacy.overview.recentDesc", "这里只展示摘要和边界，不主动展开全文。")}
+            title={t("legacy.overview.recent")}
+            description={t("legacy.overview.recentDesc")}
           />
           <div className="mt-5 grid gap-3">
             {recentItems.length > 0 ? (
@@ -146,14 +146,14 @@ export function LegacyOverviewTab({
                 />
               ))
             ) : (
-              <EmptyState message={t("legacy.empty.items", "当前没有生命整理条目。")} compact />
+              <EmptyState message={t("legacy.empty.items")} compact />
             )}
           </div>
         </Surface>
 
         <div className="space-y-4">
           <LegacyPanel
-            title={t("legacy.overview.emotionalLoad", "情感负荷分布")}
+            title={t("legacy.overview.emotionalLoad")}
             description={t(
               "legacy.overview.emotionalLoadDesc",
               "情感负荷不是主分类，只是单份内容的打开提醒。",
@@ -173,8 +173,8 @@ export function LegacyOverviewTab({
           </LegacyPanel>
 
           <LegacyPanel
-            title={t("legacy.overview.reviewPrompts", "回看问题")}
-            description={t("legacy.overview.reviewPromptsDesc", "慢慢整理，不把它变成完成压力。")}
+            title={t("legacy.overview.reviewPrompts")}
+            description={t("legacy.overview.reviewPromptsDesc")}
           >
             <div className="space-y-2">
               {legacy.reviewPrompts.slice(0, 5).map((prompt) => (
@@ -186,13 +186,13 @@ export function LegacyOverviewTab({
                 </div>
               ))}
               {legacy.reviewPrompts.length === 0 ? (
-                <EmptyState message={t("legacy.empty.prompts", "当前没有回看问题。")} compact />
+                <EmptyState message={t("legacy.empty.prompts")} compact />
               ) : null}
             </div>
           </LegacyPanel>
 
           {stats.missingDeliveryConditionCount > 0 ? (
-            <LegacyWarningCallout title={t("legacy.warnings.missingDelivery", "交付条件待补")}>
+            <LegacyWarningCallout title={t("legacy.warnings.missingDelivery")}>
               {t(
                 "legacy.overview.missingDeliveryCopy",
                 "这些内容可以继续保存为草稿，但进入最终版前需要写清触发和验证方式。",

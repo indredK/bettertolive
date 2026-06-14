@@ -10,6 +10,7 @@ import {
 } from "react"
 import { X, type LucideIcon } from "lucide-react"
 import { AnimatePresence, animate, m, useMotionValue, useReducedMotion } from "motion/react"
+import { useTranslation } from "react-i18next"
 
 type CountdownControls = ReturnType<typeof animate>
 
@@ -253,10 +254,12 @@ export function PopupNotificationHeader({
   icon: Icon,
   eyebrow,
   title,
-  closeLabel = "Close",
+  closeLabel,
   onClose,
   className,
 }: PopupHeaderProps) {
+  const { t } = useTranslation()
+  const resolvedCloseLabel = closeLabel ?? t("common.actions.close")
   return (
     <header className={cn("flex items-start justify-between gap-3 px-4 pt-3.5 pb-2", className)}>
       <div className="flex min-w-0 items-start gap-2.5">
@@ -285,8 +288,8 @@ export function PopupNotificationHeader({
           size="icon-sm"
           className="shrink-0 text-[color:var(--text-muted)] hover:text-[color:var(--text-primary)]"
           onClick={onClose}
-          aria-label={closeLabel}
-          tooltip={closeLabel}
+          aria-label={resolvedCloseLabel}
+          tooltip={resolvedCloseLabel}
         >
           <X className="size-4" />
         </Button>

@@ -181,9 +181,8 @@ export function ShoppingAttributeEditDialog({
   const codeError = useMemo(() => {
     if (codeLocked) return null
     const trimmed = code.trim()
-    if (!trimmed) return t("shopping.error.codeEmpty", "代码不能为空")
-    if (!CODE_PATTERN.test(trimmed))
-      return t("shopping.error.codeFormat", "只允许字母、数字和下划线，如 Consumable")
+    if (!trimmed) return t("shopping.error.codeEmpty")
+    if (!CODE_PATTERN.test(trimmed)) return t("shopping.error.codeFormat")
     return null
   }, [code, codeLocked, t])
 
@@ -191,7 +190,7 @@ export function ShoppingAttributeEditDialog({
     const trimmed = rank.trim()
     if (!trimmed) return null
     const n = Number(trimmed)
-    if (!Number.isFinite(n)) return t("shopping.error.rankInvalid", "请输入有效数字")
+    if (!Number.isFinite(n)) return t("shopping.error.rankInvalid")
     return null
   }, [rank, t])
 
@@ -203,9 +202,9 @@ export function ShoppingAttributeEditDialog({
       if (codeError) {
         toast.error(codeError)
       } else if (semanticRequired && !semanticKey.trim()) {
-        toast.error(t("shopping.error.semanticRequired", "该类型必须设置语义键"))
+        toast.error(t("shopping.error.semanticRequired"))
       } else {
-        toast.error(t("shopping.error.nameRequired", "请填写中文名"))
+        toast.error(t("shopping.error.nameRequired"))
       }
       return
     }
@@ -267,9 +266,7 @@ export function ShoppingAttributeEditDialog({
       >
         <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("shopping.attributes.create", "新增属性")
-              : t("shopping.attributes.edit", "编辑属性")}
+            {editing.isNew ? t("shopping.attributes.create") : t("shopping.attributes.edit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -283,7 +280,7 @@ export function ShoppingAttributeEditDialog({
             <div className={cn(SHOPPING_DIALOG_SECTION_CLASS, "space-y-4 overflow-y-auto pr-1")}>
               {/* 分类 */}
               <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.kind", "分类")}</FieldLabel>
+                <FieldLabel required>{t("shopping.attributes.kind")}</FieldLabel>
                 <Select
                   value={kind}
                   onValueChange={(value) =>
@@ -306,7 +303,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 代码 */}
               <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.code", "代码")}</FieldLabel>
+                <FieldLabel required>{t("shopping.attributes.code")}</FieldLabel>
                 <Input
                   autoFocus
                   value={code}
@@ -330,7 +327,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 中文名 */}
               <div className="space-y-1.5">
-                <FieldLabel required>{t("shopping.attributes.label", "中文名")}</FieldLabel>
+                <FieldLabel required>{t("shopping.attributes.label")}</FieldLabel>
                 <Input
                   value={label}
                   onChange={(event) =>
@@ -343,7 +340,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 英文名 */}
               <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.labelEn", "英文名")}</FieldLabel>
+                <FieldLabel>{t("shopping.attributes.labelEn")}</FieldLabel>
                 <Input
                   value={labelEn}
                   onChange={(event) =>
@@ -359,7 +356,7 @@ export function ShoppingAttributeEditDialog({
               {/* 语义键 */}
               <div className="space-y-1.5">
                 <FieldLabel required={semanticRequired}>
-                  {t("shopping.attributes.semanticKey", "语义键")}
+                  {t("shopping.attributes.semanticKey")}
                 </FieldLabel>
                 {semanticOptions.length > 0 ? (
                   <Select
@@ -381,7 +378,7 @@ export function ShoppingAttributeEditDialog({
                     <SelectContent>
                       {!semanticRequired && (
                         <SelectItem value={NONE_SEMANTIC_VALUE}>
-                          {t("shopping.attributes.noSemantic", "不设置")}
+                          {t("shopping.attributes.noSemantic")}
                         </SelectItem>
                       )}
                       {semanticOptions.map((option) => (
@@ -399,7 +396,7 @@ export function ShoppingAttributeEditDialog({
                     }
                     className={SHOPPING_DIALOG_FIELD_CLASS}
                     disabled={identityLocked}
-                    placeholder={t("shopping.attributes.noSemantic", "不设置")}
+                    placeholder={t("shopping.attributes.noSemantic")}
                   />
                 )}
                 <FieldHint>{semanticHint}</FieldHint>
@@ -407,7 +404,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 样式 */}
               <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.styleToken", "样式")}</FieldLabel>
+                <FieldLabel>{t("shopping.attributes.styleToken")}</FieldLabel>
                 <Select
                   value={styleToken || NONE_STYLE_VALUE}
                   onValueChange={(value) =>
@@ -423,7 +420,7 @@ export function ShoppingAttributeEditDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={NONE_STYLE_VALUE}>
-                      {t("shopping.attributes.noStyle", "不设置")}
+                      {t("shopping.attributes.noStyle")}
                     </SelectItem>
                     {STYLE_TOKEN_OPTIONS.map((option) => (
                       <SelectItem key={option} value={option}>
@@ -437,7 +434,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 等级/排序权重 */}
               <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.rank", "等级 / 排序权重")}</FieldLabel>
+                <FieldLabel>{t("shopping.attributes.rank")}</FieldLabel>
                 <Input
                   type="number"
                   value={rank}
@@ -455,7 +452,7 @@ export function ShoppingAttributeEditDialog({
 
               {/* 说明 */}
               <div className="space-y-1.5">
-                <FieldLabel>{t("shopping.attributes.description", "说明")}</FieldLabel>
+                <FieldLabel>{t("shopping.attributes.description")}</FieldLabel>
                 <Textarea
                   value={description}
                   onChange={(event) =>
@@ -472,10 +469,10 @@ export function ShoppingAttributeEditDialog({
 
         <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel", "取消")}
+            {t("shopping.cancel")}
           </Button>
           <Button type="submit" disabled={!canSubmit || isPending}>
-            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+            {isPending ? t("shopping.saving") : t("shopping.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

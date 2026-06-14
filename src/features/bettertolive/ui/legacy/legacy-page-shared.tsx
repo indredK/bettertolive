@@ -206,7 +206,7 @@ export function LegacyItemSummaryCard({
             {item.isLocked ? (
               <Badge className="gap-1 bg-[color:var(--legacy-lock-bg)] text-[color:var(--legacy-lock-ink)]">
                 <Lock className="size-3" />
-                {t("legacy.labels.locked", "已锁定")}
+                {t("legacy.labels.locked")}
               </Badge>
             ) : null}
           </div>
@@ -232,7 +232,7 @@ export function LegacyItemSummaryCard({
                 variant="outline"
                 className="text-muted-foreground border-foreground/10 text-[10px]"
               >
-                {t("legacy.labels.aiExcluded", "不参与 AI")}
+                {t("legacy.labels.aiExcluded")}
               </Badge>
             ) : null}
           </div>
@@ -242,7 +242,7 @@ export function LegacyItemSummaryCard({
           size="icon-sm"
           variant="ghost"
           className="h-7 w-7 shrink-0"
-          label={t("legacy.actions.edit", "编辑")}
+          label={t("legacy.actions.edit")}
           icon={<Pencil className="size-3.5" />}
           onClick={onEdit}
         />

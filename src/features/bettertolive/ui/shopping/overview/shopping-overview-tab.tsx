@@ -41,22 +41,22 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
   const densityChartData = useMemo(
     () => [
       {
-        name: t("shopping.overview.itemsTotal", "物品"),
+        name: t("shopping.overview.itemsTotal"),
         value: shopping.overview.totalItems,
         fill: "var(--color-chart-1)",
       },
       {
-        name: t("shopping.overview.totalChildren", "子级"),
+        name: t("shopping.overview.totalChildren"),
         value: shopping.overview.totalChildren,
         fill: "var(--color-chart-2)",
       },
       {
-        name: t("shopping.overview.totalStages", "阶段"),
+        name: t("shopping.overview.totalStages"),
         value: shopping.overview.totalStages,
         fill: "var(--color-chart-3)",
       },
       {
-        name: t("shopping.overview.totalSystems", "系统"),
+        name: t("shopping.overview.totalSystems"),
         value: shopping.overview.totalSystems,
         fill: "var(--color-chart-4)",
       },
@@ -74,8 +74,8 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
     {
       key: "stage",
       icon: Telescope,
-      title: t("shopping.overview.stagePulse", "阶段脉冲"),
-      description: t("shopping.overview.stagePulseDescription", "最能代表当前生活阶段的配置重心。"),
+      title: t("shopping.overview.stagePulse"),
+      description: t("shopping.overview.stagePulseDescription"),
       items: stageNarrative.map((entry) => ({
         id: entry.id,
         label: entry.name,
@@ -86,7 +86,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
     {
       key: "system",
       icon: Network,
-      title: t("shopping.overview.systemPulse", "系统热点"),
+      title: t("shopping.overview.systemPulse"),
       description: t(
         "shopping.overview.systemPulseDescription",
         "哪些物件系统正在形成真正的支撑面。",
@@ -101,7 +101,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
     {
       key: "space",
       icon: MapPinned,
-      title: t("shopping.overview.spacePulse", "空间锚点"),
+      title: t("shopping.overview.spacePulse"),
       description: t(
         "shopping.overview.spacePulseDescription",
         "空间场景能暴露出你真正高频使用和维护的生活区域。",
@@ -128,11 +128,11 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                     variant="outline"
                     className="border-foreground/10 bg-accent text-accent-foreground"
                   >
-                    {t("shopping.overview.eyebrow", "生活系统总览")}
+                    {t("shopping.overview.eyebrow")}
                   </Badge>
                   <div className="max-w-2xl space-y-2">
                     <h2 className="text-[1.45rem] font-semibold tracking-tight sm:text-[1.7rem]">
-                      {t("shopping.overview.heroTitle", "把购物看成生活结构，而不是待买清单")}
+                      {t("shopping.overview.heroTitle")}
                     </h2>
                     <p className="text-muted-foreground line-clamp-3 max-w-xl text-sm leading-6">
                       {spotlightLead?.summary ||
@@ -146,24 +146,24 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
 
                 <div className="grid w-full shrink-0 grid-cols-2 gap-2 sm:grid-cols-4 lg:w-auto lg:grid-cols-2">
                   <HeroMetric
-                    label={t("shopping.overview.itemsTotal", "物品总数")}
+                    label={t("shopping.overview.itemsTotal")}
                     value={shopping.overview.totalItems}
                     tone="one"
                   />
                   <HeroMetric
-                    label={t("shopping.overview.totalChildren", "子级密度")}
+                    label={t("shopping.overview.totalChildren")}
                     value={density}
                     suffix="x"
                     tone="two"
                   />
                   <HeroMetric
-                    label={t("shopping.overview.itemsWanted", "待购占比")}
+                    label={t("shopping.overview.itemsWanted")}
                     value={wantedRatio}
                     suffix="%"
                     tone="three"
                   />
                   <HeroMetric
-                    label={t("shopping.overview.totalStages", "阶段模板")}
+                    label={t("shopping.overview.totalStages")}
                     value={shopping.overview.totalStages}
                     tone="four"
                   />
@@ -174,7 +174,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
             <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[minmax(260px,1fr)_minmax(360px,1fr)] gap-3 p-3 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,0.92fr)] lg:grid-rows-1">
               <OverviewPanel
                 icon={Sparkles}
-                title={t("shopping.overview.curationTitle", "当下策展")}
+                title={t("shopping.overview.curationTitle")}
                 subtitle={t(
                   "shopping.overview.curatedSubtitle",
                   "把正在支撑生活的物件、焦点与集合放在同一视野里。",
@@ -183,7 +183,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
               >
                 <div className="grid h-full min-h-0 grid-cols-1 grid-rows-[repeat(2,minmax(0,1fr))] gap-3">
                   <NarrativeCard
-                    title={spotlightLead?.title || t("shopping.overview.focusFallback", "当前焦点")}
+                    title={spotlightLead?.title || t("shopping.overview.focusFallback")}
                     summary={
                       spotlightLead?.reason ||
                       t(
@@ -196,8 +196,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                   />
                   <NarrativeCard
                     title={
-                      shopping.lifestyleCollections[0]?.title ||
-                      t("shopping.overview.lifestyle", "生活方式集合")
+                      shopping.lifestyleCollections[0]?.title || t("shopping.overview.lifestyle")
                     }
                     summary={
                       shopping.lifestyleCollections[0]?.description ||
@@ -214,7 +213,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
 
               <OverviewPanel
                 icon={Layers3}
-                title={t("shopping.overview.structureTitle", "结构密度")}
+                title={t("shopping.overview.structureTitle")}
                 subtitle={t(
                   "shopping.overview.structureSubtitle",
                   "物品不是越多越好，关键是它们是否形成清晰层次。",
@@ -227,10 +226,10 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                       <div className="mb-2 flex items-baseline justify-between gap-2">
                         <div>
                           <div className="text-[11px] font-medium">
-                            {t("shopping.overview.portfolioSplit", "拥有 / 待购")}
+                            {t("shopping.overview.portfolioSplit")}
                           </div>
                           <div className="text-muted-foreground mt-0.5 text-[11px]">
-                            {t("shopping.overview.portfolioSplitHint", "先看结构倾向，再看数量")}
+                            {t("shopping.overview.portfolioSplitHint")}
                           </div>
                         </div>
                         <div className="text-muted-foreground text-xs tabular-nums">
@@ -274,7 +273,7 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                               dominantBaseline="middle"
                               className="fill-muted-foreground text-[11px]"
                             >
-                              {t("shopping.overview.itemsWanted", "待购")}
+                              {t("shopping.overview.itemsWanted")}
                             </text>
                           </RadialBarChart>
                         </ResponsiveContainer>
@@ -284,10 +283,10 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
                     <div className="bg-muted/25 border-foreground/10 flex min-h-[150px] flex-col rounded-2xl border p-3 md:min-h-0">
                       <div className="mb-2">
                         <div className="text-[11px] font-medium">
-                          {t("shopping.overview.structureChartTitle", "结构层级")}
+                          {t("shopping.overview.structureChartTitle")}
                         </div>
                         <div className="text-muted-foreground mt-0.5 text-[11px]">
-                          {t("shopping.overview.structureChartHint", "看数量，也看组织成本")}
+                          {t("shopping.overview.structureChartHint")}
                         </div>
                       </div>
                       <div className="min-h-0 flex-1">
@@ -324,15 +323,15 @@ export function ShoppingOverviewTab({ shopping }: { shopping: ShoppingModuleData
 
                   <div className="mt-3 grid grid-cols-3 gap-2">
                     <MiniMetric
-                      label={t("shopping.overview.boundaries", "边界清单")}
+                      label={t("shopping.overview.boundaries")}
                       value={shopping.overview.totalBoundaryEntries}
                     />
                     <MiniMetric
-                      label={t("shopping.overview.spotlights", "焦点提示")}
+                      label={t("shopping.overview.spotlights")}
                       value={shopping.overview.totalSpotlights}
                     />
                     <MiniMetric
-                      label={t("shopping.overview.lifestyle", "生活方式集合")}
+                      label={t("shopping.overview.lifestyle")}
                       value={shopping.overview.totalLifestyleCollections}
                     />
                   </div>

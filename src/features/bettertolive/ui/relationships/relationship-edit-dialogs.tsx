@@ -163,7 +163,7 @@ export function RelationshipEditDialog({
     event.preventDefault()
 
     if (!form.name.trim() || !form.role.trim()) {
-      toast.error(t("relationships.edit.validation.relationshipRequired", "请填写姓名和角色"))
+      toast.error(t("relationships.edit.validation.relationshipRequired"))
       return
     }
 
@@ -181,11 +181,11 @@ export function RelationshipEditDialog({
 
     try {
       await saveRelationshipsMutation.mutateAsync(nextModule)
-      toast.success(t("relationships.edit.saved", "关系已保存"))
+      toast.success(t("relationships.edit.saved"))
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed", "关系保存失败"))
+      toast.error(t("relationships.edit.saveFailed"))
     }
   }
 
@@ -200,8 +200,8 @@ export function RelationshipEditDialog({
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("relationships.edit.createRelationship", "新增关系")
-              : t("relationships.edit.editRelationship", "编辑关系")}
+              ? t("relationships.edit.createRelationship")
+              : t("relationships.edit.editRelationship")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -216,21 +216,21 @@ export function RelationshipEditDialog({
             <div className="min-h-0 space-y-3 overflow-y-auto">
               <section className={RELATIONSHIP_DIALOG_COMPACT_SECTION_CLASS}>
                 <div className="grid gap-2.5 sm:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_180px]">
-                  <Field compact label={t("relationships.edit.name", "姓名")}>
+                  <Field compact label={t("relationships.edit.name")}>
                     <Input
                       value={form.name}
                       onChange={(event) => updateForm({ name: event.target.value })}
                       className={RELATIONSHIP_DIALOG_FIELD_CLASS}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.role", "角色")}>
+                  <Field compact label={t("relationships.edit.role")}>
                     <Input
                       value={form.role}
                       onChange={(event) => updateForm({ role: event.target.value })}
                       className={RELATIONSHIP_DIALOG_FIELD_CLASS}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.circle", "圈层")}>
+                  <Field compact label={t("relationships.edit.circle")}>
                     <Select
                       value={form.circleId}
                       onValueChange={(circleId) => {
@@ -256,7 +256,7 @@ export function RelationshipEditDialog({
                 <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.type", "类型")}
+                    label={t("relationships.edit.type")}
                     value={form.type}
                     options={RELATIONSHIP_TYPES}
                     group="type"
@@ -264,7 +264,7 @@ export function RelationshipEditDialog({
                   />
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.depth", "深度")}
+                    label={t("relationships.edit.depth")}
                     value={form.depth}
                     options={RELATIONSHIP_DEPTHS}
                     group="depth"
@@ -272,7 +272,7 @@ export function RelationshipEditDialog({
                   />
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.stage", "阶段")}
+                    label={t("relationships.edit.stage")}
                     value={form.stage}
                     options={RELATIONSHIP_STAGES}
                     group="stage"
@@ -280,7 +280,7 @@ export function RelationshipEditDialog({
                   />
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.impact", "影响")}
+                    label={t("relationships.edit.impact")}
                     value={form.impact}
                     options={RELATIONSHIP_IMPACTS}
                     group="impact"
@@ -288,7 +288,7 @@ export function RelationshipEditDialog({
                   />
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.interaction", "互动")}
+                    label={t("relationships.edit.interaction")}
                     value={form.interaction}
                     options={INTERACTION_FREQUENCIES}
                     group="interaction"
@@ -298,7 +298,7 @@ export function RelationshipEditDialog({
                   />
                   <EnumSelect
                     compact
-                    label={t("relationships.edit.unfinishedWeight", "未完成重量")}
+                    label={t("relationships.edit.unfinishedWeight")}
                     value={form.unfinishedWeight}
                     options={UNFINISHED_WEIGHTS}
                     group="unfinishedWeight"
@@ -311,42 +311,42 @@ export function RelationshipEditDialog({
 
               <section className={RELATIONSHIP_DIALOG_COMPACT_SECTION_CLASS}>
                 <div className="grid gap-2.5 lg:grid-cols-2">
-                  <Field compact label={t("relationships.edit.influence", "关系档案")}>
+                  <Field compact label={t("relationships.edit.influence")}>
                     <Textarea
                       value={form.influence}
                       onChange={(event) => updateForm({ influence: event.target.value })}
                       className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-16")}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.currentState", "当前状态")}>
+                  <Field compact label={t("relationships.edit.currentState")}>
                     <Textarea
                       value={form.currentState}
                       onChange={(event) => updateForm({ currentState: event.target.value })}
                       className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-16")}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.emotionalTone", "情绪线索描述")}>
+                  <Field compact label={t("relationships.edit.emotionalTone")}>
                     <Textarea
                       value={form.emotionalTone}
                       onChange={(event) => updateForm({ emotionalTone: event.target.value })}
                       className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-16")}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.unspokenLine", "没说出口")}>
+                  <Field compact label={t("relationships.edit.unspokenLine")}>
                     <Textarea
                       value={form.unspokenLine}
                       onChange={(event) => updateForm({ unspokenLine: event.target.value })}
                       className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-16")}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.positiveImpact", "正面影响")}>
+                  <Field compact label={t("relationships.edit.positiveImpact")}>
                     <Textarea
                       value={form.positiveImpact}
                       onChange={(event) => updateForm({ positiveImpact: event.target.value })}
                       className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-16")}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.ongoingShadow", "持续阴影")}>
+                  <Field compact label={t("relationships.edit.ongoingShadow")}>
                     <Textarea
                       value={form.ongoingShadow}
                       onChange={(event) => updateForm({ ongoingShadow: event.target.value })}
@@ -354,7 +354,7 @@ export function RelationshipEditDialog({
                     />
                   </Field>
                 </div>
-                <Field compact label={t("relationships.edit.boundaryStatus", "边界状态")}>
+                <Field compact label={t("relationships.edit.boundaryStatus")}>
                   <Textarea
                     value={form.boundaryStatus}
                     onChange={(event) => updateForm({ boundaryStatus: event.target.value })}
@@ -362,14 +362,14 @@ export function RelationshipEditDialog({
                   />
                 </Field>
                 <div className="grid gap-2.5 md:grid-cols-2">
-                  <Field compact label={t("relationships.edit.emotionCues", "情绪标签")}>
+                  <Field compact label={t("relationships.edit.emotionCues")}>
                     <Input
                       value={form.emotionCuesText}
                       onChange={(event) => updateForm({ emotionCuesText: event.target.value })}
                       className={RELATIONSHIP_DIALOG_FIELD_CLASS}
                     />
                   </Field>
-                  <Field compact label={t("relationships.edit.tags", "标签")}>
+                  <Field compact label={t("relationships.edit.tags")}>
                     <Input
                       value={form.tagsText}
                       onChange={(event) => updateForm({ tagsText: event.target.value })}
@@ -389,12 +389,12 @@ export function RelationshipEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel", "取消")}
+              {t("relationships.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving", "保存中")
-                : t("relationships.common.save", "保存")}
+                ? t("relationships.common.saving")
+                : t("relationships.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -432,7 +432,7 @@ export function UnsentNoteEditDialog({
     event.preventDefault()
 
     if (!form.to.trim() || !form.theme.trim() || !form.excerpt.trim()) {
-      toast.error(t("relationships.edit.validation.noteRequired", "请填写对象、主题和内容"))
+      toast.error(t("relationships.edit.validation.noteRequired"))
       return
     }
 
@@ -460,11 +460,11 @@ export function UnsentNoteEditDialog({
           unsentNotes,
         }),
       )
-      toast.success(t("relationships.edit.noteSaved", "想说的话已保存"))
+      toast.success(t("relationships.edit.noteSaved"))
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed", "保存失败"))
+      toast.error(t("relationships.edit.saveFailed"))
     }
   }
 
@@ -478,13 +478,9 @@ export function UnsentNoteEditDialog({
       >
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("relationships.edit.createNote", "新增想说的话")
-              : t("relationships.edit.editNote", "编辑想说的话")}
+            {editing.isNew ? t("relationships.edit.createNote") : t("relationships.edit.editNote")}
           </DialogTitle>
-          <DialogDescription>
-            {t("relationships.edit.noteDescription", "可以写给现有关系、独立对象，或未来的自己。")}
-          </DialogDescription>
+          <DialogDescription>{t("relationships.edit.noteDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
@@ -492,7 +488,7 @@ export function UnsentNoteEditDialog({
             <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <EnumSelect
-                  label={t("relationships.edit.targetType", "目标类型")}
+                  label={t("relationships.edit.targetType")}
                   value={form.targetType}
                   options={UNSENT_NOTE_TARGET_TYPES}
                   group="targetType"
@@ -501,7 +497,7 @@ export function UnsentNoteEditDialog({
                   }
                 />
                 <EnumSelect
-                  label={t("relationships.edit.unfinishedWeight", "未完成重量")}
+                  label={t("relationships.edit.unfinishedWeight")}
                   value={form.unfinishedWeight}
                   options={UNFINISHED_WEIGHTS}
                   group="unfinishedWeight"
@@ -509,7 +505,7 @@ export function UnsentNoteEditDialog({
                     updateForm({ unfinishedWeight: unfinishedWeight as UnfinishedWeight })
                   }
                 />
-                <Field label={t("relationships.edit.relatedRelationship", "关联关系")}>
+                <Field label={t("relationships.edit.relatedRelationship")}>
                   <Select
                     value={form.relationshipId}
                     disabled={form.targetType !== "关系条目"}
@@ -530,7 +526,7 @@ export function UnsentNoteEditDialog({
                     </SelectTrigger>
                     <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
                       <SelectItem value={NONE_RELATIONSHIP_ID}>
-                        {t("relationships.edit.noRelationship", "不关联")}
+                        {t("relationships.edit.noRelationship")}
                       </SelectItem>
                       {relationships.map((relationship) => (
                         <SelectItem key={relationship.id} value={relationship.id}>
@@ -542,14 +538,14 @@ export function UnsentNoteEditDialog({
                 </Field>
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("relationships.edit.to", "对象")}>
+                <Field label={t("relationships.edit.to")}>
                   <Input
                     value={form.to}
                     onChange={(event) => updateForm({ to: event.target.value })}
                     className={RELATIONSHIP_DIALOG_FIELD_CLASS}
                   />
                 </Field>
-                <Field label={t("relationships.edit.theme", "主题")}>
+                <Field label={t("relationships.edit.theme")}>
                   <Input
                     value={form.theme}
                     onChange={(event) => updateForm({ theme: event.target.value })}
@@ -557,7 +553,7 @@ export function UnsentNoteEditDialog({
                   />
                 </Field>
               </div>
-              <Field label={t("relationships.edit.excerpt", "内容")}>
+              <Field label={t("relationships.edit.excerpt")}>
                 <Textarea
                   value={form.excerpt}
                   onChange={(event) => updateForm({ excerpt: event.target.value })}
@@ -569,12 +565,12 @@ export function UnsentNoteEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel", "取消")}
+              {t("relationships.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving", "保存中")
-                : t("relationships.common.save", "保存")}
+                ? t("relationships.common.saving")
+                : t("relationships.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -610,7 +606,7 @@ export function RelationshipPatternEditDialog({
     event.preventDefault()
 
     if (!form.title.trim() || !form.summary.trim()) {
-      toast.error(t("relationships.edit.validation.patternRequired", "请填写标题和摘要"))
+      toast.error(t("relationships.edit.validation.patternRequired"))
       return
     }
 
@@ -630,11 +626,11 @@ export function RelationshipPatternEditDialog({
         ...relationshipsModule,
         patterns,
       })
-      toast.success(t("relationships.edit.patternSaved", "模式已保存"))
+      toast.success(t("relationships.edit.patternSaved"))
       onSaved?.()
       onClose()
     } catch {
-      toast.error(t("relationships.edit.saveFailed", "保存失败"))
+      toast.error(t("relationships.edit.saveFailed"))
     }
   }
 
@@ -649,32 +645,30 @@ export function RelationshipPatternEditDialog({
         <DialogHeader className={RELATIONSHIP_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("relationships.edit.createPattern", "新增模式")
-              : t("relationships.edit.editPattern", "编辑模式")}
+              ? t("relationships.edit.createPattern")
+              : t("relationships.edit.editPattern")}
           </DialogTitle>
-          <DialogDescription>
-            {t("relationships.edit.patternDescription", "用于跨关系复盘重复出现的角色和路径。")}
-          </DialogDescription>
+          <DialogDescription>{t("relationships.edit.patternDescription")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto px-1 py-1 pr-2">
             <section className={RELATIONSHIP_DIALOG_SECTION_CLASS}>
-              <Field label={t("relationships.edit.title", "标题")}>
+              <Field label={t("relationships.edit.title")}>
                 <Input
                   value={form.title}
                   onChange={(event) => updateForm({ title: event.target.value })}
                   className={RELATIONSHIP_DIALOG_FIELD_CLASS}
                 />
               </Field>
-              <Field label={t("relationships.edit.summary", "摘要")}>
+              <Field label={t("relationships.edit.summary")}>
                 <Textarea
                   value={form.summary}
                   onChange={(event) => updateForm({ summary: event.target.value })}
                   className={cn(RELATIONSHIP_DIALOG_FIELD_CLASS, "min-h-28")}
                 />
               </Field>
-              <Field label={t("relationships.edit.cues", "线索")}>
+              <Field label={t("relationships.edit.cues")}>
                 <Input
                   value={form.cuesText}
                   onChange={(event) => updateForm({ cuesText: event.target.value })}
@@ -686,12 +680,12 @@ export function RelationshipPatternEditDialog({
 
           <DialogFooter className={RELATIONSHIP_DIALOG_FOOTER_CLASS}>
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("relationships.common.cancel", "取消")}
+              {t("relationships.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveRelationshipsMutation.isPending}>
               {saveRelationshipsMutation.isPending
-                ? t("relationships.common.saving", "保存中")
-                : t("relationships.common.save", "保存")}
+                ? t("relationships.common.saving")
+                : t("relationships.common.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -737,7 +731,7 @@ function RelationshipCollectionTabs({
             className="h-7 w-full justify-start gap-0.5 rounded-none bg-transparent p-0"
           >
             <TabsTrigger value="connections" className="h-7 flex-none px-2 text-xs after:bottom-0">
-              {t("relationships.edit.tabs.connections", "人物关系")}
+              {t("relationships.edit.tabs.connections")}
               {form.connections.length > 0 ? (
                 <span className="text-muted-foreground ml-1 text-[10px] tabular-nums">
                   {form.connections.length}
@@ -745,7 +739,7 @@ function RelationshipCollectionTabs({
               ) : null}
             </TabsTrigger>
             <TabsTrigger value="events" className="h-7 flex-none px-2 text-xs after:bottom-0">
-              {t("relationships.edit.tabs.events", "互动事件")}
+              {t("relationships.edit.tabs.events")}
               {form.events.length > 0 ? (
                 <span className="text-muted-foreground ml-1 text-[10px] tabular-nums">
                   {form.events.length}
@@ -753,7 +747,7 @@ function RelationshipCollectionTabs({
               ) : null}
             </TabsTrigger>
             <TabsTrigger value="history" className="h-7 flex-none px-2 text-xs after:bottom-0">
-              {t("relationships.edit.tabs.history", "变化历史")}
+              {t("relationships.edit.tabs.history")}
               {form.history.length > 0 ? (
                 <span className="text-muted-foreground ml-1 text-[10px] tabular-nums">
                   {form.history.length}
@@ -769,7 +763,7 @@ function RelationshipCollectionTabs({
         >
           <EditableListHeader
             compact
-            title={t("relationships.edit.connections", "人物之间的关系")}
+            title={t("relationships.edit.connections")}
             onAdd={() => {
               const nextConnection = createEmptyConnection()
               updateForm({
@@ -838,7 +832,7 @@ function RelationshipCollectionTabs({
         <TabsContent value="events" className="mt-0 min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
           <EditableListHeader
             compact
-            title={t("relationships.edit.events", "关键互动事件")}
+            title={t("relationships.edit.events")}
             onAdd={() =>
               updateForm({
                 events: [
@@ -877,7 +871,7 @@ function RelationshipCollectionTabs({
               ))
             ) : (
               <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] px-3 py-4 text-xs text-[color:var(--text-muted)]">
-                {t("relationships.edit.noEvents", "还没有互动事件，点击上方添加。")}
+                {t("relationships.edit.noEvents")}
               </div>
             )}
           </div>
@@ -886,7 +880,7 @@ function RelationshipCollectionTabs({
         <TabsContent value="history" className="mt-0 min-h-0 flex-1 overflow-y-auto px-3 py-2.5">
           <EditableListHeader
             compact
-            title={t("relationships.edit.history", "深度 / 阶段变化历史")}
+            title={t("relationships.edit.history")}
             onAdd={() =>
               updateForm({
                 history: [
@@ -926,7 +920,7 @@ function RelationshipCollectionTabs({
               ))
             ) : (
               <div className="rounded-lg border border-dashed border-[color:var(--chip-border)] px-3 py-4 text-xs text-[color:var(--text-muted)]">
-                {t("relationships.edit.noHistory", "还没有变化历史，点击上方添加。")}
+                {t("relationships.edit.noHistory")}
               </div>
             )}
           </div>
@@ -1017,7 +1011,7 @@ function EditableListHeader({
         onClick={onAdd}
       >
         <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-        {t("relationships.common.add", "添加")}
+        {t("relationships.common.add")}
       </Button>
     </div>
   )
@@ -1045,15 +1039,15 @@ function EventEditor({
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
-          {t("relationships.edit.eventCardTitle", "互动事件")}
+          {t("relationships.edit.eventCardTitle")}
         </div>
         <Button
           type="button"
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete", "删除")}
-          tooltip={t("relationships.common.delete", "删除")}
+          aria-label={t("relationships.common.delete")}
+          tooltip={t("relationships.common.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1066,14 +1060,14 @@ function EventEditor({
             : "xl:grid-cols-[140px_160px_minmax(0,1fr)]",
         )}
       >
-        <Field compact={compact} label={t("relationships.edit.date", "日期")}>
+        <Field compact={compact} label={t("relationships.edit.date")}>
           <Input
             value={event.date}
             onChange={(inputEvent) => onChange({ ...event, date: inputEvent.target.value })}
             className={RELATIONSHIP_DIALOG_FIELD_CLASS}
           />
         </Field>
-        <Field compact={compact} label={t("relationships.edit.eventKind", "事件类型")}>
+        <Field compact={compact} label={t("relationships.edit.eventKind")}>
           <Select
             value={event.kind}
             onValueChange={(kind) => {
@@ -1094,7 +1088,7 @@ function EventEditor({
             </SelectContent>
           </Select>
         </Field>
-        <Field compact={compact} label={t("relationships.edit.eventTitle", "事件标题")}>
+        <Field compact={compact} label={t("relationships.edit.eventTitle")}>
           <Input
             value={event.title}
             onChange={(inputEvent) => onChange({ ...event, title: inputEvent.target.value })}
@@ -1102,7 +1096,7 @@ function EventEditor({
           />
         </Field>
       </div>
-      <Field compact={compact} label={t("relationships.edit.eventSummary", "事件摘要")}>
+      <Field compact={compact} label={t("relationships.edit.eventSummary")}>
         <Textarea
           value={event.summary}
           onChange={(inputEvent) => onChange({ ...event, summary: inputEvent.target.value })}
@@ -1135,15 +1129,15 @@ function HistoryEditor({
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
-          {t("relationships.edit.historyCardTitle", "变化记录")}
+          {t("relationships.edit.historyCardTitle")}
         </div>
         <Button
           type="button"
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete", "删除")}
-          tooltip={t("relationships.common.delete", "删除")}
+          aria-label={t("relationships.common.delete")}
+          tooltip={t("relationships.common.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -1156,14 +1150,14 @@ function HistoryEditor({
             : "xl:grid-cols-[140px_120px_minmax(0,1fr)_minmax(0,1fr)]",
         )}
       >
-        <Field compact={compact} label={t("relationships.edit.date", "日期")}>
+        <Field compact={compact} label={t("relationships.edit.date")}>
           <Input
             value={history.date}
             onChange={(event) => onChange({ ...history, date: event.target.value })}
             className={RELATIONSHIP_DIALOG_FIELD_CLASS}
           />
         </Field>
-        <Field compact={compact} label={t("relationships.edit.changeField", "变化字段")}>
+        <Field compact={compact} label={t("relationships.edit.changeField")}>
           <Select
             value={history.field}
             onValueChange={(field) => {
@@ -1184,14 +1178,14 @@ function HistoryEditor({
             </SelectContent>
           </Select>
         </Field>
-        <Field compact={compact} label={t("relationships.edit.from", "从")}>
+        <Field compact={compact} label={t("relationships.edit.from")}>
           <Input
             value={history.from}
             onChange={(event) => onChange({ ...history, from: event.target.value })}
             className={RELATIONSHIP_DIALOG_FIELD_CLASS}
           />
         </Field>
-        <Field compact={compact} label={t("relationships.edit.toValue", "到")}>
+        <Field compact={compact} label={t("relationships.edit.toValue")}>
           <Input
             value={history.to}
             onChange={(event) => onChange({ ...history, to: event.target.value })}
@@ -1199,7 +1193,7 @@ function HistoryEditor({
           />
         </Field>
       </div>
-      <Field compact={compact} label={t("relationships.edit.historyNote", "变化说明")}>
+      <Field compact={compact} label={t("relationships.edit.historyNote")}>
         <Textarea
           value={history.note}
           onChange={(event) => onChange({ ...history, note: event.target.value })}
@@ -1232,7 +1226,7 @@ function ConnectionEditor({
   const { t } = useTranslation()
   const otherRelationshipName =
     relationships.find((relationship) => relationship.id === connection.otherRelationshipId)
-      ?.name ?? t("relationships.edit.unselectedRelatedPerson", "未选择关联人物")
+      ?.name ?? t("relationships.edit.unselectedRelatedPerson")
   const roleSummary = summarizeConnectionRoles(connection)
 
   return (
@@ -1283,8 +1277,8 @@ function ConnectionEditor({
             size="icon-sm"
             variant="ghost"
             onClick={onRemove}
-            aria-label={t("relationships.common.delete", "删除")}
-            tooltip={t("relationships.common.delete", "删除")}
+            aria-label={t("relationships.common.delete")}
+            tooltip={t("relationships.common.delete")}
           >
             <Trash2 className="h-4 w-4" />
           </Button>
@@ -1294,7 +1288,7 @@ function ConnectionEditor({
       {expanded ? (
         <div className={compact ? "mt-2 space-y-2" : "mt-3 space-y-3"}>
           <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_128px]">
-            <Field compact={compact} label={t("relationships.edit.relatedPerson", "关联人物")}>
+            <Field compact={compact} label={t("relationships.edit.relatedPerson")}>
               <Select
                 value={connection.otherRelationshipId || NONE_RELATIONSHIP_ID}
                 onValueChange={(otherRelationshipId) => {
@@ -1314,7 +1308,7 @@ function ConnectionEditor({
                 </SelectTrigger>
                 <SelectContent className={RELATIONSHIP_SELECT_CONTENT_CLASS} align="start">
                   <SelectItem value={NONE_RELATIONSHIP_ID}>
-                    {t("relationships.edit.selectRelatedPerson", "选择一个人物")}
+                    {t("relationships.edit.selectRelatedPerson")}
                   </SelectItem>
                   {relationships.map((relationship) => (
                     <SelectItem key={relationship.id} value={relationship.id}>
@@ -1327,7 +1321,7 @@ function ConnectionEditor({
 
             <EnumSelect
               compact={compact}
-              label={t("relationships.edit.connectionStrength", "连接强度")}
+              label={t("relationships.edit.connectionStrength")}
               value={connection.strength}
               options={RELATIONSHIP_CONNECTION_STRENGTH_OPTIONS}
               group="connectionStrength"
@@ -1340,7 +1334,7 @@ function ConnectionEditor({
             />
           </div>
 
-          <Field compact={compact} label={t("relationships.edit.connectionNote", "连接备注")}>
+          <Field compact={compact} label={t("relationships.edit.connectionNote")}>
             <Textarea
               value={connection.note}
               onChange={(event) =>
@@ -1392,7 +1386,7 @@ function ConnectionEditor({
             onClick={() => onAddRole()}
           >
             <Plus className={compact ? "h-3.5 w-3.5" : "h-4 w-4"} />
-            {t("relationships.edit.addConnectionRole", "新增一行关系")}
+            {t("relationships.edit.addConnectionRole")}
           </Button>
         </div>
       ) : null}
@@ -1422,28 +1416,28 @@ function ConnectionRoleEditor({
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div className={compact ? "text-xs font-medium" : "text-sm font-medium"}>
-          {t("relationships.edit.connectionRoleCardTitle", "关系角色")}
+          {t("relationships.edit.connectionRoleCardTitle")}
         </div>
         <Button
           type="button"
           size="icon-sm"
           variant="ghost"
           onClick={onRemove}
-          aria-label={t("relationships.common.delete", "删除")}
-          tooltip={t("relationships.common.delete", "删除")}
+          aria-label={t("relationships.common.delete")}
+          tooltip={t("relationships.common.delete")}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
       <div className="grid gap-2 md:grid-cols-2">
-        <Field compact={compact} label={t("relationships.edit.selfRole", "当前人物角色")}>
+        <Field compact={compact} label={t("relationships.edit.selfRole")}>
           <Input
             value={role.selfRole}
             onChange={(event) => onChange({ ...role, selfRole: event.target.value })}
             className={RELATIONSHIP_DIALOG_FIELD_CLASS}
           />
         </Field>
-        <Field compact={compact} label={t("relationships.edit.otherRole", "对方角色")}>
+        <Field compact={compact} label={t("relationships.edit.otherRole")}>
           <Input
             value={role.otherRole}
             onChange={(event) => onChange({ ...role, otherRole: event.target.value })}
@@ -1451,10 +1445,7 @@ function ConnectionRoleEditor({
           />
         </Field>
       </div>
-      <Field
-        compact={compact}
-        label={t("relationships.edit.connectionRoleNote", "这条关系的补充说明")}
-      >
+      <Field compact={compact} label={t("relationships.edit.connectionRoleNote")}>
         <Input
           value={role.note}
           onChange={(event) => onChange({ ...role, note: event.target.value })}

@@ -90,12 +90,12 @@ export function ShoppingSystemEditDialog({
   const handleSubmit = async () => {
     const values = form.getValues()
     if (!form.formState.isValid) {
-      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      toast.error(t("shopping.error.nameRequired"))
       return
     }
 
     if (!editing.isNew && !systemId) {
-      toast.error(t("shopping.error.idNameRequired", "缺少系统 ID"))
+      toast.error(t("shopping.error.idNameRequired"))
       return
     }
 
@@ -146,8 +146,8 @@ export function ShoppingSystemEditDialog({
         name: displayName,
         defaultValue: `已删除系统：${displayName}`,
       }),
-      failureMessage: t("shopping.toast.deleteFailedSystem", "删除系统失败"),
-      undoLabel: t("shopping.undo", "撤销"),
+      failureMessage: t("shopping.toast.deleteFailedSystem"),
+      undoLabel: t("shopping.undo"),
       undoneMessage: t("shopping.toast.deleteUndoneSystem", {
         name: displayName,
         defaultValue: `已撤销删除：${displayName}`,
@@ -183,9 +183,7 @@ export function ShoppingSystemEditDialog({
       >
         <DialogHeader className={SHOPPING_DIALOG_HEADER_CLASS}>
           <DialogTitle>
-            {editing.isNew
-              ? t("shopping.system.create", "新增系统")
-              : t("shopping.system.edit", "编辑系统")}
+            {editing.isNew ? t("shopping.system.create") : t("shopping.system.edit")}
           </DialogTitle>
         </DialogHeader>
 
@@ -200,11 +198,11 @@ export function ShoppingSystemEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0 text-sm font-medium">
-                {t("shopping.systems.form.basicInfo", "基本信息")}
+                {t("shopping.systems.form.basicInfo")}
               </div>
               <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.name", "名称")}</Label>
+                  <Label>{t("shopping.systems.form.name")}</Label>
                   <Input
                     autoFocus
                     value={name}
@@ -215,14 +213,14 @@ export function ShoppingSystemEditDialog({
                   />
                   {editing.isNew && name.trim() && (
                     <div className="text-muted-foreground text-[11px]">
-                      {t("shopping.systems.form.autoId", "自动生成 ID:")}{" "}
+                      {t("shopping.systems.form.autoId")}{" "}
                       <code className="bg-muted rounded px-1">{slugifySystemId(name)}</code>
                     </div>
                   )}
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.summary", "概述")}</Label>
+                  <Label>{t("shopping.systems.form.summary")}</Label>
                   <Textarea
                     value={summary}
                     onChange={(event) =>
@@ -234,7 +232,7 @@ export function ShoppingSystemEditDialog({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.keyQuestion", "关键问题")}</Label>
+                  <Label>{t("shopping.systems.form.keyQuestion")}</Label>
                   <Textarea
                     value={keyQuestion}
                     onChange={(event) =>
@@ -246,7 +244,7 @@ export function ShoppingSystemEditDialog({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label>{t("shopping.systems.form.secondaryGroups", "二级分组(逗号分隔)")}</Label>
+                  <Label>{t("shopping.systems.form.secondaryGroups")}</Label>
                   <Textarea
                     value={secondaryGroups}
                     onChange={(event) =>
@@ -269,7 +267,7 @@ export function ShoppingSystemEditDialog({
               className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
             >
               <div className="shrink-0 text-sm font-medium">
-                {t("shopping.systems.form.assignItems", "本系统下的物品")}
+                {t("shopping.systems.form.assignItems")}
               </div>
               <div className="mt-3 min-h-0 flex-1 overflow-hidden">
                 <ShoppingItemShuttle
@@ -292,14 +290,14 @@ export function ShoppingSystemEditDialog({
               disabled={isPending}
               className="mr-auto"
             >
-              {t("shopping.delete", "删除")}
+              {t("shopping.delete")}
             </Button>
           )}
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            {t("shopping.cancel", "取消")}
+            {t("shopping.cancel")}
           </Button>
           <Button type="submit" disabled={!form.formState.isValid || isPending}>
-            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+            {isPending ? t("shopping.saving") : t("shopping.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

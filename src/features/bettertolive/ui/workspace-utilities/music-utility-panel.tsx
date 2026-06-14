@@ -39,11 +39,9 @@ export function MusicUtilityPanel({
     `shell.music.presets.${musicPresetId}.description`,
     musicDescription,
   )
-  const toggleMusicLabel = isPlaying
-    ? t("shell.music.pause", "暂停播放")
-    : t("shell.music.play", "开始播放")
-  const decreaseVolumeLabel = t("shell.music.volumeDown", "降低音量")
-  const increaseVolumeLabel = t("shell.music.volumeUp", "提高音量")
+  const toggleMusicLabel = isPlaying ? t("shell.music.pause") : t("shell.music.play")
+  const decreaseVolumeLabel = t("shell.music.volumeDown")
+  const increaseVolumeLabel = t("shell.music.volumeUp")
 
   return (
     <div

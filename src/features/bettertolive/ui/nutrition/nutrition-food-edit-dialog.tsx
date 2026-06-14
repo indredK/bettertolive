@@ -135,12 +135,12 @@ export function NutritionFoodEditDialog({
     event.preventDefault()
 
     if (!form.name.trim()) {
-      toast.error(t("nutrition.foodEdit.validation.nameRequired", "请填写食品名"))
+      toast.error(t("nutrition.foodEdit.validation.nameRequired"))
       return
     }
 
     if (form.categoryIds.length === 0) {
-      toast.error(t("nutrition.foodEdit.validation.categoryRequired", "请至少选择一个分类"))
+      toast.error(t("nutrition.foodEdit.validation.categoryRequired"))
       return
     }
 
@@ -177,10 +177,10 @@ export function NutritionFoodEditDialog({
           ? [...nextProfilesWithoutCurrent, nextProfile]
           : nextProfilesWithoutCurrent,
       })
-      toast.success(t("nutrition.foodEdit.saved", "食品已保存"))
+      toast.success(t("nutrition.foodEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.foodEdit.saveFailed", "食品保存失败"))
+      toast.error(t("nutrition.foodEdit.saveFailed"))
     }
   }
 
@@ -197,10 +197,10 @@ export function NutritionFoodEditDialog({
           (profile) => profile.foodId !== editing.food?.id,
         ),
       })
-      toast.success(t("nutrition.foodEdit.deleted", "食品已删除"))
+      toast.success(t("nutrition.foodEdit.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.foodEdit.deleteFailed", "食品删除失败"))
+      toast.error(t("nutrition.foodEdit.deleteFailed"))
     }
   }
 
@@ -215,8 +215,8 @@ export function NutritionFoodEditDialog({
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("nutrition.foodEdit.createTitle", "新增食品")
-              : t("nutrition.foodEdit.editTitle", "编辑食品")}
+              ? t("nutrition.foodEdit.createTitle")
+              : t("nutrition.foodEdit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -230,7 +230,7 @@ export function NutritionFoodEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.name", "食品名")}>
+                <Field label={t("nutrition.foodEdit.name")}>
                   <Input
                     value={form.name}
                     onChange={(event) => updateForm({ name: event.target.value })}
@@ -242,7 +242,7 @@ export function NutritionFoodEditDialog({
                   />
                 </Field>
 
-                <Field label={t("nutrition.foodEdit.defaultUnit", "默认单位")}>
+                <Field label={t("nutrition.foodEdit.defaultUnit")}>
                   <Select
                     value={form.defaultUnit}
                     onValueChange={(value) =>
@@ -266,19 +266,19 @@ export function NutritionFoodEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("nutrition.foodEdit.categories", "食品分类")}>
+              <Field label={t("nutrition.foodEdit.categories")}>
                 <MultiSelect
                   options={categoryOptions}
                   value={form.categoryIds}
                   onChange={(categoryIds) => updateForm({ categoryIds })}
-                  placeholder={t("nutrition.foodEdit.categoriesPlaceholder", "选择分类")}
-                  searchPlaceholder={t("nutrition.foodEdit.categoriesSearch", "搜索分类")}
-                  emptyMessage={t("nutrition.foodEdit.categoriesEmpty", "没有匹配分类")}
+                  placeholder={t("nutrition.foodEdit.categoriesPlaceholder")}
+                  searchPlaceholder={t("nutrition.foodEdit.categoriesSearch")}
+                  emptyMessage={t("nutrition.foodEdit.categoriesEmpty")}
                 />
               </Field>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.storage", "储存方式")}>
+                <Field label={t("nutrition.foodEdit.storage")}>
                   <Select
                     value={form.storage || NONE_VALUE}
                     onValueChange={(value) =>
@@ -291,9 +291,7 @@ export function NutritionFoodEditDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>
-                        {t("nutrition.common.optional", "可选")}
-                      </SelectItem>
+                      <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional")}</SelectItem>
                       {STORAGE_OPTIONS.map((option) => (
                         <SelectItem key={option} value={option}>
                           {t(`nutrition.enum.storage.${option}`, option)}
@@ -303,7 +301,7 @@ export function NutritionFoodEditDialog({
                   </Select>
                 </Field>
 
-                <Field label={t("nutrition.foodEdit.lifecycle", "使用周期")}>
+                <Field label={t("nutrition.foodEdit.lifecycle")}>
                   <Select
                     value={form.lifecycle || NONE_VALUE}
                     onValueChange={(value) =>
@@ -316,9 +314,7 @@ export function NutritionFoodEditDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={NONE_VALUE}>
-                        {t("nutrition.common.optional", "可选")}
-                      </SelectItem>
+                      <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional")}</SelectItem>
                       {LIFECYCLE_OPTIONS.map((option) => (
                         <SelectItem key={option} value={option}>
                           {t(`nutrition.enum.lifecycle.${option}`, option)}
@@ -330,30 +326,30 @@ export function NutritionFoodEditDialog({
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.dietaryTags", "饮食标签")}>
+                <Field label={t("nutrition.foodEdit.dietaryTags")}>
                   <Input
                     value={form.dietaryTagsText}
                     onChange={(event) => updateForm({ dietaryTagsText: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.foodEdit.tagsPlaceholder", "用逗号分隔")}
+                    placeholder={t("nutrition.foodEdit.tagsPlaceholder")}
                   />
                 </Field>
-                <Field label={t("nutrition.foodEdit.allergenTags", "过敏原")}>
+                <Field label={t("nutrition.foodEdit.allergenTags")}>
                   <Input
                     value={form.allergenTagsText}
                     onChange={(event) => updateForm({ allergenTagsText: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.foodEdit.tagsPlaceholder", "用逗号分隔")}
+                    placeholder={t("nutrition.foodEdit.tagsPlaceholder")}
                   />
                 </Field>
               </div>
 
-              <Field label={t("nutrition.foodEdit.note", "备注")}>
+              <Field label={t("nutrition.foodEdit.note")}>
                 <Textarea
                   value={form.note}
                   onChange={(event) => updateForm({ note: event.target.value })}
                   className={NUTRITION_DIALOG_FIELD_CLASS}
-                  placeholder={t("nutrition.foodEdit.notePlaceholder", "储存、使用场景或限制说明")}
+                  placeholder={t("nutrition.foodEdit.notePlaceholder")}
                 />
               </Field>
             </section>
@@ -361,7 +357,7 @@ export function NutritionFoodEditDialog({
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div>
                 <h3 className="text-sm font-semibold">
-                  {t("nutrition.foodEdit.nutritionSection", "营养档案")}
+                  {t("nutrition.foodEdit.nutritionSection")}
                 </h3>
                 <p className="text-muted-foreground mt-1 text-xs leading-5">
                   {t(
@@ -373,43 +369,43 @@ export function NutritionFoodEditDialog({
 
               <div className="grid gap-4 md:grid-cols-4">
                 <NumberField
-                  label={t("nutrition.nutrients.energyKcal", "能量")}
+                  label={t("nutrition.nutrients.energyKcal")}
                   value={form.energyKcal}
                   onChange={(energyKcal) => updateForm({ energyKcal })}
                   suffix="kcal"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.proteinG", "蛋白质")}
+                  label={t("nutrition.nutrients.proteinG")}
                   value={form.proteinG}
                   onChange={(proteinG) => updateForm({ proteinG })}
                   suffix="g"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.fatG", "脂肪")}
+                  label={t("nutrition.nutrients.fatG")}
                   value={form.fatG}
                   onChange={(fatG) => updateForm({ fatG })}
                   suffix="g"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.carbG", "碳水")}
+                  label={t("nutrition.nutrients.carbG")}
                   value={form.carbG}
                   onChange={(carbG) => updateForm({ carbG })}
                   suffix="g"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.fiberG", "膳食纤维")}
+                  label={t("nutrition.nutrients.fiberG")}
                   value={form.fiberG}
                   onChange={(fiberG) => updateForm({ fiberG })}
                   suffix="g"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.sugarG", "糖")}
+                  label={t("nutrition.nutrients.sugarG")}
                   value={form.sugarG}
                   onChange={(sugarG) => updateForm({ sugarG })}
                   suffix="g"
                 />
                 <NumberField
-                  label={t("nutrition.nutrients.sodiumMg", "钠")}
+                  label={t("nutrition.nutrients.sodiumMg")}
                   value={form.sodiumMg}
                   onChange={(sodiumMg) => updateForm({ sodiumMg })}
                   suffix="mg"
@@ -417,7 +413,7 @@ export function NutritionFoodEditDialog({
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.source", "来源")}>
+                <Field label={t("nutrition.foodEdit.source")}>
                   <Select
                     value={form.source}
                     onValueChange={(value) =>
@@ -440,7 +436,7 @@ export function NutritionFoodEditDialog({
                   </Select>
                 </Field>
 
-                <Field label={t("nutrition.foodEdit.confidence", "可信度")}>
+                <Field label={t("nutrition.foodEdit.confidence")}>
                   <Select
                     value={form.confidence}
                     onValueChange={(value) =>
@@ -486,16 +482,16 @@ export function NutritionFoodEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.foodEdit.delete", "删除")}
+                {t("nutrition.foodEdit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>

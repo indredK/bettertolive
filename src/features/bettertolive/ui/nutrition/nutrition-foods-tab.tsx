@@ -119,7 +119,7 @@ export function NutritionFoodsTab({
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("nutrition.foods.search", "搜索食品、分类或储存方式")}
+              placeholder={t("nutrition.foods.search")}
               className="border-foreground/15 bg-background"
             />
           </div>
@@ -130,7 +130,7 @@ export function NutritionFoodsTab({
               onClick={() => setActiveCategoryId(ALL_CATEGORY_ID)}
             >
               <div className="flex items-center justify-between gap-2">
-                <div className="font-medium">{t("nutrition.foods.allFoods", "全部食品")}</div>
+                <div className="font-medium">{t("nutrition.foods.allFoods")}</div>
                 <Badge
                   variant="outline"
                   className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
@@ -139,7 +139,7 @@ export function NutritionFoodsTab({
                 </Badge>
               </div>
               <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
-                {t("nutrition.foods.allFoodsDesc", "跨分类查看和搜索整个食品库。")}
+                {t("nutrition.foods.allFoodsDesc")}
               </p>
             </NutritionSelectableCard>
 
@@ -176,11 +176,10 @@ export function NutritionFoodsTab({
                 <div className="flex shrink-0 items-center justify-between gap-3">
                   <div>
                     <h3 className="font-semibold tracking-tight">
-                      {activeCategory?.name ?? t("nutrition.foods.allFoods", "全部食品")}
+                      {activeCategory?.name ?? t("nutrition.foods.allFoods")}
                     </h3>
                     <p className="text-muted-foreground mt-1 text-sm leading-6">
-                      {activeCategory?.description ??
-                        t("nutrition.foods.allFoodsDesc", "跨分类查看和搜索整个食品库。")}
+                      {activeCategory?.description ?? t("nutrition.foods.allFoodsDesc")}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -195,7 +194,7 @@ export function NutritionFoodsTab({
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      label={t("nutrition.categoryEdit.editTitle", "编辑食品分类")}
+                      label={t("nutrition.categoryEdit.editTitle")}
                       icon={<Pencil className="size-3.5" />}
                       onClick={() =>
                         setEditingCategory({ isNew: false, category: activeCategory! })
@@ -229,7 +228,7 @@ export function NutritionFoodsTab({
                 }
               />
             ) : (
-              <NutritionEmptyDetailCard message={t("nutrition.foods.empty", "没有匹配的食品。")} />
+              <NutritionEmptyDetailCard message={t("nutrition.foods.empty")} />
             )}
           </div>
         </NutritionDetailPane>
@@ -353,23 +352,23 @@ function FoodDetail({
         <div className="shrink-0">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
-              {t("nutrition.foods.baseLibrary", "食品基础库")}
+              {t("nutrition.foods.baseLibrary")}
             </Badge>
             <AnimatedIconButton
               show={Boolean(onEdit)}
               type="button"
               variant="outline"
               size="sm"
-              label={t("nutrition.foodEdit.editAction", "编辑")}
+              label={t("nutrition.foodEdit.editAction")}
               icon={<Pencil className="size-3.5" />}
               onClick={onEdit}
             >
-              {t("nutrition.foodEdit.editAction", "编辑")}
+              {t("nutrition.foodEdit.editAction")}
             </AnimatedIconButton>
           </div>
           <h3 className="mt-3 text-2xl font-semibold tracking-tight">{food.name}</h3>
           <p className="text-muted-foreground mt-2 text-sm leading-6">
-            {food.note || t("nutrition.foods.noNote", "暂无备注，后续可补充储存、使用和限制信息。")}
+            {food.note || t("nutrition.foods.noNote")}
           </p>
           <NutritionTagBar names={categoryNames} className="mt-3" />
         </div>
@@ -377,64 +376,56 @@ function FoodDetail({
         <div className="mt-4 grid shrink-0 gap-2 sm:grid-cols-4">
           <NutritionMetricCard
             icon={Boxes}
-            label={t("nutrition.foods.unit", "默认单位")}
+            label={t("nutrition.foods.unit")}
             value={t(`nutrition.enum.unit.${food.defaultUnit}`, food.defaultUnit)}
           />
           <NutritionMetricCard
             icon={Leaf}
-            label={t("nutrition.foods.storage", "储存")}
+            label={t("nutrition.foods.storage")}
             value={food.storage ? t(`nutrition.enum.storage.${food.storage}`, food.storage) : "-"}
           />
           <NutritionMetricCard
-            label={t("nutrition.foods.lifecycle", "周期")}
+            label={t("nutrition.foods.lifecycle")}
             value={
               food.lifecycle ? t(`nutrition.enum.lifecycle.${food.lifecycle}`, food.lifecycle) : "-"
             }
           />
           <NutritionMetricCard
             icon={Search}
-            label={t("nutrition.foods.nutrition", "营养")}
-            value={
-              profile
-                ? t("nutrition.foods.hasProfile", "已录入")
-                : t("nutrition.foods.missingProfile", "待补")
-            }
+            label={t("nutrition.foods.nutrition")}
+            value={profile ? t("nutrition.foods.hasProfile") : t("nutrition.foods.missingProfile")}
           />
         </div>
 
         <div className="mt-4 grid min-h-0 flex-1 gap-3 overflow-y-auto pr-1 lg:grid-cols-2">
           <div className="border-foreground/10 bg-background/70 rounded-2xl border p-4">
-            <h4 className="text-sm font-semibold">
-              {t("nutrition.foods.dietaryTags", "饮食标签")}
-            </h4>
+            <h4 className="text-sm font-semibold">{t("nutrition.foods.dietaryTags")}</h4>
             {dietaryTagNames.length > 0 ? (
               <NutritionTagBar names={dietaryTagNames} className="mt-3" />
             ) : (
               <p className="text-muted-foreground mt-3 text-xs leading-5">
-                {t("nutrition.foods.noDietaryTags", "暂无饮食标签或过敏原。")}
+                {t("nutrition.foods.noDietaryTags")}
               </p>
             )}
           </div>
           <div className="border-foreground/10 bg-background/70 rounded-2xl border p-4">
-            <h4 className="text-sm font-semibold">
-              {t("nutrition.foods.nutrientProfile", "营养档案")}
-            </h4>
+            <h4 className="text-sm font-semibold">{t("nutrition.foods.nutrientProfile")}</h4>
             {profile ? (
               <div className="mt-3 space-y-2 text-sm">
                 <NutrientLine
-                  label={t("nutrition.nutrients.energyKcal", "能量")}
+                  label={t("nutrition.nutrients.energyKcal")}
                   value={formatProfileNutrient(profile.energyKcal, "kcal", 0, t)}
                 />
                 <NutrientLine
-                  label={t("nutrition.nutrients.proteinG", "蛋白质")}
+                  label={t("nutrition.nutrients.proteinG")}
                   value={formatProfileNutrient(profile.proteinG, "g", 1, t)}
                 />
                 <NutrientLine
-                  label={t("nutrition.nutrients.carbG", "碳水")}
+                  label={t("nutrition.nutrients.carbG")}
                   value={formatProfileNutrient(profile.carbG, "g", 1, t)}
                 />
                 <NutrientLine
-                  label={t("nutrition.nutrients.sodiumMg", "钠")}
+                  label={t("nutrition.nutrients.sodiumMg")}
                   value={formatProfileNutrient(profile.sodiumMg, "mg", 0, t)}
                 />
                 <p className="text-muted-foreground pt-2 text-xs">
@@ -475,7 +466,7 @@ function formatProfileNutrient(
   t: TFunction,
 ) {
   if (typeof value !== "number") {
-    return t("nutrition.nutrients.pending", "待补")
+    return t("nutrition.nutrients.pending")
   }
 
   return `${formatNutrientValue(value, digits)} ${unit}`

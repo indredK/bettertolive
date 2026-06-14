@@ -108,7 +108,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
               name: food.name,
               basis: profile
                 ? `${profile.basisAmount}${translateNutritionEnum(t, "unit", profile.basisUnit)}`
-                : t("nutrition.nutrients.pending", "待补"),
+                : t("nutrition.nutrients.pending"),
               missing: countFoodMissingFields(profile),
               energyKcal: profile?.energyKcal,
               proteinG: profile?.proteinG,
@@ -151,7 +151,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
             return {
               id: recipe.id,
               name: recipe.name,
-              basis: t("nutrition.nutrients.perServing", "每份"),
+              basis: t("nutrition.nutrients.perServing"),
               missing: totals.missingCount,
               ...totals,
             }
@@ -204,7 +204,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
           return {
             id: plan.id,
             name: plan.date,
-            basis: t("nutrition.nutrients.dailyTotal", "每日合计"),
+            basis: t("nutrition.nutrients.dailyTotal"),
             missing: totals.missingCount,
             ...totals,
           }
@@ -241,7 +241,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
             <Input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder={t("nutrition.nutrients.search", "搜索食品、食谱或日期")}
+              placeholder={t("nutrition.nutrients.search")}
               className="border-foreground/15 bg-background xl:max-w-xs"
             />
           </div>
@@ -249,14 +249,14 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
           <div className="border-foreground/10 bg-background/70 grid gap-3 rounded-2xl border p-3 xl:grid-cols-[minmax(0,1fr)_auto]">
             <div className="min-w-0">
               <div className="text-muted-foreground mb-2 text-xs font-medium">
-                {t("nutrition.nutrients.categoryFilter", "分类筛选")}
+                {t("nutrition.nutrients.categoryFilter")}
               </div>
               <div className="flex flex-wrap gap-1.5">
                 <FilterChip
                   isActive={effectiveCategoryId === "all"}
                   onClick={() => setCategoryId("all")}
                 >
-                  {t("nutrition.nutrients.allCategories", "全部分类")}
+                  {t("nutrition.nutrients.allCategories")}
                 </FilterChip>
                 {nutrition.foodCategories.map((category) => (
                   <FilterChip
@@ -286,8 +286,8 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                 onClick={() => setMissingOnly((current) => !current)}
               >
                 {missingOnly
-                  ? t("nutrition.nutrients.missingOnlyActive", "仅看待补")
-                  : t("nutrition.nutrients.missingOnly", "只看待补")}
+                  ? t("nutrition.nutrients.missingOnlyActive")
+                  : t("nutrition.nutrients.missingOnly")}
               </button>
               <Badge
                 variant="outline"
@@ -311,11 +311,11 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                       ) : (
                         <BarChart3 className="size-4" />
                       )}
-                      {t("nutrition.nutrients.item", "条目")}
+                      {t("nutrition.nutrients.item")}
                     </span>
                   </th>
                   <th className="px-3 py-3 text-left font-medium">
-                    {t("nutrition.nutrients.basis", "粒度")}
+                    {t("nutrition.nutrients.basis")}
                   </th>
                   {NUTRIENT_KEYS.map((key) => (
                     <th key={key} className="px-3 py-3 text-right font-medium">
@@ -323,7 +323,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                     </th>
                   ))}
                   <th className="px-3 py-3 text-right font-medium">
-                    {t("nutrition.nutrients.missing", "待补")}
+                    {t("nutrition.nutrients.missing")}
                   </th>
                 </tr>
               </thead>
@@ -344,7 +344,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                     <td className="px-3 py-3 font-medium">
                       <div>{row.name}</div>
                       <div className="text-muted-foreground mt-1 text-[11px]">
-                        {t("nutrition.nutrients.rowClickHint", "点击查看详细营养")}
+                        {t("nutrition.nutrients.rowClickHint")}
                       </div>
                     </td>
                     <td className="text-muted-foreground px-3 py-3">{row.basis}</td>
@@ -365,7 +365,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                             variant="outline"
                             className="border-foreground/10 bg-muted text-muted-foreground"
                           >
-                            {t("nutrition.nutrients.pending", "待补")}
+                            {t("nutrition.nutrients.pending")}
                           </Badge>
                         )}
                       </td>
@@ -389,11 +389,9 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
           </div>
         ) : (
           <div className="border-foreground/15 bg-muted/20 mt-4 flex min-h-[260px] flex-1 flex-col items-center justify-center rounded-2xl border border-dashed p-8 text-center">
-            <div className="text-sm font-medium">
-              {t("nutrition.nutrients.empty", "没有匹配的营养条目")}
-            </div>
+            <div className="text-sm font-medium">{t("nutrition.nutrients.empty")}</div>
             <p className="text-muted-foreground mt-2 max-w-md text-xs leading-5">
-              {t("nutrition.nutrients.emptyHint", "可以清空搜索、切换分类，或关闭只看待补筛选。")}
+              {t("nutrition.nutrients.emptyHint")}
             </p>
           </div>
         )}
@@ -441,7 +439,7 @@ function NutrientDetailDrawer({
                 variant="outline"
                 className="border-foreground/10 bg-muted text-muted-foreground"
               >
-                {t("nutrition.nutrients.simulatedBadge", "含模拟雷达")}
+                {t("nutrition.nutrients.simulatedBadge")}
               </Badge>
             </div>
             <DialogTitle className="mt-2 text-xl">
@@ -462,7 +460,7 @@ function NutrientDetailDrawer({
                   <div>
                     <h3 className="flex items-center gap-2 text-sm font-semibold">
                       <Hexagon className="size-4" />
-                      {t("nutrition.nutrients.chartTitle", "六维营养轮廓")}
+                      {t("nutrition.nutrients.chartTitle")}
                     </h3>
                     <p className="text-muted-foreground mt-1 text-xs leading-5">
                       {t(
@@ -474,7 +472,7 @@ function NutrientDetailDrawer({
                   <div className="text-right">
                     <div className="text-2xl font-semibold tracking-tight">{knownCount}</div>
                     <div className="text-muted-foreground text-[11px]">
-                      {t("nutrition.nutrients.knownFields", "已知字段")}
+                      {t("nutrition.nutrients.knownFields")}
                     </div>
                   </div>
                 </div>
@@ -504,16 +502,10 @@ function NutrientDetailDrawer({
               </section>
 
               <section className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                <NutrientDrawerStat label={t("nutrition.nutrients.basis")} value={row.basis} />
+                <NutrientDrawerStat label={t("nutrition.nutrients.missing")} value={row.missing} />
                 <NutrientDrawerStat
-                  label={t("nutrition.nutrients.basis", "粒度")}
-                  value={row.basis}
-                />
-                <NutrientDrawerStat
-                  label={t("nutrition.nutrients.missing", "待补")}
-                  value={row.missing}
-                />
-                <NutrientDrawerStat
-                  label={t("nutrition.nutrients.scoreLabel", "轮廓均值")}
+                  label={t("nutrition.nutrients.scoreLabel")}
                   value={Math.round(
                     radarData.reduce((total, entry) => total + entry.score, 0) / radarData.length,
                   )}
@@ -522,9 +514,7 @@ function NutrientDetailDrawer({
             </div>
 
             <section className="border-foreground/10 bg-background/70 mt-4 rounded-3xl border p-4">
-              <h3 className="text-sm font-semibold">
-                {t("nutrition.nutrients.detailTitle", "详细营养表")}
-              </h3>
+              <h3 className="text-sm font-semibold">{t("nutrition.nutrients.detailTitle")}</h3>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {NUTRIENT_KEYS.map((key) => (
                   <div
@@ -560,27 +550,27 @@ function NutrientDrawerStat({ label, value }: { label: string; value: number | s
 function buildNutrientRadarData(row: NutrientTableRow, t: TFunction) {
   return [
     {
-      label: t("nutrition.nutrients.dimensions.energy", "能量"),
+      label: t("nutrition.nutrients.dimensions.energy"),
       score: scoreNutrient(row.energyKcal, 650, `${row.id}:energy`),
     },
     {
-      label: t("nutrition.nutrients.dimensions.protein", "蛋白"),
+      label: t("nutrition.nutrients.dimensions.protein"),
       score: scoreNutrient(row.proteinG, 35, `${row.id}:protein`),
     },
     {
-      label: t("nutrition.nutrients.dimensions.carbs", "碳水"),
+      label: t("nutrition.nutrients.dimensions.carbs"),
       score: scoreNutrient(row.carbG, 85, `${row.id}:carbs`),
     },
     {
-      label: t("nutrition.nutrients.dimensions.fats", "脂肪"),
+      label: t("nutrition.nutrients.dimensions.fats"),
       score: scoreNutrient(row.fatG, 28, `${row.id}:fats`),
     },
     {
-      label: t("nutrition.nutrients.dimensions.fiber", "纤维"),
+      label: t("nutrition.nutrients.dimensions.fiber"),
       score: scoreNutrient(row.fiberG, 12, `${row.id}:fiber`),
     },
     {
-      label: t("nutrition.nutrients.dimensions.lightness", "轻负担"),
+      label: t("nutrition.nutrients.dimensions.lightness"),
       score: Math.round(
         (scoreLowerIsBetter(row.sugarG, 32, `${row.id}:sugar`) +
           scoreLowerIsBetter(row.sodiumMg, 900, `${row.id}:sodium`)) /
@@ -624,7 +614,7 @@ function formatDetailedNutrient(row: NutrientTableRow, key: NutrientKey, t: TFun
   const value = row[key]
 
   if (typeof value !== "number") {
-    return t("nutrition.nutrients.pending", "待补")
+    return t("nutrition.nutrients.pending")
   }
 
   return `${formatNutrientValue(value, key === "energyKcal" || key === "sodiumMg" ? 0 : 1)} ${

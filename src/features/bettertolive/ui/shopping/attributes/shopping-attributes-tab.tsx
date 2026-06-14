@@ -146,9 +146,7 @@ export function ShoppingAttributesTab({
   const handleMutationError = (error: unknown) => {
     const message = String(error)
     if (message.includes("conflict")) {
-      toast.error(
-        t("shopping.attributes.conflict", "该属性已被其他操作修改，已刷新最新状态，请重试"),
-      )
+      toast.error(t("shopping.attributes.conflict"))
       onRefresh()
     } else {
       toast.error(message)
@@ -215,7 +213,7 @@ export function ShoppingAttributesTab({
     dispatch({ type: "begin", target: REORDER_TARGET, kind: "reorder" })
     try {
       await reorderAttributeDefinitions(selectedGroup.kind, nextOrder)
-      toast.success(t("shopping.attributes.reordered", "属性顺序已更新"))
+      toast.success(t("shopping.attributes.reordered"))
       onRefresh()
     } catch (error) {
       setOrderedIds(oldOrder)
@@ -233,7 +231,7 @@ export function ShoppingAttributesTab({
     try {
       const updated = await disableAttributeDefinition(attribute.id, attribute.version)
       dispatch({ type: "settle", target: attribute.id, patch: { version: updated.version } })
-      toast.success(t("shopping.attributes.disableSuccess", "属性已停用"))
+      toast.success(t("shopping.attributes.disableSuccess"))
       onRefresh()
     } catch (error) {
       dispatch({ type: "settle", target: attribute.id })
@@ -251,7 +249,7 @@ export function ShoppingAttributesTab({
       try {
         const updated = await enableAttributeDefinition(attribute.id, attribute.version)
         dispatch({ type: "settle", target: attribute.id, patch: { version: updated.version } })
-        toast.success(t("shopping.attributes.enableSuccess", "属性已启用"))
+        toast.success(t("shopping.attributes.enableSuccess"))
         onRefresh()
       } catch (error) {
         dispatch({ type: "settle", target: attribute.id })
@@ -306,7 +304,7 @@ export function ShoppingAttributesTab({
             }
           >
             <Plus className="size-4" />
-            {t("shopping.attributes.add", "新增")}
+            {t("shopping.attributes.add")}
           </Button>
         ) : null}
       </div>
@@ -318,7 +316,7 @@ export function ShoppingAttributesTab({
             "text-muted-foreground rounded-xl border p-6 text-center text-sm",
           )}
         >
-          {t("shopping.attributes.emptyHint", "当前分类下还没有属性定义")}
+          {t("shopping.attributes.emptyHint")}
         </div>
       ) : (
         <ShoppingTabBody>
@@ -366,7 +364,7 @@ export function ShoppingAttributesTab({
                             type="button"
                             variant="ghost"
                             size="icon-sm"
-                            label={t("shopping.attributes.edit", "编辑属性")}
+                            label={t("shopping.attributes.edit")}
                             icon={<Pencil className="h-3.5 w-3.5" />}
                             onClick={(e) => {
                               e.stopPropagation()
@@ -384,8 +382,8 @@ export function ShoppingAttributesTab({
                             size="icon-sm"
                             label={
                               attribute.isEnabled
-                                ? t("shopping.attributes.disable", "停用属性")
-                                : t("shopping.attributes.enable", "启用属性")
+                                ? t("shopping.attributes.disable")
+                                : t("shopping.attributes.enable")
                             }
                             icon={
                               attribute.isEnabled ? (
@@ -419,7 +417,7 @@ export function ShoppingAttributesTab({
                       {shoppingAttributeDisplayName(selectedAttribute)}
                       {!selectedAttribute.isEnabled && (
                         <span className="ml-2 text-sm font-normal text-amber-500">
-                          ({t("shopping.attributes.disabledBadge", "已停用")})
+                          ({t("shopping.attributes.disabledBadge")})
                         </span>
                       )}
                     </CardTitle>
@@ -432,38 +430,38 @@ export function ShoppingAttributesTab({
                   <div className={cn(SHOPPING_MUTED_PANEL_CLASS, "rounded-lg border p-3")}>
                     <div className="grid gap-3 md:grid-cols-2">
                       <DetailRow
-                        label={t("shopping.attributes.kind", "分类")}
+                        label={t("shopping.attributes.kind")}
                         value={shoppingAttributeKindDisplayName(selectedAttribute.kind, t)}
                       />
                       <DetailRow
-                        label={t("shopping.attributes.semanticKey", "语义键")}
+                        label={t("shopping.attributes.semanticKey")}
                         value={shoppingAttributeSemanticDisplayName(
                           selectedAttribute.semanticKey,
                           t,
                         )}
                       />
                       <DetailRow
-                        label={t("shopping.attributes.labelEn", "英文名")}
-                        value={selectedAttribute.labelEn || t("shopping.attributes.none", "未设置")}
+                        label={t("shopping.attributes.labelEn")}
+                        value={selectedAttribute.labelEn || t("shopping.attributes.none")}
                       />
                       <DetailRow
-                        label={t("shopping.attributes.styleToken", "样式")}
+                        label={t("shopping.attributes.styleToken")}
                         value={shoppingAttributeStyleTokenDisplayName(
                           selectedAttribute.styleToken,
                           t,
                         )}
                       />
                       <DetailRow
-                        label={t("shopping.attributes.rank", "等级 / 排序权重")}
+                        label={t("shopping.attributes.rank")}
                         value={
                           selectedAttribute.rank != null
                             ? String(selectedAttribute.rank)
-                            : t("shopping.attributes.none", "未设置")
+                            : t("shopping.attributes.none")
                         }
                       />
                       <div>
                         <div className="text-muted-foreground text-[11px]">
-                          {t("shopping.attributes.state", "状态")}
+                          {t("shopping.attributes.state")}
                         </div>
                         {selectedAttribute.isEnabled ? (
                           <div className="text-sm font-medium text-green-600 dark:text-green-400">
@@ -481,18 +479,16 @@ export function ShoppingAttributesTab({
 
                   <div>
                     <div className="text-muted-foreground mb-1.5 text-[11px]">
-                      {t("shopping.attributes.description", "说明")}
+                      {t("shopping.attributes.description")}
                     </div>
                     <div className="text-sm leading-6">
-                      {selectedAttribute.description || t("shopping.attributes.none", "未设置")}
+                      {selectedAttribute.description || t("shopping.attributes.none")}
                     </div>
                   </div>
                 </CardContent>
               </Card>
             ) : (
-              <ShoppingEmptyDetailCard
-                message={t("shopping.attributes.selectPrompt", "从左侧选择一个属性查看详情")}
-              />
+              <ShoppingEmptyDetailCard message={t("shopping.attributes.selectPrompt")} />
             )}
           </ShoppingDetailPane>
         </ShoppingTabBody>
@@ -505,7 +501,7 @@ export function ShoppingAttributesTab({
           onSaved={() => {
             setEditing(null)
             onRefresh()
-            toast.success(t("shopping.toast.saved", "已保存"))
+            toast.success(t("shopping.toast.saved"))
           }}
         />
       ) : null}
@@ -540,7 +536,7 @@ export function ShoppingAttributesTab({
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setDisableConfirm(null)}>
-                {t("shopping.cancel", "取消")}
+                {t("shopping.cancel")}
               </Button>
               <Button
                 variant="destructive"

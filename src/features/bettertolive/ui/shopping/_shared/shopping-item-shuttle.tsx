@@ -76,21 +76,21 @@ export function ShoppingItemShuttle({
       itemLayout={scope === "stage" ? "compact" : "default"}
       description={
         scope === "system"
-          ? t("shopping.systems.form.assignItemsHelp", "将属于此系统的物品移至右侧，保存后生效")
+          ? t("shopping.systems.form.assignItemsHelp")
           : scope === "space"
-            ? t("shopping.spaces.form.assignItemsHelp", "将属于此空间的物品移至右侧，保存后生效")
-            : t("shopping.stage.shuttleDescription", "将属于此阶段的物品移至右侧，保存后生效")
+            ? t("shopping.spaces.form.assignItemsHelp")
+            : t("shopping.stage.shuttleDescription")
       }
       labels={{
-        availableTitle: t("shopping.shuttle.candidates", "候选"),
-        selectedTitle: t("shopping.shuttle.selected", "已选"),
-        searchPlaceholder: t("shopping.shuttle.search", "搜索物品名"),
-        emptyAvailable: t("shopping.shuttle.empty", "暂无候选"),
-        emptySelected: t("shopping.shuttle.noSelected", "尚未选择"),
-        addChecked: t("shopping.shuttle.addChecked", "加入勾选"),
-        addAll: t("shopping.shuttle.addAll", "全部加入"),
-        removeChecked: t("shopping.shuttle.removeChecked", "移除勾选"),
-        removeAll: t("shopping.shuttle.removeAll", "全部移除"),
+        availableTitle: t("shopping.shuttle.candidates"),
+        selectedTitle: t("shopping.shuttle.selected"),
+        searchPlaceholder: t("shopping.shuttle.search"),
+        emptyAvailable: t("shopping.shuttle.empty"),
+        emptySelected: t("shopping.shuttle.noSelected"),
+        addChecked: t("shopping.shuttle.addChecked"),
+        addAll: t("shopping.shuttle.addAll"),
+        removeChecked: t("shopping.shuttle.removeChecked"),
+        removeAll: t("shopping.shuttle.removeAll"),
       }}
     />
   )

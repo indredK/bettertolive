@@ -89,7 +89,7 @@ export function NutritionFoodCategoryEditDialog({
     event.preventDefault()
 
     if (!form.name.trim()) {
-      toast.error(t("nutrition.categoryEdit.validation.nameRequired", "请填写分类名"))
+      toast.error(t("nutrition.categoryEdit.validation.nameRequired"))
       return
     }
 
@@ -112,10 +112,10 @@ export function NutritionFoodCategoryEditDialog({
         ...nutrition,
         foodCategories: nextCategories,
       })
-      toast.success(t("nutrition.categoryEdit.saved", "食品分类已保存"))
+      toast.success(t("nutrition.categoryEdit.saved"))
       onClose()
     } catch {
-      toast.error(t("nutrition.categoryEdit.saveFailed", "食品分类保存失败"))
+      toast.error(t("nutrition.categoryEdit.saveFailed"))
     }
   }
 
@@ -131,10 +131,10 @@ export function NutritionFoodCategoryEditDialog({
           (category) => category.id !== editing.category?.id,
         ),
       })
-      toast.success(t("nutrition.categoryEdit.deleted", "食品分类已删除"))
+      toast.success(t("nutrition.categoryEdit.deleted"))
       onClose()
     } catch {
-      toast.error(t("nutrition.categoryEdit.deleteFailed", "食品分类删除失败"))
+      toast.error(t("nutrition.categoryEdit.deleteFailed"))
     }
   }
 
@@ -149,8 +149,8 @@ export function NutritionFoodCategoryEditDialog({
         <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
           <DialogTitle>
             {editing.isNew
-              ? t("nutrition.categoryEdit.createTitle", "新增食品分类")
-              : t("nutrition.categoryEdit.editTitle", "编辑食品分类")}
+              ? t("nutrition.categoryEdit.createTitle")
+              : t("nutrition.categoryEdit.editTitle")}
           </DialogTitle>
           <DialogDescription>
             {t(
@@ -164,16 +164,16 @@ export function NutritionFoodCategoryEditDialog({
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={NUTRITION_DIALOG_SECTION_CLASS}>
               <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_180px]">
-                <Field label={t("nutrition.categoryEdit.name", "分类名")}>
+                <Field label={t("nutrition.categoryEdit.name")}>
                   <Input
                     value={form.name}
                     onChange={(event) => updateForm({ name: event.target.value })}
                     className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("nutrition.categoryEdit.namePlaceholder", "例如：常备蛋白")}
+                    placeholder={t("nutrition.categoryEdit.namePlaceholder")}
                   />
                 </Field>
 
-                <Field label={t("nutrition.categoryEdit.sortOrder", "排序")}>
+                <Field label={t("nutrition.categoryEdit.sortOrder")}>
                   <Input
                     type="number"
                     min={0}
@@ -185,7 +185,7 @@ export function NutritionFoodCategoryEditDialog({
                 </Field>
               </div>
 
-              <Field label={t("nutrition.categoryEdit.dimension", "分类维度")}>
+              <Field label={t("nutrition.categoryEdit.dimension")}>
                 <Select
                   value={form.dimension}
                   onValueChange={(dimension) =>
@@ -208,7 +208,7 @@ export function NutritionFoodCategoryEditDialog({
                 </Select>
               </Field>
 
-              <Field label={t("nutrition.categoryEdit.descriptionLabel", "说明")}>
+              <Field label={t("nutrition.categoryEdit.descriptionLabel")}>
                 <Textarea
                   value={form.description}
                   onChange={(event) => updateForm({ description: event.target.value })}
@@ -242,16 +242,16 @@ export function NutritionFoodCategoryEditDialog({
                 className="mr-auto"
               >
                 <Trash2 className="size-4" />
-                {t("nutrition.categoryEdit.delete", "删除")}
+                {t("nutrition.categoryEdit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("nutrition.common.cancel", "取消")}
+              {t("nutrition.common.cancel")}
             </Button>
             <Button type="submit" disabled={saveNutritionMutation.isPending}>
               {saveNutritionMutation.isPending
-                ? t("nutrition.common.saving", "保存中")
-                : t("nutrition.common.save", "保存")}
+                ? t("nutrition.common.saving")
+                : t("nutrition.common.save")}
             </Button>
           </DialogFooter>
         </form>

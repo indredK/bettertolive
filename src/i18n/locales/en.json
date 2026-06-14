@@ -3,6 +3,21 @@
     "filter": {
       "label": "Filter",
       "clearAll": "Clear all"
+    },
+    "actions": {
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting…",
+      "confirm": "Confirm",
+      "close": "Close",
+      "edit": "Edit",
+      "add": "Add",
+      "create": "Create",
+      "deleted": "Deleted",
+      "undo": "Undo",
+      "retry": "Retry"
     }
   },
   "shopping": {
@@ -3925,7 +3940,11 @@
       "conclusionPlaceholder": "Conclusion",
       "deleteAria": "Delete verdict",
       "noPresets": "This pair of civilizations has no verdicts",
-      "noPresetsHint": ", click \"Add Verdict\" to create one"
+      "noPresetsHint": ", click \"Add Verdict\" to create one",
+      "deletePending": "Queued for deletion. Undo is available for 5 seconds.",
+      "deleteSuccess": "Deleted verdict",
+      "deleteFailed": "Failed to delete verdict",
+      "deleteUndone": "Deletion undone"
     },
     "star": {
       "suffix": "Causal Map",

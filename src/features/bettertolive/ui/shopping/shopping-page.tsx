@@ -85,14 +85,12 @@ export function ShoppingPage({
         <ActionGroup>
           <div className="min-w-0 flex-1 overflow-hidden">
             <TabsList className="hide-scrollbar max-w-full shrink-0 justify-start overflow-x-auto">
-              <TabsTrigger value="overview">{t("shopping.tabs.overview", "总览")}</TabsTrigger>
-              <TabsTrigger value="planning">{t("shopping.tabs.planning", "物件库")}</TabsTrigger>
-              <TabsTrigger value="systems">{t("shopping.tabs.systems", "物件系统")}</TabsTrigger>
-              <TabsTrigger value="spaces">{t("shopping.tabs.spaces", "空间场景")}</TabsTrigger>
-              <TabsTrigger value="stages">{t("shopping.tabs.stages", "阶段适用")}</TabsTrigger>
-              <TabsTrigger value="attributes">
-                {t("shopping.tabs.attributes", "属性字典")}
-              </TabsTrigger>
+              <TabsTrigger value="overview">{t("shopping.tabs.overview")}</TabsTrigger>
+              <TabsTrigger value="planning">{t("shopping.tabs.planning")}</TabsTrigger>
+              <TabsTrigger value="systems">{t("shopping.tabs.systems")}</TabsTrigger>
+              <TabsTrigger value="spaces">{t("shopping.tabs.spaces")}</TabsTrigger>
+              <TabsTrigger value="stages">{t("shopping.tabs.stages")}</TabsTrigger>
+              <TabsTrigger value="attributes">{t("shopping.tabs.attributes")}</TabsTrigger>
             </TabsList>
           </div>
 
@@ -104,7 +102,7 @@ export function ShoppingPage({
                 onClick={() => handleEditItem(null)}
               >
                 <Plus className="size-4" />
-                {t("shopping.planning.addItem", "新增物品")}
+                {t("shopping.planning.addItem")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "systems"}
@@ -112,7 +110,7 @@ export function ShoppingPage({
                 onClick={() => setEditingSystem({ isNew: true, system: null })}
               >
                 <Plus className="size-4" />
-                {t("shopping.systems.addSystem", "新增系统")}
+                {t("shopping.systems.addSystem")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "spaces"}
@@ -120,7 +118,7 @@ export function ShoppingPage({
                 onClick={() => setEditingSpace({ isNew: true, space: null })}
               >
                 <Plus className="size-4" />
-                {t("shopping.spaces.addSpace", "新增空间")}
+                {t("shopping.spaces.addSpace")}
               </AnimatedButton>
               <AnimatedButton
                 show={activeTab === "stages"}
@@ -128,7 +126,7 @@ export function ShoppingPage({
                 onClick={() => setEditingStage({ isNew: true, stage: null })}
               >
                 <Plus className="size-4" />
-                {t("shopping.stages.addStage", "新增阶段")}
+                {t("shopping.stages.addStage")}
               </AnimatedButton>
             </ActionGroup>
           </AnimatedVisibility>
@@ -201,7 +199,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingItem(null)
             refresh()
-            toast.success(t("shopping.toast.saved", "已保存"))
+            toast.success(t("shopping.toast.saved"))
           }}
           onDeleted={() => {
             setEditingItem(null)
@@ -219,7 +217,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingStage(null)
             refresh()
-            toast.success(t("shopping.toast.saved", "已保存"))
+            toast.success(t("shopping.toast.saved"))
           }}
           onDeleted={() => {
             setEditingStage(null)
@@ -237,7 +235,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingSystem(null)
             refresh()
-            toast.success(t("shopping.toast.saved", "已保存"))
+            toast.success(t("shopping.toast.saved"))
           }}
           onDeleted={() => {
             setEditingSystem(null)
@@ -255,7 +253,7 @@ export function ShoppingPage({
           onSaved={() => {
             setEditingSpace(null)
             refresh()
-            toast.success(t("shopping.toast.saved", "已保存"))
+            toast.success(t("shopping.toast.saved"))
           }}
           onDeleted={() => {
             setEditingSpace(null)

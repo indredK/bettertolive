@@ -107,8 +107,8 @@ export function LegacyItemsTab({
     () => [
       {
         key: "category",
-        label: t("legacy.fields.category", "内容类别"),
-        allLabel: t("legacy.filters.all", "全部"),
+        label: t("legacy.fields.category"),
+        allLabel: t("legacy.filters.all"),
         value: category,
         options: LEGACY_CATEGORIES.map((value) => ({
           value,
@@ -117,8 +117,8 @@ export function LegacyItemsTab({
       },
       {
         key: "status",
-        label: t("legacy.fields.status", "完成状态"),
-        allLabel: t("legacy.filters.all", "全部"),
+        label: t("legacy.fields.status"),
+        allLabel: t("legacy.filters.all"),
         value: status,
         options: LEGACY_STATUSES.map((value) => ({
           value,
@@ -127,8 +127,8 @@ export function LegacyItemsTab({
       },
       {
         key: "visibility",
-        label: t("legacy.fields.visibility", "可见时机"),
-        allLabel: t("legacy.filters.all", "全部"),
+        label: t("legacy.fields.visibility"),
+        allLabel: t("legacy.filters.all"),
         value: visibility,
         options: LEGACY_VISIBILITIES.map((value) => ({
           value,
@@ -137,8 +137,8 @@ export function LegacyItemsTab({
       },
       {
         key: "signal",
-        label: t("legacy.filters.signal", "保护信号"),
-        allLabel: t("legacy.filters.all", "全部"),
+        label: t("legacy.filters.signal"),
+        allLabel: t("legacy.filters.all"),
         value: signal,
         options: (["missingDelivery", "locked", "aiExcluded", "secondConfirm"] as const).map(
           (value) => ({ value, label: t(`legacy.filters.${value}`, value) }),
@@ -173,7 +173,7 @@ export function LegacyItemsTab({
                 value={localQuery}
                 onChange={(event) => setLocalQuery(event.currentTarget.value)}
                 className="h-9 pl-9"
-                placeholder={t("legacy.items.search", "搜索标题、正文、标签")}
+                placeholder={t("legacy.items.search")}
               />
             </div>
             <FilterPopoverButton
@@ -202,10 +202,7 @@ export function LegacyItemsTab({
               />
             ))
           ) : (
-            <EmptyState
-              message={t("legacy.empty.filteredItems", "当前筛选下没有生命整理条目。")}
-              compact
-            />
+            <EmptyState message={t("legacy.empty.filteredItems")} compact />
           )}
         </div>
       </LegacySidebarPane>
@@ -220,9 +217,7 @@ export function LegacyItemsTab({
             onDeleted={onDeleted}
           />
         ) : (
-          <LegacyEmptyDetailCard
-            message={t("legacy.items.selectPrompt", "选择一个条目查看详情。")}
-          />
+          <LegacyEmptyDetailCard message={t("legacy.items.selectPrompt")} />
         )}
       </LegacyDetailPane>
     </LegacyTabBody>
@@ -258,8 +253,8 @@ function LegacyItemDetail({
         title: item.title,
         defaultValue: `已删除生命整理条目：${item.title}`,
       }),
-      failureMessage: t("legacy.toast.deleteFailedItem", "删除生命整理条目失败"),
-      undoLabel: t("legacy.undo", "撤销"),
+      failureMessage: t("legacy.toast.deleteFailedItem"),
+      undoLabel: t("legacy.undo"),
       undoneMessage: t("legacy.toast.deleteUndoneItem", {
         title: item.title,
         defaultValue: `已撤销删除：${item.title}`,
@@ -284,17 +279,17 @@ function LegacyItemDetail({
               show={isControlMode}
               variant="outline"
               size="sm"
-              label={t("legacy.actions.edit", "编辑")}
+              label={t("legacy.actions.edit")}
               icon={<Pencil className="size-4" />}
               onClick={onEdit}
             >
-              {t("legacy.actions.edit", "编辑")}
+              {t("legacy.actions.edit")}
             </AnimatedIconButton>
             <AnimatedIconButton
               show={isControlMode}
               variant="outline"
               size="sm"
-              label={t("legacy.actions.delete", "删除")}
+              label={t("legacy.actions.delete")}
               icon={<Trash2 className="size-4" />}
               onClick={handleDelete}
             />
@@ -312,13 +307,13 @@ function LegacyItemDetail({
           <Badge variant="outline">{translateLegacyEnum(t, "status", item.status)}</Badge>
           {item.isLocked ? (
             <Badge className="bg-[color:var(--legacy-lock-bg)] text-[color:var(--legacy-lock-ink)]">
-              {t("legacy.labels.locked", "已锁定")}
+              {t("legacy.labels.locked")}
             </Badge>
           ) : null}
         </div>
 
         {warnings.length > 0 ? (
-          <LegacyWarningCallout title={t("legacy.items.warningTitle", "需要确认的边界")}>
+          <LegacyWarningCallout title={t("legacy.items.warningTitle")}>
             <div className="flex flex-wrap gap-2">
               {warnings.map((warning) => (
                 <Badge
@@ -335,15 +330,15 @@ function LegacyItemDetail({
 
         <div className="border-foreground/10 bg-muted/20 rounded-lg border p-4">
           <div className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-            {t("legacy.fields.content", "正文")}
+            {t("legacy.fields.content")}
           </div>
           {item.requiresSecondConfirm && !isContentRevealed ? (
             <div className="mt-3 space-y-3">
               <p className="text-muted-foreground text-sm leading-6">
-                {t("legacy.items.secondConfirmCopy", "这份内容标记为需要二次确认，先只显示摘要。")}
+                {t("legacy.items.secondConfirmCopy")}
               </p>
               <Button variant="outline" size="sm" onClick={() => setIsContentRevealed(true)}>
-                {t("legacy.actions.revealContent", "打开正文")}
+                {t("legacy.actions.revealContent")}
               </Button>
             </div>
           ) : (
@@ -352,42 +347,40 @@ function LegacyItemDetail({
         </div>
 
         {item.deliveryCondition ? (
-          <LegacyWarningCallout title={t("legacy.fields.deliveryCondition", "交付条件")} compact>
+          <LegacyWarningCallout title={t("legacy.fields.deliveryCondition")} compact>
             {item.deliveryCondition}
           </LegacyWarningCallout>
         ) : null}
 
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
           <LegacyMeta
-            label={t("legacy.fields.urgency", "紧急度")}
+            label={t("legacy.fields.urgency")}
             value={translateLegacyEnum(t, "urgency", item.urgency)}
           />
           <LegacyMeta
-            label={t("legacy.fields.emotionalLoad", "情感负荷")}
+            label={t("legacy.fields.emotionalLoad")}
             value={
               item.emotionalLoad
                 ? translateLegacyEnum(t, "emotionalLoad", item.emotionalLoad)
-                : t("legacy.labels.unrated", "待自评")
+                : t("legacy.labels.unrated")
             }
           />
-          <LegacyMeta label={t("legacy.fields.updatedAt", "更新时间")} value={item.updatedAt} />
-          <LegacyMeta label={t("legacy.fields.createdAt", "创建时间")} value={item.createdAt} />
+          <LegacyMeta label={t("legacy.fields.updatedAt")} value={item.updatedAt} />
+          <LegacyMeta label={t("legacy.fields.createdAt")} value={item.createdAt} />
           <LegacyMeta
-            label={t("legacy.fields.finalizedAt", "最终确认")}
-            value={item.finalizedAt ?? t("legacy.labels.notFinalized", "未最终确认")}
+            label={t("legacy.fields.finalizedAt")}
+            value={item.finalizedAt ?? t("legacy.labels.notFinalized")}
           />
           <LegacyMeta
-            label={t("legacy.fields.aiBoundary", "AI 边界")}
+            label={t("legacy.fields.aiBoundary")}
             value={
-              item.excludeFromAi
-                ? t("legacy.labels.aiExcluded", "不参与 AI")
-                : t("legacy.labels.aiAllowed", "可参与整理")
+              item.excludeFromAi ? t("legacy.labels.aiExcluded") : t("legacy.labels.aiAllowed")
             }
             accent={item.excludeFromAi}
           />
         </div>
 
-        <LegacyMeta label={t("legacy.fields.reviewCue", "回看提示")} value={item.reviewCue} />
+        <LegacyMeta label={t("legacy.fields.reviewCue")} value={item.reviewCue} />
 
         <div className="flex flex-wrap gap-2">
           {item.tags.map((tag) => (

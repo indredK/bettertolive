@@ -37,8 +37,8 @@ export function LegacyDeliveryMapTab({
       <LegacySidebarPane>
         <SectionHeading
           icon={MapPinned}
-          title={t("legacy.deliveryMap.title", "交付地图")}
-          description={t("legacy.deliveryMap.description", "按接收者和可见时机检查谁会看到什么。")}
+          title={t("legacy.deliveryMap.title")}
+          description={t("legacy.deliveryMap.description")}
           compact
         />
 
@@ -66,7 +66,7 @@ export function LegacyDeliveryMapTab({
               </button>
             ))
           ) : (
-            <EmptyState message={t("legacy.empty.items", "当前没有生命整理条目。")} compact />
+            <EmptyState message={t("legacy.empty.items")} compact />
           )}
         </div>
       </LegacySidebarPane>
@@ -100,10 +100,7 @@ export function LegacyDeliveryMapTab({
               >
                 <div className="space-y-3">
                   {section.warnings.length > 0 ? (
-                    <LegacyWarningCallout
-                      title={t("legacy.items.warningTitle", "需要确认的边界")}
-                      compact
-                    >
+                    <LegacyWarningCallout title={t("legacy.items.warningTitle")} compact>
                       <div className="flex flex-wrap gap-2">
                         {section.warnings.map((warning) => (
                           <Badge
@@ -133,7 +130,7 @@ export function LegacyDeliveryMapTab({
             ))}
 
             <LegacyPanel
-              title={t("legacy.deliveryMap.checklistTitle", "交付检查")}
+              title={t("legacy.deliveryMap.checklistTitle")}
               description={t(
                 "legacy.deliveryMap.checklistDesc",
                 "这些检查来自条目字段，不生成独立数据。",
@@ -163,7 +160,7 @@ export function LegacyDeliveryMapTab({
             </LegacyPanel>
           </div>
         ) : (
-          <LegacyEmptyDetailCard message={t("legacy.empty.items", "当前没有生命整理条目。")} />
+          <LegacyEmptyDetailCard message={t("legacy.empty.items")} />
         )}
       </div>
     </LegacyTabBody>

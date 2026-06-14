@@ -106,12 +106,12 @@ export function FinanceEntryEditDialog({
     const amount = Number(form.amount)
 
     if (!form.date || !form.label.trim() || !form.category.trim() || !Number.isFinite(amount)) {
-      toast.error(t("finance.edit.validation.required", "请填写日期、标题、类别和有效金额"))
+      toast.error(t("finance.edit.validation.required"))
       return
     }
 
     if (amount <= 0) {
-      toast.error(t("finance.edit.validation.amountPositive", "金额需要大于 0"))
+      toast.error(t("finance.edit.validation.amountPositive"))
       return
     }
 
@@ -140,10 +140,10 @@ export function FinanceEntryEditDialog({
         ...finance,
         entries: sortEntriesByDate(nextEntries),
       })
-      toast.success(t("finance.toast.saved", "已保存账目"))
+      toast.success(t("finance.toast.saved"))
       onClose()
     } catch {
-      toast.error(t("finance.toast.saveFailed", "保存失败"))
+      toast.error(t("finance.toast.saveFailed"))
     }
   }
 
@@ -164,10 +164,10 @@ export function FinanceEntryEditDialog({
         ...finance,
         entries: finance.entries.filter((entry) => entry.id !== editing.entry?.id),
       })
-      toast.success(t("finance.toast.deleted", "已删除账目"))
+      toast.success(t("finance.toast.deleted"))
       onClose()
     } catch {
-      toast.error(t("finance.toast.deleteFailed", "删除失败"))
+      toast.error(t("finance.toast.deleteFailed"))
     }
   }
 
@@ -176,18 +176,14 @@ export function FinanceEntryEditDialog({
       <DialogContent className="flex max-h-[min(760px,calc(100dvh-2rem))] max-w-3xl flex-col overflow-hidden border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
         <DialogHeader className="shrink-0">
           <DialogTitle>
-            {editing.isNew
-              ? t("finance.edit.createTitle", "新增账目")
-              : t("finance.edit.editTitle", "编辑账目")}
+            {editing.isNew ? t("finance.edit.createTitle") : t("finance.edit.editTitle")}
           </DialogTitle>
-          <DialogDescription>
-            {t("finance.edit.description", "记录金额，也保留这笔钱背后的生活语境。")}
-          </DialogDescription>
+          <DialogDescription>{t("finance.edit.description")}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="min-h-0 flex-1 overflow-y-auto pr-1">
           <div className="grid gap-3 min-[720px]:grid-cols-2">
-            <Field label={t("finance.edit.fields.date", "日期")}>
+            <Field label={t("finance.edit.fields.date")}>
               <Input
                 type="date"
                 value={form.date}
@@ -195,7 +191,7 @@ export function FinanceEntryEditDialog({
               />
             </Field>
 
-            <Field label={t("finance.edit.fields.direction", "方向")}>
+            <Field label={t("finance.edit.fields.direction")}>
               <Select
                 value={form.direction}
                 onValueChange={(value) => {
@@ -217,14 +213,14 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field label={t("finance.edit.fields.label", "标题")}>
+            <Field label={t("finance.edit.fields.label")}>
               <Input
                 value={form.label}
                 onChange={(event) => updateForm({ label: event.target.value })}
               />
             </Field>
 
-            <Field label={t("finance.edit.fields.amount", "金额")}>
+            <Field label={t("finance.edit.fields.amount")}>
               <Input
                 inputMode="decimal"
                 min="0"
@@ -235,7 +231,7 @@ export function FinanceEntryEditDialog({
               />
             </Field>
 
-            <Field label={t("finance.edit.fields.category", "类别")}>
+            <Field label={t("finance.edit.fields.category")}>
               <Select
                 value={form.category}
                 onValueChange={(value) => {
@@ -257,14 +253,14 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field label={t("finance.edit.fields.account", "账户")}>
+            <Field label={t("finance.edit.fields.account")}>
               <Input
                 value={form.account}
                 onChange={(event) => updateForm({ account: event.target.value })}
               />
             </Field>
 
-            <Field label={t("finance.edit.fields.lifeSystem", "生活系统")}>
+            <Field label={t("finance.edit.fields.lifeSystem")}>
               <Select
                 value={form.lifeSystem}
                 onValueChange={(value) => {
@@ -286,7 +282,7 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field label={t("finance.edit.fields.necessity", "必要性")}>
+            <Field label={t("finance.edit.fields.necessity")}>
               <Select
                 value={form.necessity}
                 onValueChange={(value) => {
@@ -308,7 +304,7 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field label={t("finance.edit.fields.reviewStatus", "复盘状态")}>
+            <Field label={t("finance.edit.fields.reviewStatus")}>
               <Select
                 value={form.reviewStatus}
                 onValueChange={(value) => {
@@ -330,7 +326,7 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field label={t("finance.edit.fields.linkedModule", "关联模块")}>
+            <Field label={t("finance.edit.fields.linkedModule")}>
               <Select
                 value={form.linkedModule}
                 onValueChange={(value) => {
@@ -352,7 +348,7 @@ export function FinanceEntryEditDialog({
               </Select>
             </Field>
 
-            <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.note", "说明")}>
+            <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.note")}>
               <Textarea
                 value={form.note}
                 onChange={(event) => updateForm({ note: event.target.value })}
@@ -360,11 +356,11 @@ export function FinanceEntryEditDialog({
               />
             </Field>
 
-            <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.tags", "标签")}>
+            <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.tags")}>
               <Textarea
                 value={form.tagsText}
                 onChange={(event) => updateForm({ tagsText: event.target.value })}
-                placeholder={t("finance.edit.tagsPlaceholder", "每行一个标签")}
+                placeholder={t("finance.edit.tagsPlaceholder")}
                 rows={3}
               />
             </Field>
@@ -379,16 +375,14 @@ export function FinanceEntryEditDialog({
                 onClick={handleDelete}
               >
                 <Trash2 className="size-4" />
-                {t("finance.edit.delete", "删除")}
+                {t("finance.edit.delete")}
               </Button>
             ) : null}
             <Button type="button" variant="outline" onClick={onClose}>
-              {t("finance.edit.cancel", "取消")}
+              {t("finance.edit.cancel")}
             </Button>
             <Button type="submit" disabled={saveFinanceMutation.isPending}>
-              {saveFinanceMutation.isPending
-                ? t("finance.edit.saving", "保存中")
-                : t("finance.edit.save", "保存")}
+              {saveFinanceMutation.isPending ? t("finance.edit.saving") : t("finance.edit.save")}
             </Button>
           </DialogFooter>
         </form>
