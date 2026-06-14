@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { splitListText } from "@/lib/list-utils"
 import {
   Dialog,
   DialogContent,
@@ -65,13 +66,6 @@ function createNowLabel() {
     [now.getFullYear(), padTimePart(now.getMonth() + 1), padTimePart(now.getDate())].join("-") +
     ` ${padTimePart(now.getHours())}:${padTimePart(now.getMinutes())}`
   )
-}
-
-function splitListText(text: string) {
-  return text
-    .split(/[,，\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean)
 }
 
 function createInitialReflectionForm(entry: ReflectionEntry | null): ReflectionFormState {

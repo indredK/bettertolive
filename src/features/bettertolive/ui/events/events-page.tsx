@@ -17,6 +17,7 @@ import { toast } from "sonner"
 
 import { Badge } from "@/components/ui/badge"
 import { AnimatedButton, AnimatedIconButton, Button } from "@/components/ui/button"
+import { splitListText } from "@/lib/list-utils"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog,
@@ -82,13 +83,6 @@ function createInitialEventForm(event: EventEntry | null): EventFormState {
     theme: event?.theme ?? "",
     tagsText: (event?.tags ?? []).join("，"),
   }
-}
-
-function splitListText(text: string) {
-  return text
-    .split(/[,，\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean)
 }
 
 function normalizeOccurredAt(value: string) {

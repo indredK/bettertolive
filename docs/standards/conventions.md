@@ -241,6 +241,31 @@
 
 > 以上 F9 硬约定中"删除确认统一"与"输入体验三项"属于**存量批量改造项**——见文末「弹窗改造清单」。审查时按 `review-scope.md` 维度二判级。
 
+### F11. 共享工具函数（`src/lib/`）
+
+> `src/lib/` 存放跨模块复用的**纯函数型工具**。与 `src/components/ui/`（UI 组件）分工不同——`lib/` 是逻辑封装，不输出 JSX。
+
+#### F11.1 已有共享工具清单
+
+| 文件 | 导出 | 用途 |
+|------|------|------|
+| `lib/utils.ts` | `cn()` | CSS 类名合并（`clsx` + `tailwind-merge`），**F7 已约定必须用** |
+| `lib/ui-layers.ts` | `UI_LAYERS` | z-index 语义层级常量，**F10 已约定必须用** |
+| `lib/app-motion.ts` | 动画预设常量 | 动画 easing/duration/spring/presence，**F2 已约定必须复用** |
+| `lib/query-client.ts` | `createAppQueryClient()` | TanStack Query 的 `QueryClient` 工厂 |
+| `lib/id-utils.ts` | `generateId(prefix)` | 统一 ID 生成，基于 `nanoid` |
+| `lib/list-utils.ts` | `splitListText` / `joinListText` / `uniqueList` | 字符串列表的拆分/合并/去重 |
+
+#### F11.2 使用约定
+
+- **硬约定**：**禁止在模块内重复定义已有共享工具**。以下函数禁止在 `features/` 下本地定义：
+  - `splitListText` / `joinListText` / `uniqueList` → 从 `@/lib/list-utils` 导入
+  - `generateId` 或手写 `crypto.randomUUID()` + `Date.now()` 回退 → 从 `@/lib/id-utils` 导入
+  - `cn()` → 从 `@/lib/utils` 导入（F7 已覆盖）
+- **硬约定**：`joinListText` 使用场合不同时**传分隔符参数**，不要另写一个"换行版 joinListText"（如 `joinListText(values, "\n")`）。同理 `splitListText` 传自定义分隔正则：`splitListText(text, /\n\|,\|，/)`。
+- **硬约定**：ID 生成**唯一出口是 `generateId(prefix)`**（基于 `nanoid`），不再各模块手写 `crypto.randomUUID()`/`Date.now()+Math.random()` 拼接逻辑。
+- **硬约定**：深度克隆用原生 `structuredClone()`（mock/fixture 数据场景），不再用 `JSON.parse(JSON.stringify())`（会静默丢失 `undefined`/`Date`/`Function`）。
+
 ---
 
 ## 后端
@@ -304,15 +329,16 @@
 6. 手写/修改 `src/bindings.ts`
 7. 弹窗违反 F9：关闭三通道（ESC/遮罩/X）被无故关掉、页脚按钮构成/顺序错、删除非 destructive 或新建态出现、乐观关闭、保存按钮未绑 isPending+canSubmit、删除用 window.confirm 而非撤销式、缺回车提交/自动聚焦/脏数据关闭确认
 8. 违反 F10：z-index 硬编码不走 `UI_LAYERS`、自造 button variant、图标按钮无 aria-label/tooltip、表单控件缺关联 label、裸用 base-ui/原生标签而非 `components/ui/` 封装
+9. 违反 F11：模块内重复定义已有共享工具（`splitListText`/`joinListText`/`uniqueList`/ID 生成）、深度克隆用 `JSON.parse(JSON.stringify())` 而非 `structuredClone()`、不用 `generateId()` 而手写 ID 拼接
 
 **后端**
-9. 多步写 / DELETE+INSERT 不包 `write_tx`（或用了 `let conn` 开不了事务）
-10. command 路径用 unwrap/expect/可 panic 写法
-11. 新代码用 `Result<T, String>` 而非 `thiserror` 类型化错误
-12. 迁移不包事务、或改已发布的旧迁移版本
-13. 改了 command 不跑 `generate:bindings`
-14. command 不在 Rust 侧校验前端输入（只靠前端 zod）
-15. capability 超出最小必要权限
+10. 多步写 / DELETE+INSERT 不包 `write_tx`（或用了 `let conn` 开不了事务）
+11. command 路径用 unwrap/expect/可 panic 写法
+12. 新代码用 `Result<T, String>` 而非 `thiserror` 类型化错误
+13. 迁移不包事务、或改已发布的旧迁移版本
+14. 改了 command 不跑 `generate:bindings`
+15. command 不在 Rust 侧校验前端输入（只靠前端 zod）
+16. capability 超出最小必要权限
 
 > 数据备份/导出（B6）是发布前门槛，开发期豁免，不在本清单内。
 

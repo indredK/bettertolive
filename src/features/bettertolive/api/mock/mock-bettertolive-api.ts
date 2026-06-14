@@ -48,11 +48,7 @@ let socioeconomicsData: SocioeconomicsModuleData = cloneMockData(
 let worldHistoryMockData: WorldHistoryModuleData = cloneMockData(WORLD_HISTORY_SEED)
 
 function cloneMockData<T>(data: T): T {
-  if (typeof data === "undefined") {
-    return data
-  }
-
-  return JSON.parse(JSON.stringify(data)) as T
+  return structuredClone(data)
 }
 
 function withMockLatency<T>(data: T) {

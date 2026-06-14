@@ -6,6 +6,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText, uniqueList } from "@/lib/list-utils"
 import {
   Dialog,
   DialogContent,
@@ -183,25 +185,6 @@ type AnchorFormState = {
   linkedMemoryIdsText: string
 }
 
-function createJourneyId(prefix: string) {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-}
-
-function joinListText(values: string[] | undefined) {
-  return (values ?? []).join("\n")
-}
-
-function splitListText(text: string) {
-  return text
-    .split(/\n|,|，/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-}
-
-function uniqueList(values: string[]) {
-  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)))
-}
-
 function replaceById<T extends { id: string }>(items: T[], nextItem: T, isNew: boolean) {
   if (isNew) {
     return [nextItem, ...items]
@@ -240,7 +223,7 @@ function createInitialMemoryForm(memory: MemoryEntry | null): MemoryFormState {
     title: memory?.title ?? "",
     type: memory?.type ?? MEMORY_TYPES[0],
     primaryEra: memory?.primaryEra ?? "",
-    eraText: joinListText(memory?.era),
+    eraText: joinListText(memory?.era, "\n"),
     emotionalWeight: memory?.emotionalWeight ?? EMOTIONAL_WEIGHTS[1],
     processing: memory?.processing ?? PROCESSING_STATUSES[1],
     privacy: memory?.privacy ?? PRIVACY_LEVELS[0],
@@ -248,8 +231,8 @@ function createInitialMemoryForm(memory: MemoryEntry | null): MemoryFormState {
     summary: memory?.summary ?? "",
     impact: memory?.impact ?? "",
     sensoryCue: memory?.sensoryCue ?? "",
-    sourceModulesText: joinListText(memory?.sourceModules ?? ["手动录入"]),
-    tagsText: joinListText(memory?.tags),
+    sourceModulesText: joinListText(memory?.sourceModules ?? ["手动录入"], "\n"),
+    tagsText: joinListText(memory?.tags, "\n"),
   }
 }
 
@@ -263,10 +246,10 @@ function createInitialGrowthForm(node: GrowthNode | null, memory: MemoryWorkspac
     before: node?.before ?? "",
     after: node?.after ?? "",
     keyEvent: node?.keyEvent ?? "",
-    beforeMemoryIdsText: joinListText(node?.beforeMemoryIds),
-    afterMemoryIdsText: joinListText(node?.afterMemoryIds),
+    beforeMemoryIdsText: joinListText(node?.beforeMemoryIds, "\n"),
+    afterMemoryIdsText: joinListText(node?.afterMemoryIds, "\n"),
     triggerMemoryId: node?.triggerMemoryId ?? fallbackMemoryId,
-    evidenceText: joinListText(node?.evidence),
+    evidenceText: joinListText(node?.evidence, "\n"),
   } satisfies GrowthFormState
 }
 
@@ -275,7 +258,7 @@ function createInitialAnchorForm(anchor: MemoryAnchor | null): AnchorFormState {
     type: anchor?.type ?? ANCHOR_TYPES[0],
     label: anchor?.label ?? "",
     note: anchor?.note ?? "",
-    linkedMemoryIdsText: joinListText(anchor?.linkedMemoryIds),
+    linkedMemoryIdsText: joinListText(anchor?.linkedMemoryIds, "\n"),
   }
 }
 
@@ -298,7 +281,7 @@ function createMemoryFromForm(seed: MemoryEntry | null, form: MemoryFormState): 
   const era = uniqueList([primaryEra, ...splitListText(form.eraText)])
 
   return {
-    id: seed?.id ?? createJourneyId("memory"),
+    id: seed?.id ?? generateId("memory"),
     title: form.title.trim(),
     type: form.type,
     era,
@@ -321,7 +304,7 @@ function createGrowthNodeFromForm(
   validMemoryIds: Set<string>,
 ): GrowthNode {
   return {
-    id: seed?.id ?? createJourneyId("growth-node"),
+    id: seed?.id ?? generateId("growth-node"),
     title: form.title.trim(),
     domain: form.domain,
     stability: form.stability,
@@ -341,7 +324,7 @@ function createAnchorFromForm(
   validMemoryIds: Set<string>,
 ) {
   return {
-    id: seed?.id ?? createJourneyId("memory-anchor"),
+    id: seed?.id ?? generateId("memory-anchor"),
     type: form.type,
     label: form.label.trim(),
     note: form.note.trim(),

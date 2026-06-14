@@ -1,3 +1,5 @@
+import dayjs from "dayjs"
+
 import type {
   FinanceLifeSystem,
   FinanceLinkedModule,
@@ -5,6 +7,8 @@ import type {
   FinanceReviewStatus,
   TransactionDirection,
 } from "@/features/bettertolive/types"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 
 export const FINANCE_CATEGORIES = [
   "餐饮",
@@ -56,27 +60,14 @@ export const FINANCE_LINKED_MODULES = [
 
 export const FINANCE_DIRECTIONS = ["expense", "income"] satisfies TransactionDirection[]
 
-export function createFinanceId(prefix = "finance-entry") {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
+export const createFinanceId = (prefix = "finance-entry") => generateId(prefix)
 
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-}
+export const joinFinanceListText = (values?: string[]) => joinListText(values, "\n")
 
-export function joinFinanceListText(values?: string[]) {
-  return (values ?? []).join("\n")
-}
-
-export function splitFinanceListText(text: string) {
-  return text
-    .split(/\n|,|，/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-}
+export const splitFinanceListText = (text: string) => splitListText(text, /\n|,|，/)
 
 export function getEntryMonth(date: string) {
-  return date.slice(0, 7)
+  return dayjs(date).format("YYYY-MM")
 }
 
 export function getLatestMonth(entries: Array<{ date: string }>) {

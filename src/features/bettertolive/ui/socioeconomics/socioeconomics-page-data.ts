@@ -7,6 +7,8 @@ import type {
   EconTopicArea,
   SocioeconomicsDiscipline,
 } from "@/features/bettertolive/types"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 
 export const ECON_DOMAINS = [
   "货币与物价",
@@ -65,22 +67,6 @@ export const ECON_CONFIDENCE_ORDER: Record<EconConfidence, number> = {
   有自己的判断框架: 3,
 }
 
-export function createSocioeconomicsId(prefix: string) {
-  const randomId =
-    typeof globalThis.crypto?.randomUUID === "function"
-      ? globalThis.crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
+export const createSocioeconomicsId = (prefix: string) => generateId(prefix)
 
-  return `${prefix}-${randomId}`
-}
-
-export function splitListText(text: string) {
-  return text
-    .split(/[,，\n]/)
-    .map((item) => item.trim())
-    .filter(Boolean)
-}
-
-export function joinListText(items?: string[]) {
-  return (items ?? []).join("，")
-}
+export { joinListText, splitListText }
