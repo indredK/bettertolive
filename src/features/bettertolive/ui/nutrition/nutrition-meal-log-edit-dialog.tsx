@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Plus, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useState } from "react"
@@ -206,7 +207,7 @@ export function NutritionMealLogEditDialog({
     }
 
     const nextLog: MealLog = {
-      id: editing.log?.id ?? createId("meal-log"),
+      id: editing.log?.id ?? generateId("meal-log"),
       dateTime: toOffsetDateTime(form.dateTime),
       plannedSlotId: form.plannedSlotId || undefined,
       entries,
@@ -610,7 +611,7 @@ function LogEntryRow({
           size="icon-sm"
           onClick={onRemove}
           disabled={removeDisabled}
-          tooltip={t("nutrition.mealLogEdit.delete")}
+          tooltip={t("common.actions.delete")}
         >
           <Trash2 className="size-4" />
         </Button>
@@ -749,7 +750,7 @@ function createDefaultEntryPatch(
 
 function createEmptyEntry(type: DailyPlanEntry["type"]): LogEntryForm {
   return {
-    id: createId("log-entry"),
+    id: generateId("log-entry"),
     type,
     recipeId: "",
     servings: "",
@@ -822,14 +823,6 @@ function toOffsetDateTime(value: string) {
   const minutes = String(absoluteOffset % 60).padStart(2, "0")
 
   return `${value.length === 16 ? `${value}:00` : value}${sign}${hours}:${minutes}`
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function Field({ children, label }: { children: ReactNode; label: string }) {

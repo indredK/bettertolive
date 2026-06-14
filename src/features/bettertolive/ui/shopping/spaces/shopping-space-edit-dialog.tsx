@@ -118,17 +118,14 @@ export function ShoppingSpaceEditDialog({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: editing.space.name,
-        defaultValue: `已加入删除队列：${editing.space.name}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessSpace", {
         name: editing.space.name,
-        defaultValue: `已删除空间：${editing.space.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSpace"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: editing.space.name,
-        defaultValue: `已撤销删除：${editing.space.name}`,
       }),
       onDelete: () => deleteSpaceDefinition(editing.space!.id),
       onDeleted,

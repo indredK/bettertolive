@@ -138,7 +138,11 @@ function PreferencesTab({
                 onClick={() => setLocale(lang)}
               >
                 <div className="flex items-center justify-between">
-                  <span>{lang === "zh" ? "中文" : "English"}</span>
+                  <span>
+                    {lang === "zh"
+                      ? t("shell.language.chineseTitle")
+                      : t("shell.language.englishTitle")}
+                  </span>
                   {isActive && <Check className="size-3.5 text-emerald-600" />}
                 </div>
               </button>

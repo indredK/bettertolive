@@ -245,18 +245,15 @@ function LegacyItemDetail({
         name: item.title,
       }),
       pendingMessage: t("common.toast.deletePending", {
-        title: item.title,
-        defaultValue: `已加入删除队列：${item.title}，5 秒内可撤销`,
+        name: item.title,
       }),
       successMessage: t("legacy.toast.deleteSuccessItem", {
         title: item.title,
-        defaultValue: `已删除生命整理条目：${item.title}`,
       }),
       failureMessage: t("legacy.toast.deleteFailedItem"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
-        title: item.title,
-        defaultValue: `已撤销删除：${item.title}`,
+        name: item.title,
       }),
       onDelete: () => deleteLegacyItem(item.id),
       onDeleted,

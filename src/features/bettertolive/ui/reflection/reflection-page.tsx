@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { CalendarDays, Hash, NotebookPen, Pencil, Plus, Sparkles, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useMemo, useState } from "react"
@@ -44,15 +45,6 @@ type ReflectionFormState = {
 type CountRow = {
   label: string
   count: number
-}
-
-function createReflectionId() {
-  const randomId =
-    typeof globalThis.crypto?.randomUUID === "function"
-      ? globalThis.crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-
-  return `reflection-${randomId}`
 }
 
 function padTimePart(value: number) {
@@ -574,7 +566,7 @@ function ReflectionEditDialog({
       return
     }
 
-    const id = editing.entry?.id ?? createReflectionId()
+    const id = editing.entry?.id ?? generateId("reflection")
     const nextEntry = createReflectionEntry(form, id)
     const entries = editing.entry
       ? reflectionModule.entries.map((entry) => (entry.id === id ? nextEntry : entry))

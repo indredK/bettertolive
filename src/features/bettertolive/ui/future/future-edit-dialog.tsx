@@ -1,5 +1,6 @@
 import { Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
+import { joinListText } from "@/lib/list-utils"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
@@ -46,10 +47,6 @@ const FUTURE_DIALOG_FIELD_CLASS = "w-full border-foreground/15 bg-background sha
 const FUTURE_DIALOG_FOOTER_CLASS =
   "sticky bottom-0 z-10 gap-2 border-foreground/10 bg-background/95 supports-[backdrop-filter]:bg-background/90 supports-[backdrop-filter]:backdrop-blur-xs"
 
-function listToText(values: string[] | undefined) {
-  return (values ?? []).join("\n")
-}
-
 function textToDelimitedList(text: string) {
   return text
     .split(/\n|,|，/)
@@ -91,7 +88,7 @@ export function FutureBlueprintEditDialog({
   const saveFutureMutation = useSaveFutureMutation()
   const [identity, setIdentity] = useState(future.identity)
   const [lifestyle, setLifestyle] = useState(future.lifestyle)
-  const [valuesText, setValuesText] = useState(() => listToText(future.values))
+  const [valuesText, setValuesText] = useState(() => joinListText(future.values, "\n"))
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
@@ -194,7 +191,7 @@ export function FutureMilestoneEditDialog({
   const saveFutureMutation = useSaveFutureMutation()
   const [horizon, setHorizon] = useState(editing.milestone?.horizon ?? "")
   const [summary, setSummary] = useState(editing.milestone?.summary ?? "")
-  const [stepsText, setStepsText] = useState(() => listToText(editing.milestone?.steps))
+  const [stepsText, setStepsText] = useState(() => joinListText(editing.milestone?.steps, "\n"))
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()

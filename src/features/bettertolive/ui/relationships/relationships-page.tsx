@@ -433,17 +433,14 @@ export function RelationshipsPage({
       }),
       pendingMessage: t("relationships.toast.deleteRelationshipPending", {
         name: relationship.name,
-        defaultValue: `已加入删除队列：${relationship.name}，5 秒内可撤销`,
       }),
       successMessage: t("relationships.toast.deleteRelationshipSuccess", {
         name: relationship.name,
-        defaultValue: `已删除关系：${relationship.name}`,
       }),
       failureMessage: t("relationships.toast.deleteRelationshipFailed"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("relationships.toast.deleteRelationshipUndone", {
         name: relationship.name,
-        defaultValue: `已撤销删除：${relationship.name}`,
       }),
       onDelete: () => saveRelationshipsMutation.mutateAsync(nextModule),
       onDeleted: () => {
@@ -932,7 +929,6 @@ function RelationshipsGraphTab({
                     >
                       {t("relationships.graph.centerDepth", {
                         count: effectiveGraphScope.maxDepth,
-                        defaultValue: `展开 ${effectiveGraphScope.maxDepth} 跳`,
                       })}
                     </Badge>
                   ) : null}
@@ -1846,7 +1842,6 @@ function UnsentNotesTab({
                 <div className="text-sm text-[color:var(--text-muted)]">
                   {t("relationships.unsent.relatedRelationship", {
                     name: relationshipById.get(selectedNote.relationshipId)?.name,
-                    defaultValue: `关联关系：${relationshipById.get(selectedNote.relationshipId)?.name}`,
                   })}
                 </div>
               ) : null}

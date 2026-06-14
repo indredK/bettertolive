@@ -43,7 +43,6 @@ import type {
 } from "@/features/bettertolive/types"
 import {
   buildRelationshipConnectionPerspectives,
-  createRelationshipScopedId,
   getRelationshipsFromCircles,
   mergeConnectionsForRelationship,
   syncUnsentLineRefs,
@@ -74,6 +73,7 @@ import {
   translateRelationshipEnum,
   type RelationshipEnumGroup,
 } from "@/features/bettertolive/ui/relationships/relationships-page-data"
+import { generateId } from "@/lib/id-utils"
 import { cn } from "@/lib/utils"
 
 export type EditingRelationship = {
@@ -1248,7 +1248,6 @@ function ConnectionEditor({
               <span className={cn("truncate font-medium", compact ? "text-sm" : "text-base")}>
                 {t("relationships.edit.connectionCardTitle", {
                   name: otherRelationshipName,
-                  defaultValue: `和${otherRelationshipName}的关系`,
                 })}
               </span>
               <span className="rounded-full border border-[color:var(--chip-border)] px-2 py-0.5 text-[10px] text-[color:var(--text-muted)]">
@@ -1474,7 +1473,7 @@ function summarizeConnectionRoles(connection: RelationshipConnectionPerspective)
 
 function createEmptyConnection() {
   return {
-    id: createRelationshipScopedId("relationship-connection"),
+    id: generateId("relationship-connection"),
     note: "",
     otherRelationshipId: "",
     roles: [createEmptyConnectionRole()],
@@ -1484,7 +1483,7 @@ function createEmptyConnection() {
 
 function createEmptyConnectionRole(selfRole = "", otherRole = "") {
   return {
-    id: createRelationshipScopedId("relationship-connection-role"),
+    id: generateId("relationship-connection-role"),
     note: "",
     otherRole,
     selfRole,
@@ -1497,7 +1496,7 @@ function createInitialRelationshipForm(
 ): RelationshipFormState {
   const relationship = editing.relationship
   const fallbackCircleId = relationshipsModule.circles[0]?.id ?? ""
-  const id = relationship?.id ?? createRelationshipScopedId("relationship")
+  const id = relationship?.id ?? generateId("relationship")
   const relationships = getRelationshipsFromCircles(relationshipsModule.circles)
 
   return {

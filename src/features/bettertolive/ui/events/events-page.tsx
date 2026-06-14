@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import {
   BookOpenText,
   CalendarClock,
@@ -51,15 +52,6 @@ type EventFormState = {
 type ThemeRow = {
   label: string
   count: number
-}
-
-function createEventId() {
-  const randomId =
-    typeof globalThis.crypto?.randomUUID === "function"
-      ? globalThis.crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-
-  return `event-${randomId}`
 }
 
 function padTimePart(value: number) {
@@ -649,7 +641,7 @@ function EventEditDialog({
     const now = new Date().toISOString()
     const content = form.excerpt.trim()
     const nextEvent: EventEntry = {
-      id: editing.event?.id ?? createEventId(),
+      id: editing.event?.id ?? generateId("event"),
       type: "event",
       createdAt: editing.event?.createdAt ?? now,
       occurredAt: normalizeOccurredAt(form.date),

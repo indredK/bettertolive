@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Plus, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useState } from "react"
@@ -228,7 +229,7 @@ export function NutritionDailyPlanEditDialog({
     }
 
     const nextPlan: DailyPlan = {
-      id: editing.plan?.id ?? createId("daily-plan"),
+      id: editing.plan?.id ?? generateId("daily-plan"),
       date: form.date.trim(),
       slots: nextSlots,
       note: form.note.trim() || undefined,
@@ -655,7 +656,7 @@ function createSlotForm(slot: DailyMealSlot): PlanSlotForm {
 
 function createEmptySlot(structure: MealStructure): PlanSlotForm {
   return {
-    id: createId("daily-slot"),
+    id: generateId("daily-slot"),
     structure,
     status: "planned",
     note: "",
@@ -737,7 +738,7 @@ function createDefaultEntryPatch(
 
 function createEmptyEntry(type: DailyPlanEntry["type"]): PlanEntryForm {
   return {
-    id: createId("plan-entry"),
+    id: generateId("plan-entry"),
     type,
     recipeId: "",
     servings: "",
@@ -789,14 +790,6 @@ function todayString() {
   const now = new Date()
   const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60_000)
   return localNow.toISOString().slice(0, 10)
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function Field({ children, label }: { children: ReactNode; label: string }) {

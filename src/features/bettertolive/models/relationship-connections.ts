@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import type {
   RelationshipCircle,
   RelationshipConnection,
@@ -191,15 +192,6 @@ export function sortRelationshipPair(sourceId: string, targetId: string) {
   return sourceId <= targetId ? [sourceId, targetId] : [targetId, sourceId]
 }
 
-export function createRelationshipScopedId(prefix: string) {
-  const randomId =
-    typeof globalThis.crypto?.randomUUID === "function"
-      ? globalThis.crypto.randomUUID()
-      : `${Date.now()}-${Math.random().toString(36).slice(2)}`
-
-  return `${prefix}-${randomId}`
-}
-
 function normalizeSingleConnection(
   connection: RelationshipConnection,
   validRelationshipIds: Set<string>,
@@ -231,7 +223,7 @@ function normalizeSingleConnection(
       : [createDefaultConnectionRole(stableSourceId, stableTargetId, relationshipById)]
 
   return {
-    id: `${connection.id ?? ""}`.trim() || createRelationshipScopedId("relationship-connection"),
+    id: `${connection.id ?? ""}`.trim() || generateId("relationship-connection"),
     note: `${connection.note ?? ""}`.trim(),
     roles: visibleRoles,
     sourceId: stableSourceId,
@@ -266,7 +258,7 @@ function sanitizeConnectionRole(role: RelationshipConnectionRole, shouldSwapRole
   }
 
   return {
-    id: `${role.id ?? ""}`.trim() || createRelationshipScopedId("relationship-connection-role"),
+    id: `${role.id ?? ""}`.trim() || generateId("relationship-connection-role"),
     note,
     sourceRole: shouldSwapRoles ? targetRole : sourceRole,
     targetRole: shouldSwapRoles ? sourceRole : targetRole,
@@ -332,7 +324,7 @@ function createConnectionFromPerspectiveRow(
         }
 
         return {
-          id: role.id?.trim() || createRelationshipScopedId("relationship-connection-role"),
+          id: role.id?.trim() || generateId("relationship-connection-role"),
           note,
           sourceRole: isSourcePerspective ? selfRole : otherRole,
           targetRole: isSourcePerspective ? otherRole : selfRole,
@@ -342,7 +334,7 @@ function createConnectionFromPerspectiveRow(
   )
 
   return {
-    id: row.id?.trim() || createRelationshipScopedId("relationship-connection"),
+    id: row.id?.trim() || generateId("relationship-connection"),
     note: `${row.note ?? ""}`.trim(),
     roles,
     sourceId,

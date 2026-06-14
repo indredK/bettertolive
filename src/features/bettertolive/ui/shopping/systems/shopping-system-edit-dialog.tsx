@@ -139,17 +139,14 @@ export function ShoppingSystemEditDialog({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: displayName,
-        defaultValue: `已加入删除队列：${displayName}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessSystem", {
         name: displayName,
-        defaultValue: `已删除系统：${displayName}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSystem"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: displayName,
-        defaultValue: `已撤销删除：${displayName}`,
       }),
       onDelete: () => deleteSystemDefinition(editing.system!.id),
       onDeleted,

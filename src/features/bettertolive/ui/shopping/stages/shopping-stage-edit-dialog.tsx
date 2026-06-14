@@ -98,7 +98,6 @@ export function ShoppingStageEditDialog({
       if (result.removedDuplicateIds.length > 0) {
         toast.warning(
           t("shopping.stage.duplicateItems", {
-            defaultValue: `已自动去除重复物品：${result.removedDuplicateIds.join(", ")}`,
             ids: result.removedDuplicateIds.join(", "),
           }),
         )
@@ -207,17 +206,14 @@ export function ShoppingStageEditDialog({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: seed.name,
-        defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessStage", {
         name: seed.name,
-        defaultValue: `已删除阶段：${seed.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedStage"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: seed.name,
-        defaultValue: `已撤销删除：${seed.name}`,
       }),
       onDelete: () => deleteStageTemplate(seed.id),
       onDeleted,

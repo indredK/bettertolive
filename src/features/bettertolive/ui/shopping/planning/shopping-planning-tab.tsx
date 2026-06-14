@@ -408,17 +408,14 @@ export function ShoppingPlanningTab({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name,
-        defaultValue: `已加入删除队列：${name}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessItem", {
         name,
-        defaultValue: `已删除物件：${name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedItem"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name,
-        defaultValue: `已撤销删除：${name}`,
       }),
       onDelete: () => deleteItem(id),
       onDeleted: () => {
@@ -460,7 +457,6 @@ export function ShoppingPlanningTab({
               {t("shopping.planning.filteredItemCount", {
                 count: filteredItems.length,
                 total: items.length,
-                defaultValue: `${filteredItems.length} / ${items.length} 个物品`,
               })}
             </div>
             <div className="flex flex-col gap-2">

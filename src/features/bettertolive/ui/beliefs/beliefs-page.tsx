@@ -10,6 +10,7 @@ import {
   Waypoints,
 } from "lucide-react"
 import { useMemo, useState } from "react"
+import { joinListText } from "@/lib/list-utils"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
@@ -149,10 +150,6 @@ function createDistribution<T extends string>(
 
 function createBeliefLookup(entries: BeliefEntry[]) {
   return new Map(entries.map((entry) => [entry.id, entry]))
-}
-
-function listToText(values: string[] | undefined) {
-  return (values ?? []).join("，")
 }
 
 function textToList(value: string) {
@@ -1246,7 +1243,7 @@ function BeliefEditDialog({
     seed?.defenseMechanism ?? null,
   )
   const [attachmentNote, setAttachmentNote] = useState(seed?.attachmentNote ?? "")
-  const [tags, setTags] = useState(listToText(seed?.tags))
+  const [tags, setTags] = useState(joinListText(seed?.tags, "，"))
 
   const canSubmit = title.trim().length > 0 && statement.trim().length > 0
 
@@ -1266,13 +1263,16 @@ function BeliefEditDialog({
       seed.domain !== domain ||
       seed.layer !== layer ||
       seed.source !== source ||
-      listToText(seed.secondaryDomains) !==
-        listToText(secondaryDomains.filter((item) => item !== domain)) ||
+      joinListText(seed.secondaryDomains, "，") !==
+        joinListText(
+          secondaryDomains.filter((item) => item !== domain),
+          "，",
+        ) ||
       (seed.cbtLayer ?? null) !== cbtLayer ||
-      listToText(seed.cognitiveDistortions) !== listToText(cognitiveDistortions) ||
+      joinListText(seed.cognitiveDistortions, "，") !== joinListText(cognitiveDistortions, "，") ||
       (seed.defenseMechanism ?? null) !== defenseMechanism ||
       (seed.attachmentNote ?? "") !== attachmentNote.trim() ||
-      listToText(seed.tags) !== listToText(textToList(tags))
+      joinListText(seed.tags, "，") !== joinListText(textToList(tags), "，")
     ) {
       changedFields.push("内容")
     }
@@ -1342,17 +1342,14 @@ function BeliefEditDialog({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: seed.title,
-        defaultValue: `已加入删除队列：${seed.title}，5 秒内可撤销`,
       }),
       successMessage: t("beliefs.toast.deleteSuccess", {
         name: seed.title,
-        defaultValue: `已删除观念：${seed.title}`,
       }),
       failureMessage: t("common.toast.deleteFailed"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: seed.title,
-        defaultValue: `已撤销删除：${seed.title}`,
       }),
       onDelete: () => deleteBeliefEntry(seed.id),
       onDeleted,

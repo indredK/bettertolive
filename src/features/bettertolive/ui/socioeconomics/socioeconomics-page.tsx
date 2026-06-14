@@ -1444,7 +1444,6 @@ function ConceptGraphDetail({
         >
           {t("socioeconomics.graph.connectedEntriesCount", {
             count: entries.length,
-            defaultValue: `连接 ${entries.length} 个条目`,
           })}
         </Badge>
       </div>

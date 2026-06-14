@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 import {
   Dialog,
   DialogContent,
@@ -138,21 +140,6 @@ const LIFESTYLE_FACTORS = [
 
 const LINK_DIRECTIONS = ["正相关", "负相关", "混合"] satisfies EmotionLifestyleLink["direction"][]
 
-function createId(prefix: string) {
-  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
-}
-
-function splitList(value: string) {
-  return value
-    .split(/[\n,，]/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-}
-
-function listToText(values: string[] | undefined) {
-  return (values ?? []).join("\n")
-}
-
 function normalizeSelectValue(value: string) {
   return value === NONE_VALUE ? "" : value
 }
@@ -232,8 +219,8 @@ function createInitialForm(target: EmotionEntityEditorTarget): FormState {
         state: target.item?.state ?? "平静",
         intensity: target.item?.intensity ?? "5/10",
         bodySignal: target.item?.bodySignal ?? "",
-        tags: listToText(target.item?.tags),
-        emotionTags: listToText(target.item?.emotionTags),
+        tags: joinListText(target.item?.tags, "\n"),
+        emotionTags: joinListText(target.item?.emotionTags, "\n"),
         triggerEvent: target.item?.triggerEvent ?? "",
         impulse: target.item?.impulse ?? "",
         needRightNow: target.item?.needRightNow ?? "",
@@ -249,9 +236,9 @@ function createInitialForm(target: EmotionEntityEditorTarget): FormState {
       return {
         title: target.item?.title ?? "",
         summary: target.item?.summary ?? "",
-        cues: listToText(target.item?.cues),
+        cues: joinListText(target.item?.cues, "\n"),
         category: target.item?.category ?? "",
-        recentExamples: listToText(target.item?.recentExamples),
+        recentExamples: joinListText(target.item?.recentExamples, "\n"),
       }
     case "tool":
       return {
@@ -333,14 +320,14 @@ function buildNextEmotion(
   switch (target.kind) {
     case "checkIn": {
       const item: EmotionCheckIn = {
-        id: target.item?.id ?? createId("emotion-checkin"),
+        id: target.item?.id ?? generateId("emotion-checkin"),
         date: form.date.trim(),
         summary: form.summary.trim(),
         state: form.state as EmotionState,
         intensity: form.intensity.trim(),
         bodySignal: form.bodySignal.trim(),
-        tags: splitList(form.tags),
-        emotionTags: splitList(form.emotionTags) as EmotionEmotionTag[],
+        tags: splitListText(form.tags),
+        emotionTags: splitListText(form.emotionTags) as EmotionEmotionTag[],
         triggerEvent: form.triggerEvent.trim() || undefined,
         impulse: (form.impulse || undefined) as EmotionImpulse | undefined,
         needRightNow: form.needRightNow.trim() || undefined,
@@ -351,7 +338,7 @@ function buildNextEmotion(
     case "trendPoint": {
       const score = Math.max(0, Math.min(10, Number(form.score) || 0))
       const item: EmotionTrendPoint = {
-        id: target.item?.id ?? createId("emotion-trend"),
+        id: target.item?.id ?? generateId("emotion-trend"),
         label: form.label.trim(),
         score,
         note: form.note.trim(),
@@ -362,19 +349,19 @@ function buildNextEmotion(
     }
     case "trigger": {
       const item: EmotionTriggerGroup = {
-        id: target.item?.id ?? createId("emotion-trigger"),
+        id: target.item?.id ?? generateId("emotion-trigger"),
         title: form.title.trim(),
         summary: form.summary.trim(),
-        cues: splitList(form.cues),
+        cues: splitListText(form.cues),
         category: (form.category || undefined) as EmotionTriggerCategory | undefined,
-        recentExamples: splitList(form.recentExamples),
+        recentExamples: splitListText(form.recentExamples),
       }
       nextEmotion.triggers = upsertById(nextEmotion.triggers, item, target.isNew)
       return nextEmotion
     }
     case "tool": {
       const item: EmotionSupportTool = {
-        id: target.item?.id ?? createId("emotion-tool"),
+        id: target.item?.id ?? generateId("emotion-tool"),
         title: form.title.trim(),
         description: form.description.trim(),
         when: form.when.trim(),
@@ -386,7 +373,7 @@ function buildNextEmotion(
     }
     case "timelineSegment": {
       const item: EmotionTimelineSegment = {
-        id: target.item?.id ?? createId("emotion-segment"),
+        id: target.item?.id ?? generateId("emotion-segment"),
         range: form.range.trim(),
         trend: form.trend as EmotionTimelineSegment["trend"],
         summary: form.summary.trim(),
@@ -396,7 +383,7 @@ function buildNextEmotion(
     }
     case "loopPattern": {
       const item: EmotionLoopPattern = {
-        id: target.item?.id ?? createId("emotion-loop"),
+        id: target.item?.id ?? generateId("emotion-loop"),
         title: form.title.trim(),
         description: form.description.trim(),
         frequency: form.frequency.trim(),
@@ -406,7 +393,7 @@ function buildNextEmotion(
     }
     case "lifestyleLink": {
       const item: EmotionLifestyleLink = {
-        id: target.item?.id ?? createId("emotion-life"),
+        id: target.item?.id ?? generateId("emotion-life"),
         factor: form.factor as EmotionLifestyleLink["factor"],
         observation: form.observation.trim(),
         direction: form.direction as EmotionLifestyleLink["direction"],
@@ -416,7 +403,7 @@ function buildNextEmotion(
     }
     case "environmentCue": {
       const item: EmotionEnvironmentCue = {
-        id: target.item?.id ?? createId("emotion-env"),
+        id: target.item?.id ?? generateId("emotion-env"),
         context: form.context.trim(),
         description: form.description.trim(),
       }
@@ -425,7 +412,7 @@ function buildNextEmotion(
     }
     case "relationshipCue": {
       const item: EmotionRelationshipCue = {
-        id: target.item?.id ?? createId("emotion-rel"),
+        id: target.item?.id ?? generateId("emotion-rel"),
         who: form.who.trim(),
         pattern: form.pattern.trim(),
       }
@@ -434,7 +421,7 @@ function buildNextEmotion(
     }
     case "recoveryNote": {
       const item: EmotionRecoveryNote = {
-        id: target.item?.id ?? createId("emotion-recovery"),
+        id: target.item?.id ?? generateId("emotion-recovery"),
         date: form.date.trim(),
         what: form.what.trim(),
         effect: form.effect.trim(),
@@ -1041,7 +1028,7 @@ export function EmotionTextListEditDialog({
 }) {
   const { t } = useTranslation()
   const saveEmotionMutation = useSaveEmotionMutation()
-  const [value, setValue] = useState(listToText(emotion[listKey]))
+  const [value, setValue] = useState(joinListText(emotion[listKey], "\n"))
   const title =
     listKey === "minimalRecoverySteps"
       ? t("emotion.editor.textList.minimalRecoverySteps")
@@ -1053,7 +1040,7 @@ export function EmotionTextListEditDialog({
     try {
       await saveEmotionMutation.mutateAsync({
         ...cloneEmotion(emotion),
-        [listKey]: splitList(value),
+        [listKey]: splitListText(value),
       })
       toast.success(t("common.toast.saved"))
       onClose()
@@ -1206,7 +1193,7 @@ function ChipToggleField<T extends string>({
   values: readonly T[]
 }) {
   const { t } = useTranslation()
-  const selected = splitList(selectedText)
+  const selected = splitListText(selectedText)
 
   const toggle = (value: string) => {
     const next = selected.includes(value)

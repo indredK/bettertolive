@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Plus, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { Children, useState } from "react"
@@ -246,7 +247,7 @@ export function NutritionProfileEditDialog({
                   hardConstraints: [
                     ...form.hardConstraints,
                     {
-                      id: createId("constraint"),
+                      id: generateId("constraint"),
                       type: "医学限制",
                       label: "",
                       note: "",
@@ -316,7 +317,7 @@ export function NutritionProfileEditDialog({
                   softStances: [
                     ...form.softStances,
                     {
-                      id: createId("stance"),
+                      id: generateId("stance"),
                       type: "临时关注",
                       label: "",
                       note: "",
@@ -516,12 +517,4 @@ function toStanceForm(stance: DietarySoftStance): StanceForm {
     label: stance.label,
     note: stance.note,
   }
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}`
 }

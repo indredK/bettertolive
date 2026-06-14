@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { m, AnimatePresence } from "motion/react"
 import { ChevronLeft, ChevronRight, Play, Square, Pencil, Check, X } from "lucide-react"
@@ -31,20 +32,15 @@ interface WorldHistoryPageProps {
 
 type PanelView = "star" | "gantt" | "arena"
 
-const PANEL_TABS: { key: PanelView; label: string }[] = [
-  { key: "star", label: "🌌 星图" },
-  { key: "gantt", label: "📊 演进" },
-  { key: "arena", label: "⚖️ 对质" },
-]
-
-function cloneModule(data: WorldHistoryModuleData): WorldHistoryModuleData {
-  return JSON.parse(JSON.stringify(data)) as WorldHistoryModuleData
+const PANEL_TAB_KEYS: PanelView[] = ["star", "gantt", "arena"]
+const PANEL_TAB_EMOJI: Record<PanelView, string> = {
+  star: "🌌",
+  gantt: "📊",
+  arena: "⚖️",
 }
 
-function genId(prefix: string): string {
-  const rand =
-    globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.round(Math.random() * 1_000_000)}`
-  return `${prefix}-${rand}`
+function cloneModule(data: WorldHistoryModuleData): WorldHistoryModuleData {
+  return structuredClone(data)
 }
 
 function CivilizationSelector({
@@ -239,7 +235,7 @@ export function WorldHistoryPage({
 
   function addEvent() {
     const event: WorldHistoryTimelineEvent = {
-      id: genId("t"),
+      id: generateId("t"),
       civilizationId: activeCivilizationId,
       year: 0,
       label: t("worldhistory.event.newLabel"),
@@ -264,7 +260,7 @@ export function WorldHistoryPage({
 
   function addPreset(civA: CivilizationId, civB: CivilizationId) {
     const preset: ComparisonPreset = {
-      id: genId("preset"),
+      id: generateId("preset"),
       title: t("worldhistory.preset.newLabel"),
       civA,
       civB,
@@ -401,9 +397,9 @@ export function WorldHistoryPage({
       <div className="flex shrink-0 flex-col gap-2">
         <Tabs value={panelView} onValueChange={(v) => setPanelView(v as PanelView)}>
           <TabsList className="w-full">
-            {PANEL_TABS.map((tab) => (
-              <TabsTrigger key={tab.key} value={tab.key} className="flex-1">
-                {tab.label}
+            {PANEL_TAB_KEYS.map((key) => (
+              <TabsTrigger key={key} value={key} className="flex-1">
+                {PANEL_TAB_EMOJI[key]} {t(`worldhistory.tabs.${key}`)}
               </TabsTrigger>
             ))}
           </TabsList>

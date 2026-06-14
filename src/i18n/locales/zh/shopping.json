@@ -689,6 +689,11 @@
     "noChildren": "该物品暂无子级",
     "noMatchingChildren": "没有匹配的子级",
     "selectTierChildren": "选择子级",
-    "shuttleDescription": "将属于此阶段的物品移至右侧，保存后生效"
+    "shuttleDescription": "将属于此阶段的物品移至右侧，保存后生效",
+    "duplicateItems": "已自动去除重复物品：{{ids}}"
+  },
+  "warning": {
+    "emptyChildren": "子级 {{indices}} 名称为空，提交时将被自动移除",
+    "emptyChannels": "子级 {{indices}} 存在渠道名称为空的价格行，提交时将被移除"
   }
 }

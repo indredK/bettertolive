@@ -110,7 +110,7 @@ export function GanttTimeline({
                       className="absolute font-mono text-[9px] text-[color:var(--text-muted)]"
                       style={{ left: `${(i / 5) * 100}%`, transform: "translateX(-50%)" }}
                     >
-                      {yr < 0 ? `前${Math.abs(yr)}` : `${yr}`}
+                      {yr < 0 ? `${t("worldhistory.gantt.yearPrefix")}${Math.abs(yr)}` : `${yr}`}
                     </div>
                   )
                 })}

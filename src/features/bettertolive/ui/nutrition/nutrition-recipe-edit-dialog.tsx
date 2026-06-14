@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Plus, Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useMemo, useState } from "react"
@@ -215,7 +216,7 @@ export function NutritionRecipeEditDialog({
       return
     }
 
-    const nextRecipeId = editing.recipe?.id ?? createId("recipe")
+    const nextRecipeId = editing.recipe?.id ?? generateId("recipe")
     const nextRecipe: Recipe = {
       id: nextRecipeId,
       name: form.name.trim(),
@@ -635,14 +636,6 @@ function parsePositiveNumber(value: string, fallback: number) {
 
 function stringifyNumber(value: number | undefined) {
   return typeof value === "number" ? String(value) : ""
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function Field({ children, label }: { children: ReactNode; label: string }) {

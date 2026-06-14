@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useState } from "react"
@@ -93,7 +94,7 @@ export function NutritionFoodCategoryEditDialog({
       return
     }
 
-    const nextCategoryId = editing.category?.id ?? createId("food-category")
+    const nextCategoryId = editing.category?.id ?? generateId("food-category")
     const nextCategory: FoodCategoryDefinition = {
       id: nextCategoryId,
       name: form.name.trim(),
@@ -279,14 +280,6 @@ function nextSortOrder(categories: FoodCategoryDefinition[]) {
 function parsePositiveNumber(value: string, fallback: number) {
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : fallback
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function Field({ children, label }: { children: ReactNode; label: string }) {

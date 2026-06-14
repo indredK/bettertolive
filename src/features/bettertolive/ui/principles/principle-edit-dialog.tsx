@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Trash2 } from "lucide-react"
 import type { TFunction } from "i18next"
 import type { FormEvent, ReactNode } from "react"
@@ -113,7 +114,7 @@ export function PrincipleEditDialog({
       return
     }
 
-    const nextId = editing.principle?.id ?? createId("principle")
+    const nextId = editing.principle?.id ?? generateId("principle")
     const nextEntry = createEntryFromForm({
       existingEntry: editing.principle,
       form,
@@ -130,10 +131,10 @@ export function PrincipleEditDialog({
         entries: nextEntries,
         boundaries: deriveBoundaryList(nextEntries),
       })
-      toast.success(t("principles.edit.saved"))
+      toast.success(t("common.toast.saved"))
       onSaved?.()
     } catch {
-      toast.error(t("principles.edit.saveFailed"))
+      toast.error(t("common.toast.saveFailed"))
     }
   }
 
@@ -142,10 +143,10 @@ export function PrincipleEditDialog({
     if (!seed) return
 
     confirmUndoableDelete({
-      confirmMessage: t("principles.edit.confirmDelete"),
+      confirmMessage: t("common.confirm.deleteItem", { name: seed.title }),
       pendingMessage: t("common.toast.deletePending", { name: seed.title }),
-      successMessage: t("principles.edit.deleted"),
-      failureMessage: t("principles.edit.deleteFailed"),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", { name: seed.title }),
       onDelete: async () => {
@@ -504,7 +505,7 @@ function createRevision(
   }
 
   return {
-    id: createId("revision"),
+    id: generateId("revision"),
     date: new Date().toISOString().slice(0, 10),
     summary: t("principles.edit.revision.summary", {
       fields: changedFields
@@ -551,12 +552,4 @@ function normalizeList(value: string) {
     })
 
   return normalized
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now().toString(36)}`
 }

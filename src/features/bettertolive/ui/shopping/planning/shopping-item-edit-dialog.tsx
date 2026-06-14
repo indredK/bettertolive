@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Plus, TriangleAlert, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -143,7 +144,7 @@ export function ShoppingItemEditDialog({
   }
 
   const addChild = () => {
-    setChildren((current) => [...current, createDefaultChildDraft({ index: current.length })])
+    setChildren((current) => [...current, createDefaultChildDraft()])
   }
 
   const removeChild = (childIndex: number) => {
@@ -155,7 +156,7 @@ export function ShoppingItemEditDialog({
       const channelPrices = child.channelPrices ?? []
       return {
         ...child,
-        channelPrices: [...channelPrices, createChannelPriceDraft("", channelPrices.length)],
+        channelPrices: [...channelPrices, createChannelPriceDraft("")],
       }
     })
   }
@@ -184,7 +185,6 @@ export function ShoppingItemEditDialog({
       const indices = emptyNamedChildren.map(({ index }) => index + 1).join(", ")
       toast.warning(
         t("shopping.warning.emptyChildren", {
-          defaultValue: `子级 ${indices} 名称为空，提交时将被自动移除`,
           indices,
         }),
       )
@@ -200,7 +200,6 @@ export function ShoppingItemEditDialog({
       const indices = emptyChannelChildren.map(({ index }) => index + 1).join(", ")
       toast.warning(
         t("shopping.warning.emptyChannels", {
-          defaultValue: `子级 ${indices} 存在渠道名称为空的价格行，提交时将被移除`,
           indices,
         }),
       )
@@ -250,17 +249,14 @@ export function ShoppingItemEditDialog({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: seed.name,
-        defaultValue: `已加入删除队列：${seed.name}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessItem", {
         name: seed.name,
-        defaultValue: `已删除物件：${seed.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedItem"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: seed.name,
-        defaultValue: `已撤销删除：${seed.name}`,
       }),
       onDelete: () => deleteItem(seed.id),
       onDeleted,
@@ -819,20 +815,20 @@ function normalizeChildDraft(
   },
 ): ShoppingItemChild {
   return {
-    id: child.id || createLocalId("child", fallback.index),
+    id: child.id || generateId("child"),
     name: child.name ?? "",
     status: child.status ?? fallback.status,
     lifecycle: child.lifecycle ?? fallback.lifecycle,
     depreciation: child.depreciation,
-    channelPrices: (child.channelPrices ?? []).map((channelPrice, channelIndex) =>
-      normalizeChildChannelPrice(channelPrice, channelIndex),
+    channelPrices: (child.channelPrices ?? []).map((channelPrice) =>
+      normalizeChildChannelPrice(channelPrice),
     ),
   }
 }
 
-function createDefaultChildDraft({ index }: { index: number }): ShoppingItemChild {
+function createDefaultChildDraft(): ShoppingItemChild {
   return {
-    id: createLocalId("child", index),
+    id: generateId("child"),
     name: "",
     status: ShoppingStatus.Owned,
     lifecycle: ShoppingLifecycle.Durable,
@@ -843,10 +839,9 @@ function createDefaultChildDraft({ index }: { index: number }): ShoppingItemChil
 
 function normalizeChildChannelPrice(
   channelPrice: ShoppingItemChildChannelPrice,
-  index: number,
 ): ShoppingItemChildChannelPrice {
   return {
-    id: channelPrice.id || createLocalId("channel", index),
+    id: channelPrice.id || generateId("channel"),
     channel: channelPrice.channel ?? "",
     entryPrice: channelPrice.entryPrice,
     sweetSpotPrice: channelPrice.sweetSpotPrice,
@@ -854,20 +849,15 @@ function normalizeChildChannelPrice(
   }
 }
 
-function createChannelPriceDraft(channel: string, index: number): ShoppingItemChildChannelPrice {
+function createChannelPriceDraft(channel: string): ShoppingItemChildChannelPrice {
   return {
-    id: createLocalId("channel", index),
+    id: generateId("channel"),
     channel,
     entryPrice: undefined,
     sweetSpotPrice: undefined,
     overpayPrice: undefined,
   }
 }
-
-function createLocalId(prefix: string, index: number) {
-  return `${prefix}_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 8)}`
-}
-
 function parseOptionalNumber(value: string) {
   const normalized = value.trim()
   if (!normalized) return undefined

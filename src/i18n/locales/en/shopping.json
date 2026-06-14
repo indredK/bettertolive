@@ -689,6 +689,11 @@
     "noChildren": "This item has no children",
     "noMatchingChildren": "No matching children",
     "selectTierChildren": "Select children",
-    "shuttleDescription": "Move items belonging to this stage to the right, then save"
+    "shuttleDescription": "Move items belonging to this stage to the right, then save",
+    "duplicateItems": "Duplicate items removed: {{ids}}"
+  },
+  "warning": {
+    "emptyChildren": "Children {{indices}} have empty names and will be removed on submit",
+    "emptyChannels": "Children {{indices}} have price rows with empty channel names that will be removed"
   }
 }

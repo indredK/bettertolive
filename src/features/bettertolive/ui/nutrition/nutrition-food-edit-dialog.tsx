@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { Trash2 } from "lucide-react"
 import type { FormEvent, ReactNode } from "react"
 import { useMemo, useState } from "react"
@@ -144,7 +145,7 @@ export function NutritionFoodEditDialog({
       return
     }
 
-    const nextFoodId = editing.food?.id ?? createId("food")
+    const nextFoodId = editing.food?.id ?? generateId("food")
     const nextProfile = createNextProfile({
       existingProfile,
       foodId: nextFoodId,
@@ -550,7 +551,7 @@ function createNextProfile({
   }
 
   return {
-    id: existingProfile?.id ?? createId("nutrient"),
+    id: existingProfile?.id ?? generateId("nutrient"),
     foodId,
     basisAmount: 100,
     basisUnit: form.defaultUnit === "ml" ? "ml" : "g",
@@ -578,14 +579,6 @@ function parseOptionalNumber(value: string) {
 
 function stringifyNumber(value: number | undefined) {
   return typeof value === "number" ? String(value) : ""
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function Field({ children, label }: { children: ReactNode; label: string }) {

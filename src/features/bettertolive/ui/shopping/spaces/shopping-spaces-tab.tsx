@@ -252,17 +252,14 @@ export function ShoppingSpacesTab({
       }),
       pendingMessage: t("common.toast.deletePending", {
         name: space.name,
-        defaultValue: `已加入删除队列：${space.name}，5 秒内可撤销`,
       }),
       successMessage: t("shopping.toast.deleteSuccessSpace", {
         name: space.name,
-        defaultValue: `已删除空间：${space.name}`,
       }),
       failureMessage: t("shopping.toast.deleteFailedSpace"),
       undoLabel: t("common.actions.undo"),
       undoneMessage: t("common.toast.deleteUndone", {
         name: space.name,
-        defaultValue: `已撤销删除：${space.name}`,
       }),
       onDelete: () => deleteSpaceDefinition(space.id),
       onDeleted: () => {

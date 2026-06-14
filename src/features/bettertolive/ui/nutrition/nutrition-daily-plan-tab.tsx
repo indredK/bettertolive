@@ -1,3 +1,4 @@
+import { generateId } from "@/lib/id-utils"
 import { CalendarRange, CircleCheck, ClipboardCheck, Pencil, Utensils } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
@@ -88,7 +89,7 @@ export function NutritionDailyPlanTab({
     }
 
     const nextLog: MealLog = {
-      id: createId("meal-log"),
+      id: generateId("meal-log"),
       dateTime: toOffsetDateTime(defaultSlotDateTime(plan.date, slot.structure)),
       plannedSlotId: slot.id,
       entries: slot.entries.map(clonePlanEntry),
@@ -332,14 +333,6 @@ function toOffsetDateTime(value: string) {
   const minutes = String(absoluteOffset % 60).padStart(2, "0")
 
   return `${value.length === 16 ? `${value}:00` : value}${sign}${hours}:${minutes}`
-}
-
-function createId(prefix: string) {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return `${prefix}-${crypto.randomUUID()}`
-  }
-
-  return `${prefix}-${Date.now()}`
 }
 
 function PlanListCard({
