@@ -179,6 +179,7 @@ src/features/bettertolive/
 └── ui/<module>/
     ├── <module>-page.tsx
     ├── <module>-page-data.ts
+    ├── <module>-constants.ts         ← 跨子组件共享的常量/枚举/工具函数
     ├── _shared/
     │   ├── <module>-types.ts
     │   └── <module>-page-shared.tsx

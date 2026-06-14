@@ -281,21 +281,10 @@ function scrambleLabel(label: string, revealProgress: number) {
     .join("")
 }
 
-function SidebarBrandTitle({ isActive, label }: { isActive: boolean; label: string }) {
+function AnimatedBrandLabel({ label }: { label: string }) {
   const [displayLabel, setDisplayLabel] = useState(label)
 
   useEffect(() => {
-    if (!isActive) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- resetting label when inactive is a derived state sync
-      setDisplayLabel(label)
-      return
-    }
-
-    if (typeof window === "undefined") {
-      setDisplayLabel(label)
-      return
-    }
-
     let frame = 0
     const maxFrames = Math.max(12, label.length * 4)
     const intervalId = window.setInterval(() => {
@@ -311,11 +300,19 @@ function SidebarBrandTitle({ isActive, label }: { isActive: boolean; label: stri
 
     return () => {
       window.clearInterval(intervalId)
-      setDisplayLabel(label)
     }
-  }, [isActive, label])
+  }, [label])
 
   return <span>{displayLabel}</span>
+}
+
+function SidebarBrandTitle({ isActive, label }: { isActive: boolean; label: string }) {
+  if (!isActive) {
+    return <span>{label}</span>
+  }
+
+  // key forces remount on label change, giving a clean animation restart
+  return <AnimatedBrandLabel key={label} label={label} />
 }
 
 export function BetterToLiveAppShell() {
