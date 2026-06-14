@@ -9,8 +9,8 @@ import {
   PopupNotification,
   PopupNotificationBody,
   PopupNotificationHeader,
-  usePopupNotification,
 } from "@/components/ui/popup-notification"
+import { usePopupNotification } from "@/components/ui/popup-notification-hook"
 import type { WorkspaceRhythmSlide } from "@/features/bettertolive/config/sidebar"
 import { cn } from "@/lib/utils"
 

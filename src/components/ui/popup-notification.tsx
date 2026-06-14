@@ -1,5 +1,4 @@
 import {
-  createContext,
   type ReactNode,
   useCallback,
   useContext,
@@ -15,14 +14,12 @@ import { useTranslation } from "react-i18next"
 type CountdownControls = ReturnType<typeof animate>
 
 import { Button } from "@/components/ui/button"
+import {
+  PopupNotificationContext,
+  type PopupNotificationContextValue,
+} from "@/components/ui/popup-notification-hook"
 import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
-
-type PopupNotificationContextValue = {
-  isPaused: boolean
-}
-
-const PopupNotificationContext = createContext<PopupNotificationContextValue | null>(null)
 
 function usePopupNotificationContext() {
   const ctx = useContext(PopupNotificationContext)
@@ -308,8 +305,4 @@ export function PopupNotificationBody({
   // expose context so consumers (e.g. carousels) can pause when hovered
   usePopupNotificationContext()
   return <div className={cn("px-4 pt-1 pb-3.5", className)}>{children}</div>
-}
-
-export function usePopupNotification() {
-  return usePopupNotificationContext()
 }

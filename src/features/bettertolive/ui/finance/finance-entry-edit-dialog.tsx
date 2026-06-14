@@ -1,8 +1,11 @@
 import { Trash2 } from "lucide-react"
-import type { FormEvent, ReactNode } from "react"
-import { useState } from "react"
+import type { ReactNode } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -51,22 +54,28 @@ export type EditingFinanceEntry = {
   entry: TransactionEntry | null
 }
 
-type EntryFormState = {
-  date: string
-  label: string
-  category: string
-  amount: string
-  direction: TransactionDirection
-  note: string
-  account: string
-  lifeSystem: FinanceLifeSystem
-  necessity: FinanceNecessity
-  reviewStatus: FinanceReviewStatus
-  linkedModule: FinanceLinkedModule
-  tagsText: string
-}
+const financeEntryFormSchema = z.object({
+  date: z.string().min(1),
+  label: z.string().min(1),
+  category: z.string().min(1),
+  amount: z
+    .string()
+    .min(1)
+    .refine((value) => Number.isFinite(Number(value)), "Amount must be a valid number")
+    .refine((value) => Number(value) > 0, "Amount must be positive"),
+  direction: z.string(),
+  note: z.string(),
+  account: z.string(),
+  lifeSystem: z.string(),
+  necessity: z.string(),
+  reviewStatus: z.string(),
+  linkedModule: z.string(),
+  tagsText: z.string(),
+})
 
-function createInitialEntryForm(entry: TransactionEntry | null): EntryFormState {
+type EntryFormValues = z.infer<typeof financeEntryFormSchema>
+
+function createInitialEntryForm(entry: TransactionEntry | null): EntryFormValues {
   return {
     date: entry?.date ?? new Date().toISOString().slice(0, 10),
     label: entry?.label ?? "",
@@ -94,58 +103,43 @@ export function FinanceEntryEditDialog({
 }) {
   const { t } = useTranslation()
   const saveFinanceMutation = useSaveFinanceMutation()
-  const [form, setForm] = useState<EntryFormState>(() => createInitialEntryForm(editing.entry))
+  const form = useForm<EntryFormValues>({
+    resolver: zodResolver(financeEntryFormSchema),
+    defaultValues: createInitialEntryForm(editing.entry),
+  })
 
-  const updateForm = (patch: Partial<EntryFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    const amount = Number(form.amount)
-
-    if (!form.date || !form.label.trim() || !form.category.trim() || !Number.isFinite(amount)) {
-      toast.error(t("finance.edit.validation.required"))
-      return
-    }
-
-    if (amount <= 0) {
-      toast.error(t("finance.edit.validation.amountPositive"))
-      return
-    }
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    const amount = Number(values.amount)
 
     const nextEntry: TransactionEntry = {
       id: editing.entry?.id ?? generateId("finance-entry"),
-      date: form.date,
-      label: form.label.trim(),
-      category: form.category.trim(),
+      date: values.date,
+      label: values.label.trim(),
+      category: values.category.trim(),
       amount,
-      direction: form.direction,
-      note: form.note.trim(),
-      account: form.account.trim() || undefined,
-      lifeSystem: form.lifeSystem,
-      necessity: form.necessity,
-      reviewStatus: form.reviewStatus,
-      linkedModule: form.linkedModule,
-      tags: splitListText(form.tagsText, /\n|,|，/),
+      direction: values.direction as TransactionDirection,
+      note: values.note.trim(),
+      account: values.account.trim() || undefined,
+      lifeSystem: values.lifeSystem as FinanceLifeSystem,
+      necessity: values.necessity as FinanceNecessity,
+      reviewStatus: values.reviewStatus as FinanceReviewStatus,
+      linkedModule: values.linkedModule as FinanceLinkedModule,
+      tags: splitListText(values.tagsText, /\n|,|，/),
     }
 
     const nextEntries = editing.isNew
       ? [nextEntry, ...finance.entries]
       : finance.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry))
 
-    try {
-      await saveFinanceMutation.mutateAsync({
-        ...finance,
-        entries: sortEntriesByDate(nextEntries),
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+    await saveFinanceMutation.mutateAsync({
+      ...finance,
+      entries: sortEntriesByDate(nextEntries),
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = form.formState.isValid
 
   const handleDelete = () => {
     if (!editing.entry) return
@@ -178,187 +172,229 @@ export function FinanceEntryEditDialog({
           <DialogDescription>{t("finance.edit.description")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="min-h-0 flex-1 overflow-y-auto pr-1">
+        <form onSubmit={handleFormSubmit} className="min-h-0 flex-1 overflow-y-auto pr-1">
           <div className="grid gap-3 min-[720px]:grid-cols-2">
             <Field label={t("finance.edit.fields.date")}>
-              <Input
-                type="date"
-                value={form.date}
-                onChange={(event) => updateForm({ date: event.target.value })}
+              <Controller
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <Input type="date" value={field.value} onChange={field.onChange} />
+                )}
               />
             </Field>
 
             <Field label={t("finance.edit.fields.direction")}>
-              <Select
-                value={form.direction}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ direction: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_DIRECTIONS.map((direction) => (
-                    <SelectItem key={direction} value={direction}>
-                      {translateFinanceEnum(t, "direction", direction)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="direction"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_DIRECTIONS.map((direction) => (
+                        <SelectItem key={direction} value={direction}>
+                          {translateFinanceEnum(t, "direction", direction)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field label={t("finance.edit.fields.label")}>
-              <Input
-                value={form.label}
-                onChange={(event) => updateForm({ label: event.target.value })}
+              <Controller
+                control={form.control}
+                name="label"
+                render={({ field }) => <Input value={field.value} onChange={field.onChange} />}
               />
             </Field>
 
             <Field label={t("finance.edit.fields.amount")}>
-              <Input
-                inputMode="decimal"
-                min="0"
-                step="0.01"
-                type="number"
-                value={form.amount}
-                onChange={(event) => updateForm({ amount: event.target.value })}
+              <Controller
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <Input
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    type="number"
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
             </Field>
 
             <Field label={t("finance.edit.fields.category")}>
-              <Select
-                value={form.category}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ category: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {translateFinanceEnum(t, "category", category)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {translateFinanceEnum(t, "category", category)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field label={t("finance.edit.fields.account")}>
-              <Input
-                value={form.account}
-                onChange={(event) => updateForm({ account: event.target.value })}
+              <Controller
+                control={form.control}
+                name="account"
+                render={({ field }) => <Input value={field.value} onChange={field.onChange} />}
               />
             </Field>
 
             <Field label={t("finance.edit.fields.lifeSystem")}>
-              <Select
-                value={form.lifeSystem}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ lifeSystem: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_LIFE_SYSTEMS.map((lifeSystem) => (
-                    <SelectItem key={lifeSystem} value={lifeSystem}>
-                      {translateFinanceEnum(t, "lifeSystem", lifeSystem)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="lifeSystem"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_LIFE_SYSTEMS.map((system) => (
+                        <SelectItem key={system} value={system}>
+                          {translateFinanceEnum(t, "lifeSystem", system)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field label={t("finance.edit.fields.necessity")}>
-              <Select
-                value={form.necessity}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ necessity: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_NECESSITIES.map((necessity) => (
-                    <SelectItem key={necessity} value={necessity}>
-                      {translateFinanceEnum(t, "necessity", necessity)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="necessity"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_NECESSITIES.map((necessity) => (
+                        <SelectItem key={necessity} value={necessity}>
+                          {translateFinanceEnum(t, "necessity", necessity)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field label={t("finance.edit.fields.reviewStatus")}>
-              <Select
-                value={form.reviewStatus}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ reviewStatus: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_REVIEW_STATUSES.map((reviewStatus) => (
-                    <SelectItem key={reviewStatus} value={reviewStatus}>
-                      {translateFinanceEnum(t, "reviewStatus", reviewStatus)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="reviewStatus"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_REVIEW_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {translateFinanceEnum(t, "reviewStatus", status)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field label={t("finance.edit.fields.linkedModule")}>
-              <Select
-                value={form.linkedModule}
-                onValueChange={(value) => {
-                  if (value !== null) {
-                    updateForm({ linkedModule: value })
-                  }
-                }}
-              >
-                <SelectTrigger fullWidth>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {FINANCE_LINKED_MODULES.map((linkedModule) => (
-                    <SelectItem key={linkedModule} value={linkedModule}>
-                      {translateFinanceEnum(t, "linkedModule", linkedModule)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Controller
+                control={form.control}
+                name="linkedModule"
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onValueChange={(value) => {
+                      if (value !== null) field.onChange(value)
+                    }}
+                  >
+                    <SelectTrigger fullWidth>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FINANCE_LINKED_MODULES.map((module) => (
+                        <SelectItem key={module} value={module}>
+                          {translateFinanceEnum(t, "linkedModule", module)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
             </Field>
 
             <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.note")}>
-              <Textarea
-                value={form.note}
-                onChange={(event) => updateForm({ note: event.target.value })}
-                rows={3}
+              <Controller
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <Textarea value={field.value} onChange={field.onChange} rows={3} />
+                )}
               />
             </Field>
 
             <Field className="min-[720px]:col-span-2" label={t("finance.edit.fields.tags")}>
-              <Textarea
-                value={form.tagsText}
-                onChange={(event) => updateForm({ tagsText: event.target.value })}
-                placeholder={t("finance.edit.tagsPlaceholder")}
-                rows={3}
+              <Controller
+                control={form.control}
+                name="tagsText"
+                render={({ field }) => (
+                  <Textarea
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t("finance.edit.tagsPlaceholder")}
+                    rows={3}
+                  />
+                )}
               />
             </Field>
           </div>
@@ -378,7 +414,7 @@ export function FinanceEntryEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveFinanceMutation.isPending}>
+            <Button type="submit" disabled={saveFinanceMutation.isPending || !canSubmit}>
               {saveFinanceMutation.isPending
                 ? t("common.actions.saving")
                 : t("common.actions.save")}

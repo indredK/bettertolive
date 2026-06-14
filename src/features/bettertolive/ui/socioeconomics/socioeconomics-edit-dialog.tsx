@@ -1,8 +1,11 @@
 import { Trash2 } from "lucide-react"
-import type { FormEvent, ReactNode } from "react"
-import { useState } from "react"
+import { type FormEvent, type ReactNode, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -640,6 +643,12 @@ export function SocioeconomicsGapEditDialog({
   )
 }
 
+const promptFormSchema = z.object({
+  prompt: z.string().min(1),
+})
+
+type PromptFormValues = z.infer<typeof promptFormSchema>
+
 export function SocioeconomicsPromptEditDialog({
   editing,
   socioeconomics,
@@ -651,33 +660,27 @@ export function SocioeconomicsPromptEditDialog({
 }) {
   const { t } = useTranslation()
   const saveSocioeconomicsMutation = useSaveSocioeconomicsMutation()
-  const [prompt, setPrompt] = useState(editing.prompt)
+  const form = useForm<PromptFormValues>({
+    resolver: zodResolver(promptFormSchema),
+    defaultValues: { prompt: editing.prompt },
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!prompt.trim()) {
-      toast.error(t("socioeconomics.edit.validation.promptRequired"))
-      return
-    }
-
+  const handleFormSubmit = form.handleSubmit(async (values) => {
     const nextPrompts = editing.isNew
-      ? [prompt.trim(), ...socioeconomics.reviewPrompts]
+      ? [values.prompt.trim(), ...socioeconomics.reviewPrompts]
       : socioeconomics.reviewPrompts.map((item, index) =>
-          index === editing.index ? prompt.trim() : item,
+          index === editing.index ? values.prompt.trim() : item,
         )
 
-    try {
-      await saveSocioeconomicsMutation.mutateAsync({
-        ...socioeconomics,
-        reviewPrompts: nextPrompts,
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+    await saveSocioeconomicsMutation.mutateAsync({
+      ...socioeconomics,
+      reviewPrompts: nextPrompts,
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = form.formState.isValid
 
   const handleDelete = () => {
     if (editing.index === null) return
@@ -714,15 +717,21 @@ export function SocioeconomicsPromptEditDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 overflow-y-auto px-1 py-1 pr-2">
             <section className={SOCIO_DIALOG_SECTION_CLASS}>
               <Field label={t("socioeconomics.fields.prompt")}>
-                <Textarea
-                  value={prompt}
-                  onChange={(event) => setPrompt(event.target.value)}
-                  className={SOCIO_DIALOG_FIELD_CLASS}
-                  rows={5}
+                <Controller
+                  control={form.control}
+                  name="prompt"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={SOCIO_DIALOG_FIELD_CLASS}
+                      rows={5}
+                    />
+                  )}
                 />
               </Field>
             </section>
@@ -738,8 +747,10 @@ export function SocioeconomicsPromptEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveSocioeconomicsMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveSocioeconomicsMutation.isPending || !canSubmit}>
+              {saveSocioeconomicsMutation.isPending
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

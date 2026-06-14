@@ -1,7 +1,11 @@
 import { generateId } from "@/lib/id-utils"
 import { CalendarDays, Hash, NotebookPen, Pencil, Plus, Sparkles, Trash2 } from "lucide-react"
-import type { FormEvent, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { useMemo, useState } from "react"
+
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
@@ -35,12 +39,14 @@ type EditingReflection = {
   entry: ReflectionEntry | null
 }
 
-type ReflectionFormState = {
-  date: string
-  title: string
-  excerpt: string
-  tagsText: string
-}
+const reflectionFormSchema = z.object({
+  date: z.string().min(1),
+  title: z.string().min(1),
+  excerpt: z.string().min(1),
+  tagsText: z.string(),
+})
+
+type ReflectionFormValues = z.infer<typeof reflectionFormSchema>
 
 type CountRow = {
   label: string
@@ -60,7 +66,7 @@ function createNowLabel() {
   )
 }
 
-function createInitialReflectionForm(entry: ReflectionEntry | null): ReflectionFormState {
+function createInitialReflectionForm(entry: ReflectionEntry | null): ReflectionFormValues {
   return {
     date: entry?.date ?? createNowLabel(),
     title: entry?.title ?? "",
@@ -69,7 +75,7 @@ function createInitialReflectionForm(entry: ReflectionEntry | null): ReflectionF
   }
 }
 
-function createReflectionEntry(form: ReflectionFormState, id: string): ReflectionEntry {
+function createReflectionEntry(form: ReflectionFormValues, id: string): ReflectionEntry {
   return {
     id,
     date: form.date.trim(),
@@ -538,39 +544,27 @@ function ReflectionEditDialog({
 }) {
   const { t } = useTranslation()
   const saveReflectionMutation = useSaveReflectionMutation()
-  const [form, setForm] = useState<ReflectionFormState>(() =>
-    createInitialReflectionForm(editing.entry),
-  )
+  const form = useForm<ReflectionFormValues>({
+    resolver: zodResolver(reflectionFormSchema),
+    defaultValues: createInitialReflectionForm(editing.entry),
+  })
 
-  const updateForm = (patch: Partial<ReflectionFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!form.date.trim() || !form.title.trim() || !form.excerpt.trim()) {
-      toast.error(t("reflection.validation.required"))
-      return
-    }
-
+  const handleFormSubmit = form.handleSubmit(async (values) => {
     const id = editing.entry?.id ?? generateId("reflection")
-    const nextEntry = createReflectionEntry(form, id)
+    const nextEntry = createReflectionEntry(values, id)
     const entries = editing.entry
       ? reflectionModule.entries.map((entry) => (entry.id === id ? nextEntry : entry))
       : [nextEntry, ...reflectionModule.entries]
 
-    try {
-      await saveReflectionMutation.mutateAsync({
-        ...reflectionModule,
-        entries: sortReflections(entries),
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+    await saveReflectionMutation.mutateAsync({
+      ...reflectionModule,
+      entries: sortReflections(entries),
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = form.formState.isValid
 
   return (
     <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
@@ -582,39 +576,63 @@ function ReflectionEditDialog({
           <DialogDescription>{t("reflection.edit.description")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <div className="grid gap-4 sm:grid-cols-[180px_minmax(0,1fr)]">
               <Field label={t("reflection.fields.date")}>
-                <Input
-                  value={form.date}
-                  onChange={(event) => updateForm({ date: event.target.value })}
-                  placeholder={t("reflection.placeholders.date")}
+                <Controller
+                  control={form.control}
+                  name="date"
+                  render={({ field }) => (
+                    <Input
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t("reflection.placeholders.date")}
+                    />
+                  )}
                 />
               </Field>
               <Field label={t("reflection.fields.title")}>
-                <Input
-                  value={form.title}
-                  onChange={(event) => updateForm({ title: event.target.value })}
-                  placeholder={t("reflection.placeholders.title")}
+                <Controller
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <Input
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={t("reflection.placeholders.title")}
+                    />
+                  )}
                 />
               </Field>
             </div>
 
             <Field label={t("reflection.fields.excerpt")}>
-              <Textarea
-                value={form.excerpt}
-                onChange={(event) => updateForm({ excerpt: event.target.value })}
-                placeholder={t("reflection.placeholders.excerpt")}
-                className="min-h-36"
+              <Controller
+                control={form.control}
+                name="excerpt"
+                render={({ field }) => (
+                  <Textarea
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t("reflection.placeholders.excerpt")}
+                    className="min-h-36"
+                  />
+                )}
               />
             </Field>
 
             <Field label={t("reflection.fields.tags")}>
-              <Input
-                value={form.tagsText}
-                onChange={(event) => updateForm({ tagsText: event.target.value })}
-                placeholder={t("reflection.placeholders.tags")}
+              <Controller
+                control={form.control}
+                name="tagsText"
+                render={({ field }) => (
+                  <Input
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder={t("reflection.placeholders.tags")}
+                  />
+                )}
               />
             </Field>
           </div>
@@ -623,8 +641,10 @@ function ReflectionEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveReflectionMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveReflectionMutation.isPending || !canSubmit}>
+              {saveReflectionMutation.isPending
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

@@ -1,9 +1,12 @@
 import { Trash2 } from "lucide-react"
-import type { FormEvent, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { joinListText } from "@/lib/list-utils"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -77,6 +80,28 @@ function removeAt<T>(items: T[], index: number | null) {
   return items.filter((_, itemIndex) => itemIndex !== index)
 }
 
+const blueprintFormSchema = z.object({
+  identity: z.string().min(1),
+  lifestyle: z.string().min(1),
+  valuesText: z.string(),
+})
+
+type BlueprintFormValues = z.infer<typeof blueprintFormSchema>
+
+const milestoneFormSchema = z.object({
+  horizon: z.string().min(1),
+  summary: z.string().min(1),
+  stepsText: z.string().min(1),
+})
+
+type MilestoneFormValues = z.infer<typeof milestoneFormSchema>
+
+const experimentFormSchema = z.object({
+  experiment: z.string().min(1),
+})
+
+type ExperimentFormValues = z.infer<typeof experimentFormSchema>
+
 export function FutureBlueprintEditDialog({
   future,
   onClose,
@@ -86,31 +111,27 @@ export function FutureBlueprintEditDialog({
 }) {
   const { t } = useTranslation()
   const saveFutureMutation = useSaveFutureMutation()
-  const [identity, setIdentity] = useState(future.identity)
-  const [lifestyle, setLifestyle] = useState(future.lifestyle)
-  const [valuesText, setValuesText] = useState(() => joinListText(future.values, "\n"))
+  const form = useForm<BlueprintFormValues>({
+    resolver: zodResolver(blueprintFormSchema),
+    defaultValues: {
+      identity: future.identity,
+      lifestyle: future.lifestyle,
+      valuesText: joinListText(future.values, "\n"),
+    },
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    await saveFutureMutation.mutateAsync({
+      ...future,
+      identity: values.identity.trim(),
+      lifestyle: values.lifestyle.trim(),
+      values: textToDelimitedList(values.valuesText),
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
 
-    if (!identity.trim() || !lifestyle.trim()) {
-      toast.error(t("future.edit.validation.blueprintRequired"))
-      return
-    }
-
-    try {
-      await saveFutureMutation.mutateAsync({
-        ...future,
-        identity: identity.trim(),
-        lifestyle: lifestyle.trim(),
-        values: textToDelimitedList(valuesText),
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+  const canSubmit = form.formState.isValid
 
   return (
     <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
@@ -125,32 +146,50 @@ export function FutureBlueprintEditDialog({
           <DialogDescription>{t("future.edit.blueprintDescription")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
               <FutureField label={t("future.edit.identity")}>
-                <Textarea
-                  value={identity}
-                  onChange={(event) => setIdentity(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
-                  placeholder={t("future.edit.identityPlaceholder")}
+                <Controller
+                  control={form.control}
+                  name="identity"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
+                      placeholder={t("future.edit.identityPlaceholder")}
+                    />
+                  )}
                 />
               </FutureField>
 
               <FutureField label={t("future.edit.lifestyle")}>
-                <Textarea
-                  value={lifestyle}
-                  onChange={(event) => setLifestyle(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
-                  placeholder={t("future.edit.lifestylePlaceholder")}
+                <Controller
+                  control={form.control}
+                  name="lifestyle"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-28")}
+                      placeholder={t("future.edit.lifestylePlaceholder")}
+                    />
+                  )}
                 />
               </FutureField>
 
               <FutureField label={t("future.edit.values")} hint={t("future.edit.valuesHint")}>
-                <Textarea
-                  value={valuesText}
-                  onChange={(event) => setValuesText(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-24")}
+                <Controller
+                  control={form.control}
+                  name="valuesText"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-24")}
+                    />
+                  )}
                 />
               </FutureField>
             </section>
@@ -160,8 +199,8 @@ export function FutureBlueprintEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveFutureMutation.isPending || !canSubmit}>
+              {saveFutureMutation.isPending ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -181,40 +220,35 @@ export function FutureMilestoneEditDialog({
 }) {
   const { t } = useTranslation()
   const saveFutureMutation = useSaveFutureMutation()
-  const [horizon, setHorizon] = useState(editing.milestone?.horizon ?? "")
-  const [summary, setSummary] = useState(editing.milestone?.summary ?? "")
-  const [stepsText, setStepsText] = useState(() => joinListText(editing.milestone?.steps, "\n"))
+  const form = useForm<MilestoneFormValues>({
+    resolver: zodResolver(milestoneFormSchema),
+    defaultValues: {
+      horizon: editing.milestone?.horizon ?? "",
+      summary: editing.milestone?.summary ?? "",
+      stepsText: joinListText(editing.milestone?.steps, "\n"),
+    },
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    const steps = textToLines(values.stepsText)
+    await saveFutureMutation.mutateAsync({
+      ...future,
+      milestones: replaceAt(
+        future.milestones,
+        editing.index,
+        {
+          horizon: values.horizon.trim(),
+          summary: values.summary.trim(),
+          steps,
+        },
+        editing.isNew,
+      ),
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
 
-    const steps = textToLines(stepsText)
-
-    if (!horizon.trim() || !summary.trim() || steps.length === 0) {
-      toast.error(t("future.edit.validation.milestoneRequired"))
-      return
-    }
-
-    try {
-      await saveFutureMutation.mutateAsync({
-        ...future,
-        milestones: replaceAt(
-          future.milestones,
-          editing.index,
-          {
-            horizon: horizon.trim(),
-            summary: summary.trim(),
-            steps,
-          },
-          editing.isNew,
-        ),
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+  const canSubmit = form.formState.isValid
 
   const handleDelete = () => {
     if (editing.isNew) return
@@ -258,31 +292,49 @@ export function FutureMilestoneEditDialog({
           <DialogDescription>{t("future.edit.milestoneDescription")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
               <FutureField label={t("future.edit.horizon")}>
-                <Input
-                  value={horizon}
-                  onChange={(event) => setHorizon(event.target.value)}
-                  className={FUTURE_DIALOG_FIELD_CLASS}
-                  placeholder={t("future.edit.horizonPlaceholder")}
+                <Controller
+                  control={form.control}
+                  name="horizon"
+                  render={({ field }) => (
+                    <Input
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={FUTURE_DIALOG_FIELD_CLASS}
+                      placeholder={t("future.edit.horizonPlaceholder")}
+                    />
+                  )}
                 />
               </FutureField>
 
               <FutureField label={t("future.edit.summary")}>
-                <Textarea
-                  value={summary}
-                  onChange={(event) => setSummary(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-24")}
+                <Controller
+                  control={form.control}
+                  name="summary"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-24")}
+                    />
+                  )}
                 />
               </FutureField>
 
               <FutureField label={t("future.edit.steps")} hint={t("future.edit.stepsHint")}>
-                <Textarea
-                  value={stepsText}
-                  onChange={(event) => setStepsText(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-32")}
+                <Controller
+                  control={form.control}
+                  name="stepsText"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-32")}
+                    />
+                  )}
                 />
               </FutureField>
             </section>
@@ -298,8 +350,8 @@ export function FutureMilestoneEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveFutureMutation.isPending || !canSubmit}>
+              {saveFutureMutation.isPending ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -319,27 +371,26 @@ export function FutureExperimentEditDialog({
 }) {
   const { t } = useTranslation()
   const saveFutureMutation = useSaveFutureMutation()
-  const [experiment, setExperiment] = useState(editing.experiment)
+  const form = useForm<ExperimentFormValues>({
+    resolver: zodResolver(experimentFormSchema),
+    defaultValues: { experiment: editing.experiment },
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    await saveFutureMutation.mutateAsync({
+      ...future,
+      experiments: replaceAt(
+        future.experiments,
+        editing.index,
+        values.experiment.trim(),
+        editing.isNew,
+      ),
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
 
-    if (!experiment.trim()) {
-      toast.error(t("future.edit.validation.experimentRequired"))
-      return
-    }
-
-    try {
-      await saveFutureMutation.mutateAsync({
-        ...future,
-        experiments: replaceAt(future.experiments, editing.index, experiment.trim(), editing.isNew),
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+  const canSubmit = form.formState.isValid
 
   const handleDelete = () => {
     if (editing.isNew) return
@@ -381,14 +432,20 @@ export function FutureExperimentEditDialog({
           <DialogDescription>{t("future.edit.experimentDescription")}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
             <section className={FUTURE_DIALOG_SECTION_CLASS}>
               <FutureField label={t("future.edit.experiment")}>
-                <Textarea
-                  value={experiment}
-                  onChange={(event) => setExperiment(event.target.value)}
-                  className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-32")}
+                <Controller
+                  control={form.control}
+                  name="experiment"
+                  render={({ field }) => (
+                    <Textarea
+                      value={field.value}
+                      onChange={field.onChange}
+                      className={cn(FUTURE_DIALOG_FIELD_CLASS, "min-h-32")}
+                    />
+                  )}
                 />
               </FutureField>
             </section>
@@ -404,8 +461,8 @@ export function FutureExperimentEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveFutureMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveFutureMutation.isPending || !canSubmit}>
+              {saveFutureMutation.isPending ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

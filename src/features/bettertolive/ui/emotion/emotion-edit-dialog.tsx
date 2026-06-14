@@ -4,6 +4,11 @@ import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
+/* eslint-disable react-hooks/incompatible-library */
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
+
 import { Button } from "@/components/ui/button"
 import { generateId } from "@/lib/id-utils"
 import { joinListText, splitListText } from "@/lib/list-utils"
@@ -285,31 +290,6 @@ function createInitialForm(target: EmotionEntityEditorTarget): FormState {
   }
 }
 
-function getRequiredField(target: EmotionEntityEditorTarget, form: FormState) {
-  switch (target.kind) {
-    case "checkIn":
-      return form.date.trim() && form.summary.trim() && form.bodySignal.trim()
-    case "trendPoint":
-      return form.label.trim() && form.note.trim()
-    case "trigger":
-      return form.title.trim() && form.summary.trim()
-    case "tool":
-      return form.title.trim() && form.description.trim() && form.when.trim()
-    case "timelineSegment":
-      return form.range.trim() && form.summary.trim()
-    case "loopPattern":
-      return form.title.trim() && form.description.trim()
-    case "lifestyleLink":
-      return form.observation.trim()
-    case "environmentCue":
-      return form.context.trim() && form.description.trim()
-    case "relationshipCue":
-      return form.who.trim() && form.pattern.trim()
-    case "recoveryNote":
-      return form.date.trim() && form.what.trim() && form.effect.trim()
-  }
-}
-
 function buildNextEmotion(
   emotion: EmotionModuleData,
   target: EmotionEntityEditorTarget,
@@ -474,6 +454,53 @@ function removeEntity(emotion: EmotionModuleData, target: EmotionEntityEditorTar
   return nextEmotion
 }
 
+function getRequiredKeys(target: EmotionEntityEditorTarget): string[] {
+  switch (target.kind) {
+    case "checkIn":
+      return ["date", "summary", "bodySignal"]
+    case "trendPoint":
+      return ["label", "note"]
+    case "trigger":
+      return ["title", "summary"]
+    case "tool":
+      return ["title", "description", "when"]
+    case "timelineSegment":
+      return ["range", "summary"]
+    case "loopPattern":
+      return ["title", "description"]
+    case "lifestyleLink":
+      return ["observation"]
+    case "environmentCue":
+      return ["context", "description"]
+    case "relationshipCue":
+      return ["who", "pattern"]
+    case "recoveryNote":
+      return ["date", "what", "effect"]
+  }
+}
+
+function buildEmotionEntitySchema(target: EmotionEntityEditorTarget) {
+  const requiredKeys = getRequiredKeys(target)
+  return z.record(z.string(), z.string()).superRefine((data, ctx) => {
+    for (const key of requiredKeys) {
+      if (!(data[key] ?? "").trim()) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, path: [key], message: "Required" })
+      }
+    }
+  })
+}
+
+const emotionOverviewFormSchema = z.object({
+  windowLabel: z.string().min(1),
+  averageScore: z.string(),
+  bestWindow: z.string(),
+  worstWindow: z.string(),
+  conclusion: z.string().min(1),
+  topEmotionTags: z.string(),
+})
+
+type EmotionOverviewFormValues = z.infer<typeof emotionOverviewFormSchema>
+
 export function EmotionEntityEditDialog({
   editing,
   emotion,
@@ -485,26 +512,24 @@ export function EmotionEntityEditDialog({
 }) {
   const { t } = useTranslation()
   const saveEmotionMutation = useSaveEmotionMutation()
-  const [form, setForm] = useState<FormState>(() => createInitialForm(editing))
+  const defaultValues = createInitialForm(editing)
+  const form = useForm<Record<string, string>>({
+    resolver: zodResolver(buildEmotionEntitySchema(editing)),
+    defaultValues,
+  })
 
-  const updateForm = (patch: FormState) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
+  const handleFormSubmit = form.handleSubmit(async (values) => {
+    await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, values))
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!getRequiredField(editing, form)) {
-      toast.error(t("emotion.editor.validation.required"))
-      return
-    }
-
-    try {
-      await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, form))
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch (error) {
-      toast.error(String(error))
+  const canSubmit = form.formState.isValid
+  // EntityFields expects a direct record + onChange patch interface
+  const formRecord = form.watch()
+  const updateForm = (patch: Record<string, string>) => {
+    for (const [key, value] of Object.entries(patch)) {
+      form.setValue(key, value, { shouldValidate: true })
     }
   }
 
@@ -526,14 +551,14 @@ export function EmotionEntityEditDialog({
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex max-h-[min(820px,calc(100dvh-2rem))] max-w-3xl grid-rows-none flex-col gap-0 overflow-hidden border border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)] p-0">
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader className="shrink-0 border-b border-[color:var(--surface-border)] px-5 py-4 pr-12">
             <DialogTitle>{t(getTargetTitle(editing), getTargetFallbackTitle(editing))}</DialogTitle>
             <DialogDescription>{t("emotion.editor.description")}</DialogDescription>
           </DialogHeader>
 
           <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
-            <EntityFields target={editing} form={form} onChange={updateForm} />
+            <EntityFields target={editing} form={formRecord} onChange={updateForm} />
           </div>
 
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
@@ -546,8 +571,10 @@ export function EmotionEntityEditDialog({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveEmotionMutation.isPending || !canSubmit}>
+              {saveEmotionMutation.isPending
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>
@@ -897,36 +924,28 @@ export function EmotionOverviewEditDialog({
 }) {
   const { t } = useTranslation()
   const saveEmotionMutation = useSaveEmotionMutation()
-  const [form, setForm] = useState({
-    windowLabel: emotion.overview.windowLabel,
-    averageScore: String(emotion.overview.averageScore),
-    bestWindow: emotion.overview.bestWindow,
-    worstWindow: emotion.overview.worstWindow,
-    conclusion: emotion.overview.conclusion,
-    topEmotionTags: emotion.overview.topEmotionTags
-      .map((entry) => `${entry.tag},${entry.count}`)
-      .join("\n"),
+  const form = useForm<EmotionOverviewFormValues>({
+    resolver: zodResolver(emotionOverviewFormSchema),
+    defaultValues: {
+      windowLabel: emotion.overview.windowLabel,
+      averageScore: String(emotion.overview.averageScore),
+      bestWindow: emotion.overview.bestWindow,
+      worstWindow: emotion.overview.worstWindow,
+      conclusion: emotion.overview.conclusion,
+      topEmotionTags: emotion.overview.topEmotionTags
+        .map((entry) => `${entry.tag},${entry.count}`)
+        .join("\n"),
+    },
   })
 
-  const updateForm = (patch: Partial<typeof form>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!form.windowLabel.trim() || !form.conclusion.trim()) {
-      toast.error(t("emotion.editor.validation.required"))
-      return
-    }
-
+  const handleFormSubmit = form.handleSubmit(async (values) => {
     const overview: EmotionOverviewSummary = {
-      windowLabel: form.windowLabel.trim(),
-      averageScore: Math.max(0, Math.min(10, Number(form.averageScore) || 0)),
-      bestWindow: form.bestWindow.trim(),
-      worstWindow: form.worstWindow.trim(),
-      conclusion: form.conclusion.trim(),
-      topEmotionTags: form.topEmotionTags
+      windowLabel: values.windowLabel.trim(),
+      averageScore: Math.max(0, Math.min(10, Number(values.averageScore) || 0)),
+      bestWindow: values.bestWindow.trim(),
+      worstWindow: values.worstWindow.trim(),
+      conclusion: values.conclusion.trim(),
+      topEmotionTags: values.topEmotionTags
         .split("\n")
         .map((row) => {
           const [tag, count] = row.split(/[,，]/).map((entry) => entry.trim())
@@ -938,72 +957,108 @@ export function EmotionOverviewEditDialog({
         .filter((entry) => entry.tag),
     }
 
-    try {
-      await saveEmotionMutation.mutateAsync({
-        ...cloneEmotion(emotion),
-        overview,
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch (error) {
-      toast.error(String(error))
-    }
-  }
+    await saveEmotionMutation.mutateAsync({
+      ...cloneEmotion(emotion),
+      overview,
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = form.formState.isValid
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex max-h-[min(760px,calc(100dvh-2rem))] max-w-2xl grid-rows-none flex-col gap-0 overflow-hidden border border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)] p-0">
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
+        <form onSubmit={handleFormSubmit} className="flex min-h-0 flex-1 flex-col">
           <DialogHeader className="shrink-0 border-b border-[color:var(--surface-border)] px-5 py-4 pr-12">
             <DialogTitle>{t("emotion.editor.overview.title")}</DialogTitle>
             <DialogDescription>{t("emotion.editor.overview.description")}</DialogDescription>
           </DialogHeader>
           <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-5 py-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              <TextField
-                label={t("emotion.editor.fields.windowLabel")}
-                value={form.windowLabel}
-                onChange={(windowLabel) => updateForm({ windowLabel })}
+              <Controller
+                control={form.control}
+                name="windowLabel"
+                render={({ field }) => (
+                  <TextField
+                    label={t("emotion.editor.fields.windowLabel")}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
-              <TextField
-                label={t("emotion.editor.fields.averageScore")}
-                value={form.averageScore}
-                onChange={(averageScore) => updateForm({ averageScore })}
-                type="number"
-                min={0}
-                max={10}
+              <Controller
+                control={form.control}
+                name="averageScore"
+                render={({ field }) => (
+                  <TextField
+                    label={t("emotion.editor.fields.averageScore")}
+                    value={field.value}
+                    onChange={field.onChange}
+                    type="number"
+                    min={0}
+                    max={10}
+                  />
+                )}
               />
-              <TextField
-                label={t("emotion.editor.fields.bestWindow")}
-                value={form.bestWindow}
-                onChange={(bestWindow) => updateForm({ bestWindow })}
+              <Controller
+                control={form.control}
+                name="bestWindow"
+                render={({ field }) => (
+                  <TextField
+                    label={t("emotion.editor.fields.bestWindow")}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
-              <TextField
-                label={t("emotion.editor.fields.worstWindow")}
-                value={form.worstWindow}
-                onChange={(worstWindow) => updateForm({ worstWindow })}
+              <Controller
+                control={form.control}
+                name="worstWindow"
+                render={({ field }) => (
+                  <TextField
+                    label={t("emotion.editor.fields.worstWindow")}
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
+                )}
               />
             </div>
-            <TextField
-              label={t("emotion.editor.fields.topEmotionTags")}
-              value={form.topEmotionTags}
-              onChange={(topEmotionTags) => updateForm({ topEmotionTags })}
-              multiline
-              placeholder={t("emotion.editor.overview.tagsPlaceholder")}
+            <Controller
+              control={form.control}
+              name="topEmotionTags"
+              render={({ field }) => (
+                <TextField
+                  label={t("emotion.editor.fields.topEmotionTags")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  multiline
+                  placeholder={t("emotion.editor.overview.tagsPlaceholder")}
+                />
+              )}
             />
-            <TextField
-              label={t("emotion.editor.fields.conclusion")}
-              value={form.conclusion}
-              onChange={(conclusion) => updateForm({ conclusion })}
-              multiline
+            <Controller
+              control={form.control}
+              name="conclusion"
+              render={({ field }) => (
+                <TextField
+                  label={t("emotion.editor.fields.conclusion")}
+                  value={field.value}
+                  onChange={field.onChange}
+                  multiline
+                />
+              )}
             />
           </div>
           <DialogFooter className="shrink-0 border-[color:var(--surface-border)] bg-[color:var(--dialog-bg)]">
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={saveEmotionMutation.isPending}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={saveEmotionMutation.isPending || !canSubmit}>
+              {saveEmotionMutation.isPending
+                ? t("common.actions.saving")
+                : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </form>

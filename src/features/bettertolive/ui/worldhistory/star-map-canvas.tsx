@@ -91,10 +91,9 @@ export function StarMapCanvas({
       <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl bg-[color:var(--muted-surface-bg)]">
         {/* SVG 连线：viewBox 0-100 + preserveAspectRatio none，与节点百分比定位严格对齐 */}
         <svg
-          className="pointer-events-none absolute inset-0 size-full"
+          className={`pointer-events-none absolute inset-0 size-full ${UI_LAYERS.starMapLink}`}
           viewBox="0 0 100 100"
           preserveAspectRatio="none"
-          style={{ zIndex: 1 }}
         >
           {links.map((link) => {
             const source = nodes.find((n) => n.id === link.sourceId)

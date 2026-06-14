@@ -1,5 +1,7 @@
 export const UI_LAYERS = {
   header: "z-[20]",
+  /** SVG link overlay behind star-map nodes */
+  starMapLink: "z-[1]",
   /** Internal canvas elements (e.g., star-map layers) */
   canvas: "z-[4]",
   /** Gantt chart timeline markers */

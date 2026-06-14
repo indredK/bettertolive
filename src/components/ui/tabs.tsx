@@ -2,7 +2,8 @@ import { useRef } from "react"
 import { Tabs as TabsPrimitive } from "@base-ui/react/tabs"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { LiquidGlassBackdrop, useLiquidGlassPointer } from "@/components/ui/liquid-glass"
+import { LiquidGlassBackdrop } from "@/components/ui/liquid-glass"
+import { useLiquidGlassPointer } from "@/components/ui/liquid-glass-hook"
 import { cn } from "@/lib/utils"
 
 function Tabs({ className, orientation = "horizontal", ...props }: TabsPrimitive.Root.Props) {

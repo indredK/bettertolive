@@ -1,9 +1,13 @@
 import { Trash2 } from "lucide-react"
 import type { TFunction } from "i18next"
 import type { FormEvent, ReactNode } from "react"
-import { useState } from "react"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+
+/* eslint-disable react-hooks/incompatible-library */
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 
 import { Button } from "@/components/ui/button"
 import { generateId } from "@/lib/id-utils"
@@ -429,6 +433,54 @@ export function JourneyEditDialog({
   }
 }
 
+const memoryFormSchema = z.object({
+  title: z.string().min(1),
+  type: z.string(),
+  primaryEra: z.string().min(1),
+  eraText: z.string(),
+  emotionalWeight: z.string(),
+  processing: z.string(),
+  privacy: z.string(),
+  formativePower: z.string(),
+  summary: z.string().min(1),
+  impact: z.string().min(1),
+  sensoryCue: z.string(),
+  sourceModulesText: z.string(),
+  tagsText: z.string(),
+})
+
+type MemoryFormValues = z.infer<typeof memoryFormSchema>
+
+const growthFormSchema = z.object({
+  title: z.string().min(1),
+  domain: z.string(),
+  stability: z.string(),
+  before: z.string().min(1),
+  after: z.string().min(1),
+  keyEvent: z.string().min(1),
+  beforeMemoryIdsText: z.string(),
+  afterMemoryIdsText: z.string(),
+  triggerMemoryId: z.string(),
+  evidenceText: z.string(),
+})
+
+type GrowthFormValues = z.infer<typeof growthFormSchema>
+
+const anchorFormSchema = z.object({
+  type: z.string(),
+  label: z.string().min(1),
+  note: z.string().min(1),
+  linkedMemoryIdsText: z.string(),
+})
+
+type AnchorFormValues = z.infer<typeof anchorFormSchema>
+
+const textEditFormSchema = z.object({
+  value: z.string().min(1),
+})
+
+type TextEditFormValues = z.infer<typeof textEditFormSchema>
+
 function JourneyMemoryEditDialog({
   editing,
   growth,
@@ -442,39 +494,30 @@ function JourneyMemoryEditDialog({
 }) {
   const { t } = useTranslation()
   const saveJourneyMutation = useSaveJourneyMutation()
-  const [form, setForm] = useState<MemoryFormState>(() => createInitialMemoryForm(editing.memory))
+  const rhf = useForm<MemoryFormValues>({
+    resolver: zodResolver(memoryFormSchema),
+    defaultValues: createInitialMemoryForm(editing.memory) as MemoryFormValues,
+  })
 
+  const handleFormSubmit = rhf.handleSubmit(async (values) => {
+    const nextMemory = createMemoryFromForm(editing.memory, values as MemoryFormState)
+
+    await saveJourneyMutation.mutateAsync({
+      growth,
+      memory: {
+        ...memory,
+        memories: replaceById(memory.memories, nextMemory, editing.isNew),
+      },
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = rhf.formState.isValid
+  const form = rhf.watch() as MemoryFormState
   const updateForm = (patch: Partial<MemoryFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (
-      !form.title.trim() ||
-      !form.primaryEra.trim() ||
-      !form.summary.trim() ||
-      !form.impact.trim()
-    ) {
-      toast.error(t("journey.edit.validation.memoryRequired"))
-      return
-    }
-
-    const nextMemory = createMemoryFromForm(editing.memory, form)
-
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth,
-        memory: {
-          ...memory,
-          memories: replaceById(memory.memories, nextMemory, editing.isNew),
-        },
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
+    for (const [key, value] of Object.entries(patch)) {
+      rhf.setValue(key as keyof MemoryFormValues, value, { shouldValidate: true })
     }
   }
 
@@ -503,10 +546,11 @@ function JourneyMemoryEditDialog({
       }
       description={t("journey.edit.memoryDescription")}
       isPending={saveJourneyMutation.isPending}
+      canSubmit={canSubmit}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
         <JourneyField label={t("journey.fields.title")}>
@@ -636,42 +680,43 @@ function JourneyGrowthNodeEditDialog({
   const { t } = useTranslation()
   const saveJourneyMutation = useSaveJourneyMutation()
   const validMemoryIds = new Set(memory.memories.map((entry) => entry.id))
-  const [form, setForm] = useState<GrowthFormState>(() =>
-    createInitialGrowthForm(editing.node, memory),
-  )
-
-  const updateForm = (patch: Partial<GrowthFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (
-      !form.title.trim() ||
-      !form.before.trim() ||
-      !form.after.trim() ||
-      !form.keyEvent.trim() ||
-      !validMemoryIds.has(form.triggerMemoryId)
-    ) {
-      toast.error(t("journey.edit.validation.growthRequired"))
-      return
-    }
-
-    const nextNode = createGrowthNodeFromForm(editing.node, form, validMemoryIds)
-
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth: {
-          ...growth,
-          growthNodes: replaceById(growth.growthNodes, nextNode, editing.isNew),
-        },
-        memory,
+  const growthSchemaWithIds = growthFormSchema.superRefine((data, ctx) => {
+    if (!validMemoryIds.has(data.triggerMemoryId)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["triggerMemoryId"],
+        message: "Invalid memory ID",
       })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
+    }
+  })
+  const rhf = useForm<GrowthFormValues>({
+    resolver: zodResolver(growthSchemaWithIds),
+    defaultValues: createInitialGrowthForm(editing.node, memory) as GrowthFormValues,
+  })
+
+  const handleFormSubmit = rhf.handleSubmit(async (values) => {
+    const nextNode = createGrowthNodeFromForm(
+      editing.node,
+      values as GrowthFormState,
+      validMemoryIds,
+    )
+
+    await saveJourneyMutation.mutateAsync({
+      growth: {
+        ...growth,
+        growthNodes: replaceById(growth.growthNodes, nextNode, editing.isNew),
+      },
+      memory,
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = rhf.formState.isValid
+  const form = rhf.watch() as GrowthFormState
+  const updateForm = (patch: Partial<GrowthFormState>) => {
+    for (const [key, value] of Object.entries(patch)) {
+      rhf.setValue(key as keyof GrowthFormValues, value, { shouldValidate: true })
     }
   }
 
@@ -704,10 +749,11 @@ function JourneyGrowthNodeEditDialog({
       }
       description={t("journey.edit.growthDescription")}
       isPending={saveJourneyMutation.isPending}
+      canSubmit={canSubmit}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
         <JourneyField label={t("journey.fields.title")}>
@@ -821,34 +867,34 @@ function JourneyAnchorEditDialog({
   const { t } = useTranslation()
   const saveJourneyMutation = useSaveJourneyMutation()
   const validMemoryIds = new Set(memory.memories.map((entry) => entry.id))
-  const [form, setForm] = useState<AnchorFormState>(() => createInitialAnchorForm(editing.anchor))
+  const rhf = useForm<AnchorFormValues>({
+    resolver: zodResolver(anchorFormSchema),
+    defaultValues: createInitialAnchorForm(editing.anchor) as AnchorFormValues,
+  })
 
+  const handleFormSubmit = rhf.handleSubmit(async (values) => {
+    const nextAnchor = createAnchorFromForm(
+      editing.anchor,
+      values as AnchorFormState,
+      validMemoryIds,
+    )
+
+    await saveJourneyMutation.mutateAsync({
+      growth,
+      memory: {
+        ...memory,
+        anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
+      },
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
+
+  const canSubmit = rhf.formState.isValid
+  const form = rhf.watch() as AnchorFormState
   const updateForm = (patch: Partial<AnchorFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!form.label.trim() || !form.note.trim()) {
-      toast.error(t("journey.edit.validation.anchorRequired"))
-      return
-    }
-
-    const nextAnchor = createAnchorFromForm(editing.anchor, form, validMemoryIds)
-
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth,
-        memory: {
-          ...memory,
-          anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
-        },
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
+    for (const [key, value] of Object.entries(patch)) {
+      rhf.setValue(key as keyof AnchorFormValues, value, { shouldValidate: true })
     }
   }
 
@@ -881,10 +927,11 @@ function JourneyAnchorEditDialog({
       }
       description={t("journey.edit.anchorDescription")}
       isPending={saveJourneyMutation.isPending}
+      canSubmit={canSubmit}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
         <JourneySelectField
@@ -937,43 +984,37 @@ function JourneyTextEditDialog({
 }) {
   const { t } = useTranslation()
   const saveJourneyMutation = useSaveJourneyMutation()
-  const [value, setValue] = useState(editing.value)
+  const rhf = useForm<TextEditFormValues>({
+    resolver: zodResolver(textEditFormSchema),
+    defaultValues: { value: editing.value },
+  })
   const isThread = editing.kind === "thread"
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
+  const handleFormSubmit = rhf.handleSubmit(async (values) => {
+    await saveJourneyMutation.mutateAsync({
+      growth: isThread
+        ? {
+            ...growth,
+            threads: replaceAt(growth.threads, editing.index, values.value.trim(), editing.isNew),
+          }
+        : growth,
+      memory: isThread
+        ? memory
+        : {
+            ...memory,
+            reviewPrompts: replaceAt(
+              memory.reviewPrompts,
+              editing.index,
+              values.value.trim(),
+              editing.isNew,
+            ),
+          },
+    })
+    toast.success(t("common.toast.saved"))
+    onClose()
+  })
 
-    if (!value.trim()) {
-      toast.error(t("journey.edit.validation.textRequired"))
-      return
-    }
-
-    try {
-      await saveJourneyMutation.mutateAsync({
-        growth: isThread
-          ? {
-              ...growth,
-              threads: replaceAt(growth.threads, editing.index, value.trim(), editing.isNew),
-            }
-          : growth,
-        memory: isThread
-          ? memory
-          : {
-              ...memory,
-              reviewPrompts: replaceAt(
-                memory.reviewPrompts,
-                editing.index,
-                value.trim(),
-                editing.isNew,
-              ),
-            },
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
+  const canSubmit = rhf.formState.isValid
 
   const handleDelete = () => {
     if (editing.isNew) return
@@ -1020,17 +1061,24 @@ function JourneyTextEditDialog({
         isThread ? t("journey.edit.threadDescription") : t("journey.edit.promptDescription")
       }
       isPending={saveJourneyMutation.isPending}
+      canSubmit={canSubmit}
       deleteLabel={editing.isNew ? undefined : t("common.actions.delete")}
       onDelete={editing.isNew ? undefined : handleDelete}
       onClose={onClose}
-      onSubmit={handleSubmit}
+      onSubmit={handleFormSubmit}
     >
       <section className={JOURNEY_DIALOG_SECTION_CLASS}>
         <JourneyField label={isThread ? t("journey.fields.thread") : t("journey.fields.prompt")}>
-          <Textarea
-            value={value}
-            onChange={(event) => setValue(event.target.value)}
-            className={cn(JOURNEY_DIALOG_FIELD_CLASS, "min-h-32")}
+          <Controller
+            control={rhf.control}
+            name="value"
+            render={({ field }) => (
+              <Textarea
+                value={field.value}
+                onChange={field.onChange}
+                className={cn(JOURNEY_DIALOG_FIELD_CLASS, "min-h-32")}
+              />
+            )}
           />
         </JourneyField>
       </section>
@@ -1043,6 +1091,7 @@ function JourneyDialogFrame({
   description,
   children,
   isPending,
+  canSubmit = true,
   deleteLabel,
   onDelete,
   onClose,
@@ -1052,6 +1101,7 @@ function JourneyDialogFrame({
   description: string
   children: ReactNode
   isPending: boolean
+  canSubmit?: boolean
   deleteLabel?: string
   onDelete?: () => void
   onClose: () => void
@@ -1091,7 +1141,7 @@ function JourneyDialogFrame({
             <Button type="button" variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button type="submit" disabled={isPending || !canSubmit}>
               {isPending ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
