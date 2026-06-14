@@ -106,7 +106,7 @@ export function NutritionLogsTab({
                   dimensions={[
                     {
                       key: "filter",
-                      label: t("nutrition.logs.filterTitle"),
+                      label: t("common.filter.label"),
                       allLabel: t("nutrition.logs.filters.all"),
                       value: filter,
                       options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
@@ -123,7 +123,7 @@ export function NutritionLogsTab({
                 dimensions={[
                   {
                     key: "filter",
-                    label: t("nutrition.logs.filterTitle"),
+                    label: t("common.filter.label"),
                     allLabel: t("nutrition.logs.filters.all"),
                     value: filter,
                     options: (LOG_FILTERS.slice(1) as ReadonlyArray<string>).map((f) => ({
@@ -268,7 +268,7 @@ function LogCard({
             type="button"
             variant="ghost"
             size="icon-sm"
-            label={t("nutrition.logs.edit")}
+            label={t("common.actions.edit")}
             icon={<Pencil className="size-3.5" />}
             onClick={onEdit}
           />

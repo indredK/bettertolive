@@ -1008,7 +1008,7 @@ function PrincipleCard({
           type="button"
           size="icon-sm"
           variant="ghost"
-          label={t("principles.actions.edit")}
+          label={t("common.actions.edit")}
           icon={<Pencil className="size-3.5" />}
           onClick={onEdit}
         />

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { m, AnimatePresence } from "motion/react"
 import { useTranslation } from "react-i18next"
 
+import { UI_LAYERS } from "@/lib/ui-layers"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import type {
@@ -126,7 +127,7 @@ export function StarMapCanvas({
             <m.button
               key={node.id}
               type="button"
-              className="absolute z-[3] flex -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center select-none"
+              className={`absolute ${UI_LAYERS.canvas} flex -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center select-none`}
               style={{ left: `${node.x}%`, top: `${node.y}%` }}
               animate={{ scale: isHighlighted ? 1.08 : 1 }}
               transition={{ duration: 0.2 }}
@@ -165,7 +166,7 @@ export function StarMapCanvas({
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 8 }}
-              className="absolute inset-x-3 bottom-3 z-[4] max-h-[70%] overflow-auto rounded-lg border border-[color:var(--surface-border)] p-4 shadow-xl"
+              className={`absolute inset-x-3 bottom-3 ${UI_LAYERS.canvas} max-h-[70%] overflow-auto rounded-lg border border-[color:var(--surface-border)] p-4 shadow-xl`}
               style={{ backgroundColor: "var(--hero-bg)", color: "var(--hero-ink)" }}
             >
               <div className="flex items-start justify-between gap-2">

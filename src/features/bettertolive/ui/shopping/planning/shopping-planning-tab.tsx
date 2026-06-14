@@ -93,7 +93,7 @@ function PlanItemCard({
           size="icon-sm"
           variant="ghost"
           className="h-6 w-6 shrink-0"
-          label={t("shopping.planning.edit")}
+          label={t("common.actions.edit")}
           icon={<Pencil className="size-3" />}
           onClick={onEdit}
         />
@@ -183,7 +183,7 @@ function PlanItemDetail({
           show={isControlMode && Boolean(onDelete)}
           variant="outline"
           size="sm"
-          label={t("shopping.planning.delete")}
+          label={t("common.actions.delete")}
           icon={<Trash2 className="h-4 w-4" />}
           onClick={onDelete}
         />

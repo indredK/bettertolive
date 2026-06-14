@@ -3,6 +3,7 @@ import { m, AnimatePresence } from "motion/react"
 import { Plus, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
+import { UI_LAYERS } from "@/lib/ui-layers"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -229,7 +230,7 @@ export function GanttTimeline({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="pointer-events-none absolute z-[50] w-56 rounded-lg border border-[color:var(--surface-border)] p-3 shadow-xl"
+              className={`pointer-events-none absolute ${UI_LAYERS.ganttMarker} w-56 rounded-lg border border-[color:var(--surface-border)] p-3 shadow-xl`}
               style={{
                 left: tooltipPos.x,
                 top: tooltipPos.y,

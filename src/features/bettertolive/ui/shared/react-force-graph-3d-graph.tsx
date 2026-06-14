@@ -28,6 +28,7 @@ import { createPortal } from "react-dom"
 import { Button } from "@/components/ui/button"
 import type { CytoscapeThemeTokens } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
 import { cn } from "@/lib/utils"
+import { UI_LAYERS } from "@/lib/ui-layers"
 
 type GraphPrimitive = string | number | boolean | null | undefined
 
@@ -531,7 +532,7 @@ export function ReactForceGraph3DGraph({
         "relative min-h-[420px] overflow-hidden rounded-[1.25rem]",
         className,
         isFullscreenPresentation &&
-          "fixed inset-0 z-[2147483647] [height:100dvh] h-screen [max-height:100dvh] min-h-screen [width:100vw] rounded-none bg-[color:var(--background)] p-4",
+          `fixed inset-0 ${UI_LAYERS.graphFullscreen} [height:100dvh] h-screen [max-height:100dvh] min-h-screen [width:100vw] rounded-none bg-[color:var(--background)] p-4`,
       )}
     >
       {legend ? (

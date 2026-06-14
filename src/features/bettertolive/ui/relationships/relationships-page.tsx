@@ -98,62 +98,36 @@ const RELATIONSHIP_GRAPH_LAYOUT = {
   padding: 56,
 } as const
 
-const RELATIONSHIP_GRAPH_MARK_PALETTE = [
-  {
-    bg: "rgba(219, 234, 254, 0.82)",
-    border: "#60a5fa",
-    ink: "#1e3a8a",
-  },
-  {
-    bg: "rgba(220, 252, 231, 0.82)",
-    border: "#22c55e",
-    ink: "#14532d",
-  },
-  {
-    bg: "rgba(255, 228, 230, 0.82)",
-    border: "#fb7185",
-    ink: "#881337",
-  },
-  {
-    bg: "rgba(254, 249, 195, 0.86)",
-    border: "#f59e0b",
-    ink: "#78350f",
-  },
-  {
-    bg: "rgba(237, 233, 254, 0.84)",
-    border: "#8b5cf6",
-    ink: "#4c1d95",
-  },
-  {
-    bg: "rgba(204, 251, 241, 0.82)",
-    border: "#14b8a6",
-    ink: "#134e4a",
-  },
-] as const
+import { readGraphPalette, readGraphImpactMarks, readGraphWeightMarks } from "@/lib/graph-tokens"
 
-const RELATIONSHIP_GRAPH_IMPACT_MARKS = [
-  { bg: "rgba(34, 197, 94, 0.82)", border: "#22c55e", key: "impact-滋养", value: "滋养" },
-  { bg: "rgba(245, 158, 11, 0.84)", border: "#f59e0b", key: "impact-消耗", value: "消耗" },
-  { bg: "rgba(251, 113, 133, 0.84)", border: "#fb7185", key: "impact-混合", value: "混合" },
-  { bg: "rgba(226, 232, 240, 0.9)", border: "#94a3b8", key: "impact-中性", value: "中性" },
-] as const satisfies ReadonlyArray<{
-  bg: string
-  border: string
-  key: string
-  value: RelationshipImpact
-}>
+function getGraphMarkPalette() {
+  return readGraphPalette()
+}
 
-const RELATIONSHIP_GRAPH_WEIGHT_MARKS = [
-  { bg: "rgba(127, 29, 29, 0.92)", border: "#ef4444", key: "weight-heavy", value: "很重" },
-  { bg: "rgba(251, 146, 60, 0.88)", border: "#f97316", key: "weight-medium", value: "中等" },
-  { bg: "rgba(254, 240, 138, 0.9)", border: "#eab308", key: "weight-light", value: "轻微" },
-  { bg: "rgba(226, 232, 240, 0.92)", border: "#94a3b8", key: "weight-none", value: "无" },
-] as const satisfies ReadonlyArray<{
-  bg: string
-  border: string
-  key: string
-  value: UnfinishedWeight
-}>
+const IMPACT_VALUES: RelationshipImpact[] = ["滋养", "消耗", "混合", "中性"]
+const WEIGHT_VALUES: UnfinishedWeight[] = ["很重", "中等", "轻微", "无"]
+
+/** Read graph impact color marks from CSS variables, paired with enum values. */
+function getGraphImpactMarks() {
+  const tokens = readGraphImpactMarks()
+  return tokens.map((token, i) => ({
+    bg: token.bg,
+    border: token.border,
+    key: `impact-${IMPACT_VALUES[i]}`,
+    value: IMPACT_VALUES[i],
+  }))
+}
+
+/** Read graph weight color marks from CSS variables, paired with enum values. */
+function getGraphWeightMarks() {
+  const tokens = readGraphWeightMarks()
+  return tokens.map((token, i) => ({
+    bg: token.bg,
+    border: token.border,
+    key: `weight-${["heavy", "medium", "light", "none"][i]}`,
+    value: WEIGHT_VALUES[i],
+  }))
+}
 
 function createRelationshipsGraphStylesheet(
   theme: CytoscapeThemeTokens,
@@ -268,7 +242,7 @@ function createRelationshipNodeMarkStyles(
   }
 
   if (markMode === "weight") {
-    return RELATIONSHIP_GRAPH_WEIGHT_MARKS.map((mark) => ({
+    return getGraphWeightMarks().map((mark) => ({
       selector: `node[kind = 'relationship'][graphMarkKey = '${mark.key}']`,
       style: {
         "background-color": mark.bg,
@@ -280,10 +254,10 @@ function createRelationshipNodeMarkStyles(
   const keys =
     markMode === "stage"
       ? RELATIONSHIP_STAGES.map((stage) => `stage-${stage}`)
-      : RELATIONSHIP_GRAPH_MARK_PALETTE.map((_, index) => `circle-${index}`)
+      : getGraphMarkPalette().map((_, index) => `circle-${index}`)
 
   return keys.map((key, index) => {
-    const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+    const color = getGraphMarkPalette()[index % getGraphMarkPalette().length]
 
     return {
       selector: `node[kind = 'relationship'][graphMarkKey = '${key}']`,
@@ -929,10 +903,7 @@ function RelationshipsGraphTab({
                 </div>
                 <p className="text-xs leading-5 text-[color:var(--text-muted)]">
                   {currentGraphMarkOption?.description ??
-                    t(
-                      "relationships.graph.markModes.defaultDescription",
-                      "切换维度后，节点颜色会跟着变化。",
-                    )}
+                    t("relationships.graph.markModes.defaultDescription")}
                 </p>
               </div>
 
@@ -2228,7 +2199,7 @@ function createRelationshipGraphMark({
 }) {
   if (markMode === "impact") {
     const value = relationship.impact
-    const mark = RELATIONSHIP_GRAPH_IMPACT_MARKS.find((item) => item.value === value)
+    const mark = getGraphImpactMarks().find((item) => item.value === value)
     return {
       key: mark?.key ?? "impact-中性",
       label: value,
@@ -2237,7 +2208,7 @@ function createRelationshipGraphMark({
 
   if (markMode === "weight") {
     const value = relationship.unfinishedWeight ?? "无"
-    const mark = RELATIONSHIP_GRAPH_WEIGHT_MARKS.find((item) => item.value === value)
+    const mark = getGraphWeightMarks().find((item) => item.value === value)
     return {
       key: mark?.key ?? "weight-none",
       label: value,
@@ -2252,7 +2223,7 @@ function createRelationshipGraphMark({
   }
 
   return {
-    key: `circle-${circleIndex % RELATIONSHIP_GRAPH_MARK_PALETTE.length}`,
+    key: `circle-${circleIndex % getGraphMarkPalette().length}`,
     label: "circle",
   }
 }
@@ -2270,32 +2241,32 @@ function createRelationshipGraphLegendItems({
 }): RelationshipGraphLegendItem[] {
   if (markMode === "impact") {
     const usedValues = new Set(nodes.map((node) => node.relationship.impact))
-    return RELATIONSHIP_GRAPH_IMPACT_MARKS.filter((mark) => usedValues.has(mark.value)).map(
-      (mark) => ({
+    return getGraphImpactMarks()
+      .filter((mark) => usedValues.has(mark.value))
+      .map((mark) => ({
         bg: mark.bg,
         border: mark.border,
         key: mark.key,
         label: translateGraphLabel("impact", mark.value),
-      }),
-    )
+      }))
   }
 
   if (markMode === "weight") {
     const usedValues = new Set(nodes.map((node) => node.relationship.unfinishedWeight ?? "无"))
-    return RELATIONSHIP_GRAPH_WEIGHT_MARKS.filter((mark) => usedValues.has(mark.value)).map(
-      (mark) => ({
+    return getGraphWeightMarks()
+      .filter((mark) => usedValues.has(mark.value))
+      .map((mark) => ({
         bg: mark.bg,
         border: mark.border,
         key: mark.key,
         label: translateGraphLabel("unfinishedWeight", mark.value),
-      }),
-    )
+      }))
   }
 
   if (markMode === "stage") {
     const usedValues = new Set(nodes.map((node) => node.relationship.stage))
     return RELATIONSHIP_STAGES.filter((stage) => usedValues.has(stage)).map((stage, index) => {
-      const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+      const color = getGraphMarkPalette()[index % getGraphMarkPalette().length]
 
       return {
         bg: color.bg,
@@ -2313,7 +2284,7 @@ function createRelationshipGraphLegendItems({
       return []
     }
 
-    const color = RELATIONSHIP_GRAPH_MARK_PALETTE[index % RELATIONSHIP_GRAPH_MARK_PALETTE.length]
+    const color = getGraphMarkPalette()[index % getGraphMarkPalette().length]
 
     return [
       {

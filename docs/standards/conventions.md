@@ -81,6 +81,7 @@
   - 原因：内联默认值与 json 重复且会漂移——key 一旦在 json 里（现状 98% 都在），i18next 用的是 json 值，那句内联中文是被忽略的死代码，只会误导。
   - **缺 key 的统一处理**：不用每处写兜底。key 缺失时 i18next 默认返回 key 字符串本身（如 `beliefs.signals.limiting`），这是开发期"该补翻译了"的可见信号，比散落一堆内联中文更好。
 - **写法**：新增 key 用 `模块名.` 前缀归类（通用动作走 `common.actions.*`，见下条），**同时补 `zh.json` 与 `en.json`**（en 缺失会 fallback 到 zh，但应补齐）。
+- **硬约定（缺失 key 先查 common）**：审查或新增 key 时，**先扫描下一条「通用已覆盖」表**，确认 `common.*` 中是否已有语义等价的 key。如果 `common.filter.label` 已经是"筛选"，就不要再为某个模块新增 `nutrition.logs.filterTitle` 之类冗余 key —— 这比"新增一个缺失 key"更优先。**新增模块私有 key 的前提是：`common.*` 中确实没有等价文案**。
 - **硬约定（通用动作文案全局收口）**：跨模块复用的通用动作/状态文案**统一用 `common.actions.*` 一处定义**，不再各模块各起 key。覆盖：`save`(保存) / `saving`(保存中) / `cancel`(取消) / `delete`(删除) / `deleting`(删除中) / `confirm`(确定) / `close`(关闭) / `edit`(编辑) / `add`(添加) / `create`(新建) / `deleted`(已删除) / `undo`(撤销) / `retry`(重试) 等。新代码一律 `t("common.actions.save")`，**禁止再写 `shopping.save` / `nutrition.common.save` / `xxx.editor.save` 这类模块私有的通用动作 key**。只有**带模块语境的特定文案**（如"保存这餐记录""删除该关系"）才放模块命名空间。
   - 现状：同一个"保存"散落成 10+ 个 key、"删除"30+ 次（`relationships.common.delete` / `shopping.delete` / `journey.actions.delete` …），属存量重复，待向 `common.actions.*` 收敛（见文末改造清单）。`common` 命名空间已存在（现有 `common.filter.*`）。
 - **硬约定（校验文案分层组织）**：校验/错误提示文案按以下三层放置，**不混放**：
@@ -179,6 +180,15 @@
 - **硬约定**：类名拼接用 `cn()`（`clsx` + `tailwind-merge`），不手写字符串拼 className。
 - **约定**：字体走 `--font-sans` / `--font-heading` 变量。
 
+#### F7.1 图谱可视化颜色
+
+cytoscape / react-force-graph-3d 等库在运行时**程序化消费颜色值**（传入 JS 对象而非 className），无法直接走 Tailwind 语义类。此类场景的约定：
+
+- **硬约定**：图谱着色令牌统一走 `--graph-*` CSS 自定义属性，在 `globals.css` 的 `:root` 和 `.dark` 中分别定义。**禁止在图谱组件内硬编码 hex 作为着色调色板**。
+- **模式**：创建运行时读取器函数（如 `src/lib/graph-tokens.ts` 的 `readGraphPalette()` / `readGraphImpactMarks()` / `readGraphWeightMarks()`），通过 `getComputedStyle(document.documentElement).getPropertyValue(...)` 读取 CSS 变量。调用方在渲染时调用读取器获得当前主题的颜色值，传给图谱引擎。
+- **SSR 安全网**：读取器函数应带 fallback 默认值（`readToken(name, fallback)`），当 `document` 不可用时返回 fallback。
+- **适用范围**：关系图谱着色调色板、影响/未完成重量标记色、cytoscape 主题令牌（`--tone-*`）、启动屏动画色（`--splash-*`）等所有需要 JS 程序化消费的颜色。
+
 ### F8. 错误边界与崩溃兜底
 
 桌面应用没有"刷新页面"逃生通道——组件抛错不拦截会**整应用白屏**。
@@ -219,7 +229,7 @@
 适用于 `src/components/ui/`（base-ui/radix/shadcn 体系）所有基础组件及其使用方。
 
 **层级（z-index）**
-- **硬约定**：浮层 z-index **只用 `src/lib/ui-layers.ts` 的 `UI_LAYERS` 语义层级**（`header:20 / utilityPanel:90 / notifications:100 / dialogOverlay:140 / dialogContent:150 / floatingContent:160`），**禁止在组件里硬编码 `z-[999]` 之类魔法数字**。新浮层归类到已有层级，确需新层级在 `ui-layers.ts` 增设。
+- **硬约定**：浮层 z-index **只用 `src/lib/ui-layers.ts` 的 `UI_LAYERS` 语义层级**（当前完整层级：`header:20 / canvas:4 / ganttMarker:50 / utilityPanel:90 / notifications:100 / dialogOverlay:140 / dialogContent:150 / floatingContent:160 / graphFullscreen:200`），**禁止在组件里硬编码 `z-[999]` 之类魔法数字**。新浮层归类到已有层级，确需新层级在 `ui-layers.ts` 增设。
 
 **按钮（button.tsx）**
 - **硬约定**：只用既有 `variant`（`default / outline / secondary / ghost / destructive / link`）与 `size`（`default / xs / sm / icon / icon-sm / icon-lg`），**不在调用处用 className 覆盖出新变体**。语义对应：主操作 `default`、次要 `outline`、危险 `destructive`、弱化/图标 `ghost`。
@@ -255,6 +265,7 @@
 | `lib/query-client.ts` | `createAppQueryClient()` | TanStack Query 的 `QueryClient` 工厂 |
 | `lib/id-utils.ts` | `generateId(prefix)` | 统一 ID 生成，基于 `nanoid` |
 | `lib/list-utils.ts` | `splitListText` / `joinListText` / `uniqueList` | 字符串列表的拆分/合并/去重 |
+| `lib/graph-tokens.ts` | `readGraphPalette()` / `readGraphImpactMarks()` / `readGraphWeightMarks()` | 图谱着色令牌运行时读取器，从 CSS 变量读取颜色（F7.1 规范） |
 
 #### F11.2 使用约定
 
@@ -321,7 +332,7 @@
 ## 速查：硬约定清单（违反即 bug，按 review-scope.md 分级）
 
 **前端**
-1. 文案不走 i18n / 传内联默认文案 `t("x","中文")` / 通用动作文案不用 `common.actions.*` 而自起模块 key / 颜色硬编码 hex / 手写 className 不用 `cn()`
+1. 文案不走 i18n / 传内联默认文案 `t("x","中文")` / 通用动作/文案有 `common.*` 等价项却另起模块私有 key / 颜色硬编码 hex（含图谱着色调色板不走 `--graph-*` CSS 变量）/ 手写 className 不用 `cn()`
 2. 动画用 `motion.div`、硬编码动画参数、位移动画无 reduced-motion、`AnimatePresence` 用 index 当 key
 3. 新表单不用 zod、提交按钮无 disabled、静默丢弃用户输入无 `toast.warning`
 4. queryKey 手写字符串、mutation 漏 invalidate、mutation `onError` 无反馈、服务端数据塞进 zustand、半吊子乐观更新
@@ -329,7 +340,7 @@
 6. 手写/修改 `src/bindings.ts`
 7. 弹窗违反 F9：关闭三通道（ESC/遮罩/X）被无故关掉、页脚按钮构成/顺序错、删除非 destructive 或新建态出现、乐观关闭、保存按钮未绑 isPending+canSubmit、删除用 window.confirm 而非撤销式、缺回车提交/自动聚焦/脏数据关闭确认
 8. 违反 F10：z-index 硬编码不走 `UI_LAYERS`、自造 button variant、图标按钮无 aria-label/tooltip、表单控件缺关联 label、裸用 base-ui/原生标签而非 `components/ui/` 封装
-9. 违反 F11：模块内重复定义已有共享工具（`splitListText`/`joinListText`/`uniqueList`/ID 生成）、深度克隆用 `JSON.parse(JSON.stringify())` 而非 `structuredClone()`、不用 `generateId()` 而手写 ID 拼接
+9. 违反 F11：模块内重复定义已有共享工具（`splitListText`/`joinListText`/`uniqueList`/ID 生成）、深度克隆用 `JSON.parse(JSON.stringify())` 而非 `structuredClone()`、不用 `generateId()` 而手写 ID 拼接、图谱着色令牌不走 `graph-tokens.ts` 而本地硬编码 hex
 
 **后端**
 10. 多步写 / DELETE+INSERT 不包 `write_tx`（或用了 `let conn` 开不了事务）
