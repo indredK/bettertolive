@@ -242,6 +242,116 @@
       "styleToken": "card",
       "rank": 4,
       "sortOrder": 4
+    },
+    {
+      "id": "shopping-channel-jd",
+      "kind": "channel",
+      "code": "京东",
+      "label": "京东",
+      "labelEn": "JD.com",
+      "description": "京东自营及第三方商家",
+      "styleToken": "accent",
+      "sortOrder": 0
+    },
+    {
+      "id": "shopping-channel-tmall",
+      "kind": "channel",
+      "code": "天猫",
+      "label": "天猫",
+      "labelEn": "Tmall",
+      "description": "天猫官方旗舰店及商家",
+      "styleToken": "accent",
+      "sortOrder": 1
+    },
+    {
+      "id": "shopping-channel-pdd",
+      "kind": "channel",
+      "code": "拼多多",
+      "label": "拼多多",
+      "labelEn": "Pinduoduo",
+      "description": "拼多多平台",
+      "styleToken": "secondary",
+      "sortOrder": 2
+    },
+    {
+      "id": "shopping-channel-xiaomi",
+      "kind": "channel",
+      "code": "小米官方",
+      "label": "小米官方",
+      "labelEn": "Mi Official",
+      "description": "小米官方渠道（官网或小米之家）",
+      "styleToken": "secondary",
+      "sortOrder": 3
+    },
+    {
+      "id": "shopping-channel-sams",
+      "kind": "channel",
+      "code": "山姆",
+      "label": "山姆",
+      "labelEn": "Sam's Club",
+      "description": "山姆会员商店",
+      "styleToken": "muted",
+      "sortOrder": 4
+    },
+    {
+      "id": "shopping-channel-ikea",
+      "kind": "channel",
+      "code": "宜家",
+      "label": "宜家",
+      "labelEn": "IKEA",
+      "description": "宜家家居",
+      "styleToken": "muted",
+      "sortOrder": 5
+    },
+    {
+      "id": "shopping-channel-pharmacy",
+      "kind": "channel",
+      "code": "药店",
+      "label": "药店",
+      "labelEn": "Pharmacy",
+      "description": "线下药店",
+      "styleToken": "muted",
+      "sortOrder": 6
+    },
+    {
+      "id": "shopping-channel-jd-health",
+      "kind": "channel",
+      "code": "京东健康",
+      "label": "京东健康",
+      "labelEn": "JD Health",
+      "description": "京东健康平台",
+      "styleToken": "muted",
+      "sortOrder": 7
+    },
+    {
+      "id": "shopping-channel-muji",
+      "kind": "channel",
+      "code": "无印良品",
+      "label": "无印良品",
+      "labelEn": "MUJI",
+      "description": "无印良品官方渠道",
+      "styleToken": "muted",
+      "sortOrder": 8
+    },
+    {
+      "id": "shopping-channel-secondhand",
+      "kind": "channel",
+      "code": "二手平台",
+      "label": "二手平台",
+      "labelEn": "Second-hand",
+      "description": "闲鱼、转转等二手交易平台",
+      "styleToken": "muted",
+      "sortOrder": 9
+    },
+    {
+      "id": "shopping-channel-handmade",
+      "kind": "channel",
+      "code": "手作",
+      "label": "手作",
+      "labelEn": "Handmade",
+      "description": "手工自制或手工艺人定制",
+      "styleToken": "card",
+      "sortOrder": 10
     }
   ],
   "items": [
