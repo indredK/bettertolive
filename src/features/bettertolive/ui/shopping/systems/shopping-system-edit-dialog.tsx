@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
+/* eslint-disable react-hooks/incompatible-library */
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
@@ -31,6 +35,13 @@ import {
 } from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
+const systemFormSchema = z.object({
+  name: z.string().min(1),
+  summary: z.string(),
+  keyQuestion: z.string(),
+  secondaryGroups: z.string(),
+})
+
 export function ShoppingSystemEditDialog({
   editing,
   shopping,
@@ -45,12 +56,21 @@ export function ShoppingSystemEditDialog({
   onDeleted?: () => void
 }) {
   const { t } = useTranslation()
-  const [name, setName] = useState(editing.system?.name ?? "")
-  const [summary, setSummary] = useState(editing.system?.summary ?? "")
-  const [keyQuestion, setKeyQuestion] = useState(editing.system?.keyQuestion ?? "")
-  const [secondaryGroups, setSecondaryGroups] = useState(
-    (editing.system?.secondaryGroups ?? []).join(", "),
-  )
+  const [isPending, setIsPending] = useState(false)
+  const form = useForm<z.infer<typeof systemFormSchema>>({
+    resolver: zodResolver(systemFormSchema),
+    defaultValues: {
+      name: editing.system?.name ?? "",
+      summary: editing.system?.summary ?? "",
+      keyQuestion: editing.system?.keyQuestion ?? "",
+      secondaryGroups: (editing.system?.secondaryGroups ?? []).join(", "),
+    },
+  })
+  const name = form.watch("name")
+  const summary = form.watch("summary")
+  const keyQuestion = form.watch("keyQuestion")
+  const secondaryGroups = form.watch("secondaryGroups")
+
   const [selectedItemIds, setSelectedItemIds] = useState<string[]>(() =>
     editing.system
       ? shopping.items
@@ -68,41 +88,44 @@ export function ShoppingSystemEditDialog({
   const systemId = editing.isNew ? slugifySystemId(name) : (editing.system?.id ?? "")
 
   const handleSubmit = async () => {
-    const normalizedName = name.trim()
+    const values = form.getValues()
+    if (!form.formState.isValid) {
+      toast.error(t("shopping.error.nameRequired", "请填写名称"))
+      return
+    }
 
     if (!editing.isNew && !systemId) {
       toast.error(t("shopping.error.idNameRequired", "缺少系统 ID"))
       return
     }
-    if (!normalizedName) {
-      toast.error(t("shopping.error.nameRequired", "请填写名称"))
-      return
-    }
 
-    const groups = secondaryGroups
+    const groups = values.secondaryGroups
       .split(",")
       .map((entry) => entry.trim())
       .filter(Boolean)
 
+    setIsPending(true)
     try {
-      const form = {
+      const payload = {
         id: systemId,
-        name: normalizedName,
-        summary: summary.trim(),
-        keyQuestion: keyQuestion.trim(),
+        name: values.name.trim(),
+        summary: values.summary.trim(),
+        keyQuestion: values.keyQuestion.trim(),
         secondaryGroups: groups,
       }
 
       if (editing.isNew) {
-        await createSystemDefinition(form)
+        await createSystemDefinition(payload)
       } else {
-        await updateSystemDefinition(form)
+        await updateSystemDefinition(payload)
       }
 
       await assignSystemDefinitionItems(systemId, validSelectedItemIds)
       onSaved()
     } catch (e) {
       toast.error(String(e))
+    } finally {
+      setIsPending(false)
     }
   }
 
@@ -138,8 +161,20 @@ export function ShoppingSystemEditDialog({
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && form.formState.isDirty) {
+      const confirmed = window.confirm(
+        t("shopping.confirm.unsavedChanges", {
+          defaultValue: "当前有未保存的修改，确定要关闭吗？",
+        }),
+      )
+      if (!confirmed) return
+    }
+    if (!open) onClose()
+  }
+
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1240px,calc(100vw-3rem))]",
@@ -154,93 +189,118 @@ export function ShoppingSystemEditDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="shrink-0 text-sm font-medium">
-              {t("shopping.systems.form.basicInfo", "基本信息")}
-            </div>
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-              <div className="space-y-1.5">
-                <Label>{t("shopping.systems.form.name", "名称")}</Label>
-                <Input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  className={SHOPPING_DIALOG_FIELD_CLASS}
-                />
-                {editing.isNew && name.trim() && (
-                  <div className="text-muted-foreground text-[11px]">
-                    {t("shopping.systems.form.autoId", "自动生成 ID:")}{" "}
-                    <code className="bg-muted rounded px-1">{slugifySystemId(name)}</code>
-                  </div>
-                )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleSubmit()
+          }}
+        >
+          <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="shrink-0 text-sm font-medium">
+                {t("shopping.systems.form.basicInfo", "基本信息")}
               </div>
-
-              <div className="space-y-1.5">
-                <Label>{t("shopping.systems.form.summary", "概述")}</Label>
-                <Textarea
-                  value={summary}
-                  onChange={(event) => setSummary(event.target.value)}
-                  rows={5}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label>{t("shopping.systems.form.keyQuestion", "关键问题")}</Label>
-                <Textarea
-                  value={keyQuestion}
-                  onChange={(event) => setKeyQuestion(event.target.value)}
-                  rows={4}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label>{t("shopping.systems.form.secondaryGroups", "二级分组(逗号分隔)")}</Label>
-                <Textarea
-                  value={secondaryGroups}
-                  onChange={(event) => setSecondaryGroups(event.target.value)}
-                  rows={4}
-                  placeholder={t(
-                    "shopping.systems.form.secondaryGroupsPlaceholder",
-                    "日常打扫, 洗衣, ...",
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.systems.form.name", "名称")}</Label>
+                  <Input
+                    autoFocus
+                    value={name}
+                    onChange={(event) =>
+                      form.setValue("name", event.target.value, { shouldValidate: true })
+                    }
+                    className={SHOPPING_DIALOG_FIELD_CLASS}
+                  />
+                  {editing.isNew && name.trim() && (
+                    <div className="text-muted-foreground text-[11px]">
+                      {t("shopping.systems.form.autoId", "自动生成 ID:")}{" "}
+                      <code className="bg-muted rounded px-1">{slugifySystemId(name)}</code>
+                    </div>
                   )}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.systems.form.summary", "概述")}</Label>
+                  <Textarea
+                    value={summary}
+                    onChange={(event) =>
+                      form.setValue("summary", event.target.value, { shouldValidate: true })
+                    }
+                    rows={5}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.systems.form.keyQuestion", "关键问题")}</Label>
+                  <Textarea
+                    value={keyQuestion}
+                    onChange={(event) =>
+                      form.setValue("keyQuestion", event.target.value, { shouldValidate: true })
+                    }
+                    rows={4}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.systems.form.secondaryGroups", "二级分组(逗号分隔)")}</Label>
+                  <Textarea
+                    value={secondaryGroups}
+                    onChange={(event) =>
+                      form.setValue("secondaryGroups", event.target.value, {
+                        shouldValidate: true,
+                      })
+                    }
+                    rows={4}
+                    placeholder={t(
+                      "shopping.systems.form.secondaryGroupsPlaceholder",
+                      "日常打扫, 洗衣, ...",
+                    )}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="shrink-0 text-sm font-medium">
+                {t("shopping.systems.form.assignItems", "本系统下的物品")}
+              </div>
+              <div className="mt-3 min-h-0 flex-1 overflow-hidden">
+                <ShoppingItemShuttle
+                  items={shopping.items}
+                  attributeDefinitions={shopping.attributeDefinitions}
+                  selectedIds={validSelectedItemIds}
+                  onChange={setSelectedItemIds}
+                  scope="system"
                 />
               </div>
             </div>
           </div>
-
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="shrink-0 text-sm font-medium">
-              {t("shopping.systems.form.assignItems", "本系统下的物品")}
-            </div>
-            <div className="mt-3 min-h-0 flex-1 overflow-hidden">
-              <ShoppingItemShuttle
-                items={shopping.items}
-                attributeDefinitions={shopping.attributeDefinitions}
-                selectedIds={validSelectedItemIds}
-                onChange={setSelectedItemIds}
-                scope="system"
-              />
-            </div>
-          </div>
-        </div>
+        </form>
 
         <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
           {!editing.isNew && (
-            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="mr-auto"
+            >
               {t("shopping.delete", "删除")}
             </Button>
           )}
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
             {t("shopping.cancel", "取消")}
           </Button>
-          <Button onClick={handleSubmit}>{t("shopping.save", "保存")}</Button>
+          <Button type="submit" disabled={!form.formState.isValid || isPending}>
+            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

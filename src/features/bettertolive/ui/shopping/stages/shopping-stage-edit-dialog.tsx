@@ -1,6 +1,10 @@
 import { Plus, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
+/* eslint-disable react-hooks/incompatible-library */
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 import { toast } from "sonner"
 
 import { AnimatedIconButton, Button } from "@/components/ui/button"
@@ -39,6 +43,12 @@ import {
 } from "@/features/bettertolive/ui/shopping/_shared/shopping-page-shared"
 import { cn } from "@/lib/utils"
 
+const stageFormSchema = z.object({
+  name: z.string().min(1),
+  description: z.string(),
+  focus: z.string(),
+})
+
 export type EditingStage = { isNew: boolean; stage: ShoppingStageTemplate | null }
 
 type StageEditorDraft = Omit<ShoppingStageTemplateForm, "id">
@@ -59,13 +69,28 @@ export function ShoppingStageEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.stage
+  const [isPending, setIsPending] = useState(false)
 
   const itemMap = useMemo(
     () => new Map(shopping.items.map((item) => [item.id, item])),
     [shopping.items],
   )
 
-  const [draft, setDraft] = useState<StageEditorDraft>(() => createInitialDraft(seed, itemMap))
+  const initialDraft = useMemo(() => createInitialDraft(seed, itemMap), [seed, itemMap])
+  const form = useForm<z.infer<typeof stageFormSchema>>({
+    resolver: zodResolver(stageFormSchema),
+    defaultValues: {
+      name: initialDraft.name,
+      description: initialDraft.description,
+      focus: initialDraft.focus,
+    },
+  })
+
+  const [draft, setDraft] = useState<StageEditorDraft>(initialDraft)
+
+  const stageName = form.watch("name")
+  const stageDescription = form.watch("description")
+  const stageFocus = form.watch("focus")
 
   const handleDraftChange = (updater: (current: StageEditorDraft) => StageEditorDraft) => {
     setDraft((current) => {
@@ -121,9 +146,10 @@ export function ShoppingStageEditDialog({
     }))
   }
 
-  const canSubmit = useMemo(() => draft.name.trim().length > 0, [draft.name])
+  const canSubmit = form.formState.isValid
 
   const handleSubmit = async () => {
+    const values = form.getValues()
     if (!canSubmit) {
       toast.error(t("shopping.error.nameRequired", "请填写名称"))
       return
@@ -147,25 +173,28 @@ export function ShoppingStageEditDialog({
       ),
     )
 
-    const form: ShoppingStageTemplateForm = {
+    const payload: ShoppingStageTemplateForm = {
       id: seed?.id,
-      name: draft.name.trim(),
-      description: draft.description.trim(),
-      focus: draft.focus.trim(),
+      name: values.name.trim(),
+      description: values.description.trim(),
+      focus: values.focus.trim(),
       systemDimensionIds: autoSystemDimensionIds,
       spaceDimensionIds: autoSpaceDimensionIds,
       items: draft.items,
     }
 
+    setIsPending(true)
     try {
       if (editing.isNew) {
-        await createStageTemplate(form)
+        await createStageTemplate(payload)
       } else {
-        await updateStageTemplate(form)
+        await updateStageTemplate(payload)
       }
       onSaved()
     } catch (e) {
       toast.error(String(e))
+    } finally {
+      setIsPending(false)
     }
   }
 
@@ -200,8 +229,20 @@ export function ShoppingStageEditDialog({
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && form.formState.isDirty) {
+      const confirmed = window.confirm(
+        t("shopping.confirm.unsavedChanges", {
+          defaultValue: "当前有未保存的修改，确定要关闭吗？",
+        }),
+      )
+      if (!confirmed) return
+    }
+    if (!open) onClose()
+  }
+
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1180px,calc(100vw-3rem))]",
@@ -216,109 +257,121 @@ export function ShoppingStageEditDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="shrink-0">
-              <div className="text-sm font-medium">{t("shopping.stage.basicInfo", "基本属性")}</div>
-            </div>
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-              <div className="space-y-1.5">
-                <Label>{t("shopping.stage.name", "名称")} *</Label>
-                <Input
-                  value={draft.name}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, name: event.target.value }))
-                  }
-                  className={SHOPPING_DIALOG_FIELD_CLASS}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("shopping.stage.description", "描述")}</Label>
-                <Textarea
-                  value={draft.description}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      description: event.target.value,
-                    }))
-                  }
-                  rows={4}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>{t("shopping.stage.focus", "重点")}</Label>
-                <Textarea
-                  value={draft.focus}
-                  onChange={(event) =>
-                    setDraft((current) => ({ ...current, focus: event.target.value }))
-                  }
-                  rows={5}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="flex shrink-0 items-center justify-between gap-3">
-              <div className="text-sm font-medium">{t("shopping.stage.items", "阶段物品")}</div>
-            </div>
-
-            <ShoppingItemShuttle
-              items={shopping.items}
-              attributeDefinitions={shopping.attributeDefinitions}
-              selectedIds={selectedItemIds}
-              onChange={syncItemsFromIds}
-              scope="stage"
-              className="shrink-0"
-            />
-
-            <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-              {draft.items.length === 0 ? (
-                <EmptyStageHint
-                  title={t("shopping.stage.emptyDimensions", "先添加物品")}
-                  description={t(
-                    "shopping.stage.emptyShuttleHint",
-                    "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
-                  )}
-                />
-              ) : (
-                <div className="grid gap-3 pt-4 xl:grid-cols-2">
-                  {draft.items.map((stageItem) => {
-                    const item = itemMap.get(stageItem.itemId)
-                    if (!item) return null
-                    return (
-                      <StageItemEditorCard
-                        key={stageItem.itemId}
-                        item={item}
-                        stageItem={stageItem}
-                        onRemoveItem={() => removeStageItem(stageItem.itemId)}
-                        onUpdateTier={updateTier}
-                      />
-                    )
-                  })}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleSubmit()
+          }}
+        >
+          <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="shrink-0">
+                <div className="text-sm font-medium">
+                  {t("shopping.stage.basicInfo", "基本属性")}
                 </div>
-              )}
+              </div>
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.stage.name", "名称")} *</Label>
+                  <Input
+                    autoFocus
+                    value={stageName}
+                    onChange={(event) =>
+                      form.setValue("name", event.target.value, { shouldValidate: true })
+                    }
+                    className={SHOPPING_DIALOG_FIELD_CLASS}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.stage.description", "描述")}</Label>
+                  <Textarea
+                    value={stageDescription}
+                    onChange={(event) =>
+                      form.setValue("description", event.target.value, { shouldValidate: true })
+                    }
+                    rows={4}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-24 resize-none")}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.stage.focus", "重点")}</Label>
+                  <Textarea
+                    value={stageFocus}
+                    onChange={(event) =>
+                      form.setValue("focus", event.target.value, { shouldValidate: true })
+                    }
+                    rows={5}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-28 resize-none")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="flex shrink-0 items-center justify-between gap-3">
+                <div className="text-sm font-medium">{t("shopping.stage.items", "阶段物品")}</div>
+              </div>
+
+              <ShoppingItemShuttle
+                items={shopping.items}
+                attributeDefinitions={shopping.attributeDefinitions}
+                selectedIds={selectedItemIds}
+                onChange={syncItemsFromIds}
+                scope="stage"
+                className="shrink-0"
+              />
+
+              <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+                {draft.items.length === 0 ? (
+                  <EmptyStageHint
+                    title={t("shopping.stage.emptyDimensions", "先添加物品")}
+                    description={t(
+                      "shopping.stage.emptyShuttleHint",
+                      "通过上方穿梭框添加阶段物品，然后为每个物品配置各档位子级",
+                    )}
+                  />
+                ) : (
+                  <div className="grid gap-3 pt-4 xl:grid-cols-2">
+                    {draft.items.map((stageItem) => {
+                      const item = itemMap.get(stageItem.itemId)
+                      if (!item) return null
+                      return (
+                        <StageItemEditorCard
+                          key={stageItem.itemId}
+                          item={item}
+                          stageItem={stageItem}
+                          onRemoveItem={() => removeStageItem(stageItem.itemId)}
+                          onUpdateTier={updateTier}
+                        />
+                      )
+                    })}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </form>
 
         <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
           {!editing.isNew && (
-            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="mr-auto"
+            >
               {t("shopping.delete", "删除")}
             </Button>
           )}
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
             {t("shopping.cancel", "取消")}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit}>
-            {t("shopping.save", "保存")}
+          <Button type="submit" disabled={!canSubmit || isPending}>
+            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
           </Button>
         </DialogFooter>
       </DialogContent>

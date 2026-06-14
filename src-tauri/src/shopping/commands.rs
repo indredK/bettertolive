@@ -368,10 +368,12 @@ pub fn create_shopping_space_definition(
     state: State<AppState>,
     form: SpaceDefinitionFormDto,
 ) -> Result<ShoppingSpaceDefinitionDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let now = chrono_now();
-    ShoppingRepository::create_space_definition(&conn, &id, &form.name, &form.note, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::create_space_definition(tx, &id, &form.name, &form.note, &now)
+    })
 }
 
 #[tauri::command]
@@ -380,10 +382,12 @@ pub fn update_shopping_space_definition(
     state: State<AppState>,
     form: SpaceDefinitionFormDto,
 ) -> Result<ShoppingSpaceDefinitionDto, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.ok_or("id is required for update")?;
     let now = chrono_now();
-    ShoppingRepository::update_space_definition(&conn, &id, &form.name, &form.note, &now)
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::update_space_definition(tx, &id, &form.name, &form.note, &now)
+    })
 }
 
 #[tauri::command]
@@ -756,22 +760,24 @@ pub fn create_shopping_page_content(
     state: State<AppState>,
     form: PageContentFormDto,
 ) -> Result<PageContentRow, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
     let now = chrono_now();
 
-    ShoppingRepository::create_page_content(
-        &conn,
-        &id,
-        &form.content_type,
-        form.title.as_deref(),
-        form.stage.as_deref(),
-        form.system.as_deref(),
-        form.summary.as_deref(),
-        form.reason.as_deref(),
-        &form.body,
-        &now,
-    )?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::create_page_content(
+            tx,
+            &id,
+            &form.content_type,
+            form.title.as_deref(),
+            form.stage.as_deref(),
+            form.system.as_deref(),
+            form.summary.as_deref(),
+            form.reason.as_deref(),
+            &form.body,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_page_content_by_id(&conn, &id)?
         .ok_or("Failed to retrieve created page content".to_string())
@@ -783,22 +789,24 @@ pub fn update_shopping_page_content(
     state: State<AppState>,
     form: PageContentFormDto,
 ) -> Result<PageContentRow, String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
     let id = form.id.as_ref().ok_or("id is required for update")?.clone();
     let now = chrono_now();
 
-    ShoppingRepository::update_page_content(
-        &conn,
-        &id,
-        &form.content_type,
-        form.title.as_deref(),
-        form.stage.as_deref(),
-        form.system.as_deref(),
-        form.summary.as_deref(),
-        form.reason.as_deref(),
-        &form.body,
-        &now,
-    )?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::update_page_content(
+            tx,
+            &id,
+            &form.content_type,
+            form.title.as_deref(),
+            form.stage.as_deref(),
+            form.system.as_deref(),
+            form.summary.as_deref(),
+            form.reason.as_deref(),
+            &form.body,
+            &now,
+        )
+    })?;
 
     ShoppingRepository::get_page_content_by_id(&conn, &id)?
         .ok_or("Failed to retrieve updated page content".to_string())
@@ -807,8 +815,10 @@ pub fn update_shopping_page_content(
 #[tauri::command]
 #[specta::specta]
 pub fn delete_shopping_page_content(state: State<AppState>, id: String) -> Result<(), String> {
-    let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
-    ShoppingRepository::delete_page_content(&conn, &id)
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::delete_page_content(tx, &id)
+    })
 }
 
 #[tauri::command]

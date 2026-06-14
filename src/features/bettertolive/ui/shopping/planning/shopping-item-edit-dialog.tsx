@@ -1,6 +1,10 @@
 import { Plus, TriangleAlert, Trash2 } from "lucide-react"
 import { useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
+/* eslint-disable react-hooks/incompatible-library */
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
 import { toast } from "sonner"
 
 import { AnimatedIconButton, Button } from "@/components/ui/button"
@@ -56,6 +60,13 @@ export type EditingItem = { isNew: boolean; item: ShoppingItem | null }
 
 const NONE_SELECT_VALUE = "__none__"
 
+const itemFormSchema = z.object({
+  name: z.string().min(1),
+  systemTags: z.string().array().min(1),
+  spaceTags: z.string().array().min(1),
+  note: z.string(),
+})
+
 export function ShoppingItemEditDialog({
   editing,
   shopping,
@@ -72,8 +83,23 @@ export function ShoppingItemEditDialog({
   const { t } = useTranslation()
   const seed = editing.item
   const attributeDefinitions = shopping.attributeDefinitions
+  const [isPending, setIsPending] = useState(false)
 
-  const [name, setName] = useState(seed?.name ?? "")
+  const form = useForm<z.infer<typeof itemFormSchema>>({
+    resolver: zodResolver(itemFormSchema),
+    defaultValues: {
+      name: seed?.name ?? "",
+      systemTags: seed?.systemTags ?? [],
+      spaceTags: seed?.spaceTags ?? [],
+      note: seed?.note ?? "",
+    },
+  })
+
+  const name = form.watch("name")
+  const systemTags = form.watch("systemTags")
+  const spaceTags = form.watch("spaceTags")
+  const note = form.watch("note")
+
   const [children, setChildren] = useState<ShoppingItemChild[]>(() =>
     (seed?.children ?? []).map((child, index) =>
       normalizeChildDraft(child, {
@@ -83,9 +109,6 @@ export function ShoppingItemEditDialog({
       }),
     ),
   )
-  const [systemTags, setSystemTags] = useState<string[]>(seed?.systemTags ?? [])
-  const [spaceTags, setSpaceTags] = useState<string[]>(seed?.spaceTags ?? [])
-  const [note, setNote] = useState(seed?.note ?? "")
 
   // 渠道选项来自属性字典 channel 类的启用条目
   const channelOptions = useMemo(
@@ -97,11 +120,16 @@ export function ShoppingItemEditDialog({
     [attributeDefinitions],
   )
 
-  const toggleTag = (list: string[], setter: (value: string[]) => void, id: string) => {
-    if (list.includes(id)) {
-      setter(list.filter((entry) => entry !== id))
+  const toggleTag = (field: "systemTags" | "spaceTags", id: string) => {
+    const current = form.getValues(field)
+    if (current.includes(id)) {
+      form.setValue(
+        field,
+        current.filter((entry) => entry !== id),
+        { shouldValidate: true },
+      )
     } else {
-      setter([...list, id])
+      form.setValue(field, [...current, id], { shouldValidate: true })
     }
   }
 
@@ -139,12 +167,10 @@ export function ShoppingItemEditDialog({
     }))
   }
 
-  const canSubmit = useMemo(
-    () => name.trim().length > 0 && systemTags.length >= 1 && spaceTags.length >= 1,
-    [name, spaceTags.length, systemTags.length],
-  )
+  const canSubmit = form.formState.isValid
 
   const handleSubmit = async () => {
+    const values = form.getValues()
     if (!canSubmit) {
       toast.error(t("shopping.error.itemRequired", "请填写名称,并至少各选一个系统和空间"))
       return
@@ -164,9 +190,25 @@ export function ShoppingItemEditDialog({
       )
     }
 
-    const form: ShoppingItemForm = {
+    // 检查是否有渠道名称为空的渠道价格行，给出警告
+    const emptyChannelChildren = children
+      .map((child, idx) => ({ child, index: idx }))
+      .filter(({ child }) =>
+        (child.channelPrices ?? []).some((cp) => cp.channel.trim().length === 0),
+      )
+    if (emptyChannelChildren.length > 0) {
+      const indices = emptyChannelChildren.map(({ index }) => index + 1).join(", ")
+      toast.warning(
+        t("shopping.warning.emptyChannels", {
+          defaultValue: `子级 ${indices} 存在渠道名称为空的价格行，提交时将被移除`,
+          indices,
+        }),
+      )
+    }
+
+    const formPayload: ShoppingItemForm = {
       id: seed?.id,
-      name: name.trim(),
+      name: values.name.trim(),
       children: children
         .map((child) => ({
           ...child,
@@ -179,20 +221,23 @@ export function ShoppingItemEditDialog({
             .filter((channelPrice) => channelPrice.channel.length > 0),
         }))
         .filter((child) => child.name.length > 0),
-      systemTags,
-      spaceTags,
-      note: note.trim(),
+      systemTags: values.systemTags,
+      spaceTags: values.spaceTags,
+      note: values.note.trim(),
     }
 
+    setIsPending(true)
     try {
       if (editing.isNew) {
-        await createItem(form)
+        await createItem(formPayload)
       } else {
-        await updateItem(form)
+        await updateItem(formPayload)
       }
       onSaved()
     } catch (error) {
       toast.error(String(error))
+    } finally {
+      setIsPending(false)
     }
   }
 
@@ -227,8 +272,20 @@ export function ShoppingItemEditDialog({
     }
   }
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && form.formState.isDirty) {
+      const confirmed = window.confirm(
+        t("shopping.confirm.unsavedChanges", {
+          defaultValue: "当前有未保存的修改，确定要关闭吗？",
+        }),
+      )
+      if (!confirmed) return
+    }
+    if (!open) onClose()
+  }
+
   return (
-    <Dialog open onOpenChange={(open) => !open && onClose()}>
+    <Dialog open onOpenChange={handleOpenChange}>
       <DialogContent
         className={cn(
           "flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[min(1320px,calc(100vw-3rem))]",
@@ -243,105 +300,124 @@ export function ShoppingItemEditDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="shrink-0 text-sm font-medium">
-              {t("shopping.item.basicAttributes", "基础属性")}
-            </div>
-            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
-              <div className="space-y-1.5">
-                <Label>{t("shopping.item.name", "名称")} *</Label>
-                <Input
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  className={SHOPPING_DIALOG_FIELD_CLASS}
-                />
+        <form
+          onSubmit={(e) => {
+            e.preventDefault()
+            void handleSubmit()
+          }}
+        >
+          <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="shrink-0 text-sm font-medium">
+                {t("shopping.item.basicAttributes", "基础属性")}
               </div>
-
-              <div className="grid gap-4">
-                <TagSelectorPanel
-                  label={t("shopping.item.systemTags", "系统标签(至少 1 个)")}
-                  options={shopping.systemDefinitions.map((system) => ({
-                    id: system.id,
-                    label: system.name || system.id,
-                  }))}
-                  selectedIds={systemTags}
-                  onToggle={(id) => toggleTag(systemTags, setSystemTags, id)}
-                />
-                <TagSelectorPanel
-                  label={t("shopping.item.spaceTags", "空间标签(至少 1 个)")}
-                  options={shopping.spaceDefinitions.map((space) => ({
-                    id: space.id,
-                    label: space.name,
-                  }))}
-                  selectedIds={spaceTags}
-                  onToggle={(id) => toggleTag(spaceTags, setSpaceTags, id)}
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label>{t("shopping.item.note", "备注")}</Label>
-                <Textarea
-                  value={note}
-                  onChange={(event) => setNote(event.target.value)}
-                  rows={7}
-                  className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-32 resize-none")}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div
-            className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
-          >
-            <div className="shrink-0">
-              <div className="flex items-center justify-between gap-3">
-                <div className="text-sm font-medium">
-                  {t("shopping.item.childSettings", "子级设置")}
-                </div>
-                <Button type="button" variant="outline" size="sm" onClick={addChild}>
-                  <Plus className="mr-1 h-4 w-4" />
-                  {t("shopping.item.addChild", "添加子级")}
-                </Button>
-              </div>
-            </div>
-            <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
-              {children.length === 0 ? (
-                <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
-                  {t("shopping.item.noChildren", "暂未添加子级")}
-                </div>
-              ) : (
-                children.map((child, index) => (
-                  <ChildEditorCard
-                    key={child.id}
-                    child={child}
-                    childIndex={index}
-                    attributeDefinitions={attributeDefinitions}
-                    channelOptions={channelOptions}
-                    onRemove={() => removeChild(index)}
-                    onChange={(updater) => updateChild(index, updater)}
-                    onAddChannel={() => addChannelToChild(index)}
-                    onRemoveChannel={(channelIndex) => removeChannelFromChild(index, channelIndex)}
+              <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.item.name", "名称")} *</Label>
+                  <Input
+                    autoFocus
+                    value={name}
+                    onChange={(event) =>
+                      form.setValue("name", event.target.value, { shouldValidate: true })
+                    }
+                    className={SHOPPING_DIALOG_FIELD_CLASS}
                   />
-                ))
-              )}
+                </div>
+
+                <div className="grid gap-4">
+                  <TagSelectorPanel
+                    label={t("shopping.item.systemTags", "系统标签(至少 1 个)")}
+                    options={shopping.systemDefinitions.map((system) => ({
+                      id: system.id,
+                      label: system.name || system.id,
+                    }))}
+                    selectedIds={systemTags}
+                    onToggle={(id) => toggleTag("systemTags", id)}
+                  />
+                  <TagSelectorPanel
+                    label={t("shopping.item.spaceTags", "空间标签(至少 1 个)")}
+                    options={shopping.spaceDefinitions.map((space) => ({
+                      id: space.id,
+                      label: space.name,
+                    }))}
+                    selectedIds={spaceTags}
+                    onToggle={(id) => toggleTag("spaceTags", id)}
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label>{t("shopping.item.note", "备注")}</Label>
+                  <Textarea
+                    value={note}
+                    onChange={(event) =>
+                      form.setValue("note", event.target.value, { shouldValidate: true })
+                    }
+                    rows={7}
+                    className={cn(SHOPPING_DIALOG_FIELD_CLASS, "min-h-32 resize-none")}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div
+              className={cn(SHOPPING_DIALOG_SECTION_CLASS, "flex min-h-0 flex-col overflow-hidden")}
+            >
+              <div className="shrink-0">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-sm font-medium">
+                    {t("shopping.item.childSettings", "子级设置")}
+                  </div>
+                  <Button type="button" variant="outline" size="sm" onClick={addChild}>
+                    <Plus className="mr-1 h-4 w-4" />
+                    {t("shopping.item.addChild", "添加子级")}
+                  </Button>
+                </div>
+              </div>
+              <div className="min-h-0 flex-1 space-y-3 overflow-y-auto pr-1">
+                {children.length === 0 ? (
+                  <div className="border-foreground/15 bg-muted/15 text-muted-foreground rounded-lg border border-dashed px-4 py-8 text-center text-xs">
+                    {t("shopping.item.noChildren", "暂未添加子级")}
+                  </div>
+                ) : (
+                  children.map((child, index) => (
+                    <ChildEditorCard
+                      key={child.id}
+                      child={child}
+                      childIndex={index}
+                      attributeDefinitions={attributeDefinitions}
+                      channelOptions={channelOptions}
+                      onRemove={() => removeChild(index)}
+                      onChange={(updater) => updateChild(index, updater)}
+                      onAddChannel={() => addChannelToChild(index)}
+                      onRemoveChannel={(channelIndex) =>
+                        removeChannelFromChild(index, channelIndex)
+                      }
+                    />
+                  ))
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        </form>
 
         <DialogFooter className={SHOPPING_DIALOG_FOOTER_CLASS}>
           {!editing.isNew && (
-            <Button variant="outline" onClick={handleDelete} className="mr-auto">
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isPending}
+              className="mr-auto"
+            >
               {t("shopping.delete", "删除")}
             </Button>
           )}
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isPending}>
             {t("shopping.cancel", "取消")}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit}>
-            {t("shopping.save", "保存")}
+          <Button type="submit" disabled={!canSubmit || isPending}>
+            {isPending ? t("shopping.saving", "保存中") : t("shopping.save", "保存")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -115,6 +115,10 @@ fn apply_migrations(tx: &rusqlite::Transaction<'_>) -> SqliteResult<()> {
     Ok(())
 }
 
+/// 判断表是否为空。
+/// # Safety
+/// 当前所有调用点均传入硬编码表名字面量（无用户输入），不存在 SQL 注入风险。
+/// 若未来新增调用点接受外部参数，应改用参数化查询或白名单校验。
 fn table_is_empty(conn: &Connection, table: &str) -> SqliteResult<bool> {
     let count: i64 = conn.query_row(&format!("SELECT COUNT(*) FROM {}", table), [], |row| {
         row.get(0)
