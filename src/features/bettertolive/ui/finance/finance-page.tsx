@@ -90,7 +90,7 @@ export function FinancePage({
   )
   const target = editableFinance.monthlyTargets.find((entry) => entry.month === latestMonth)
   const reviewEntries = entries.filter(
-    (entry) => entry.reviewStatus === "待复盘" || entry.reviewStatus === "可优化",
+    (entry) => entry.reviewStatus === "needs_review" || entry.reviewStatus === "can_optimize",
   )
 
   const handleCreateEntry = () => {
@@ -623,7 +623,7 @@ function TransactionCard({
                 variant="outline"
                 className={cn(
                   "border-[color:var(--chip-border)]",
-                  entry.reviewStatus === "待复盘" || entry.reviewStatus === "可优化"
+                  entry.reviewStatus === "needs_review" || entry.reviewStatus === "can_optimize"
                     ? "bg-[color:var(--finance-review-bg)] text-[color:var(--finance-review-ink)]"
                     : "bg-[color:var(--surface-bg)] text-[color:var(--text-secondary)]",
                 )}
