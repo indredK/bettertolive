@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import type {
   FoodCategoryDefinition,
   FoodItem,
+  FoodNutrientProfile,
   NutritionModuleData,
 } from "@/features/bettertolive/types"
 import {
@@ -40,6 +41,54 @@ import { cn } from "@/lib/utils"
 
 const ALL_CATEGORY_ID = "all"
 
+type FoodSemanticFilter =
+  | "highProtein"
+  | "highFiber"
+  | "highCalcium"
+  | "highIron"
+  | "highPotassium"
+  | "highSugarRisk"
+  | "highSodiumRisk"
+  | "highSaturatedFatRisk"
+  | "eggProtein"
+  | "dairyProtein"
+  | "soyProtein"
+  | "seafoodProtein"
+  | "poultryProtein"
+  | "redMeatProtein"
+  | "wholeIngredient"
+  | "lightlyProcessed"
+  | "highlyProcessed"
+
+const FILTER_GROUPS: Array<{
+  id: "nutrition" | "risk" | "source" | "processing"
+  filters: FoodSemanticFilter[]
+}> = [
+  {
+    id: "nutrition",
+    filters: ["highProtein", "highFiber", "highCalcium", "highIron", "highPotassium"],
+  },
+  {
+    id: "risk",
+    filters: ["highSugarRisk", "highSodiumRisk", "highSaturatedFatRisk"],
+  },
+  {
+    id: "source",
+    filters: [
+      "eggProtein",
+      "dairyProtein",
+      "soyProtein",
+      "seafoodProtein",
+      "poultryProtein",
+      "redMeatProtein",
+    ],
+  },
+  {
+    id: "processing",
+    filters: ["wholeIngredient", "lightlyProcessed", "highlyProcessed"],
+  },
+]
+
 export function NutritionFoodsTab({
   createCategoryRequested = false,
   createFoodRequested = false,
@@ -64,6 +113,7 @@ export function NutritionFoodsTab({
   const [editingCategory, setEditingCategory] = useState<EditingFoodCategory | null>(null)
   const [editingFood, setEditingFood] = useState<EditingFood | null>(null)
   const [query, setQuery] = useState("")
+  const [semanticFilter, setSemanticFilter] = useState<FoodSemanticFilter | null>(null)
   const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
   const selectedCategory =
     activeCategoryId === ALL_CATEGORY_ID
@@ -72,6 +122,7 @@ export function NutritionFoodsTab({
   const effectiveCategoryId = selectedCategory?.id ?? ALL_CATEGORY_ID
   const activeCategory = effectiveCategoryId === ALL_CATEGORY_ID ? null : selectedCategory
   const foods = nutrition.foods.filter((food) => {
+    const profile = lookups.profileByFoodId.get(food.id)
     const categoryText = food.categoryIds
       .map((id) => {
         const category = lookups.categoryById.get(id)
@@ -89,13 +140,15 @@ export function NutritionFoodsTab({
       food.lifecycle ? translateNutritionEnum(t, "lifecycle", food.lifecycle) : "",
       food.dietaryTags.join(" "),
       food.allergenTags.join(" "),
+      buildFoodSignalSearchText(profile, t),
       food.note,
     ].join(" ")
     const matchesQuery = !query.trim() || text.toLowerCase().includes(query.trim().toLowerCase())
     const matchesCategory =
       effectiveCategoryId === ALL_CATEGORY_ID ||
       (activeCategory ? food.categoryIds.includes(activeCategory.id) : true)
-    return matchesQuery && matchesCategory
+    const matchesSemantic = !semanticFilter || matchesFoodSemanticFilter(profile, semanticFilter)
+    return matchesQuery && matchesCategory && matchesSemantic
   })
   const activeFood = foods.find((food) => food.id === activeFoodId) ?? foods[0] ?? null
 
@@ -122,6 +175,36 @@ export function NutritionFoodsTab({
               placeholder={t("nutrition.foods.search")}
               className="border-foreground/15 bg-background"
             />
+          </div>
+
+          <div className="border-foreground/10 bg-background/70 mt-3 rounded-2xl border p-3">
+            <div className="text-muted-foreground mb-2 text-xs font-medium">
+              {t("nutrition.foods.filters.title")}
+            </div>
+            <div className="space-y-3">
+              <FilterChipRow
+                isActive={semanticFilter === null}
+                label={t("nutrition.foods.filters.all")}
+                onClick={() => setSemanticFilter(null)}
+              />
+              {FILTER_GROUPS.map((group) => (
+                <div key={group.id}>
+                  <div className="text-muted-foreground mb-1.5 text-[11px] font-medium">
+                    {t(`nutrition.foods.filterGroups.${group.id}`)}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.filters.map((filterId) => (
+                      <FilterChipRow
+                        key={filterId}
+                        isActive={semanticFilter === filterId}
+                        label={t(`nutrition.foods.filters.${filterId}`)}
+                        onClick={() => setSemanticFilter(filterId)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="mt-3 space-y-3">
@@ -310,6 +393,8 @@ function FoodListCard({
   const { t } = useTranslation()
   const lookups = useMemo(() => buildNutritionLookups(nutrition), [nutrition])
   const categoryNames = food.categoryIds.map((id) => lookups.categoryById.get(id)?.name ?? id)
+  const profile = lookups.profileByFoodId.get(food.id)
+  const signalBadges = buildFoodSignalBadges(profile, t).slice(0, 3)
 
   return (
     <NutritionSelectableCard isActive={isActive} onClick={onClick}>
@@ -320,11 +405,24 @@ function FoodListCard({
           className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
         >
           {food.storage
-            ? t(`nutrition.enum.storage.${food.storage}`, food.storage)
-            : t(`nutrition.enum.unit.${food.defaultUnit}`, food.defaultUnit)}
+            ? t(`nutrition.enum.storage.${food.storage}`)
+            : t(`nutrition.enum.unit.${food.defaultUnit}`)}
         </Badge>
       </div>
       <NutritionTagBar names={categoryNames.slice(0, 4)} className="mt-2" />
+      {signalBadges.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {signalBadges.map((badge) => (
+            <Badge
+              key={`${food.id}:${badge}`}
+              variant="outline"
+              className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
+            >
+              {badge}
+            </Badge>
+          ))}
+        </div>
+      ) : null}
     </NutritionSelectableCard>
   )
 }
@@ -343,6 +441,7 @@ function FoodDetail({
   const profile = lookups.profileByFoodId.get(food.id)
   const categoryNames = food.categoryIds.map((id) => lookups.categoryById.get(id)?.name ?? id)
   const dietaryTagNames = [...food.dietaryTags, ...food.allergenTags]
+  const signalBadges = buildFoodSignalBadges(profile, t)
 
   return (
     <Card
@@ -371,29 +470,48 @@ function FoodDetail({
             {food.note || t("nutrition.foods.noNote")}
           </p>
           <NutritionTagBar names={categoryNames} className="mt-3" />
+          {signalBadges.length > 0 ? (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {signalBadges.map((badge) => (
+                <Badge
+                  key={`${food.id}:${badge}`}
+                  variant="outline"
+                  className="border-foreground/10 bg-muted text-muted-foreground"
+                >
+                  {badge}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
         </div>
 
-        <div className="mt-4 grid shrink-0 gap-2 sm:grid-cols-4">
+        <div className="mt-4 grid shrink-0 gap-2 sm:grid-cols-5">
           <NutritionMetricCard
             icon={Boxes}
             label={t("nutrition.foods.unit")}
-            value={t(`nutrition.enum.unit.${food.defaultUnit}`, food.defaultUnit)}
+            value={t(`nutrition.enum.unit.${food.defaultUnit}`)}
           />
           <NutritionMetricCard
             icon={Leaf}
             label={t("nutrition.foods.storage")}
-            value={food.storage ? t(`nutrition.enum.storage.${food.storage}`, food.storage) : "-"}
+            value={food.storage ? t(`nutrition.enum.storage.${food.storage}`) : "-"}
           />
           <NutritionMetricCard
             label={t("nutrition.foods.lifecycle")}
-            value={
-              food.lifecycle ? t(`nutrition.enum.lifecycle.${food.lifecycle}`, food.lifecycle) : "-"
-            }
+            value={food.lifecycle ? t(`nutrition.enum.lifecycle.${food.lifecycle}`) : "-"}
           />
           <NutritionMetricCard
             icon={Search}
             label={t("nutrition.foods.nutrition")}
             value={profile ? t("nutrition.foods.hasProfile") : t("nutrition.foods.missingProfile")}
+          />
+          <NutritionMetricCard
+            label={t("nutrition.foods.processingLevel")}
+            value={
+              profile?.processingLevel
+                ? translateNutritionEnum(t, "processingLevel", profile.processingLevel)
+                : "-"
+            }
           />
         </div>
 
@@ -421,8 +539,28 @@ function FoodDetail({
                   value={formatProfileNutrient(profile.proteinG, "g", 1, t)}
                 />
                 <NutrientLine
+                  label={t("nutrition.nutrients.addedSugarG")}
+                  value={formatProfileNutrient(profile.addedSugarG, "g", 1, t)}
+                />
+                <NutrientLine
+                  label={t("nutrition.nutrients.saturatedFatG")}
+                  value={formatProfileNutrient(profile.saturatedFatG, "g", 1, t)}
+                />
+                <NutrientLine
                   label={t("nutrition.nutrients.carbG")}
                   value={formatProfileNutrient(profile.carbG, "g", 1, t)}
+                />
+                <NutrientLine
+                  label={t("nutrition.nutrients.calciumMg")}
+                  value={formatProfileNutrient(profile.calciumMg, "mg", 0, t)}
+                />
+                <NutrientLine
+                  label={t("nutrition.nutrients.ironMg")}
+                  value={formatProfileNutrient(profile.ironMg, "mg", 1, t)}
+                />
+                <NutrientLine
+                  label={t("nutrition.nutrients.potassiumMg")}
+                  value={formatProfileNutrient(profile.potassiumMg, "mg", 0, t)}
                 />
                 <NutrientLine
                   label={t("nutrition.nutrients.sodiumMg")}
@@ -431,16 +569,13 @@ function FoodDetail({
                 <p className="text-muted-foreground pt-2 text-xs">
                   {profile.basisAmount}
                   {translateNutritionEnum(t, "unit", profile.basisUnit)} ·{" "}
-                  {t(`nutrition.enum.source.${profile.source}`, profile.source)} ·{" "}
-                  {t(`nutrition.enum.confidence.${profile.confidence}`, profile.confidence)}
+                  {t(`nutrition.enum.source.${profile.source}`)} ·{" "}
+                  {t(`nutrition.enum.confidence.${profile.confidence}`)}
                 </p>
               </div>
             ) : (
               <p className="text-muted-foreground mt-3 text-sm leading-6">
-                {t(
-                  "nutrition.foods.profileMissingCopy",
-                  "这项食品仍可进入食谱和计划，但营养表会显示待补。",
-                )}
+                {t("nutrition.foods.profileMissingCopy")}
               </p>
             )}
           </div>
@@ -470,4 +605,151 @@ function formatProfileNutrient(
   }
 
   return `${formatNutrientValue(value, digits)} ${unit}`
+}
+
+function buildFoodSignalSearchText(profile: FoodNutrientProfile | undefined, t: TFunction) {
+  if (!profile) {
+    return ""
+  }
+
+  return [
+    profile.sugarKind ? translateNutritionEnum(t, "sugarKind", profile.sugarKind) : "",
+    profile.proteinSource ? translateNutritionEnum(t, "proteinSource", profile.proteinSource) : "",
+    profile.processingLevel
+      ? translateNutritionEnum(t, "processingLevel", profile.processingLevel)
+      : "",
+    profile.sodiumRiskLevel
+      ? translateNutritionEnum(t, "sodiumRiskLevel", profile.sodiumRiskLevel)
+      : "",
+  ].join(" ")
+}
+
+function buildFoodSignalBadges(profile: FoodNutrientProfile | undefined, t: TFunction) {
+  if (!profile) {
+    return []
+  }
+
+  return [
+    profile.proteinSource
+      ? `${t("nutrition.foods.signalLabels.protein")} · ${translateNutritionEnum(
+          t,
+          "proteinSource",
+          profile.proteinSource,
+        )}`
+      : null,
+    profile.processingLevel
+      ? `${t("nutrition.foods.signalLabels.processing")} · ${translateNutritionEnum(
+          t,
+          "processingLevel",
+          profile.processingLevel,
+        )}`
+      : null,
+    profile.sodiumRiskLevel
+      ? `${t("nutrition.foods.signalLabels.sodium")} · ${translateNutritionEnum(
+          t,
+          "sodiumRiskLevel",
+          profile.sodiumRiskLevel,
+        )}`
+      : null,
+    profile.sugarKind
+      ? `${t("nutrition.foods.signalLabels.sugar")} · ${translateNutritionEnum(
+          t,
+          "sugarKind",
+          profile.sugarKind,
+        )}`
+      : null,
+    getFoodSemanticBadge(profile, t),
+  ].filter((entry): entry is string => Boolean(entry))
+}
+
+function FilterChipRow({
+  isActive,
+  label,
+  onClick,
+}: {
+  isActive: boolean
+  label: string
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      className={cn(
+        "border-foreground/10 bg-muted text-muted-foreground rounded-full border px-3 py-1 text-xs transition",
+        isActive && "border-ring/60 bg-accent text-accent-foreground",
+      )}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  )
+}
+
+function matchesFoodSemanticFilter(
+  profile: FoodNutrientProfile | undefined,
+  filterId: FoodSemanticFilter,
+) {
+  if (!profile) {
+    return false
+  }
+
+  switch (filterId) {
+    case "highProtein":
+      return (profile.proteinG ?? 0) >= 12
+    case "highFiber":
+      return (profile.fiberG ?? 0) >= 3
+    case "highCalcium":
+      return (profile.calciumMg ?? 0) >= 100
+    case "highIron":
+      return (profile.ironMg ?? 0) >= 2
+    case "highPotassium":
+      return (profile.potassiumMg ?? 0) >= 300
+    case "highSugarRisk":
+      return profile.sugarKind === "游离糖/添加糖" || (profile.addedSugarG ?? 0) >= 8
+    case "highSodiumRisk":
+      return profile.sodiumRiskLevel === "高" || (profile.sodiumMg ?? 0) >= 600
+    case "highSaturatedFatRisk":
+      return (profile.saturatedFatG ?? 0) >= 4
+    case "eggProtein":
+      return profile.proteinSource === "蛋类"
+    case "dairyProtein":
+      return profile.proteinSource === "奶类"
+    case "soyProtein":
+      return profile.proteinSource === "豆制品" || profile.proteinSource === "豆类"
+    case "seafoodProtein":
+      return profile.proteinSource === "鱼虾海鲜"
+    case "poultryProtein":
+      return profile.proteinSource === "禽肉"
+    case "redMeatProtein":
+      return profile.proteinSource === "畜肉" || profile.proteinSource === "加工肉"
+    case "wholeIngredient":
+      return profile.processingLevel === "原食材"
+    case "lightlyProcessed":
+      return profile.processingLevel === "轻加工"
+    case "highlyProcessed":
+      return profile.processingLevel === "高度加工"
+  }
+}
+
+function getFoodSemanticBadge(profile: FoodNutrientProfile, t: TFunction) {
+  if ((profile.proteinG ?? 0) >= 12) {
+    return t("nutrition.foods.badges.highProtein")
+  }
+  if ((profile.fiberG ?? 0) >= 3) {
+    return t("nutrition.foods.badges.highFiber")
+  }
+  if (profile.sugarKind === "游离糖/添加糖" || (profile.addedSugarG ?? 0) >= 8) {
+    return t("nutrition.foods.badges.highSugarRisk")
+  }
+  if (profile.sodiumRiskLevel === "高" || (profile.sodiumMg ?? 0) >= 600) {
+    return t("nutrition.foods.badges.highSodiumRisk")
+  }
+  if ((profile.potassiumMg ?? 0) >= 300) {
+    return t("nutrition.foods.badges.highPotassium")
+  }
+  if ((profile.calciumMg ?? 0) >= 100) {
+    return t("nutrition.foods.badges.highCalcium")
+  }
+
+  return null
 }

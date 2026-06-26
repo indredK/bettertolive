@@ -31,6 +31,9 @@ import { Card, CardContent } from "@/components/ui/card"
 import type { NutritionModuleData } from "@/features/bettertolive/types"
 import { NutritionProfileEditDialog } from "@/features/bettertolive/ui/nutrition/nutrition-profile-edit-dialog"
 import {
+  buildDailyPlanSignals,
+  buildNutritionSemanticCues,
+  buildReplacementSuggestions,
   buildNutritionLookups,
   calculateDailyPlanNutrition,
   findDailyPlanForDate,
@@ -72,10 +75,33 @@ export function NutritionOverviewTab({
   const completionRatio = plan?.slots.length
     ? Math.round((plannedSlotCount / plan.slots.length) * 100)
     : 0
-  const recipesReady = nutrition.recipes
-    .filter((recipe) => recipe.repeatability !== "只想记录")
-    .slice(0, 3)
   const currentIntent = nutrition.profile.currentIntent
+  const planSignals = plan
+    ? buildDailyPlanSignals({
+        foodById: lookups.foodById,
+        plan,
+        profileByFoodId: lookups.profileByFoodId,
+        recipeById: lookups.recipeById,
+      })
+    : []
+  const replacementRecipes = plan
+    ? buildReplacementSuggestions({
+        foodById: lookups.foodById,
+        plan,
+        profileByFoodId: lookups.profileByFoodId,
+        recipeById: lookups.recipeById,
+        recipes: nutrition.recipes,
+      })
+    : []
+  const semanticCues = plan
+    ? buildNutritionSemanticCues({
+        foodById: lookups.foodById,
+        plan,
+        profileByFoodId: lookups.profileByFoodId,
+        recipeById: lookups.recipeById,
+      })
+    : []
+  const overviewActions = buildOverviewActions(planSignals, replacementRecipes, semanticCues, t)
 
   const nutrientBars = totals
     ? [
@@ -113,10 +139,7 @@ export function NutritionOverviewTab({
                       {t("nutrition.overview.heroTitle")}
                     </h2>
                     <p className="text-muted-foreground line-clamp-3 max-w-xl text-sm leading-6">
-                      {t(
-                        "nutrition.overview.heroDescription",
-                        "把食谱、食品、营养和真实进食收敛到一页里，先看今天怎么吃、缺什么、下一步能做什么。",
-                      )}
+                      {t("nutrition.overview.heroDescription")}
                     </p>
                   </div>
                 </div>
@@ -132,10 +155,7 @@ export function NutritionOverviewTab({
                     icon={ListChecks}
                     label={t("nutrition.overview.arrangedSlots")}
                     value={`${plannedSlotCount}/${plan?.slots.length ?? 0}`}
-                    detail={t(
-                      "nutrition.overview.arrangedSlotsHint",
-                      "空餐次不制造压力，只提示预案",
-                    )}
+                    detail={t("nutrition.overview.arrangedSlotsHint")}
                   />
                   <NutritionMetricCard
                     icon={Leaf}
@@ -173,7 +193,7 @@ export function NutritionOverviewTab({
                           variant="outline"
                           className="border-foreground/10 bg-muted text-muted-foreground"
                         >
-                          {t(`nutrition.status.${slot.status}`, slot.status)}
+                          {t(`nutrition.status.${slot.status}`)}
                         </Badge>
                       </div>
                       <div className="mt-2 space-y-1">
@@ -209,10 +229,7 @@ export function NutritionOverviewTab({
               <OverviewPanel
                 icon={Droplets}
                 title={t("nutrition.overview.nutritionPulse")}
-                subtitle={t(
-                  "nutrition.overview.nutritionPulseDesc",
-                  "轻量估算，不把缺失数据算成 0。",
-                )}
+                subtitle={t("nutrition.overview.nutritionPulseDesc")}
               >
                 <div className="grid h-full min-h-0 grid-rows-[160px_minmax(0,1fr)] gap-3">
                   <div className="grid min-h-0 grid-cols-[140px_minmax(0,1fr)] gap-3">
@@ -241,10 +258,7 @@ export function NutritionOverviewTab({
                         {completionRatio}%
                       </div>
                       <p className="text-muted-foreground mt-2 text-sm leading-6">
-                        {t(
-                          "nutrition.overview.completionCopy",
-                          "今天已经有了预案，剩下的是让它足够好执行。",
-                        )}
+                        {t("nutrition.overview.completionCopy")}
                       </p>
                     </div>
                   </div>
@@ -302,10 +316,7 @@ export function NutritionOverviewTab({
                 />
               </div>
               <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
-                {t(
-                  "nutrition.overview.profileDesc",
-                  "先看边界和当前目标，再安排今天能执行的吃法。",
-                )}
+                {t("nutrition.overview.profileDesc")}
               </p>
 
               <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
@@ -359,23 +370,28 @@ export function NutritionOverviewTab({
                 <h3 className="text-sm font-semibold">{t("nutrition.overview.actions")}</h3>
               </div>
               <div className="mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
-                {recipesReady.map((recipe) => (
+                {overviewActions.map((action) => (
                   <div
-                    key={recipe.id}
+                    key={action.id}
                     className="border-foreground/10 bg-muted/20 rounded-xl border p-3"
                   >
-                    <div className="font-medium">{recipe.name}</div>
+                    <div className="font-medium">{action.title}</div>
                     <p className="text-muted-foreground mt-1 line-clamp-2 text-xs leading-5">
-                      {recipe.summary}
+                      {action.description}
                     </p>
+                    {action.recipeName ? (
+                      <div className="text-foreground mt-2 text-xs font-medium">
+                        {t("nutrition.overview.actionRecipe", { name: action.recipeName })}
+                      </div>
+                    ) : null}
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {recipe.tags.slice(0, 3).map((tag) => (
+                      {action.badges.map((badge) => (
                         <Badge
-                          key={tag}
+                          key={`${action.id}:${badge}`}
                           variant="outline"
                           className="border-foreground/10 bg-background/70 text-[10px]"
                         >
-                          {tag}
+                          {badge}
                         </Badge>
                       ))}
                     </div>
@@ -412,14 +428,10 @@ export function NutritionOverviewTab({
                 ) : null}
                 {totals ? (
                   <div className="text-muted-foreground text-xs">
-                    {t(
-                      "nutrition.overview.energySummary",
-                      "今日估算 {{kcal}} kcal · 蛋白 {{protein}} g",
-                      {
-                        kcal: formatNutrientValue(totals.energyKcal),
-                        protein: formatNutrientValue(totals.proteinG, 1),
-                      },
-                    )}
+                    {t("nutrition.overview.energySummary", {
+                      kcal: formatNutrientValue(totals.energyKcal),
+                      protein: formatNutrientValue(totals.proteinG, 1),
+                    })}
                   </div>
                 ) : null}
               </div>
@@ -500,4 +512,121 @@ function OverviewPanel({
       <div className="mt-3 min-h-0 flex-1">{children}</div>
     </section>
   )
+}
+
+function buildOverviewActions(
+  planSignals: ReturnType<typeof buildDailyPlanSignals>,
+  replacementRecipes: ReturnType<typeof buildReplacementSuggestions>,
+  semanticCues: ReturnType<typeof buildNutritionSemanticCues>,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  const actions = planSignals
+    .filter((signal) => signal.tone !== "positive")
+    .map((signal) => {
+      const linkedRecipe = replacementRecipes.find((entry) =>
+        entry.reasons.some((reason) => matchesSignalReason(signal.id, reason)),
+      )
+
+      return {
+        id: signal.id,
+        title: t(`nutrition.overview.actionTitles.${signal.id}`),
+        description: buildOverviewActionDescription({
+          semanticCues,
+          signal,
+          t,
+        }),
+        recipeName: linkedRecipe?.recipe.name,
+        badges: [
+          t(`nutrition.dailyPlan.signalLabels.${signal.id}`),
+          ...(linkedRecipe?.reasons.map((reason) =>
+            t(`nutrition.dailyPlan.reasonLabels.${reason}`),
+          ) ?? []),
+        ].slice(0, 3),
+      }
+    })
+
+  if (actions.length > 0) {
+    return actions.slice(0, 3)
+  }
+
+  const fallbackRecipe = replacementRecipes[0]
+
+  return [
+    {
+      id: "balanced",
+      title: t("nutrition.overview.actionTitles.balanced"),
+      description: t("nutrition.overview.actionBodies.balanced"),
+      recipeName: fallbackRecipe?.recipe.name,
+      badges: fallbackRecipe
+        ? fallbackRecipe.reasons.map((reason) => t(`nutrition.dailyPlan.reasonLabels.${reason}`))
+        : [t("nutrition.overview.actionReady")],
+    },
+  ]
+}
+
+function buildOverviewActionDescription({
+  semanticCues,
+  signal,
+  t,
+}: {
+  semanticCues: ReturnType<typeof buildNutritionSemanticCues>
+  signal: ReturnType<typeof buildDailyPlanSignals>[number]
+  t: ReturnType<typeof useTranslation>["t"]
+}) {
+  if (signal.id === "sugar") {
+    const wholeFruitCue = semanticCues.find((cue) => cue.id === "wholeFruitStable")
+    const juiceCue = semanticCues.find((cue) => cue.id === "juiceDrinkPressure")
+
+    if (juiceCue && wholeFruitCue) {
+      return t("nutrition.overview.actionBodies.sugar.withFruitAndJuice", {
+        fruit: wholeFruitCue.names[0],
+        juice: juiceCue.names[0],
+      })
+    }
+
+    if (juiceCue) {
+      return t("nutrition.overview.actionBodies.sugar.withJuiceOnly", {
+        juice: juiceCue.names[0],
+      })
+    }
+  }
+
+  if (signal.id === "protein") {
+    const soyCue = semanticCues.find((cue) => cue.id === "soyProteinPresent")
+
+    if (soyCue) {
+      return t("nutrition.overview.actionBodies.protein.withSoyAnchor", {
+        food: soyCue.names[0],
+      })
+    }
+  }
+
+  if (signal.id === "sodium") {
+    const pantryCue = semanticCues.find((cue) => cue.id === "pantrySodiumPressure")
+
+    if (pantryCue) {
+      return t("nutrition.overview.actionBodies.sodium.withPantryPressure", {
+        foods: pantryCue.names.slice(0, 2).join(" / "),
+      })
+    }
+  }
+
+  return t(`nutrition.overview.actionBodies.${signal.id}.${signal.state}`)
+}
+
+function matchesSignalReason(
+  signalId: ReturnType<typeof buildDailyPlanSignals>[number]["id"],
+  reason: ReturnType<typeof buildReplacementSuggestions>[number]["reasons"][number],
+) {
+  if (signalId === "protein") {
+    return reason === "proteinSupport" || reason === "calciumSupport"
+  }
+  if (signalId === "fiber") {
+    return reason === "fiberSupport" || reason === "potassiumSupport"
+  }
+  if (signalId === "sugar") {
+    return reason === "lowerSugar" || reason === "lightSupport"
+  }
+
+  return reason === "lowerSodium" || reason === "lightSupport"
 }

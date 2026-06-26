@@ -1,9 +1,14 @@
-import { generateId } from "@/lib/id-utils"
-import { Trash2 } from "lucide-react"
-import type { FormEvent, ReactNode } from "react"
-import { useMemo, useState } from "react"
+import type { ReactNode } from "react"
+import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
+/* eslint-disable react-hooks/incompatible-library */
+import { Controller, useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod/v4"
+import { Trash2 } from "lucide-react"
 import { toast } from "sonner"
+
+import { useDirtyConfirm } from "@/features/bettertolive/hooks/use-dirty-confirm"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +31,7 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveNutritionMutation } from "@/features/bettertolive/queries/use-save-nutrition-mutation"
+import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
 import type {
   FoodItem,
   FoodNutrientProfile,
@@ -39,31 +45,13 @@ import {
   NUTRITION_DIALOG_SECTION_CLASS,
 } from "@/features/bettertolive/ui/nutrition/nutrition-page-shared"
 import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nutrition-i18n"
+import { generateId } from "@/lib/id-utils"
+import { joinListText, splitListText } from "@/lib/list-utils"
 import { cn } from "@/lib/utils"
 
 export type EditingFood = {
   isNew: boolean
   food: FoodItem | null
-}
-
-type FoodFormState = {
-  name: string
-  categoryIds: string[]
-  defaultUnit: FoodItem["defaultUnit"]
-  storage: FoodItem["storage"] | ""
-  lifecycle: FoodItem["lifecycle"] | ""
-  allergenTagsText: string
-  dietaryTagsText: string
-  note: string
-  energyKcal: string
-  proteinG: string
-  fatG: string
-  carbG: string
-  fiberG: string
-  sugarG: string
-  sodiumMg: string
-  source: FoodNutrientProfile["source"]
-  confidence: FoodNutrientProfile["confidence"]
 }
 
 const DEFAULT_UNIT_OPTIONS: FoodItem["defaultUnit"][] = ["g", "ml", "个", "份"]
@@ -77,10 +65,181 @@ const LIFECYCLE_OPTIONS: Array<NonNullable<FoodItem["lifecycle"]>> = [
 ]
 const SOURCE_OPTIONS: FoodNutrientProfile["source"][] = ["手动", "包装", "食物成分表", "外部导入"]
 const CONFIDENCE_OPTIONS: FoodNutrientProfile["confidence"][] = ["高", "中", "低"]
+const SUGAR_KIND_OPTIONS: NonNullable<FoodNutrientProfile["sugarKind"]>[] = [
+  "天然存在",
+  "游离糖/添加糖",
+  "混合",
+  "未知",
+]
+const PROTEIN_SOURCE_OPTIONS: NonNullable<FoodNutrientProfile["proteinSource"]>[] = [
+  "蛋类",
+  "奶类",
+  "豆制品",
+  "豆类",
+  "鱼虾海鲜",
+  "禽肉",
+  "畜肉",
+  "加工肉",
+]
+const PROCESSING_LEVEL_OPTIONS: NonNullable<FoodNutrientProfile["processingLevel"]>[] = [
+  "原食材",
+  "轻加工",
+  "中度加工",
+  "高度加工",
+]
+const SODIUM_RISK_OPTIONS: NonNullable<FoodNutrientProfile["sodiumRiskLevel"]>[] = [
+  "低",
+  "中",
+  "高",
+]
+const PORTION_UNIT_OPTIONS: Array<"个" | "份"> = ["个", "份"]
 const NONE_VALUE = "__none__"
+type PersistedPortionProfile = {
+  unit: "个" | "份"
+  estimatedGrams: number
+  note?: string
+}
 
-function normalizeSelectValue(value: string | null) {
-  return value === null || value === NONE_VALUE ? "" : value
+const nutrientFieldNames = [
+  "energyKcal",
+  "proteinG",
+  "fatG",
+  "saturatedFatG",
+  "carbG",
+  "fiberG",
+  "sugarG",
+  "addedSugarG",
+  "sodiumMg",
+  "calciumMg",
+  "ironMg",
+  "potassiumMg",
+] as const satisfies ReadonlyArray<keyof FoodFormValues>
+
+const portionProfileSchema = z.object({
+  unit: z.enum(PORTION_UNIT_OPTIONS),
+  estimatedGrams: z.string(),
+  note: z.string(),
+})
+
+const foodFormSchema = z
+  .object({
+    name: z.string().trim().min(1),
+    categoryIds: z.array(z.string()).min(1),
+    defaultUnit: z.enum(DEFAULT_UNIT_OPTIONS),
+    storage: z.union([z.enum(STORAGE_OPTIONS), z.literal("")]),
+    lifecycle: z.union([z.enum(LIFECYCLE_OPTIONS), z.literal("")]),
+    allergenTagsText: z.string(),
+    dietaryTagsText: z.string(),
+    note: z.string(),
+    energyKcal: z.string(),
+    proteinG: z.string(),
+    fatG: z.string(),
+    saturatedFatG: z.string(),
+    carbG: z.string(),
+    fiberG: z.string(),
+    sugarG: z.string(),
+    addedSugarG: z.string(),
+    sodiumMg: z.string(),
+    calciumMg: z.string(),
+    ironMg: z.string(),
+    potassiumMg: z.string(),
+    sugarKind: z.union([z.enum(SUGAR_KIND_OPTIONS), z.literal("")]),
+    proteinSource: z.union([z.enum(PROTEIN_SOURCE_OPTIONS), z.literal("")]),
+    processingLevel: z.union([z.enum(PROCESSING_LEVEL_OPTIONS), z.literal("")]),
+    sodiumRiskLevel: z.union([z.enum(SODIUM_RISK_OPTIONS), z.literal("")]),
+    portionProfiles: z.array(portionProfileSchema),
+    source: z.enum(SOURCE_OPTIONS),
+    confidence: z.enum(CONFIDENCE_OPTIONS),
+  })
+  .superRefine((values, context) => {
+    for (const fieldName of nutrientFieldNames) {
+      const rawValue = values[fieldName]
+      if (!rawValue.trim()) {
+        continue
+      }
+      if (!Number.isFinite(Number(rawValue))) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: "invalid-number",
+        })
+        continue
+      }
+      if (Number(rawValue) < 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [fieldName],
+          message: "negative-number",
+        })
+      }
+    }
+
+    values.portionProfiles.forEach((portionProfile, index) => {
+      if (!portionProfile.estimatedGrams.trim()) {
+        return
+      }
+      if (!Number.isFinite(Number(portionProfile.estimatedGrams))) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["portionProfiles", index, "estimatedGrams"],
+          message: "invalid-number",
+        })
+        return
+      }
+      if (Number(portionProfile.estimatedGrams) <= 0) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["portionProfiles", index, "estimatedGrams"],
+          message: "portion-positive",
+        })
+      }
+    })
+  })
+
+type FoodFormValues = z.infer<typeof foodFormSchema>
+
+function createInitialForm(
+  food: FoodItem | null,
+  profile: FoodNutrientProfile | undefined,
+): FoodFormValues {
+  const portionProfiles = PORTION_UNIT_OPTIONS.map((unit) => {
+    const portionProfile = profile?.portionProfiles?.find((entry) => entry.unit === unit)
+    return {
+      unit,
+      estimatedGrams: stringifyNumber(portionProfile?.estimatedGrams),
+      note: portionProfile?.note ?? "",
+    }
+  })
+
+  return {
+    name: food?.name ?? "",
+    categoryIds: food?.categoryIds ?? [],
+    defaultUnit: food?.defaultUnit ?? "g",
+    storage: food?.storage ?? "",
+    lifecycle: food?.lifecycle ?? "",
+    allergenTagsText: joinListText(food?.allergenTags),
+    dietaryTagsText: joinListText(food?.dietaryTags),
+    note: food?.note ?? "",
+    energyKcal: stringifyNumber(profile?.energyKcal),
+    proteinG: stringifyNumber(profile?.proteinG),
+    fatG: stringifyNumber(profile?.fatG),
+    saturatedFatG: stringifyNumber(profile?.saturatedFatG),
+    carbG: stringifyNumber(profile?.carbG),
+    fiberG: stringifyNumber(profile?.fiberG),
+    sugarG: stringifyNumber(profile?.sugarG),
+    addedSugarG: stringifyNumber(profile?.addedSugarG),
+    sodiumMg: stringifyNumber(profile?.sodiumMg),
+    calciumMg: stringifyNumber(profile?.calciumMg),
+    ironMg: stringifyNumber(profile?.ironMg),
+    potassiumMg: stringifyNumber(profile?.potassiumMg),
+    sugarKind: profile?.sugarKind ?? "",
+    proteinSource: profile?.proteinSource ?? "",
+    processingLevel: profile?.processingLevel ?? "",
+    sodiumRiskLevel: profile?.sodiumRiskLevel ?? "",
+    portionProfiles,
+    source: profile?.source ?? "手动",
+    confidence: profile?.confidence ?? "中",
+  }
 }
 
 export function NutritionFoodEditDialog({
@@ -116,6 +275,7 @@ export function NutritionFoodEditDialog({
     : []
   const referenceCount =
     referencedByRecipes.length + referencedByPlans.length + referencedByLogs.length
+
   const categoryOptions = useMemo<MultiSelectOption[]>(
     () =>
       nutrition.foodCategories.map((category) => ({
@@ -124,406 +284,573 @@ export function NutritionFoodEditDialog({
       })),
     [nutrition.foodCategories, t],
   )
-  const [form, setForm] = useState<FoodFormState>(() =>
-    createInitialForm(editing.food, existingProfile),
+
+  const form = useForm<FoodFormValues>({
+    resolver: zodResolver(foodFormSchema),
+    defaultValues: createInitialForm(editing.food, existingProfile),
+    mode: "onChange",
+  })
+
+  const categoryIds = form.watch("categoryIds")
+  const canSubmit = form.formState.isValid
+
+  const handleSubmit = form.handleSubmit(
+    async (values) => {
+      const nextFoodId = editing.food?.id ?? generateId("food")
+      const nextProfile = createNextProfile({
+        existingProfile,
+        foodId: nextFoodId,
+        form: values,
+      })
+
+      const nextFood: FoodItem = {
+        id: nextFoodId,
+        name: values.name.trim(),
+        categoryIds: values.categoryIds,
+        defaultUnit: values.defaultUnit,
+        storage: values.storage || undefined,
+        lifecycle: values.lifecycle || undefined,
+        allergenTags: splitListText(values.allergenTagsText, /[,，\n]/),
+        dietaryTags: splitListText(values.dietaryTagsText, /[,，\n]/),
+        nutrientProfileId: nextProfile?.id,
+        note: values.note.trim() || undefined,
+      }
+
+      const nextFoods = editing.isNew
+        ? [...nutrition.foods, nextFood]
+        : nutrition.foods.map((food) => (food.id === nextFood.id ? nextFood : food))
+      const nextProfilesWithoutCurrent = nutrition.nutrientProfiles.filter(
+        (profile) => profile.foodId !== nextFood.id,
+      )
+
+      try {
+        await saveNutritionMutation.mutateAsync({
+          ...nutrition,
+          foods: nextFoods,
+          nutrientProfiles: nextProfile
+            ? [...nextProfilesWithoutCurrent, nextProfile]
+            : nextProfilesWithoutCurrent,
+        })
+        toast.success(t("common.toast.saved"))
+        onClose()
+      } catch {
+        toast.error(t("common.toast.saveFailed"))
+      }
+    },
+    () => {
+      toast.error(t("common.validation.invalidForm"))
+    },
   )
 
-  const updateForm = (patch: Partial<FoodFormState>) => {
-    setForm((current) => ({ ...current, ...patch }))
-  }
-
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault()
-
-    if (!form.name.trim()) {
-      toast.error(t("nutrition.foodEdit.validation.nameRequired"))
-      return
-    }
-
-    if (form.categoryIds.length === 0) {
-      toast.error(t("nutrition.foodEdit.validation.categoryRequired"))
-      return
-    }
-
-    const nextFoodId = editing.food?.id ?? generateId("food")
-    const nextProfile = createNextProfile({
-      existingProfile,
-      foodId: nextFoodId,
-      form,
-    })
-    const nextFood: FoodItem = {
-      id: nextFoodId,
-      name: form.name.trim(),
-      categoryIds: form.categoryIds,
-      defaultUnit: form.defaultUnit,
-      storage: form.storage || undefined,
-      lifecycle: form.lifecycle || undefined,
-      allergenTags: splitTags(form.allergenTagsText),
-      dietaryTags: splitTags(form.dietaryTagsText),
-      nutrientProfileId: nextProfile?.id,
-      note: form.note.trim() || undefined,
-    }
-    const nextFoods = editing.isNew
-      ? [...nutrition.foods, nextFood]
-      : nutrition.foods.map((food) => (food.id === nextFood.id ? nextFood : food))
-    const nextProfilesWithoutCurrent = nutrition.nutrientProfiles.filter(
-      (profile) => profile.foodId !== nextFood.id,
-    )
-
-    try {
-      await saveNutritionMutation.mutateAsync({
-        ...nutrition,
-        foods: nextFoods,
-        nutrientProfiles: nextProfile
-          ? [...nextProfilesWithoutCurrent, nextProfile]
-          : nextProfilesWithoutCurrent,
-      })
-      toast.success(t("common.toast.saved"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.saveFailed"))
-    }
-  }
-
-  const handleDelete = async () => {
+  const handleDelete = () => {
     if (!editing.food || referenceCount > 0) {
       return
     }
 
-    try {
-      await saveNutritionMutation.mutateAsync({
-        ...nutrition,
-        foods: nutrition.foods.filter((food) => food.id !== editing.food?.id),
-        nutrientProfiles: nutrition.nutrientProfiles.filter(
-          (profile) => profile.foodId !== editing.food?.id,
-        ),
-      })
-      toast.success(t("common.toast.deleted"))
-      onClose()
-    } catch {
-      toast.error(t("common.toast.deleteFailed"))
+    confirmUndoableDelete({
+      confirmMessage: t("common.confirm.deleteItem", { name: editing.food.name }),
+      pendingMessage: t("common.toast.deletePending", { name: editing.food.name }),
+      successMessage: t("common.toast.deleted"),
+      failureMessage: t("common.toast.deleteFailed"),
+      undoLabel: t("common.actions.undo"),
+      undoneMessage: t("common.toast.deleteUndone", { name: editing.food.name }),
+      onDelete: () =>
+        saveNutritionMutation.mutateAsync({
+          ...nutrition,
+          foods: nutrition.foods.filter((food) => food.id !== editing.food?.id),
+          nutrientProfiles: nutrition.nutrientProfiles.filter(
+            (profile) => profile.foodId !== editing.food?.id,
+          ),
+        }),
+      onDeleted: () => onClose(),
+    })
+  }
+
+  const { handleOpenChange, dirtyConfirmDialog } = useDirtyConfirm({
+    isDirty: form.formState.isDirty,
+    confirmMessage: t("common.confirm.unsavedChanges"),
+    cancelLabel: t("common.actions.cancel"),
+    confirmLabel: t("common.actions.confirm"),
+  })
+  const requestClose = () => {
+    if (saveNutritionMutation.isPending) {
+      return
     }
+    handleOpenChange(onClose)(false)
   }
 
   return (
-    <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
-      <DialogContent
-        className={cn(
-          NUTRITION_DIALOG_CONTENT_CLASS,
-          "flex max-h-[min(760px,calc(100dvh-2rem))] max-w-4xl flex-col overflow-hidden",
-        )}
+    <>
+      <Dialog
+        open
+        onOpenChange={(open) => {
+          if (!open && saveNutritionMutation.isPending) {
+            return
+          }
+          handleOpenChange(onClose)(open)
+        }}
       >
-        <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
-          <DialogTitle>
-            {editing.isNew
-              ? t("nutrition.foodEdit.createTitle")
-              : t("nutrition.foodEdit.editTitle")}
-          </DialogTitle>
-          <DialogDescription>
-            {t(
-              "nutrition.foodEdit.description",
-              "食品是饮食模块的基础数据源，会被食谱、每日计划和营养成分表复用。",
-            )}
-          </DialogDescription>
-        </DialogHeader>
+        <DialogContent
+          className={cn(
+            NUTRITION_DIALOG_CONTENT_CLASS,
+            "flex max-h-[min(820px,calc(100dvh-2rem))] max-w-5xl flex-col overflow-hidden",
+          )}
+        >
+          <DialogHeader className={NUTRITION_DIALOG_HEADER_CLASS}>
+            <DialogTitle>
+              {editing.isNew
+                ? t("nutrition.foodEdit.createTitle")
+                : t("nutrition.foodEdit.editTitle")}
+            </DialogTitle>
+            <DialogDescription>{t("nutrition.foodEdit.description")}</DialogDescription>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
-            <section className={NUTRITION_DIALOG_SECTION_CLASS}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.name")}>
-                  <Input
-                    value={form.name}
-                    onChange={(event) => updateForm({ name: event.target.value })}
-                    className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t(
-                      "nutrition.foodEdit.namePlaceholder",
-                      "例如：鸡蛋、番茄、杂粮饭",
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              void handleSubmit()
+            }}
+            className="flex min-h-0 flex-1 flex-col"
+          >
+            <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-1 py-1 pr-2">
+              <section className={NUTRITION_DIALOG_SECTION_CLASS}>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field
+                    error={getFieldErrorMessage(form.formState.errors.name?.message, t, {
+                      field: t("nutrition.foodEdit.name"),
+                    })}
+                    label={t("nutrition.foodEdit.name")}
+                  >
+                    <Controller
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <Input
+                          value={field.value}
+                          onChange={field.onChange}
+                          className={NUTRITION_DIALOG_FIELD_CLASS}
+                          placeholder={t("nutrition.foodEdit.namePlaceholder")}
+                        />
+                      )}
+                    />
+                  </Field>
+
+                  <Field label={t("nutrition.foodEdit.defaultUnit")}>
+                    <Controller
+                      control={form.control}
+                      name="defaultUnit"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            if (value !== null) {
+                              field.onChange(value)
+                            }
+                          }}
+                        >
+                          <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {DEFAULT_UNIT_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {t(`nutrition.enum.unit.${option}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </Field>
+                </div>
+
+                <Field
+                  error={getFieldErrorMessage(form.formState.errors.categoryIds?.message, t, {
+                    field: t("nutrition.foodEdit.categories"),
+                  })}
+                  label={t("nutrition.foodEdit.categories")}
+                >
+                  <MultiSelect
+                    options={categoryOptions}
+                    value={categoryIds}
+                    onChange={(nextCategoryIds) =>
+                      form.setValue("categoryIds", nextCategoryIds, {
+                        shouldDirty: true,
+                        shouldTouch: true,
+                        shouldValidate: true,
+                      })
+                    }
+                    placeholder={t("nutrition.foodEdit.categoriesPlaceholder")}
+                    searchPlaceholder={t("nutrition.foodEdit.categoriesSearch")}
+                    emptyMessage={t("nutrition.foodEdit.categoriesEmpty")}
+                  />
+                </Field>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label={t("nutrition.foodEdit.storage")}>
+                    <Controller
+                      control={form.control}
+                      name="storage"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value || NONE_VALUE}
+                          onValueChange={(value) => field.onChange(normalizeSelectValue(value))}
+                        >
+                          <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={NONE_VALUE}>
+                              {t("nutrition.common.optional")}
+                            </SelectItem>
+                            {STORAGE_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {t(`nutrition.enum.storage.${option}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </Field>
+
+                  <Field label={t("nutrition.foodEdit.lifecycle")}>
+                    <Controller
+                      control={form.control}
+                      name="lifecycle"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value || NONE_VALUE}
+                          onValueChange={(value) => field.onChange(normalizeSelectValue(value))}
+                        >
+                          <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={NONE_VALUE}>
+                              {t("nutrition.common.optional")}
+                            </SelectItem>
+                            {LIFECYCLE_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {t(`nutrition.enum.lifecycle.${option}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </Field>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label={t("nutrition.foodEdit.dietaryTags")}>
+                    <Controller
+                      control={form.control}
+                      name="dietaryTagsText"
+                      render={({ field }) => (
+                        <Input
+                          value={field.value}
+                          onChange={field.onChange}
+                          className={NUTRITION_DIALOG_FIELD_CLASS}
+                          placeholder={t("common.form.tagsPlaceholder")}
+                        />
+                      )}
+                    />
+                  </Field>
+
+                  <Field label={t("nutrition.foodEdit.allergenTags")}>
+                    <Controller
+                      control={form.control}
+                      name="allergenTagsText"
+                      render={({ field }) => (
+                        <Input
+                          value={field.value}
+                          onChange={field.onChange}
+                          className={NUTRITION_DIALOG_FIELD_CLASS}
+                          placeholder={t("common.form.tagsPlaceholder")}
+                        />
+                      )}
+                    />
+                  </Field>
+                </div>
+
+                <Field label={t("nutrition.foodEdit.note")}>
+                  <Controller
+                    control={form.control}
+                    name="note"
+                    render={({ field }) => (
+                      <Textarea
+                        value={field.value}
+                        onChange={field.onChange}
+                        className={NUTRITION_DIALOG_FIELD_CLASS}
+                        placeholder={t("nutrition.foodEdit.notePlaceholder")}
+                      />
                     )}
                   />
                 </Field>
+              </section>
 
-                <Field label={t("nutrition.foodEdit.defaultUnit")}>
-                  <Select
-                    value={form.defaultUnit}
-                    onValueChange={(value) =>
-                      updateForm({
-                        defaultUnit: (normalizeSelectValue(value) ||
-                          form.defaultUnit) as FoodItem["defaultUnit"],
-                      })
-                    }
-                  >
-                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DEFAULT_UNIT_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`nutrition.enum.unit.${option}`, option)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
+              <section className={NUTRITION_DIALOG_SECTION_CLASS}>
+                <div>
+                  <h3 className="text-sm font-semibold">
+                    {t("nutrition.foodEdit.nutritionSection")}
+                  </h3>
+                  <p className="text-muted-foreground mt-1 text-xs leading-5">
+                    {t("nutrition.foodEdit.nutritionDescription")}
+                  </p>
+                </div>
 
-              <Field label={t("nutrition.foodEdit.categories")}>
-                <MultiSelect
-                  options={categoryOptions}
-                  value={form.categoryIds}
-                  onChange={(categoryIds) => updateForm({ categoryIds })}
-                  placeholder={t("nutrition.foodEdit.categoriesPlaceholder")}
-                  searchPlaceholder={t("nutrition.foodEdit.categoriesSearch")}
-                  emptyMessage={t("nutrition.foodEdit.categoriesEmpty")}
-                />
-              </Field>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.storage")}>
-                  <Select
-                    value={form.storage || NONE_VALUE}
-                    onValueChange={(value) =>
-                      updateForm({
-                        storage: normalizeSelectValue(value) as FoodFormState["storage"],
-                      })
-                    }
-                  >
-                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional")}</SelectItem>
-                      {STORAGE_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`nutrition.enum.storage.${option}`, option)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-
-                <Field label={t("nutrition.foodEdit.lifecycle")}>
-                  <Select
-                    value={form.lifecycle || NONE_VALUE}
-                    onValueChange={(value) =>
-                      updateForm({
-                        lifecycle: normalizeSelectValue(value) as FoodFormState["lifecycle"],
-                      })
-                    }
-                  >
-                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={NONE_VALUE}>{t("nutrition.common.optional")}</SelectItem>
-                      {LIFECYCLE_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`nutrition.enum.lifecycle.${option}`, option)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
-
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.dietaryTags")}>
-                  <Input
-                    value={form.dietaryTagsText}
-                    onChange={(event) => updateForm({ dietaryTagsText: event.target.value })}
-                    className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("common.form.tagsPlaceholder")}
+                <div className="grid gap-4 md:grid-cols-4">
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.energyKcal")}
+                    name="energyKcal"
+                    suffix="kcal"
                   />
-                </Field>
-                <Field label={t("nutrition.foodEdit.allergenTags")}>
-                  <Input
-                    value={form.allergenTagsText}
-                    onChange={(event) => updateForm({ allergenTagsText: event.target.value })}
-                    className={NUTRITION_DIALOG_FIELD_CLASS}
-                    placeholder={t("common.form.tagsPlaceholder")}
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.proteinG")}
+                    name="proteinG"
+                    suffix="g"
                   />
-                </Field>
-              </div>
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.fatG")}
+                    name="fatG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.saturatedFatG")}
+                    name="saturatedFatG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.carbG")}
+                    name="carbG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.fiberG")}
+                    name="fiberG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.sugarG")}
+                    name="sugarG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.addedSugarG")}
+                    name="addedSugarG"
+                    suffix="g"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.sodiumMg")}
+                    name="sodiumMg"
+                    suffix="mg"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.calciumMg")}
+                    name="calciumMg"
+                    suffix="mg"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.ironMg")}
+                    name="ironMg"
+                    suffix="mg"
+                    step="0.1"
+                  />
+                  <ControlledNumberField
+                    control={form.control}
+                    label={t("nutrition.nutrients.potassiumMg")}
+                    name="potassiumMg"
+                    suffix="mg"
+                  />
+                </div>
 
-              <Field label={t("nutrition.foodEdit.note")}>
-                <Textarea
-                  value={form.note}
-                  onChange={(event) => updateForm({ note: event.target.value })}
-                  className={NUTRITION_DIALOG_FIELD_CLASS}
-                  placeholder={t("nutrition.foodEdit.notePlaceholder")}
-                />
-              </Field>
-            </section>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <ControlledSelectField
+                    control={form.control}
+                    label={t("nutrition.foodEdit.sugarKind")}
+                    name="sugarKind"
+                    options={SUGAR_KIND_OPTIONS.map((option) => ({
+                      label: translateNutritionEnum(t, "sugarKind", option),
+                      value: option,
+                    }))}
+                  />
+                  <ControlledSelectField
+                    control={form.control}
+                    label={t("nutrition.foodEdit.proteinSource")}
+                    name="proteinSource"
+                    options={PROTEIN_SOURCE_OPTIONS.map((option) => ({
+                      label: translateNutritionEnum(t, "proteinSource", option),
+                      value: option,
+                    }))}
+                  />
+                  <ControlledSelectField
+                    control={form.control}
+                    label={t("nutrition.foodEdit.processingLevel")}
+                    name="processingLevel"
+                    options={PROCESSING_LEVEL_OPTIONS.map((option) => ({
+                      label: translateNutritionEnum(t, "processingLevel", option),
+                      value: option,
+                    }))}
+                  />
+                  <ControlledSelectField
+                    control={form.control}
+                    label={t("nutrition.foodEdit.sodiumRiskLevel")}
+                    name="sodiumRiskLevel"
+                    options={SODIUM_RISK_OPTIONS.map((option) => ({
+                      label: translateNutritionEnum(t, "sodiumRiskLevel", option),
+                      value: option,
+                    }))}
+                  />
+                </div>
 
-            <section className={NUTRITION_DIALOG_SECTION_CLASS}>
-              <div>
-                <h3 className="text-sm font-semibold">
-                  {t("nutrition.foodEdit.nutritionSection")}
-                </h3>
-                <p className="text-muted-foreground mt-1 text-xs leading-5">
-                  {t(
-                    "nutrition.foodEdit.nutritionDescription",
-                    "按每 100g / 100ml 维护。留空时不会按 0 计算，而是在营养表显示待补。",
-                  )}
-                </p>
-              </div>
+                <div className="grid gap-4 xl:grid-cols-2">
+                  {PORTION_UNIT_OPTIONS.map((unit, index) => (
+                    <div
+                      key={unit}
+                      className="border-foreground/10 bg-background/70 rounded-2xl border p-3"
+                    >
+                      <div className="mb-3 text-sm font-medium">
+                        {t("nutrition.foodEdit.portionWeight", {
+                          unit: translateNutritionEnum(t, "unit", unit),
+                        })}
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-[minmax(0,140px)_minmax(0,1fr)]">
+                        <ControlledNumberField
+                          control={form.control}
+                          label={t("nutrition.foodEdit.estimatedGrams")}
+                          name={`portionProfiles.${index}.estimatedGrams`}
+                          suffix="g"
+                        />
+                        <Field label={t("nutrition.foodEdit.portionNote")}>
+                          <Controller
+                            control={form.control}
+                            name={`portionProfiles.${index}.note`}
+                            render={({ field }) => (
+                              <Input
+                                value={field.value}
+                                onChange={field.onChange}
+                                className={NUTRITION_DIALOG_FIELD_CLASS}
+                                placeholder={t("nutrition.foodEdit.portionNotePlaceholder")}
+                              />
+                            )}
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                </div>
 
-              <div className="grid gap-4 md:grid-cols-4">
-                <NumberField
-                  label={t("nutrition.nutrients.energyKcal")}
-                  value={form.energyKcal}
-                  onChange={(energyKcal) => updateForm({ energyKcal })}
-                  suffix="kcal"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.proteinG")}
-                  value={form.proteinG}
-                  onChange={(proteinG) => updateForm({ proteinG })}
-                  suffix="g"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.fatG")}
-                  value={form.fatG}
-                  onChange={(fatG) => updateForm({ fatG })}
-                  suffix="g"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.carbG")}
-                  value={form.carbG}
-                  onChange={(carbG) => updateForm({ carbG })}
-                  suffix="g"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.fiberG")}
-                  value={form.fiberG}
-                  onChange={(fiberG) => updateForm({ fiberG })}
-                  suffix="g"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.sugarG")}
-                  value={form.sugarG}
-                  onChange={(sugarG) => updateForm({ sugarG })}
-                  suffix="g"
-                />
-                <NumberField
-                  label={t("nutrition.nutrients.sodiumMg")}
-                  value={form.sodiumMg}
-                  onChange={(sodiumMg) => updateForm({ sodiumMg })}
-                  suffix="mg"
-                />
-              </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label={t("nutrition.foodEdit.source")}>
+                    <Controller
+                      control={form.control}
+                      name="source"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            if (value !== null) {
+                              field.onChange(value)
+                            }
+                          }}
+                        >
+                          <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SOURCE_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {t(`nutrition.enum.source.${option}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </Field>
 
-              <div className="grid gap-4 md:grid-cols-2">
-                <Field label={t("nutrition.foodEdit.source")}>
-                  <Select
-                    value={form.source}
-                    onValueChange={(value) =>
-                      updateForm({
-                        source: (normalizeSelectValue(value) ||
-                          form.source) as FoodNutrientProfile["source"],
-                      })
-                    }
-                  >
-                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SOURCE_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`nutrition.enum.source.${option}`, option)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
+                  <Field label={t("nutrition.foodEdit.confidence")}>
+                    <Controller
+                      control={form.control}
+                      name="confidence"
+                      render={({ field }) => (
+                        <Select
+                          value={field.value}
+                          onValueChange={(value) => {
+                            if (value !== null) {
+                              field.onChange(value)
+                            }
+                          }}
+                        >
+                          <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CONFIDENCE_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {t(`nutrition.enum.confidence.${option}`)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
+                  </Field>
+                </div>
+              </section>
 
-                <Field label={t("nutrition.foodEdit.confidence")}>
-                  <Select
-                    value={form.confidence}
-                    onValueChange={(value) =>
-                      updateForm({
-                        confidence: (normalizeSelectValue(value) ||
-                          form.confidence) as FoodNutrientProfile["confidence"],
-                      })
-                    }
-                  >
-                    <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CONFIDENCE_OPTIONS.map((option) => (
-                        <SelectItem key={option} value={option}>
-                          {t(`nutrition.enum.confidence.${option}`, option)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </Field>
-              </div>
-            </section>
+              {!editing.isNew && referenceCount > 0 ? (
+                <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed px-4 py-3 text-xs leading-5">
+                  {t("nutrition.foodEdit.deleteBlocked", { count: referenceCount })}
+                </div>
+              ) : null}
+            </div>
 
-            {!editing.isNew && referenceCount > 0 ? (
-              <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed px-4 py-3 text-xs leading-5">
-                {t(
-                  "nutrition.foodEdit.deleteBlocked",
-                  "该食品已被 {{count}} 个食谱、计划或记录引用，暂不能删除。",
-                  { count: referenceCount },
-                )}
-              </div>
-            ) : null}
-          </div>
-
-          <DialogFooter className={NUTRITION_DIALOG_FOOTER_CLASS}>
-            {!editing.isNew ? (
+            <DialogFooter className={NUTRITION_DIALOG_FOOTER_CLASS}>
+              {!editing.isNew ? (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={referenceCount > 0 || saveNutritionMutation.isPending}
+                  className="mr-auto"
+                >
+                  <Trash2 className="size-4" />
+                  {t("common.actions.delete")}
+                </Button>
+              ) : null}
               <Button
                 type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                disabled={referenceCount > 0 || saveNutritionMutation.isPending}
-                className="mr-auto"
+                variant="outline"
+                onClick={requestClose}
+                disabled={saveNutritionMutation.isPending}
               >
-                <Trash2 className="size-4" />
-                {t("common.actions.delete")}
+                {t("common.actions.cancel")}
               </Button>
-            ) : null}
-            <Button type="button" variant="outline" onClick={onClose}>
-              {t("common.actions.cancel")}
-            </Button>
-            <Button type="submit" disabled={saveNutritionMutation.isPending}>
-              {saveNutritionMutation.isPending
-                ? t("common.actions.saving")
-                : t("common.actions.save")}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+              <Button type="submit" disabled={!canSubmit || saveNutritionMutation.isPending}>
+                {saveNutritionMutation.isPending
+                  ? t("common.actions.saving")
+                  : t("common.actions.save")}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+      {dirtyConfirmDialog}
+    </>
   )
-}
-
-function createInitialForm(
-  food: FoodItem | null,
-  profile: FoodNutrientProfile | undefined,
-): FoodFormState {
-  return {
-    name: food?.name ?? "",
-    categoryIds: food?.categoryIds ?? [],
-    defaultUnit: food?.defaultUnit ?? "g",
-    storage: food?.storage ?? "",
-    lifecycle: food?.lifecycle ?? "",
-    allergenTagsText: (food?.allergenTags ?? []).join(", "),
-    dietaryTagsText: (food?.dietaryTags ?? []).join(", "),
-    note: food?.note ?? "",
-    energyKcal: stringifyNumber(profile?.energyKcal),
-    proteinG: stringifyNumber(profile?.proteinG),
-    fatG: stringifyNumber(profile?.fatG),
-    carbG: stringifyNumber(profile?.carbG),
-    fiberG: stringifyNumber(profile?.fiberG),
-    sugarG: stringifyNumber(profile?.sugarG),
-    sodiumMg: stringifyNumber(profile?.sodiumMg),
-    source: profile?.source ?? "手动",
-    confidence: profile?.confidence ?? "中",
-  }
 }
 
 function createNextProfile({
@@ -533,20 +860,53 @@ function createNextProfile({
 }: {
   existingProfile?: FoodNutrientProfile
   foodId: string
-  form: FoodFormState
+  form: FoodFormValues
 }): FoodNutrientProfile | null {
   const nutrientValues = {
     energyKcal: parseOptionalNumber(form.energyKcal),
     proteinG: parseOptionalNumber(form.proteinG),
     fatG: parseOptionalNumber(form.fatG),
+    saturatedFatG: parseOptionalNumber(form.saturatedFatG),
     carbG: parseOptionalNumber(form.carbG),
     fiberG: parseOptionalNumber(form.fiberG),
     sugarG: parseOptionalNumber(form.sugarG),
+    addedSugarG: parseOptionalNumber(form.addedSugarG),
     sodiumMg: parseOptionalNumber(form.sodiumMg),
+    calciumMg: parseOptionalNumber(form.calciumMg),
+    ironMg: parseOptionalNumber(form.ironMg),
+    potassiumMg: parseOptionalNumber(form.potassiumMg),
   }
-  const hasAnyNutrient = Object.values(nutrientValues).some((value) => value !== undefined)
 
-  if (!hasAnyNutrient) {
+  const portionProfiles = form.portionProfiles.reduce<PersistedPortionProfile[]>(
+    (accumulator, portionProfile) => {
+      const estimatedGrams = parseOptionalNumber(portionProfile.estimatedGrams)
+      if (estimatedGrams === undefined) {
+        return accumulator
+      }
+
+      accumulator.push({
+        unit: portionProfile.unit,
+        estimatedGrams,
+        note: portionProfile.note.trim() || undefined,
+      })
+
+      return accumulator
+    },
+    [],
+  )
+
+  const semanticValues = {
+    sugarKind: form.sugarKind || undefined,
+    proteinSource: form.proteinSource || undefined,
+    processingLevel: form.processingLevel || undefined,
+    sodiumRiskLevel: form.sodiumRiskLevel || undefined,
+  }
+
+  const hasAnyNutrient = Object.values(nutrientValues).some((value) => value !== undefined)
+  const hasAnySemantic = Object.values(semanticValues).some((value) => value !== undefined)
+  const hasAnyPortion = portionProfiles.length > 0
+
+  if (!hasAnyNutrient && !hasAnySemantic && !hasAnyPortion) {
     return null
   }
 
@@ -556,16 +916,11 @@ function createNextProfile({
     basisAmount: 100,
     basisUnit: form.defaultUnit === "ml" ? "ml" : "g",
     ...nutrientValues,
+    ...semanticValues,
+    portionProfiles: portionProfiles.length > 0 ? portionProfiles : undefined,
     source: form.source,
     confidence: form.confidence,
   }
-}
-
-function splitTags(value: string) {
-  return value
-    .split(/[,，]/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
 }
 
 function parseOptionalNumber(value: string) {
@@ -581,41 +936,120 @@ function stringifyNumber(value: number | undefined) {
   return typeof value === "number" ? String(value) : ""
 }
 
-function Field({ children, label }: { children: ReactNode; label: string }) {
+function normalizeSelectValue(value: string | null) {
+  return value === null || value === NONE_VALUE ? "" : value
+}
+
+function getFieldErrorMessage(
+  message: string | undefined,
+  t: ReturnType<typeof useTranslation>["t"],
+  params: Record<string, string>,
+) {
+  if (!message) {
+    return undefined
+  }
+
+  if (message === "invalid-number") {
+    return t("common.validation.invalidForm")
+  }
+  if (message === "negative-number") {
+    return t("common.validation.nonNegative", params)
+  }
+  if (message === "portion-positive") {
+    return t("nutrition.foodEdit.validation.portionPositive")
+  }
+
+  return t("common.validation.required", params)
+}
+
+function Field({ children, error, label }: { children: ReactNode; error?: string; label: string }) {
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
       {children}
+      {error ? <p className="text-destructive text-xs">{error}</p> : null}
     </div>
   )
 }
 
-function NumberField({
+function ControlledNumberField({
+  control,
   label,
-  onChange,
+  name,
+  step = "0.1",
   suffix,
-  value,
 }: {
+  control: ReturnType<typeof useForm<FoodFormValues>>["control"]
   label: string
-  onChange: (value: string) => void
+  name: keyof FoodFormValues | `portionProfiles.${number}.estimatedGrams`
+  step?: string
   suffix: string
-  value: string
+}) {
+  const { t } = useTranslation()
+
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field
+          error={getFieldErrorMessage(fieldState.error?.message, t, { field: label })}
+          label={label}
+        >
+          <div className="relative">
+            <Input
+              type="number"
+              min={0}
+              step={step}
+              value={typeof field.value === "string" ? field.value : ""}
+              onChange={field.onChange}
+              className={cn(NUTRITION_DIALOG_FIELD_CLASS, "pr-12")}
+            />
+            <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
+              {suffix}
+            </span>
+          </div>
+        </Field>
+      )}
+    />
+  )
+}
+
+function ControlledSelectField({
+  control,
+  label,
+  name,
+  options,
+}: {
+  control: ReturnType<typeof useForm<FoodFormValues>>["control"]
+  label: string
+  name: "sugarKind" | "proteinSource" | "processingLevel" | "sodiumRiskLevel"
+  options: Array<{ label: string; value: string }>
 }) {
   return (
     <Field label={label}>
-      <div className="relative">
-        <Input
-          type="number"
-          min={0}
-          step="0.1"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className={cn(NUTRITION_DIALOG_FIELD_CLASS, "pr-12")}
-        />
-        <span className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs">
-          {suffix}
-        </span>
-      </div>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <Select
+            value={field.value || NONE_VALUE}
+            onValueChange={(value) => field.onChange(normalizeSelectValue(value))}
+          >
+            <SelectTrigger className={NUTRITION_DIALOG_FIELD_CLASS}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={NONE_VALUE}>-</SelectItem>
+              {options.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+      />
     </Field>
   )
 }

@@ -15,7 +15,6 @@ import type {
   MealLog,
   MealStructure,
   NutritionModuleData,
-  Recipe,
 } from "@/features/bettertolive/types"
 import {
   NutritionDailyPlanEditDialog,
@@ -24,9 +23,11 @@ import {
 import {
   NUTRIENT_KEYS,
   NUTRIENT_UNITS,
+  buildDailyPlanSignals,
+  buildNutritionSemanticCues,
   buildNutritionLookups,
+  buildReplacementSuggestions,
   calculateDailyPlanNutrition,
-  calculateRecipeNutrition,
   findDailyPlanForDate,
   formatEntryTitle,
   formatNutrientValue,
@@ -219,7 +220,7 @@ export function NutritionDailyPlanTab({
                           variant="outline"
                           className="border-foreground/10 bg-muted text-muted-foreground"
                         >
-                          {t(`nutrition.status.${slot.status}`, slot.status)}
+                          {t(`nutrition.status.${slot.status}`)}
                         </Badge>
                       </div>
                       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -390,7 +391,20 @@ function DailyNutritionPanel({
     foodById: lookups.foodById,
     plan,
     profileByFoodId: lookups.profileByFoodId,
+    recipeById: lookups.recipeById,
     recipes: nutrition.recipes,
+  })
+  const planSignals = buildDailyPlanSignals({
+    foodById: lookups.foodById,
+    plan,
+    profileByFoodId: lookups.profileByFoodId,
+    recipeById: lookups.recipeById,
+  })
+  const semanticCues = buildNutritionSemanticCues({
+    foodById: lookups.foodById,
+    plan,
+    profileByFoodId: lookups.profileByFoodId,
+    recipeById: lookups.recipeById,
   })
 
   return (
@@ -421,16 +435,22 @@ function DailyNutritionPanel({
               <GapLine
                 label={t("nutrition.dailyPlan.emptySlots")}
                 value={emptySlotCount}
-                detail={t(
-                  "nutrition.dailyPlan.emptySlotsHint",
-                  "可以继续留白，也可以补一个低门槛预案",
-                )}
+                detail={t("nutrition.dailyPlan.emptySlotsHint")}
               />
               <GapLine
                 label={t("nutrition.dailyPlan.pendingNutrition")}
                 value={totals.missingCount}
                 detail={t("nutrition.dailyPlan.pendingNutritionHint")}
               />
+              {planSignals.map((signal) => (
+                <GapLine
+                  key={signal.id}
+                  detail={buildSignalInsightDetail(signal, semanticCues, t)}
+                  label={t(`nutrition.dailyPlan.signalLabels.${signal.id}`)}
+                  value={formatSignalValue(signal)}
+                  tone={signal.tone}
+                />
+              ))}
             </div>
           </section>
 
@@ -439,7 +459,7 @@ function DailyNutritionPanel({
               key={key}
               className="border-foreground/10 bg-background/70 flex items-center justify-between gap-3 rounded-xl border px-3 py-2 text-sm"
             >
-              <span className="text-muted-foreground">{t(`nutrition.nutrients.${key}`, key)}</span>
+              <span className="text-muted-foreground">{t(`nutrition.nutrients.${key}`)}</span>
               <span className="font-medium">
                 {formatNutrientValue(
                   totals[key],
@@ -451,13 +471,9 @@ function DailyNutritionPanel({
           ))}
           {totals.missingCount > 0 ? (
             <div className="border-foreground/15 bg-muted/25 text-muted-foreground rounded-xl border border-dashed px-3 py-3 text-xs leading-5">
-              {t(
-                "nutrition.dailyPlan.missingNutrition",
-                "{{count}} 个条目营养数据待补，未按 0 计算。",
-                {
-                  count: totals.missingCount,
-                },
-              )}
+              {t("nutrition.dailyPlan.missingNutrition", {
+                count: totals.missingCount,
+              })}
             </div>
           ) : null}
           <section className="border-foreground/10 bg-background/70 rounded-2xl border p-3">
@@ -501,6 +517,15 @@ function DailyNutritionPanel({
                           {tag}
                         </Badge>
                       ))}
+                      {entry.reasons.map((reason) => (
+                        <Badge
+                          key={reason}
+                          variant="outline"
+                          className="border-foreground/10 bg-background/70 text-[10px]"
+                        >
+                          {t(`nutrition.dailyPlan.reasonLabels.${reason}`)}
+                        </Badge>
+                      ))}
                       {entry.totals.missingCount > 0 ? (
                         <Badge
                           variant="outline"
@@ -516,10 +541,7 @@ function DailyNutritionPanel({
                 ))
               ) : (
                 <div className="border-foreground/15 text-muted-foreground rounded-xl border border-dashed px-3 py-4 text-center text-xs leading-5">
-                  {t(
-                    "nutrition.dailyPlan.noReplacement",
-                    "暂无可替换食谱，可以先补充食谱或完善营养数据。",
-                  )}
+                  {t("nutrition.dailyPlan.noReplacement")}
                 </div>
               )}
             </div>
@@ -530,41 +552,79 @@ function DailyNutritionPanel({
   )
 }
 
-function GapLine({ detail, label, value }: { detail: string; label: string; value: number }) {
+function buildSignalInsightDetail(
+  signal: ReturnType<typeof buildDailyPlanSignals>[number],
+  semanticCues: ReturnType<typeof buildNutritionSemanticCues>,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  if (signal.id === "sugar") {
+    const wholeFruitCue = semanticCues.find((cue) => cue.id === "wholeFruitStable")
+    const juiceCue = semanticCues.find((cue) => cue.id === "juiceDrinkPressure")
+
+    if (wholeFruitCue && juiceCue) {
+      return t("nutrition.dailyPlan.insights.sugar.withFruitAndJuice", {
+        fruit: wholeFruitCue.names[0],
+        juice: juiceCue.names[0],
+      })
+    }
+  }
+
+  if (signal.id === "protein") {
+    const soyCue = semanticCues.find((cue) => cue.id === "soyProteinPresent")
+
+    if (soyCue) {
+      return t("nutrition.dailyPlan.insights.protein.withSoyAnchor", {
+        food: soyCue.names[0],
+      })
+    }
+  }
+
+  if (signal.id === "sodium") {
+    const pantryCue = semanticCues.find((cue) => cue.id === "pantrySodiumPressure")
+
+    if (pantryCue) {
+      return t("nutrition.dailyPlan.insights.sodium.withPantryPressure", {
+        foods: pantryCue.names.slice(0, 2).join(" / "),
+      })
+    }
+  }
+
+  return t(`nutrition.dailyPlan.insights.${signal.id}.${signal.state}`)
+}
+
+function GapLine({
+  detail,
+  label,
+  tone = "neutral",
+  value,
+}: {
+  detail: string
+  label: string
+  tone?: "neutral" | "positive" | "warning"
+  value: number | string
+}) {
+  const valueClassName =
+    tone === "positive"
+      ? "text-emerald-600 dark:text-emerald-400"
+      : tone === "warning"
+        ? "text-amber-600 dark:text-amber-400"
+        : ""
+
   return (
     <div className="border-foreground/10 bg-muted/20 rounded-xl border px-3 py-2">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="text-muted-foreground">{label}</span>
-        <span className="font-semibold">{value}</span>
+        <span className={cn("font-semibold", valueClassName)}>{value}</span>
       </div>
       <p className="text-muted-foreground mt-1 text-xs leading-5">{detail}</p>
     </div>
   )
 }
 
-function buildReplacementSuggestions({
-  foodById,
-  plan,
-  profileByFoodId,
-  recipes,
-}: {
-  foodById: ReturnType<typeof buildNutritionLookups>["foodById"]
-  plan: DailyPlan
-  profileByFoodId: ReturnType<typeof buildNutritionLookups>["profileByFoodId"]
-  recipes: Recipe[]
-}) {
-  const plannedRecipeIds = new Set(
-    plan.slots.flatMap((slot) =>
-      slot.entries.flatMap((entry) => (entry.type === "recipe" ? [entry.recipeId] : [])),
-    ),
-  )
+function formatSignalValue(signal: ReturnType<typeof buildDailyPlanSignals>[number]) {
+  if (signal.id === "sodium") {
+    return `${formatNutrientValue(signal.value)} mg`
+  }
 
-  return recipes
-    .filter((recipe) => recipe.repeatability !== "只想记录" && !plannedRecipeIds.has(recipe.id))
-    .map((recipe) => ({
-      recipe,
-      totals: calculateRecipeNutrition({ foodById, profileByFoodId, recipe }),
-    }))
-    .sort((a, b) => a.totals.missingCount - b.totals.missingCount)
-    .slice(0, 3)
+  return `${formatNutrientValue(signal.value, 1)} g`
 }

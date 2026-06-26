@@ -11,6 +11,7 @@ import { NutritionFoodsTab } from "@/features/bettertolive/ui/nutrition/nutritio
 import { NutritionLogsTab } from "@/features/bettertolive/ui/nutrition/nutrition-logs-tab"
 import { NutritionNutrientsTab } from "@/features/bettertolive/ui/nutrition/nutrition-nutrients-tab"
 import { NutritionOverviewTab } from "@/features/bettertolive/ui/nutrition/nutrition-overview-tab"
+import { buildNutritionWeeklyReview } from "@/features/bettertolive/ui/nutrition/nutrition-page-data"
 import { NutritionRecipesTab } from "@/features/bettertolive/ui/nutrition/nutrition-recipes-tab"
 import { cn } from "@/lib/utils"
 
@@ -44,8 +45,11 @@ export function NutritionPage({
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState("overview")
   const [pendingCreateAction, setPendingCreateAction] = useState<NutritionCreateAction | null>(null)
-  const normalizedNutrition = normalizeNutritionData(nutrition)
-  const normalizedEditableNutrition = normalizeNutritionData(editableNutrition ?? nutrition)
+  const normalizedNutrition = normalizeNutritionDataWithReview(nutrition, t)
+  const normalizedEditableNutrition = normalizeNutritionDataWithReview(
+    editableNutrition ?? nutrition,
+    t,
+  )
   const controlModeKey = isControlMode ? "control" : "browse"
   const tabContentClassName = cn(
     "min-h-0",
@@ -200,9 +204,41 @@ export function NutritionPage({
 }
 
 function normalizeNutritionData(nutrition: NutritionModuleData): NutritionModuleData {
-  const source = nutrition as Partial<NutritionModuleData>
+  const base = {
+    profile: {
+      hardConstraints: nutrition.profile?.hardConstraints ?? [],
+      softStances: nutrition.profile?.softStances ?? [],
+      currentIntent: {
+        ...nutrition.profile?.currentIntent,
+        mode: nutrition.profile?.currentIntent?.mode ?? EMPTY_NUTRITION_PROFILE.currentIntent.mode,
+      },
+    },
+    foodCategories: nutrition.foodCategories ?? [],
+    foods: nutrition.foods ?? [],
+    nutrientProfiles: nutrition.nutrientProfiles ?? [],
+    recipes: nutrition.recipes ?? [],
+    dailyPlans: nutrition.dailyPlans ?? [],
+    mealLogs: nutrition.mealLogs ?? [],
+    meals: nutrition.meals ?? [],
+    weeklyReview: nutrition.weeklyReview
+      ? {
+          highlights: nutrition.weeklyReview.highlights ?? [],
+          missingSignals: nutrition.weeklyReview.missingSignals ?? [],
+          crossViews: nutrition.weeklyReview.crossViews ?? [],
+        }
+      : EMPTY_WEEKLY_REVIEW,
+    foodMemories: nutrition.foodMemories ?? [],
+  } satisfies NutritionModuleData
 
-  return {
+  return base
+}
+
+function normalizeNutritionDataWithReview(
+  nutrition: NutritionModuleData,
+  t: ReturnType<typeof useTranslation>["t"],
+) {
+  const source = nutrition as Partial<NutritionModuleData>
+  const normalized = normalizeNutritionData({
     profile: {
       hardConstraints: source.profile?.hardConstraints ?? [],
       softStances: source.profile?.softStances ?? [],
@@ -226,5 +262,10 @@ function normalizeNutritionData(nutrition: NutritionModuleData): NutritionModule
         }
       : EMPTY_WEEKLY_REVIEW,
     foodMemories: source.foodMemories ?? [],
+  })
+
+  return {
+    ...normalized,
+    weeklyReview: buildNutritionWeeklyReview({ nutrition: normalized, t }),
   }
 }

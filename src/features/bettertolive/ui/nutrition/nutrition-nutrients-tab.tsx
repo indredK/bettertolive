@@ -29,7 +29,10 @@ import type {
 } from "@/features/bettertolive/types"
 import {
   NUTRIENT_KEYS,
+  NUTRIENT_FRACTION_DIGITS,
   NUTRIENT_UNITS,
+  PRIMARY_NUTRIENT_KEYS,
+  QUALITY_NUTRIENT_KEYS,
   type NutrientKey,
   buildNutritionLookups,
   calculateDailyPlanNutrition,
@@ -45,6 +48,7 @@ import { translateNutritionEnum } from "@/features/bettertolive/ui/nutrition/nut
 import { cn } from "@/lib/utils"
 
 type NutrientMode = "foods" | "recipes" | "plans"
+type NutrientTablePreset = "primary" | "quality"
 
 type NutrientTableRow = {
   id: string
@@ -52,13 +56,19 @@ type NutrientTableRow = {
   basis: string
   missing: number
   missingCount?: number
+  sugarKind?: string
+  proteinSource?: string
+  processingLevel?: string
+  sodiumRiskLevel?: string
 } & Partial<Record<NutrientKey, number>>
 
 const MODES = ["foods", "recipes", "plans"] satisfies NutrientMode[]
+const TABLE_PRESETS = ["primary", "quality"] satisfies NutrientTablePreset[]
 
 export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModuleData }) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<NutrientMode>("foods")
+  const [tablePreset, setTablePreset] = useState<NutrientTablePreset>("primary")
   const [categoryId, setCategoryId] = useState("all")
   const [missingOnly, setMissingOnly] = useState(false)
   const [query, setQuery] = useState("")
@@ -68,6 +78,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
     categoryId === "all" || lookups.categoryById.has(categoryId) ? categoryId : "all"
   const activeCategory =
     effectiveCategoryId === "all" ? null : lookups.categoryById.get(effectiveCategoryId)
+  const visibleKeys = tablePreset === "primary" ? PRIMARY_NUTRIENT_KEYS : QUALITY_NUTRIENT_KEYS
 
   const rows = useMemo<NutrientTableRow[]>(() => {
     const normalized = query.trim().toLowerCase()
@@ -95,6 +106,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
               food.lifecycle ? translateNutritionEnum(t, "lifecycle", food.lifecycle) : "",
               food.dietaryTags.join(" "),
               food.allergenTags.join(" "),
+              profileSemanticText(lookups.profileByFoodId.get(food.id), t),
             ].join(" ")
             const matchesQuery = !normalized || text.toLowerCase().includes(normalized)
             const matchesCategory =
@@ -113,10 +125,27 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
               energyKcal: profile?.energyKcal,
               proteinG: profile?.proteinG,
               fatG: profile?.fatG,
+              saturatedFatG: profile?.saturatedFatG,
               carbG: profile?.carbG,
               fiberG: profile?.fiberG,
               sugarG: profile?.sugarG,
+              addedSugarG: profile?.addedSugarG,
               sodiumMg: profile?.sodiumMg,
+              calciumMg: profile?.calciumMg,
+              ironMg: profile?.ironMg,
+              potassiumMg: profile?.potassiumMg,
+              sugarKind: profile?.sugarKind
+                ? translateNutritionEnum(t, "sugarKind", profile.sugarKind)
+                : undefined,
+              proteinSource: profile?.proteinSource
+                ? translateNutritionEnum(t, "proteinSource", profile.proteinSource)
+                : undefined,
+              processingLevel: profile?.processingLevel
+                ? translateNutritionEnum(t, "processingLevel", profile.processingLevel)
+                : undefined,
+              sodiumRiskLevel: profile?.sodiumRiskLevel
+                ? translateNutritionEnum(t, "sodiumRiskLevel", profile.sodiumRiskLevel)
+                : undefined,
             }
           }),
       )
@@ -171,7 +200,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                   slot.structure,
                   translateNutritionEnum(t, "mealRole", slot.structure),
                   slot.status,
-                  t(`nutrition.status.${slot.status}`, slot.status),
+                  t(`nutrition.status.${slot.status}`),
                   slot.note,
                   slot.entries
                     .map((entry) =>
@@ -234,7 +263,18 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
             <div className="flex flex-wrap gap-1.5">
               {MODES.map((entry) => (
                 <FilterChip key={entry} isActive={mode === entry} onClick={() => setMode(entry)}>
-                  {t(`nutrition.nutrients.modes.${entry}`, entry)}
+                  {t(`nutrition.nutrients.modes.${entry}`)}
+                </FilterChip>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {TABLE_PRESETS.map((entry) => (
+                <FilterChip
+                  key={entry}
+                  isActive={tablePreset === entry}
+                  onClick={() => setTablePreset(entry)}
+                >
+                  {t(`nutrition.nutrients.tablePresets.${entry}`)}
                 </FilterChip>
               ))}
             </div>
@@ -301,7 +341,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
 
         {rows.length > 0 ? (
           <div className="border-foreground/10 mt-4 min-h-0 flex-1 overflow-auto rounded-2xl border">
-            <table className="w-full min-w-[920px] text-sm">
+            <table className="w-full min-w-[1080px] text-sm">
               <thead className="bg-muted/40 text-muted-foreground sticky top-0 z-10">
                 <tr>
                   <th className="px-3 py-3 text-left font-medium">
@@ -317,9 +357,9 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                   <th className="px-3 py-3 text-left font-medium">
                     {t("nutrition.nutrients.basis")}
                   </th>
-                  {NUTRIENT_KEYS.map((key) => (
+                  {visibleKeys.map((key) => (
                     <th key={key} className="px-3 py-3 text-right font-medium">
-                      {t(`nutrition.nutrients.${key}`, key)}
+                      {t(`nutrition.nutrients.${key}`)}
                     </th>
                   ))}
                   <th className="px-3 py-3 text-right font-medium">
@@ -343,19 +383,29 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
                   >
                     <td className="px-3 py-3 font-medium">
                       <div>{row.name}</div>
+                      {mode === "foods" ? (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {buildRowSignals(row, t).map((signal) => (
+                            <Badge
+                              key={`${row.id}:${signal}`}
+                              variant="outline"
+                              className="border-foreground/10 bg-muted text-muted-foreground text-[10px]"
+                            >
+                              {signal}
+                            </Badge>
+                          ))}
+                        </div>
+                      ) : null}
                       <div className="text-muted-foreground mt-1 text-[11px]">
                         {t("nutrition.nutrients.rowClickHint")}
                       </div>
                     </td>
                     <td className="text-muted-foreground px-3 py-3">{row.basis}</td>
-                    {NUTRIENT_KEYS.map((key) => (
+                    {visibleKeys.map((key) => (
                       <td key={key} className="px-3 py-3 text-right">
                         {typeof row[key] === "number" ? (
                           <>
-                            {formatNutrientValue(
-                              row[key] ?? 0,
-                              key === "energyKcal" || key === "sodiumMg" ? 0 : 1,
-                            )}
+                            {formatNutrientValue(row[key] ?? 0, NUTRIENT_FRACTION_DIGITS[key])}
                             <span className="text-muted-foreground ml-1 text-xs">
                               {NUTRIENT_UNITS[key]}
                             </span>
@@ -400,6 +450,7 @@ export function NutritionNutrientsTab({ nutrition }: { nutrition: NutritionModul
         <NutrientDetailDrawer
           mode={mode}
           row={selectedRow}
+          tablePreset={tablePreset}
           onClose={() => setSelectedRowId(null)}
         />
       ) : null}
@@ -411,14 +462,17 @@ function NutrientDetailDrawer({
   mode,
   onClose,
   row,
+  tablePreset,
 }: {
   mode: NutrientMode
   onClose: () => void
   row: NutrientTableRow
+  tablePreset: NutrientTablePreset
 }) {
   const { t } = useTranslation()
   const radarData = buildNutrientRadarData(row, t)
   const knownCount = NUTRIENT_KEYS.filter((key) => typeof row[key] === "number").length
+  const metadata = buildRowMetadata(row, t)
 
   return (
     <Dialog open onOpenChange={(open) => (!open ? onClose() : undefined)}>
@@ -433,7 +487,7 @@ function NutrientDetailDrawer({
           <DialogHeader className="border-foreground/10 bg-card/80 shrink-0 border-b px-5 py-4 pr-14">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="outline" className="border-ring/50 bg-accent text-accent-foreground">
-                {t(`nutrition.nutrients.modes.${mode}`, mode)}
+                {t(`nutrition.nutrients.modes.${mode}`)}
               </Badge>
               <Badge
                 variant="outline"
@@ -445,12 +499,7 @@ function NutrientDetailDrawer({
             <DialogTitle className="mt-2 text-xl">
               {t("nutrition.nutrients.drawerTitle", { name: row.name })}
             </DialogTitle>
-            <DialogDescription>
-              {t(
-                "nutrition.nutrients.drawerDescription",
-                "先用现有营养字段和稳定模拟分数搭建详情视图，后续可接入真实目标值。",
-              )}
-            </DialogDescription>
+            <DialogDescription>{t("nutrition.nutrients.drawerDescription")}</DialogDescription>
           </DialogHeader>
 
           <div className="min-h-0 flex-1 overflow-y-auto p-5">
@@ -463,10 +512,7 @@ function NutrientDetailDrawer({
                       {t("nutrition.nutrients.chartTitle")}
                     </h3>
                     <p className="text-muted-foreground mt-1 text-xs leading-5">
-                      {t(
-                        "nutrition.nutrients.chartHint",
-                        "类似游戏战力表：越靠外代表该维度越突出，缺失字段会临时模拟。",
-                      )}
+                      {t("nutrition.nutrients.chartHint")}
                     </p>
                   </div>
                   <div className="text-right">
@@ -513,22 +559,67 @@ function NutrientDetailDrawer({
               </section>
             </div>
 
+            {metadata.length > 0 ? (
+              <section className="border-foreground/10 bg-background/70 mt-4 rounded-3xl border p-4">
+                <h3 className="text-sm font-semibold">{t("nutrition.nutrients.metadataTitle")}</h3>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {metadata.map((entry) => (
+                    <Badge
+                      key={`${row.id}:${entry.label}:${entry.value}`}
+                      variant="outline"
+                      className="border-foreground/10 bg-muted text-muted-foreground"
+                    >
+                      {entry.label} · {entry.value}
+                    </Badge>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
             <section className="border-foreground/10 bg-background/70 mt-4 rounded-3xl border p-4">
-              <h3 className="text-sm font-semibold">{t("nutrition.nutrients.detailTitle")}</h3>
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-sm font-semibold">{t("nutrition.nutrients.detailTitle")}</h3>
+                <Badge
+                  variant="outline"
+                  className="border-foreground/10 bg-muted text-muted-foreground"
+                >
+                  {t(`nutrition.nutrients.tablePresets.${tablePreset}`)}
+                </Badge>
+              </div>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {NUTRIENT_KEYS.map((key) => (
+                {PRIMARY_NUTRIENT_KEYS.map((key) => (
                   <div
                     key={key}
                     className="border-foreground/10 bg-muted/20 flex items-center justify-between gap-3 rounded-2xl border px-3 py-2.5"
                   >
                     <span className="text-muted-foreground text-sm">
-                      {t(`nutrition.nutrients.${key}`, key)}
+                      {t(`nutrition.nutrients.${key}`)}
                     </span>
                     <span className="font-medium tabular-nums">
                       {formatDetailedNutrient(row, key, t)}
                     </span>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4">
+                <h4 className="text-muted-foreground text-xs font-medium">
+                  {t("nutrition.nutrients.qualityTitle")}
+                </h4>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {QUALITY_NUTRIENT_KEYS.map((key) => (
+                    <div
+                      key={key}
+                      className="border-foreground/10 bg-muted/20 flex items-center justify-between gap-3 rounded-2xl border px-3 py-2.5"
+                    >
+                      <span className="text-muted-foreground text-sm">
+                        {t(`nutrition.nutrients.${key}`)}
+                      </span>
+                      <span className="font-medium tabular-nums">
+                        {formatDetailedNutrient(row, key, t)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </section>
           </div>
@@ -572,9 +663,10 @@ function buildNutrientRadarData(row: NutrientTableRow, t: TFunction) {
     {
       label: t("nutrition.nutrients.dimensions.lightness"),
       score: Math.round(
-        (scoreLowerIsBetter(row.sugarG, 32, `${row.id}:sugar`) +
+        (scoreLowerIsBetter(row.addedSugarG ?? row.sugarG, 18, `${row.id}:addedSugar`) +
+          scoreLowerIsBetter(row.saturatedFatG, 8, `${row.id}:saturatedFat`) +
           scoreLowerIsBetter(row.sodiumMg, 900, `${row.id}:sodium`)) /
-          2,
+          3,
       ),
     },
   ]
@@ -617,9 +709,7 @@ function formatDetailedNutrient(row: NutrientTableRow, key: NutrientKey, t: TFun
     return t("nutrition.nutrients.pending")
   }
 
-  return `${formatNutrientValue(value, key === "energyKcal" || key === "sodiumMg" ? 0 : 1)} ${
-    NUTRIENT_UNITS[key]
-  }`
+  return `${formatNutrientValue(value, NUTRIENT_FRACTION_DIGITS[key])} ${NUTRIENT_UNITS[key]}`
 }
 
 function FilterChip({
@@ -651,6 +741,56 @@ function countFoodMissingFields(profile: FoodNutrientProfile | undefined) {
   }
 
   return NUTRIENT_KEYS.filter((key) => profile[key] === undefined).length
+}
+
+function profileSemanticText(profile: FoodNutrientProfile | undefined, t: TFunction) {
+  if (!profile) {
+    return ""
+  }
+
+  return [
+    profile.sugarKind ? translateNutritionEnum(t, "sugarKind", profile.sugarKind) : "",
+    profile.proteinSource ? translateNutritionEnum(t, "proteinSource", profile.proteinSource) : "",
+    profile.processingLevel
+      ? translateNutritionEnum(t, "processingLevel", profile.processingLevel)
+      : "",
+    profile.sodiumRiskLevel
+      ? translateNutritionEnum(t, "sodiumRiskLevel", profile.sodiumRiskLevel)
+      : "",
+  ].join(" ")
+}
+
+function buildRowSignals(row: NutrientTableRow, t: TFunction) {
+  const signals: string[] = []
+
+  if (row.proteinSource) {
+    signals.push(`${t("nutrition.nutrients.signalLabels.protein")} · ${row.proteinSource}`)
+  }
+  if (row.processingLevel) {
+    signals.push(`${t("nutrition.nutrients.signalLabels.processing")} · ${row.processingLevel}`)
+  }
+  if (row.sodiumRiskLevel) {
+    signals.push(`${t("nutrition.nutrients.signalLabels.sodium")} · ${row.sodiumRiskLevel}`)
+  }
+
+  return signals
+}
+
+function buildRowMetadata(row: NutrientTableRow, t: TFunction) {
+  return [
+    row.sugarKind
+      ? { label: t("nutrition.nutrients.signalLabels.sugar"), value: row.sugarKind }
+      : null,
+    row.proteinSource
+      ? { label: t("nutrition.nutrients.signalLabels.protein"), value: row.proteinSource }
+      : null,
+    row.processingLevel
+      ? { label: t("nutrition.nutrients.signalLabels.processing"), value: row.processingLevel }
+      : null,
+    row.sodiumRiskLevel
+      ? { label: t("nutrition.nutrients.signalLabels.sodium"), value: row.sodiumRiskLevel }
+      : null,
+  ].filter((entry): entry is { label: string; value: string } => Boolean(entry))
 }
 
 function recipeUsesCategory(
