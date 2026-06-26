@@ -73,6 +73,13 @@ async function saveMemoryToRust(memory: MemoryWorkspaceModuleData) {
   await invoke("save_memory", { memory })
 }
 
+async function saveJourneyToRust(payload: {
+  growth: GrowthModuleData
+  memory: MemoryWorkspaceModuleData
+}) {
+  await invoke("save_journey", { payload })
+}
+
 function getFutureFromRust() {
   return invoke<FutureModuleData>("get_future")
 }
@@ -170,6 +177,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     saveGrowth: (growth) => saveGrowthToRust(growth),
     getMemory: () => getMemoryFromRust(),
     saveMemory: (memory) => saveMemoryToRust(memory),
+    saveJourney: (payload) => saveJourneyToRust(payload),
     async getJourney(): Promise<JourneyModuleData> {
       const [growth, memory] = await Promise.all([getGrowthFromRust(), getMemoryFromRust()])
       return { ...growth, ...memory }

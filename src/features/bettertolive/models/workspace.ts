@@ -48,7 +48,7 @@ export type TransactionEntry = {
   id: string
   date: string
   label: string
-  category: string
+  category: FinanceCategory
   amount: number
   direction: TransactionDirection
   note: string
@@ -60,20 +60,44 @@ export type TransactionEntry = {
   tags?: string[]
 }
 
+export type FinanceCategory =
+  | "food"
+  | "housing"
+  | "transport"
+  | "shopping"
+  | "learning"
+  | "health"
+  | "social"
+  | "entertainment"
+  | "income"
+  | "savings"
+  | "other"
+
 export type FinanceLifeSystem =
-  | "基本生活"
-  | "身体健康"
-  | "关系社交"
-  | "成长学习"
-  | "居住环境"
-  | "自由安全"
-  | "娱乐恢复"
+  | "basic_life"
+  | "health"
+  | "relationships"
+  | "growth"
+  | "housing"
+  | "safety"
+  | "recovery"
 
-export type FinanceNecessity = "生存必需" | "稳定维护" | "体验改善" | "长期投资" | "冲动/待复盘"
+export type FinanceNecessity =
+  | "essential"
+  | "maintenance"
+  | "upgrade"
+  | "long_term_investment"
+  | "impulse_review"
 
-export type FinanceReviewStatus = "已确认" | "待复盘" | "可优化" | "值得保留"
+export type FinanceReviewStatus = "confirmed" | "needs_review" | "can_optimize" | "worth_keeping"
 
-export type FinanceLinkedModule = "手动录入" | "购物" | "饮食" | "记事" | "反思" | "未来"
+export type FinanceLinkedModule =
+  | "manual"
+  | "shopping"
+  | "nutrition"
+  | "events"
+  | "reflection"
+  | "future"
 
 export type FinanceMonthlyTarget = {
   id: string
@@ -86,7 +110,7 @@ export type FinanceMonthlyTarget = {
 
 export type FinanceCategoryRule = {
   id: string
-  category: string
+  category: FinanceCategory
   monthlyLimit?: number
   intent: string
   reviewPrompt?: string
@@ -1013,9 +1037,17 @@ export type NutritionReviewInsight = {
   evidence: string[]
 }
 
+export type NutritionMissingSignal = {
+  id: string
+  label: string
+  evidence: string[]
+}
+
 export type NutritionCrossViewRow = {
+  id: string
   label: string
   count: number
+  evidence: string[]
   valueDensity?: ValueDensity
   bodyFeedback?: BodyFeedback
 }
@@ -1029,7 +1061,7 @@ export type NutritionCrossView = {
 
 export type NutritionWeeklyReview = {
   highlights: NutritionReviewInsight[]
-  missingSignals: string[]
+  missingSignals: NutritionMissingSignal[]
   crossViews: NutritionCrossView[]
 }
 
@@ -1045,6 +1077,28 @@ export type FoodCategoryDefinition = {
 
 export type NutritionBasisUnit = "g" | "ml"
 
+export type SugarKind = "天然存在" | "游离糖/添加糖" | "混合" | "未知"
+
+export type ProteinSourceKind =
+  | "蛋类"
+  | "奶类"
+  | "豆制品"
+  | "豆类"
+  | "鱼虾海鲜"
+  | "禽肉"
+  | "畜肉"
+  | "加工肉"
+
+export type ProcessingLevel = "原食材" | "轻加工" | "中度加工" | "高度加工"
+
+export type SodiumRiskLevel = "低" | "中" | "高"
+
+export type FoodPortionProfile = {
+  unit: "个" | "份"
+  estimatedGrams: number
+  note?: string
+}
+
 export type FoodNutrientProfile = {
   id: string
   foodId: string
@@ -1053,10 +1107,20 @@ export type FoodNutrientProfile = {
   energyKcal?: number
   proteinG?: number
   fatG?: number
+  saturatedFatG?: number
   carbG?: number
   fiberG?: number
   sugarG?: number
+  addedSugarG?: number
   sodiumMg?: number
+  calciumMg?: number
+  ironMg?: number
+  potassiumMg?: number
+  sugarKind?: SugarKind
+  proteinSource?: ProteinSourceKind
+  processingLevel?: ProcessingLevel
+  sodiumRiskLevel?: SodiumRiskLevel
+  portionProfiles?: FoodPortionProfile[]
   source: "手动" | "包装" | "食物成分表" | "外部导入"
   confidence: "高" | "中" | "低"
 }

@@ -17,10 +17,7 @@ export function useSaveJourneyMutation() {
 
   return useMutation({
     mutationFn: async ({ growth, memory }: SaveJourneyPayload) => {
-      await Promise.all([
-        getBetterToLiveApi().saveGrowth(growth),
-        getBetterToLiveApi().saveMemory(memory),
-      ])
+      await getBetterToLiveApi().saveJourney({ growth, memory })
     },
     onSuccess: async () => {
       await Promise.all([

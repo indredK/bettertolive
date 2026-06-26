@@ -174,6 +174,10 @@ export type BetterToLiveApi = {
   saveGrowth: (growth: GrowthModuleData) => Promise<void>
   getMemory: () => Promise<MemoryWorkspaceModuleData>
   saveMemory: (memory: MemoryWorkspaceModuleData) => Promise<void>
+  saveJourney: (payload: {
+    growth: GrowthModuleData
+    memory: MemoryWorkspaceModuleData
+  }) => Promise<void>
   getJourney: () => Promise<JourneyModuleData>
   getLegacy: () => Promise<LegacyWorkspaceModuleData>
   listLegacyItems: () => Promise<LegacyItem[]>

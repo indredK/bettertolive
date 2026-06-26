@@ -235,6 +235,11 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
       memoryMockData = cloneMockData(memory)
       return withMockLatency(undefined)
     },
+    saveJourney: ({ growth, memory }) => {
+      growthMockData = cloneMockData(growth)
+      memoryMockData = cloneMockData(memory)
+      return withMockLatency(undefined)
+    },
     getJourney: () =>
       withMockLatency({
         ...growthMockData,

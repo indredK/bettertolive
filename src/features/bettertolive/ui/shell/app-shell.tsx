@@ -335,6 +335,7 @@ export function BetterToLiveAppShell() {
   const layoutMode = useWorkspaceLayoutMode()
   const workspaceQuery = useWorkspaceSnapshotQuery()
   const viewModel = useWorkspaceViewModel({
+    activeView,
     searchQuery,
     workspace: workspaceQuery.workspaceSnapshot,
   })

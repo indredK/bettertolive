@@ -8,7 +8,6 @@ import { workspaceQueryKeys } from "@/features/bettertolive/queries/workspace-qu
 
 export function useWorkspaceSnapshotQuery() {
   const apiMode = resolveBetterToLiveApiMode()
-  const fallbackSnapshot = apiMode === "mock" ? workspaceSnapshotMockData : emptyWorkspaceSnapshot
 
   const query = useQuery({
     queryKey: [...workspaceQueryKeys.snapshot(), apiMode],
@@ -16,6 +15,13 @@ export function useWorkspaceSnapshotQuery() {
     initialData: apiMode === "mock" ? workspaceSnapshotMockData : undefined,
     staleTime: 1000 * 60 * 5,
   })
+
+  const fallbackSnapshot =
+    apiMode === "mock"
+      ? workspaceSnapshotMockData
+      : query.isError
+        ? workspaceSnapshotMockData
+        : emptyWorkspaceSnapshot
 
   return {
     data: query.data,
