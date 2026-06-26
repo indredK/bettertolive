@@ -4,6 +4,8 @@ mod events;
 mod finance;
 mod future;
 mod growth;
+mod journey;
+mod json_store;
 mod legacy;
 mod memory;
 mod nutrition;
@@ -23,6 +25,7 @@ use events::commands::{get_events, save_events, EventsState};
 use finance::commands::{get_finance, save_finance, FinanceState};
 use future::commands::{get_future, save_future, FutureState};
 use growth::commands::{get_growth, save_growth, GrowthState};
+use journey::commands::{save_journey, JourneyState};
 use legacy::commands::{
     create_legacy_item, delete_legacy_item, get_legacy, list_legacy_items, update_legacy_item,
 };
@@ -170,6 +173,9 @@ pub fn run() {
             app.manage(MemoryState {
                 data_path: app_data_dir.join("memory.json"),
             });
+            app.manage(JourneyState {
+                data_path: app_data_dir.join("journey.json"),
+            });
             app.manage(PrinciplesState {
                 data_path: app_data_dir.join("principles.json"),
             });
@@ -203,6 +209,7 @@ pub fn run() {
             save_growth,
             get_memory,
             save_memory,
+            save_journey,
             get_legacy,
             list_legacy_items,
             create_legacy_item,

@@ -11,7 +11,7 @@ use crate::shopping::models::{
     AttributeDefinitionRow, ItemChildWriteModel, ItemRow, PageContentRow, SpaceDefinitionRow,
     StageItemRow, StageTemplateRow, SystemDefinitionRow,
 };
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{params, params_from_iter, Connection, OptionalExtension};
 use std::collections::{HashMap, HashSet};
 
 pub struct ShoppingRepository;
@@ -21,6 +21,16 @@ struct ExistingChildCodes {
     lifecycle_def_id: Option<String>,
     depreciation_def_id: Option<String>,
     channel_def_ids: Vec<String>,
+}
+
+struct ItemChildWithParent {
+    item_id: String,
+    child: ShoppingItemChildDto,
+}
+
+struct ItemChildChannelWithParent {
+    child_id: String,
+    channel: ShoppingItemChildChannelDto,
 }
 
 // ===== 行→struct 映射 =====
@@ -149,6 +159,12 @@ impl ShoppingRepository {
             .filter(|id| seen.insert((*id).clone()))
             .cloned()
             .collect()
+    }
+
+    fn sql_placeholders(count: usize) -> String {
+        std::iter::repeat_n("?", count)
+            .collect::<Vec<_>>()
+            .join(",")
     }
 
     fn id_exists(
@@ -1243,131 +1259,234 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
         let rows = stmt.query_map([], row_to_item).map_err(|e| e.to_string())?;
 
-        let mut items = Vec::new();
+        let mut item_rows = Vec::new();
         for row in rows {
-            let r = row.map_err(|e| e.to_string())?;
-            items.push(Self::hydrate_item(conn, r)?);
+            item_rows.push(row.map_err(|e| e.to_string())?);
         }
-        Ok(items)
+
+        Self::hydrate_items(conn, item_rows)
     }
 
-    fn hydrate_item(conn: &Connection, r: ItemRow) -> Result<ShoppingItemDto, String> {
-        let children = Self::list_children_for_item(conn, &r.id)?;
-        let system_tags = Self::list_system_tags_for_item(conn, &r.id)?;
-        let space_tags = Self::list_space_tags_for_item(conn, &r.id)?;
-
-        Ok(ShoppingItemDto {
-            id: r.id,
-            name: r.name,
-            children,
-            system_tags,
-            space_tags,
-            note: r.note,
-        })
-    }
-
-    fn list_children_for_item(
+    fn hydrate_items(
         conn: &Connection,
-        item_id: &str,
-    ) -> Result<Vec<ShoppingItemChildDto>, String> {
-        let mut stmt = conn
-            .prepare(
-                "SELECT c.id, c.name,
-                        s.code AS status_code,
-                        l.code AS lifecycle_code,
-                        d.code AS depreciation_code
-                 FROM shopping_item_children c
-                 LEFT JOIN shopping_attribute_definitions s ON c.status_def_id = s.id
-                 LEFT JOIN shopping_attribute_definitions l ON c.lifecycle_def_id = l.id
-                 LEFT JOIN shopping_attribute_definitions d ON c.depreciation_def_id = d.id
-                 WHERE c.item_id = ?1
-                 ORDER BY c.sort_order, c.id",
-            )
-            .map_err(|e| e.to_string())?;
+        item_rows: Vec<ItemRow>,
+    ) -> Result<Vec<ShoppingItemDto>, String> {
+        if item_rows.is_empty() {
+            return Ok(Vec::new());
+        }
+
+        let item_ids = item_rows
+            .iter()
+            .map(|item_row| item_row.id.clone())
+            .collect::<Vec<_>>();
+        let mut children_by_item = Self::list_children_for_items(conn, &item_ids)?;
+        let child_ids = children_by_item
+            .values()
+            .flat_map(|children| children.iter().map(|child| child.id.clone()))
+            .collect::<Vec<_>>();
+        let channel_prices_by_child = Self::list_channel_prices_for_children(conn, &child_ids)?;
+
+        for children in children_by_item.values_mut() {
+            for child in children.iter_mut() {
+                child.channel_prices = channel_prices_by_child
+                    .get(&child.id)
+                    .cloned()
+                    .unwrap_or_default();
+            }
+        }
+
+        let system_tags_by_item = Self::list_system_tags_for_items(conn, &item_ids)?;
+        let space_tags_by_item = Self::list_space_tags_for_items(conn, &item_ids)?;
+
+        Ok(item_rows
+            .into_iter()
+            .map(|item_row| ShoppingItemDto {
+                children: children_by_item.remove(&item_row.id).unwrap_or_default(),
+                id: item_row.id.clone(),
+                name: item_row.name,
+                note: item_row.note,
+                space_tags: space_tags_by_item
+                    .get(&item_row.id)
+                    .cloned()
+                    .unwrap_or_default(),
+                system_tags: system_tags_by_item
+                    .get(&item_row.id)
+                    .cloned()
+                    .unwrap_or_default(),
+            })
+            .collect())
+    }
+
+    fn list_children_for_items(
+        conn: &Connection,
+        item_ids: &[String],
+    ) -> Result<HashMap<String, Vec<ShoppingItemChildDto>>, String> {
+        if item_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let sql = format!(
+            "SELECT c.item_id, c.id, c.name,
+                    s.code AS status_code,
+                    l.code AS lifecycle_code,
+                    d.code AS depreciation_code
+             FROM shopping_item_children c
+             LEFT JOIN shopping_attribute_definitions s ON c.status_def_id = s.id
+             LEFT JOIN shopping_attribute_definitions l ON c.lifecycle_def_id = l.id
+             LEFT JOIN shopping_attribute_definitions d ON c.depreciation_def_id = d.id
+             WHERE c.item_id IN ({})
+             ORDER BY c.item_id, c.sort_order, c.id",
+            Self::sql_placeholders(item_ids.len())
+        );
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
         let rows = stmt
-            .query_map(params![item_id], |row| {
-                Ok(ShoppingItemChildDto {
-                    id: row.get(0)?,
-                    name: row.get(1)?,
-                    status: row.get(2)?,
-                    lifecycle: row.get(3)?,
-                    depreciation: row.get(4)?,
-                    channel_prices: Vec::new(),
+            .query_map(params_from_iter(item_ids.iter()), |row| {
+                Ok(ItemChildWithParent {
+                    item_id: row.get(0)?,
+                    child: ShoppingItemChildDto {
+                        id: row.get(1)?,
+                        name: row.get(2)?,
+                        status: row.get(3)?,
+                        lifecycle: row.get(4)?,
+                        depreciation: row.get(5)?,
+                        channel_prices: Vec::new(),
+                    },
                 })
             })
             .map_err(|e| e.to_string())?;
 
-        let mut list = Vec::new();
+        let mut children_by_item = HashMap::new();
         for row in rows {
-            let mut child = row.map_err(|e| e.to_string())?;
-            child.channel_prices = Self::list_channel_prices_for_child(conn, &child.id)?;
-            list.push(child);
+            let row = row.map_err(|e| e.to_string())?;
+            children_by_item
+                .entry(row.item_id)
+                .or_insert_with(Vec::new)
+                .push(row.child);
         }
-        Ok(list)
+
+        Ok(children_by_item)
     }
 
-    fn list_channel_prices_for_child(
+    fn list_channel_prices_for_children(
         conn: &Connection,
-        child_id: &str,
-    ) -> Result<Vec<ShoppingItemChildChannelDto>, String> {
-        let mut stmt = conn
-            .prepare(
-                "SELECT cc.id, a.code AS channel_code, cc.entry_price, cc.sweet_spot_price, cc.overpay_price
-                 FROM shopping_item_child_channels cc
-                 LEFT JOIN shopping_attribute_definitions a ON cc.channel_def_id = a.id
-                 WHERE cc.item_child_id = ?1
-                 ORDER BY cc.sort_order, cc.id",
-            )
-            .map_err(|e| e.to_string())?;
+        child_ids: &[String],
+    ) -> Result<HashMap<String, Vec<ShoppingItemChildChannelDto>>, String> {
+        if child_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let sql = format!(
+            "SELECT cc.item_child_id, cc.id, a.code AS channel_code, cc.entry_price, cc.sweet_spot_price, cc.overpay_price
+             FROM shopping_item_child_channels cc
+             LEFT JOIN shopping_attribute_definitions a ON cc.channel_def_id = a.id
+             WHERE cc.item_child_id IN ({})
+             ORDER BY cc.item_child_id, cc.sort_order, cc.id",
+            Self::sql_placeholders(child_ids.len())
+        );
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
         let rows = stmt
-            .query_map(params![child_id], |row| {
-                Ok(ShoppingItemChildChannelDto {
-                    id: row.get(0)?,
-                    channel: row.get(1)?,
-                    entry_price: row.get(2)?,
-                    sweet_spot_price: row.get(3)?,
-                    overpay_price: row.get(4)?,
+            .query_map(params_from_iter(child_ids.iter()), |row| {
+                Ok(ItemChildChannelWithParent {
+                    child_id: row.get(0)?,
+                    channel: ShoppingItemChildChannelDto {
+                        id: row.get(1)?,
+                        channel: row.get(2)?,
+                        entry_price: row.get(3)?,
+                        sweet_spot_price: row.get(4)?,
+                        overpay_price: row.get(5)?,
+                    },
                 })
             })
             .map_err(|e| e.to_string())?;
 
-        let mut list = Vec::new();
+        let mut channels_by_child = HashMap::new();
         for row in rows {
-            list.push(row.map_err(|e| e.to_string())?);
+            let row = row.map_err(|e| e.to_string())?;
+            channels_by_child
+                .entry(row.child_id)
+                .or_insert_with(Vec::new)
+                .push(row.channel);
         }
-        Ok(list)
+
+        Ok(channels_by_child)
+    }
+
+    fn list_system_tags_for_items(
+        conn: &Connection,
+        item_ids: &[String],
+    ) -> Result<HashMap<String, Vec<String>>, String> {
+        if item_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let sql = format!(
+            "SELECT item_id, system_id
+             FROM shopping_item_systems
+             WHERE item_id IN ({})
+             ORDER BY item_id, sort_order",
+            Self::sql_placeholders(item_ids.len())
+        );
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map(params_from_iter(item_ids.iter()), |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
+
+        let mut tags_by_item = HashMap::new();
+        for row in rows {
+            let (item_id, system_id) = row.map_err(|e| e.to_string())?;
+            tags_by_item
+                .entry(item_id)
+                .or_insert_with(Vec::new)
+                .push(system_id);
+        }
+
+        Ok(tags_by_item)
+    }
+
+    fn list_space_tags_for_items(
+        conn: &Connection,
+        item_ids: &[String],
+    ) -> Result<HashMap<String, Vec<String>>, String> {
+        if item_ids.is_empty() {
+            return Ok(HashMap::new());
+        }
+
+        let sql = format!(
+            "SELECT item_id, space_id
+             FROM shopping_item_spaces
+             WHERE item_id IN ({})
+             ORDER BY item_id, sort_order",
+            Self::sql_placeholders(item_ids.len())
+        );
+        let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map(params_from_iter(item_ids.iter()), |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
+
+        let mut tags_by_item = HashMap::new();
+        for row in rows {
+            let (item_id, space_id) = row.map_err(|e| e.to_string())?;
+            tags_by_item
+                .entry(item_id)
+                .or_insert_with(Vec::new)
+                .push(space_id);
+        }
+
+        Ok(tags_by_item)
     }
 
     fn list_system_tags_for_item(conn: &Connection, item_id: &str) -> Result<Vec<String>, String> {
-        let mut stmt = conn
-            .prepare(
-                "SELECT system_id FROM shopping_item_systems WHERE item_id = ?1 ORDER BY sort_order",
-            )
-            .map_err(|e| e.to_string())?;
-        let rows = stmt
-            .query_map(params![item_id], |row| row.get::<_, String>(0))
-            .map_err(|e| e.to_string())?;
-        let mut list = Vec::new();
-        for row in rows {
-            list.push(row.map_err(|e| e.to_string())?);
-        }
-        Ok(list)
+        let mut tags_by_item = Self::list_system_tags_for_items(conn, &[item_id.to_string()])?;
+        Ok(tags_by_item.remove(item_id).unwrap_or_default())
     }
 
     fn list_space_tags_for_item(conn: &Connection, item_id: &str) -> Result<Vec<String>, String> {
-        let mut stmt = conn
-            .prepare(
-                "SELECT space_id FROM shopping_item_spaces WHERE item_id = ?1 ORDER BY sort_order",
-            )
-            .map_err(|e| e.to_string())?;
-        let rows = stmt
-            .query_map(params![item_id], |row| row.get::<_, String>(0))
-            .map_err(|e| e.to_string())?;
-        let mut list = Vec::new();
-        for row in rows {
-            list.push(row.map_err(|e| e.to_string())?);
-        }
-        Ok(list)
+        let mut tags_by_item = Self::list_space_tags_for_items(conn, &[item_id.to_string()])?;
+        Ok(tags_by_item.remove(item_id).unwrap_or_default())
     }
 
     #[allow(dead_code)]
@@ -1395,8 +1514,9 @@ impl ShoppingRepository {
             .query_map(params![id], row_to_item)
             .map_err(|e| e.to_string())?;
         if let Some(row) = rows.next() {
-            let r = row.map_err(|e| e.to_string())?;
-            Ok(Some(Self::hydrate_item(conn, r)?))
+            let item_rows = vec![row.map_err(|e| e.to_string())?];
+            let mut items = Self::hydrate_items(conn, item_rows)?;
+            Ok(items.pop())
         } else {
             Ok(None)
         }

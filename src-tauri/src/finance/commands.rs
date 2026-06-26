@@ -1,4 +1,6 @@
-use std::path::{Path, PathBuf};
+use crate::finance::dto::FinanceModuleDto;
+use crate::json_store::{atomic_write_json, read_json_file};
+use std::path::PathBuf;
 use tauri::State;
 
 /// 记账模块第一阶段后端状态。
@@ -9,42 +11,86 @@ pub struct FinanceState {
     pub data_path: PathBuf,
 }
 
-fn seed_finance() -> Result<serde_json::Value, String> {
+fn seed_finance() -> Result<FinanceModuleDto, String> {
     serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
 }
 
-fn temp_finance_path(data_path: &Path) -> PathBuf {
-    let file_name = data_path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("finance.json");
-
-    data_path.with_file_name(format!("{file_name}.tmp"))
-}
-
 #[tauri::command]
-pub fn get_finance(state: State<FinanceState>) -> Result<serde_json::Value, String> {
+pub fn get_finance(state: State<FinanceState>) -> Result<FinanceModuleDto, String> {
     if !state.data_path.exists() {
         return seed_finance();
     }
 
-    let content = std::fs::read_to_string(&state.data_path).map_err(|e| e.to_string())?;
-    serde_json::from_str(&content).map_err(|e| e.to_string())
+    read_json_file(&state.data_path)
 }
 
 #[tauri::command]
-pub fn save_finance(state: State<FinanceState>, finance: serde_json::Value) -> Result<(), String> {
-    if let Some(parent) = state.data_path.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+pub fn save_finance(state: State<FinanceState>, finance: FinanceModuleDto) -> Result<(), String> {
+    finance.validate()?;
+    atomic_write_json(&state.data_path, &finance)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::finance::dto::FinanceModuleDto;
+
+    #[test]
+    fn legacy_finance_values_round_trip_to_codes() {
+        let finance: FinanceModuleDto = serde_json::from_value(serde_json::json!({
+            "entries": [
+                {
+                    "id": "finance-entry-1",
+                    "date": "2026-06-20",
+                    "label": "Lunch",
+                    "category": "餐饮",
+                    "amount": 24,
+                    "direction": "expense",
+                    "note": "note",
+                    "lifeSystem": "基本生活",
+                    "necessity": "生存必需",
+                    "reviewStatus": "待复盘",
+                    "linkedModule": "手动录入",
+                    "tags": ["daily"]
+                }
+            ],
+            "monthlyTargets": [],
+            "categoryRules": [],
+            "reviewPrompts": []
+        }))
+        .unwrap();
+
+        finance.validate().unwrap();
+
+        let persisted = serde_json::to_value(finance).unwrap();
+        assert_eq!(persisted["entries"][0]["category"], "food");
+        assert_eq!(persisted["entries"][0]["lifeSystem"], "basic_life");
+        assert_eq!(persisted["entries"][0]["necessity"], "essential");
+        assert_eq!(persisted["entries"][0]["reviewStatus"], "needs_review");
+        assert_eq!(persisted["entries"][0]["linkedModule"], "manual");
     }
 
-    let content = serde_json::to_string_pretty(&finance).map_err(|e| e.to_string())?;
-    let temp_path = temp_finance_path(&state.data_path);
+    #[test]
+    fn rejects_non_positive_finance_amount() {
+        let finance: FinanceModuleDto = serde_json::from_value(serde_json::json!({
+            "entries": [
+                {
+                    "id": "finance-entry-1",
+                    "date": "2026-06-20",
+                    "label": "Lunch",
+                    "category": "food",
+                    "amount": 0,
+                    "direction": "expense",
+                    "note": "note",
+                    "tags": []
+                }
+            ],
+            "monthlyTargets": [],
+            "categoryRules": [],
+            "reviewPrompts": []
+        }))
+        .unwrap();
 
-    if temp_path.exists() {
-        std::fs::remove_file(&temp_path).map_err(|e| e.to_string())?;
+        let error = finance.validate().unwrap_err();
+        assert!(error.contains("amount must be positive"));
     }
-
-    std::fs::write(&temp_path, content).map_err(|e| e.to_string())?;
-    std::fs::rename(&temp_path, &state.data_path).map_err(|e| e.to_string())
 }

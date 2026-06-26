@@ -1,62 +1,96 @@
 import dayjs from "dayjs"
 
 import type {
+  FinanceCategory,
   FinanceLifeSystem,
   FinanceLinkedModule,
   FinanceNecessity,
   FinanceReviewStatus,
   TransactionDirection,
 } from "@/features/bettertolive/types"
+import type { TFunction } from "i18next"
 
 export const FINANCE_CATEGORIES = [
-  "餐饮",
-  "居住",
-  "交通",
-  "购物",
-  "学习成长",
-  "健康",
-  "社交",
-  "娱乐",
-  "收入",
-  "储蓄",
-  "其他",
-] as const
+  "food",
+  "housing",
+  "transport",
+  "shopping",
+  "learning",
+  "health",
+  "social",
+  "entertainment",
+  "income",
+  "savings",
+  "other",
+] as const satisfies readonly FinanceCategory[]
 
 export const FINANCE_LIFE_SYSTEMS = [
-  "基本生活",
-  "身体健康",
-  "关系社交",
-  "成长学习",
-  "居住环境",
-  "自由安全",
-  "娱乐恢复",
-] satisfies FinanceLifeSystem[]
+  "basic_life",
+  "health",
+  "relationships",
+  "growth",
+  "housing",
+  "safety",
+  "recovery",
+] as const satisfies readonly FinanceLifeSystem[]
 
 export const FINANCE_NECESSITIES = [
-  "生存必需",
-  "稳定维护",
-  "体验改善",
-  "长期投资",
-  "冲动/待复盘",
-] satisfies FinanceNecessity[]
+  "essential",
+  "maintenance",
+  "upgrade",
+  "long_term_investment",
+  "impulse_review",
+] as const satisfies readonly FinanceNecessity[]
 
 export const FINANCE_REVIEW_STATUSES = [
-  "已确认",
-  "待复盘",
-  "可优化",
-  "值得保留",
-] satisfies FinanceReviewStatus[]
+  "confirmed",
+  "needs_review",
+  "can_optimize",
+  "worth_keeping",
+] as const satisfies readonly FinanceReviewStatus[]
 
 export const FINANCE_LINKED_MODULES = [
-  "手动录入",
-  "购物",
-  "饮食",
-  "记事",
-  "反思",
-  "未来",
-] satisfies FinanceLinkedModule[]
+  "manual",
+  "shopping",
+  "nutrition",
+  "events",
+  "reflection",
+  "future",
+] as const satisfies readonly FinanceLinkedModule[]
 
-export const FINANCE_DIRECTIONS = ["expense", "income"] satisfies TransactionDirection[]
+export const FINANCE_DIRECTIONS = [
+  "expense",
+  "income",
+] as const satisfies readonly TransactionDirection[]
+
+const FINANCE_ENUM_GROUPS = {
+  category: FINANCE_CATEGORIES,
+  lifeSystem: FINANCE_LIFE_SYSTEMS,
+  necessity: FINANCE_NECESSITIES,
+  reviewStatus: FINANCE_REVIEW_STATUSES,
+  linkedModule: FINANCE_LINKED_MODULES,
+} as const
+
+export function getFinanceEnumSearchTokens<K extends keyof typeof FINANCE_ENUM_GROUPS>(
+  t: TFunction,
+  group: K,
+  value: (typeof FINANCE_ENUM_GROUPS)[K][number] | undefined,
+) {
+  if (!value) {
+    return []
+  }
+
+  const resolved = t(`finance.enum.${group}.${value}`)
+  const english = t(`finance.enumSearch.en.${group}.${value}`, { defaultValue: "" })
+  const chinese = t(`finance.enumSearch.zh.${group}.${value}`, { defaultValue: "" })
+  const isKnownValue = FINANCE_ENUM_GROUPS[group].some((candidate) => candidate === value)
+
+  if (!isKnownValue) {
+    return [value]
+  }
+
+  return [value, resolved, english, chinese].filter((token) => token && token !== value)
+}
 
 export function getEntryMonth(date: string) {
   return dayjs(date).format("YYYY-MM")

@@ -1,4 +1,6 @@
-use std::path::{Path, PathBuf};
+use crate::emotion::dto::EmotionModuleDto;
+use crate::json_store::{atomic_write_json, read_json_file};
+use std::path::PathBuf;
 use tauri::State;
 
 /// 情绪模块第一阶段后端状态。
@@ -9,42 +11,64 @@ pub struct EmotionState {
     pub data_path: PathBuf,
 }
 
-fn seed_emotion() -> Result<serde_json::Value, String> {
+fn seed_emotion() -> Result<EmotionModuleDto, String> {
     serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
 }
 
-fn temp_emotion_path(data_path: &Path) -> PathBuf {
-    let file_name = data_path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("emotion.json");
-
-    data_path.with_file_name(format!("{file_name}.tmp"))
-}
-
 #[tauri::command]
-pub fn get_emotion(state: State<EmotionState>) -> Result<serde_json::Value, String> {
+pub fn get_emotion(state: State<EmotionState>) -> Result<EmotionModuleDto, String> {
     if !state.data_path.exists() {
         return seed_emotion();
     }
 
-    let content = std::fs::read_to_string(&state.data_path).map_err(|e| e.to_string())?;
-    serde_json::from_str(&content).map_err(|e| e.to_string())
+    read_json_file(&state.data_path)
 }
 
 #[tauri::command]
-pub fn save_emotion(state: State<EmotionState>, emotion: serde_json::Value) -> Result<(), String> {
-    if let Some(parent) = state.data_path.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+pub fn save_emotion(state: State<EmotionState>, emotion: EmotionModuleDto) -> Result<(), String> {
+    emotion.validate()?;
+    atomic_write_json(&state.data_path, &emotion)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::emotion::dto::EmotionModuleDto;
+
+    #[test]
+    fn rejects_unknown_emotion_enum_value() {
+        let result = serde_json::from_value::<EmotionModuleDto>(serde_json::json!({
+            "checkIns": [
+                {
+                    "id": "emotion-checkin-1",
+                    "date": "2026-06-20",
+                    "summary": "summary",
+                    "state": "不存在的状态",
+                    "intensity": "5/10",
+                    "bodySignal": "signal",
+                    "tags": []
+                }
+            ],
+            "trend": [],
+            "triggers": [],
+            "tools": [],
+            "overview": {
+                "windowLabel": "最近 7 天",
+                "averageScore": 5.0,
+                "topEmotionTags": [],
+                "bestWindow": "",
+                "worstWindow": "",
+                "conclusion": ""
+            },
+            "timelineSegments": [],
+            "loopPatterns": [],
+            "lifestyleLinks": [],
+            "environmentCues": [],
+            "relationshipCues": [],
+            "recoveryNotes": [],
+            "ineffectiveActions": [],
+            "minimalRecoverySteps": []
+        }));
+
+        assert!(result.is_err());
     }
-
-    let content = serde_json::to_string_pretty(&emotion).map_err(|e| e.to_string())?;
-    let temp_path = temp_emotion_path(&state.data_path);
-
-    if temp_path.exists() {
-        std::fs::remove_file(&temp_path).map_err(|e| e.to_string())?;
-    }
-
-    std::fs::write(&temp_path, content).map_err(|e| e.to_string())?;
-    std::fs::rename(&temp_path, &state.data_path).map_err(|e| e.to_string())
 }

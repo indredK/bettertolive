@@ -14,6 +14,7 @@ use crate::{
     finance::commands::{get_finance, FinanceState},
     future::commands::{get_future, FutureState},
     growth::commands::{get_growth, GrowthState},
+    journey::commands::JourneyState,
     memory::commands::{get_memory, MemoryState},
     nutrition::commands::{get_nutrition, NutritionState},
     overview::commands::{get_overview, OverviewState},
@@ -51,6 +52,7 @@ pub fn get_workspace_snapshot(
     finance_state: State<FinanceState>,
     future_state: State<FutureState>,
     growth_state: State<GrowthState>,
+    journey_state: State<JourneyState>,
     memory_state: State<MemoryState>,
     nutrition_state: State<NutritionState>,
     overview_state: State<OverviewState>,
@@ -68,8 +70,12 @@ pub fn get_workspace_snapshot(
     let beliefs = crate::beliefs::commands::get_beliefs(beliefs_state)?;
     let principles = get_principles(principles_state)?;
     let relationships = get_relationships(relationships_state)?;
-    let growth = get_growth(growth_state)?;
-    let memory = get_memory(memory_state)?;
+    let growth = get_growth(
+        growth_state.clone(),
+        memory_state.clone(),
+        journey_state.clone(),
+    )?;
+    let memory = get_memory(memory_state, growth_state.clone(), journey_state)?;
     let socioeconomics = get_socioeconomics(socioeconomics_state)?;
     let future = get_future(future_state)?;
     let conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
@@ -78,12 +84,12 @@ pub fn get_workspace_snapshot(
 
     Ok(WorkspaceSnapshotDto {
         overview: Some(overview),
-        reflection: Some(reflection),
+        reflection: Some(serde_json::to_value(reflection).map_err(|e| e.to_string())?),
         events: Some(events),
-        finance: Some(finance),
+        finance: Some(serde_json::to_value(finance).map_err(|e| e.to_string())?),
         shopping,
         nutrition: Some(nutrition),
-        emotion: Some(emotion),
+        emotion: Some(serde_json::to_value(emotion).map_err(|e| e.to_string())?),
         beliefs: Some(
             serde_json::to_value::<BeliefsModuleDto>(beliefs).map_err(|e| e.to_string())?,
         ),

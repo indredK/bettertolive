@@ -27,15 +27,7 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { useSaveFinanceMutation } from "@/features/bettertolive/queries/use-save-finance-mutation"
 import { confirmUndoableDelete } from "@/features/bettertolive/ui/shopping/_shared/shopping-delete"
-import type {
-  FinanceLifeSystem,
-  FinanceLinkedModule,
-  FinanceModuleData,
-  FinanceNecessity,
-  FinanceReviewStatus,
-  TransactionDirection,
-  TransactionEntry,
-} from "@/features/bettertolive/types"
+import type { FinanceModuleData, TransactionEntry } from "@/features/bettertolive/types"
 import {
   FINANCE_CATEGORIES,
   FINANCE_DIRECTIONS,
@@ -57,19 +49,19 @@ export type EditingFinanceEntry = {
 const financeEntryFormSchema = z.object({
   date: z.string().min(1),
   label: z.string().min(1),
-  category: z.string().min(1),
+  category: z.enum(FINANCE_CATEGORIES),
   amount: z
     .string()
     .min(1)
     .refine((value) => Number.isFinite(Number(value)), "Amount must be a valid number")
     .refine((value) => Number(value) > 0, "Amount must be positive"),
-  direction: z.string(),
+  direction: z.enum(FINANCE_DIRECTIONS),
   note: z.string(),
   account: z.string(),
-  lifeSystem: z.string(),
-  necessity: z.string(),
-  reviewStatus: z.string(),
-  linkedModule: z.string(),
+  lifeSystem: z.enum(FINANCE_LIFE_SYSTEMS),
+  necessity: z.enum(FINANCE_NECESSITIES),
+  reviewStatus: z.enum(FINANCE_REVIEW_STATUSES),
+  linkedModule: z.enum(FINANCE_LINKED_MODULES),
   tagsText: z.string(),
 })
 
@@ -115,15 +107,15 @@ export function FinanceEntryEditDialog({
       id: editing.entry?.id ?? generateId("finance-entry"),
       date: values.date,
       label: values.label.trim(),
-      category: values.category.trim(),
+      category: values.category,
       amount,
-      direction: values.direction as TransactionDirection,
+      direction: values.direction,
       note: values.note.trim(),
       account: values.account.trim() || undefined,
-      lifeSystem: values.lifeSystem as FinanceLifeSystem,
-      necessity: values.necessity as FinanceNecessity,
-      reviewStatus: values.reviewStatus as FinanceReviewStatus,
-      linkedModule: values.linkedModule as FinanceLinkedModule,
+      lifeSystem: values.lifeSystem,
+      necessity: values.necessity,
+      reviewStatus: values.reviewStatus,
+      linkedModule: values.linkedModule,
       tags: splitListText(values.tagsText, /\n|,|，/),
     }
 

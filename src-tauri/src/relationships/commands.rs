@@ -1,3 +1,5 @@
+use crate::json_store::{atomic_write_json, read_json_file};
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use tauri::State;
 
@@ -24,6 +26,13 @@ const PRESET_RELATIONSHIP_CONNECTION_IDS: &[&str] = &[
     "relationship-connection-self-neighbor-friend",
     "relationship-connection-partner-best-friend",
 ];
+const RELATIONSHIPS_SCHEMA_VERSION: u32 = 2;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct VersionedRelationshipsDocument {
+    schema_version: u32,
+    data: serde_json::Value,
+}
 
 fn seed_relationships() -> Result<serde_json::Value, String> {
     let mut relationships: serde_json::Value =
@@ -32,40 +41,11 @@ fn seed_relationships() -> Result<serde_json::Value, String> {
     Ok(relationships)
 }
 
-fn should_reset_to_current_seed(relationships: &serde_json::Value) -> bool {
-    !relationships
-        .get("circles")
-        .and_then(|circles| circles.as_array())
-        .map(|circles| {
-            circles.iter().any(|circle| {
-                circle
-                    .get("id")
-                    .and_then(|id| id.as_str())
-                    .is_some_and(|id| id == FIVE_GENERATION_ROOT_ID)
-            })
-        })
-        .unwrap_or(false)
-}
-
-fn backup_relationships(data_path: &Path) -> Result<(), String> {
-    if !data_path.exists() {
-        return Ok(());
-    }
-
-    let file_name = data_path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("relationships.json");
-    let backup_path =
-        data_path.with_file_name(format!("{file_name}.bak-before-five-generation-reset"));
-
-    if backup_path.exists() {
-        return Ok(());
-    }
-
-    std::fs::copy(data_path, backup_path)
-        .map(|_| ())
-        .map_err(|e| e.to_string())
+fn seed_relationships_document() -> Result<VersionedRelationshipsDocument, String> {
+    Ok(VersionedRelationshipsDocument {
+        schema_version: RELATIONSHIPS_SCHEMA_VERSION,
+        data: seed_relationships()?,
+    })
 }
 
 fn remove_preset_relationship_connections(relationships: &mut serde_json::Value) -> bool {
@@ -262,73 +242,79 @@ fn connection_pair_key(connection: &serde_json::Value) -> Option<String> {
     }
 }
 
-fn temp_relationships_path(data_path: &Path) -> PathBuf {
-    let file_name = data_path
-        .file_name()
-        .and_then(|name| name.to_str())
-        .unwrap_or("relationships.json");
+fn migrate_relationships_document(
+    mut document: VersionedRelationshipsDocument,
+) -> Result<VersionedRelationshipsDocument, String> {
+    loop {
+        match document.schema_version {
+            1 => {
+                remove_preset_relationship_connections(&mut document.data);
+                add_missing_default_connections(&mut document.data)?;
+                fill_missing_connection_roles(&mut document.data);
+                document.schema_version = 2;
+            }
+            RELATIONSHIPS_SCHEMA_VERSION => return Ok(document),
+            version => {
+                return Err(format!(
+                    "unsupported relationships schema version: {}",
+                    version
+                ))
+            }
+        }
+    }
+}
 
-    data_path.with_file_name(format!("{file_name}.tmp"))
+fn read_versioned_relationships_document(
+    data_path: &Path,
+) -> Result<(VersionedRelationshipsDocument, bool), String> {
+    if !data_path.exists() {
+        return Ok((seed_relationships_document()?, true));
+    }
+
+    let raw: serde_json::Value = read_json_file(data_path)?;
+    let is_versioned = raw
+        .get("schema_version")
+        .and_then(|value| value.as_u64())
+        .is_some()
+        && raw.get("data").is_some();
+
+    if is_versioned {
+        let document: VersionedRelationshipsDocument =
+            serde_json::from_value(raw).map_err(|e| e.to_string())?;
+        let should_persist = document.schema_version != RELATIONSHIPS_SCHEMA_VERSION;
+        return Ok((migrate_relationships_document(document)?, should_persist));
+    }
+
+    let document = migrate_relationships_document(VersionedRelationshipsDocument {
+        schema_version: 1,
+        data: raw,
+    })?;
+
+    Ok((document, true))
 }
 
 #[tauri::command]
 pub fn get_relationships(state: State<RelationshipsState>) -> Result<serde_json::Value, String> {
-    if !state.data_path.exists() {
-        let seed = seed_relationships()?;
-        save_relationships_to_path(&state.data_path, &seed)?;
-        return Ok(seed);
+    let (document, should_persist) = read_versioned_relationships_document(&state.data_path)?;
+
+    if should_persist {
+        atomic_write_json(&state.data_path, &document)?;
     }
 
-    let content = std::fs::read_to_string(&state.data_path).map_err(|e| e.to_string())?;
-    let mut relationships: serde_json::Value =
-        serde_json::from_str(&content).map_err(|e| e.to_string())?;
-
-    if should_reset_to_current_seed(&relationships) {
-        backup_relationships(&state.data_path)?;
-        let seed = seed_relationships()?;
-        save_relationships_to_path(&state.data_path, &seed)?;
-        return Ok(seed);
-    }
-
-    let mut should_save_relationships = false;
-
-    if remove_preset_relationship_connections(&mut relationships) {
-        should_save_relationships = true;
-    }
-
-    if add_missing_default_connections(&mut relationships)? {
-        should_save_relationships = true;
-    }
-
-    if fill_missing_connection_roles(&mut relationships) {
-        should_save_relationships = true;
-    }
-
-    if should_save_relationships {
-        backup_relationships(&state.data_path)?;
-        save_relationships_to_path(&state.data_path, &relationships)?;
-    }
-
-    Ok(relationships)
+    Ok(document.data)
 }
 
 fn save_relationships_to_path(
     data_path: &Path,
     relationships: &serde_json::Value,
 ) -> Result<(), String> {
-    if let Some(parent) = data_path.parent() {
-        std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
-    }
-
-    let content = serde_json::to_string_pretty(relationships).map_err(|e| e.to_string())?;
-    let temp_path = temp_relationships_path(data_path);
-
-    if temp_path.exists() {
-        std::fs::remove_file(&temp_path).map_err(|e| e.to_string())?;
-    }
-
-    std::fs::write(&temp_path, content).map_err(|e| e.to_string())?;
-    std::fs::rename(&temp_path, data_path).map_err(|e| e.to_string())
+    atomic_write_json(
+        data_path,
+        &VersionedRelationshipsDocument {
+            schema_version: RELATIONSHIPS_SCHEMA_VERSION,
+            data: relationships.clone(),
+        },
+    )
 }
 
 #[tauri::command]
@@ -337,4 +323,99 @@ pub fn save_relationships(
     relationships: serde_json::Value,
 ) -> Result<(), String> {
     save_relationships_to_path(&state.data_path, &relationships)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::read_versioned_relationships_document;
+    use super::{VersionedRelationshipsDocument, RELATIONSHIPS_SCHEMA_VERSION};
+    use std::path::PathBuf;
+
+    fn unique_path(name: &str) -> PathBuf {
+        let unique = format!("bettertolive-relationships-{name}-{}", uuid::Uuid::new_v4());
+        std::env::temp_dir().join(unique)
+    }
+
+    #[test]
+    fn legacy_plain_document_is_not_reset_to_seed() {
+        let data_path = unique_path("legacy-no-reset");
+        std::fs::write(
+            &data_path,
+            serde_json::to_string_pretty(&serde_json::json!({
+                "circles": [],
+                "patterns": [],
+                "unsentNotes": [],
+                "connections": []
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+
+        let (document, should_persist) = read_versioned_relationships_document(&data_path).unwrap();
+        assert!(should_persist);
+        assert_eq!(document.schema_version, RELATIONSHIPS_SCHEMA_VERSION);
+        assert_eq!(document.data["circles"], serde_json::json!([]));
+        assert_eq!(document.data["connections"], serde_json::json!([]));
+
+        if data_path.exists() {
+            std::fs::remove_file(&data_path).unwrap();
+        }
+    }
+
+    #[test]
+    fn legacy_document_is_migrated_to_versioned_envelope() {
+        let data_path = unique_path("legacy-envelope");
+        std::fs::write(
+            &data_path,
+            serde_json::to_string_pretty(&serde_json::json!({
+                "circles": [
+                    {
+                        "id": "relationship-five-generation-family",
+                        "title": "家庭",
+                        "summary": "summary",
+                        "entries": [
+                            { "id": "source", "name": "源" },
+                            { "id": "target", "name": "目标" }
+                        ]
+                    }
+                ],
+                "patterns": [],
+                "unsentNotes": [],
+                "connections": [
+                    {
+                        "id": "connection-1",
+                        "sourceId": "source",
+                        "targetId": "target",
+                        "note": "note",
+                        "strength": "中"
+                    }
+                ]
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+
+        let (document, should_persist) = read_versioned_relationships_document(&data_path).unwrap();
+        assert!(should_persist);
+        assert_eq!(document.schema_version, RELATIONSHIPS_SCHEMA_VERSION);
+        assert_eq!(
+            document.data["connections"][0]["roles"][0]["sourceRole"],
+            serde_json::json!("源")
+        );
+
+        let envelope = VersionedRelationshipsDocument {
+            schema_version: document.schema_version,
+            data: document.data.clone(),
+        };
+        crate::json_store::atomic_write_json(&data_path, &envelope).unwrap();
+
+        let persisted: VersionedRelationshipsDocument =
+            crate::json_store::read_json_file(&data_path).unwrap();
+        assert_eq!(persisted.schema_version, RELATIONSHIPS_SCHEMA_VERSION);
+        assert!(persisted.data.get("circles").is_some());
+
+        if data_path.exists() {
+            std::fs::remove_file(&data_path).unwrap();
+        }
+    }
 }
