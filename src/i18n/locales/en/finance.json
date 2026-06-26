@@ -67,47 +67,139 @@
       "income": "Income"
     },
     "category": {
-      "餐饮": "Food",
-      "居住": "Housing",
-      "交通": "Transport",
-      "购物": "Shopping",
-      "学习成长": "Learning",
-      "健康": "Health",
-      "社交": "Social",
-      "娱乐": "Entertainment",
-      "收入": "Income",
-      "储蓄": "Savings",
-      "其他": "Other"
+      "food": "Food",
+      "housing": "Housing",
+      "transport": "Transport",
+      "shopping": "Shopping",
+      "learning": "Learning",
+      "health": "Health",
+      "social": "Social",
+      "entertainment": "Entertainment",
+      "income": "Income",
+      "savings": "Savings",
+      "other": "Other"
     },
     "lifeSystem": {
-      "基本生活": "Basic living",
-      "身体健康": "Physical health",
-      "关系社交": "Relationships",
-      "成长学习": "Growth and learning",
-      "居住环境": "Living environment",
-      "自由安全": "Freedom and safety",
-      "娱乐恢复": "Play and recovery"
+      "basic_life": "Basic living",
+      "health": "Physical health",
+      "relationships": "Relationships",
+      "growth": "Growth and learning",
+      "housing": "Living environment",
+      "safety": "Freedom and safety",
+      "recovery": "Play and recovery"
     },
     "necessity": {
-      "生存必需": "Essential",
-      "稳定维护": "Stability maintenance",
-      "体验改善": "Experience upgrade",
-      "长期投资": "Long-term investment",
-      "冲动/待复盘": "Impulse / review later"
+      "essential": "Essential",
+      "maintenance": "Stability maintenance",
+      "upgrade": "Experience upgrade",
+      "long_term_investment": "Long-term investment",
+      "impulse_review": "Impulse / review later"
     },
     "reviewStatus": {
-      "已确认": "Confirmed",
-      "待复盘": "Needs review",
-      "可优化": "Can optimize",
-      "值得保留": "Worth keeping"
+      "confirmed": "Confirmed",
+      "needs_review": "Needs review",
+      "can_optimize": "Can optimize",
+      "worth_keeping": "Worth keeping"
     },
     "linkedModule": {
-      "手动录入": "Manual entry",
-      "购物": "Shopping",
-      "饮食": "Nutrition",
-      "记事": "Events",
-      "反思": "Reflection",
-      "未来": "Future"
+      "manual": "Manual entry",
+      "shopping": "Shopping",
+      "nutrition": "Nutrition",
+      "events": "Events",
+      "reflection": "Reflection",
+      "future": "Future"
+    }
+  },
+  "enumSearch": {
+    "zh": {
+      "category": {
+        "food": "餐饮",
+        "housing": "居住",
+        "transport": "交通",
+        "shopping": "购物",
+        "learning": "学习成长",
+        "health": "健康",
+        "social": "社交",
+        "entertainment": "娱乐",
+        "income": "收入",
+        "savings": "储蓄",
+        "other": "其他"
+      },
+      "lifeSystem": {
+        "basic_life": "基本生活",
+        "health": "身体健康",
+        "relationships": "关系社交",
+        "growth": "成长学习",
+        "housing": "居住环境",
+        "safety": "自由安全",
+        "recovery": "娱乐恢复"
+      },
+      "necessity": {
+        "essential": "生存必需",
+        "maintenance": "稳定维护",
+        "upgrade": "体验改善",
+        "long_term_investment": "长期投资",
+        "impulse_review": "冲动/待复盘"
+      },
+      "reviewStatus": {
+        "confirmed": "已确认",
+        "needs_review": "待复盘",
+        "can_optimize": "可优化",
+        "worth_keeping": "值得保留"
+      },
+      "linkedModule": {
+        "manual": "手动录入",
+        "shopping": "购物",
+        "nutrition": "饮食",
+        "events": "记事",
+        "reflection": "反思",
+        "future": "未来"
+      }
+    },
+    "en": {
+      "category": {
+        "food": "Food",
+        "housing": "Housing",
+        "transport": "Transport",
+        "shopping": "Shopping",
+        "learning": "Learning",
+        "health": "Health",
+        "social": "Social",
+        "entertainment": "Entertainment",
+        "income": "Income",
+        "savings": "Savings",
+        "other": "Other"
+      },
+      "lifeSystem": {
+        "basic_life": "Basic living",
+        "health": "Physical health",
+        "relationships": "Relationships",
+        "growth": "Growth and learning",
+        "housing": "Living environment",
+        "safety": "Freedom and safety",
+        "recovery": "Play and recovery"
+      },
+      "necessity": {
+        "essential": "Essential",
+        "maintenance": "Stability maintenance",
+        "upgrade": "Experience upgrade",
+        "long_term_investment": "Long-term investment",
+        "impulse_review": "Impulse / review later"
+      },
+      "reviewStatus": {
+        "confirmed": "Confirmed",
+        "needs_review": "Needs review",
+        "can_optimize": "Can optimize",
+        "worth_keeping": "Worth keeping"
+      },
+      "linkedModule": {
+        "manual": "Manual entry",
+        "shopping": "Shopping",
+        "nutrition": "Nutrition",
+        "events": "Events",
+        "reflection": "Reflection",
+        "future": "Future"
+      }
     }
   },
   "tabs": {

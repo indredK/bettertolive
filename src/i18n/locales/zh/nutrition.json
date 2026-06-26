@@ -54,6 +54,33 @@
       "中": "中",
       "低": "低"
     },
+    "sugarKind": {
+      "天然存在": "天然存在",
+      "游离糖/添加糖": "游离糖/添加糖",
+      "混合": "混合",
+      "未知": "未知"
+    },
+    "proteinSource": {
+      "蛋类": "蛋类",
+      "奶类": "奶类",
+      "豆制品": "豆制品",
+      "豆类": "豆类",
+      "鱼虾海鲜": "鱼虾海鲜",
+      "禽肉": "禽肉",
+      "畜肉": "畜肉",
+      "加工肉": "加工肉"
+    },
+    "processingLevel": {
+      "原食材": "原食材",
+      "轻加工": "轻加工",
+      "中度加工": "中度加工",
+      "高度加工": "高度加工"
+    },
+    "sodiumRiskLevel": {
+      "低": "低",
+      "中": "中",
+      "高": "高"
+    },
     "mealRole": {
       "早餐": "早餐",
       "午餐": "午餐",
@@ -178,6 +205,38 @@
     "noConstraints": "暂无硬约束",
     "noStances": "暂无软立场",
     "actions": "可执行建议",
+    "actionRecipe": "可优先安排：{{name}}",
+    "actionReady": "结构较稳",
+    "actionTitles": {
+      "protein": "补一个真正的蛋白主轴",
+      "fiber": "把蔬菜和纤维补进来",
+      "sugar": "把甜饮和游离糖压下来",
+      "sodium": "把高钠和重口味降一点",
+      "balanced": "今天的结构已经比较稳"
+    },
+    "actionBodies": {
+      "protein": {
+        "medium": "今天已经有一点蛋白，但主导来源还不够稳，最好再补一餐带蛋、鱼、禽肉、豆制品或奶类的组合。",
+        "low": "今天的蛋白来源偏弱，后面一餐尽量别只靠主食或饮品，补一个真正的蛋白主体。",
+        "withSoyAnchor": "今天已经有 {{food}} 这类豆类/豆制品在补位，后面只需要再把蛋白主轴拉稳，不必退回加工肉。"
+      },
+      "fiber": {
+        "medium": "纤维有一些，但蔬菜和高钾食物还不够撑场，补一份绿叶菜、豆类或高纤主食会更稳。",
+        "low": "今天的蔬菜和纤维明显偏弱，后面一餐需要主动补蔬菜、豆类或高纤主食，不然后面更容易饿。"
+      },
+      "sugar": {
+        "medium": "今天已经出现一点游离糖或甜饮压力，后面尽量把饮品换成更轻的选项。",
+        "high": "今天的游离糖压力已经偏高，后面一餐别再叠甜饮或甜点，优先回到主食 + 蛋白 + 蔬菜。",
+        "withFruitAndJuice": "今天同时出现了 {{fruit}} 这类完整水果和 {{juice}} 这类甜饮型糖来源，后面更适合保留前者、压下后者。",
+        "withJuiceOnly": "今天已经有 {{juice}} 这类更像甜饮的糖来源，后面尽量别再叠加果汁、奶茶或甜咖啡。"
+      },
+      "sodium": {
+        "medium": "今天的钠压力开始抬头，后面一餐尽量避开重调味、汤底和加工肉。",
+        "high": "今天的钠压力已经偏高，后面最好选清淡一些的组合，少靠勾芡汁、腌制品和重口味调味。",
+        "withPantryPressure": "今天的钠压力已经被 {{foods}} 这类库存型高钠食物抬起来了，后面别再补咸菜、酱汁或加工肉。"
+      },
+      "balanced": "今天的蛋白、纤维和风险项结构都还稳，接下来重点是保持执行，不必再额外加码。"
+    },
     "review": "近期校准",
     "missingNutrition": "{{count}} 项营养数据待补",
     "energySummary": "今日估算 {{kcal}} kcal · 蛋白 {{protein}} g"
@@ -230,7 +289,49 @@
     "replacementHint": "从未安排且营养数据更完整的食谱里挑选。",
     "missingShort": "待补 {{count}}",
     "noReplacement": "暂无可替换食谱，可以先补充食谱或完善营养数据。",
-    "missingNutrition": "{{count}} 个条目营养数据待补，未按 0 计算。"
+    "missingNutrition": "{{count}} 个条目营养数据待补，未按 0 计算。",
+    "signalLabels": {
+      "protein": "蛋白主轴",
+      "fiber": "纤维与蔬菜",
+      "sugar": "游离糖压力",
+      "sodium": "钠压力"
+    },
+    "insights": {
+      "protein": {
+        "good": "今天已有稳定蛋白来源，后续重点是保持结构。",
+        "medium": "蛋白已经起步，但主导来源还不够扎实。",
+        "low": "蛋白主轴偏弱，后面一餐最好主动补蛋、鱼、禽肉、豆制品或奶类。",
+        "withSoyAnchor": "今天已经有 {{food}} 在补植物蛋白，后面更适合继续补真正蛋白主轴，而不是退回加工肉。"
+      },
+      "fiber": {
+        "good": "纤维和高钾食物已经比较在线。",
+        "medium": "纤维有一些，但蔬菜和高钾食物还能再补。",
+        "low": "蔬菜和纤维偏弱，今天更容易饿或吃完不够轻。"
+      },
+      "sugar": {
+        "good": "今天游离糖压力不高。",
+        "medium": "已经有一些甜饮或游离糖信号，后面别继续叠加。",
+        "high": "游离糖压力偏高，后面优先回到正餐结构。",
+        "withFruitAndJuice": "今天既有 {{fruit}} 这类完整水果，也有 {{juice}} 这类更像甜饮的糖来源，后面保留前者、压下后者会更稳。"
+      },
+      "sodium": {
+        "good": "今天钠压力整体可控。",
+        "medium": "钠或加工调味开始抬头，后面一餐尽量清淡一点。",
+        "high": "钠压力偏高，后面别再叠重口味和高加工项。",
+        "withPantryPressure": "今天的钠压力已经被 {{foods}} 这类库存型高钠食物推高，后面一餐尽量别再靠咸菜、午餐肉或重酱汁。"
+      }
+    },
+    "reasonLabels": {
+      "proteinSupport": "补蛋白",
+      "fiberSupport": "补纤维",
+      "soyProteinSupport": "豆类蛋白补位",
+      "wholeFruitSupport": "完整水果替代",
+      "lightSupport": "更轻负担",
+      "potassiumSupport": "补钾",
+      "calciumSupport": "补钙",
+      "lowerSugar": "降糖压力",
+      "lowerSodium": "降钠压力"
+    }
   },
   "dailyPlanEdit": {
     "createTitle": "新增每日计划",
@@ -376,7 +477,49 @@
     "dietaryTags": "饮食标签",
     "noDietaryTags": "暂无饮食标签或过敏原。",
     "nutrientProfile": "营养档案",
-    "profileMissingCopy": "这项食品仍可进入食谱和计划，但营养表会显示待补。"
+    "profileMissingCopy": "这项食品仍可进入食谱和计划，但营养表会显示待补。",
+    "processingLevel": "加工度",
+    "filterGroups": {
+      "nutrition": "营养主轴",
+      "risk": "风险提示",
+      "source": "来源语义",
+      "processing": "加工度"
+    },
+    "filters": {
+      "title": "语义筛选",
+      "all": "全部语义",
+      "highProtein": "高蛋白",
+      "highFiber": "高纤维",
+      "highCalcium": "高钙",
+      "highIron": "高铁",
+      "highPotassium": "高钾",
+      "highSugarRisk": "高糖风险",
+      "highSodiumRisk": "高钠风险",
+      "highSaturatedFatRisk": "高饱和脂肪风险",
+      "eggProtein": "蛋类",
+      "dairyProtein": "奶类",
+      "soyProtein": "豆制品/豆类",
+      "seafoodProtein": "鱼虾海鲜",
+      "poultryProtein": "禽肉",
+      "redMeatProtein": "畜肉/加工肉",
+      "wholeIngredient": "原食材",
+      "lightlyProcessed": "轻加工",
+      "highlyProcessed": "高度加工"
+    },
+    "badges": {
+      "highProtein": "高蛋白",
+      "highFiber": "高纤维候选",
+      "highCalcium": "高钙候选",
+      "highPotassium": "高钾候选",
+      "highSugarRisk": "高糖风险",
+      "highSodiumRisk": "高钠风险"
+    },
+    "signalLabels": {
+      "protein": "蛋白来源",
+      "processing": "加工度",
+      "sodium": "钠风险",
+      "sugar": "糖类型"
+    }
   },
   "categoryEdit": {
     "createTitle": "新增食品分类",
@@ -415,6 +558,14 @@
     "notePlaceholder": "储存、使用场景或限制说明",
     "nutritionSection": "营养档案",
     "nutritionDescription": "按每 100g / 100ml 维护。留空时不会按 0 计算，而是在营养表显示待补。",
+    "sugarKind": "糖类型",
+    "proteinSource": "蛋白来源",
+    "processingLevel": "加工度",
+    "sodiumRiskLevel": "钠风险",
+    "portionWeight": "{{unit}} 重量",
+    "estimatedGrams": "估算克重",
+    "portionNote": "份量备注",
+    "portionNotePlaceholder": "例如：去皮中等大小，约 110g",
     "source": "来源",
     "confidence": "可信度",
     "deleteBlocked": "该食品已被 {{count}} 个食谱、计划或记录引用，暂不能删除。",
@@ -424,7 +575,8 @@
     "deleteFailed": "食品删除失败",
     "validation": {
       "nameRequired": "请填写食品名",
-      "categoryRequired": "请至少选择一个分类"
+      "categoryRequired": "请至少选择一个分类",
+      "portionPositive": "份量估算需要大于 0"
     }
   },
   "nutrients": {
@@ -455,10 +607,27 @@
     "energyKcal": "能量",
     "proteinG": "蛋白质",
     "fatG": "脂肪",
+    "saturatedFatG": "饱和脂肪",
     "carbG": "碳水",
     "fiberG": "膳食纤维",
     "sugarG": "糖",
+    "addedSugarG": "添加糖",
     "sodiumMg": "钠",
+    "calciumMg": "钙",
+    "ironMg": "铁",
+    "potassiumMg": "钾",
+    "metadataTitle": "营养语义",
+    "qualityTitle": "质量与风险",
+    "tablePresets": {
+      "primary": "基础营养",
+      "quality": "质量信号"
+    },
+    "signalLabels": {
+      "protein": "蛋白来源",
+      "processing": "加工度",
+      "sodium": "钠风险",
+      "sugar": "糖类型"
+    },
     "modes": {
       "foods": "食品",
       "recipes": "食谱",
@@ -479,16 +648,112 @@
     "search": "搜索进食、场景、反馈或食物记忆",
     "empty": "没有匹配的进食记录。",
     "review": "回顾线索",
+    "highlights": "本周洞察",
+    "missingSignals": "待补线索",
+    "crossViews": "关联视图",
+    "focusLabel": "当前聚焦",
+    "focusReasonLabel": "命中原因",
+    "evidenceCount": "{{count}} 条证据",
     "boundary": "这里保留观察线索：为什么吃、吃完怎样、计划为什么偏离。它服务计划校准，不用来评判。",
     "changeReason": "偏差原因",
     "changeReasonWithValue": "偏差原因：{{reason}}",
     "valueDensity": "价值密度",
+    "noReviewData": "再多记几次真实进食，这里就会开始长出规律。",
     "filters": {
       "all": "全部",
       "linkedPlan": "关联计划",
       "linkedMemory": "关联记忆",
       "changed": "有偏差",
       "needsCare": "需要照顾"
+    },
+    "semanticBadges": {
+      "wholeFruit": "完整水果",
+      "juiceDrink": "甜饮型糖",
+      "pantrySodium": "库存型高钠",
+      "soyProtein": "豆类/豆制品蛋白",
+      "freeSugar": "游离糖压力"
+    },
+    "focusReasons": {
+      "balancedStructure": "结构完整且整体更稳",
+      "freeSugar": "出现了游离糖或高糖压力",
+      "heavySodium": "出现了高钠或重口味压力",
+      "wholeFruit": "出现了完整水果型信号",
+      "juiceDrink": "出现了果汁/甜饮型糖",
+      "fruitWithSoy": "完整水果和豆类蛋白同时出现",
+      "pantrySodium": "出现了库存型高钠组合",
+      "seasoning": "高钠压力主要来自调味料",
+      "processed": "高钠压力主要来自加工现成食物",
+      "breakfastGap": "早餐时段里蛋白或完整结构偏弱",
+      "externalGap": "外食场景里结构和蛋白更容易掉线",
+      "unstructuredExternal": "外食同时缺少结构化记录",
+      "juiceVsFruit": "这条记录体现了果汁和完整水果的差异"
+    },
+    "derived": {
+      "highlights": {
+        "balancedStructure": {
+          "title": "结构完整的餐更容易给出稳定反馈",
+          "summary": "这周有 {{count}} 次进食同时出现了蛋白主轴、纤维支撑，并且没有明显糖钠压力，身体反馈更稳。"
+        },
+        "sweetTrigger": {
+          "title": "非饥饿触发的甜饮更容易带来后续加餐",
+          "summary": "这周有 {{count}} 次进食把高糖项和情绪/习惯触发叠在一起，后续更容易出现还想继续吃。"
+        },
+        "sodiumPressure": {
+          "title": "高钠或重口味更容易把身体反馈推向偏重",
+          "summary": "这周有 {{count}} 次进食同时出现高钠/重口味信号和偏重偏胀反馈，说明这条因果线已经开始重复。"
+        },
+        "homeStable": {
+          "title": "在家做且有结构的餐更容易稳定下来",
+          "summary": "这周有 {{count}} 次在家做的结构化进食给出了满足舒服的反馈，这类组合值得继续复用。"
+        },
+        "wholeFruitStable": {
+          "title": "完整水果型加餐比甜饮型糖更稳",
+          "summary": "这周有 {{count}} 次进食出现了完整水果且没有叠甜饮，反馈更容易保持平稳。"
+        },
+        "pantrySodium": {
+          "title": "库存型高钠组合很容易被低估",
+          "summary": "这周有 {{count}} 次进食把咸菜、午餐肉、酱油或方便面这类库存型高钠食物叠在一起，身体反馈更容易变重。"
+        }
+      },
+      "missingSignals": {
+        "breakfast": "早餐结构还不稳定，蛋白和纤维经常缺一块。",
+        "externalGap": "外卖、便利店或旅行场景里，蛋白和蔬菜更容易一起缺席。",
+        "unstructuredExternal": "一旦吃法变成临时文本型外食，钠和重口味线索会迅速变多。",
+        "juiceVsFruit": "果汁和完整水果在体感上并不等价，便利店饮品更容易把糖压力抬起来。"
+      },
+      "crossViews": {
+        "signalFeedback": {
+          "title": "营养信号 × 身体反馈",
+          "summary": "把结构完整、高糖和高钠这些信号，与吃完后的身体感觉放到一起看。",
+          "rows": {
+            "balanced": "结构完整",
+            "freeSugar": "高糖压力",
+            "heavySodium": "高钠/重口味"
+          }
+        },
+        "gapScenes": {
+          "title": "缺口场景 × 身体反馈",
+          "summary": "哪些场景最容易让蛋白、蔬菜和结构一起掉线，可以先从这些地方补预案。"
+        },
+        "fruitSugar": {
+          "title": "完整水果 × 甜饮型糖",
+          "summary": "把完整水果、果汁/甜饮，以及带豆类蛋白的水果型加餐拆开看，更容易判断哪种加餐更稳。",
+          "rows": {
+            "wholeFruit": "完整水果型加餐",
+            "juiceDrink": "果汁/甜饮型糖",
+            "fruitWithSoy": "完整水果 + 豆类蛋白"
+          }
+        },
+        "pantrySodium": {
+          "title": "库存型高钠 × 身体反馈",
+          "summary": "把库存型高钠组合拆成整体、调味料和加工现成食物三层，更容易知道压力是从哪里堆起来的。",
+          "rows": {
+            "overall": "库存型高钠整体",
+            "seasoning": "调味料推动",
+            "processed": "加工现成食物推动"
+          }
+        }
+      }
     }
   },
   "logEdit": {

@@ -67,47 +67,139 @@
       "income": "收入"
     },
     "category": {
-      "餐饮": "餐饮",
-      "居住": "居住",
-      "交通": "交通",
-      "购物": "购物",
-      "学习成长": "学习成长",
-      "健康": "健康",
-      "社交": "社交",
-      "娱乐": "娱乐",
-      "收入": "收入",
-      "储蓄": "储蓄",
-      "其他": "其他"
+      "food": "餐饮",
+      "housing": "居住",
+      "transport": "交通",
+      "shopping": "购物",
+      "learning": "学习成长",
+      "health": "健康",
+      "social": "社交",
+      "entertainment": "娱乐",
+      "income": "收入",
+      "savings": "储蓄",
+      "other": "其他"
     },
     "lifeSystem": {
-      "基本生活": "基本生活",
-      "身体健康": "身体健康",
-      "关系社交": "关系社交",
-      "成长学习": "成长学习",
-      "居住环境": "居住环境",
-      "自由安全": "自由安全",
-      "娱乐恢复": "娱乐恢复"
+      "basic_life": "基本生活",
+      "health": "身体健康",
+      "relationships": "关系社交",
+      "growth": "成长学习",
+      "housing": "居住环境",
+      "safety": "自由安全",
+      "recovery": "娱乐恢复"
     },
     "necessity": {
-      "生存必需": "生存必需",
-      "稳定维护": "稳定维护",
-      "体验改善": "体验改善",
-      "长期投资": "长期投资",
-      "冲动/待复盘": "冲动/待复盘"
+      "essential": "生存必需",
+      "maintenance": "稳定维护",
+      "upgrade": "体验改善",
+      "long_term_investment": "长期投资",
+      "impulse_review": "冲动/待复盘"
     },
     "reviewStatus": {
-      "已确认": "已确认",
-      "待复盘": "待复盘",
-      "可优化": "可优化",
-      "值得保留": "值得保留"
+      "confirmed": "已确认",
+      "needs_review": "待复盘",
+      "can_optimize": "可优化",
+      "worth_keeping": "值得保留"
     },
     "linkedModule": {
-      "手动录入": "手动录入",
-      "购物": "购物",
-      "饮食": "饮食",
-      "记事": "记事",
-      "反思": "反思",
-      "未来": "未来"
+      "manual": "手动录入",
+      "shopping": "购物",
+      "nutrition": "饮食",
+      "events": "记事",
+      "reflection": "反思",
+      "future": "未来"
+    }
+  },
+  "enumSearch": {
+    "zh": {
+      "category": {
+        "food": "餐饮",
+        "housing": "居住",
+        "transport": "交通",
+        "shopping": "购物",
+        "learning": "学习成长",
+        "health": "健康",
+        "social": "社交",
+        "entertainment": "娱乐",
+        "income": "收入",
+        "savings": "储蓄",
+        "other": "其他"
+      },
+      "lifeSystem": {
+        "basic_life": "基本生活",
+        "health": "身体健康",
+        "relationships": "关系社交",
+        "growth": "成长学习",
+        "housing": "居住环境",
+        "safety": "自由安全",
+        "recovery": "娱乐恢复"
+      },
+      "necessity": {
+        "essential": "生存必需",
+        "maintenance": "稳定维护",
+        "upgrade": "体验改善",
+        "long_term_investment": "长期投资",
+        "impulse_review": "冲动/待复盘"
+      },
+      "reviewStatus": {
+        "confirmed": "已确认",
+        "needs_review": "待复盘",
+        "can_optimize": "可优化",
+        "worth_keeping": "值得保留"
+      },
+      "linkedModule": {
+        "manual": "手动录入",
+        "shopping": "购物",
+        "nutrition": "饮食",
+        "events": "记事",
+        "reflection": "反思",
+        "future": "未来"
+      }
+    },
+    "en": {
+      "category": {
+        "food": "Food",
+        "housing": "Housing",
+        "transport": "Transport",
+        "shopping": "Shopping",
+        "learning": "Learning",
+        "health": "Health",
+        "social": "Social",
+        "entertainment": "Entertainment",
+        "income": "Income",
+        "savings": "Savings",
+        "other": "Other"
+      },
+      "lifeSystem": {
+        "basic_life": "Basic living",
+        "health": "Physical health",
+        "relationships": "Relationships",
+        "growth": "Growth and learning",
+        "housing": "Living environment",
+        "safety": "Freedom and safety",
+        "recovery": "Play and recovery"
+      },
+      "necessity": {
+        "essential": "Essential",
+        "maintenance": "Stability maintenance",
+        "upgrade": "Experience upgrade",
+        "long_term_investment": "Long-term investment",
+        "impulse_review": "Impulse / review later"
+      },
+      "reviewStatus": {
+        "confirmed": "Confirmed",
+        "needs_review": "Needs review",
+        "can_optimize": "Can optimize",
+        "worth_keeping": "Worth keeping"
+      },
+      "linkedModule": {
+        "manual": "Manual entry",
+        "shopping": "Shopping",
+        "nutrition": "Nutrition",
+        "events": "Events",
+        "reflection": "Reflection",
+        "future": "Future"
+      }
     }
   },
   "tabs": {

@@ -54,6 +54,33 @@
       "中": "Medium",
       "低": "Low"
     },
+    "sugarKind": {
+      "天然存在": "Naturally occurring",
+      "游离糖/添加糖": "Free / added sugar",
+      "混合": "Mixed",
+      "未知": "Unknown"
+    },
+    "proteinSource": {
+      "蛋类": "Eggs",
+      "奶类": "Dairy",
+      "豆制品": "Soy products",
+      "豆类": "Legumes",
+      "鱼虾海鲜": "Fish / seafood",
+      "禽肉": "Poultry",
+      "畜肉": "Red meat",
+      "加工肉": "Processed meat"
+    },
+    "processingLevel": {
+      "原食材": "Whole ingredient",
+      "轻加工": "Lightly processed",
+      "中度加工": "Moderately processed",
+      "高度加工": "Highly processed"
+    },
+    "sodiumRiskLevel": {
+      "低": "Low",
+      "中": "Medium",
+      "高": "High"
+    },
     "mealRole": {
       "早餐": "Breakfast",
       "午餐": "Lunch",
@@ -178,6 +205,38 @@
     "noConstraints": "No hard constraints",
     "noStances": "No soft stances",
     "actions": "Executable Suggestions",
+    "actionRecipe": "Prioritize: {{name}}",
+    "actionReady": "Structure is steady",
+    "actionTitles": {
+      "protein": "Add a real protein anchor",
+      "fiber": "Bring vegetables and fiber back in",
+      "sugar": "Pull sweet drinks and free sugar down",
+      "sodium": "Dial back sodium and heavy seasoning",
+      "balanced": "Today's structure is already steady"
+    },
+    "actionBodies": {
+      "protein": {
+        "medium": "There is some protein already, but the main source is still not stable enough. Add a meal built around eggs, fish, poultry, soy, or dairy.",
+        "low": "Protein support is weak today. Try not to rely only on starch or drinks in the next meal, and add a real protein anchor.",
+        "withSoyAnchor": "Foods like {{food}} are already helping as soy or legume protein. The next step is to keep the protein anchor steady instead of falling back to processed meat."
+      },
+      "fiber": {
+        "medium": "Fiber has started to show up, but vegetables and potassium-rich foods are still light. Another serving of greens, legumes, or a higher-fiber staple would help.",
+        "low": "Vegetables and fiber are clearly weak today. The next meal should actively add greens, legumes, or a higher-fiber staple, or hunger may rebound later."
+      },
+      "sugar": {
+        "medium": "Some free sugar or sweet-drink pressure is already present today. Try to make later drinks lighter.",
+        "high": "Free sugar pressure is already high today. Avoid stacking another sweet drink or dessert and return to a meal with starch, protein, and vegetables.",
+        "withFruitAndJuice": "Today already includes both {{fruit}} as a whole-fruit option and {{juice}} as a drink-style sugar source. Keep the first and dial back the second.",
+        "withJuiceOnly": "Today already includes {{juice}}, which behaves more like a sweet drink than a whole fruit. Avoid stacking more juice, milk tea, or sweet coffee later."
+      },
+      "sodium": {
+        "medium": "Sodium pressure is starting to rise today. The next meal should avoid heavy sauces, soup bases, and processed meats where possible.",
+        "high": "Sodium pressure is already high today. A lighter meal with less sauce, pickling, and heavy seasoning will land better.",
+        "withPantryPressure": "Today's sodium load has already been pushed up by pantry-style salty foods like {{foods}}. Avoid adding more pickles, sauces, or processed meat later."
+      },
+      "balanced": "Protein, fiber, and risk signals are all relatively steady today. The main job now is to keep execution easy."
+    },
     "review": "Recent Calibration",
     "missingNutrition": "{{count}} nutrition items pending",
     "energySummary": "Estimated today: {{kcal}} kcal · protein {{protein}} g"
@@ -230,7 +289,49 @@
     "replacementHint": "Suggested from unplanned recipes with more complete nutrition data.",
     "missingShort": "{{count}} pending",
     "noReplacement": "No replacement recipes yet. Add recipes or complete nutrition data first.",
-    "missingNutrition": "{{count}} entries have pending nutrition data and were not counted as zero."
+    "missingNutrition": "{{count}} entries have pending nutrition data and were not counted as zero.",
+    "signalLabels": {
+      "protein": "Protein anchor",
+      "fiber": "Fiber and vegetables",
+      "sugar": "Free sugar pressure",
+      "sodium": "Sodium pressure"
+    },
+    "insights": {
+      "protein": {
+        "good": "Protein sources are stable today. The main task is keeping the structure going.",
+        "medium": "Protein has started to show up, but the leading source is still not firm enough.",
+        "low": "Protein support is weak. A later meal should actively add eggs, fish, poultry, soy, or dairy.",
+        "withSoyAnchor": "Foods like {{food}} are already helping with plant protein. The next meal should keep building a real protein anchor instead of falling back to processed meat."
+      },
+      "fiber": {
+        "good": "Fiber and potassium-rich foods are in a decent place today.",
+        "medium": "There is some fiber, but vegetables and potassium-rich foods can still be strengthened.",
+        "low": "Vegetables and fiber are weak today, so hunger or heaviness may show up later."
+      },
+      "sugar": {
+        "good": "Free sugar pressure is low today.",
+        "medium": "Some sweet-drink or free sugar signals are already present, so avoid stacking more later.",
+        "high": "Free sugar pressure is high, and the rest of the day should return to regular meal structure.",
+        "withFruitAndJuice": "Today includes both {{fruit}} as a whole fruit and {{juice}} as a drink-style sugar source. Keeping the first and reducing the second will land better."
+      },
+      "sodium": {
+        "good": "Sodium pressure is under control today.",
+        "medium": "Sodium or processed seasoning is starting to rise, so later meals should stay lighter.",
+        "high": "Sodium pressure is high, and later meals should avoid more heavy seasoning or processed items.",
+        "withPantryPressure": "Today's sodium pressure is already being driven by pantry-style salty foods like {{foods}}, so the next meal should avoid pickles, luncheon meat, and heavy sauces."
+      }
+    },
+    "reasonLabels": {
+      "proteinSupport": "Protein support",
+      "fiberSupport": "Fiber support",
+      "soyProteinSupport": "Soy / legume protein",
+      "wholeFruitSupport": "Whole fruit support",
+      "lightSupport": "Lighter load",
+      "potassiumSupport": "Potassium support",
+      "calciumSupport": "Calcium support",
+      "lowerSugar": "Lower sugar pressure",
+      "lowerSodium": "Lower sodium pressure"
+    }
   },
   "dailyPlanEdit": {
     "createTitle": "Add Daily Plan",
@@ -376,7 +477,49 @@
     "dietaryTags": "Dietary Tags",
     "noDietaryTags": "No dietary tags or allergens yet.",
     "nutrientProfile": "Nutrient Profile",
-    "profileMissingCopy": "This food can still be used in recipes and plans, but the nutrition table will show it as pending."
+    "profileMissingCopy": "This food can still be used in recipes and plans, but the nutrition table will show it as pending.",
+    "processingLevel": "Processing",
+    "filterGroups": {
+      "nutrition": "Nutrition Axes",
+      "risk": "Risk Signals",
+      "source": "Source Semantics",
+      "processing": "Processing"
+    },
+    "filters": {
+      "title": "Semantic Filters",
+      "all": "All Signals",
+      "highProtein": "High Protein",
+      "highFiber": "High Fiber",
+      "highCalcium": "High Calcium",
+      "highIron": "High Iron",
+      "highPotassium": "High Potassium",
+      "highSugarRisk": "High Sugar Risk",
+      "highSodiumRisk": "High Sodium Risk",
+      "highSaturatedFatRisk": "High Saturated Fat Risk",
+      "eggProtein": "Eggs",
+      "dairyProtein": "Dairy",
+      "soyProtein": "Soy / Legumes",
+      "seafoodProtein": "Fish / Seafood",
+      "poultryProtein": "Poultry",
+      "redMeatProtein": "Red / Processed Meat",
+      "wholeIngredient": "Whole Ingredient",
+      "lightlyProcessed": "Lightly Processed",
+      "highlyProcessed": "Highly Processed"
+    },
+    "badges": {
+      "highProtein": "High Protein",
+      "highFiber": "High Fiber Candidate",
+      "highCalcium": "High Calcium Candidate",
+      "highPotassium": "High Potassium Candidate",
+      "highSugarRisk": "High Sugar Risk",
+      "highSodiumRisk": "High Sodium Risk"
+    },
+    "signalLabels": {
+      "protein": "Protein source",
+      "processing": "Processing",
+      "sodium": "Sodium risk",
+      "sugar": "Sugar type"
+    }
   },
   "categoryEdit": {
     "createTitle": "Add Food Category",
@@ -415,6 +558,14 @@
     "notePlaceholder": "Storage, usage scenes, or constraints",
     "nutritionSection": "Nutrient Profile",
     "nutritionDescription": "Maintain values per 100g / 100ml. Blank fields are shown as pending, not counted as zero.",
+    "sugarKind": "Sugar Type",
+    "proteinSource": "Protein Source",
+    "processingLevel": "Processing",
+    "sodiumRiskLevel": "Sodium Risk",
+    "portionWeight": "{{unit}} weight",
+    "estimatedGrams": "Estimated Grams",
+    "portionNote": "Portion Note",
+    "portionNotePlaceholder": "For example: medium peeled size, about 110g",
     "source": "Source",
     "confidence": "Confidence",
     "deleteBlocked": "This food is referenced by {{count}} recipes, plans, or logs and cannot be deleted yet.",
@@ -424,7 +575,8 @@
     "deleteFailed": "Failed to delete food",
     "validation": {
       "nameRequired": "Enter a food name",
-      "categoryRequired": "Select at least one category"
+      "categoryRequired": "Select at least one category",
+      "portionPositive": "Portion estimate must be greater than 0"
     }
   },
   "nutrients": {
@@ -455,10 +607,27 @@
     "energyKcal": "Energy",
     "proteinG": "Protein",
     "fatG": "Fat",
+    "saturatedFatG": "Saturated Fat",
     "carbG": "Carbs",
     "fiberG": "Fiber",
     "sugarG": "Sugar",
+    "addedSugarG": "Added Sugar",
     "sodiumMg": "Sodium",
+    "calciumMg": "Calcium",
+    "ironMg": "Iron",
+    "potassiumMg": "Potassium",
+    "metadataTitle": "Nutrition Semantics",
+    "qualityTitle": "Quality and Risk",
+    "tablePresets": {
+      "primary": "Core Nutrients",
+      "quality": "Quality Signals"
+    },
+    "signalLabels": {
+      "protein": "Protein source",
+      "processing": "Processing",
+      "sodium": "Sodium risk",
+      "sugar": "Sugar type"
+    },
     "modes": {
       "foods": "Foods",
       "recipes": "Recipes",
@@ -479,16 +648,112 @@
     "search": "Search meals, scenes, feedback, or food memories",
     "empty": "No matching meal logs.",
     "review": "Review Clues",
+    "highlights": "Weekly Signals",
+    "missingSignals": "Missing Clues",
+    "crossViews": "Cross Views",
+    "focusLabel": "Focused review",
+    "focusReasonLabel": "Why this log matched",
+    "evidenceCount": "{{count}} evidence items",
     "boundary": "This keeps the observation clues: why you ate, how it felt afterward, and why the plan changed. It calibrates plans, not judges you.",
     "changeReason": "Change reason",
     "changeReasonWithValue": "Change reason: {{reason}}",
     "valueDensity": "Value density",
+    "noReviewData": "Log a few more real meals and patterns will start to show up here.",
     "filters": {
       "all": "All",
       "linkedPlan": "Linked Plan",
       "linkedMemory": "Linked Memory",
       "changed": "Changed",
       "needsCare": "Needs Care"
+    },
+    "semanticBadges": {
+      "wholeFruit": "Whole fruit",
+      "juiceDrink": "Drink-style sugar",
+      "pantrySodium": "Pantry sodium",
+      "soyProtein": "Soy / legume protein",
+      "freeSugar": "Free sugar pressure"
+    },
+    "focusReasons": {
+      "balancedStructure": "Balanced structure stayed steadier",
+      "freeSugar": "Free sugar or sweet-drink pressure showed up",
+      "heavySodium": "High sodium or heavy seasoning showed up",
+      "wholeFruit": "A whole-fruit signal was present",
+      "juiceDrink": "Juice or drink-style sugar was present",
+      "fruitWithSoy": "Whole fruit and soy protein appeared together",
+      "pantrySodium": "A pantry-style salty combination appeared",
+      "seasoning": "Seasoning drove most of the sodium pressure",
+      "processed": "Processed ready foods drove most of the sodium pressure",
+      "breakfastGap": "Breakfast structure or protein was still weak",
+      "externalGap": "External-meal scenes were where structure dropped off",
+      "unstructuredExternal": "The external meal also lacked structured logging",
+      "juiceVsFruit": "This log shows the difference between juice and whole fruit"
+    },
+    "derived": {
+      "highlights": {
+        "balancedStructure": {
+          "title": "Structured meals more often lead to stable feedback",
+          "summary": "This week, {{count}} meals showed a protein anchor, fiber support, and no obvious sugar or sodium pressure, and the body response was steadier."
+        },
+        "sweetTrigger": {
+          "title": "Sweet drinks triggered without hunger are more likely to lead to extra eating later",
+          "summary": "This week, {{count}} meals stacked high-sugar items with emotional or habit triggers, and were more likely to lead to wanting more afterward."
+        },
+        "sodiumPressure": {
+          "title": "High sodium or heavy seasoning more often pushes the body toward heaviness",
+          "summary": "This week, {{count}} meals repeated the pattern of high sodium or heavy seasoning together with heavy or bloated feedback."
+        },
+        "homeStable": {
+          "title": "Home-cooked meals with structure are easier to stabilize",
+          "summary": "This week, {{count}} structured home-cooked meals led to satisfied and comfortable feedback. These are worth repeating."
+        },
+        "wholeFruitStable": {
+          "title": "Whole-fruit snacks are steadier than drink-style sugar",
+          "summary": "This week, {{count}} meals included whole fruit without stacking sweet drinks, and the feedback stayed steadier."
+        },
+        "pantrySodium": {
+          "title": "Pantry-style salty combinations are easy to underestimate",
+          "summary": "This week, {{count}} meals stacked pickles, luncheon meat, soy sauce, or instant noodles together, and the body was more likely to feel heavy afterward."
+        }
+      },
+      "missingSignals": {
+        "breakfast": "Breakfast structure is still unstable, and protein or fiber is often missing.",
+        "externalGap": "Delivery, convenience-store, and travel scenes are where protein and vegetables most often disappear together.",
+        "unstructuredExternal": "When external meals stay unstructured, sodium and heavy-seasoning signals rise quickly.",
+        "juiceVsFruit": "Juice and whole fruit do not land the same way, and convenience-store drinks are more likely to raise sugar pressure."
+      },
+      "crossViews": {
+        "signalFeedback": {
+          "title": "Nutrition signals × body feedback",
+          "summary": "Put balanced structure, high sugar, and high sodium next to how the body felt afterward.",
+          "rows": {
+            "balanced": "Balanced structure",
+            "freeSugar": "High sugar pressure",
+            "heavySodium": "High sodium / heavy seasoning"
+          }
+        },
+        "gapScenes": {
+          "title": "Gap scenes × body feedback",
+          "summary": "See which scenes most often lose protein, vegetables, and meal structure together, so you can build fallback plans there first."
+        },
+        "fruitSugar": {
+          "title": "Whole fruit × drink-style sugar",
+          "summary": "Split whole fruit, juice or sweet drinks, and fruit snacks with soy protein so it is easier to see which snack pattern stays steadier.",
+          "rows": {
+            "wholeFruit": "Whole-fruit snack",
+            "juiceDrink": "Juice / drink-style sugar",
+            "fruitWithSoy": "Whole fruit + soy protein"
+          }
+        },
+        "pantrySodium": {
+          "title": "Pantry sodium × body feedback",
+          "summary": "Break pantry-style salty pressure into the overall pattern, seasoning-driven pressure, and processed ready-food pressure to see where it is accumulating.",
+          "rows": {
+            "overall": "Overall pantry sodium",
+            "seasoning": "Seasoning-driven",
+            "processed": "Processed ready-food driven"
+          }
+        }
+      }
     }
   },
   "logEdit": {
