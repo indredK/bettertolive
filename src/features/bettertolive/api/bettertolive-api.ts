@@ -191,6 +191,11 @@ export type BetterToLiveApi = {
   getWorldHistory: () => Promise<WorldHistoryModuleData>
   saveWorldHistory: (worldHistory: WorldHistoryModuleData) => Promise<void>
   getWorkspaceSnapshot: () => Promise<WorkspaceSnapshot>
+
+  // ---- Import/Export (bulk operations) ----
+  saveBeliefs: (beliefs: BeliefsModuleData) => Promise<void>
+  importShopping: (data: ShoppingModuleData) => Promise<void>
+  importLegacy: (data: LegacyWorkspaceModuleData) => Promise<void>
 }
 
 let betterToLiveApiSingleton: BetterToLiveApi | null = null

@@ -8,10 +8,12 @@ import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/c
 import { useLocaleStore } from "@/features/bettertolive/stores/locale-store"
 import { cn } from "@/lib/utils"
 
+import { DataTab } from "./data-tab"
+
 const APP_VERSION = "0.1.0"
 const GITHUB_URL = "https://github.com/indredK/bettertolive"
 
-type SettingsTab = "about" | "preferences"
+type SettingsTab = "about" | "preferences" | "data"
 
 function AboutTab() {
   const { t } = useTranslation()
@@ -229,7 +231,7 @@ export function SettingsDialog({
         <div className="flex" style={{ minHeight: "420px" }}>
           <div className="flex w-[176px] shrink-0 flex-col gap-1 border-r border-[color:var(--surface-border)] bg-[color:var(--aside-bg)] p-4 pt-12">
             <DialogTitle className="sr-only">{t("shell.settings.title")}</DialogTitle>
-            {(["about", "preferences"] as SettingsTab[]).map((tab) => (
+            {(["about", "preferences", "data"] as SettingsTab[]).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -251,6 +253,7 @@ export function SettingsDialog({
             {activeTab === "preferences" && (
               <PreferencesTab themeId={themeId} themes={themes} onSelectTheme={onSelectTheme} />
             )}
+            {activeTab === "data" && <DataTab />}
           </div>
         </div>
       </DialogContent>

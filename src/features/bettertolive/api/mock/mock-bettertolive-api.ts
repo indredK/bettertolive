@@ -303,5 +303,19 @@ export function createMockBetterToLiveApi(): BetterToLiveApi {
         socioeconomics: socioeconomicsData,
         future: futureMockData,
       }),
+
+    // ---- Import/Export ----
+    saveBeliefs: (beliefs) => {
+      beliefsMockData = cloneMockData(beliefs)
+      return withMockLatency(undefined)
+    },
+    importShopping: (data) => {
+      ;(workspaceSnapshotMockData as Record<string, unknown>).shopping = cloneMockData(data)
+      return withMockLatency(undefined)
+    },
+    importLegacy: (data) => {
+      legacyApiData = cloneMockData(data)
+      return withMockLatency(undefined)
+    },
   }
 }

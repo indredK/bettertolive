@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use tauri::State;
 
 use crate::beliefs::dto::{BeliefEntryDto, BeliefEntryFormDto, BeliefsModuleDto};
+use crate::json_store::atomic_write_json;
 
 /// 观念模块第一阶段后端状态。
 ///
@@ -168,4 +169,10 @@ pub fn delete_belief_entry(state: State<BeliefsState>, id: String) -> Result<(),
         .retain(|relation| relation.from_id != id && relation.to_id != id);
 
     write_beliefs(&state.data_path, &beliefs)
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn save_beliefs(state: State<BeliefsState>, beliefs: BeliefsModuleDto) -> Result<(), String> {
+    atomic_write_json(&state.data_path, &beliefs)
 }

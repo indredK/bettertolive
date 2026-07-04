@@ -48,6 +48,9 @@ export const commands = {
 	assignSpaceDefinitionItems: (spaceId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_space_definition_items", { spaceId, itemIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 	countItemsUsingShoppingAttribute: (kind: string, code: string) => typedError<number, string>(__TAURI_INVOKE("count_items_using_shopping_attribute", { kind, code })),
+	saveBeliefs: (beliefs: BeliefsModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("save_beliefs", { beliefs })),
+	importLegacy: (data: LegacyModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("import_legacy", { data })),
+	importShopping: (data: ShoppingModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("import_shopping", { data })),
 };
 
 /* Types */

@@ -503,7 +503,8 @@
     "button": "设置",
     "tabs": {
       "about": "关于",
-      "preferences": "偏好设置"
+      "preferences": "偏好设置",
+      "data": "数据"
     },
     "about": {
       "description": "本地优先的个人生活管理系统",
@@ -522,6 +523,23 @@
       "appearance": {
         "title": "外观"
       }
+    },
+    "data": {
+      "export": "导出",
+      "exportDone": "导出成功",
+      "exportFailed": "导出失败",
+      "exportDescription": "将所有数据导出为单个文件，用于备份或迁移",
+      "import": "导入",
+      "importOverwrite": "覆盖",
+      "importMerge": "合并",
+      "importOverwriteHelp": "替换所有现有数据",
+      "importMergeHelp": "保留现有数据，按 ID 添加新项目",
+      "importDescription": "从之前导出的文件导入数据",
+      "importConfirmTitle": "导入数据",
+      "importConfirmOverwrite": "这将替换所有现有数据，确定继续吗？",
+      "importConfirmMerge": "将以合并模式导入数据，现有数据将被保留。",
+      "importFileInvalid": "无效或不兼容的文件",
+      "importDone": "导入成功"
     }
   }
 }

@@ -839,3 +839,267 @@ pub fn reorder_shopping_page_contents(
         ShoppingRepository::reorder_page_contents(tx, &ordered_ids, &now)
     })
 }
+
+#[tauri::command]
+#[specta::specta]
+pub fn import_shopping(state: State<AppState>, data: ShoppingModuleDto) -> Result<(), String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+
+    write_tx(&mut conn, |tx| {
+        tx.execute_batch("PRAGMA defer_foreign_keys = ON;")
+            .map_err(|e| e.to_string())?;
+
+        // Delete all shopping data (child tables first)
+        tx.execute("DELETE FROM shopping_item_child_channels", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_item_children", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_item_channels", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_item_systems", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_item_spaces", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_items", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_stage_item_tiers", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_stage_template_system_dimensions", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_stage_template_space_dimensions", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_stage_items", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_stage_templates", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_system_definitions", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_space_definitions", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_attribute_definitions", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_page_content", [])
+            .map_err(|e| e.to_string())?;
+
+        // Re-insert system definitions
+        for (i, sd) in data.system_definitions.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_system_definitions
+                 (id, name, summary, key_question, secondary_groups_json, sort_order, is_enabled, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+                rusqlite::params![
+                    sd.id, sd.name, sd.summary, sd.key_question,
+                    serde_json::to_string(&sd.secondary_groups).map_err(|e| e.to_string())?,
+                    i as i32, now, now,
+                ],
+            ).map_err(|e| e.to_string())?;
+        }
+
+        // Re-insert space definitions
+        for (i, sd) in data.space_definitions.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_space_definitions
+                 (id, name, note, sort_order, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                rusqlite::params![sd.id, sd.name, sd.note, i as i32, now, now],
+            )
+            .map_err(|e| e.to_string())?;
+        }
+
+        // Re-insert attribute definitions
+        for (i, ad) in data.attribute_definitions.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_attribute_definitions
+                 (id, kind, code, semantic_key, label, label_en, description, style_token, rank, sort_order, is_enabled, is_system, version, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15)",
+                rusqlite::params![
+                    ad.id, ad.kind, ad.code, ad.semantic_key, ad.label, ad.label_en,
+                    ad.description, ad.style_token, ad.rank, i as i32,
+                    ad.is_enabled, ad.is_system, ad.version, now, now,
+                ],
+            ).map_err(|e| e.to_string())?;
+        }
+
+        // Re-insert items with children
+        for (item_idx, item) in data.items.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_items
+                 (id, name, note, sort_order, is_archived, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, 0, ?5, ?6)",
+                rusqlite::params![item.id, item.name, item.note, item_idx as i32, now, now],
+            )
+            .map_err(|e| e.to_string())?;
+
+            // System tags
+            for (tag_idx, sys_id) in item.system_tags.iter().enumerate() {
+                tx.execute(
+                    "INSERT INTO shopping_item_systems (id, item_id, system_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    rusqlite::params![
+                        format!("{}_{}", item.id, tag_idx),
+                        item.id,
+                        sys_id,
+                        tag_idx as i32,
+                    ],
+                )
+                .map_err(|e| e.to_string())?;
+            }
+
+            // Space tags
+            for (tag_idx, space_id) in item.space_tags.iter().enumerate() {
+                tx.execute(
+                    "INSERT INTO shopping_item_spaces (id, item_id, space_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    rusqlite::params![
+                        format!("{}_{}", item.id, tag_idx),
+                        item.id,
+                        space_id,
+                        tag_idx as i32,
+                    ],
+                )
+                .map_err(|e| e.to_string())?;
+            }
+
+            // Children
+            for (child_idx, child) in item.children.iter().enumerate() {
+                tx.execute(
+                    "INSERT INTO shopping_item_children
+                     (id, item_id, name, status_def_id, lifecycle_def_id, depreciation_def_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                    rusqlite::params![
+                        child.id, item.id, child.name,
+                        child.status, child.lifecycle, child.depreciation,
+                        child_idx as i32,
+                    ],
+                ).map_err(|e| e.to_string())?;
+
+                // Channel prices for each child
+                for (ch_idx, ch) in child.channel_prices.iter().enumerate() {
+                    tx.execute(
+                        "INSERT INTO shopping_item_child_channels
+                         (id, item_child_id, channel_def_id, entry_price, sweet_spot_price, overpay_price, sort_order)
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                        rusqlite::params![
+                            ch.id, child.id, ch.channel,
+                            ch.entry_price, ch.sweet_spot_price, ch.overpay_price,
+                            ch_idx as i32,
+                        ],
+                    ).map_err(|e| e.to_string())?;
+                }
+            }
+        }
+
+        // Re-insert stage templates
+        for (st_idx, st) in data.stage_templates.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_stage_templates
+                 (id, name, description, focus, sort_order, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+                rusqlite::params![
+                    st.id,
+                    st.name,
+                    st.description,
+                    st.focus,
+                    st_idx as i32,
+                    now,
+                    now
+                ],
+            )
+            .map_err(|e| e.to_string())?;
+
+            // System dimensions
+            for (dim_idx, sys_id) in st.system_dimension_ids.iter().enumerate() {
+                tx.execute(
+                    "INSERT INTO shopping_stage_template_system_dimensions (id, stage_template_id, system_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    rusqlite::params![
+                        format!("{}_sysdim_{}", st.id, dim_idx), st.id, sys_id, dim_idx as i32,
+                    ],
+                ).map_err(|e| e.to_string())?;
+            }
+
+            // Space dimensions
+            for (dim_idx, space_id) in st.space_dimension_ids.iter().enumerate() {
+                tx.execute(
+                    "INSERT INTO shopping_stage_template_space_dimensions (id, stage_template_id, space_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    rusqlite::params![
+                        format!("{}_spacedim_{}", st.id, dim_idx), st.id, space_id, dim_idx as i32,
+                    ],
+                ).map_err(|e| e.to_string())?;
+            }
+
+            // Stage items
+            for (si_idx, si) in st.items.iter().enumerate() {
+                let si_id = format!("{}_item_{}", st.id, si_idx);
+                tx.execute(
+                    "INSERT INTO shopping_stage_items (id, stage_template_id, item_id, sort_order)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    rusqlite::params![si_id, st.id, si.item_id, si_idx as i32],
+                )
+                .map_err(|e| e.to_string())?;
+
+                for tier_def in [
+                    ("low", &si.tiers.low),
+                    ("base", &si.tiers.base),
+                    ("up", &si.tiers.up),
+                ] {
+                    for (tier_idx, child_id) in tier_def.1.iter().enumerate() {
+                        tx.execute(
+                            "INSERT INTO shopping_stage_item_tiers (id, stage_item_id, tier, item_child_id, sort_order)
+                             VALUES (?1, ?2, ?3, ?4, ?5)",
+                            rusqlite::params![
+                                format!("{}_tier_{}_{}", si_id, tier_def.0, tier_idx),
+                                si_id, tier_def.0, child_id, tier_idx as i32,
+                            ],
+                        ).map_err(|e| e.to_string())?;
+                    }
+                }
+            }
+        }
+
+        // Page content
+        let mut content_sort = 0i32;
+        for spotlight in &data.spotlights {
+            tx.execute(
+                "INSERT INTO shopping_page_content
+                 (id, content_type, title, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at)
+                 VALUES (?1, 'spotlight', ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+                rusqlite::params![
+                    spotlight.id, spotlight.title, spotlight.summary, spotlight.reason,
+                    serde_json::to_string(&spotlight.attention).map_err(|e| e.to_string())?,
+                    content_sort, now, now,
+                ],
+            ).map_err(|e| e.to_string())?;
+            content_sort += 1;
+        }
+        for boundary in &data.boundary_entries {
+            tx.execute(
+                "INSERT INTO shopping_page_content
+                 (id, content_type, title, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at)
+                 VALUES (?1, 'boundary_entry', ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+                rusqlite::params![
+                    boundary.id, boundary.item, boundary.system, boundary.reason,
+                    "{}", content_sort, now, now,
+                ],
+            ).map_err(|e| e.to_string())?;
+            content_sort += 1;
+        }
+        for lc in &data.lifestyle_collections {
+            tx.execute(
+                "INSERT INTO shopping_page_content
+                 (id, content_type, title, summary, reason, body_json, sort_order, is_enabled, created_at, updated_at)
+                 VALUES (?1, 'lifestyle_collection', ?2, ?3, ?4, ?5, ?6, 1, ?7, ?8)",
+                rusqlite::params![
+                    lc.id, lc.title, lc.description, "",
+                    serde_json::to_string(&lc.items).map_err(|e| e.to_string())?,
+                    content_sort, now, now,
+                ],
+            ).map_err(|e| e.to_string())?;
+            content_sort += 1;
+        }
+
+        Ok(())
+    })
+}

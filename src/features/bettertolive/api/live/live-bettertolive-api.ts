@@ -193,5 +193,10 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     saveFuture: (future) => saveFutureToRust(future),
     getWorldHistory: () => getWorldHistoryFromRust(),
     saveWorldHistory: (worldHistory) => saveWorldHistoryToRust(worldHistory),
+
+    // ---- Import/Export ----
+    saveBeliefs: (beliefs) => invoke("save_beliefs", { beliefs }),
+    importShopping: (data) => invoke("import_shopping", { data }),
+    importLegacy: (data) => invoke("import_legacy", { data }),
   }
 }

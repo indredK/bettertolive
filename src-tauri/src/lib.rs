@@ -18,7 +18,8 @@ mod socioeconomics;
 mod worldhistory;
 
 use beliefs::commands::{
-    create_belief_entry, delete_belief_entry, get_beliefs, update_belief_entry, BeliefsState,
+    create_belief_entry, delete_belief_entry, get_beliefs, save_beliefs, update_belief_entry,
+    BeliefsState,
 };
 use emotion::commands::{get_emotion, save_emotion, EmotionState};
 use events::commands::{get_events, save_events, EventsState};
@@ -27,7 +28,8 @@ use future::commands::{get_future, save_future, FutureState};
 use growth::commands::{get_growth, save_growth, GrowthState};
 use journey::commands::{save_journey, JourneyState};
 use legacy::commands::{
-    create_legacy_item, delete_legacy_item, get_legacy, list_legacy_items, update_legacy_item,
+    create_legacy_item, delete_legacy_item, get_legacy, import_legacy, list_legacy_items,
+    update_legacy_item,
 };
 use memory::commands::{get_memory, save_memory, MemoryState};
 use nutrition::commands::{get_nutrition, save_nutrition, NutritionState};
@@ -42,7 +44,7 @@ use shopping::commands::{
     create_shopping_stage_template, create_system_definition, delete_shopping_item,
     delete_shopping_page_content, delete_shopping_space_definition, delete_shopping_stage_template,
     delete_system_definition, disable_shopping_attribute_definition,
-    enable_shopping_attribute_definition, get_shopping, get_workspace_snapshot,
+    enable_shopping_attribute_definition, get_shopping, get_workspace_snapshot, import_shopping,
     list_shopping_attribute_definitions, list_shopping_attribute_definitions_for_management,
     list_shopping_items, list_shopping_page_contents, list_shopping_space_definitions,
     list_shopping_stage_templates, reorder_shopping_attribute_definitions,
@@ -109,7 +111,10 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         assign_system_definition_items,
         assign_space_definition_items,
         reorder_shopping_page_contents,
-        count_items_using_shopping_attribute
+        count_items_using_shopping_attribute,
+        save_beliefs,
+        import_legacy,
+        import_shopping,
     ])
 }
 
@@ -265,7 +270,10 @@ pub fn run() {
             assign_system_definition_items,
             assign_space_definition_items,
             reorder_shopping_page_contents,
-            count_items_using_shopping_attribute
+            count_items_using_shopping_attribute,
+            save_beliefs,
+            import_legacy,
+            import_shopping,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

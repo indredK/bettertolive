@@ -265,7 +265,8 @@
     "button": "Settings",
     "tabs": {
       "about": "About",
-      "preferences": "Preferences"
+      "preferences": "Preferences",
+      "data": "Data"
     },
     "about": {
       "description": "A local-first personal life management system",
@@ -284,6 +285,23 @@
       "appearance": {
         "title": "Appearance"
       }
+    },
+    "data": {
+      "export": "Export",
+      "exportDone": "Export saved successfully",
+      "exportFailed": "Export failed",
+      "exportDescription": "Export all data to a single file for backup or transfer",
+      "import": "Import",
+      "importOverwrite": "Overwrite",
+      "importMerge": "Merge",
+      "importOverwriteHelp": "Replace all existing data",
+      "importMergeHelp": "Keep existing data, add new items by ID",
+      "importDescription": "Import from a previously exported file",
+      "importConfirmTitle": "Import data",
+      "importConfirmOverwrite": "This will replace ALL existing data. Are you sure?",
+      "importConfirmMerge": "Import data (merge mode). Existing data will be preserved.",
+      "importFileInvalid": "Invalid or incompatible file",
+      "importDone": "Import completed successfully"
     }
   }
 }
