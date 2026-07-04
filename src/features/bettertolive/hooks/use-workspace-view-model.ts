@@ -10,7 +10,7 @@ import type {
   WorkspaceSnapshot,
 } from "@/features/bettertolive/models/workspace"
 import { normalizeRelationshipsModuleData } from "@/features/bettertolive/models/relationship-connections"
-import { getFinanceEnumSearchTokens } from "@/features/bettertolive/ui/finance/finance-page-data"
+import { getFinanceEnumSearchTokens } from "@/features/bettertolive/finance/finance-page-data"
 
 type QueryMatcher = (...values: Array<string | number | undefined>) => boolean
 

@@ -1,12 +1,12 @@
 import type { BeliefEntryForm, BetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
-import { WORLD_HISTORY_SEED } from "@/features/bettertolive/ui/worldhistory/world-history-data"
+import { WORLD_HISTORY_SEED } from "@/features/bettertolive/worldhistory/world-history-data"
 import {
   LEGACY_EMOTIONAL_LOAD_HEAVY,
   LEGACY_RECIPIENT_SELF,
   LEGACY_STATUS_FINAL,
   LEGACY_VISIBILITY_AFTER_DEATH,
-} from "@/features/bettertolive/ui/legacy/legacy-page-data"
+} from "@/features/bettertolive/legacy/legacy-page-data"
 import type {
   BeliefEntry,
   BeliefsModuleData,
