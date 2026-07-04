@@ -7,8 +7,8 @@ import {
   FilterAppliedChips,
   FilterPopoverButton,
   type FilterPopoverDimension,
-} from "@/features/bettertolive/ui/shared/filter-popover"
-import { Surface } from "@/features/bettertolive/ui/shared/shared"
+} from "@/features/bettertolive/shared/filter-popover"
+import { Surface } from "@/features/bettertolive/shared/shared"
 import { cn } from "@/lib/utils"
 
 export function FilterablePanel({

@@ -18,11 +18,11 @@ import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/c
 import type { WorkspaceMusicPresetId } from "@/features/bettertolive/hooks/use-workspace-music"
 import { useLocaleStore } from "@/features/bettertolive/stores/locale-store"
 import { useWorkspaceUiStore } from "@/features/bettertolive/stores/workspace-ui-store"
-import { MusicUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/music-utility-panel"
-import { NotificationCenterPanel } from "@/features/bettertolive/ui/workspace-utilities/notification-center-panel"
-import { ThemeUtilityPanel } from "@/features/bettertolive/ui/workspace-utilities/theme-utility-panel"
-import { UtilityIconButton } from "@/features/bettertolive/ui/workspace-utilities/utility-icon-button"
-import { UtilityPanelPortal } from "@/features/bettertolive/ui/workspace-utilities/utility-panel-portal"
+import { MusicUtilityPanel } from "@/features/bettertolive/workspace-utilities/music-utility-panel"
+import { NotificationCenterPanel } from "@/features/bettertolive/workspace-utilities/notification-center-panel"
+import { ThemeUtilityPanel } from "@/features/bettertolive/workspace-utilities/theme-utility-panel"
+import { UtilityIconButton } from "@/features/bettertolive/workspace-utilities/utility-icon-button"
+import { UtilityPanelPortal } from "@/features/bettertolive/workspace-utilities/utility-panel-portal"
 
 type UtilityPanel = "themes" | "notifications" | "music" | null
 

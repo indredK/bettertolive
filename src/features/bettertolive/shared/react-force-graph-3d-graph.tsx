@@ -26,7 +26,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { createPortal } from "react-dom"
 
 import { Button } from "@/components/ui/button"
-import type { CytoscapeThemeTokens } from "@/features/bettertolive/ui/shared/cytoscape-2d-graph"
+import type { CytoscapeThemeTokens } from "@/features/bettertolive/shared/cytoscape-2d-graph"
 import { readGraphPaletteColor } from "@/lib/graph-tokens"
 import { cn } from "@/lib/utils"
 import { UI_LAYERS } from "@/lib/ui-layers"

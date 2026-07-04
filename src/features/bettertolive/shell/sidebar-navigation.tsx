@@ -7,7 +7,7 @@ import type { AppView } from "@/features/bettertolive/types"
 import {
   SIDEBAR_EXPAND_TRANSITION,
   SIDEBAR_COLLAPSE_TRANSITION,
-} from "@/features/bettertolive/ui/shell/sidebar-shell-motion"
+} from "@/features/bettertolive/shell/sidebar-shell-motion"
 import { cn } from "@/lib/utils"
 
 const PREVIEW_LIMIT = 4
