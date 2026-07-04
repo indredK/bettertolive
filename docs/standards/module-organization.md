@@ -48,7 +48,7 @@ commands.rs  →  repository.rs  →  models.rs（Row）
 
 ---
 
-## 二、前端 UI（`src/features/bettertolive/ui/<module>/`）
+## 二、前端 UI（`src/features/bettertolive/<module>/`）
 
 ### 文件清单
 
@@ -56,48 +56,43 @@ commands.rs  →  repository.rs  →  models.rs（Row）
 |---|---|---|
 | `<module>-page.tsx` | 主页面组件，组合各子功能标签页，通过 `<Tabs>` 切换 | 必须 |
 | `<module>-page-data.ts` | 页面级数据加载（Query 调用）、状态管理、计算逻辑 | 推荐 |
-| `_shared/` | 模块内共享的类型定义、工具函数、UI 组件 | 推荐 |
-| `_shared/<module>-types.ts` | 模块内多个子功能共享的 TypeScript 类型定义 | 推荐 |
-| `_shared/<module>-page-shared.tsx` | 模块内多子功能复用的 UI 组件（如卡片、列表） | 按需 |
-| `_shared/<module>-delete.ts` | 删除操作逻辑封装 | 按需 |
-| `_shared/<module>-sortable-card.tsx` | 可排序卡片组件 | 按需 |
-| `_shared/<module>-item-shuttle.tsx` | 穿梭组件（在两个列表间转移项目） | 按需 |
-| `<sub>/` | 子功能目录，每个子功能一般对应页面中的一个标签页 | 按需 |
-| `<sub>/<module>-<sub>-tab.tsx` | 子功能标签页主要内容组件 | 推荐 |
-| `<sub>/<module>-<sub>-edit-dialog.tsx` | 子功能的编辑/新建弹窗 | 按需 |
-| `<sub>/<module>-<sub>-utils.ts` | 子功能专属工具函数、数据转换 | 按需 |
+| `queries.ts` | TanStack Query 的 `useMutation` / `useQuery` 封装，集中管理该模块的缓存读写 | 推荐 |
+| `components/` | 子功能目录，每个子功能对应页面中的一个标签页或弹窗 | 按需 |
+| `components/<sub>/<module>-<sub>-tab.tsx` | 子功能标签页主要内容组件 | 推荐 |
+| `components/<sub>/<module>-<sub>-edit-dialog.tsx` | 子功能的编辑/新建弹窗 | 按需 |
+| `components/<sub>/<module>-<sub>-utils.ts` | 子功能专属工具函数、数据转换 | 按需 |
+
+> 跨模块共享的 UI 组件和工具函数统一放 `src/features/bettertolive/shared/`，不留在模块内。参见 `conventions.md` F1 组件复用三层。
 
 ### 目录结构示例（以 `shopping` 为参考）
 
 ```
-ui/shopping/
+shopping/
 ├── shopping-page.tsx              ← 主页面，Tabs 容器
 ├── shopping-page-data.ts          ← 页面数据层
-├── _shared/                       ← 模块内共享
-│   ├── shopping-types.ts
-│   ├── shopping-page-shared.tsx
-│   ├── shopping-delete.ts
-│   ├── shopping-sortable-card.tsx
-│   └── shopping-item-shuttle.tsx
-├── overview/                      ← 子功能：总览
-│   └── shopping-overview-tab.tsx
-├── planning/                      ← 子功能：规划
-│   ├── shopping-planning-tab.tsx
-│   └── shopping-item-edit-dialog.tsx
-├── stages/                        ← 子功能：阶段
-│   ├── shopping-stages-tab.tsx
-│   ├── shopping-stage-edit-dialog.tsx
-│   └── shopping-stage-utils.ts
-├── spaces/                        ← 子功能：空间
-│   ├── shopping-spaces-tab.tsx
-│   └── shopping-space-edit-dialog.tsx
-├── systems/                       ← 子功能：系统
-│   ├── shopping-systems-tab.tsx
-│   └── shopping-system-edit-dialog.tsx
-└── attributes/                    ← 子功能：属性
-    ├── shopping-attributes-tab.tsx
-    └── shopping-attribute-edit-dialog.tsx
+├── queries.ts                     ← TanStack Query hooks
+└── components/                    ← 子功能组件
+    ├── overview/
+    │   └── shopping-overview-tab.tsx
+    ├── planning/
+    │   ├── shopping-planning-tab.tsx
+    │   └── shopping-item-edit-dialog.tsx
+    ├── stages/
+    │   ├── shopping-stages-tab.tsx
+    │   ├── shopping-stage-edit-dialog.tsx
+    │   └── shopping-stage-utils.ts
+    ├── spaces/
+    │   ├── shopping-spaces-tab.tsx
+    │   └── shopping-space-edit-dialog.tsx
+    ├── systems/
+    │   ├── shopping-systems-tab.tsx
+    │   └── shopping-system-edit-dialog.tsx
+    └── attributes/
+        ├── shopping-attributes-tab.tsx
+        └── shopping-attribute-edit-dialog.tsx
 ```
+
+> 旧结构中的 `_shared/`（模块内共享）已拆解：跨模块复用的提升到 `shared/`（如 `shopping-delete.ts` → `shared/shopping-delete.ts`），仅模块内复用的就地放在 `components/<sub>/` 下。
 
 ### 命名约定
 
@@ -129,17 +124,18 @@ ui/shopping/
 
 ---
 
-## 四、前端 Queries（`src/features/bettertolive/queries/`）
+## 四、前端 Queries（`src/features/bettertolive/<module>/queries.ts`）
 
-| 文件 | 职责 | 必要性 |
+| 内容 | 职责 | 必要性 |
 |---|---|---|
-| `use-save-<module>-mutation.ts` | TanStack Query `useMutation` 封装，处理增删改操作的乐观更新与缓存失效 | 按需 |
-| `use-<module>-query.ts` | TanStack Query `useQuery` 封装，读取模块数据 | 按需 |
+| `queries.ts` 中的 `useMutation` / `useQuery` hook | 该模块的增删改查操作封装，处理缓存失效与乐观更新 | 推荐 |
 
-- mutation 命名：`use-save-<module>-mutation.ts`
-- query 命名：`use-<module>-query.ts`
-- queryKey 统一走 `workspace-query-keys.ts`（`workspaceQueryKeys.<module>()`）
+- 每个 feature 在根目录下放一个 `queries.ts`，包含该模块所有 TanStack Query hooks
+- mutation 命名：`useSave<Module>Mutation`（导出函数，驼峰式）
+- query 命名：`use<Module>Query`（导出函数，驼峰式）
+- queryKey 统一走 `queries/workspace-query-keys.ts`（`workspaceQueryKeys.<module>()`）
 - mutation `onSuccess` 中同时失效 `snapshot()` + 该模块 key
+- 全局共享的 query 文件（`workspace-query-keys.ts`、`use-workspace-snapshot-query.ts` 等）仍保留在 `queries/` 目录下
 
 ---
 
@@ -155,8 +151,9 @@ src-tauri/src/<module>/
 ├── commands.rs
 └── seed.json
 
-src/features/bettertolive/ui/<module>/
-└── <module>-page.tsx
+src/features/bettertolive/<module>/
+├── <module>-page.tsx
+└── queries.ts
 ```
 
 ### 完整模块（多子功能、复杂数据模型）
@@ -173,16 +170,12 @@ src-tauri/src/<module>/
 ├── repository.rs
 └── seed.json
 
-src/features/bettertolive/
-├── api/<module>-crud-api.ts
-├── queries/use-save-<module>-mutation.ts
-└── ui/<module>/
-    ├── <module>-page.tsx
-    ├── <module>-page-data.ts
-    ├── <module>-constants.ts         ← 跨子组件共享的常量/枚举/工具函数
-    ├── _shared/
-    │   ├── <module>-types.ts
-    │   └── <module>-page-shared.tsx
+src/features/bettertolive/<module>/
+├── <module>-page.tsx
+├── <module>-page-data.ts
+├── queries.ts
+├── <module>-constants.ts         ← 跨子组件共享的常量/枚举/工具函数
+└── components/
     ├── <sub1>/
     │   ├── <module>-<sub1>-tab.tsx
     │   └── <module>-<sub1>-edit-dialog.tsx

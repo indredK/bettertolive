@@ -17,13 +17,17 @@
 | 目录 | 放什么 |
 |---|---|
 | `api/` | 与后端通信封装（含 `mock/`、`fallback/`、真实实现） |
-| `config/` | 模块常量、配置 |
-| `hooks/` | 模块内自定义 hook |
+| `hooks/` | 全局自定义 hook（非模块专属） |
 | `models/` | 业务模型转换（DTO ↔ 视图模型） |
-| `queries/` | TanStack Query 的 query/mutation hook + queryKeys |
+| `queries/` | 全局 TanStack Query 文件（`workspace-query-keys`、`use-workspace-snapshot-query`） |
 | `stores/` | 客户端本地状态（非服务端状态） |
-| `ui/` | 组件；复杂模块按子页面分目录，模块内复用放 `ui/<模块>/_shared/` |
 | `types.ts` | 模块对外类型 |
+| `shared/` | 跨模块复用的 UI 组件、工具函数 |
+| `shell/` | 外壳层（app-shell、sidebar、splash-screen、settings-dialog） |
+| `workspace-utilities/` | 工作台工具栏面板（音乐/通知/主题） |
+| `<feature>/` | 每个 feature 自包含：`<feature>-page.tsx` + `queries.ts` + `components/` |
+
+> 旧结构中的 `ui/` 和 `queries/` 已被域内聚结构取代：每个 feature 的页面、query hooks、子组件统一放在 `src/features/bettertolive/<feature>/` 下，不再按层分组。跨 feature 共享的提升到 `shared/`。
 
 后端 `src-tauri/src/<模块>/`：`db.rs`（建表/迁移/seed）、`repository.rs`（SQL + 业务逻辑）、`commands.rs`（`#[tauri::command]`，前端唯一入口）、`dto.rs`（跨 IPC 结构，serde + specta）。
 
@@ -44,9 +48,10 @@
 按"复用范围"决定组件放哪：
 
 - **`src/components/ui/`**：跨模块通用基础组件（shadcn 体系，如 `button/dialog/form/table/multi-select/transfer-list` + 动画类 `animated-visibility`）。新基础组件优先 shadcn 风格放这。
-- **`ui/<模块>/_shared/`**：单模块内多页面复用（如 `shopping-sortable-card.tsx`）。
+- **`src/features/bettertolive/shared/`**：跨 feature 复用（如 `shopping-delete.ts`、`formatters.ts`、`notification-layer.tsx`）。
+- **模块内**：放 `components/<sub>/` 下，不额外抽子目录。
 - **就地写**：只一处用到的，不提前抽象。
-- **建议**：第 2 个使用方出现才上提到 `_shared`，跨模块才上提到 `components/ui`。
+- **建议**：第 2 个使用方出现才上提到跨 feature 共享。
 
 ### F2. 动画
 
@@ -71,7 +76,7 @@
 - **硬约定（状态归属）**：服务端数据归 Query；纯客户端 UI 状态（弹窗开关、草稿、选中项、本地偏好）归 zustand 或组件 state。**不要把服务端数据塞进 zustand 维护副本**。
 - **现状**：客户端状态用 zustand（`stores/`，如 `locale-store.ts`，可配 `subscribeWithSelector`）；跨模块共享才进 `stores/`，单组件用 `useState`。
 - **乐观更新（默认不用）**：当前统一"成功 → invalidate 重拉"，简单可靠，**优先保持**。若确需乐观更新，**必须完整四步**：`onMutate`（cancelQueries → 快照 → 改缓存 → 返回回滚上下文）+ `onError` 用快照回滚 + invalidate 放 `onSettled`。**半吊子乐观更新（改了缓存不回滚）算第一档 bug**——要么完整做，要么别做。
-- **约定**：query hook 命名 `use-<x>-query.ts`，mutation 命名 `use-save-<x>-mutation.ts`，放 `queries/`。
+- **约定**：query/mutation hook 命名使用驼峰式导出函数（`use<Module>Query` / `useSave<Module>Mutation`），放在各 feature 根目录下的 `queries.ts` 中。全局共享的 Query 文件保留在 `queries/` 目录下。
 
 ### F5. 国际化 i18n
 
