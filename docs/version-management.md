@@ -65,8 +65,7 @@
 
 | Secret | 用途 |
 |---|---|
-| `RELEASE_PLEASE_TOKEN` | PAT（`repo` 权限），用于 Release Please 推 tag 并触发 release workflow |
-| `RELEASE_PAT` | 同上，bettertolive 已配置时可作为 fallback |
+| `RELEASE_PLEASE_TOKEN` | PAT（`repo` 权限，含 pull request 写入），用于 Release Please 创建 PR 和推 tag |
 | `TAURI_SIGNING_PRIVATE_KEY` | Tauri 更新包签名私钥 |
 | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 签名私钥密码（如有） |
 
