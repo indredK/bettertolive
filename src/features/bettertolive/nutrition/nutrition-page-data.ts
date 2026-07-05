@@ -569,6 +569,7 @@ export function buildReplacementSuggestions({
       slot.entries.flatMap((entry) => (entry.type === "recipe" ? [entry.recipeId] : [])),
     ),
   )
+  const planMealRoles = new Set(plan.slots.map((slot) => slot.structure))
   const signalMap = new Map(
     buildDailyPlanSignals({ foodById, plan, profileByFoodId, recipeById }).map((signal) => [
       signal.id,
@@ -587,6 +588,11 @@ export function buildReplacementSuggestions({
       const profiles = collectRecipeProfiles(recipe, profileByFoodId)
       const reasons: NutritionRecipeSuggestionReason[] = []
       let score = recipe.repeatability === "常做" ? 12 : 6
+
+      const matchingMealRoles = recipe.mealRoles.filter((role) => planMealRoles.has(role))
+      if (matchingMealRoles.length > 0) {
+        score += 40
+      }
 
       if (needsProtein && totals.proteinG >= 20 && hasPrimaryProteinSource(profiles)) {
         reasons.push("proteinSupport")
