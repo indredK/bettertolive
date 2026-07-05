@@ -22,7 +22,6 @@ jobs:
         os:
           - macos-latest
           - windows-latest
-          - ubuntu-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -41,10 +40,6 @@ jobs:
         with:
           workspaces: |
             ./src-tauri -> target
-
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
-        run: bash scripts/ci/install-linux-deps.sh
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -71,9 +66,6 @@ jobs:
             os: macos-latest
           - target: x86_64-pc-windows-msvc
             os: windows-latest
-          # Linux release packaging can be enabled once a stable target is chosen.
-          # - target: x86_64-unknown-linux-gnu
-          #   os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
 
@@ -95,10 +87,6 @@ jobs:
           workspaces: |
             ./src-tauri -> target
 
-      - name: Install Linux dependencies
-        if: runner.os == 'Linux'
-        run: bash scripts/ci/install-linux-deps.sh
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -110,10 +98,8 @@ jobs:
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
             bun tauri build --target ${{ matrix.target }} --bundles app,dmg
-          elif [ "${{ runner.os }}" = "Windows" ]; then
-            bun tauri build --target ${{ matrix.target }} --bundles msi,nsis
           else
-            bun tauri build --target ${{ matrix.target }}
+            bun tauri build --target ${{ matrix.target }} --bundles msi,nsis
           fi
 
       - name: Collect macOS bundle and updater artifacts
