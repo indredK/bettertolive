@@ -1,0 +1,22 @@
+{
+  "cards": [],
+  "questions": [],
+  "entries": [
+    {
+      "id": "belief-1",
+      "title": "你的第一个信念",
+      "statement": "记录你的第一条信念，从这里开始探索自己的内在假设。",
+      "description": "信念是你理解世界和自己的底层假设。把它写下来，是看清它的第一步。",
+      "domain": "自我",
+      "layer": "价值观",
+      "stability": "正在形成",
+      "source": "主动反思",
+      "impact": "中性",
+      "cbtLayer": "中间信念",
+      "revisionHistory": [],
+      "tags": ["开始"]
+    }
+  ],
+  "relations": [],
+  "attachmentReflection": ""
+}

@@ -12,7 +12,7 @@ pub struct FinanceState {
 }
 
 fn seed_finance() -> Result<FinanceModuleDto, String> {
-    serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
+    serde_json::from_str(include_str!("initial.json")).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -25,7 +25,11 @@ pub fn get_finance(state: State<FinanceState>) -> Result<FinanceModuleDto, Strin
 }
 
 #[tauri::command]
-pub fn save_finance(state: State<FinanceState>, finance: FinanceModuleDto) -> Result<(), String> {
+pub fn save_finance(
+    state: State<FinanceState>,
+    mut finance: FinanceModuleDto,
+) -> Result<(), String> {
+    finance.normalize();
     finance.validate()?;
     atomic_write_json(&state.data_path, &finance)
 }
@@ -70,7 +74,32 @@ mod tests {
     }
 
     #[test]
-    fn rejects_non_positive_finance_amount() {
+    fn rejects_negative_finance_amount() {
+        let finance: FinanceModuleDto = serde_json::from_value(serde_json::json!({
+            "entries": [
+                {
+                    "id": "finance-entry-1",
+                    "date": "2026-06-20",
+                    "label": "Lunch",
+                    "category": "food",
+                    "amount": -5,
+                    "direction": "expense",
+                    "note": "note",
+                    "tags": []
+                }
+            ],
+            "monthlyTargets": [],
+            "categoryRules": [],
+            "reviewPrompts": []
+        }))
+        .unwrap();
+
+        let error = finance.validate().unwrap_err();
+        assert!(error.contains("amount must be positive"));
+    }
+
+    #[test]
+    fn allows_zero_finance_amount() {
         let finance: FinanceModuleDto = serde_json::from_value(serde_json::json!({
             "entries": [
                 {
@@ -90,7 +119,6 @@ mod tests {
         }))
         .unwrap();
 
-        let error = finance.validate().unwrap_err();
-        assert!(error.contains("amount must be positive"));
+        finance.validate().unwrap();
     }
 }

@@ -1,0 +1,23 @@
+{
+  "memories": [
+    {
+      "id": "memory-1",
+      "title": "开始整理自己的记忆",
+      "type": "事件",
+      "era": ["当下"],
+      "primaryEra": "当下",
+      "emotionalWeight": "轻",
+      "processing": "已整理",
+      "privacy": "仅自己",
+      "summary": "今天你打开了人生记忆的入口，准备把那些重要的碎片慢慢安放好。",
+      "impact": "这是你主动整理人生的开始。",
+      "sourceModules": ["手动录入"],
+      "tags": ["开始", "BetterToLive"]
+    }
+  ],
+  "anchors": [],
+  "eraSuggestions": ["童年", "学生时代", "当下"],
+  "reviewPrompts": [
+    "如果重新看那段时期，你最想先理解的不是发生了什么，而是当时的你为什么会那样反应。"
+  ]
+}

@@ -13,6 +13,7 @@ mod overview;
 mod principles;
 mod reflection;
 mod relationships;
+mod reset;
 mod shopping;
 mod socioeconomics;
 mod worldhistory;
@@ -37,6 +38,7 @@ use overview::commands::{get_overview, OverviewState};
 use principles::commands::{get_principles, save_principles, PrinciplesState};
 use reflection::commands::{get_reflection, save_reflection, ReflectionState};
 use relationships::commands::{get_relationships, save_relationships, RelationshipsState};
+use reset::reset_to_initial_data;
 use shopping::commands::{
     assign_space_definition_items, assign_system_definition_items,
     count_items_using_shopping_attribute, create_shopping_attribute_definition,
@@ -274,6 +276,7 @@ pub fn run() {
             save_beliefs,
             import_legacy,
             import_shopping,
+            reset_to_initial_data,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

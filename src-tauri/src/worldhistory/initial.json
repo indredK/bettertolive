@@ -1,0 +1,26 @@
+{
+  "civilizations": [
+    {
+      "id": "greek",
+      "name": "古希腊",
+      "nameEn": "Ancient Greece",
+      "era": "约公元前800年–前146年",
+      "location": "爱琴海沿岸·伯罗奔尼撒半岛",
+      "summary": "破碎多山的地理格局催生出数百个独立城邦，海洋阻隔带来的自保安全感与贫瘠土地迫使的海外殖民贸易，共同塑造了人类历史上最早的公民自治实验与理性哲学传统。",
+      "indices": {
+        "calories": 38,
+        "defense": 72,
+        "trust": 78,
+        "authority": 30,
+        "taboos": 25,
+        "abstract": 92
+      },
+      "color": "#3B82F6",
+      "icon": "🏛️"
+    }
+  ],
+  "causalNodes": [],
+  "causalLinks": [],
+  "timelineEvents": [],
+  "comparisonPresets": []
+}

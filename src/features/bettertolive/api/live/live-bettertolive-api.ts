@@ -193,6 +193,7 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     saveFuture: (future) => saveFutureToRust(future),
     getWorldHistory: () => getWorldHistoryFromRust(),
     saveWorldHistory: (worldHistory) => saveWorldHistoryToRust(worldHistory),
+    resetToInitialData: () => invoke("reset_to_initial_data"),
 
     // ---- Import/Export ----
     saveBeliefs: (beliefs) => invoke("save_beliefs", { beliefs }),

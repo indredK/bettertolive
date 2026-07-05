@@ -1,0 +1,42 @@
+{
+  "checkIns": [
+    {
+      "id": "emotion-checkin-1",
+      "date": "2026-07-05 12:00",
+      "summary": "这是你的第一条情绪记录，你可以在这里捕捉日常的情绪变化。",
+      "state": "平静",
+      "intensity": "5/10",
+      "bodySignal": "正常",
+      "tags": ["开始"],
+      "emotionTags": ["平静"],
+      "needRightNow": "继续熟悉 BetterToLive 的各项功能。"
+    }
+  ],
+  "trend": [],
+  "triggers": [],
+  "tools": [
+    {
+      "id": "emotion-tool-1",
+      "title": "先离开屏幕十分钟",
+      "description": "让神经系统先松一点，再决定要不要继续处理事情。",
+      "when": "脑子很热、一直想证明自己时",
+      "kind": "有效"
+    }
+  ],
+  "overview": {
+    "windowLabel": "最近 7 天",
+    "averageScore": 0,
+    "topEmotionTags": [],
+    "bestWindow": "",
+    "worstWindow": "",
+    "conclusion": ""
+  },
+  "timelineSegments": [],
+  "loopPatterns": [],
+  "lifestyleLinks": [],
+  "environmentCues": [],
+  "relationshipCues": [],
+  "recoveryNotes": [],
+  "ineffectiveActions": [],
+  "minimalRecoverySteps": []
+}

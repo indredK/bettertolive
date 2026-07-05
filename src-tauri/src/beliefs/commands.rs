@@ -13,7 +13,7 @@ pub struct BeliefsState {
 }
 
 fn seed_beliefs() -> Result<BeliefsModuleDto, String> {
-    serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
+    serde_json::from_str(include_str!("initial.json")).map_err(|e| e.to_string())
 }
 
 fn temp_beliefs_path(data_path: &Path) -> PathBuf {

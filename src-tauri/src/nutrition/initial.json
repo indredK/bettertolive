@@ -1,0 +1,31 @@
+{
+  "profile": {
+    "hardConstraints": [],
+    "softStances": [],
+    "currentIntent": {
+      "mode": "维持",
+      "note": ""
+    }
+  },
+  "foodCategories": [
+    {
+      "id": "cat-staple",
+      "name": "主食",
+      "dimension": "食物大类",
+      "description": "米面、杂粮和薯类，负责一天的基础能量。",
+      "sortOrder": 1
+    }
+  ],
+  "foods": [],
+  "nutrientProfiles": [],
+  "recipes": [],
+  "dailyPlans": [],
+  "mealLogs": [],
+  "meals": [],
+  "weeklyReview": {
+    "highlights": [],
+    "missingSignals": [],
+    "crossViews": []
+  },
+  "foodMemories": []
+}

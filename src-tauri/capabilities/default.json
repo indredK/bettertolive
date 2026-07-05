@@ -11,9 +11,15 @@
       "allow": [{ "url": "https://github.com/**" }]
     },
     "dialog:default",
+    "fs:allow-read-text-file",
+    "fs:allow-write-text-file",
+    "fs:allow-exists",
+    "fs:allow-remove",
+    "fs:allow-rename",
+    "fs:allow-mkdir",
     {
       "identifier": "fs:scope",
-      "allow": ["$APPDATA/**"]
+      "allow": ["$APPDATA/**", "$DOWNLOAD/**", "$DESKTOP/**", "$HOME/**"]
     }
   ]
 }

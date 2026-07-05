@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "id": "legacy-item-1",
+      "title": "留给未来的信息",
+      "category": "重要交代",
+      "recipient": "特定的人",
+      "recipientName": "",
+      "relatedRelationshipId": "",
+      "urgency": "关键信息",
+      "visibility": "现在",
+      "deliveryCondition": "",
+      "status": "草稿",
+      "summary": "这是你的第一条生命整理条目。你可以在这里存放那些重要的话和想法。",
+      "content": "在这个模块里，你可以提前安放那些重要但还没说出口的话。",
+      "contentPreview": "在这个模块里，你可以提前安放那些重要但还没说出口的话。",
+      "isLocked": false,
+      "requiresSecondConfirm": false,
+      "excludeFromAi": false,
+      "createdAt": "2026-07-05T12:00:00",
+      "updatedAt": "2026-07-05T12:00:00",
+      "reviewCue": "初次创建，等待完善。",
+      "tags": ["开始"]
+    }
+  ],
+  "trustBoundaries": [],
+  "reviewPrompts": ["如果明天就不在了，有没有什么话是你希望已经说出口的？"]
+}

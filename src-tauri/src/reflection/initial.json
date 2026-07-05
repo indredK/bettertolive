@@ -1,0 +1,15 @@
+{
+  "entries": [
+    {
+      "id": "reflection-1",
+      "date": "2026-07-05 12:00",
+      "title": "欢迎使用 BetterToLive",
+      "excerpt": "这是你的第一条反思记录。你可以在这里写下每天的观察和感受，慢慢搭建属于自己的成长轨迹。",
+      "tags": ["开始", "BetterToLive"]
+    }
+  ],
+  "draftExample": {
+    "content": "今天我开始使用 BetterToLive。\n我希望它能帮我分清：哪些是想象，哪些是真正重要的东西。\n\n真正让我轻松的，不是把事情全部做完，而是知道自己已经在往哪个方向走。",
+    "tags": ["开始", "BetterToLive"]
+  }
+}

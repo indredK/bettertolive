@@ -1,27 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
 
 import { getBetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
-import { resolveBetterToLiveApiMode } from "@/features/bettertolive/api/config"
 import { emptyWorkspaceSnapshot } from "@/features/bettertolive/api/fallback/empty-workspace-snapshot"
-import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
 import { workspaceQueryKeys } from "@/features/bettertolive/queries/workspace-query-keys"
 
 export function useWorkspaceSnapshotQuery() {
-  const apiMode = resolveBetterToLiveApiMode()
-
   const query = useQuery({
-    queryKey: [...workspaceQueryKeys.snapshot(), apiMode],
+    queryKey: workspaceQueryKeys.snapshot(),
     queryFn: () => getBetterToLiveApi().getWorkspaceSnapshot(),
-    initialData: apiMode === "mock" ? workspaceSnapshotMockData : undefined,
     staleTime: 1000 * 60 * 5,
   })
-
-  const fallbackSnapshot =
-    apiMode === "mock"
-      ? workspaceSnapshotMockData
-      : query.isError
-        ? workspaceSnapshotMockData
-        : emptyWorkspaceSnapshot
 
   return {
     data: query.data,
@@ -32,6 +20,6 @@ export function useWorkspaceSnapshotQuery() {
     isLoading: query.isLoading,
     refetch: query.refetch,
     status: query.status,
-    workspaceSnapshot: query.data ?? fallbackSnapshot,
+    workspaceSnapshot: query.data ?? emptyWorkspaceSnapshot,
   }
 }

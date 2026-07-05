@@ -75,8 +75,8 @@ fn create_schema(conn: &Connection) -> SqliteResult<()> {
     Ok(())
 }
 
-fn seed_tables(conn: &Connection) -> SqliteResult<()> {
-    let seed_json = include_str!("seed.json");
+pub(crate) fn seed_tables(conn: &Connection) -> SqliteResult<()> {
+    let seed_json = include_str!("initial.json");
     let seed: serde_json::Value = serde_json::from_str(seed_json).map_err(|e| {
         rusqlite::Error::InvalidParameterName(format!("Failed to parse legacy seed.json: {}", e))
     })?;

@@ -1,0 +1,25 @@
+{
+  "entries": [
+    {
+      "id": "finance-entry-001",
+      "date": "2026-07-05",
+      "label": "第一笔记录",
+      "category": "餐饮",
+      "amount": 0,
+      "direction": "expense",
+      "note": "这是你的第一条财务记录，你可以在这里追踪每一笔收支。",
+      "account": "现金",
+      "lifeSystem": "基本生活",
+      "necessity": "稳定维护",
+      "reviewStatus": "已确认",
+      "linkedModule": "手动录入",
+      "tags": ["开始"]
+    }
+  ],
+  "monthlyTargets": [],
+  "categoryRules": [],
+  "reviewPrompts": [
+    "本周花出去的钱，最多是在维持生活、恢复状态，还是缓解焦虑？",
+    "哪一笔支出确实让生活变稳定了？"
+  ]
+}

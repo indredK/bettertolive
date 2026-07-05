@@ -925,8 +925,8 @@ pub fn import_shopping(state: State<AppState>, data: ShoppingModuleDto) -> Resul
         for (item_idx, item) in data.items.iter().enumerate() {
             tx.execute(
                 "INSERT INTO shopping_items
-                 (id, name, note, sort_order, is_archived, created_at, updated_at)
-                 VALUES (?1, ?2, ?3, ?4, 0, ?5, ?6)",
+                 (id, name, status, lifecycle, note, sort_order, is_archived, created_at, updated_at)
+                 VALUES (?1, ?2, 'Owned', 'Durable', ?3, ?4, 0, ?5, ?6)",
                 rusqlite::params![item.id, item.name, item.note, item_idx as i32, now, now],
             )
             .map_err(|e| e.to_string())?;

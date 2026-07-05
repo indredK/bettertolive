@@ -1,0 +1,17 @@
+{
+  "entries": [
+    {
+      "id": "event-1",
+      "type": "event",
+      "createdAt": "2026-07-05T12:00:00+08:00",
+      "occurredAt": "2026-07-05T12:00:00+08:00",
+      "date": "2026-07-05 12:00",
+      "title": "开始使用 BetterToLive",
+      "content": "这是你创建的第一条记事，用来记录生活中值得被记住的瞬间。",
+      "excerpt": "这是你创建的第一条记事，用来记录生活中值得被记住的瞬间。",
+      "theme": "开始",
+      "tags": ["BetterToLive", "开始"],
+      "status": "active"
+    }
+  ]
+}

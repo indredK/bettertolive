@@ -1,6 +1,4 @@
-import { resolveBetterToLiveApiMode } from "@/features/bettertolive/api/config"
 import { createLiveBetterToLiveApi } from "@/features/bettertolive/api/live/live-bettertolive-api"
-import { createMockBetterToLiveApi } from "@/features/bettertolive/api/mock/mock-bettertolive-api"
 import type {
   BeliefEntry,
   BeliefsModuleData,
@@ -196,6 +194,9 @@ export type BetterToLiveApi = {
   saveBeliefs: (beliefs: BeliefsModuleData) => Promise<void>
   importShopping: (data: ShoppingModuleData) => Promise<void>
   importLegacy: (data: LegacyWorkspaceModuleData) => Promise<void>
+
+  // ---- Data Reset ----
+  resetToInitialData: () => Promise<void>
 }
 
 let betterToLiveApiSingleton: BetterToLiveApi | null = null
@@ -205,10 +206,7 @@ export function getBetterToLiveApi() {
     return betterToLiveApiSingleton
   }
 
-  betterToLiveApiSingleton =
-    resolveBetterToLiveApiMode() === "live"
-      ? createLiveBetterToLiveApi()
-      : createMockBetterToLiveApi()
+  betterToLiveApiSingleton = createLiveBetterToLiveApi()
 
   return betterToLiveApiSingleton
 }

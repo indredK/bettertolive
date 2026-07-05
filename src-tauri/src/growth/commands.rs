@@ -10,7 +10,7 @@ pub struct GrowthState {
 }
 
 pub(crate) fn seed_growth() -> Result<serde_json::Value, String> {
-    serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
+    serde_json::from_str(include_str!("initial.json")).map_err(|e| e.to_string())
 }
 
 #[tauri::command]

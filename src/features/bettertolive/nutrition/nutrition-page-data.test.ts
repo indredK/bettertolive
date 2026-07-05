@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next"
 
-import { nutritionMockData } from "@/features/bettertolive/api/mock/data/nutrition/nutrition.mock"
+import { nutritionFixtureData } from "@/features/bettertolive/nutrition/__fixtures__/nutrition.fixture"
 import {
   buildDailyPlanSignals,
   buildNutritionSemanticCues,
@@ -24,7 +24,7 @@ function createTranslator(): TFunction {
 
 describe("nutrition-page-data", () => {
   it("marks stacked free-sugar and salty plans with warning signals", () => {
-    const lookups = buildNutritionLookups(nutritionMockData)
+    const lookups = buildNutritionLookups(nutritionFixtureData)
     const plan = {
       id: "plan-risky",
       date: "2026-06-23",
@@ -95,7 +95,7 @@ describe("nutrition-page-data", () => {
   })
 
   it("prefers structured recipes when replacing a sugar and sodium heavy day", () => {
-    const lookups = buildNutritionLookups(nutritionMockData)
+    const lookups = buildNutritionLookups(nutritionFixtureData)
     const plan = {
       id: "plan-relief",
       date: "2026-06-23",
@@ -134,7 +134,7 @@ describe("nutrition-page-data", () => {
       plan,
       profileByFoodId: lookups.profileByFoodId,
       recipeById: lookups.recipeById,
-      recipes: nutritionMockData.recipes,
+      recipes: nutritionFixtureData.recipes,
     })
 
     expect(suggestions[0]?.recipe.id).toBe("recipe-steamed-fish")
@@ -143,7 +143,7 @@ describe("nutrition-page-data", () => {
 
   it("derives recurring sweet-trigger and sodium-pressure review clues from meal logs", () => {
     const review = buildNutritionWeeklyReview({
-      nutrition: nutritionMockData,
+      nutrition: nutritionFixtureData,
       t: createTranslator(),
     })
 
@@ -167,7 +167,7 @@ describe("nutrition-page-data", () => {
   })
 
   it("reads food semantics directly from the nutrition seed", () => {
-    const lookups = buildNutritionLookups(nutritionMockData)
+    const lookups = buildNutritionLookups(nutritionFixtureData)
 
     expect(lookups.profileByFoodId.get("food-apple")?.sugarKind).toBe("天然存在")
     expect(lookups.profileByFoodId.get("food-juice")?.sugarKind).toBe("游离糖/添加糖")
@@ -176,8 +176,8 @@ describe("nutrition-page-data", () => {
   })
 
   it("builds semantic cues for whole fruit, soy protein, and pantry sodium", () => {
-    const lookups = buildNutritionLookups(nutritionMockData)
-    const plan = nutritionMockData.dailyPlans.find((entry) => entry.id === "plan-2026-06-14")
+    const lookups = buildNutritionLookups(nutritionFixtureData)
+    const plan = nutritionFixtureData.dailyPlans.find((entry) => entry.id === "plan-2026-06-14")
 
     expect(plan).toBeTruthy()
 
@@ -193,14 +193,14 @@ describe("nutrition-page-data", () => {
   })
 
   it("connects newly added foods into recipes, plans, and logs", () => {
-    expect(nutritionMockData.recipes.some((recipe) => recipe.id === "recipe-oats-soy-apple")).toBe(
-      true,
-    )
     expect(
-      nutritionMockData.recipes.some((recipe) => recipe.id === "recipe-edamame-rice-bowl"),
+      nutritionFixtureData.recipes.some((recipe) => recipe.id === "recipe-oats-soy-apple"),
     ).toBe(true)
     expect(
-      nutritionMockData.dailyPlans.some((plan) =>
+      nutritionFixtureData.recipes.some((recipe) => recipe.id === "recipe-edamame-rice-bowl"),
+    ).toBe(true)
+    expect(
+      nutritionFixtureData.dailyPlans.some((plan) =>
         plan.slots.some((slot) =>
           slot.entries.some(
             (entry) => entry.type === "recipe" && entry.recipeId === "recipe-oats-soy-apple",
@@ -209,12 +209,12 @@ describe("nutrition-page-data", () => {
       ),
     ).toBe(true)
     expect(
-      nutritionMockData.mealLogs.some((log) =>
+      nutritionFixtureData.mealLogs.some((log) =>
         log.entries.some((entry) => entry.type === "food" && entry.foodId === "food-juice"),
       ),
     ).toBe(true)
     expect(
-      nutritionMockData.mealLogs.some((log) =>
+      nutritionFixtureData.mealLogs.some((log) =>
         log.entries.some((entry) => entry.type === "food" && entry.foodId === "food-pickle"),
       ),
     ).toBe(true)
@@ -222,7 +222,7 @@ describe("nutrition-page-data", () => {
 
   it("derives fruit-sugar and pantry-sodium cross views with segmented rows", () => {
     const review = buildNutritionWeeklyReview({
-      nutrition: nutritionMockData,
+      nutrition: nutritionFixtureData,
       t: createTranslator(),
     })
 
@@ -256,8 +256,8 @@ describe("nutrition-page-data", () => {
   })
 
   it("resolves recipe-based log semantics for whole fruit and soy protein", () => {
-    const lookups = buildNutritionLookups(nutritionMockData)
-    const recipeLog = nutritionMockData.mealLogs.find((entry) => entry.id === "log-9")
+    const lookups = buildNutritionLookups(nutritionFixtureData)
+    const recipeLog = nutritionFixtureData.mealLogs.find((entry) => entry.id === "log-9")
 
     expect(recipeLog).toBeTruthy()
 

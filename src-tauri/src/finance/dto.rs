@@ -159,6 +159,19 @@ pub struct FinanceModuleDto {
 }
 
 impl FinanceModuleDto {
+    /// Fix up legacy data: convert negative amounts to positive and flip direction.
+    pub fn normalize(&mut self) {
+        for entry in &mut self.entries {
+            if entry.amount < 0.0 {
+                entry.amount = -entry.amount;
+                entry.direction = match entry.direction {
+                    TransactionDirectionDto::Income => TransactionDirectionDto::Expense,
+                    TransactionDirectionDto::Expense => TransactionDirectionDto::Income,
+                };
+            }
+        }
+    }
+
     pub fn validate(&self) -> Result<(), String> {
         for entry in &self.entries {
             if entry.id.trim().is_empty() {
@@ -170,7 +183,7 @@ impl FinanceModuleDto {
             if entry.label.trim().is_empty() {
                 return Err(format!("finance entry {} is missing label", entry.id));
             }
-            if entry.amount <= 0.0 {
+            if entry.amount < 0.0 {
                 return Err(format!(
                     "finance entry {} amount must be positive",
                     entry.id

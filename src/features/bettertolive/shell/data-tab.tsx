@@ -1,9 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query"
-import { Download, Upload, AlertTriangle } from "lucide-react"
+import { Download, RotateCcw, Upload, AlertTriangle } from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
+import { getBetterToLiveApi } from "@/features/bettertolive/api/bettertolive-api"
 import { collectAllData } from "@/features/bettertolive/api/import-export/export-utils"
 import {
   importData,
@@ -30,6 +31,9 @@ export function DataTab() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
+  const [resetStep, setResetStep] = useState<0 | 1 | 2>(0)
+  const [resetting, setResetting] = useState(false)
+
   function closeMessages() {
     setErrorMessage(null)
     setSuccessMessage(null)
@@ -55,8 +59,13 @@ export function DataTab() {
       const json = JSON.stringify(data, null, 2)
       await writeTextFile(path, json)
       setSuccessMessage(t("shell.settings.data.exportDone"))
-    } catch {
-      setErrorMessage(t("shell.settings.data.exportFailed"))
+    } catch (err) {
+      console.error("Export failed:", err)
+      setErrorMessage(
+        t("shell.settings.data.exportFailed") +
+          ": " +
+          (err instanceof Error ? err.message : String(err)),
+      )
     } finally {
       setExporting(false)
     }
@@ -118,8 +127,13 @@ export function DataTab() {
       await importData(rawImportData as Parameters<typeof importData>[0], importMode)
       await queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.all })
       setSuccessMessage(t("shell.settings.data.importDone"))
-    } catch {
-      setErrorMessage(t("shell.settings.data.exportFailed"))
+    } catch (err) {
+      console.error("Import failed:", err)
+      setErrorMessage(
+        t("shell.settings.data.importFailed") +
+          ": " +
+          (err instanceof Error ? err.message : String(err)),
+      )
     } finally {
       setImporting(false)
       setShowConfirm(false)
@@ -132,6 +146,31 @@ export function DataTab() {
     setShowConfirm(false)
     setImportSummary(null)
     setRawImportData(null)
+  }
+
+  async function handleResetExportFirst() {
+    await handleExport()
+    setResetStep(0)
+  }
+
+  async function handleConfirmReset() {
+    closeMessages()
+    setResetting(true)
+    try {
+      await getBetterToLiveApi().resetToInitialData()
+      await queryClient.invalidateQueries({ queryKey: workspaceQueryKeys.all })
+      setSuccessMessage(t("shell.settings.data.resetDone"))
+    } catch (err) {
+      console.error("Reset failed:", err)
+      setErrorMessage(
+        t("shell.settings.data.resetFailed") +
+          ": " +
+          (err instanceof Error ? err.message : String(err)),
+      )
+    } finally {
+      setResetting(false)
+      setResetStep(0)
+    }
   }
 
   return (
@@ -187,6 +226,88 @@ export function DataTab() {
           {t("shell.settings.data.import")}
         </Button>
       </section>
+
+      <section>
+        <div className="mb-2.5 flex items-center gap-2">
+          <RotateCcw className="size-3.5 text-[color:var(--text-muted)]" />
+          <span className="text-xs font-medium tracking-wide text-[color:var(--text-muted)] uppercase">
+            {t("shell.settings.data.reset")}
+          </span>
+        </div>
+        <p className="mb-3 text-xs text-[color:var(--text-muted)]">
+          {t("shell.settings.data.resetDescription")}
+        </p>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full justify-start gap-2 border-red-200 bg-red-50/50 text-red-700 hover:bg-red-50"
+          onClick={() => setResetStep(1)}
+        >
+          <RotateCcw className="size-4" />
+          {t("shell.settings.data.reset")}
+        </Button>
+      </section>
+
+      {resetStep === 1 && (
+        <div className="space-y-3 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-[color:var(--text-primary)]">
+            <AlertTriangle className="size-4 text-amber-600" />
+            {t("shell.settings.data.reset")}
+          </div>
+          <p className="text-xs text-[color:var(--text-muted)]">
+            {t("shell.settings.data.resetExportHint")}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 border-[color:var(--chip-border)] bg-white/80 text-[color:var(--text-primary)] hover:bg-white"
+              onClick={handleResetExportFirst}
+            >
+              {t("shell.settings.data.resetExport")}
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 bg-amber-600 text-white hover:bg-amber-700"
+              onClick={() => setResetStep(2)}
+            >
+              {t("shell.settings.data.resetSecond")}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {resetStep === 2 && (
+        <div className="space-y-3 rounded-xl border border-red-200 bg-red-50/60 p-4">
+          <div className="flex items-center gap-2 text-sm font-medium text-red-700">
+            <AlertTriangle className="size-4 text-red-600" />
+            {t("shell.settings.data.resetSecondWarning")}
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1 border-[color:var(--chip-border)] bg-white/80 text-[color:var(--text-primary)] hover:bg-white"
+              onClick={() => setResetStep(0)}
+              disabled={resetting}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1 bg-red-600 text-white hover:bg-red-700"
+              onClick={handleConfirmReset}
+              disabled={resetting}
+            >
+              {resetting ? (
+                <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : (
+                t("shell.settings.data.resetSecond")
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {errorMessage && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">

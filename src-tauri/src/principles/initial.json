@@ -1,0 +1,24 @@
+{
+  "entries": [
+    {
+      "id": "principle-1",
+      "title": "你的第一个原则",
+      "statement": "记录你的第一条原则，用它来引导日常决策和边界。",
+      "description": "原则是你为自己设定的行为边界和决策标准，它让选择变得更清晰。",
+      "domain": "自我",
+      "type": "标准",
+      "strength": "强烈偏好",
+      "source": "主动推导",
+      "status": "生效中",
+      "cost": "零代价",
+      "boundary": "先停下来想想，再做决定。",
+      "protectedValue": "决策质量",
+      "decisionCue": "当面对不确定时，先写下你的原则再看选项。",
+      "revisionHistory": [],
+      "tags": ["开始"]
+    }
+  ],
+  "boundaries": [],
+  "relations": [],
+  "decisionPrompts": []
+}

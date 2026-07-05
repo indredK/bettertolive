@@ -36,7 +36,7 @@ struct VersionedRelationshipsDocument {
 
 fn seed_relationships() -> Result<serde_json::Value, String> {
     let mut relationships: serde_json::Value =
-        serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())?;
+        serde_json::from_str(include_str!("initial.json")).map_err(|e| e.to_string())?;
     fill_missing_connection_roles(&mut relationships);
     Ok(relationships)
 }

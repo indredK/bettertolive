@@ -857,7 +857,16 @@ export function BetterToLiveAppShell() {
               >
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="size-4" />
-                  {t("shell.apiErrorFallback")}
+                  <div>
+                    <div>{t("shell.apiErrorFallback")}</div>
+                    {workspaceQuery.error && (
+                      <div className="mt-1 text-xs opacity-75">
+                        {workspaceQuery.error instanceof Error
+                          ? workspaceQuery.error.message
+                          : String(workspaceQuery.error)}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <Button
                   size="sm"

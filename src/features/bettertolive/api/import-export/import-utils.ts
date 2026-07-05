@@ -83,10 +83,11 @@ async function importModule(
   importedData: ModuleData | undefined,
   mode: ImportMode,
   onProgress?: (module: string, status: "ok" | "error", error?: string) => void,
-): Promise<void> {
+): Promise<string | null> {
   if (importedData == null) {
-    onProgress?.(name, "error", "module data not found in export file")
-    return
+    const msg = "module data not found in export file"
+    onProgress?.(name, "error", msg)
+    return `${name}: ${msg}`
   }
 
   const api = getBetterToLiveApi()
@@ -94,12 +95,13 @@ async function importModule(
   try {
     switch (name) {
       case "overview":
-        return
+        return null
       default: {
         const setter = getSetter(api, name)
         if (!setter) {
-          onProgress?.(name, "error", `no import handler for module: ${name}`)
-          return
+          const msg = `no import handler for module: ${name}`
+          onProgress?.(name, "error", msg)
+          return `${name}: ${msg}`
         }
         if (mode === "overwrite") {
           await setter(importedData)
@@ -118,11 +120,13 @@ async function importModule(
           }
         }
         onProgress?.(name, "ok")
+        return null
       }
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     onProgress?.(name, "error", message)
+    return `${name}: ${message}`
   }
 }
 
@@ -230,10 +234,15 @@ export async function importData(
   mode: ImportMode,
   onProgress?: (module: string, status: "ok" | "error", error?: string) => void,
 ): Promise<void> {
+  const errors: string[] = []
   for (const name of IMPORT_MODULES) {
     const importedData = (exportData.data as Record<string, unknown>)[name] as
       | ModuleData
       | undefined
-    await importModule(name, importedData, mode, onProgress)
+    const err = await importModule(name, importedData, mode, onProgress)
+    if (err) errors.push(err)
+  }
+  if (errors.length > 0) {
+    throw new Error(`Import partially failed:\n${errors.join("\n")}`)
   }
 }

@@ -1,0 +1,21 @@
+{
+  "entries": [
+    {
+      "id": "socio-knowledge-1",
+      "title": "你的第一条社会经济知识",
+      "domain": "个人财务",
+      "layer": "微观",
+      "confidence": "听过名词",
+      "source": "主动反思",
+      "relevance": "直接影响当前决策",
+      "summary": "从这里开始搭建你对社会经济运行的理解框架。",
+      "understandingNote": "每条知识都可以标注置信度，追踪自己的认知成长。",
+      "relatedConcepts": ["开始"],
+      "confidenceHistory": [],
+      "tags": ["开始", "BetterToLive"],
+      "discipline": "经济学"
+    }
+  ],
+  "gaps": [],
+  "reviewPrompts": ["本月有没有一条\u201c听过名词\u201d的概念，可以升到\u201c知道大致逻辑\u201d？"]
+}

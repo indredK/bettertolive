@@ -301,7 +301,17 @@
       "importConfirmOverwrite": "This will replace ALL existing data. Are you sure?",
       "importConfirmMerge": "Import data (merge mode). Existing data will be preserved.",
       "importFileInvalid": "Invalid or incompatible file",
-      "importDone": "Import completed successfully"
+      "importDone": "Import completed successfully",
+      "importFailed": "Import failed",
+      "resetFailed": "Reset failed",
+      "reset": "Reset to Initial Data",
+      "resetDescription": "Clear all data and restore the minimal initial state",
+      "resetExportHint": "Consider exporting first to keep a backup",
+      "resetExport": "Export First",
+      "resetSecond": "Reset",
+      "resetSecondWarning": "This will permanently delete ALL your data. Are you absolutely sure?",
+      "resetting": "Resetting…",
+      "resetDone": "Data has been reset to initial state"
     }
   }
 }

@@ -1,0 +1,36 @@
+{
+  "circles": [
+    {
+      "id": "circle-1",
+      "title": "我的关系圈",
+      "summary": "这是你的第一个关系圈，从这里开始记录生命中重要的人。",
+      "entries": [
+        {
+          "id": "person-1",
+          "name": "第一个联系人",
+          "type": "朋友",
+          "role": "开始记录",
+          "depth": "亲近",
+          "stage": "稳定",
+          "impact": "滋养",
+          "interaction": "每周",
+          "influence": "每个人都是你成长故事的一部分。",
+          "currentState": "刚刚开始记录，等待被你定义。",
+          "emotionalTone": "期待",
+          "unspokenLine": "谢谢你出现在我的生命里。",
+          "positiveImpact": "值得被记录和珍惜。",
+          "ongoingShadow": "有些话还没说，但可以在 Unsent Notes 里先放好。",
+          "boundaryStatus": "边界清晰",
+          "events": [],
+          "emotionCues": ["温暖", "信任"],
+          "unsentLineIds": [],
+          "history": [],
+          "tags": ["开始"]
+        }
+      ]
+    }
+  ],
+  "patterns": [],
+  "unsentNotes": [],
+  "connections": []
+}

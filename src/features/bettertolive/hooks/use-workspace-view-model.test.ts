@@ -1,6 +1,6 @@
 import type { TFunction } from "i18next"
 
-import { workspaceSnapshotMockData } from "@/features/bettertolive/api/mock/data/workspace-snapshot.mock"
+import { emptyWorkspaceSnapshot } from "@/features/bettertolive/api/fallback/empty-workspace-snapshot"
 import { buildWorkspaceViewModel } from "@/features/bettertolive/hooks/use-workspace-view-model"
 import type { WorkspaceSnapshot } from "@/features/bettertolive/models/workspace"
 
@@ -10,7 +10,7 @@ function createTranslator(): TFunction {
 }
 
 function createWorkspaceSnapshot(): WorkspaceSnapshot {
-  return structuredClone(workspaceSnapshotMockData)
+  return structuredClone(emptyWorkspaceSnapshot)
 }
 
 describe("buildWorkspaceViewModel", () => {

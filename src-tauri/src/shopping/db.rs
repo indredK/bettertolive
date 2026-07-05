@@ -414,8 +414,8 @@ fn add_column_if_missing(
     Ok(())
 }
 
-fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
-    let seed_json = include_str!("seed.json");
+pub(crate) fn seed_new_tables(conn: &Connection) -> SqliteResult<()> {
+    let seed_json = include_str!("initial.json");
     let seed: serde_json::Value = serde_json::from_str(seed_json).map_err(|e| {
         rusqlite::Error::InvalidParameterName(format!("Failed to parse shopping seed.json: {}", e))
     })?;

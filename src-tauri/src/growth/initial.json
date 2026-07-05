@@ -1,0 +1,18 @@
+{
+  "growthNodes": [
+    {
+      "id": "growth-1",
+      "title": "开始记录自己的成长",
+      "domain": "自我",
+      "stability": "基本稳定",
+      "before": "你曾经只是被动经历生活，没有主动回顾和整理。",
+      "after": "现在你开始用 BetterToLive 追踪自己的成长轨迹。",
+      "keyEvent": "今天你决定从被动生活转向主动记录。",
+      "beforeMemoryIds": [],
+      "afterMemoryIds": [],
+      "triggerMemoryId": "",
+      "evidence": ["开始使用 BetterToLive"]
+    }
+  ],
+  "threads": ["这是你的第一条成长线索，它会随着记录慢慢展开。"]
+}

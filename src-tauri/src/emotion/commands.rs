@@ -12,7 +12,7 @@ pub struct EmotionState {
 }
 
 fn seed_emotion() -> Result<EmotionModuleDto, String> {
-    serde_json::from_str(include_str!("seed.json")).map_err(|e| e.to_string())
+    serde_json::from_str(include_str!("initial.json")).map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -33,6 +33,12 @@ pub fn save_emotion(state: State<EmotionState>, emotion: EmotionModuleDto) -> Re
 #[cfg(test)]
 mod tests {
     use crate::emotion::dto::EmotionModuleDto;
+
+    #[test]
+    fn seed_emotion_deserializes_initial_json() {
+        let _: EmotionModuleDto = serde_json::from_str(include_str!("initial.json"))
+            .expect("emotion initial.json failed");
+    }
 
     #[test]
     fn rejects_unknown_emotion_enum_value() {
