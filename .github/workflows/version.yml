@@ -28,15 +28,3 @@ jobs:
           createGithubReleases: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create release tag on version bump
-        run: |
-          VERSION=$(node -p "require('./package.json').version")
-          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
-            echo "Tag v${VERSION} already exists, skipping"
-          else
-            git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/${{ github.repository }}
-            git tag "v${VERSION}"
-            git push origin "v${VERSION}"
-            echo "Created and pushed tag v${VERSION}"
-          fi

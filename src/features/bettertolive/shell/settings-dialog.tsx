@@ -1,4 +1,13 @@
-import { Check, ExternalLink, GitFork, Globe, Palette, RefreshCw, Sparkles } from "lucide-react"
+import {
+  Check,
+  Download,
+  ExternalLink,
+  GitFork,
+  Globe,
+  Palette,
+  RefreshCw,
+  Sparkles,
+} from "lucide-react"
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -12,15 +21,79 @@ import { cn } from "@/lib/utils"
 import { DataTab } from "./data-tab"
 const GITHUB_URL = "https://github.com/indredK/bettertolive"
 
-type SettingsTab = "about" | "preferences" | "data"
+type SettingsTab = "preferences" | "data" | "about"
+type UpdateStatus =
+  | "idle"
+  | "checking"
+  | "upToDate"
+  | "available"
+  | "downloading"
+  | "ready"
+  | "error"
 
 function AboutTab() {
   const { t } = useTranslation()
-  const [updateState, setUpdateState] = useState<"idle" | "checking" | "done">("idle")
+  const [status, setStatus] = useState<UpdateStatus>("idle")
+  const [newVersion, setNewVersion] = useState<string>("")
+  const [downloadProgress, setDownloadProgress] = useState(0)
+  const [errorMsg, setErrorMsg] = useState("")
 
-  function handleCheckUpdates() {
-    setUpdateState("checking")
-    setTimeout(() => setUpdateState("done"), 1500)
+  async function handleCheckUpdates() {
+    setStatus("checking")
+    setErrorMsg("")
+
+    try {
+      const { check } = await import("@tauri-apps/plugin-updater")
+      const update = await check()
+
+      if (update?.available) {
+        setNewVersion(update.version || "")
+        setStatus("available")
+      } else {
+        setStatus("upToDate")
+      }
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : String(err))
+      setStatus("error")
+    }
+  }
+
+  async function handleDownloadAndInstall() {
+    setStatus("downloading")
+    setDownloadProgress(0)
+
+    try {
+      const { check } = await import("@tauri-apps/plugin-updater")
+      const update = await check()
+
+      if (!update?.available) {
+        setStatus("upToDate")
+        return
+      }
+
+      let downloaded = 0
+      let contentLength = 0
+
+      await update.downloadAndInstall((event) => {
+        switch (event.event) {
+          case "Started":
+            contentLength = event.data.contentLength ?? 0
+            break
+          case "Progress":
+            downloaded += event.data.chunkLength
+            if (contentLength > 0) {
+              setDownloadProgress(Math.min(100, Math.round((downloaded / contentLength) * 100)))
+            }
+            break
+          case "Finished":
+            setStatus("ready")
+            break
+        }
+      })
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : String(err))
+      setStatus("error")
+    }
   }
 
   return (
@@ -55,30 +128,93 @@ function AboutTab() {
       </div>
 
       <div className="space-y-2">
-        <Button
-          variant="outline"
-          size="sm"
-          className={cn(
-            "w-full justify-start gap-2 border-[color:var(--chip-border)] bg-white/80 text-[color:var(--text-primary)] hover:bg-white",
-            updateState === "done" && "border-emerald-200 bg-emerald-50 text-emerald-700",
-          )}
-          onClick={handleCheckUpdates}
-          disabled={updateState === "checking"}
-        >
-          {updateState === "done" ? (
-            <>
-              <Check className="size-4 text-emerald-600" />
-              {t("shell.settings.about.upToDate")}
-            </>
-          ) : (
-            <>
-              <RefreshCw className={cn("size-4", updateState === "checking" && "animate-spin")} />
-              {updateState === "checking"
-                ? t("shell.settings.about.checkingUpdates")
-                : t("shell.settings.about.checkUpdates")}
-            </>
-          )}
-        </Button>
+        {status === "available" ? (
+          <>
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5">
+              <p className="text-sm font-medium text-amber-800">
+                {t("shell.settings.about.newVersionAvailable", { version: newVersion })}
+              </p>
+              <p className="mt-0.5 text-xs text-amber-600">
+                {t("shell.settings.about.clickToUpdate")}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              className="w-full justify-start gap-2"
+              onClick={handleDownloadAndInstall}
+            >
+              <Download className="size-4" />
+              {t("shell.settings.about.downloadAndInstall")}
+            </Button>
+          </>
+        ) : status === "downloading" ? (
+          <div className="rounded-lg border border-[color:var(--chip-border)] bg-white/80 px-3 py-2.5">
+            <div className="mb-1.5 flex items-center justify-between text-sm">
+              <span className="text-[color:var(--text-primary)]">
+                {t("shell.settings.about.downloading")}
+              </span>
+              <span className="font-mono text-[color:var(--text-muted)]">{downloadProgress}%</span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-[color:var(--surface-hover)]">
+              <div
+                className="h-full rounded-full bg-[color:var(--text-primary)] transition-all"
+                style={{ width: `${downloadProgress}%` }}
+              />
+            </div>
+          </div>
+        ) : status === "ready" ? (
+          <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+            <p className="text-sm font-medium text-emerald-800">
+              {t("shell.settings.about.updateReady")}
+            </p>
+            <p className="mt-0.5 text-xs text-emerald-600">
+              {t("shell.settings.about.restartingSoon")}
+            </p>
+          </div>
+        ) : status === "error" ? (
+          <>
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5">
+              <p className="text-sm font-medium text-red-800">
+                {t("shell.settings.about.updateCheckFailed")}
+              </p>
+              <p className="mt-0.5 text-xs break-all text-red-600">{errorMsg}</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-start gap-2 border-[color:var(--chip-border)] bg-white/80 text-[color:var(--text-primary)] hover:bg-white"
+              onClick={handleCheckUpdates}
+            >
+              <RefreshCw className="size-4" />
+              {t("shell.settings.about.retryCheck")}
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            className={cn(
+              "w-full justify-start gap-2 border-[color:var(--chip-border)] bg-white/80 text-[color:var(--text-primary)] hover:bg-white",
+              status === "upToDate" && "border-emerald-200 bg-emerald-50 text-emerald-700",
+            )}
+            onClick={handleCheckUpdates}
+            disabled={status === "checking"}
+          >
+            {status === "upToDate" ? (
+              <>
+                <Check className="size-4 text-emerald-600" />
+                {t("shell.settings.about.upToDate")}
+              </>
+            ) : (
+              <>
+                <RefreshCw className={cn("size-4", status === "checking" && "animate-spin")} />
+                {status === "checking"
+                  ? t("shell.settings.about.checkingUpdates")
+                  : t("shell.settings.about.checkUpdates")}
+              </>
+            )}
+          </Button>
+        )}
 
         <a
           href={GITHUB_URL}
@@ -219,7 +355,7 @@ export function SettingsDialog({
   onSelectTheme: (id: WorkspaceThemeId) => void
 }) {
   const { t } = useTranslation()
-  const [activeTab, setActiveTab] = useState<SettingsTab>("about")
+  const [activeTab, setActiveTab] = useState<SettingsTab>("preferences")
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -230,7 +366,7 @@ export function SettingsDialog({
         <div className="flex" style={{ minHeight: "420px" }}>
           <div className="flex w-[176px] shrink-0 flex-col gap-1 border-r border-[color:var(--surface-border)] bg-[color:var(--aside-bg)] p-4 pt-12">
             <DialogTitle className="sr-only">{t("shell.settings.title")}</DialogTitle>
-            {(["about", "preferences", "data"] as SettingsTab[]).map((tab) => (
+            {(["preferences", "data", "about"] as SettingsTab[]).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -248,11 +384,11 @@ export function SettingsDialog({
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 pt-10">
-            {activeTab === "about" && <AboutTab />}
             {activeTab === "preferences" && (
               <PreferencesTab themeId={themeId} themes={themes} onSelectTheme={onSelectTheme} />
             )}
             {activeTab === "data" && <DataTab />}
+            {activeTab === "about" && <AboutTab />}
           </div>
         </div>
       </DialogContent>
