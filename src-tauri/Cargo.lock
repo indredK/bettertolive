@@ -296,7 +296,6 @@ version = "0.3.0"
 dependencies = [
  "base64 0.22.1",
  "chrono",
- "embed-resource",
  "minisign-verify",
  "rusqlite",
  "serde",

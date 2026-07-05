@@ -65,6 +65,8 @@
 | `release-please-config.json` | 版本 bump 与 extra-files |
 | `scripts/release/generate-updater-json.mjs` | 生成 Tauri updater 清单 |
 | `scripts/release/write-updater-manifest.mjs` | 收集各平台 updater 产物 |
+| `src-tauri/common-controls.manifest` | Windows Common Controls v6 manifest |
+| `src-tauri/build.rs` | 链入测试二进制 Windows manifest |
 | `src-tauri/src/bin/verify_updater_manifest.rs` | 发布前验签 |
 
 ---
@@ -84,3 +86,19 @@
 - **为什么 Release Please + bench 发版？** 版本管理自动化 + updater 闭环（`latest.json` + 验签）
 - **为什么 Linux 暂未打包？** 与 bench 一致，先保证 macOS / Windows 稳定，后续可按需启用 matrix 行
 - **私有仓库？** CI/CD 可用；Tauri updater 需公开可访问的 `latest.json` 与安装包 URL
+
+---
+
+## Windows CI 注意事项
+
+Tauri 默认只给主程序嵌入 Windows manifest，`cargo test --lib` 生成的测试 exe 缺少 Common Controls v6，会在 CI 上以 `STATUS_ENTRYPOINT_NOT_FOUND` (0xc0000139) 崩溃。
+
+**不要**用 `embed-resource` 直接编译 `.xml`（API 不匹配且无效）。
+
+**正确做法**（见 `src-tauri/build.rs`，参考 [cc-switch](https://github.com/farion1231/cc-switch)）：
+
+1. 维护 `common-controls.manifest`
+2. `cargo:rustc-link-arg-tests=/MANIFEST:EMBED` + `/MANIFESTINPUT:...`
+3. `cargo:rustc-link-arg-bins=/MANIFEST:NO`（主程序 manifest 由 `tauri_build` 负责）
+
+修改 manifest 或 `build.rs` 后，务必在 `windows-latest` runner 上验证 `cargo test --manifest-path src-tauri/Cargo.toml`。
