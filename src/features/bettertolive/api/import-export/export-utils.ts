@@ -3,8 +3,7 @@ import {
   CURRENT_EXPORT_VERSION,
   type ExportData,
 } from "@/features/bettertolive/api/import-export/types"
-
-const APP_VERSION = "0.1.0"
+import { APP_VERSION } from "@/shared/version"
 
 export async function collectAllData(): Promise<ExportData> {
   const api = getBetterToLiveApi()

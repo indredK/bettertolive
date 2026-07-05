@@ -6,11 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import type { WorkspaceTheme, WorkspaceThemeId } from "@/features/bettertolive/config/theme-presets"
 import { useLocaleStore } from "@/features/bettertolive/stores/locale-store"
+import { APP_VERSION } from "@/shared/version"
 import { cn } from "@/lib/utils"
 
 import { DataTab } from "./data-tab"
-
-const APP_VERSION = "0.1.0"
 const GITHUB_URL = "https://github.com/indredK/bettertolive"
 
 type SettingsTab = "about" | "preferences" | "data"
