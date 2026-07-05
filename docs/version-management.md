@@ -1,19 +1,18 @@
 # 版本管理自动化方案
 
-> 基于 Conventional Commits + Changesets 的全自动版本管理流水线。
+> 基于 Conventional Commits + Release Please 的全自动版本管理流水线（与 bench 一致）。
 
 ---
 
 ## 整体流程
 
 ```
-开发分支 PR（写 Conventional Commits）
+开发分支 PR（Conventional Commits：feat / fix / feat!）
   → 合并到 main
-    → [changeset.yml] 自动解析 commits，生成 changeset 文件
-      → [version.yml / changesets/action] 创建「Version Packages」PR（含版本号 + CHANGELOG）
-        → 人工审查并合并该 PR
-          → [version.yml] 自动打 git tag
-            → [release.yml] 触发 Tauri 构建，发布安装包
+    → [release-please.yml] 自动创建/更新 Release PR（版本号 + CHANGELOG）
+      → 合并 Release PR
+        → 自动打 git tag + 创建 GitHub Release
+          → [release.yml] 触发 Tauri 构建，发布安装包
 ```
 
 ---
@@ -31,53 +30,34 @@
 | `feat!:` / `BREAKING CHANGE` | 主版本 +1 |
 | `chore: / docs: / refactor:` | 不触发版本变更 |
 
-无需手动执行 `bun changeset add`，全程自动化。
+### 2. feat PR 合并 → Release PR（`release-please.yml`）
 
-### 2. PR 合并 → 自动生成 changeset（`changeset.yml`）
+- 触发条件：push 到 `main`
+- Release Please 解析自上次发版以来的 commits
+- 自动创建/更新 `chore(main): release x.y.z` PR
+- 同步更新 `package.json`、`Cargo.toml`、`Cargo.lock`、`tauri.conf.json`、`src/shared/version.ts`
 
-- 触发条件：PR 合并到 `main`
-- 逻辑：读取该 PR 的所有 commit，解析 Conventional Commits 类型
-- 取最高变更级别（breaking > feat > fix），生成 `.changeset/*.md` 文件
-- 自动 commit 并 push 到 `main`
+### 3. Release PR 合并 → 发版
 
-### 3. Changeset → 版本 PR（`version.yml` / `changesets/action`）
+- Release Please 自动创建 `v*` git tag 和 GitHub Release
+- tag push 触发 `release.yml`
 
-- 触发条件：push 到 `main` 时存在 `.changeset/*.md` 文件
-- 调用 `changeset version` 更新版本号 + 生成 CHANGELOG
-- 同步脚本 `sync-version.mjs` 将新版本号写入 `Cargo.toml` 和 `tauri.conf.json`
-- 自动创建/更新「Version Packages」PR（包含版本变更 + CHANGELOG）
-- **需要人工审查并合并该 PR**
-
-### 4. 版本 PR 合并 → 发版（`version.yml`）
-
-- 触发条件：「Version Packages」PR 合并到 `main`
-- 检测到版本号变化（当前版本无对应 git tag）
-- 自动创建 `v*` git tag
-- push tag 触发 `release.yml`
-
-### 5. Tag → 构建发布（`release.yml`）
+### 4. Tag → 构建发布（`release.yml`）
 
 - 触发条件：`v*` tag 被 push
-- 构建 macOS（aarch64 + x86_64）、Ubuntu、Windows 安装包
+- 构建 macOS（aarch64 + x86_64 + universal）、Ubuntu、Windows 安装包
 - 创建 GitHub Release，上传构建产物
 
 ---
 
-## 新增文件
+## 配置文件
 
 | 文件 | 作用 |
 |---|---|
-| `scripts/generate-changeset.mjs` | 从 PR 的 Conventional Commits 解析变更级别，生成 changeset 文件 |
-| `scripts/sync-version.mjs` | 将 `package.json` 版本同步到 `Cargo.toml` 和 `tauri.conf.json` |
-| `.github/workflows/changeset.yml` | PR 合并后 auto-changeset |
-| `.github/workflows/version.yml` | 版本 PR 创建 + 打 tag 发版 |
-
-## 修改文件
-
-| 文件 | 变更 |
-|---|---|
-| `package.json` | `version:packages` 改为 `changeset version && bun scripts/sync-version.mjs` |
-| `.changeset/config.json` | 启用 changelog 生成 |
+| `.github/workflows/release-please.yml` | push main 时运行 Release Please |
+| `release-please-config.json` | 版本 bump 规则与 extra-files 同步配置 |
+| `.release-please-manifest.json` | 当前已发布版本号 |
+| `.github/workflows/release.yml` | tag 触发 Tauri 打包 |
 
 ---
 
@@ -85,14 +65,17 @@
 
 | Secret | 用途 |
 |---|---|
-| `RELEASE_PAT` | Personal Access Token（`repo` 权限），用于 tag push 触发 release workflow |
+| `RELEASE_PLEASE_TOKEN` | PAT（`repo` 权限），用于 Release Please 推 tag 并触发 release workflow |
+| `RELEASE_PAT` | 同上，bettertolive 已配置时可作为 fallback |
+| `TAURI_SIGNING_PRIVATE_KEY` | Tauri 更新包签名私钥 |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 签名私钥密码（如有） |
 
-> `GITHUB_TOKEN` 推送 tag 不会触发其他 workflow，必须用 PAT。
+> 未配置 `RELEASE_PLEASE_TOKEN` 时回退到 `GITHUB_TOKEN`，但 PAT 推送的 tag 才能可靠触发后续 workflow。
 
 ---
 
 ## 关键设计决策
 
-- **为什么不手动写 changeset？** 开发者只需写 Conventional Commits，减少心智负担，统一规范
-- **为什么保留「Version Packages」PR 的人工审查环节？** 确认 changelog 内容和版本号无误后再发版
-- **版本存三处如何保证一致？** `sync-version.mjs` 在 `changeset version` 后自动同步，版本 PR 中已包含所有文件修改，合并后三处始终一致
+- **为什么用 Release Please？** 与 bench 统一，feat PR 合并后一条 Release PR 即可发版，链路更短
+- **版本存多处如何保证一致？** `release-please-config.json` 的 `extra-files` 在 Release PR 中一并更新
+- **Release PR 要不要人工合并？** 建议快速 review 后合并；也可配置 auto-merge

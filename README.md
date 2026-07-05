@@ -27,8 +27,6 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - `bun run fix:precommit` - auto-fix staged files before the strict commit gate
 - `bun run check:precommit` - run the full strict pre-commit gate
 - `bun run analyze:bundle` - build with a bundle report in analyze mode
-- `bun run changeset` - create a versioning note for the next release
-- `bun run version:packages` - apply pending changesets and update versions
 - `bun run generate:bindings` - refresh TypeScript bindings generated from Rust commands
 - `bun run check:rust` - run rustfmt, clippy, and cargo check
 
@@ -40,4 +38,4 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - Tauri Specta bindings generated into `src/bindings.ts`
 - Husky, strict pre-commit scripts, and commitlint
 - GitHub Actions CI for frontend and Rust checks
-- Changesets, Dependabot, and release workflow scaffolding
+- Release Please, Dependabot, and release workflow scaffolding

@@ -19,8 +19,6 @@
     "check:precommit": "bash ./scripts/pre-commit-strict.sh",
     "test": "vitest",
     "analyze:bundle": "bun run lint && bun run typecheck && vite build --mode analyze",
-    "changeset": "changeset",
-    "version:packages": "changeset version && bun scripts/sync-version.mjs",
     "db:reset": "rm -f ~/Library/Application\\ Support/com.bettertolive.app/bettertolive.db && echo 'DB reset. Run bun run start to rebuild.'",
     "db:reforge": "bun run db:reset && bun run start",
     "check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --all --check && cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings && cargo check --manifest-path src-tauri/Cargo.toml --all-targets --all-features",
@@ -76,7 +74,6 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.31.0",
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.0.2",
     "@eslint/js": "^10.0.1",
