@@ -25,8 +25,9 @@ fn embed_windows_test_manifest() {
     let manifest_arg = format!("/MANIFESTINPUT:{manifest_input}");
 
     println!("cargo:rerun-if-changed={}", manifest_path.display());
-    println!("cargo:rustc-link-arg-tests=/MANIFEST:EMBED");
-    println!("cargo:rustc-link-arg-tests={manifest_arg}");
-    // Tauri already embeds the manifest into release/debug binaries.
+    // `rustc-link-arg-tests` only applies to explicit [[test]] targets, not lib #[test].
+    // Use the global link arg for all artifacts, then disable duplicate embedding on bins.
+    println!("cargo:rustc-link-arg=/MANIFEST:EMBED");
+    println!("cargo:rustc-link-arg={manifest_arg}");
     println!("cargo:rustc-link-arg-bins=/MANIFEST:NO");
 }
