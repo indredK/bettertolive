@@ -62,17 +62,10 @@ export type LegacyDistributionRow<T extends string = string> = {
 }
 
 export type LegacySignalFilter =
-  | "all"
-  | "missingDelivery"
-  | "locked"
-  | "aiExcluded"
-  | "secondConfirm"
+  "all" | "missingDelivery" | "locked" | "aiExcluded" | "secondConfirm"
 
 export type LegacyDeliveryWarningKind =
-  | "missingDelivery"
-  | "missingRecipient"
-  | "criticalDraft"
-  | "finalUnlocked"
+  "missingDelivery" | "missingRecipient" | "criticalDraft" | "finalUnlocked"
 
 export type LegacyDeliveryWarning = {
   kind: LegacyDeliveryWarningKind

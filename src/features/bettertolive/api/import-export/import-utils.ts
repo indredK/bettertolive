@@ -237,8 +237,7 @@ export async function importData(
   const errors: string[] = []
   for (const name of IMPORT_MODULES) {
     const importedData = (exportData.data as Record<string, unknown>)[name] as
-      | ModuleData
-      | undefined
+      ModuleData | undefined
     const err = await importModule(name, importedData, mode, onProgress)
     if (err) errors.push(err)
   }

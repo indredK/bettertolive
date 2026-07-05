@@ -74,30 +74,15 @@ export type FinanceCategory =
   | "other"
 
 export type FinanceLifeSystem =
-  | "basic_life"
-  | "health"
-  | "relationships"
-  | "growth"
-  | "housing"
-  | "safety"
-  | "recovery"
+  "basic_life" | "health" | "relationships" | "growth" | "housing" | "safety" | "recovery"
 
 export type FinanceNecessity =
-  | "essential"
-  | "maintenance"
-  | "upgrade"
-  | "long_term_investment"
-  | "impulse_review"
+  "essential" | "maintenance" | "upgrade" | "long_term_investment" | "impulse_review"
 
 export type FinanceReviewStatus = "confirmed" | "needs_review" | "can_optimize" | "worth_keeping"
 
 export type FinanceLinkedModule =
-  | "manual"
-  | "shopping"
-  | "nutrition"
-  | "events"
-  | "reflection"
-  | "future"
+  "manual" | "shopping" | "nutrition" | "events" | "reflection" | "future"
 
 export type FinanceMonthlyTarget = {
   id: string
@@ -323,14 +308,7 @@ export type BeliefImpact = "支撑性" | "限制性" | "中性" | "冲突中"
 export type BeliefCbtLayer = "自动思维" | "中间信念" | "核心信念"
 
 export type CognitiveDistortion =
-  | "全有或全无"
-  | "过度概括"
-  | "灾难化"
-  | "读心术"
-  | "应该陈述"
-  | "个人化"
-  | "情绪推理"
-  | "贴标签"
+  "全有或全无" | "过度概括" | "灾难化" | "读心术" | "应该陈述" | "个人化" | "情绪推理" | "贴标签"
 
 export type DefenseMechanism = "否认" | "投射" | "合理化" | "理智化" | "反向形成" | "升华"
 
@@ -556,28 +534,14 @@ export type MemoryType = "事件" | "地点" | "物件" | "人物" | "照片" | 
 export type EmotionalWeight = "轻" | "中性" | "重" | "很重"
 
 export type ProcessingStatus =
-  | "已整理"
-  | "正在理解"
-  | "暂不触碰"
-  | "决定不再细究"
-  | "开放问题"
-  | "想留给某人"
-  | "记不清的裂缝"
+  "已整理" | "正在理解" | "暂不触碰" | "决定不再细究" | "开放问题" | "想留给某人" | "记不清的裂缝"
 
 export type PrivacyLevel = "仅自己" | "需二次确认" | "指定的人" | "未来可公开" | "离世后可看"
 
 export type FormativePower = "极深" | "较深" | "中等" | "轻微" | "无"
 
 export type MemorySourceModule =
-  | "手动录入"
-  | "反思"
-  | "记事"
-  | "记账"
-  | "关系"
-  | "情绪"
-  | "原则"
-  | "未来"
-  | "生命整理"
+  "手动录入" | "反思" | "记事" | "记账" | "关系" | "情绪" | "原则" | "未来" | "生命整理"
 
 export type GrowthDomain = "关系" | "自我" | "工作" | "情绪能力" | "生活方式"
 
@@ -630,14 +594,7 @@ export type EmotionEmotionTag =
   | "兴奋"
 
 export type EmotionImpulse =
-  | "逃避"
-  | "倾诉"
-  | "睡觉"
-  | "吃东西"
-  | "出门"
-  | "沉默"
-  | "运动"
-  | "刷手机"
+  "逃避" | "倾诉" | "睡觉" | "吃东西" | "出门" | "沉默" | "运动" | "刷手机"
 
 export type EmotionCheckIn = {
   id: string
@@ -662,14 +619,7 @@ export type EmotionTrendPoint = {
 }
 
 export type EmotionTriggerCategory =
-  | "工作"
-  | "家庭"
-  | "亲密关系"
-  | "金钱"
-  | "睡眠"
-  | "社交"
-  | "自我否定"
-  | "环境"
+  "工作" | "家庭" | "亲密关系" | "金钱" | "睡眠" | "社交" | "自我否定" | "环境"
 
 export type EmotionTriggerGroup = {
   id: string
@@ -913,43 +863,20 @@ export type LegacyWorkspaceModuleData = LegacyModuleData
 export type FutureModuleData = FutureBlueprint
 
 export type MealScene =
-  | "在家做"
-  | "外卖"
-  | "堂食"
-  | "路边/便利店"
-  | "应酬/聚餐"
-  | "旅行"
-  | "加餐零食"
+  "在家做" | "外卖" | "堂食" | "路边/便利店" | "应酬/聚餐" | "旅行" | "加餐零食"
 
 export type MealStructure = "早餐" | "午餐" | "晚餐" | "加餐" | "夜宵" | "节庆餐" | "饮品"
 
 export type BeverageKind =
-  | "含咖啡因"
-  | "含酒精"
-  | "含糖饮品"
-  | "鲜榨果汁"
-  | "茶水"
-  | "奶/豆奶"
-  | "其他"
+  "含咖啡因" | "含酒精" | "含糖饮品" | "鲜榨果汁" | "茶水" | "奶/豆奶" | "其他"
 
 export type MealComposition =
-  | "主食为主"
-  | "蛋白为主"
-  | "蔬果为主"
-  | "综合搭配"
-  | "几乎只有碳水"
-  | "几乎只有油盐糖"
+  "主食为主" | "蛋白为主" | "蔬果为主" | "综合搭配" | "几乎只有碳水" | "几乎只有油盐糖"
 
 export type MealOrigin = "家常" | "地方菜系" | "异国料理" | "工业速食" | "自给自种" | "节令食材"
 
 export type MealTrigger =
-  | "准时按点"
-  | "真饿了"
-  | "社交场合"
-  | "情绪驱动"
-  | "习惯反射"
-  | "不想浪费"
-  | "看到就想吃"
+  "准时按点" | "真饿了" | "社交场合" | "情绪驱动" | "习惯反射" | "不想浪费" | "看到就想吃"
 
 export type ValueDensity = "高" | "中" | "低" | "不划算"
 
@@ -1080,14 +1007,7 @@ export type NutritionBasisUnit = "g" | "ml"
 export type SugarKind = "天然存在" | "游离糖/添加糖" | "混合" | "未知"
 
 export type ProteinSourceKind =
-  | "蛋类"
-  | "奶类"
-  | "豆制品"
-  | "豆类"
-  | "鱼虾海鲜"
-  | "禽肉"
-  | "畜肉"
-  | "加工肉"
+  "蛋类" | "奶类" | "豆制品" | "豆类" | "鱼虾海鲜" | "禽肉" | "畜肉" | "加工肉"
 
 export type ProcessingLevel = "原食材" | "轻加工" | "中度加工" | "高度加工"
 
@@ -1221,12 +1141,7 @@ export type EconRelevance = "直接影响当前决策" | "影响中期规划" | 
 export type SocioeconomicsDiscipline = "经济学" | "社会学"
 
 export type EconTopicArea =
-  | "经济学基础概念"
-  | "微观经济学"
-  | "宏观经济学"
-  | "著名经济学家"
-  | "经济原理与模型"
-  | "经济政策"
+  "经济学基础概念" | "微观经济学" | "宏观经济学" | "著名经济学家" | "经济原理与模型" | "经济政策"
 
 export type EconConfidenceRevision = {
   id: string
@@ -1278,20 +1193,10 @@ export type SocioeconomicsModuleData = {
 export type CivilizationId = "greek" | "egypt" | "chinese" | "maya"
 
 export type GeopoliticalDimension =
-  | "calories"
-  | "defense"
-  | "trust"
-  | "authority"
-  | "taboos"
-  | "abstract"
+  "calories" | "defense" | "trust" | "authority" | "taboos" | "abstract"
 
 export type CausalNodeKind =
-  | "catalyst"
-  | "nutrition"
-  | "customs"
-  | "conflict"
-  | "prohibition"
-  | "faith"
+  "catalyst" | "nutrition" | "customs" | "conflict" | "prohibition" | "faith"
 
 export type CausalNode = {
   id: string

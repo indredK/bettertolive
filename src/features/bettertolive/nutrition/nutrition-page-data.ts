@@ -116,10 +116,7 @@ export type NutritionRecipeSuggestion = {
 }
 
 export type NutritionSemanticCueId =
-  | "wholeFruitStable"
-  | "juiceDrinkPressure"
-  | "soyProteinPresent"
-  | "pantrySodiumPressure"
+  "wholeFruitStable" | "juiceDrinkPressure" | "soyProteinPresent" | "pantrySodiumPressure"
 
 export type NutritionSemanticCue = {
   id: NutritionSemanticCueId

@@ -23,13 +23,7 @@ const GITHUB_URL = "https://github.com/indredK/bettertolive"
 
 type SettingsTab = "preferences" | "data" | "about"
 type UpdateStatus =
-  | "idle"
-  | "checking"
-  | "upToDate"
-  | "available"
-  | "downloading"
-  | "ready"
-  | "error"
+  "idle" | "checking" | "upToDate" | "available" | "downloading" | "ready" | "error"
 
 function AboutTab() {
   const { t } = useTranslation()

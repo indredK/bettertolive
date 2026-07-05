@@ -71,8 +71,8 @@ export function NutritionDailyPlanTab({
   const generatedSourceLogBySlotId = useMemo(
     () =>
       new Map<string, MealLog>(
-        sourceNutrition.mealLogs.flatMap(
-          (log): Array<[string, MealLog]> => (log.plannedSlotId ? [[log.plannedSlotId, log]] : []),
+        sourceNutrition.mealLogs.flatMap((log): Array<[string, MealLog]> =>
+          log.plannedSlotId ? [[log.plannedSlotId, log]] : [],
         ),
       ),
     [sourceNutrition.mealLogs],
@@ -98,19 +98,15 @@ export function NutritionDailyPlanTab({
       ...(slot.note ? { note: slot.note } : {}),
     }
     const eatenStatus: DailyMealSlot["status"] = "eaten"
-    const nextDailyPlans: DailyPlan[] = sourceNutrition.dailyPlans.map(
-      (currentPlan): DailyPlan =>
-        currentPlan.id === plan.id
-          ? {
-              ...currentPlan,
-              slots: currentPlan.slots.map(
-                (currentSlot): DailyMealSlot =>
-                  currentSlot.id === slot.id
-                    ? { ...currentSlot, status: eatenStatus }
-                    : currentSlot,
-              ),
-            }
-          : currentPlan,
+    const nextDailyPlans: DailyPlan[] = sourceNutrition.dailyPlans.map((currentPlan): DailyPlan =>
+      currentPlan.id === plan.id
+        ? {
+            ...currentPlan,
+            slots: currentPlan.slots.map((currentSlot): DailyMealSlot =>
+              currentSlot.id === slot.id ? { ...currentSlot, status: eatenStatus } : currentSlot,
+            ),
+          }
+        : currentPlan,
     )
 
     try {

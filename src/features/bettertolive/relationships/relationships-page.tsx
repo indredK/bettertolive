@@ -762,8 +762,7 @@ type RelationshipGraphNodeMeta = {
 type RelationshipGraphMode = "2d" | "3d"
 type RelationshipGraphMarkMode = "circle" | "impact" | "stage" | "weight"
 type RelationshipGraphScope =
-  | { mode: "global" }
-  | { maxDepth: number; mode: "centered"; rootId: string }
+  { mode: "global" } | { maxDepth: number; mode: "centered"; rootId: string }
 
 function RelationshipsGraphTab({
   onEditRelationship,

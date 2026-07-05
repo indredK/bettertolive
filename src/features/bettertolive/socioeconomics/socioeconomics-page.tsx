@@ -53,12 +53,7 @@ import {
 import { cn } from "@/lib/utils"
 
 type SocioeconomicsEnumGroup =
-  | "discipline"
-  | "domain"
-  | "layer"
-  | "confidence"
-  | "source"
-  | "relevance"
+  "discipline" | "domain" | "layer" | "confidence" | "source" | "relevance"
 
 type DistributionRow = {
   label: string
