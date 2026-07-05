@@ -1,0 +1,40 @@
+name: Changeset
+
+on:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  generate:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          token: ${{ secrets.RELEASE_PAT }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - name: Generate changeset from PR commits
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bun scripts/generate-changeset.mjs ${{ github.event.pull_request.number }}
+
+      - name: Commit and push changeset
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain .changeset/)" ]; then
+            git add .changeset/
+            git commit -m "chore: add changeset for PR #${{ github.event.pull_request.number }} [skip ci]"
+            git pull --rebase origin main
+            git push
+          else
+            echo "No changeset generated"
+          fi

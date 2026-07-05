@@ -1,0 +1,42 @@
+name: Version
+
+on:
+  push:
+    branches: [main]
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: oven-sh/setup-bun@v2
+
+      - run: bun install --frozen-lockfile
+
+      - name: Create Version Packages PR or bump versions
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: bun run version:packages
+          publish: ""
+          createGithubReleases: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create release tag on version bump
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "Tag v${VERSION} already exists, skipping"
+          else
+            git remote set-url origin https://x-access-token:${{ secrets.RELEASE_PAT }}@github.com/${{ github.repository }}
+            git tag "v${VERSION}"
+            git push origin "v${VERSION}"
+            echo "Created and pushed tag v${VERSION}"
+          fi
