@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/indredK/bettertolive/compare/v0.3.1...v0.3.2) (2026-07-05)
+
+
+### Bug Fixes
+
+* **build:** use rustc-link-arg for lib unit tests on Windows ([a0d715a](https://github.com/indredK/bettertolive/commit/a0d715a21c581f0def93b1d05c692e7e5398b005))
+
 ## [0.3.1](https://github.com/indredK/bettertolive/compare/v0.3.0...v0.3.1) (2026-07-05)
 
 ### Bug Fixes
