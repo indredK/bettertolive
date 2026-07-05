@@ -38,4 +38,5 @@ A local-first Tauri desktop app built with React, TypeScript, Tailwind CSS, and 
 - Tauri Specta bindings generated into `src/bindings.ts`
 - Husky, strict pre-commit scripts, and commitlint
 - GitHub Actions CI for frontend and Rust checks
-- Release Please, Dependabot, and release workflow scaffolding
+- Cross-platform Tauri verify on pull requests
+- Release Please, Dependabot, and bench-style release pipeline

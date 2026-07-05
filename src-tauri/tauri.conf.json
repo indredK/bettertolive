@@ -19,11 +19,15 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https: data:; style-src 'self' 'unsafe-inline'; script-src 'self'"
+      "csp": "default-src 'self'; img-src 'self' asset: https: data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://github.com https://release-assets.githubusercontent.com"
     }
   },
   "bundle": {
     "active": true,
+    "createUpdaterArtifacts": true,
+    "macOS": {
+      "signingIdentity": "-"
+    },
     "targets": "all",
     "icon": [
       "icons/32x32.png",

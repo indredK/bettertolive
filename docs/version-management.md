@@ -1,6 +1,6 @@
 # 版本管理自动化方案
 
-> 基于 Conventional Commits + Release Please 的全自动版本管理流水线（与 bench 一致）。
+> 基于 Conventional Commits + Release Please + bench 风格三段式发版流水线。
 
 ---
 
@@ -8,11 +8,14 @@
 
 ```
 开发分支 PR（Conventional Commits：feat / fix / feat!）
+  → [ci.yml] lint / typecheck / test（Ubuntu，~1min）
+  → [verify-tauri.yml] 三端 Tauri debug 编译冒烟（PR 门禁）
   → 合并到 main
-    → [release-please.yml] 自动创建/更新 Release PR（版本号 + CHANGELOG）
+    → [release-please.yml] 自动创建/更新 Release PR
       → 合并 Release PR
-        → 自动打 git tag + 创建 GitHub Release
-          → [release.yml] 触发 Tauri 构建，发布安装包
+        → 自动打 git tag
+          → [release.yml] verify → build → publish
+            → 上传安装包 + latest.json（Tauri 自动更新）
 ```
 
 ---
@@ -21,32 +24,33 @@
 
 ### 1. 开发阶段
 
-开发者按 Conventional Commits 规范提交：
-
-| 提交类型 | 对应版本变化 |
+| 提交类型 | 版本变化 |
 |---|---|
 | `feat:` | 次版本 +1 |
 | `fix:` | 修订号 +1 |
 | `feat!:` / `BREAKING CHANGE` | 主版本 +1 |
 | `chore: / docs: / refactor:` | 不触发版本变更 |
 
-### 2. feat PR 合并 → Release PR（`release-please.yml`）
+### 2. PR 门禁
 
-- 触发条件：push 到 `main`
-- Release Please 解析自上次发版以来的 commits
+| Workflow | 作用 |
+|---|---|
+| `ci.yml` | ESLint、TypeScript、Vitest |
+| `verify-tauri.yml` | macOS / Windows / Ubuntu 三端 `tauri build --debug --no-bundle` + Rust 测试 |
+
+### 3. Release Please → Release PR
+
+- push 到 `main` 时运行
 - 自动创建/更新 `chore(main): release x.y.z` PR
-- 同步更新 `package.json`、`Cargo.toml`、`Cargo.lock`、`tauri.conf.json`、`src/shared/version.ts`
-
-### 3. Release PR 合并 → 发版
-
-- Release Please 自动创建 `v*` git tag 和 GitHub Release
-- tag push 触发 `release.yml`
+- 同步 `package.json`、`Cargo.toml`、`Cargo.lock`、`tauri.conf.json`、`src/shared/version.ts`
 
 ### 4. Tag → 构建发布（`release.yml`）
 
-- 触发条件：`v*` tag 被 push
-- 构建 macOS（aarch64 + x86_64 + universal）、Ubuntu、Windows 安装包
-- 创建 GitHub Release，上传构建产物
+三段式，与 bench 一致：
+
+1. **verify** — 发版前三端冒烟（与 PR 门禁相同）
+2. **release-build** — 分平台打正式包（mac aarch64 / mac x86_64 / Windows），收集 updater 产物
+3. **publish** — 合并 artifact、生成 `latest.json`、Rust 验签、上传 GitHub Release（非 draft）
 
 ---
 
@@ -54,10 +58,14 @@
 
 | 文件 | 作用 |
 |---|---|
-| `.github/workflows/release-please.yml` | push main 时运行 Release Please |
-| `release-please-config.json` | 版本 bump 规则与 extra-files 同步配置 |
-| `.release-please-manifest.json` | 当前已发布版本号 |
-| `.github/workflows/release.yml` | tag 触发 Tauri 打包 |
+| `.github/workflows/release-please.yml` | Release Please |
+| `.github/workflows/ci.yml` | 快速前端检查 |
+| `.github/workflows/verify-tauri.yml` | 跨平台 Tauri 冒烟 |
+| `.github/workflows/release.yml` | tag 触发打包发布 |
+| `release-please-config.json` | 版本 bump 与 extra-files |
+| `scripts/release/generate-updater-json.mjs` | 生成 Tauri updater 清单 |
+| `scripts/release/write-updater-manifest.mjs` | 收集各平台 updater 产物 |
+| `src-tauri/src/bin/verify_updater_manifest.rs` | 发布前验签 |
 
 ---
 
@@ -65,16 +73,14 @@
 
 | Secret | 用途 |
 |---|---|
-| `RELEASE_PLEASE_TOKEN` | PAT（`repo` 权限，含 pull request 写入），用于 Release Please 创建 PR 和推 tag |
-| `TAURI_SIGNING_PRIVATE_KEY` | Tauri 更新包签名私钥 |
+| `RELEASE_PLEASE_TOKEN` | Release Please 开 PR + 推 tag + 上传 Release |
+| `TAURI_SIGNING_PRIVATE_KEY` | Tauri updater 签名私钥 |
 | `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | 签名私钥密码（如有） |
-
-> 未配置 `RELEASE_PLEASE_TOKEN` 时回退到 `GITHUB_TOKEN`，但 PAT 推送的 tag 才能可靠触发后续 workflow。
 
 ---
 
 ## 关键设计决策
 
-- **为什么用 Release Please？** 与 bench 统一，feat PR 合并后一条 Release PR 即可发版，链路更短
-- **版本存多处如何保证一致？** `release-please-config.json` 的 `extra-files` 在 Release PR 中一并更新
-- **Release PR 要不要人工合并？** 建议快速 review 后合并；也可配置 auto-merge
+- **为什么 Release Please + bench 发版？** 版本管理自动化 + updater 闭环（`latest.json` + 验签）
+- **为什么 Linux 暂未打包？** 与 bench 一致，先保证 macOS / Windows 稳定，后续可按需启用 matrix 行
+- **私有仓库？** CI/CD 可用；Tauri updater 需公开可访问的 `latest.json` 与安装包 URL
