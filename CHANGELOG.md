@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.3](https://github.com/indredK/bettertolive/compare/v0.4.2...v0.4.3) (2026-07-06)
+
+
+### Bug Fixes
+
+* 添加默认更新器权限 ([ed9c5ae](https://github.com/indredK/bettertolive/commit/ed9c5ae62ee6ffc6e636468a74a2a96a4e7f2e1d))
+
 ## [0.4.2](https://github.com/indredK/bettertolive/compare/v0.4.1...v0.4.2) (2026-07-06)
 
 
