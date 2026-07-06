@@ -44,6 +44,15 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Format check
+        run: bun run format:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
       - name: Run frontend tests
         run: bun run test
 
@@ -51,7 +60,7 @@ jobs:
         run: cargo test --manifest-path src-tauri/Cargo.toml
 
       - name: Run Tauri build smoke test (no bundle)
-        run: bun tauri build --debug --no-bundle
+        run: bun tauri build --debug --no-bundle -- --bin bettertolive
 
   release-build:
     name: Release Build (${{ matrix.target }})
@@ -97,27 +106,32 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: |
           if [ "${{ runner.os }}" = "macOS" ]; then
-            bun tauri build --target ${{ matrix.target }} --bundles app,dmg
+            bun tauri build --target ${{ matrix.target }} --bundles app,dmg -- --bin bettertolive
           else
-            bun tauri build --target ${{ matrix.target }} --bundles msi,nsis
+            bun tauri build --target ${{ matrix.target }} --bundles msi,nsis -- --bin bettertolive
           fi
 
       - name: Collect macOS bundle and updater artifacts
         if: runner.os == 'macOS'
         run: |
           mkdir -p artifacts
-          cp src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg artifacts/ || true
-          find src-tauri/target -name "*.dmg" -exec cp {} artifacts/ \; 2>/dev/null || true
-          updater_file="$(find src-tauri/target/${{ matrix.target }}/release/bundle -name "*.app.tar.gz" | head -n 1)"
+          dmg_file="$(find src-tauri/target/${{ matrix.target }}/release/bundle/dmg -name "*.dmg" -maxdepth 1 | head -n 1)"
+          if [ -z "$dmg_file" ]; then
+            echo "::error::macOS dmg bundle not found for ${{ matrix.target }}."
+            exit 1
+          fi
+          case "${{ matrix.target }}" in
+            aarch64-apple-darwin) dmg_arch="aarch64"; updater_platform="darwin-aarch64" ;;
+            x86_64-apple-darwin) dmg_arch="x86_64"; updater_platform="darwin-x86_64" ;;
+            *) echo "Unsupported macOS target: ${{ matrix.target }}" && exit 1 ;;
+          esac
+          dmg_name="${dmg_arch}-$(basename "$dmg_file")"
+          cp "$dmg_file" "artifacts/$dmg_name"
+          updater_file="$(find src-tauri/target/${{ matrix.target }}/release/bundle/macos -name "*.app.tar.gz" -maxdepth 1 | head -n 1)"
           if [ -z "$updater_file" ] || [ ! -f "${updater_file}.sig" ]; then
             echo "::error::macOS updater bundle (.app.tar.gz) not found for ${{ matrix.target }}. Build must use --bundles app,dmg with createUpdaterArtifacts enabled."
             exit 1
           fi
-          case "${{ matrix.target }}" in
-            aarch64-apple-darwin) updater_platform="darwin-aarch64" ;;
-            x86_64-apple-darwin) updater_platform="darwin-x86_64" ;;
-            *) echo "Unsupported macOS updater target: ${{ matrix.target }}" && exit 1 ;;
-          esac
           updater_name="${updater_platform}-$(basename "$updater_file")"
           updater_sig_name="${updater_name}.sig"
           cp "$updater_file" "artifacts/$updater_name"
@@ -134,24 +148,40 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
-          Get-ChildItem -Path src-tauri/target -Recurse -Include *.msi,*.exe,*.sig | Where-Object { $_.FullName -match "bundle" } | Copy-Item -Destination artifacts/ -ErrorAction SilentlyContinue
-          $preferred = Get-ChildItem -Path src-tauri/target -Recurse -File | Where-Object { $_.FullName -match "bundle" -and $_.Name -match '\.exe$' } | Select-Object -First 1
-          if (-not $preferred) {
-            $preferred = Get-ChildItem -Path src-tauri/target -Recurse -File | Where-Object { $_.FullName -match "bundle" -and $_.Name -match '\.msi$' } | Select-Object -First 1
-          }
-          if ($preferred) {
-            $sigPath = "$($preferred.FullName).sig"
-            if (Test-Path $sigPath) {
-              Copy-Item $preferred.FullName -Destination artifacts/ -ErrorAction SilentlyContinue
-              Copy-Item $sigPath -Destination artifacts/ -ErrorAction SilentlyContinue
-              bun scripts/release/write-updater-manifest.mjs `
-                --output-dir artifacts `
-                --target "${{ matrix.target }}" `
-                --platform "windows-x86_64" `
-                --file "$($preferred.FullName)" `
-                --signature "$sigPath"
+          $bundleDir = "src-tauri/target/${{ matrix.target }}/release/bundle"
+          $preferred = $null
+          $preferredSig = $null
+          $nsisDir = Join-Path $bundleDir "nsis"
+          if (Test-Path $nsisDir) {
+            $preferred = Get-ChildItem -Path $nsisDir -Filter "*.exe" -File | Select-Object -First 1
+            if ($preferred -and (Test-Path "$($preferred.FullName).sig")) {
+              $preferredSig = "$($preferred.FullName).sig"
             }
           }
+          if (-not $preferred) {
+            $msiDir = Join-Path $bundleDir "msi"
+            if (Test-Path $msiDir) {
+              $preferred = Get-ChildItem -Path $msiDir -Filter "*.msi" -File | Select-Object -First 1
+              if ($preferred -and (Test-Path "$($preferred.FullName).sig")) {
+                $preferredSig = "$($preferred.FullName).sig"
+              }
+            }
+          }
+          if (-not $preferred -or -not $preferredSig) {
+            Write-Error "Windows updater bundle not found for ${{ matrix.target }}. Build must use --bundles msi,nsis with createUpdaterArtifacts enabled."
+            exit 1
+          }
+          $arch = "x86_64"
+          $installerName = "${arch}-$($preferred.Name)"
+          $sigName = "${installerName}.sig"
+          Copy-Item $preferred.FullName -Destination (Join-Path "artifacts" $installerName)
+          Copy-Item $preferredSig -Destination (Join-Path "artifacts" $sigName)
+          bun scripts/release/write-updater-manifest.mjs `
+            --output-dir artifacts `
+            --target "${{ matrix.target }}" `
+            --platform "windows-x86_64" `
+            --file "artifacts/$installerName" `
+            --signature "artifacts/$sigName"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v7
@@ -209,7 +239,7 @@ jobs:
       - name: Verify updater signatures
         run: |
           updater_pubkey="$(node -e "const fs=require('fs'); const conf=JSON.parse(fs.readFileSync('src-tauri/tauri.conf.json','utf8')); process.stdout.write(conf.plugins.updater.pubkey);")"
-          cargo run --manifest-path src-tauri/Cargo.toml --bin verify_updater_manifest -- \
+          cargo run --manifest-path src-tauri/Cargo.toml --features release-tools --bin verify_updater_manifest -- \
             --latest-json release-assets/latest.json \
             --assets-dir release-assets \
             --pubkey "$updater_pubkey"

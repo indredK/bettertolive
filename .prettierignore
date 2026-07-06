@@ -6,3 +6,4 @@ src-tauri/target
 src/bindings.ts
 src/routeTree.gen.ts
 docs
+CHANGELOG.md

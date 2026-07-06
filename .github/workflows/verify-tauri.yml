@@ -45,6 +45,15 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      - name: Format check
+        run: bun run format:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck
+        run: bun run typecheck
+
       - name: Run frontend tests
         run: bun run test
 
@@ -52,4 +61,4 @@ jobs:
         run: cargo test --manifest-path src-tauri/Cargo.toml
 
       - name: Run Tauri build smoke test (no bundle)
-        run: bun tauri build --debug --no-bundle
+        run: bun tauri build --debug --no-bundle -- --bin bettertolive

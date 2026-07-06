@@ -4,6 +4,19 @@ version = "0.4.0"
 description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
+default-run = "bettertolive"
+
+[[bin]]
+name = "bettertolive"
+path = "src/main.rs"
+
+[[bin]]
+name = "verify_updater_manifest"
+path = "src/bin/verify_updater_manifest.rs"
+required-features = ["release-tools"]
+
+[features]
+release-tools = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
