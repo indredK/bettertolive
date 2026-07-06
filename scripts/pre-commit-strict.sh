@@ -5,20 +5,22 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
-# Collect staged files for formatting / lint checks.
+# Collect staged files for formatting check.
 STAGED_FILES=()
 while IFS= read -r file; do
   [ -n "$file" ] && STAGED_FILES+=("$file")
 done < <(git diff --cached --name-only --diff-filter=ACMR)
 
 PRETTIER_FILES=()
-for file in "${STAGED_FILES[@]}"; do
-  case "$file" in
-    *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs|*.css|*.html|*.json|*.md|*.yml|*.yaml)
-      PRETTIER_FILES+=("$file")
-      ;;
-  esac
-done
+if [ "${#STAGED_FILES[@]}" -gt 0 ]; then
+  for file in "${STAGED_FILES[@]}"; do
+    case "$file" in
+      *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs|*.css|*.html|*.json|*.md|*.yml|*.yaml)
+        PRETTIER_FILES+=("$file")
+        ;;
+    esac
+  done
+fi
 
 run_step() {
   local label="$1"
