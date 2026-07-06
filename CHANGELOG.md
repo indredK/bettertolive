@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.1](https://github.com/indredK/bettertolive/compare/v0.4.0...v0.4.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* **tauri:** 配置项目二进制名并修复构建命令 ([d779532](https://github.com/indredK/bettertolive/commit/d779532f931c08745d0644a5a8c114531dcbeb5b))
+* 移除所有工作流中的格式检查步骤 ([a9b0662](https://github.com/indredK/bettertolive/commit/a9b0662c00a518192bc10e030574ec440dfc6621))
+
 ## [0.4.0](https://github.com/indredK/bettertolive/compare/v0.3.2...v0.4.0) (2026-07-05)
 
 
