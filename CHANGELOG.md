@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/indredK/bettertolive/compare/v0.4.1...v0.4.2) (2026-07-06)
+
+
+### Bug Fixes
+
+* 优化版本号获取与提交检查 ([0c5ecb0](https://github.com/indredK/bettertolive/commit/0c5ecb055754cccecb2328c96901ad9073ceaa6c))
+
 ## [0.4.1](https://github.com/indredK/bettertolive/compare/v0.4.0...v0.4.1) (2026-07-06)
 
 
