@@ -18,11 +18,18 @@ coverage
 *.local
 
 # Editor directories and files
-.claude
 .vscode/*
-.codebuddy
 !.vscode/extensions.json
 .idea
+
+# AI tool directories — only commit entry pointers, ignore local session data
+.claude/*
+!.claude/CLAUDE.md
+.codebuddy/*
+!.codebuddy/rules/
+.trae/*
+!.trae/rules/
+
 .DS_Store
 *.suo
 *.ntvs*
