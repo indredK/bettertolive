@@ -5,6 +5,21 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+# Collect staged files for formatting / lint checks.
+STAGED_FILES=()
+while IFS= read -r file; do
+  [ -n "$file" ] && STAGED_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+PRETTIER_FILES=()
+for file in "${STAGED_FILES[@]}"; do
+  case "$file" in
+    *.js|*.jsx|*.ts|*.tsx|*.mjs|*.cjs|*.css|*.html|*.json|*.md|*.yml|*.yaml)
+      PRETTIER_FILES+=("$file")
+      ;;
+  esac
+done
+
 run_step() {
   local label="$1"
   shift
@@ -13,7 +28,11 @@ run_step() {
   "$@"
 }
 
-run_step "Checking formatting" bun run format:check
+if [ "${#PRETTIER_FILES[@]}" -gt 0 ]; then
+  run_step "Checking formatting" bunx prettier --check "${PRETTIER_FILES[@]}"
+else
+  printf '\nNo staged files need formatting check.\n'
+fi
 run_step "Linting code" bun run lint
 run_step "Type-checking TypeScript" bun run typecheck
 run_step "Building frontend" bun run build:bundle
