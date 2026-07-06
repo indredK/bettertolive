@@ -75,6 +75,7 @@ export function LegacyItemEditDialog({
   const seed = editing.item
   const [form, setForm] = useState<LegacyItemForm>(() => createLegacyItemForm(seed))
   const [isUnlocked, setIsUnlocked] = useState(editing.isNew || !seed?.isLocked)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const isReadOnly = !isUnlocked
 
   const tagsText = useMemo(() => form.tags.join(", "), [form.tags])
@@ -136,6 +137,7 @@ export function LegacyItemEditDialog({
     }
 
     try {
+      setIsSubmitting(true)
       if (editing.isNew) {
         await createLegacyItem(form)
       } else {
@@ -144,6 +146,8 @@ export function LegacyItemEditDialog({
       onSaved()
     } catch (error) {
       toast.error(String(error))
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -394,8 +398,8 @@ export function LegacyItemEditDialog({
           <Button variant="outline" onClick={onClose}>
             {t("common.actions.cancel")}
           </Button>
-          <Button onClick={handleSubmit} disabled={!canSubmit || isReadOnly}>
-            {t("common.actions.save")}
+          <Button onClick={handleSubmit} disabled={!canSubmit || isReadOnly || isSubmitting}>
+            {isSubmitting ? t("common.actions.saving") : t("common.actions.save")}
           </Button>
         </DialogFooter>
       </DialogContent>

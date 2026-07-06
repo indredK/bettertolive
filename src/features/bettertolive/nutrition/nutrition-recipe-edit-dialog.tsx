@@ -47,6 +47,7 @@ export type EditingRecipe = {
 }
 
 type RecipeIngredientForm = {
+  id: string
   foodId: string
   amount: string
   unit: RecipeIngredient["unit"]
@@ -447,7 +448,7 @@ export function NutritionRecipeEditDialog({
               <div className="space-y-2">
                 {form.ingredients.map((ingredient, index) => (
                   <div
-                    key={`${index}-${ingredient.foodId}`}
+                    key={ingredient.id}
                     className="border-foreground/10 bg-background/70 grid gap-3 rounded-xl border p-3 lg:grid-cols-[minmax(180px,1fr)_120px_100px_minmax(160px,0.8fr)_auto]"
                   >
                     <Field label={t("nutrition.recipeEdit.food")}>
@@ -582,6 +583,7 @@ export function NutritionRecipeEditDialog({
 function createInitialForm(recipe: Recipe | null, defaultFoodId: string): RecipeFormState {
   const ingredients =
     recipe?.ingredients.map((ingredient) => ({
+      id: generateId("ingredient"),
       foodId: ingredient.foodId,
       amount: String(ingredient.amount),
       unit: ingredient.unit,
@@ -606,6 +608,7 @@ function createInitialForm(recipe: Recipe | null, defaultFoodId: string): Recipe
 
 function createEmptyIngredient(defaultFoodId: string): RecipeIngredientForm {
   return {
+    id: generateId("ingredient"),
     foodId: defaultFoodId,
     amount: "",
     unit: "g",

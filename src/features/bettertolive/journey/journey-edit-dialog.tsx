@@ -502,15 +502,19 @@ function JourneyMemoryEditDialog({
   const handleFormSubmit = rhf.handleSubmit(async (values) => {
     const nextMemory = createMemoryFromForm(editing.memory, values as MemoryFormState)
 
-    await saveJourneyMutation.mutateAsync({
-      growth,
-      memory: {
-        ...memory,
-        memories: replaceById(memory.memories, nextMemory, editing.isNew),
-      },
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveJourneyMutation.mutateAsync({
+        growth,
+        memory: {
+          ...memory,
+          memories: replaceById(memory.memories, nextMemory, editing.isNew),
+        },
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = rhf.formState.isValid
@@ -701,15 +705,19 @@ function JourneyGrowthNodeEditDialog({
       validMemoryIds,
     )
 
-    await saveJourneyMutation.mutateAsync({
-      growth: {
-        ...growth,
-        growthNodes: replaceById(growth.growthNodes, nextNode, editing.isNew),
-      },
-      memory,
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveJourneyMutation.mutateAsync({
+        growth: {
+          ...growth,
+          growthNodes: replaceById(growth.growthNodes, nextNode, editing.isNew),
+        },
+        memory,
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = rhf.formState.isValid
@@ -879,15 +887,19 @@ function JourneyAnchorEditDialog({
       validMemoryIds,
     )
 
-    await saveJourneyMutation.mutateAsync({
-      growth,
-      memory: {
-        ...memory,
-        anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
-      },
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveJourneyMutation.mutateAsync({
+        growth,
+        memory: {
+          ...memory,
+          anchors: replaceById(memory.anchors, nextAnchor, editing.isNew),
+        },
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = rhf.formState.isValid
@@ -991,27 +1003,31 @@ function JourneyTextEditDialog({
   const isThread = editing.kind === "thread"
 
   const handleFormSubmit = rhf.handleSubmit(async (values) => {
-    await saveJourneyMutation.mutateAsync({
-      growth: isThread
-        ? {
-            ...growth,
-            threads: replaceAt(growth.threads, editing.index, values.value.trim(), editing.isNew),
-          }
-        : growth,
-      memory: isThread
-        ? memory
-        : {
-            ...memory,
-            reviewPrompts: replaceAt(
-              memory.reviewPrompts,
-              editing.index,
-              values.value.trim(),
-              editing.isNew,
-            ),
-          },
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveJourneyMutation.mutateAsync({
+        growth: isThread
+          ? {
+              ...growth,
+              threads: replaceAt(growth.threads, editing.index, values.value.trim(), editing.isNew),
+            }
+          : growth,
+        memory: isThread
+          ? memory
+          : {
+              ...memory,
+              reviewPrompts: replaceAt(
+                memory.reviewPrompts,
+                editing.index,
+                values.value.trim(),
+                editing.isNew,
+              ),
+            },
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = rhf.formState.isValid

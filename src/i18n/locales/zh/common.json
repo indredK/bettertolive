@@ -53,6 +53,10 @@
   "empty": {
     "noData": "暂无分布数据。"
   },
+  "error": {
+    "title": "出错了",
+    "unexpected": "发生了一个意外错误"
+  },
   "graph": {
     "renderError": "图谱暂时无法显示：{{error}}"
   },

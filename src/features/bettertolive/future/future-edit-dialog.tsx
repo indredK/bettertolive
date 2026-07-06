@@ -121,14 +121,18 @@ export function FutureBlueprintEditDialog({
   })
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
-    await saveFutureMutation.mutateAsync({
-      ...future,
-      identity: values.identity.trim(),
-      lifestyle: values.lifestyle.trim(),
-      values: textToDelimitedList(values.valuesText),
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveFutureMutation.mutateAsync({
+        ...future,
+        identity: values.identity.trim(),
+        lifestyle: values.lifestyle.trim(),
+        values: textToDelimitedList(values.valuesText),
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid
@@ -231,21 +235,25 @@ export function FutureMilestoneEditDialog({
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
     const steps = textToLines(values.stepsText)
-    await saveFutureMutation.mutateAsync({
-      ...future,
-      milestones: replaceAt(
-        future.milestones,
-        editing.index,
-        {
-          horizon: values.horizon.trim(),
-          summary: values.summary.trim(),
-          steps,
-        },
-        editing.isNew,
-      ),
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveFutureMutation.mutateAsync({
+        ...future,
+        milestones: replaceAt(
+          future.milestones,
+          editing.index,
+          {
+            horizon: values.horizon.trim(),
+            summary: values.summary.trim(),
+            steps,
+          },
+          editing.isNew,
+        ),
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid
@@ -377,17 +385,21 @@ export function FutureExperimentEditDialog({
   })
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
-    await saveFutureMutation.mutateAsync({
-      ...future,
-      experiments: replaceAt(
-        future.experiments,
-        editing.index,
-        values.experiment.trim(),
-        editing.isNew,
-      ),
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveFutureMutation.mutateAsync({
+        ...future,
+        experiments: replaceAt(
+          future.experiments,
+          editing.index,
+          values.experiment.trim(),
+          editing.isNew,
+        ),
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid

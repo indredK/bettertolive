@@ -672,12 +672,16 @@ export function SocioeconomicsPromptEditDialog({
           index === editing.index ? values.prompt.trim() : item,
         )
 
-    await saveSocioeconomicsMutation.mutateAsync({
-      ...socioeconomics,
-      reviewPrompts: nextPrompts,
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveSocioeconomicsMutation.mutateAsync({
+        ...socioeconomics,
+        reviewPrompts: nextPrompts,
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "@/components/ui/button"
+import { UI_LAYERS } from "@/lib/ui-layers"
 import { cn } from "@/lib/utils"
 
 export type FilterPopoverDimension = {
@@ -107,7 +108,10 @@ export function FilterPopoverButton({
 
       {isOpen ? (
         <div
-          className="absolute top-full right-0 z-50 mt-1.5 space-y-2 rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] p-2.5 shadow-lg backdrop-blur-xl"
+          className={cn(
+            "absolute top-full right-0 mt-1.5 space-y-2 rounded-xl border border-[color:var(--chip-border)] bg-[color:var(--surface-bg)] p-2.5 shadow-lg backdrop-blur-xl",
+            UI_LAYERS.floatingContent,
+          )}
           style={{ width: popoverWidth }}
         >
           {dimensions.map((dimension) => (

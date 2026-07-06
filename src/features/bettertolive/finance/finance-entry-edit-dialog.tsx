@@ -123,12 +123,16 @@ export function FinanceEntryEditDialog({
       ? [nextEntry, ...finance.entries]
       : finance.entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry))
 
-    await saveFinanceMutation.mutateAsync({
-      ...finance,
-      entries: sortEntriesByDate(nextEntries),
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveFinanceMutation.mutateAsync({
+        ...finance,
+        entries: sortEntriesByDate(nextEntries),
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid

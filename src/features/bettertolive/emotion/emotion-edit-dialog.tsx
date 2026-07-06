@@ -519,9 +519,13 @@ export function EmotionEntityEditDialog({
   })
 
   const handleFormSubmit = form.handleSubmit(async (values) => {
-    await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, values))
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveEmotionMutation.mutateAsync(buildNextEmotion(emotion, editing, values))
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid
@@ -957,12 +961,16 @@ export function EmotionOverviewEditDialog({
         .filter((entry) => entry.tag),
     }
 
-    await saveEmotionMutation.mutateAsync({
-      ...cloneEmotion(emotion),
-      overview,
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveEmotionMutation.mutateAsync({
+        ...cloneEmotion(emotion),
+        overview,
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid

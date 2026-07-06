@@ -556,12 +556,16 @@ function ReflectionEditDialog({
       ? reflectionModule.entries.map((entry) => (entry.id === id ? nextEntry : entry))
       : [nextEntry, ...reflectionModule.entries]
 
-    await saveReflectionMutation.mutateAsync({
-      ...reflectionModule,
-      entries: sortReflections(entries),
-    })
-    toast.success(t("common.toast.saved"))
-    onClose()
+    try {
+      await saveReflectionMutation.mutateAsync({
+        ...reflectionModule,
+        entries: sortReflections(entries),
+      })
+      toast.success(t("common.toast.saved"))
+      onClose()
+    } catch {
+      // mutation.onError 已处理错误提示
+    }
   })
 
   const canSubmit = form.formState.isValid

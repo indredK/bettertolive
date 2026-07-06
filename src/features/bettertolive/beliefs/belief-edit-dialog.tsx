@@ -1,6 +1,7 @@
 "use client"
 
 /* eslint-disable react-hooks/incompatible-library */
+import { useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod/v4"
@@ -200,6 +201,7 @@ export function BeliefEditDialog({
 }) {
   const { t } = useTranslation()
   const seed = editing.entry
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<BeliefFormValues>({
     resolver: zodResolver(beliefFormSchema),
@@ -309,6 +311,7 @@ export function BeliefEditDialog({
     }
 
     try {
+      setIsSubmitting(true)
       if (editing.isNew) {
         await createBeliefEntry(payload)
       } else {
@@ -317,6 +320,8 @@ export function BeliefEditDialog({
       onSaved()
     } catch (error) {
       toast.error(String(error))
+    } finally {
+      setIsSubmitting(false)
     }
   })
 
@@ -561,8 +566,8 @@ export function BeliefEditDialog({
             <Button variant="outline" onClick={onClose}>
               {t("common.actions.cancel")}
             </Button>
-            <Button type="submit" disabled={!isValid}>
-              {t("common.actions.save")}
+            <Button type="submit" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? t("common.actions.saving") : t("common.actions.save")}
             </Button>
           </DialogFooter>
         </DialogContent>
