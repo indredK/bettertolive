@@ -11,7 +11,8 @@
     "stages": "Stage Fit",
     "planning": "Item Library",
     "admin": "Admin",
-    "attributes": "Attribute Dictionary"
+    "attributes": "Attribute Dictionary",
+    "cooldown": "Cooldown"
   },
   "cardGrid": {
     "addNew": "Add New"
@@ -695,5 +696,28 @@
   "warning": {
     "emptyChildren": "Children {{indices}} have empty names and will be removed on submit",
     "emptyChannels": "Children {{indices}} have price rows with empty channel names that will be removed"
+  },
+  "cooldown": {
+    "lead": "Sleep on it for a few days before deciding to buy.",
+    "empty": "Empty is fine. Nothing is in the cooldown yet.",
+    "add": "Put in cooldown",
+    "addTitle": "Set a wanted item aside for a few days",
+    "addDescription": "After the cooldown you decide: keep it / extend / let it go. Letting go is a normal result.",
+    "itemLabel": "Item",
+    "pickItem": "Pick a wanted item",
+    "hoursLabel": "Cooldown length",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Why do you want it? Will you still want it after the cooldown?",
+    "confirm": "Start cooldown",
+    "keep": "Keep it",
+    "extend": "A few more days",
+    "release": "Let it go",
+    "counting": "Cooling down",
+    "ready": "Ready to decide",
+    "extended": "Extended {{count}} time(s)",
+    "toastKept": "Kept in this week's wants",
+    "toastExtended": "Set aside for a few more days",
+    "toastReleased": "Decided to skip it",
+    "toastAdded": "Put in cooldown"
   }
 }

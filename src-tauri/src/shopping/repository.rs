@@ -1,11 +1,12 @@
 #![allow(clippy::too_many_arguments, clippy::type_complexity)]
 
 use crate::shopping::dto::{
-    ShoppingAttributeDefinitionDto, ShoppingBoundaryEntryDto, ShoppingItemChildChannelDto,
-    ShoppingItemChildDto, ShoppingItemDto, ShoppingLifestyleCollectionDto, ShoppingModuleDto,
-    ShoppingOverviewDimensionPulseDto, ShoppingOverviewDto, ShoppingOverviewStagePulseDto,
-    ShoppingSpaceDefinitionDto, ShoppingSpotlightDto, ShoppingStageItemDto,
-    ShoppingStageItemTiersDto, ShoppingStageTemplateDto, ShoppingSystemDefinitionDto,
+    ShoppingAttributeDefinitionDto, ShoppingBoundaryEntryDto, ShoppingCooldownDto,
+    ShoppingItemChildChannelDto, ShoppingItemChildDto, ShoppingItemDto,
+    ShoppingLifestyleCollectionDto, ShoppingModuleDto, ShoppingOverviewDimensionPulseDto,
+    ShoppingOverviewDto, ShoppingOverviewStagePulseDto, ShoppingSpaceDefinitionDto,
+    ShoppingSpotlightDto, ShoppingStageItemDto, ShoppingStageItemTiersDto,
+    ShoppingStageTemplateDto, ShoppingSystemDefinitionDto,
 };
 use crate::shopping::models::{
     AttributeDefinitionRow, ItemChildWriteModel, ItemRow, PageContentRow, SpaceDefinitionRow,
@@ -396,6 +397,7 @@ impl ShoppingRepository {
         let spotlights = Self::list_spotlights(conn)?;
         let boundary_entries = Self::list_boundary_entries(conn)?;
         let lifestyle_collections = Self::list_lifestyle_collections(conn)?;
+        let cooldowns = Self::list_cooldowns(conn)?;
         let overview = Self::build_shopping_overview(
             &items,
             &system_definitions,
@@ -405,6 +407,7 @@ impl ShoppingRepository {
             &boundary_entries,
             &lifestyle_collections,
             &attribute_definitions,
+            cooldowns.len() as i32,
         );
 
         Ok(ShoppingModuleDto {
@@ -417,6 +420,7 @@ impl ShoppingRepository {
             spotlights,
             boundary_entries,
             lifestyle_collections,
+            cooldowns,
         })
     }
 
@@ -429,6 +433,7 @@ impl ShoppingRepository {
         boundary_entries: &[ShoppingBoundaryEntryDto],
         lifestyle_collections: &[ShoppingLifestyleCollectionDto],
         attribute_definitions: &[ShoppingAttributeDefinitionDto],
+        cooldown_count: i32,
     ) -> ShoppingOverviewDto {
         // 通过语义键动态解析代表 "wanted" 的 code，避免硬编码 "Wanted"
         let wanted_code: String = attribute_definitions
@@ -536,6 +541,7 @@ impl ShoppingRepository {
             total_spotlights: Self::count_to_i32(spotlights.len()),
             total_boundary_entries: Self::count_to_i32(boundary_entries.len()),
             total_lifestyle_collections: Self::count_to_i32(lifestyle_collections.len()),
+            cooldown_count,
             top_stage_pulses,
             top_system_pulses,
             top_space_pulses,
@@ -2366,6 +2372,170 @@ impl ShoppingRepository {
             .map_err(|e| e.to_string())?;
         }
         Ok(())
+    }
+
+    // ===== Cooldowns(冷静室) =====
+
+    pub fn list_cooldowns(conn: &Connection) -> Result<Vec<ShoppingCooldownDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT c.id, c.item_id, COALESCE(i.name, '') AS item_name,
+                        c.entered_at, c.release_at, c.extend_count, c.outcome, c.note
+                 FROM shopping_cooldowns c
+                 LEFT JOIN shopping_items i ON c.item_id = i.id
+                 WHERE c.outcome = 'pending'
+                 ORDER BY c.release_at ASC, c.sort_order ASC, c.id ASC",
+            )
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok(ShoppingCooldownDto {
+                    id: row.get(0)?,
+                    item_id: row.get(1)?,
+                    item_name: row.get(2)?,
+                    entered_at: row.get(3)?,
+                    release_at: row.get(4)?,
+                    extend_count: row.get(5)?,
+                    outcome: row.get(6)?,
+                    note: row.get(7)?,
+                })
+            })
+            .map_err(|e| e.to_string())?;
+        let mut list = Vec::new();
+        for row in rows {
+            list.push(row.map_err(|e| e.to_string())?);
+        }
+        Ok(list)
+    }
+
+    pub fn create_cooldown(
+        conn: &Connection,
+        id: &str,
+        item_id: &str,
+        entered_at: &str,
+        release_at: &str,
+        note: &str,
+        now: &str,
+    ) -> Result<ShoppingCooldownDto, String> {
+        if !Self::id_exists(conn, "shopping_items", "id", item_id)? {
+            return Err(format!("item not found: {item_id}"));
+        }
+        let next_order: i32 = conn
+            .query_row(
+                "SELECT COALESCE(MAX(sort_order), -1) + 1 FROM shopping_cooldowns",
+                [],
+                |row| row.get(0),
+            )
+            .map_err(|e| e.to_string())?;
+        conn.execute(
+            "INSERT INTO shopping_cooldowns
+                (id, item_id, entered_at, release_at, extend_count, outcome, note, sort_order, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, 0, 'pending', ?5, ?6, ?7, ?8)",
+            params![id, item_id, entered_at, release_at, note, next_order, now, now],
+        )
+        .map_err(|e| e.to_string())?;
+        Self::get_cooldown_by_id(conn, id)?
+            .ok_or_else(|| "failed to load created cooldown".to_string())
+    }
+
+    pub fn extend_cooldown(
+        conn: &Connection,
+        id: &str,
+        hours: i64,
+        now: &str,
+    ) -> Result<ShoppingCooldownDto, String> {
+        let rows_affected = conn
+            .execute(
+                "UPDATE shopping_cooldowns
+                 SET release_at = datetime(MAX(release_at, ?1), '+' || ?2 || ' hours'),
+                     extend_count = extend_count + 1,
+                     updated_at = ?3
+                 WHERE id = ?4 AND outcome = 'pending'",
+                params![now, hours, now, id],
+            )
+            .map_err(|e| e.to_string())?;
+        if rows_affected == 0 {
+            return Err("cooldown not found or already resolved".to_string());
+        }
+        Self::get_cooldown_by_id(conn, id)?.ok_or_else(|| "cooldown not found".to_string())
+    }
+
+    pub fn resolve_cooldown(
+        conn: &Connection,
+        id: &str,
+        outcome: &str,
+        now: &str,
+    ) -> Result<ShoppingCooldownDto, String> {
+        let rows_affected = conn
+            .execute(
+                "UPDATE shopping_cooldowns SET outcome = ?1, updated_at = ?2
+                 WHERE id = ?3 AND outcome = 'pending'",
+                params![outcome, now, id],
+            )
+            .map_err(|e| e.to_string())?;
+        if rows_affected == 0 {
+            return Err("cooldown not found or already resolved".to_string());
+        }
+        // 返回最新状态(已进入历史，outcome 已变更)
+        let mut stmt = conn
+            .prepare(
+                "SELECT c.id, c.item_id, COALESCE(i.name, '') AS item_name,
+                        c.entered_at, c.release_at, c.extend_count, c.outcome, c.note
+                 FROM shopping_cooldowns c
+                 LEFT JOIN shopping_items i ON c.item_id = i.id
+                 WHERE c.id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+        let mut rows = stmt
+            .query_map(params![id], |row| {
+                Ok(ShoppingCooldownDto {
+                    id: row.get(0)?,
+                    item_id: row.get(1)?,
+                    item_name: row.get(2)?,
+                    entered_at: row.get(3)?,
+                    release_at: row.get(4)?,
+                    extend_count: row.get(5)?,
+                    outcome: row.get(6)?,
+                    note: row.get(7)?,
+                })
+            })
+            .map_err(|e| e.to_string())?;
+        rows.next()
+            .map(|row| row.map_err(|e| e.to_string()))
+            .unwrap_or_else(|| Err("cooldown not found".to_string()))
+    }
+
+    pub fn get_cooldown_by_id(
+        conn: &Connection,
+        id: &str,
+    ) -> Result<Option<ShoppingCooldownDto>, String> {
+        let mut stmt = conn
+            .prepare(
+                "SELECT c.id, c.item_id, COALESCE(i.name, '') AS item_name,
+                        c.entered_at, c.release_at, c.extend_count, c.outcome, c.note
+                 FROM shopping_cooldowns c
+                 LEFT JOIN shopping_items i ON c.item_id = i.id
+                 WHERE c.id = ?1",
+            )
+            .map_err(|e| e.to_string())?;
+        let mut rows = stmt
+            .query_map(params![id], |row| {
+                Ok(ShoppingCooldownDto {
+                    id: row.get(0)?,
+                    item_id: row.get(1)?,
+                    item_name: row.get(2)?,
+                    entered_at: row.get(3)?,
+                    release_at: row.get(4)?,
+                    extend_count: row.get(5)?,
+                    outcome: row.get(6)?,
+                    note: row.get(7)?,
+                })
+            })
+            .map_err(|e| e.to_string())?;
+        match rows.next() {
+            Some(row) => Ok(Some(row.map_err(|e| e.to_string())?)),
+            None => Ok(None),
+        }
     }
 
     // ===== 展示类内容聚合 =====

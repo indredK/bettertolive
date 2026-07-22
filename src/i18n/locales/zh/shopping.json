@@ -11,7 +11,8 @@
     "stages": "阶段适用",
     "planning": "物件库",
     "admin": "管理",
-    "attributes": "属性字典"
+    "attributes": "属性字典",
+    "cooldown": "冷静室"
   },
   "cardGrid": {
     "addNew": "新增"
@@ -695,5 +696,28 @@
   "warning": {
     "emptyChildren": "子级 {{indices}} 名称为空，提交时将被自动移除",
     "emptyChannels": "子级 {{indices}} 存在渠道名称为空的价格行，提交时将被移除"
+  },
+  "cooldown": {
+    "lead": "先放几天，再决定要不要买。",
+    "empty": "空着也挺好。还没有在冷静室的物件。",
+    "add": "放入冷静室",
+    "addTitle": "把想买的东西先放几天",
+    "addDescription": "冷静期结束后你再决定：还想要 / 再放几天 / 算了。算了也是正常结果。",
+    "itemLabel": "物件",
+    "pickItem": "选择一个想买的物件",
+    "hoursLabel": "冷静时长",
+    "noteLabel": "备注（可选）",
+    "notePlaceholder": "为什么想买？冷静期里还会想要吗？",
+    "confirm": "开始冷静",
+    "keep": "还想要",
+    "extend": "再放几天",
+    "release": "算了",
+    "counting": "冷静中",
+    "ready": "可以决定了",
+    "extended": "已延长 {{count}} 次",
+    "toastKept": "已留在本周想买里",
+    "toastExtended": "已再放几天",
+    "toastReleased": "先不要了",
+    "toastAdded": "已放入冷静室"
   }
 }

@@ -20,6 +20,7 @@ import type {
   ReflectionModuleData,
   RelationshipsModuleData,
   ShoppingModuleData,
+  ShoppingCooldown,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
   WorldHistoryModuleData,
@@ -149,6 +150,13 @@ export function createLiveBetterToLiveApi(): BetterToLiveApi {
     // ---- Tauri commands (Rust backend) ----
 
     getShopping: () => getShoppingFromRust(),
+
+    createShoppingCooldown: (itemId, note, hours) =>
+      invoke<ShoppingCooldown>("create_shopping_cooldown", { itemId, note, hours }),
+    extendShoppingCooldown: (id, hours) =>
+      invoke<ShoppingCooldown>("extend_shopping_cooldown", { id, hours }),
+    resolveShoppingCooldown: (id, outcome) =>
+      invoke<ShoppingCooldown>("resolve_shopping_cooldown", { id, outcome }),
 
     getWorkspaceSnapshot: () => invoke<WorkspaceSnapshot>("get_workspace_snapshot"),
 

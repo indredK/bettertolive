@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>阶段 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.97 0.01 250); --fg: oklch(0.22 0.03 260); --muted: oklch(0.48 0.03 260);
+      --card: #fff; --border: oklch(0.9 0.02 250); --aside: oklch(0.96 0.015 250);
+      --blue: oklch(0.48 0.1 255); --primary-fg: #fff; --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+    .app { height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); overflow: hidden; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0,1fr); }
+      .nav-label, .brand-sub { display: none; }
+    }
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a.on { background: var(--blue); color: #fff; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+    .main {
+      min-width: 0; min-height: 0; display: flex; flex-direction: column;
+      padding: 14px 16px; overflow: hidden;
+    }
+    .head { flex-shrink: 0; margin-bottom: 12px; }
+    .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    h1 { margin: 4px 0 2px; font-size: 18px; }
+    .lead { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .card {
+      flex: 1; min-height: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px; display: flex; flex-direction: column; overflow: hidden;
+    }
+    label { font-size: 11px; color: var(--muted); }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 12px; }
+    .row button {
+      border: 1px solid var(--border); background: #fff; border-radius: 999px;
+      padding: 6px 11px; font-size: 12px; cursor: pointer;
+    }
+    .row button.on { background: var(--blue); color: #fff; border-color: transparent; }
+    .out {
+      flex: 1; min-height: 0; overflow: auto;
+      background: oklch(0.97 0.01 250); border-radius: 10px; padding: 12px;
+      font-size: 13px; line-height: 1.55; color: var(--muted);
+    }
+    .out b { display: block; color: var(--fg); margin-bottom: 6px; font-size: 11px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; flex-shrink: 0; }
+    .actions button {
+      border-radius: 8px; padding: 7px 12px; font-size: 12px; font-weight: 600; cursor: pointer;
+      border: 1px solid var(--border); background: #fff;
+    }
+    .actions .primary { background: var(--blue); color: #fff; border-color: transparent; }
+    .toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--fg); color: #fff; padding: 8px 14px; border-radius: 999px;
+      font-size: 12px; opacity: 0; transition: .2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">阶段</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a class="on" href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <div class="eyebrow">阶段</div>
+        <h1>换一种生活，这件还合适吗</h1>
+        <p class="lead">只做对照 · 整页不滚动</p>
+      </div>
+      <div class="card">
+        <label>看哪一件</label>
+        <div class="row" id="items"></div>
+        <label>现在</label>
+        <div style="margin:4px 0 10px;font-weight:600;font-size:13px;">独居 · 租房 · 远程</div>
+        <label>如果变成</label>
+        <div class="row" id="stages"></div>
+        <div class="out" id="out"></div>
+        <div class="actions">
+          <button class="primary" data-a="cool">放进冷静室</button>
+          <button data-a="later">以后再说</button>
+          <button data-a="no">不要了</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const items = ["人体工学椅", "空气炸锅", "沙发"];
+    const stages = ["合住", "搬家", "回办公室", "长期出门", "有娃"];
+    const data = {
+      "人体工学椅": {
+        合住: "合住后桌子常要共用，可能占地方。",
+        搬家: "能带走，搬家时会麻烦一点。",
+        回办公室: "在家坐的时间变少，可以再等等。",
+        长期出门: "人不在家，椅子就闲着。",
+        有娃: "还用得上，家里位置会更紧。",
+      },
+      "空气炸锅": {
+        合住: "厨房还用得上。", 搬家: "体积不大，带走还行。",
+        回办公室: "早晚在家做饭仍用得到。", 长期出门: "长期不在就用不上。", 有娃: "家里做饭会更多。",
+      },
+      "沙发": {
+        合住: "尺寸和口味难统一。", 搬家: "搬家很麻烦。",
+        回办公室: "不是现在急的。", 长期出门: "空着也占地方。", 有娃: "更像下一阶段再考虑。",
+      },
+    };
+    let item = items[0], stage = stages[0];
+    function toast(m) {
+      const t = document.getElementById("toast");
+      t.textContent = m; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1800);
+    }
+    function render() {
+      document.getElementById("items").innerHTML = items.map(i =>
+        `<button class="${i===item?"on":""}" data-i="${i}">${i}</button>`).join("");
+      document.getElementById("stages").innerHTML = stages.map(s =>
+        `<button class="${s===stage?"on":""}" data-s="${s}">${s}</button>`).join("");
+      document.querySelectorAll("#items button").forEach(b => b.onclick = () => { item = b.dataset.i; render(); });
+      document.querySelectorAll("#stages button").forEach(b => b.onclick = () => { stage = b.dataset.s; render(); });
+      document.getElementById("out").innerHTML =
+        `<b>现在：独居 · 远程　→　如果：${stage}</b>${data[item][stage]}`;
+    }
+    document.querySelectorAll(".actions button").forEach(b => {
+      b.onclick = () => toast({ cool: "已放进冷静室", later: "记在以后", no: "先不要了" }[b.dataset.a]);
+    });
+    render();
+  </script>
+</body>
+</html>

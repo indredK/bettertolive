@@ -182,3 +182,18 @@ pub struct PageContentRow {
     pub created_at: String,
     pub updated_at: String,
 }
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+pub struct CooldownRow {
+    pub id: String,
+    pub item_id: String,
+    pub item_name: String,
+    pub entered_at: String,
+    pub release_at: String,
+    pub extend_count: i32,
+    pub outcome: String,
+    pub note: String,
+    pub sort_order: i32,
+    pub created_at: String,
+    pub updated_at: String,
+}

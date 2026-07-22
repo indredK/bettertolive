@@ -12,6 +12,7 @@ export const emptyShoppingModuleData = {
     totalSpotlights: 0,
     totalBoundaryEntries: 0,
     totalLifestyleCollections: 0,
+    cooldownCount: 0,
     topStagePulses: [],
     topSystemPulses: [],
     topSpacePulses: [],
@@ -24,4 +25,5 @@ export const emptyShoppingModuleData = {
   stageTemplates: [],
   boundaryEntries: [],
   lifestyleCollections: [],
+  cooldowns: [],
 } satisfies ShoppingModuleData

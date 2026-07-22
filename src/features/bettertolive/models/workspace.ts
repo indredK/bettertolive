@@ -243,6 +243,20 @@ export type ShoppingLifestyleCollection = {
   items: string[]
 }
 
+// ===== 冷静室(冷却调度层) =====
+
+export type ShoppingCooldown = {
+  id: string
+  itemId: string
+  itemName: string
+  enteredAt: string
+  releaseAt: string
+  extendCount: number
+  /** pending(冷静中) | kept(还想要) | released(算了) */
+  outcome: string
+  note: string
+}
+
 export type ShoppingOverviewStagePulse = {
   id: string
   name: string
@@ -266,6 +280,7 @@ export type ShoppingOverview = {
   totalSpotlights: number
   totalBoundaryEntries: number
   totalLifestyleCollections: number
+  cooldownCount: number
   topStagePulses: ShoppingOverviewStagePulse[]
   topSystemPulses: ShoppingOverviewDimensionPulse[]
   topSpacePulses: ShoppingOverviewDimensionPulse[]
@@ -840,6 +855,7 @@ export type ShoppingModuleData = {
   stageTemplates: ShoppingStageTemplate[]
   boundaryEntries: ShoppingBoundaryEntry[]
   lifestyleCollections: ShoppingLifestyleCollection[]
+  cooldowns: ShoppingCooldown[]
 }
 
 export type BeliefsModuleData = BeliefProfile

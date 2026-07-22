@@ -19,6 +19,7 @@ import { ShoppingAttributesTab } from "@/features/bettertolive/shopping/componen
 import { ShoppingSpacesTab } from "@/features/bettertolive/shopping/components/spaces/shopping-spaces-tab"
 import { ShoppingStagesTab } from "@/features/bettertolive/shopping/components/stages/shopping-stages-tab"
 import { ShoppingSystemsTab } from "@/features/bettertolive/shopping/components/systems/shopping-systems-tab"
+import { ShoppingCooldownTab } from "@/features/bettertolive/shopping/components/cooldown/shopping-cooldown-tab"
 import {
   ShoppingItemEditDialog,
   type EditingItem,
@@ -91,6 +92,14 @@ export function ShoppingPage({
               <TabsTrigger value="spaces">{t("shopping.tabs.spaces")}</TabsTrigger>
               <TabsTrigger value="stages">{t("shopping.tabs.stages")}</TabsTrigger>
               <TabsTrigger value="attributes">{t("shopping.tabs.attributes")}</TabsTrigger>
+              <TabsTrigger value="cooldown" className="gap-1.5">
+                {t("shopping.tabs.cooldown")}
+                {shopping.overview.cooldownCount > 0 && (
+                  <span className="bg-accent text-accent-foreground ml-0.5 inline-flex min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums">
+                    {shopping.overview.cooldownCount}
+                  </span>
+                )}
+              </TabsTrigger>
             </TabsList>
           </div>
 
@@ -183,6 +192,14 @@ export function ShoppingPage({
 
         <TabsContent value="attributes" className="h-full min-h-0 overflow-hidden">
           <ShoppingAttributesTab
+            shopping={shopping}
+            isControlMode={isControlMode}
+            onRefresh={refresh}
+          />
+        </TabsContent>
+
+        <TabsContent value="cooldown" className="h-full min-h-0 overflow-hidden">
+          <ShoppingCooldownTab
             shopping={shopping}
             isControlMode={isControlMode}
             onRefresh={refresh}

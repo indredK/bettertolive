@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>冷静室 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.24 0.025 230); --fg: oklch(0.96 0.01 220); --muted: oklch(0.72 0.03 220);
+      --card: oklch(0.3 0.03 230); --border: oklch(0.38 0.03 230); --aside: oklch(0.22 0.03 230);
+      --accent: oklch(0.75 0.07 200); --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+    .app { height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); overflow: hidden; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0,1fr); }
+      .nav-label, .brand-sub { display: none; }
+    }
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a.on { background: var(--accent); color: var(--bg); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+    .main {
+      min-width: 0; min-height: 0; display: flex; flex-direction: column;
+      padding: 14px 16px; overflow: hidden;
+    }
+    .head {
+      flex-shrink: 0; display: flex; justify-content: space-between; align-items: flex-end;
+      gap: 10px; margin-bottom: 12px;
+    }
+    .eyebrow { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); font-weight: 650; }
+    h1 { margin: 4px 0 2px; font-size: 18px; }
+    .lead { margin: 0; color: var(--muted); font-size: 12px; }
+    .head button {
+      background: var(--accent); color: var(--bg); border: none; border-radius: 999px;
+      padding: 7px 12px; font-weight: 650; font-size: 12px; cursor: pointer; flex-shrink: 0;
+    }
+
+    .vault {
+      flex: 1; min-height: 0; overflow: auto;
+      border: 1px solid var(--border); border-radius: 14px; background: var(--card);
+    }
+    .item {
+      display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+      padding: 14px 16px; border-bottom: 1px solid var(--border);
+    }
+    .item:last-child { border-bottom: none; }
+    .item h3 { margin: 0 0 2px; font-size: 14px; }
+    .item p { margin: 0; font-size: 11px; color: var(--muted); }
+    .timer {
+      font-variant-numeric: tabular-nums; font-size: 16px; font-weight: 650; color: var(--accent); text-align: right;
+    }
+    .timer small { display: block; font-size: 10px; color: var(--muted); font-weight: 500; }
+    .actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .actions button {
+      border-radius: 8px; padding: 5px 10px; font-size: 11px; cursor: pointer;
+      border: 1px solid var(--border); background: transparent; color: var(--fg);
+    }
+    .actions .primary { background: var(--accent); color: var(--bg); border-color: transparent; font-weight: 650; }
+    .empty { text-align: center; padding: 40px 12px; color: var(--muted); line-height: 1.6; font-size: 13px; }
+    .toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: 999px;
+      font-size: 12px; opacity: 0; transition: .2s;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">冷静室</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a class="on" href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <div>
+          <div class="eyebrow">冷静室</div>
+          <h1>先放几天</h1>
+          <p class="lead">列表可滚 · 整页不滚</p>
+        </div>
+        <button id="add">再放一件</button>
+      </div>
+      <div class="vault" id="vault"></div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    let items = [
+      { id: 1, name: "机械键盘", where: "桌面", h: 47, m: 12, s: 8 },
+      { id: 2, name: "人体工学椅", where: "工位", h: 61, m: 40, s: 22 },
+      { id: 3, name: "空气炸锅", where: "厨房", h: 18, m: 5, s: 44 },
+    ];
+    function toast(msg) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2000);
+    }
+    function pad(n) { return String(n).padStart(2, "0"); }
+    function render() {
+      const v = document.getElementById("vault");
+      if (!items.length) {
+        v.innerHTML = `<div class="empty">空着也挺好。</div>`;
+        return;
+      }
+      v.innerHTML = items.map(it => `
+        <div class="item">
+          <div>
+            <h3>${it.name}</h3>
+            <p>${it.where}</p>
+            <div class="actions">
+              <button class="primary" data-act="keep" data-id="${it.id}">还想要</button>
+              <button data-act="freeze" data-id="${it.id}">再放几天</button>
+              <button data-act="release" data-id="${it.id}">算了</button>
+            </div>
+          </div>
+          <div class="timer" data-timer="${it.id}">${pad(it.h)}:${pad(it.m)}:${pad(it.s)}<small>还剩</small></div>
+        </div>
+      `).join("");
+      v.querySelectorAll("[data-act]").forEach(b => {
+        b.onclick = () => {
+          const it = items.find(x => x.id == b.dataset.id);
+          if (b.dataset.act === "release") {
+            items = items.filter(x => x.id != it.id); toast(`「${it.name}」先不要了`); render();
+          }
+          if (b.dataset.act === "freeze") {
+            it.h = 72; it.m = 0; it.s = 0; toast("再放几天"); render();
+          }
+          if (b.dataset.act === "keep") {
+            items = items.filter(x => x.id != it.id); toast(`「${it.name}」留在本周想买里`); render();
+          }
+        };
+      });
+    }
+    setInterval(() => {
+      items.forEach(it => {
+        if (it.s > 0) it.s--;
+        else if (it.m > 0) { it.m--; it.s = 59; }
+        else if (it.h > 0) { it.h--; it.m = 59; it.s = 59; }
+        const el = document.querySelector(`[data-timer="${it.id}"]`);
+        if (el) el.innerHTML = `${pad(it.h)}:${pad(it.m)}:${pad(it.s)}<small>还剩</small>`;
+      });
+    }, 1000);
+    document.getElementById("add").onclick = () => {
+      items.unshift({ id: Date.now(), name: "灯", where: "桌面", h: 72, m: 0, s: 0 });
+      toast("先放几天。"); render();
+    };
+    render();
+  </script>
+</body>
+</html>

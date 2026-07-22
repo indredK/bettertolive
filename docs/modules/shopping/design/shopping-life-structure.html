@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>生活场景 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.975 0.012 82);
+      --bg2: oklch(0.96 0.015 82);
+      --fg: oklch(0.22 0.02 60);
+      --muted: oklch(0.48 0.02 60);
+      --card: oklch(0.995 0.006 82);
+      --border: oklch(0.88 0.02 80);
+      --aside: oklch(0.965 0.015 80);
+      --primary: oklch(0.4 0.07 55);
+      --primary-fg: oklch(0.99 0.01 82);
+      --accent: oklch(0.945 0.025 80);
+      --red: oklch(0.58 0.14 25);
+      --red-bg: oklch(0.96 0.03 25);
+      --yellow: oklch(0.55 0.08 75);
+      --yellow-bg: oklch(0.97 0.03 90);
+      --green: oklch(0.5 0.08 150);
+      --green-bg: oklch(0.96 0.025 150);
+      --blue: oklch(0.48 0.08 250);
+      --cool: oklch(0.45 0.05 220);
+      --sidebar-w: 240px;
+      --detail-w: 280px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+
+    /* 对齐 bettertolive：整窗 100dvh，侧栏 + 主区，主区内部再分栏 */
+    .app {
+      height: 100dvh; max-height: 100dvh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+      overflow: hidden;
+    }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0, 1fr); }
+      .nav-label, .brand-sub { display: none; }
+      :root { --detail-w: 240px; }
+    }
+    @media (max-width: 1100px) {
+      .workspace { grid-template-columns: 1fr !important; }
+      .detail { display: none !important; }
+      .detail.force { display: flex !important; position: absolute; inset: 48px 12px 12px; z-index: 20; }
+    }
+
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px;
+      min-height: 0; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; font-weight: 500; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; min-height: 0; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a:hover { background: var(--accent); color: var(--fg); }
+    .nav a.on { background: var(--primary); color: var(--primary-fg); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; flex-shrink: 0; }
+
+    .shell {
+      min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .topbar {
+      flex-shrink: 0; display: flex; align-items: center; gap: 10px;
+      padding: 10px 14px; border-bottom: 1px solid var(--border);
+      background: oklch(0.99 0.005 82 / 0.95);
+    }
+    .tabs { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; }
+    .tab {
+      border: none; background: transparent; color: var(--muted);
+      padding: 7px 12px; border-radius: 999px; font-size: 12.5px; cursor: pointer; white-space: nowrap;
+    }
+    .tab:hover { background: var(--accent); color: var(--fg); }
+    .tab.active { background: var(--primary); color: var(--primary-fg); }
+    .icon-btn {
+      position: relative; border: 1px solid var(--border); background: var(--card);
+      border-radius: 9px; padding: 7px 11px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;
+    }
+    .icon-btn .badge {
+      position: absolute; top: -5px; right: -5px; background: var(--cool); color: #fff;
+      font-size: 10px; min-width: 16px; height: 16px; border-radius: 999px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .icon-btn.primary { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+
+    .workspace {
+      flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) var(--detail-w);
+      overflow: hidden;
+      position: relative;
+    }
+    .content {
+      min-width: 0; min-height: 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      padding: 14px 16px;
+    }
+    .detail {
+      border-left: 1px solid var(--border); background: var(--card);
+      min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .detail-head {
+      flex-shrink: 0; padding: 12px 14px; border-bottom: 1px solid var(--border);
+      font-size: 13px; font-weight: 650;
+    }
+    .detail-body { flex: 1; min-height: 0; overflow: auto; padding: 12px 14px; }
+
+    .view { display: none; flex: 1; min-height: 0; flex-direction: column; overflow: hidden; }
+    .view.active { display: flex; }
+
+    .head { flex-shrink: 0; margin-bottom: 10px; }
+    .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    h1 { font-size: 18px; margin: 4px 0 2px; font-weight: 650; line-height: 1.25; }
+    .sub { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .stage-bar {
+      flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; font-size: 12px; color: var(--muted);
+    }
+    .stage-bar .pill {
+      background: var(--primary); color: var(--primary-fg);
+      border-radius: 999px; padding: 3px 8px; font-size: 11px; font-weight: 600; color: var(--primary-fg);
+    }
+
+    .legend { flex-shrink: 0; display: flex; gap: 12px; margin-bottom: 8px; font-size: 11px; color: var(--muted); }
+    .legend i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 3px; vertical-align: middle; }
+
+    /* 场景网格：占满剩余高度，内部不整页滚 */
+    .systems-grid {
+      flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    @media (max-width: 1240px) {
+      .systems-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 800px) {
+      .systems-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    .sys {
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+      background: var(--card); cursor: pointer; text-align: left;
+      min-height: 0; position: relative;
+      display: flex; flex-direction: column; justify-content: flex-end;
+    }
+    .sys:hover { border-color: oklch(0.78 0.03 60); }
+    .sys.selected { outline: 2px solid var(--primary); outline-offset: 0; }
+    .sys.red { background: linear-gradient(180deg, var(--red-bg), var(--card)); }
+    .sys.yellow { background: linear-gradient(180deg, var(--yellow-bg), var(--card)); }
+    .sys.green { background: linear-gradient(180deg, var(--green-bg), var(--card)); }
+    .sys.gray { opacity: 0.5; }
+    .sys .status {
+      position: absolute; top: 8px; right: 8px;
+      font-size: 10px; font-weight: 650; padding: 2px 6px; border-radius: 999px;
+      background: var(--bg2); color: var(--muted);
+    }
+    .sys.red .status { background: var(--red-bg); color: var(--red); }
+    .sys.yellow .status { background: var(--yellow-bg); color: var(--yellow); }
+    .sys.green .status { background: var(--green-bg); color: var(--green); }
+    .sys h4 { margin: 0 0 2px; font-size: 13px; font-weight: 650; }
+    .sys p { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.35; }
+
+    .panel {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px; margin-bottom: 8px;
+    }
+    .panel h4 { margin: 0 0 6px; font-size: 12px; font-weight: 650; }
+    .note { margin: 0; font-size: 12px; line-height: 1.5; color: var(--muted); }
+    .item {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12.5px;
+    }
+    .item:last-child { border-bottom: none; }
+    .item .name { font-weight: 550; }
+    .item .where { font-size: 11px; color: var(--muted); }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; flex-shrink: 0; }
+    .btn {
+      border: 1px solid var(--border); background: var(--card); color: var(--fg);
+      border-radius: 8px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer;
+    }
+    .btn.primary { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+    .btn.ghost { background: transparent; }
+    .btn.soft { color: var(--green); }
+
+    .scroll-list { flex: 1; min-height: 0; overflow: auto; }
+
+    .cool-card {
+      border: 1px solid var(--border); border-radius: 12px; padding: 12px;
+      background: var(--card); margin-bottom: 8px;
+      display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center;
+    }
+    .cool-card h4 { margin: 0 0 2px; font-size: 13px; }
+    .cool-card p { margin: 0; font-size: 11px; color: var(--muted); }
+    .timer {
+      font-variant-numeric: tabular-nums; font-weight: 650; font-size: 15px;
+      color: var(--cool); text-align: right;
+    }
+    .timer small { display: block; font-size: 10px; color: var(--muted); font-weight: 500; }
+
+    .stage-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+    .stage-pick button {
+      border: 1px solid var(--border); background: var(--card); border-radius: 999px;
+      padding: 6px 11px; font-size: 12px; cursor: pointer;
+    }
+    .stage-pick button.on { background: var(--blue); color: #fff; border-color: transparent; }
+    .verdict {
+      border-radius: 10px; padding: 10px 12px; font-size: 12.5px; line-height: 1.5;
+      background: var(--bg2); border: 1px solid var(--border); color: var(--muted);
+    }
+    .verdict b { display: block; color: var(--fg); margin-bottom: 4px; font-size: 11px; }
+
+    .space-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; flex: 1; min-height: 0; align-content: start; overflow: auto; }
+    .space-row {
+      display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center;
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--card);
+    }
+    .space-row .tag {
+      font-size: 11px; font-weight: 650; padding: 3px 0; border-radius: 999px; text-align: center;
+    }
+    .tag.ok { background: var(--green-bg); color: var(--green); }
+    .tag.full { background: var(--yellow-bg); color: var(--yellow); }
+    .tag.tight { background: var(--red-bg); color: var(--red); }
+    .space-row h4 { margin: 0 0 1px; font-size: 12.5px; }
+    .space-row p { margin: 0; font-size: 11px; color: var(--muted); }
+
+    .story-grid {
+      flex: 1; min-height: 0; overflow: auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start;
+    }
+    @media (max-width: 900px) { .story-grid, .space-list { grid-template-columns: 1fr; } }
+    .story-grid .panel { margin: 0; }
+
+    .fill-panel {
+      flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden;
+    }
+    .fill-panel .panel { flex: 1; min-height: 0; display: flex; flex-direction: column; margin: 0; overflow: hidden; }
+    .fill-panel .inner { flex: 1; min-height: 0; overflow: auto; }
+
+    .empty { text-align: center; padding: 24px 8px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%) translateY(8px);
+      background: var(--fg); color: var(--primary-fg); padding: 8px 14px; border-radius: 999px;
+      font-size: 12px; opacity: 0; pointer-events: none; transition: .2s; z-index: 60;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .modal-bg {
+      position: fixed; inset: 0; background: oklch(0.2 0.02 60 / 0.35);
+      display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+    }
+    .modal-bg.open { display: flex; }
+    .modal {
+      background: var(--card); border-radius: 14px; width: min(400px, 100%);
+      max-height: min(70dvh, 520px); overflow: auto; padding: 18px;
+      border: 1px solid var(--border);
+    }
+    .modal h2 { margin: 0 0 4px; font-size: 16px; }
+    .modal .meta { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+    .field { margin-bottom: 10px; }
+    .field label { display: block; font-size: 11px; color: var(--muted); margin-bottom: 5px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chips button {
+      border: 1px solid var(--border); background: #fff; border-radius: 999px;
+      padding: 5px 10px; font-size: 12px; cursor: pointer;
+    }
+    .chips button.on { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+    input[type="text"] {
+      width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border);
+      font-size: 13px; font-family: inherit;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">购物工作台</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a class="on" href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+      </nav>
+    </aside>
+
+    <div class="shell">
+      <header class="topbar">
+        <nav class="tabs" id="tabs">
+          <button class="tab active" data-view="map">场景</button>
+          <button class="tab" data-view="future">阶段</button>
+          <button class="tab" data-view="cool">冷静室</button>
+          <button class="tab" data-view="space">空间</button>
+          <button class="tab" data-view="story">示例</button>
+        </nav>
+        <button class="icon-btn" id="btnCool">冷静 <span class="badge" id="coolBadge">3</span></button>
+        <button class="icon-btn primary" id="btnWant">想买</button>
+      </header>
+
+      <div class="workspace">
+        <div class="content">
+          <!-- 场景 -->
+          <section class="view active" id="view-map">
+            <div class="head">
+              <div class="eyebrow">场景</div>
+              <h1>家里各处现在怎样</h1>
+              <p class="sub">点场景看缺什么、有什么可以先收</p>
+            </div>
+            <div class="stage-bar"><span class="pill">阶段</span> 独居 · 租房 · 远程</div>
+            <div class="legend">
+              <span><i style="background:var(--red)"></i>缺一点</span>
+              <span><i style="background:var(--yellow)"></i>有点满</span>
+              <span><i style="background:var(--green)"></i>还行</span>
+              <span><i style="background:#bbb"></i>用不到</span>
+            </div>
+            <div class="systems-grid" id="systemsGrid"></div>
+          </section>
+
+          <!-- 阶段 -->
+          <section class="view" id="view-future">
+            <div class="head">
+              <div class="eyebrow">阶段</div>
+              <h1>换一种生活，这件还合适吗</h1>
+              <p class="sub">只做对照</p>
+            </div>
+            <div class="fill-panel">
+              <div class="panel">
+                <h4>看哪一件</h4>
+                <div class="stage-pick" id="futureItemPick"></div>
+                <h4>如果变成</h4>
+                <div class="stage-pick" id="futureStagePick"></div>
+                <div class="inner" style="margin-top:4px;">
+                  <div id="futureVerdict"></div>
+                </div>
+                <div class="btn-row" id="futureActions"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 冷静室 -->
+          <section class="view" id="view-cool">
+            <div class="head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:8px;">
+              <div>
+                <div class="eyebrow">冷静室</div>
+                <h1>先放几天</h1>
+                <p class="sub">到期再决定，也可以就算了</p>
+              </div>
+              <button class="btn primary" id="addDemoCool">再放一件</button>
+            </div>
+            <div class="scroll-list" id="coolList"></div>
+          </section>
+
+          <!-- 空间 -->
+          <section class="view" id="view-space">
+            <div class="head">
+              <div class="eyebrow">空间</div>
+              <h1>还放得下吗</h1>
+              <p class="sub">松 · 满 · 挤</p>
+            </div>
+            <div class="space-list" id="spaceList"></div>
+            <div class="panel" style="margin-top:8px;flex-shrink:0;">
+              <h4>如果再买椅子</h4>
+              <p class="note">桌面已经有点满。可以先收，或先放进冷静室。</p>
+              <div class="btn-row">
+                <button class="btn primary" id="goFocus">去看桌面</button>
+                <button class="btn" id="chairCool">放进冷静室</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- 示例 -->
+          <section class="view" id="view-story">
+            <div class="head">
+              <div class="eyebrow">示例</div>
+              <h1>周日晚上想买三样</h1>
+              <p class="sub">空气炸锅、椅子、键盘</p>
+            </div>
+            <div class="story-grid" id="storySteps"></div>
+          </section>
+        </div>
+
+        <aside class="detail" id="detail">
+          <div class="detail-head" id="sideTitle">场景</div>
+          <div class="detail-body" id="sideBody">
+            <div class="empty">点场景查看</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-bg" id="modal"><div class="modal" id="modalBody"></div></div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const systems = [
+      { id: "sleep", name: "睡眠", status: "green", blurb: "够用", note: "先不用添。", gaps: [], extra: [] },
+      { id: "kitchen", name: "厨房", status: "red", blurb: "做早餐不太顺", note: "早餐这条线还差点东西。",
+        gaps: [
+          { name: "空气炸锅", space: "厨房台面" },
+          { name: "密封罐", space: "橱柜" },
+          { name: "锅铲", space: "厨具架" },
+        ], extra: ["闲置三明治机"] },
+      { id: "focus", name: "桌面", status: "yellow", blurb: "有点挤", note: "先收一收，比再买更有用。",
+        gaps: [{ name: "线材收纳", space: "桌面" }], extra: ["摆件偏多"] },
+      { id: "clean", name: "清洁", status: "green", blurb: "日常够用", note: "用完再补。", gaps: [], extra: [] },
+      { id: "commute", name: "通勤", status: "gray", blurb: "暂不用", note: "阶段变了再开。", gaps: [], extra: [] },
+      { id: "social", name: "待客", status: "yellow", blurb: "杯子略多", note: "可以先消化。", gaps: [], extra: ["一次性杯盘"] },
+      { id: "body", name: "活动", status: "red", blurb: "几乎不练", note: "想恢复一点运动的话。",
+        gaps: [
+          { name: "瑜伽垫", space: "客厅" },
+          { name: "弹力带", space: "抽屉" },
+        ], extra: [] },
+      { id: "entry", name: "玄关", status: "green", blurb: "进出顺", note: "保持就好。", gaps: [], extra: [] },
+    ];
+
+    const spaces = [
+      { name: "桌面", state: "full", note: "线、支架、摆件" },
+      { name: "厨房台面", state: "ok", note: "还放得下一件" },
+      { name: "橱柜", state: "full", note: "干货和闲置电器" },
+      { name: "客厅", state: "ok", note: "角落还能放垫子" },
+      { name: "玄关", state: "ok", note: "顺畅" },
+      { name: "衣柜", state: "tight", note: "偏满" },
+    ];
+
+    let coolItems = [
+      { id: "c1", name: "机械键盘", where: "桌面", left: "47:12:08" },
+      { id: "c2", name: "人体工学椅", where: "工位", left: "61:40:22" },
+      { id: "c3", name: "空气炸锅", where: "厨房", left: "18:05:44" },
+    ];
+
+    const futureItems = [
+      { id: "chair", name: "人体工学椅" },
+      { id: "fryer", name: "空气炸锅" },
+      { id: "sofa", name: "沙发" },
+    ];
+    const futureStages = ["合住", "搬家", "回办公室", "长期出门", "有娃"];
+    let selFutureItem = "chair";
+    let selFutureStage = "合住";
+    const verdicts = {
+      chair: {
+        合住: "合住后桌子常要共用，可能占地方。",
+        搬家: "能带走，搬家时会麻烦一点。",
+        回办公室: "在家坐的时间变少，可以再等等。",
+        长期出门: "人不在家，椅子就闲着。",
+        有娃: "还用得上，家里位置会更紧。",
+      },
+      fryer: {
+        合住: "厨房还用得上。",
+        搬家: "体积不大，带走还行。",
+        回办公室: "早晚在家做饭仍用得到。",
+        长期出门: "长期不在就用不上。",
+        有娃: "家里做饭会更多。",
+      },
+      sofa: {
+        合住: "尺寸和口味难统一。",
+        搬家: "搬家很麻烦。",
+        回办公室: "不是现在急的。",
+        长期出门: "空着也占地方。",
+        有娃: "更像下一阶段再考虑。",
+      },
+    };
+
+    let selectedSys = "kitchen";
+    function $(id) { return document.getElementById(id); }
+    function toast(msg) {
+      const el = $("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      setTimeout(() => el.classList.remove("show"), 2200);
+    }
+    function statusLabel(s) {
+      return { red: "缺一点", yellow: "有点满", green: "还行", gray: "用不到" }[s];
+    }
+
+    function renderSystems() {
+      $("systemsGrid").innerHTML = systems.map(s => `
+        <button class="sys ${s.status} ${selectedSys === s.id ? "selected" : ""}" data-id="${s.id}">
+          <span class="status">${statusLabel(s.status)}</span>
+          <h4>${s.name}</h4>
+          <p>${s.blurb}</p>
+        </button>
+      `).join("");
+      $("systemsGrid").querySelectorAll(".sys").forEach(btn => {
+        btn.onclick = () => {
+          selectedSys = btn.dataset.id;
+          renderSystems();
+          renderSide();
+        };
+      });
+    }
+
+    function renderSide() {
+      const s = systems.find(x => x.id === selectedSys);
+      $("sideTitle").textContent = s.name;
+      const gaps = s.gaps.length
+        ? s.gaps.map(g => `
+          <div class="item">
+            <div>
+              <div class="name">${g.name}</div>
+              <div class="where">${g.space}</div>
+            </div>
+            <button class="btn primary" data-act="decide" data-item="${g.name}" data-sys="${s.name}" data-space="${g.space}">看看</button>
+          </div>`).join("")
+        : `<p class="note">这一块暂时不用补。</p>`;
+      const extra = s.extra.length
+        ? `<div class="panel"><h4>可以先收</h4>${s.extra.map(e =>
+            `<div class="item"><span class="name">${e}</span></div>`).join("")}</div>`
+        : "";
+      $("sideBody").innerHTML = `
+        <div class="panel">
+          <h4>${statusLabel(s.status)}</h4>
+          <p class="note">${s.note}</p>
+        </div>
+        <div class="panel">
+          <h4>相关</h4>
+          ${gaps}
+        </div>
+        ${extra}
+      `;
+      $("sideBody").querySelectorAll("[data-act=decide]").forEach(btn => {
+        btn.onclick = () => openDecision(btn.dataset.item, btn.dataset.sys, btn.dataset.space);
+      });
+    }
+
+    function openDecision(name, sys, space) {
+      $("modalBody").innerHTML = `
+        <div class="eyebrow">东西</div>
+        <h2>${name}</h2>
+        <div class="meta">${sys} · ${space || "未指定"}</div>
+        <p class="note" style="margin-bottom:12px;">放进冷静室，过几天再看；或标成已有。</p>
+        <div class="btn-row">
+          <button class="btn primary" id="mCool">放进冷静室</button>
+          <button class="btn" id="mFuture">换阶段看看</button>
+          <button class="btn" id="mOwned">已有</button>
+          <button class="btn ghost" id="mClose">关闭</button>
+        </div>
+      `;
+      $("modal").classList.add("open");
+      $("mClose").onclick = () => $("modal").classList.remove("open");
+      $("mOwned").onclick = () => { $("modal").classList.remove("open"); toast(`已记下「${name}」`); };
+      $("mFuture").onclick = () => {
+        $("modal").classList.remove("open");
+        selFutureItem = name.includes("椅") ? "chair" : name.includes("炸") ? "fryer" : "chair";
+        switchView("future");
+      };
+      $("mCool").onclick = () => {
+        coolItems.unshift({ id: "c" + Date.now(), name, where: space || sys, left: "71:59:50" });
+        $("modal").classList.remove("open");
+        updateCoolBadge(); renderCool();
+        toast("先放几天。");
+      };
+    }
+
+    function updateCoolBadge() { $("coolBadge").textContent = coolItems.length; }
+
+    function renderCool() {
+      if (!coolItems.length) {
+        $("coolList").innerHTML = `<div class="empty">空着也挺好。</div>`;
+        return;
+      }
+      $("coolList").innerHTML = coolItems.map(c => `
+        <div class="cool-card">
+          <div>
+            <h4>${c.name}</h4>
+            <p>${c.where}</p>
+            <div class="btn-row">
+              <button class="btn primary" data-act="keep" data-id="${c.id}">还想要</button>
+              <button class="btn" data-act="freeze" data-id="${c.id}">再放几天</button>
+              <button class="btn soft" data-act="release" data-id="${c.id}">算了</button>
+            </div>
+          </div>
+          <div class="timer">${c.left}<small>还剩</small></div>
+        </div>
+      `).join("");
+      $("coolList").querySelectorAll("[data-act]").forEach(b => {
+        b.onclick = () => {
+          const item = coolItems.find(x => x.id === b.dataset.id);
+          if (b.dataset.act === "release") {
+            coolItems = coolItems.filter(x => x.id !== item.id);
+            updateCoolBadge(); renderCool();
+            toast(`「${item.name}」先不要了`);
+          }
+          if (b.dataset.act === "freeze") {
+            item.left = "71:59:59"; renderCool(); toast("再放几天");
+          }
+          if (b.dataset.act === "keep") {
+            coolItems = coolItems.filter(x => x.id !== item.id);
+            updateCoolBadge(); renderCool();
+            toast(`「${item.name}」留在本周想买里`);
+          }
+        };
+      });
+    }
+
+    function renderFuture() {
+      $("futureItemPick").innerHTML = futureItems.map(i =>
+        `<button class="${selFutureItem===i.id?"on":""}" data-id="${i.id}">${i.name}</button>`
+      ).join("");
+      $("futureStagePick").innerHTML = futureStages.map(s =>
+        `<button class="${selFutureStage===s?"on":""}" data-s="${s}">${s}</button>`
+      ).join("");
+      $("futureItemPick").querySelectorAll("button").forEach(b => {
+        b.onclick = () => { selFutureItem = b.dataset.id; renderFuture(); };
+      });
+      $("futureStagePick").querySelectorAll("button").forEach(b => {
+        b.onclick = () => { selFutureStage = b.dataset.s; renderFuture(); };
+      });
+      const item = futureItems.find(i => i.id === selFutureItem);
+      const text = (verdicts[selFutureItem] && verdicts[selFutureItem][selFutureStage]) || "换一个阶段看看。";
+      $("futureVerdict").innerHTML = `
+        <div class="verdict">
+          <b>现在：独居 · 远程　→　如果：${selFutureStage}</b>
+          ${text}
+        </div>
+      `;
+      $("futureActions").innerHTML = `
+        <button class="btn primary" id="fCool">放进冷静室</button>
+        <button class="btn" id="fLater">以后再说</button>
+        <button class="btn ghost" id="fNo">不要了</button>
+      `;
+      $("fCool").onclick = () => {
+        coolItems.unshift({
+          id: "c" + Date.now(), name: item.name,
+          where: "对照：" + selFutureStage, left: "72:00:00",
+        });
+        updateCoolBadge(); switchView("cool"); renderCool();
+        toast("已放进冷静室");
+      };
+      $("fLater").onclick = () => toast("记在以后");
+      $("fNo").onclick = () => toast("先不要了");
+    }
+
+    function renderSpace() {
+      const map = { ok: "松", full: "满", tight: "挤" };
+      $("spaceList").innerHTML = spaces.map(s => `
+        <div class="space-row">
+          <div class="tag ${s.state}">${map[s.state]}</div>
+          <div><h4>${s.name}</h4><p>${s.note}</p></div>
+        </div>
+      `).join("");
+    }
+
+    function renderStory() {
+      const steps = [
+        { t: "先看场景", d: "厨房缺一点，桌面有点满。", go: "map" },
+        { t: "空气炸锅", d: "对上厨房 · 放进冷静室。", go: "cool" },
+        { t: "椅子", d: "桌面满 · 先收拾或冷静。", go: "space" },
+        { t: "键盘", d: "偏想要 · 放几天。", go: "cool" },
+        { t: "几天后", d: "还想要就留；不惦记就算了。", go: "cool" },
+      ];
+      $("storySteps").innerHTML = steps.map(s => `
+        <div class="panel">
+          <h4>${s.t}</h4>
+          <p class="note">${s.d}</p>
+          <div class="btn-row"><button class="btn" data-go="${s.go}">去看看</button></div>
+        </div>
+      `).join("");
+      $("storySteps").querySelectorAll("[data-go]").forEach(b => {
+        b.onclick = () => switchView(b.dataset.go);
+      });
+    }
+
+    function switchView(name) {
+      document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+      document.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === name));
+      $("view-" + name).classList.add("active");
+      if (name === "cool") renderCool();
+      if (name === "future") renderFuture();
+      if (name === "space") renderSpace();
+      if (name === "story") renderStory();
+      if (name === "map") { renderSystems(); renderSide(); }
+    }
+
+    document.querySelectorAll(".tab").forEach(t => {
+      t.onclick = () => switchView(t.dataset.view);
+    });
+    $("btnCool").onclick = () => switchView("cool");
+    $("btnWant").onclick = () => {
+      $("modalBody").innerHTML = `
+        <div class="eyebrow">想买</div>
+        <h2>放在哪个场景</h2>
+        <div class="meta">先归个类</div>
+        <div class="field">
+          <label>场景</label>
+          <div class="chips" id="wantSys"></div>
+        </div>
+        <div class="field">
+          <label>叫什么</label>
+          <input type="text" id="wantName" placeholder="例如：椅子" />
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" id="wantGo">继续</button>
+          <button class="btn ghost" id="wantClose">取消</button>
+        </div>
+      `;
+      let ws = "focus";
+      $("wantSys").innerHTML = systems.filter(s => s.status !== "gray").map(s =>
+        `<button data-id="${s.id}" class="${ws===s.id?"on":""}">${s.name}</button>`
+      ).join("");
+      $("wantSys").querySelectorAll("button").forEach(b => {
+        b.onclick = () => {
+          ws = b.dataset.id;
+          $("wantSys").querySelectorAll("button").forEach(x => x.classList.toggle("on", x.dataset.id === ws));
+        };
+      });
+      $("modal").classList.add("open");
+      $("wantClose").onclick = () => $("modal").classList.remove("open");
+      $("wantGo").onclick = () => {
+        const name = $("wantName").value.trim() || "未命名";
+        const sys = systems.find(s => s.id === ws);
+        $("modal").classList.remove("open");
+        openDecision(name, sys.name, sys.name);
+      };
+    };
+    $("addDemoCool").onclick = () => {
+      coolItems.unshift({ id: "c" + Date.now(), name: "灯", where: "桌面", left: "72:00:00" });
+      updateCoolBadge(); renderCool(); toast("先放几天。");
+    };
+    $("goFocus").onclick = () => { selectedSys = "focus"; switchView("map"); };
+    $("chairCool").onclick = () => {
+      coolItems.unshift({ id: "c" + Date.now(), name: "人体工学椅", where: "桌面", left: "72:00:00" });
+      updateCoolBadge(); switchView("cool"); renderCool(); toast("先放几天。");
+    };
+    $("modal").addEventListener("click", e => {
+      if (e.target === $("modal")) $("modal").classList.remove("open");
+    });
+
+    renderSystems(); renderSide(); renderCool(); renderFuture(); renderSpace(); renderStory();
+    updateCoolBadge();
+  </script>
+</body>
+</html>

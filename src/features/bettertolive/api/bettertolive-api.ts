@@ -21,6 +21,7 @@ import type {
   ShoppingItemChild,
   ShoppingModuleData,
   ShoppingStageTemplate,
+  ShoppingCooldown,
   SocioeconomicsModuleData,
   WorkspaceSnapshot,
   WorldHistoryModuleData,
@@ -156,6 +157,13 @@ export type BetterToLiveApi = {
   getFinance: () => Promise<FinanceModuleData>
   saveFinance: (finance: FinanceModuleData) => Promise<void>
   getShopping: () => Promise<ShoppingModuleData>
+  createShoppingCooldown: (
+    itemId: string,
+    note?: string,
+    hours?: number,
+  ) => Promise<ShoppingCooldown>
+  extendShoppingCooldown: (id: string, hours?: number) => Promise<ShoppingCooldown>
+  resolveShoppingCooldown: (id: string, outcome: string) => Promise<ShoppingCooldown>
   getNutrition: () => Promise<NutritionModuleData>
   saveNutrition: (nutrition: NutritionModuleData) => Promise<void>
   getEmotion: () => Promise<EmotionWorkspaceModuleData>

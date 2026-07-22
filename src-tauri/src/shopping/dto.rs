@@ -149,6 +149,23 @@ pub struct ShoppingBoundaryEntryDto {
     pub reason: String,
 }
 
+// ---- 冷静室(冷却调度层) ----
+
+#[derive(Debug, Clone, Serialize, Deserialize, Type)]
+#[serde(rename_all = "camelCase")]
+pub struct ShoppingCooldownDto {
+    pub id: String,
+    pub item_id: String,
+    pub item_name: String,
+    pub entered_at: String,
+    pub release_at: String,
+    pub extend_count: i32,
+    /// pending(冷静中) | kept(还想要) | released(算了)
+    pub outcome: String,
+    #[serde(default)]
+    pub note: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, Type)]
 #[serde(rename_all = "camelCase")]
 pub struct ShoppingLifestyleCollectionDto {
@@ -187,6 +204,7 @@ pub struct ShoppingOverviewDto {
     pub total_spotlights: i32,
     pub total_boundary_entries: i32,
     pub total_lifestyle_collections: i32,
+    pub cooldown_count: i32,
     pub top_stage_pulses: Vec<ShoppingOverviewStagePulseDto>,
     pub top_system_pulses: Vec<ShoppingOverviewDimensionPulseDto>,
     pub top_space_pulses: Vec<ShoppingOverviewDimensionPulseDto>,
@@ -206,6 +224,7 @@ pub struct ShoppingModuleDto {
     pub stage_templates: Vec<ShoppingStageTemplateDto>,
     pub boundary_entries: Vec<ShoppingBoundaryEntryDto>,
     pub lifestyle_collections: Vec<ShoppingLifestyleCollectionDto>,
+    pub cooldowns: Vec<ShoppingCooldownDto>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

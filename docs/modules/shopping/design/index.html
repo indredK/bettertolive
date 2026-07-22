@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>bettertolive · 购物</title>
+  <style>
+    :root {
+      --bg: oklch(0.975 0.012 82);
+      --fg: oklch(0.22 0.02 60);
+      --muted: oklch(0.48 0.02 60);
+      --card: oklch(0.995 0.006 82);
+      --border: oklch(0.88 0.02 80);
+      --aside: oklch(0.965 0.015 80);
+      --primary: oklch(0.42 0.07 55);
+      --primary-fg: oklch(0.99 0.01 82);
+      --accent: oklch(0.94 0.03 80);
+      --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Segoe UI", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body {
+      color: var(--fg);
+      background: var(--bg);
+    }
+    /* 模拟桌面窗口：贴合最大化桌面应用视口 */
+    .app {
+      height: 100dvh;
+      max-height: 100dvh;
+      display: grid;
+      grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+      overflow: hidden;
+    }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0, 1fr); }
+      .nav-label, .brand-sub, .aside-foot { display: none; }
+      .brand-title { font-size: 11px; }
+    }
+    .aside {
+      border-right: 1px solid var(--border);
+      background: var(--aside);
+      padding: 16px 14px;
+      display: flex; flex-direction: column; gap: 12px;
+      min-height: 0; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 14px; line-height: 1.3; }
+    .brand-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .nav { display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border-radius: 10px; text-decoration: none;
+      color: var(--muted); font-size: 13px;
+    }
+    .nav a:hover { background: var(--accent); color: var(--fg); }
+    .nav a.on { background: var(--primary); color: var(--primary-fg); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.5; flex-shrink: 0; }
+    .aside-foot { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+    .main {
+      min-width: 0; min-height: 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      padding: 20px 22px;
+    }
+    .top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 16px; flex-shrink: 0; margin-bottom: 16px;
+    }
+    h1 { margin: 0; font-size: 22px; font-weight: 650; line-height: 1.25; }
+    .lead { margin: 6px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; max-width: 420px; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip {
+      font-size: 12px; padding: 5px 10px; border-radius: 999px;
+      border: 1px solid var(--border); color: var(--muted); background: var(--card);
+    }
+
+    .body {
+      flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 14px;
+      overflow: hidden;
+    }
+    @media (max-width: 1100px) {
+      .body { grid-template-columns: 1fr; }
+      .side-card { display: none; }
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 0;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .panel h2 { margin: 0 0 4px; font-size: 14px; font-weight: 650; }
+    .panel .hint { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
+
+    .grid {
+      flex: 1; min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+    }
+    a.card {
+      display: flex; flex-direction: column; justify-content: center;
+      text-decoration: none; color: inherit;
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px 16px; background: oklch(0.985 0.01 82);
+      min-height: 0;
+    }
+    a.card:hover { border-color: oklch(0.75 0.04 60); background: #fff; }
+    a.card h3 { margin: 0 0 4px; font-size: 14px; }
+    a.card p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+
+    .side-card .row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px;
+    }
+    .side-card .row:last-child { border-bottom: none; }
+    .side-card .muted { color: var(--muted); font-size: 12px; }
+    .cta {
+      margin-top: auto; display: flex; gap: 8px; flex-wrap: wrap; padding-top: 12px;
+    }
+    .cta a {
+      display: inline-flex; align-items: center;
+      background: var(--primary); color: var(--primary-fg);
+      border-radius: 999px; padding: 9px 14px; font-size: 12px; font-weight: 600;
+      text-decoration: none;
+    }
+    .cta a.ghost {
+      background: transparent; color: var(--fg); border: 1px solid var(--border);
+    }
+    .loop { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; font-size: 12px; color: var(--muted); }
+    .loop span { background: var(--accent); color: var(--fg); border-radius: 999px; padding: 4px 10px; }
+    .loop i { font-style: normal; opacity: 0.4; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div>
+        <div class="brand">bettertolive</div>
+        <div class="brand-sub">购物 · 原型</div>
+      </div>
+      <nav class="nav">
+        <a class="on" href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+        <a href="shopping-decision-flow.html"><span class="dot"></span><span class="nav-label">走查</span></a>
+      </nav>
+      <div class="aside-foot">贴合桌面壳<br />100dvh · 侧栏 + 主区</div>
+    </aside>
+
+    <main class="main">
+      <div class="top">
+        <div>
+          <h1>按场景看东西</h1>
+          <p class="lead">分类、场景、阶段，再加一点等待。整页不滚动，列表区可滚。</p>
+        </div>
+        <div class="chip-row">
+          <span class="chip">独居 · 远程</span>
+          <span class="chip">冷静中 3</span>
+        </div>
+      </div>
+
+      <div class="body">
+        <section class="panel">
+          <div class="loop">
+            <span>场景</span><i>→</i>
+            <span>阶段</span><i>→</i>
+            <span>冷静</span><i>→</i>
+            <span>空间</span>
+          </div>
+          <h2>四个入口</h2>
+          <p class="hint">与工作台同一壳层尺寸</p>
+          <div class="grid">
+            <a class="card" href="shopping-gap-map.html">
+              <h3>场景</h3>
+              <p>厨房、桌面、睡眠…</p>
+            </a>
+            <a class="card" href="shopping-future-me.html">
+              <h3>阶段</h3>
+              <p>换一种生活再看</p>
+            </a>
+            <a class="card" href="shopping-cooldown.html">
+              <h3>冷静室</h3>
+              <p>先放几天</p>
+            </a>
+            <a class="card" href="shopping-burden.html">
+              <h3>空间</h3>
+              <p>松 · 满 · 挤</p>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel side-card">
+          <h2>当前</h2>
+          <p class="hint">示例数据</p>
+          <div class="row"><span>厨房</span><span class="muted">缺一点</span></div>
+          <div class="row"><span>桌面</span><span class="muted">有点满</span></div>
+          <div class="row"><span>睡眠</span><span class="muted">还行</span></div>
+          <div class="cta">
+            <a href="shopping-life-structure.html">打开工作台</a>
+            <a class="ghost" href="shopping-decision-flow.html">走查</a>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -387,6 +387,25 @@ fn create_new_schema(conn: &Connection) -> SqliteResult<()> {
         [],
     )?;
 
+    // 冷静室:wanted 物品之上的等待调度层(不改动 shopping_items)
+    // outcome: pending(冷静中) | kept(还想要) | released(算了)
+    conn.execute(
+        "CREATE TABLE IF NOT EXISTS shopping_cooldowns (
+            id TEXT PRIMARY KEY,
+            item_id TEXT NOT NULL,
+            entered_at TEXT NOT NULL,
+            release_at TEXT NOT NULL,
+            extend_count INTEGER NOT NULL DEFAULT 0,
+            outcome TEXT NOT NULL DEFAULT 'pending',
+            note TEXT NOT NULL DEFAULT '',
+            sort_order INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL,
+            FOREIGN KEY (item_id) REFERENCES shopping_items(id) ON DELETE CASCADE
+        )",
+        [],
+    )?;
+
     Ok(())
 }
 

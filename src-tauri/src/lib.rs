@@ -42,18 +42,19 @@ use reset::reset_to_initial_data;
 use shopping::commands::{
     assign_space_definition_items, assign_system_definition_items,
     count_items_using_shopping_attribute, create_shopping_attribute_definition,
-    create_shopping_item, create_shopping_page_content, create_shopping_space_definition,
-    create_shopping_stage_template, create_system_definition, delete_shopping_item,
-    delete_shopping_page_content, delete_shopping_space_definition, delete_shopping_stage_template,
-    delete_system_definition, disable_shopping_attribute_definition,
-    enable_shopping_attribute_definition, get_shopping, get_workspace_snapshot, import_shopping,
+    create_shopping_cooldown, create_shopping_item, create_shopping_page_content,
+    create_shopping_space_definition, create_shopping_stage_template, create_system_definition,
+    delete_shopping_item, delete_shopping_page_content, delete_shopping_space_definition,
+    delete_shopping_stage_template, delete_system_definition,
+    disable_shopping_attribute_definition, enable_shopping_attribute_definition,
+    extend_shopping_cooldown, get_shopping, get_workspace_snapshot, import_shopping,
     list_shopping_attribute_definitions, list_shopping_attribute_definitions_for_management,
     list_shopping_items, list_shopping_page_contents, list_shopping_space_definitions,
     list_shopping_stage_templates, reorder_shopping_attribute_definitions,
     reorder_shopping_page_contents, reorder_space_definitions, reorder_stage_templates,
-    reorder_system_definitions, update_shopping_attribute_definition, update_shopping_item,
-    update_shopping_page_content, update_shopping_space_definition, update_shopping_stage_template,
-    update_system_definition, AppState,
+    reorder_system_definitions, resolve_shopping_cooldown, update_shopping_attribute_definition,
+    update_shopping_item, update_shopping_page_content, update_shopping_space_definition,
+    update_shopping_stage_template, update_system_definition, AppState,
 };
 use socioeconomics::commands::{get_socioeconomics, save_socioeconomics, SocioeconomicsState};
 use specta_typescript::Typescript;
@@ -114,9 +115,9 @@ fn specta_builder() -> tauri_specta::Builder<tauri::Wry> {
         assign_space_definition_items,
         reorder_shopping_page_contents,
         count_items_using_shopping_attribute,
-        save_beliefs,
-        import_legacy,
-        import_shopping,
+        create_shopping_cooldown,
+        extend_shopping_cooldown,
+        resolve_shopping_cooldown,
     ])
 }
 
@@ -274,6 +275,9 @@ pub fn run() {
             assign_space_definition_items,
             reorder_shopping_page_contents,
             count_items_using_shopping_attribute,
+            create_shopping_cooldown,
+            extend_shopping_cooldown,
+            resolve_shopping_cooldown,
             save_beliefs,
             import_legacy,
             import_shopping,

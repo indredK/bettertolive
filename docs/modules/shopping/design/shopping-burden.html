@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>空间 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.98 0.012 85); --fg: oklch(0.22 0.02 60); --muted: oklch(0.48 0.02 60);
+      --card: #fff; --border: oklch(0.9 0.02 85); --aside: oklch(0.965 0.015 80);
+      --primary: oklch(0.42 0.07 70); --yellow: oklch(0.55 0.08 75);
+      --red: oklch(0.58 0.14 25); --green: oklch(0.5 0.08 150); --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+    .app { height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); overflow: hidden; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0,1fr); }
+      .nav-label, .brand-sub { display: none; }
+    }
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a.on { background: var(--primary); color: #fff; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+    .main {
+      min-width: 0; min-height: 0; display: flex; flex-direction: column;
+      padding: 14px 16px; overflow: hidden;
+    }
+    .head { flex-shrink: 0; margin-bottom: 12px; }
+    .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    h1 { margin: 4px 0 2px; font-size: 18px; }
+    .lead { margin: 0; color: var(--muted); font-size: 12px; }
+
+    .list {
+      flex: 1; min-height: 0; overflow: auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start;
+    }
+    @media (max-width: 900px) { .list { grid-template-columns: 1fr; } }
+    .row {
+      display: grid; grid-template-columns: 40px 1fr; gap: 10px; align-items: center;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+    }
+    .tag { font-size: 11px; font-weight: 650; text-align: center; padding: 3px 0; border-radius: 999px; }
+    .tag.ok { background: oklch(0.95 0.03 150); color: var(--green); }
+    .tag.full { background: oklch(0.96 0.04 90); color: var(--yellow); }
+    .tag.tight { background: oklch(0.96 0.04 25); color: var(--red); }
+    .row h3 { margin: 0 0 1px; font-size: 13px; }
+    .row p { margin: 0; font-size: 11px; color: var(--muted); }
+
+    .panel {
+      flex-shrink: 0; margin-top: 10px; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .panel h3 { margin: 0 0 4px; font-size: 13px; }
+    .panel p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    a.btn, button {
+      border-radius: 999px; padding: 7px 12px; font-size: 12px; font-weight: 600;
+      border: 1px solid var(--border); background: #fff; color: var(--fg); cursor: pointer; text-decoration: none;
+    }
+    a.btn.primary { background: var(--primary); color: #fff; border-color: transparent; }
+    .toast {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: var(--fg); color: #fff; padding: 8px 14px; border-radius: 999px;
+      font-size: 12px; opacity: 0; transition: .2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">空间</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a class="on" href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <div class="eyebrow">空间</div>
+        <h1>还放得下吗</h1>
+        <p class="lead">松 · 满 · 挤 · 整页不滚动</p>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="panel">
+        <h3>如果再买一把椅子</h3>
+        <p>桌面已经有点满。可以先收，或先放进冷静室。</p>
+        <div class="btn-row">
+          <a class="btn primary" href="shopping-gap-map.html">去看桌面</a>
+          <button id="cool">放进冷静室</button>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const spaces = [
+      { name: "桌面", state: "full", note: "线、支架、摆件" },
+      { name: "厨房台面", state: "ok", note: "还放得下一件" },
+      { name: "橱柜", state: "full", note: "干货和闲置电器" },
+      { name: "客厅", state: "ok", note: "角落还能放垫子" },
+      { name: "玄关", state: "ok", note: "顺畅" },
+      { name: "衣柜", state: "tight", note: "偏满" },
+    ];
+    const map = { ok: "松", full: "满", tight: "挤" };
+    document.getElementById("list").innerHTML = spaces.map(s => `
+      <div class="row">
+        <div class="tag ${s.state}">${map[s.state]}</div>
+        <div><h3>${s.name}</h3><p>${s.note}</p></div>
+      </div>
+    `).join("");
+    document.getElementById("cool").onclick = () => {
+      const t = document.getElementById("toast");
+      t.textContent = "椅子已放进冷静室";
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 1800);
+    };
+  </script>
+</body>
+</html>

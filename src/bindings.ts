@@ -48,9 +48,9 @@ export const commands = {
 	assignSpaceDefinitionItems: (spaceId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_space_definition_items", { spaceId, itemIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 	countItemsUsingShoppingAttribute: (kind: string, code: string) => typedError<number, string>(__TAURI_INVOKE("count_items_using_shopping_attribute", { kind, code })),
-	saveBeliefs: (beliefs: BeliefsModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("save_beliefs", { beliefs })),
-	importLegacy: (data: LegacyModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("import_legacy", { data })),
-	importShopping: (data: ShoppingModuleDto_Deserialize) => typedError<null, string>(__TAURI_INVOKE("import_shopping", { data })),
+	createShoppingCooldown: (itemId: string, note: string | null, hours: number | null) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("create_shopping_cooldown", { itemId, note, hours })),
+	extendShoppingCooldown: (id: string, hours: number | null) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("extend_shopping_cooldown", { id, hours })),
+	resolveShoppingCooldown: (id: string, outcome: string) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("resolve_shopping_cooldown", { id, outcome })),
 };
 
 /* Types */
@@ -357,6 +357,18 @@ export type ShoppingBoundaryEntryDto = {
 	reason: string,
 };
 
+export type ShoppingCooldownDto = {
+	id: string,
+	itemId: string,
+	itemName: string,
+	enteredAt: string,
+	releaseAt: string,
+	extendCount: number,
+	/**  pending(冷静中) | kept(还想要) | released(算了) */
+	outcome: string,
+	note?: string,
+};
+
 export type ShoppingItemChildChannelDto = ShoppingItemChildChannelDto_Serialize | ShoppingItemChildChannelDto_Deserialize;
 
 export type ShoppingItemChildChannelDto_Deserialize = {
@@ -434,6 +446,7 @@ export type ShoppingModuleDto_Deserialize = {
 	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
+	cooldowns: ShoppingCooldownDto[],
 };
 
 export type ShoppingModuleDto_Serialize = {
@@ -446,6 +459,7 @@ export type ShoppingModuleDto_Serialize = {
 	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
+	cooldowns: ShoppingCooldownDto[],
 };
 
 export type ShoppingOverviewDimensionPulseDto = {
@@ -465,6 +479,7 @@ export type ShoppingOverviewDto = {
 	totalSpotlights: number,
 	totalBoundaryEntries: number,
 	totalLifestyleCollections: number,
+	cooldownCount: number,
 	topStagePulses: ShoppingOverviewStagePulseDto[],
 	topSystemPulses: ShoppingOverviewDimensionPulseDto[],
 	topSpacePulses: ShoppingOverviewDimensionPulseDto[],

@@ -26,6 +26,7 @@ const SHOPPING_TABLES: &[&str] = &[
     "shopping_item_child_channels",
     "shopping_item_systems",
     "shopping_item_spaces",
+    "shopping_cooldowns",
     "shopping_stage_templates",
     "shopping_stage_items",
     "shopping_stage_item_tiers",

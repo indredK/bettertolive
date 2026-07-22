@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>走查 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.985 0.01 82); --fg: oklch(0.22 0.02 60); --muted: oklch(0.48 0.02 60);
+      --card: #fff; --border: oklch(0.9 0.015 82); --aside: oklch(0.965 0.015 80);
+      --primary: oklch(0.4 0.07 55); --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+    .app { height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); overflow: hidden; }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0,1fr); }
+      .nav-label, .brand-sub { display: none; }
+    }
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a.on { background: var(--primary); color: #fff; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+    .main {
+      min-width: 0; min-height: 0; display: flex; flex-direction: column;
+      padding: 14px 16px; overflow: hidden;
+    }
+    .head { flex-shrink: 0; margin-bottom: 10px; }
+    h1 { margin: 0 0 4px; font-size: 18px; }
+    .lead { margin: 0; color: var(--muted); font-size: 12px; }
+    .flow {
+      flex-shrink: 0; display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      font-size: 12px; margin-bottom: 10px;
+    }
+    .flow span { background: oklch(0.95 0.02 80); border-radius: 999px; padding: 5px 10px; }
+    .flow i { font-style: normal; color: var(--muted); }
+
+    .steps {
+      flex: 1; min-height: 0; overflow: auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-content: start;
+    }
+    @media (max-width: 900px) { .steps { grid-template-columns: 1fr; } }
+    .step {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 12px 14px; border-left: 3px solid var(--primary);
+    }
+    .step h3 { margin: 0 0 4px; font-size: 13px; }
+    .step p { margin: 0; font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .step a {
+      display: inline-block; margin-top: 8px; background: var(--primary); color: #fff;
+      border-radius: 999px; padding: 5px 10px; font-size: 11px; font-weight: 600; text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">走查</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a class="on" href="shopping-decision-flow.html"><span class="dot"></span><span class="nav-label">走查</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <h1>周日晚上想买三样</h1>
+        <p class="lead">空气炸锅、椅子、键盘 · 步骤区可滚</p>
+      </div>
+      <div class="flow">
+        <span>场景</span><i>→</i><span>阶段</span><i>→</i><span>冷静</span><i>→</i><span>空间</span>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <h3>1 · 先看场景</h3>
+          <p>厨房缺一点，桌面有点满。</p>
+          <a href="shopping-gap-map.html">场景</a>
+        </div>
+        <div class="step">
+          <h3>2 · 空气炸锅</h3>
+          <p>对上厨房 · 放进冷静室。</p>
+          <a href="shopping-cooldown.html">冷静室</a>
+        </div>
+        <div class="step">
+          <h3>3 · 椅子</h3>
+          <p>桌面满 · 先收拾或冷静。</p>
+          <a href="shopping-burden.html">空间</a>
+        </div>
+        <div class="step">
+          <h3>4 · 键盘</h3>
+          <p>偏想要 · 放几天。</p>
+          <a href="shopping-cooldown.html">冷静室</a>
+        </div>
+        <div class="step">
+          <h3>5 · 几天后</h3>
+          <p>还想要就留；不惦记就算了。</p>
+          <a href="shopping-life-structure.html">工作台</a>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

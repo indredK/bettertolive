@@ -2,8 +2,8 @@
 
 use crate::shopping::db::{chrono_now, write_tx};
 use crate::shopping::dto::{
-    ShoppingAttributeDefinitionDto, ShoppingItemDto, ShoppingModuleDto, ShoppingSpaceDefinitionDto,
-    ShoppingStageTemplateDto, WorkspaceSnapshotDto,
+    ShoppingAttributeDefinitionDto, ShoppingCooldownDto, ShoppingItemDto, ShoppingModuleDto,
+    ShoppingSpaceDefinitionDto, ShoppingStageTemplateDto, WorkspaceSnapshotDto,
 };
 use crate::shopping::models::{ItemChildChannelWriteModel, ItemChildWriteModel, PageContentRow};
 use crate::shopping::repository::ShoppingRepository;
@@ -24,6 +24,7 @@ use crate::{
     socioeconomics::commands::{get_socioeconomics, SocioeconomicsState},
 };
 use crate::{legacy::dto::LegacyModuleDto, legacy::repository::LegacyRepository};
+use chrono::{Duration as ChronoDuration, Utc};
 use std::sync::Mutex;
 use tauri::State;
 
@@ -840,6 +841,63 @@ pub fn reorder_shopping_page_contents(
     })
 }
 
+// =====================
+// 冷静室(冷却调度层)
+// =====================
+
+#[tauri::command]
+#[specta::specta]
+pub fn create_shopping_cooldown(
+    state: State<AppState>,
+    item_id: String,
+    note: Option<String>,
+    hours: Option<i32>,
+) -> Result<ShoppingCooldownDto, String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    let release_at = (Utc::now() + ChronoDuration::hours(hours.unwrap_or(72) as i64)).to_rfc3339();
+    let id = uuid::Uuid::new_v4().to_string();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::create_cooldown(
+            tx,
+            &id,
+            &item_id,
+            &now,
+            &release_at,
+            &note.unwrap_or_default(),
+            &now,
+        )
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn extend_shopping_cooldown(
+    state: State<AppState>,
+    id: String,
+    hours: Option<i32>,
+) -> Result<ShoppingCooldownDto, String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::extend_cooldown(tx, &id, hours.unwrap_or(72) as i64, &now)
+    })
+}
+
+#[tauri::command]
+#[specta::specta]
+pub fn resolve_shopping_cooldown(
+    state: State<AppState>,
+    id: String,
+    outcome: String,
+) -> Result<ShoppingCooldownDto, String> {
+    let mut conn = state.db.lock().map_err(|e| format!("Lock error: {}", e))?;
+    let now = chrono_now();
+    write_tx(&mut conn, |tx| {
+        ShoppingRepository::resolve_cooldown(tx, &id, &outcome, &now)
+    })
+}
+
 #[tauri::command]
 #[specta::specta]
 pub fn import_shopping(state: State<AppState>, data: ShoppingModuleDto) -> Result<(), String> {
@@ -880,6 +938,8 @@ pub fn import_shopping(state: State<AppState>, data: ShoppingModuleDto) -> Resul
         tx.execute("DELETE FROM shopping_attribute_definitions", [])
             .map_err(|e| e.to_string())?;
         tx.execute("DELETE FROM shopping_page_content", [])
+            .map_err(|e| e.to_string())?;
+        tx.execute("DELETE FROM shopping_cooldowns", [])
             .map_err(|e| e.to_string())?;
 
         // Re-insert system definitions
@@ -1098,6 +1158,20 @@ pub fn import_shopping(state: State<AppState>, data: ShoppingModuleDto) -> Resul
                 ],
             ).map_err(|e| e.to_string())?;
             content_sort += 1;
+        }
+
+        // Cooldowns
+        for (cd_idx, cd) in data.cooldowns.iter().enumerate() {
+            tx.execute(
+                "INSERT INTO shopping_cooldowns
+                 (id, item_id, entered_at, release_at, extend_count, outcome, note, sort_order, created_at, updated_at)
+                 VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+                rusqlite::params![
+                    cd.id, cd.item_id, cd.entered_at, cd.release_at, cd.extend_count,
+                    cd.outcome, cd.note, cd_idx as i32, cd.entered_at, cd.entered_at,
+                ],
+            )
+            .map_err(|e| e.to_string())?;
         }
 
         Ok(())

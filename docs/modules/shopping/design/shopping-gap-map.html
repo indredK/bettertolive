@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>场景 · bettertolive</title>
+  <style>
+    :root {
+      --bg: oklch(0.975 0.012 82); --fg: oklch(0.22 0.02 60); --muted: oklch(0.48 0.02 60);
+      --card: #fff; --border: oklch(0.88 0.02 80); --aside: oklch(0.965 0.015 80);
+      --primary: oklch(0.4 0.07 55); --primary-fg: #fff;
+      --red: oklch(0.58 0.14 25); --yellow: oklch(0.55 0.08 75); --green: oklch(0.5 0.08 150);
+      --sidebar-w: 240px;
+      font-family: "PingFang SC", "Hiragino Sans GB", system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; overflow: hidden; }
+    body { color: var(--fg); background: var(--bg); }
+    .app {
+      height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0,1fr); overflow: hidden;
+    }
+    @media (max-width: 960px) {
+      .app { grid-template-columns: 72px minmax(0,1fr); }
+      .nav-label, .brand-sub { display: none; }
+    }
+    .aside {
+      border-right: 1px solid var(--border); background: var(--aside);
+      padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+    }
+    .brand { font-weight: 650; font-size: 13px; }
+    .brand a { color: var(--muted); text-decoration: none; font-size: 11px; display: block; margin-bottom: 4px; }
+    .brand-sub { font-size: 11px; color: var(--muted); }
+    .nav { display: flex; flex-direction: column; gap: 3px; flex: 1; overflow: auto; }
+    .nav a {
+      display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 10px;
+      text-decoration: none; color: var(--muted); font-size: 12.5px;
+    }
+    .nav a.on { background: var(--primary); color: var(--primary-fg); }
+    .nav a:hover { background: oklch(0.94 0.03 80); color: var(--fg); }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+    .main {
+      min-width: 0; min-height: 0; display: grid;
+      grid-template-rows: auto minmax(0,1fr) auto;
+      padding: 14px 16px; overflow: hidden; gap: 10px;
+    }
+    .head h1 { margin: 2px 0; font-size: 18px; }
+    .head p { margin: 0; font-size: 12px; color: var(--muted); }
+    .eyebrow { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+
+    .map {
+      min-height: 0; position: relative; border: 1px solid var(--border); border-radius: 16px;
+      background: radial-gradient(circle at 50% 50%, oklch(0.96 0.02 80), transparent 70%), var(--card);
+    }
+    .center {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+      width: 88px; height: 88px; border-radius: 50%; background: var(--primary); color: #fff;
+      display: grid; place-items: center; text-align: center; font-size: 11px; font-weight: 650; z-index: 2;
+    }
+    .bubble {
+      position: absolute; width: 76px; height: 76px; border-radius: 50%;
+      display: grid; place-items: center; text-align: center; font-size: 11px; font-weight: 650;
+      cursor: pointer; border: 1px solid transparent; transform: translate(-50%,-50%);
+    }
+    .bubble:hover, .bubble.on { outline: 2px solid var(--primary); }
+    .bubble.red { background: oklch(0.96 0.04 25); color: var(--red); border-color: oklch(0.88 0.06 25); }
+    .bubble.yellow { background: oklch(0.97 0.04 90); color: var(--yellow); }
+    .bubble.green { background: oklch(0.96 0.03 150); color: var(--green); }
+    .bubble.gray { background: oklch(0.94 0.01 80); color: #999; }
+    .bubble small { display: block; font-size: 9px; font-weight: 600; opacity: .75; margin-top: 1px; }
+
+    .detail {
+      flex-shrink: 0; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 14px; min-height: 72px; max-height: 120px; overflow: auto;
+    }
+    .detail h2 { margin: 0 0 4px; font-size: 13px; }
+    .detail p { margin: 0; font-size: 12px; color: var(--muted); }
+    .items { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .items span {
+      font-size: 11px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="aside">
+      <div class="brand">
+        <a href="index.html">← 入口</a>
+        bettertolive
+        <div class="brand-sub">场景</div>
+      </div>
+      <nav class="nav">
+        <a href="index.html"><span class="dot"></span><span class="nav-label">入口</span></a>
+        <a href="shopping-life-structure.html"><span class="dot"></span><span class="nav-label">工作台</span></a>
+        <a class="on" href="shopping-gap-map.html"><span class="dot"></span><span class="nav-label">场景</span></a>
+        <a href="shopping-future-me.html"><span class="dot"></span><span class="nav-label">阶段</span></a>
+        <a href="shopping-cooldown.html"><span class="dot"></span><span class="nav-label">冷静室</span></a>
+        <a href="shopping-burden.html"><span class="dot"></span><span class="nav-label">空间</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <div class="head">
+        <div class="eyebrow">场景</div>
+        <h1>家里各处怎样</h1>
+        <p>点气泡 · 整页不滚动</p>
+      </div>
+      <div class="map" id="map">
+        <div class="center">独居<br />远程</div>
+      </div>
+      <div class="detail" id="detail">
+        <p style="margin:0;color:var(--muted);font-size:12px;">点场景查看</p>
+      </div>
+    </main>
+  </div>
+  <script>
+    const nodes = [
+      { name: "厨房", s: "red", label: "缺一点", angle: -20, note: "做早餐不太顺", gaps: ["空气炸锅", "密封罐", "锅铲"] },
+      { name: "桌面", s: "yellow", label: "有点满", angle: 25, note: "先收一收", gaps: ["线材收纳"] },
+      { name: "睡眠", s: "green", label: "还行", angle: 70, note: "够用", gaps: [] },
+      { name: "活动", s: "red", label: "缺一点", angle: 115, note: "几乎不练", gaps: ["瑜伽垫", "弹力带"] },
+      { name: "清洁", s: "green", label: "还行", angle: 160, note: "用完再补", gaps: [] },
+      { name: "待客", s: "yellow", label: "有点满", angle: 205, note: "杯子略多", gaps: [] },
+      { name: "玄关", s: "green", label: "还行", angle: 250, note: "进出顺", gaps: [] },
+      { name: "通勤", s: "gray", label: "用不到", angle: 295, note: "远程为主", gaps: [] },
+    ];
+    const map = document.getElementById("map");
+    nodes.forEach(n => {
+      const rad = (n.angle * Math.PI) / 180;
+      const el = document.createElement("button");
+      el.className = `bubble ${n.s}`;
+      el.style.left = `${50 + Math.cos(rad) * 36}%`;
+      el.style.top = `${50 + Math.sin(rad) * 34}%`;
+      el.innerHTML = `${n.name}<small>${n.label}</small>`;
+      el.onclick = () => {
+        document.querySelectorAll(".bubble").forEach(b => b.classList.remove("on"));
+        el.classList.add("on");
+        document.getElementById("detail").innerHTML = `
+          <h2>${n.name} · ${n.label}</h2>
+          <p>${n.note}</p>
+          <div class="items">${n.gaps.length ? n.gaps.map(g => `<span>${g}</span>`).join("") : "<span>暂时不用补</span>"}</div>
+        `;
+      };
+      map.appendChild(el);
+    });
+  </script>
+</body>
+</html>
