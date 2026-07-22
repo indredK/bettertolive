@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.4](https://github.com/indredK/bettertolive/compare/v0.4.3...v0.4.4) (2026-07-22)
+
+
+### Bug Fixes
+
+* **pre-commit:** 修复无暂存文件时的报错 ([26d39a9](https://github.com/indredK/bettertolive/commit/26d39a9e611bf328c726824e515b3a6937b5238d))
+
 ## [0.4.3](https://github.com/indredK/bettertolive/compare/v0.4.2...v0.4.3) (2026-07-06)
 
 
