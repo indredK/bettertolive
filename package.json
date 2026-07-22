@@ -24,6 +24,7 @@
     "check:rust": "cargo fmt --manifest-path src-tauri/Cargo.toml --all --check && cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --all-features -- -D warnings && cargo check --manifest-path src-tauri/Cargo.toml --all-targets --all-features",
     "generate:bindings": "cargo test --manifest-path src-tauri/Cargo.toml export_bindings -- --nocapture",
     "prepare": "husky",
+    "postinstall": "cd node_modules/typescript-eslint && bun add \"typescript@^6\"",
     "commitlint": "commitlint --edit"
   },
   "dependencies": {
