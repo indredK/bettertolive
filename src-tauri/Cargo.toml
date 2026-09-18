@@ -49,3 +49,8 @@ tauri-plugin-dialog = "2"
 tauri-plugin-updater = "2"
 base64 = "0.22"
 minisign-verify = "0.2.5"
+
+# 限制 target 目录体积：line-tables-only 保留行号表（backtrace 仍可用），
+# 相比默认全量 debuginfo 大幅减小 debug 构建体积并加快增量编译。
+[profile.dev]
+debug = "line-tables-only"
