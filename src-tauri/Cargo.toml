@@ -47,7 +47,7 @@ tauri-plugin-notification = "2"
 tauri-plugin-fs = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-updater = "2"
-base64 = "0.22"
+base64 = "0.23"
 minisign-verify = "0.2.5"
 
 # 限制 target 目录体积：line-tables-only 保留行号表（backtrace 仍可用），
