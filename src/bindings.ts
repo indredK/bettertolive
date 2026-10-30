@@ -6,39 +6,39 @@ import { invoke as __TAURI_INVOKE } from "@tauri-apps/api/core";
 export const commands = {
 	greet: (name: string) => __TAURI_INVOKE<string>("greet", { name }),
 	getBeliefs: () => typedError<BeliefsModuleDto_Serialize, string>(__TAURI_INVOKE("get_beliefs")),
-	createBeliefEntry: (form: BeliefEntryFormDto) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("create_belief_entry", { form })),
-	updateBeliefEntry: (form: BeliefEntryFormDto) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("update_belief_entry", { form })),
+	createBeliefEntry: (form: BeliefEntryFormDto_Deserialize) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("create_belief_entry", { form })),
+	updateBeliefEntry: (form: BeliefEntryFormDto_Deserialize) => typedError<BeliefEntryDto_Serialize, string>(__TAURI_INVOKE("update_belief_entry", { form })),
 	deleteBeliefEntry: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_belief_entry", { id })),
 	getLegacy: () => typedError<LegacyModuleDto_Serialize, string>(__TAURI_INVOKE("get_legacy")),
 	listLegacyItems: () => typedError<LegacyItemDto_Serialize[], string>(__TAURI_INVOKE("list_legacy_items")),
-	createLegacyItem: (form: LegacyItemFormDto) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("create_legacy_item", { form })),
-	updateLegacyItem: (form: LegacyItemFormDto) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("update_legacy_item", { form })),
+	createLegacyItem: (form: LegacyItemFormDto_Deserialize) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("create_legacy_item", { form })),
+	updateLegacyItem: (form: LegacyItemFormDto_Deserialize) => typedError<LegacyItemDto_Serialize, string>(__TAURI_INVOKE("update_legacy_item", { form })),
 	deleteLegacyItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_legacy_item", { id })),
 	getShopping: () => typedError<ShoppingModuleDto_Serialize, string>(__TAURI_INVOKE("get_shopping")),
 	listShoppingItems: () => typedError<ShoppingItemDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_items")),
-	createShoppingItem: (form: ItemFormDto) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("create_shopping_item", { form })),
-	updateShoppingItem: (form: ItemFormDto) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("update_shopping_item", { form })),
+	createShoppingItem: (form: ItemFormDto_Deserialize) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("create_shopping_item", { form })),
+	updateShoppingItem: (form: ItemFormDto_Deserialize) => typedError<ShoppingItemDto_Serialize, string>(__TAURI_INVOKE("update_shopping_item", { form })),
 	deleteShoppingItem: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_item", { id })),
 	listShoppingStageTemplates: () => typedError<ShoppingStageTemplateDto[], string>(__TAURI_INVOKE("list_shopping_stage_templates")),
-	createShoppingStageTemplate: (form: StageTemplateFormDto) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("create_shopping_stage_template", { form })),
-	updateShoppingStageTemplate: (form: StageTemplateFormDto) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("update_shopping_stage_template", { form })),
+	createShoppingStageTemplate: (form: StageTemplateFormDto_Deserialize) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("create_shopping_stage_template", { form })),
+	updateShoppingStageTemplate: (form: StageTemplateFormDto_Deserialize) => typedError<ShoppingStageTemplateDto, string>(__TAURI_INVOKE("update_shopping_stage_template", { form })),
 	deleteShoppingStageTemplate: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_stage_template", { id })),
 	reorderStageTemplates: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_stage_templates", { orderedIds })),
-	listShoppingSpaceDefinitions: () => typedError<ShoppingSpaceDefinitionDto[], string>(__TAURI_INVOKE("list_shopping_space_definitions")),
+	listShoppingSpaceDefinitions: () => typedError<ShoppingSpaceDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_space_definitions")),
 	listShoppingAttributeDefinitions: () => typedError<ShoppingAttributeDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_attribute_definitions")),
 	listShoppingAttributeDefinitionsForManagement: () => typedError<ShoppingAttributeDefinitionDto_Serialize[], string>(__TAURI_INVOKE("list_shopping_attribute_definitions_for_management")),
-	createShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("create_shopping_attribute_definition", { form })),
-	updateShoppingAttributeDefinition: (form: AttributeDefinitionFormDto) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("update_shopping_attribute_definition", { form })),
+	createShoppingAttributeDefinition: (form: AttributeDefinitionFormDto_Deserialize) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("create_shopping_attribute_definition", { form })),
+	updateShoppingAttributeDefinition: (form: AttributeDefinitionFormDto_Deserialize) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("update_shopping_attribute_definition", { form })),
 	disableShoppingAttributeDefinition: (id: string, version: number) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("disable_shopping_attribute_definition", { id, version })),
 	enableShoppingAttributeDefinition: (id: string, version: number) => typedError<ShoppingAttributeDefinitionDto_Serialize, string>(__TAURI_INVOKE("enable_shopping_attribute_definition", { id, version })),
 	reorderShoppingAttributeDefinitions: (kind: string, orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_attribute_definitions", { kind, orderedIds })),
-	createShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("create_shopping_space_definition", { form })),
-	updateShoppingSpaceDefinition: (form: SpaceDefinitionFormDto) => typedError<ShoppingSpaceDefinitionDto, string>(__TAURI_INVOKE("update_shopping_space_definition", { form })),
+	createShoppingSpaceDefinition: (form: SpaceDefinitionFormDto_Deserialize) => typedError<ShoppingSpaceDefinitionDto_Serialize, string>(__TAURI_INVOKE("create_shopping_space_definition", { form })),
+	updateShoppingSpaceDefinition: (form: SpaceDefinitionFormDto_Deserialize) => typedError<ShoppingSpaceDefinitionDto_Serialize, string>(__TAURI_INVOKE("update_shopping_space_definition", { form })),
 	deleteShoppingSpaceDefinition: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_space_definition", { id })),
 	reorderSpaceDefinitions: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_space_definitions", { orderedIds })),
-	listShoppingPageContents: (contentType: string | null) => typedError<PageContentRow[], string>(__TAURI_INVOKE("list_shopping_page_contents", { contentType })),
-	createShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("create_shopping_page_content", { form })),
-	updateShoppingPageContent: (form: PageContentFormDto) => typedError<PageContentRow, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
+	listShoppingPageContents: (contentType: string | null) => typedError<PageContentRow_Serialize[], string>(__TAURI_INVOKE("list_shopping_page_contents", { contentType })),
+	createShoppingPageContent: (form: PageContentFormDto_Deserialize) => typedError<PageContentRow_Serialize, string>(__TAURI_INVOKE("create_shopping_page_content", { form })),
+	updateShoppingPageContent: (form: PageContentFormDto_Deserialize) => typedError<PageContentRow_Serialize, string>(__TAURI_INVOKE("update_shopping_page_content", { form })),
 	deleteShoppingPageContent: (id: string) => typedError<null, string>(__TAURI_INVOKE("delete_shopping_page_content", { id })),
 	createSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("create_system_definition", { form })),
 	updateSystemDefinition: (form: SystemDefinitionFormDto) => typedError<null, string>(__TAURI_INVOKE("update_system_definition", { form })),
@@ -48,13 +48,15 @@ export const commands = {
 	assignSpaceDefinitionItems: (spaceId: string, itemIds: string[]) => typedError<null, string>(__TAURI_INVOKE("assign_space_definition_items", { spaceId, itemIds })),
 	reorderShoppingPageContents: (orderedIds: string[]) => typedError<null, string>(__TAURI_INVOKE("reorder_shopping_page_contents", { orderedIds })),
 	countItemsUsingShoppingAttribute: (kind: string, code: string) => typedError<number, string>(__TAURI_INVOKE("count_items_using_shopping_attribute", { kind, code })),
-	createShoppingCooldown: (itemId: string, note: string | null, hours: number | null) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("create_shopping_cooldown", { itemId, note, hours })),
-	extendShoppingCooldown: (id: string, hours: number | null) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("extend_shopping_cooldown", { id, hours })),
-	resolveShoppingCooldown: (id: string, outcome: string) => typedError<ShoppingCooldownDto, string>(__TAURI_INVOKE("resolve_shopping_cooldown", { id, outcome })),
+	createShoppingCooldown: (itemId: string, note: string | null, hours: number | null) => typedError<ShoppingCooldownDto_Serialize, string>(__TAURI_INVOKE("create_shopping_cooldown", { itemId, note, hours })),
+	extendShoppingCooldown: (id: string, hours: number | null) => typedError<ShoppingCooldownDto_Serialize, string>(__TAURI_INVOKE("extend_shopping_cooldown", { id, hours })),
+	resolveShoppingCooldown: (id: string, outcome: string) => typedError<ShoppingCooldownDto_Serialize, string>(__TAURI_INVOKE("resolve_shopping_cooldown", { id, outcome })),
 };
 
 /* Types */
-export type AttributeDefinitionFormDto = {
+export type AttributeDefinitionFormDto = AttributeDefinitionFormDto_Serialize | AttributeDefinitionFormDto_Deserialize;
+
+export type AttributeDefinitionFormDto_Deserialize = {
 	id?: string | null,
 	kind: string,
 	code: string,
@@ -67,6 +69,21 @@ export type AttributeDefinitionFormDto = {
 	isEnabled?: boolean,
 	/**  乐观锁版本号；更新/启停时回传读到的版本，创建时忽略 */
 	version?: number,
+};
+
+export type AttributeDefinitionFormDto_Serialize = {
+	id: string | null,
+	kind: string,
+	code: string,
+	semanticKey: string | null,
+	label: string,
+	labelEn: string | null,
+	description: string,
+	styleToken: string | null,
+	rank: number | null,
+	isEnabled: boolean,
+	/**  乐观锁版本号；更新/启停时回传读到的版本，创建时忽略 */
+	version: number,
 };
 
 export type BeliefCardDto = {
@@ -90,10 +107,10 @@ export type BeliefEntryDto_Deserialize = {
 	source: string,
 	impact: string,
 	secondaryDomains?: string[],
-	cbtLayer: string | null,
+	cbtLayer?: string | null,
 	cognitiveDistortions?: string[],
-	defenseMechanism: string | null,
-	attachmentNote: string | null,
+	defenseMechanism?: string | null,
+	attachmentNote?: string | null,
 	revisionHistory?: BeliefRevisionDto[],
 	tags?: string[],
 };
@@ -109,15 +126,17 @@ export type BeliefEntryDto_Serialize = {
 	source: string,
 	impact: string,
 	secondaryDomains?: string[],
-	cbtLayer?: string | null,
+	cbtLayer?: string,
 	cognitiveDistortions?: string[],
-	defenseMechanism?: string | null,
-	attachmentNote?: string | null,
+	defenseMechanism?: string,
+	attachmentNote?: string,
 	revisionHistory: BeliefRevisionDto[],
 	tags: string[],
 };
 
-export type BeliefEntryFormDto = {
+export type BeliefEntryFormDto = BeliefEntryFormDto_Serialize | BeliefEntryFormDto_Deserialize;
+
+export type BeliefEntryFormDto_Deserialize = {
 	id?: string | null,
 	title: string,
 	statement: string,
@@ -134,6 +153,25 @@ export type BeliefEntryFormDto = {
 	attachmentNote?: string | null,
 	revisionHistory?: BeliefRevisionDto[],
 	tags?: string[],
+};
+
+export type BeliefEntryFormDto_Serialize = {
+	id: string | null,
+	title: string,
+	statement: string,
+	description: string,
+	domain: string,
+	layer: string,
+	stability: string,
+	source: string,
+	impact: string,
+	secondaryDomains: string[],
+	cbtLayer: string | null,
+	cognitiveDistortions: string[],
+	defenseMechanism: string | null,
+	attachmentNote: string | null,
+	revisionHistory: BeliefRevisionDto[],
+	tags: string[],
 };
 
 export type BeliefRelationDto = {
@@ -169,7 +207,9 @@ export type BeliefsModuleDto_Serialize = {
 	attachmentReflection: string,
 };
 
-export type ItemChildChannelFormDto = {
+export type ItemChildChannelFormDto = ItemChildChannelFormDto_Serialize | ItemChildChannelFormDto_Deserialize;
+
+export type ItemChildChannelFormDto_Deserialize = {
 	id?: string | null,
 	channel: string,
 	entryPrice?: number | null,
@@ -177,52 +217,57 @@ export type ItemChildChannelFormDto = {
 	overpayPrice?: number | null,
 };
 
-export type ItemChildFormDto = {
+export type ItemChildChannelFormDto_Serialize = {
+	id: string | null,
+	channel: string,
+	entryPrice: number | null,
+	sweetSpotPrice: number | null,
+	overpayPrice: number | null,
+};
+
+export type ItemChildFormDto = ItemChildFormDto_Serialize | ItemChildFormDto_Deserialize;
+
+export type ItemChildFormDto_Deserialize = {
 	id?: string | null,
 	name: string,
 	status?: string | null,
 	lifecycle?: string | null,
 	depreciation?: string | null,
-	channelPrices?: ItemChildChannelFormDto[],
+	channelPrices?: ItemChildChannelFormDto_Deserialize[],
 };
 
-export type ItemFormDto = {
+export type ItemChildFormDto_Serialize = {
+	id: string | null,
+	name: string,
+	status: string | null,
+	lifecycle: string | null,
+	depreciation: string | null,
+	channelPrices: ItemChildChannelFormDto_Serialize[],
+};
+
+export type ItemFormDto = ItemFormDto_Serialize | ItemFormDto_Deserialize;
+
+export type ItemFormDto_Deserialize = {
 	id?: string | null,
 	name: string,
-	children: ItemChildFormDto[],
+	children: ItemChildFormDto_Deserialize[],
 	systemTags: string[],
 	spaceTags: string[],
 	note?: string,
 };
 
+export type ItemFormDto_Serialize = {
+	id: string | null,
+	name: string,
+	children: ItemChildFormDto_Serialize[],
+	systemTags: string[],
+	spaceTags: string[],
+	note: string,
+};
+
 export type LegacyItemDto = LegacyItemDto_Serialize | LegacyItemDto_Deserialize;
 
 export type LegacyItemDto_Deserialize = {
-	id: string,
-	title: string,
-	category: string,
-	recipient: string,
-	recipientName: string | null,
-	relatedRelationshipId: string | null,
-	urgency: string,
-	visibility: string,
-	deliveryCondition: string | null,
-	status: string,
-	emotionalLoad: string | null,
-	summary: string,
-	content: string,
-	contentPreview: string,
-	isLocked: boolean,
-	requiresSecondConfirm: boolean,
-	excludeFromAi: boolean,
-	createdAt: string,
-	updatedAt: string,
-	finalizedAt: string | null,
-	reviewCue: string,
-	tags?: string[],
-};
-
-export type LegacyItemDto_Serialize = {
 	id: string,
 	title: string,
 	category: string,
@@ -244,10 +289,37 @@ export type LegacyItemDto_Serialize = {
 	updatedAt: string,
 	finalizedAt?: string | null,
 	reviewCue: string,
+	tags?: string[],
+};
+
+export type LegacyItemDto_Serialize = {
+	id: string,
+	title: string,
+	category: string,
+	recipient: string,
+	recipientName?: string,
+	relatedRelationshipId?: string,
+	urgency: string,
+	visibility: string,
+	deliveryCondition?: string,
+	status: string,
+	emotionalLoad?: string,
+	summary: string,
+	content: string,
+	contentPreview: string,
+	isLocked: boolean,
+	requiresSecondConfirm: boolean,
+	excludeFromAi: boolean,
+	createdAt: string,
+	updatedAt: string,
+	finalizedAt?: string,
+	reviewCue: string,
 	tags: string[],
 };
 
-export type LegacyItemFormDto = {
+export type LegacyItemFormDto = LegacyItemFormDto_Serialize | LegacyItemFormDto_Deserialize;
+
+export type LegacyItemFormDto_Deserialize = {
 	id?: string | null,
 	title: string,
 	category: string,
@@ -266,6 +338,27 @@ export type LegacyItemFormDto = {
 	excludeFromAi?: boolean,
 	reviewCue?: string,
 	tags?: string[],
+};
+
+export type LegacyItemFormDto_Serialize = {
+	id: string | null,
+	title: string,
+	category: string,
+	recipient: string,
+	recipientName: string | null,
+	relatedRelationshipId: string | null,
+	urgency: string,
+	visibility: string,
+	deliveryCondition: string | null,
+	status: string,
+	emotionalLoad: string | null,
+	summary: string,
+	content: string,
+	isLocked: boolean,
+	requiresSecondConfirm: boolean,
+	excludeFromAi: boolean,
+	reviewCue: string,
+	tags: string[],
 };
 
 export type LegacyModuleDto = LegacyModuleDto_Serialize | LegacyModuleDto_Deserialize;
@@ -288,8 +381,21 @@ export type LegacyTrustBoundaryDto = {
 	detail: string,
 };
 
-export type PageContentFormDto = {
+export type PageContentFormDto = PageContentFormDto_Serialize | PageContentFormDto_Deserialize;
+
+export type PageContentFormDto_Deserialize = {
 	id?: string | null,
+	contentType: string,
+	title?: string | null,
+	stage?: string | null,
+	system?: string | null,
+	summary?: string | null,
+	reason?: string | null,
+	body: string,
+};
+
+export type PageContentFormDto_Serialize = {
+	id: string | null,
 	contentType: string,
 	title: string | null,
 	stage: string | null,
@@ -299,7 +405,24 @@ export type PageContentFormDto = {
 	body: string,
 };
 
-export type PageContentRow = {
+export type PageContentRow = PageContentRow_Serialize | PageContentRow_Deserialize;
+
+export type PageContentRow_Deserialize = {
+	id: string,
+	content_type: string,
+	title?: string | null,
+	stage?: string | null,
+	system_id?: string | null,
+	summary?: string | null,
+	reason?: string | null,
+	body_json: string,
+	sort_order: number,
+	is_enabled: boolean,
+	created_at: string,
+	updated_at: string,
+};
+
+export type PageContentRow_Serialize = {
 	id: string,
 	content_type: string,
 	title: string | null,
@@ -320,12 +443,12 @@ export type ShoppingAttributeDefinitionDto_Deserialize = {
 	id: string,
 	kind: string,
 	code: string,
-	semanticKey: string | null,
+	semanticKey?: string | null,
 	label: string,
-	labelEn: string | null,
+	labelEn?: string | null,
 	description?: string,
-	styleToken: string | null,
-	rank: number | null,
+	styleToken?: string | null,
+	rank?: number | null,
 	sortOrder: number,
 	isEnabled: boolean,
 	isSystem: boolean,
@@ -337,12 +460,12 @@ export type ShoppingAttributeDefinitionDto_Serialize = {
 	id: string,
 	kind: string,
 	code: string,
-	semanticKey?: string | null,
+	semanticKey?: string,
 	label: string,
-	labelEn?: string | null,
+	labelEn?: string,
 	description: string,
-	styleToken?: string | null,
-	rank?: number | null,
+	styleToken?: string,
+	rank?: number,
 	sortOrder: number,
 	isEnabled: boolean,
 	isSystem: boolean,
@@ -357,7 +480,9 @@ export type ShoppingBoundaryEntryDto = {
 	reason: string,
 };
 
-export type ShoppingCooldownDto = {
+export type ShoppingCooldownDto = ShoppingCooldownDto_Serialize | ShoppingCooldownDto_Deserialize;
+
+export type ShoppingCooldownDto_Deserialize = {
 	id: string,
 	itemId: string,
 	itemName: string,
@@ -369,14 +494,26 @@ export type ShoppingCooldownDto = {
 	note?: string,
 };
 
+export type ShoppingCooldownDto_Serialize = {
+	id: string,
+	itemId: string,
+	itemName: string,
+	enteredAt: string,
+	releaseAt: string,
+	extendCount: number,
+	/**  pending(冷静中) | kept(还想要) | released(算了) */
+	outcome: string,
+	note: string,
+};
+
 export type ShoppingItemChildChannelDto = ShoppingItemChildChannelDto_Serialize | ShoppingItemChildChannelDto_Deserialize;
 
 export type ShoppingItemChildChannelDto_Deserialize = {
 	id: string,
 	channel: string,
-	entryPrice: number | null,
-	sweetSpotPrice: number | null,
-	overpayPrice: number | null,
+	entryPrice?: number | null,
+	sweetSpotPrice?: number | null,
+	overpayPrice?: number | null,
 };
 
 export type ShoppingItemChildChannelDto_Serialize = {
@@ -392,18 +529,18 @@ export type ShoppingItemChildDto = ShoppingItemChildDto_Serialize | ShoppingItem
 export type ShoppingItemChildDto_Deserialize = {
 	id: string,
 	name: string,
-	status: string | null,
-	lifecycle: string | null,
-	depreciation: string | null,
+	status?: string | null,
+	lifecycle?: string | null,
+	depreciation?: string | null,
 	channelPrices?: ShoppingItemChildChannelDto_Deserialize[],
 };
 
 export type ShoppingItemChildDto_Serialize = {
 	id: string,
 	name: string,
-	status?: string | null,
-	lifecycle?: string | null,
-	depreciation?: string | null,
+	status?: string,
+	lifecycle?: string,
+	depreciation?: string,
 	channelPrices: ShoppingItemChildChannelDto_Serialize[],
 };
 
@@ -439,27 +576,27 @@ export type ShoppingModuleDto = ShoppingModuleDto_Serialize | ShoppingModuleDto_
 export type ShoppingModuleDto_Deserialize = {
 	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
-	spaceDefinitions: ShoppingSpaceDefinitionDto[],
+	spaceDefinitions: ShoppingSpaceDefinitionDto_Deserialize[],
 	attributeDefinitions: ShoppingAttributeDefinitionDto_Deserialize[],
 	spotlights: ShoppingSpotlightDto[],
 	items: ShoppingItemDto_Deserialize[],
 	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
-	cooldowns: ShoppingCooldownDto[],
+	cooldowns: ShoppingCooldownDto_Deserialize[],
 };
 
 export type ShoppingModuleDto_Serialize = {
 	overview: ShoppingOverviewDto,
 	systemDefinitions: ShoppingSystemDefinitionDto[],
-	spaceDefinitions: ShoppingSpaceDefinitionDto[],
+	spaceDefinitions: ShoppingSpaceDefinitionDto_Serialize[],
 	attributeDefinitions: ShoppingAttributeDefinitionDto_Serialize[],
 	spotlights: ShoppingSpotlightDto[],
 	items: ShoppingItemDto_Serialize[],
 	stageTemplates: ShoppingStageTemplateDto[],
 	boundaryEntries: ShoppingBoundaryEntryDto[],
 	lifestyleCollections: ShoppingLifestyleCollectionDto[],
-	cooldowns: ShoppingCooldownDto[],
+	cooldowns: ShoppingCooldownDto_Serialize[],
 };
 
 export type ShoppingOverviewDimensionPulseDto = {
@@ -491,10 +628,18 @@ export type ShoppingOverviewStagePulseDto = {
 	itemCount: number,
 };
 
-export type ShoppingSpaceDefinitionDto = {
+export type ShoppingSpaceDefinitionDto = ShoppingSpaceDefinitionDto_Serialize | ShoppingSpaceDefinitionDto_Deserialize;
+
+export type ShoppingSpaceDefinitionDto_Deserialize = {
 	id: string,
 	name: string,
 	note?: string,
+};
+
+export type ShoppingSpaceDefinitionDto_Serialize = {
+	id: string,
+	name: string,
+	note: string,
 };
 
 export type ShoppingSpotlightDto = {
@@ -535,10 +680,18 @@ export type ShoppingSystemDefinitionDto = {
 	secondaryGroups: string[],
 };
 
-export type SpaceDefinitionFormDto = {
+export type SpaceDefinitionFormDto = SpaceDefinitionFormDto_Serialize | SpaceDefinitionFormDto_Deserialize;
+
+export type SpaceDefinitionFormDto_Deserialize = {
 	id?: string | null,
 	name: string,
 	note?: string,
+};
+
+export type SpaceDefinitionFormDto_Serialize = {
+	id: string | null,
+	name: string,
+	note: string,
 };
 
 export type StageItemFormDto = {
@@ -552,13 +705,25 @@ export type StageItemTiersFormDto = {
 	up: string[],
 };
 
-export type StageTemplateFormDto = {
+export type StageTemplateFormDto = StageTemplateFormDto_Serialize | StageTemplateFormDto_Deserialize;
+
+export type StageTemplateFormDto_Deserialize = {
 	id?: string | null,
 	name: string,
 	description?: string,
 	focus?: string,
 	systemDimensionIds?: string[],
 	spaceDimensionIds?: string[],
+	items: StageItemFormDto[],
+};
+
+export type StageTemplateFormDto_Serialize = {
+	id: string | null,
+	name: string,
+	description: string,
+	focus: string,
+	systemDimensionIds: string[],
+	spaceDimensionIds: string[],
 	items: StageItemFormDto[],
 };
 

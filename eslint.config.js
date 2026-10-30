@@ -20,6 +20,7 @@ export default tseslint.config(
       "coverage",
       "dist",
       "node_modules",
+      "**/._*",
       "src/bindings.ts",
       "src-tauri/target",
       "src/routeTree.gen.ts",
